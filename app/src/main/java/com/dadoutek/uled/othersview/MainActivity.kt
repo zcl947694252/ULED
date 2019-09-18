@@ -46,9 +46,6 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
@@ -66,9 +63,13 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
-import com.telink.bluetooth.event.*
-import com.telink.bluetooth.light.*
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.event.NotificationEvent
+import com.telink.bluetooth.event.ServiceEvent
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
@@ -80,6 +81,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -260,12 +262,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         installDialog?.show()
 
-        Thread {
-            Thread.sleep(100)
+        GlobalScope.launch {
+            delay(100)
             GlobalScope.launch(Dispatchers.Main) {
                 guide3(install_device_recyclerView)
             }
-        }.start()
+        }
     }
 
     private fun showInstallDeviceDetail(describe: String) {
@@ -285,12 +287,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         search_bar.setOnClickListener(dialogOnclick)
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
-        installDialog = AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
+        installDialog = AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
-
         installDialog?.show()
     }
 
@@ -304,7 +302,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
-//                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                         startActivityForResult(intent, 0)
                     }
@@ -345,7 +342,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (clickRgb) {
                 guide3 = install_device_recyclerView.getChildAt(1)
             } else {
-//                guide3 = install_device_recyclerView.getChildAt(0)
                 guide3 = install_device_recyclerView.layoutManager!!.findViewByPosition(0)
             }
 
@@ -359,15 +355,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         return null
     }
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
+    private val INSTALL_NORMAL_LIGHT = 0
+    private val INSTALL_RGB_LIGHT = 1
+    private val INSTALL_SWITCH = 2
+    private val INSTALL_SENSOR = 3
+    private val INSTALL_CURTAIN = 4
+    private val INSTALL_CONNECTOR = 5
 
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        var intent: Intent? = null
+    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
@@ -532,9 +527,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mConnectDisposal?.dispose()
         progressBar.visibility = GONE
 
-
-
-
         try {
             this.unregisterReceiver(mReceiver)
         } catch (e: Exception) {
@@ -626,7 +618,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setConnectDeviceType(
                                             mutableListOf<Int>(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY))
                                     //连接，如断开会自动重连
-//                                    LogUtils.d("TelinkLightService.Instance().autoConnect(connectParams)")
                                     TelinkLightService.Instance().autoConnect(connectParams)
 
                                 }
@@ -637,8 +628,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                 })
                 break
             }
-
-
         }
 
         val deviceInfo = this.mApplication?.connectDevice
@@ -679,40 +668,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             LogUtils.d("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
         }
-    }
-
-
-    /**
-     * 检查是不是灯
-     */
-    private fun checkIsLight(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
-        if (info != null) {
-            when (info.reserve) {
-                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> return true
-                else -> return false
-            }
-        }
-        return true
-    }
-
-    private fun checkIsRelay(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
-        if (info != null) {
-            when (info.reserve) {
-                DeviceType.SMART_RELAY -> return true
-                else -> return false
-            }
-        }
-        return true
-    }
-
-    private fun checkIsCurtain(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
-        if (info != null) {
-            when (info.reserve) {
-                DeviceType.SMART_CURTAIN -> return true
-                else -> return false
-            }
-        }
-        return true
     }
 
     override fun onStop() {
@@ -779,110 +734,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    /**
-     * 处理[NotificationEvent.ONLINE_STATUS]事件
-     */
-    @Synchronized
-    private fun onOnlineStatusNotify(event: NotificationEvent) {
-
-        val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
-
-        notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
-
-        if (notificationInfoList.isEmpty()) {
-            LogUtils.d("notificationInfoList is empty")
-            return
-        }
-
-        for (notificationInfo: OnlineStatusNotificationParser.DeviceNotificationInfo in notificationInfoList) {
-
-            val meshAddress = notificationInfo.meshAddress
-            val brightness = notificationInfo.brightness
-            val productUUID = notificationInfo.reserve
-            val connectionStatus = notificationInfo.connectionStatus
-            if (checkIsLight(notificationInfo)) {
-                val dbLight = DBUtils.getLightByMeshAddr(meshAddress)
-                if (dbLight != null) {
-                    dbLight.connectionStatus = connectionStatus.value
-                    dbLight.updateIcon()
-                    runOnUiThread { /* deviceFragment.notifyDataSetChanged() */ }
-                } else {
-                    if (connectionStatus != ConnectionStatus.OFFLINE) {
-                        val dbLightNew = DbLight()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                        if ((productUUID and 0xff) == 0xff || (productUUID and 0xff) == 0x04) {
-                            dbLightNew?.productUUID = 0x04
-                        } else if ((productUUID and 0xff) == 0x06) {
-                            dbLightNew?.productUUID = 0x06
-                        }
-                        dbLightNew.connectionStatus = connectionStatus.value
-                        dbLightNew.updateIcon()
-                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                        dbLightNew.brightness = brightness
-                        dbLightNew.color = 0
-                        dbLightNew.colorTemperature = 0
-                        dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.unnamed)
-                        dbLightNew.macAddr = "0"
-                        DBUtils.saveLight(dbLightNew, false)
-                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
-                    }
-                }
-            }
-
-            if (checkIsRelay(notificationInfo)) {
-                val dbLight = DBUtils.getRelyByMeshAddr(meshAddress)
-                if (dbLight != null) {
-                    dbLight.connectionStatus = connectionStatus.value
-                    dbLight.updateIcon()
-                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
-                } else {
-                    if (connectionStatus != ConnectionStatus.OFFLINE) {
-                        val dbLightNew = DbConnector()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                        if ((productUUID and 0xff) == 0x05) {
-                            dbLightNew?.productUUID = 0x05
-                        }
-                        dbLightNew.connectionStatus = connectionStatus.value
-                        dbLightNew.updateIcon()
-                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                        dbLightNew.color = 0
-                        dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.unnamed)
-                        dbLightNew.macAddr = "0"
-                        DBUtils.saveConnector(dbLightNew, false)
-                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
-                    }
-                }
-            }
-
-            if (checkIsCurtain(notificationInfo)) {
-                val dbLight = DBUtils.getCurtainByMeshAddr(meshAddress)
-                if (dbLight != null) {
-                    dbLight.connectionStatus = connectionStatus.value
-                    dbLight.updateIcon()
-                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
-                } else {
-                    if (connectionStatus != ConnectionStatus.OFFLINE) {
-                        val dbLightNew = DbCurtain()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                        if ((productUUID and 0xff) == 0x10) {
-                            dbLightNew?.productUUID = 0x10
-                        }
-                        dbLightNew.setConnectionStatus(connectionStatus.value)
-                        dbLightNew.updateIcon()
-                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                        dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.unnamed)
-                        dbLightNew.macAddr = "0"
-                        DBUtils.saveCurtain(dbLightNew, false)
-                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
-                    }
-                }
-            }
-        }
-    }
-
 
     private fun onServiceConnected(event: ServiceEvent) {}
 
@@ -929,91 +780,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             else -> false
         }
     }
-
-    /**
-     * 处理扫描事件
-     *
-     * @param event
-     */
-    @Synchronized
-    private fun onLeScan(event: LeScanEvent) {
-        val mesh = this.mApplication?.mesh
-//        val meshAddress = mesh?.generateMeshAddr()
-        val deviceInfo: DeviceInfo = event.args
-
-        Thread {
-            val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
-            if (dbLight != null && dbLight.macAddr == "0") {
-                dbLight.macAddr = deviceInfo.macAddress
-                DBUtils.updateLight(dbLight)
-            }
-        }.start()
-
-        if (!isSwitch(deviceInfo.productUUID)) {
-            if (bestRSSIDevice != null) {
-                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
-                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-                    bestRSSIDevice = deviceInfo
-                }
-            } else {
-                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-                bestRSSIDevice = deviceInfo
-            }
-        }
-    }
-
-/*    */
-    /**
-     * 报错log打印
-     *//*
-    private fun onErrorReport(info: ErrorReportInfo) {
-        if (bestRSSIDevice != null) {
-//            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
-        }
-        when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        LogUtils.d("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        LogUtils.d("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        LogUtils.d("未扫到目标设备")
-                    }
-                }
-
-            }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        LogUtils.d("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        LogUtils.d("未建立物理连接")
-                    }
-                }
-//                retryConnect()
-
-            }
-            ErrorReportEvent.STATE_LOGIN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        LogUtils.d("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        LogUtils.d("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        LogUtils.d("write login data 没有收到response")
-                    }
-                }
-//                retryConnect()
-            }
-        }
-    }*/
 
     private fun onNotificationEvent(event: NotificationEvent) {
         if (!foreground) return

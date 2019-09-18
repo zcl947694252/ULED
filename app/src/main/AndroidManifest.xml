@@ -252,25 +252,23 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.RGBSettingActivity"
-            android:screenOrientation="portrait" /> <!-- <activity -->
+            android:screenOrientation="portrait" />
+        <!-- <activity -->
         <!-- android:name=".rgb.SelectColorActivity" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".rgb.RGBGradientActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".light.ScanningNightlightActivity"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name=".scene.NewSceneSetAct"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
+
         <activity
             android:name=".othersview.SelectColorAct"
-            android:theme="@style/MyDialogStyleBottom" />
-        <activity
-            android:name=".light.ConfigNightlightActivity"
-            android:screenOrientation="portrait" />
+            android:theme="@style/MyDialogStyleBottom"/>
+
         <activity
             android:name=".rgb.SetDiyColorAct"
             android:screenOrientation="portrait" />

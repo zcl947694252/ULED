@@ -3,7 +3,6 @@ package com.dadoutek.uled.connector;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.content.Intent;
@@ -103,6 +102,7 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
  * Created by hejiajun on 2018/5/21.
+ * 蓝牙接收器扫描
  */
 
 public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
@@ -124,7 +124,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
-    private Dialog loadDialog;
     //分组所含灯的缓存
     private List<DbConnector> nowLightList;
     private LayoutInflater inflater;
@@ -163,7 +162,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
         //设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_device_scanning);
+        setContentView(R.layout.activity_device_scanning_connector);
         ButterKnife.bind(this);
         initData();
         initView();
@@ -1258,6 +1257,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
      * 开始扫描
      */
     private void startScan(final int delay) {
+
         //添加进disposable，防止内存溢出.
         mDisposable.add(
                 mRxPermission.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,

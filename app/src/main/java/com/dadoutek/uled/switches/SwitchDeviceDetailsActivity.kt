@@ -73,7 +73,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
             finish()
         }
-
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
@@ -338,7 +337,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     onLogin()//判断进入那个开关设置界面
 
                     stopConnectTimer()
-                    com.blankj.utilcode.util.LogUtils.d("connected22")
+                    LogUtils.d("connected22")
                 }
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -348,7 +347,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             }
 
             LightAdapter.STATUS_CONNECTED -> {
-                com.blankj.utilcode.util.LogUtils.d("connected11")
+                LogUtils.d("connected11")
             }
         }
 

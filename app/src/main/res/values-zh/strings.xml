@@ -298,7 +298,7 @@
     <string name="one_click_reset">恢复出厂设置</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
-    <string name="tip_reset_sure">确定要将所有灯恢复出厂设置吗？</string>
+    <string name="tip_reset_sure">确定恢复所有设备(开关、传感器除外)吗？</string>
     <string name="delete_lamp_tip">有灯恢复出厂设置失败，请连接后重试</string>
     <string name="error_disconnect_tip">正在恢复出厂设置，请稍后！</string>
     <string name="scene_16_tip">最多16个场景！</string>
@@ -810,5 +810,11 @@
     <string name="please_connect_normal_light">请连接冷暖灯</string>
     <string name="please_connect_curtain">请连接窗帘</string>
     <string name="scanning_timeout">扫描超时</string>
+    <string name="reset_factory_success">恢复出厂设置成功</string>
+    <string name="please_read_carefully">请仔细阅读 %1$s</string>
+    <string name="please_sure_all_device_power_on">请确保所有设备已通电(传感器,开关除外)</string>
+    <string name="reset_factory_all_device">此操作会让所有通电设备恢复出厂设置(传感器,开关除外)</string>
+    <string name="have_question_look_notice">如有其他问题,请查看app说明</string>
+    <string name="reset_warm_red">在恢复出厂设置之后可以通过添加设备重新添加。</string>
 
 </resources>

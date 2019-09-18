@@ -5,17 +5,26 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.provider.Settings
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearLayoutManager.VERTICAL
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
@@ -38,6 +47,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -55,15 +65,21 @@ class SettingActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
-    private var cancel: Button? = null
-    private var confirm: Button? = null
+    private lateinit var cancel: Button
+    private lateinit var confirm: Button
     private lateinit var pop: PopupWindow
     private var compositeDisposable = CompositeDisposable()
+    lateinit var tvOne : TextView
+    lateinit var tvTwo : TextView
+    lateinit var tvThree: TextView
+    lateinit var hinitOne: TextView
+    lateinit var hinitTwo: TextView
+    lateinit var hinitThree: TextView
+    lateinit var readTimer: TextView
+    lateinit var cancelConfirmLy: LinearLayout
+    lateinit var cancelConfirmVertical: View
 
-
-    override fun initListener() {
-
-    }
+    override fun initListener() {}
 
     override fun initData() {
         val list = arrayListOf<SettingItemBean>()
@@ -92,27 +108,57 @@ class SettingActivity : BaseActivity() {
         }
     }
 
-    @SuppressLint("CheckResult", "SetTextI18n")
+    override fun initView() {
+        image_bluetooth.visibility = View.GONE
+        toolbar.title = getString(R.string.setting)
+        toolbar.setNavigationIcon(R.mipmap.icon_return)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
+        makePop()
+    }
+
+    @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun showSureResetDialogByApp() {
         val developMode = SharedPreferencesUtils.isDeveloperModel()
         if (!developMode)
-            Observable.intervalRange(0, 6, 0, 1, TimeUnit.SECONDS)
+            Observable.intervalRange(0, 10, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        var num = 5 - it as Long
+                        var num =9 - it as Long
                         if (num == 0L) {
-                            confirm?.isClickable = true
-                            confirm?.text = getString(R.string.btn_ok)
+                            setTimerZero()
                         } else {
-                            confirm?.isClickable = false
-                            confirm?.text = getString(R.string.btn_ok) + "(" + num + "s)"
+                            cancelConfirmVertical.backgroundColor =resources.getColor(R.color.white)
+                            cancel.isClickable = false
+                            confirm.isClickable = false
+                            readTimer.text = getString(R.string.please_read_carefully,num)
                         }
                     }
         else
             confirm?.isClickable = true
 
         pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+    }
+
+    private fun setTimerZero() {
+        readTimer.visibility = View.GONE
+        cancelConfirmLy.visibility = View.VISIBLE
+        cancelConfirmVertical.backgroundColor =resources.getColor(R.color.gray)
+        tvOne.visibility = View.INVISIBLE
+        tvTwo.visibility = View.INVISIBLE
+        tvThree.visibility = View.GONE
+        hinitOne.text = getString(R.string.tip_reset_sure)
+        hinitTwo.setTextColor(resources.getColor(R.color.red))
+        hinitTwo.textSize = 13F
+        hinitTwo.text = getString(R.string.reset_warm_red)
+
+        hinitThree.visibility = View.GONE
+        cancel.text = getString(R.string.cancel)
+        confirm.text = getString(R.string.btn_ok)
+        cancel.isClickable = true
+        confirm.isClickable = true
     }
 
     /**
@@ -195,6 +241,7 @@ class SettingActivity : BaseActivity() {
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
             override fun onNext(s: String) {
+                LogUtils.e("zcl-----------$s")
                 SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.IS_LOGIN, false)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
@@ -221,23 +268,53 @@ class SettingActivity : BaseActivity() {
         })
     }
 
-    override fun initView() {
-        image_bluetooth.visibility = View.GONE
-        toolbar.title = getString(R.string.setting)
-        toolbar.setNavigationIcon(R.mipmap.icon_return)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-        makePop()
-    }
-
     /**
      *  恢复出厂设置Popwindow
      */
     private fun makePop() {
         var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
+        tvOne  = popView.findViewById(R.id.tv_one)
+        tvTwo  = popView.findViewById(R.id.tv_two)
+        tvThree = popView.findViewById(R.id.tv_three)
+        hinitOne = popView.findViewById(R.id.hinit_one)
+        hinitTwo = popView.findViewById(R.id.hinit_two)
+        hinitThree = popView.findViewById(R.id.hinit_three)
+        readTimer = popView.findViewById(R.id.read_timer)
         cancel = popView.findViewById(R.id.btn_cancel)
         confirm = popView.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+
+        tvOne.visibility =View.VISIBLE
+        tvTwo.visibility =View.VISIBLE
+        tvThree.visibility =View.VISIBLE
+
+        hinitTwo.setTextColor(resources.getColor(R.color.gray_3))
+        hinitTwo.textSize = 16F
+
+        cancel.text=""
+        confirm.text = ""
+
+
+        var cs: ClickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                ToastUtils.showShort("11111111111111111111")
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.BLUE//设置超链接的颜色
+                ds.isUnderlineText = true
+            }
+        }
+
+        val str = getString(R.string.have_question_look_notice)
+        var ss = SpannableString(str)
+        val start: Int =if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
+        val end = str.length
+        ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        hinitThree.text = ss
+        hinitThree.movementMethod = LinkMovementMethod.getInstance()
 
         cancel?.let {
             it.setOnClickListener { PopUtil.dismiss(pop) }
@@ -253,7 +330,7 @@ class SettingActivity : BaseActivity() {
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         confirm?.isClickable = false
-        pop.isOutsideTouchable = true
+        pop.isOutsideTouchable = false
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
@@ -289,15 +366,15 @@ class SettingActivity : BaseActivity() {
         }
 
 //        if (meshAdre.size > 0) {
-            Commander.resetLights(meshAdre, {
-                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
-                syncData()
-                this@SettingActivity?.bnve?.currentItem = 0
-                null
-            }, {
-                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
-                null
-            })
+        Commander.resetLights(meshAdre, {
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            syncData()
+            this@SettingActivity?.bnve?.currentItem = 0
+            null
+        }, {
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            null
+        })
 //        }
         if (meshAdre.isEmpty()) {
             hideLoadingDialog()

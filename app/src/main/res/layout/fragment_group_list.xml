@@ -173,6 +173,12 @@
             app:layout_constraintTop_toBottomOf="@+id/view6"
             app:layout_constraintVertical_bias="0.0" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/list_groups"
+            android:background="@color/gray_e"/>
+
         <include
             android:id="@+id/dialog_pop"
             layout="@layout/popwindow_install_deive_list"

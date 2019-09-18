@@ -167,6 +167,8 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     }
 
     public boolean isLogin() {
+        if (mLightCtrl==null)
+            return false;
         return this.mLightCtrl.isLogin();
     }
 

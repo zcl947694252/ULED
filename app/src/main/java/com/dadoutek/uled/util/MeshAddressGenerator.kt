@@ -6,7 +6,7 @@ import com.telink.util.MeshUtils
 /**
  * 专门用于生成可用的Mesh地址
  */
-class MeshAddressGenerator() {
+class MeshAddressGenerator {
     var meshAddress: Int = 0
         get() {
             //field代表meshAddress这个变量
@@ -28,11 +28,10 @@ class MeshAddressGenerator() {
         addressList.addAll(curtain)
         addressList.addAll(relay)
         addressList.sortBy { it }
-        when {
-            addressList.isEmpty() -> meshAddress = MeshUtils.DEVICE_ADDRESS_MIN
+        meshAddress = when {
+            addressList.isEmpty() -> MeshUtils.DEVICE_ADDRESS_MIN
             else -> {
-//                LogUtils.d("generateMeshAddr addressList.last() = ${addressList.last()}")
-                meshAddress = addressList.last()
+                addressList.last()
             }
         }
 

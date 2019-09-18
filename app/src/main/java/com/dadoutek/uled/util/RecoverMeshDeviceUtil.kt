@@ -13,7 +13,6 @@ import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -131,13 +130,10 @@ object RecoverMeshDeviceUtil {
                     sensor.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
                     sensor.macAddr = deviceInfo.macAddress
                     DBUtils.saveSensor(sensor, false)
-                    LogUtils.d("create = $sensor" + sensor.meshAddr)
                 }
 
             }
 
-        } else {
-//            LogUtils.d("the device is exist!!!!!!!")
         }
 
         return !isExist

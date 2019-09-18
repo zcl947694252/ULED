@@ -22,21 +22,15 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -318,37 +312,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 })
     }
 
-    private fun register() {
-        MD5PassWord = md5(userPassWord)
-        NetworkFactory.getApi()
-                .register(userName, MD5PassWord, userName)
-                .compose(NetworkTransformer())
-                .flatMap {
-                    hideLoadingDialog()
-                    showLoadingDialog(getString(R.string.logging_tip))
-                    AccountModel.login(userName!!, userPassWord!!)
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<DbUser>() {
-                    override fun onNext(dbUser: DbUser) {
-
-                        //("logging: " + "登录成功")
-                        DBUtils.deleteLocalData()
-//                        ToastUtils.showLong(R.string.login_success)
-                        hideLoadingDialog()
-                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                        showLoadingDialog(getString(R.string.sync_now))
-                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                        SharedPreferencesUtils.setUserLogin(true)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        hideLoadingDialog()
-                    }
-                })
-    }
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -472,10 +435,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     }
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        if (TextUtils.isEmpty(p0.toString()))
+
+        if (TextUtils.isEmpty(p0.toString())) {
             register_completed.background = getDrawable(R.drawable.btn_rec_black_bt)
-        else
+            register_phone_line.background = getDrawable(R.drawable.line_gray)
+        } else {
             register_completed.background = getDrawable(R.drawable.btn_rec_blue_bt)
+            register_phone_line.background = getDrawable(R.drawable.line_blue)
+        }
     }
 }
 

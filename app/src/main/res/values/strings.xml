@@ -299,7 +299,7 @@
     <string name="one_click_reset">Reset all lights</string>
     <string name="reset_all_now">Restoring factory settings</string>
     <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>
-    <string name="tip_reset_sure">Confirm all lights reset？</string>
+    <string name="tip_reset_sure">Are you sure to restore all devices (except switches and sensors)?</string>
     <string name="delete_lamp_tip">There is a light reset failed, please retry after connecting</string>
     <string name="error_disconnect_tip">Factory Settings are being restored, please wait</string>
     <string name="scene_16_tip">Up to 16 Scenes!</string>
@@ -886,5 +886,11 @@
     <string name="please_connect_normal_light">Please connect the  lights</string>
     <string name="please_connect_curtain">Please connect the curtain</string>
     <string name="scanning_timeout">Scan timeout</string>
+    <string name="reset_factory_success">Factory Settings restored successfully</string>
+    <string name="please_read_carefully">Please read %1$s S carefully</string>
+    <string name="please_sure_all_device_power_on">Please ensure all devices are  powered on (except sensor, switch)</string>
+    <string name="reset_factory_all_device">This will restore factory Settings(except sensor, switch) to all powered on devices.</string>
+    <string name="have_question_look_notice">If you have any other questions, please check the app description</string>
+    <string name="reset_warm_red">It can be added again by adding devices after factory Settings have been restored.</string>
 
 </resources>

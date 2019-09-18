@@ -393,6 +393,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun initData() {
         sensorData = DBUtils.getAllSensor()
+        LogUtils.e("zcl人体本地数据----------$sensorData")
         if (sensorData.size > 0) {
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
@@ -427,7 +428,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 Observable.timer(1000, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
+                            autoConnectSensor(true)//如果是断开状态直接重连不是就断开再重连
                         }
 
                 popupWindow!!.dismiss()
@@ -444,7 +445,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 Observable.timer(1000, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            autoConnectSensor()
+                            autoConnectSensor(true)
                         }
 
                 popupWindow!!.dismiss()
@@ -461,18 +462,22 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 .setTitle(R.string.factory_reset)
                 .setView(textView)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                    TelinkLightService.Instance()?.idleMode(true)
                     isClick = RESET_SENSOR
-                    val b = TelinkLightApplication.getApp().connectDevice == null
 
+                    settingType = RESET_SENSOR
+                    autoConnectSensor(true)
+
+                    /*
+                      val b = TelinkLightApplication.getApp().connectDevice == null
                     LogUtils.e("zcl", "zcl******$b")
                     if (TelinkLightApplication.getApp().connectDevice == null) {
-                        settingType = RESET_SENSOR
-                        autoConnectSensor()
-                    } else {
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
-                        settingType = NORMAL_SENSOR
-                    }
+                             settingType = RESET_SENSOR
+                             autoConnectSensor()
+                         } else {
+                             TelinkLightService.Instance()?.idleMode(true)
+                             settingType = NORMAL_SENSOR
+                         }*/
                     popupWindow!!.dismiss()
                     progressBar_sensor.visibility = View.VISIBLE
                 }
@@ -481,18 +486,21 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 }.show()
     }
 
-    private fun autoConnectSensor() {
-        showLoadingDialog(getString(R.string.connecting))
+    private fun autoConnectSensor(b: Boolean) {
+        if (b)
+            showLoadingDialog(getString(R.string.please_wait))
         LogUtils.e("zcl开始连接")
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
-        connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
-        connectParams.setConnectMac(currentLight!!.macAddr)
-        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
-        connectParams.autoEnableNotification(true)
+        connectParams?.setMeshName(DBUtils.lastUser?.controlMeshName)
+        connectParams?.setConnectMac(currentLight?.macAddr)
+        connectParams?.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
+        connectParams?.autoEnableNotification(true)
+        connectParams?.setTimeoutSeconds(5)
         progressBar_sensor.visibility = View.VISIBLE
         //连接，如断开会自动重连
         GlobalScope.launch {
+            delay(2000)
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
     }
@@ -540,7 +548,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                      * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
-                        retryConnect()
+                        if (isClick != RESET_SENSOR)//恢复
+                            retryConnect()
+
                         LogUtils.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
                         progressBar_sensor.visibility = View.GONE
 
@@ -561,22 +571,26 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                      }
                                  }*/
                             RESET_SENSOR -> {//恢复出厂设置成功后判断灯能扫描
-                                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.reset_factory_success, Toast.LENGTH_LONG).show()
                                 DBUtils.deleteSensor(currentLight!!)
+                                hideLoadingDialog()
                                 notifyData()//重新设置传感器数量
                                 settingType = NORMAL_SENSOR
                                 if (mConnectDevice != null) {
                                     LogUtils.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                     LogUtils.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
 
-                                    if (currentLight?.meshAddr == mConnectDevice?.meshAddress)
+                                    if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
                                         GlobalScope.launch {
                                             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
                                             delay(1000)
                                             if (this@SensorDeviceDetailsActivity == null || this@SensorDeviceDetailsActivity.isDestroyed ||
                                                     this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                            } else autoConnectSensor()
+                                            } else autoConnectSensor(false)
                                         }
+                                    } else {
+                                        hideLoadingDialog()
+                                    }
                                 }
                             }
                         }
@@ -603,8 +617,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         startActivity(intent)
                     } else {
                         ToastUtils.showShort(getString(R.string.version_disabled))
+                        hideLoadingDialog()
                     }
-            }, {})
+            }, { hideLoadingDialog() })
             isClick = NORMAL_SENSOR
         }
     }
@@ -624,7 +639,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }
         isClick = NORMAL_SENSOR
         settingType = NORMAL_SENSOR
-
+        hideLoadingDialog()
         if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
             startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo)
         } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
@@ -648,7 +663,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            autoConnectSensor()
+            autoConnectSensor(true)
         } else {
             TelinkLightService.Instance().idleMode(true)
             if (!scanPb.isShown) {

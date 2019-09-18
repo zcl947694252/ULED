@@ -102,4 +102,19 @@ public class DbSensor implements Serializable {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "DbSensor{" +
+                "id=" + id +
+                ", meshAddr=" + meshAddr +
+                ", name='" + name + '\'' +
+                ", controlGroupAddr='" + controlGroupAddr + '\'' +
+                ", macAddr='" + macAddr + '\'' +
+                ", productUUID=" + productUUID +
+                ", index=" + index +
+                ", belongGroupId=" + belongGroupId +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

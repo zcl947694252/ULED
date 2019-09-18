@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eeeeee"
     android:orientation="vertical">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@mipmap/top_back">
+        android:background="@drawable/top_back">
 
         <ImageView
             android:id="@+id/userIcon"
@@ -20,7 +19,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@mipmap/ic_launcher"
+            android:background="@drawable/ic_launcher"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -54,56 +53,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/gray_e"
         android:orientation="vertical">
-
-        <RelativeLayout
-            android:id="@+id/updateIte"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/btn_rectangle_top"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:text="@string/update_ite"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0.8dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:background="@color/gray" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/copyDataBase"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/btn_rectangle_all"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:text="@string/copy_data_base"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-        </RelativeLayout>
-
         <LinearLayout
             android:id="@+id/resetAllGroup"
             android:layout_width="match_parent"
@@ -245,45 +196,6 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/account_number"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:background="@color/white"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:visibility="gone">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="11dp"
-                android:src="@drawable/icon_account_management" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="38dp"
-                android:text="@string/account_management"
-                android:textColor="@color/black_e"
-                android:textSize="13sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:background="@color/background_color" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="23dp"
-                android:src="@drawable/icon_arrow" />
-
-        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/rlRegion"
@@ -549,12 +461,13 @@
             android:layout_weight="1"
             android:background="@color/background_color" />
 
-        <Button
+        <TextView
             android:id="@+id/exitLogin"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_40"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/dp_10"
             android:background="@color/white"
             android:text="@string/exit_login"
             android:textColor="@color/blue_background"

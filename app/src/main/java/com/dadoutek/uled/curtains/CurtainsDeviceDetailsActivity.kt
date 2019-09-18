@@ -21,7 +21,6 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
@@ -69,6 +68,9 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
+/**
+ * 窗帘
+ */
 
 class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<String> ,View.OnClickListener{
 

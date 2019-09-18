@@ -1,17 +1,13 @@
 package com.dadoutek.uled.fragment
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.content.*
 import android.content.Context.POWER_SERVICE
-import android.content.pm.PackageManager
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.*
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -44,6 +40,10 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
 import com.dadoutek.uled.util.*
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.Event
+import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -58,7 +58,9 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(), View.OnClickListener {
+class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
+
+
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
@@ -71,6 +73,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private var compositeDisposable = CompositeDisposable()
     private var mWakeLock: PowerManager.WakeLock? = null
     var b: Boolean = false
+    private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
 
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
@@ -93,7 +96,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
-            //(msg)
             ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
@@ -116,19 +118,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
-
-/*    private fun registerBluetoothReceiver() {
-        if (mReceive == null) {
-            mReceive = BluetoothStateBroadcastReceive()
-        }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
-        activity?.registerReceiver(mReceive, intentFilter)
-    }*/
 
 
     private val allLights: List<DbLight>
@@ -165,17 +154,17 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             return lightList
         }
 
-    internal var mHints = LongArray(6)//初始全部为0
+    private var mHints = LongArray(6)//初始全部为0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (Build.BRAND.contains("Huawei")) {
-            sleepTime = 500
+        sleepTime = if (Build.BRAND.contains("Huawei")) {
+            500
         } else {
-            sleepTime = 200
+            200
         }
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
-//        registerBluetoothReceiver()
+        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -189,7 +178,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
         initClick()
-//        rlRegion?.visibility= View.GONE
         val pm = activity!!.getSystemService(POWER_SERVICE) as PowerManager
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, "DPA")
     }
@@ -207,28 +195,14 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
-//        unregisterBluetoothReceiver()
     }
 
-/*
-    private fun unregisterBluetoothReceiver() {
-        if (mReceive != null) {
-            activity?.unregisterReceiver(mReceive)
-            mReceive = null
-        }
-    }
-*/
-
-    fun initClick() {
+    private fun initClick() {
         chearCache?.setOnClickListener(this)
-        updateIte?.setOnClickListener(this)
-        copyDataBase?.setOnClickListener(this)
         appVersion?.setOnClickListener(this)
         exitLogin?.setOnClickListener(this)
-        oneClickBackup?.setOnClickListener(this)
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
-        resetAllGroup?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
@@ -238,10 +212,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private fun initView(view: View) {
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
-        //暂时屏蔽
-        updateIte!!.visibility = View.GONE
 
-        userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
+
+        userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
 
@@ -249,7 +222,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun makePop() {
-        //todo 恢复出厂设置
+        // 恢复出厂设置
         var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
         cancel = popView.findViewById(R.id.btn_cancel)
         confirm = popView.findViewById(R.id.btn_confirm)
@@ -289,66 +262,14 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-/*
-    inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-            when (action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    if (bluetooth_image != null) {
-                        bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
-                        bluetooth_image.isEnabled = false
-                    }
-                }
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    if (bluetooth_image != null) {
-                        bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                        bluetooth_image.isEnabled = true
-                        bluetooth_image.setOnClickListener {
-                            var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                            dialog.show()
-                        }
-                    }
-                }
-                BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
-                        BluetoothAdapter.STATE_OFF -> {
-                            if (bluetooth_image != null) {
-                                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                                bluetooth_image.isEnabled = true
-                                bluetooth_image.setOnClickListener {
-                                    var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                                    dialog.show()
-                                }
-                            }
-                        }
-                        BluetoothAdapter.STATE_ON -> {
-                            if (bluetooth_image != null) {
-                                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                                bluetooth_image.isEnabled = false
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.chearCache -> emptyTheCache()
-            R.id.updateIte -> ToastUtils.showShort(R.string.wait_develop)
-            R.id.copyDataBase -> verifyStoragePermissions(activity)
             R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
-            R.id.oneClickBackup -> checkNetworkAndSync(activity)
             R.id.oneClickReset -> showSureResetDialogByApp()
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
 //            R.id.showGuideAgain -> showGuideAgainFun()
-//            R.id.resetAllGroup -> gotoResetAllGroup()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
@@ -406,19 +327,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
-        /*val builder = AlertDialog.Builder(activity)
-        builder.setTitle(R.string.tip_reset_sure)
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
 
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-            if (TelinkLightApplication.getApp().connectDevice != null)
-                resetAllLight()
-            else {
-                ToastUtils.showShort(R.string.device_not_connected)
-            }
-        }
-        val dialog = builder.create()
-        dialog.show()*/
     }
 
 
@@ -501,7 +410,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     restartApplication()
                 }
                 hideLoadingDialog()
-                Log.e("zcl", "zcl******推出上传其区域数据"+(it.id.toString() == it.last_authorizer_user_id))
+                Log.e("zcl", "zcl******推出上传其区域数据" + (it.id.toString() == it.last_authorizer_user_id))
             } else {
                 checkNetworkAndSync(activity)
             }
@@ -602,26 +511,31 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         ActivityUtils.startActivity(SplashActivity::class.java)
     }
 
-    companion object {
+    override fun performed(event: Event<String>?) {
+        when (event?.type) {
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+        }
+    }
 
-        private val REQUEST_EXTERNAL_STORAGE = 1
-        private val PERMISSIONS_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        fun verifyStoragePermissions(activity: Activity?) {
-            // Check if we have write permission
-            val permission = ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    fun onDeviceStatusChanged(event: DeviceEvent) {
+        val deviceInfo = event.args
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                //ToastUtils.showLong(getString(R.string.connect_success))
+                changeDisplayImgOnToolbar(true)
+                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
+                bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                changeDisplayImgOnToolbar(false)
+                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
 
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                // We don't have permission so prompt the user
-                ActivityCompat.requestPermissions(
-                        activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE
-                )
-            } else {
-                DBManager.getInstance().copyDatabaseToSDCard(activity)
-                ToastUtils.showShort(R.string.copy_complete)
+            }
+
+            LightAdapter.STATUS_CONNECTING -> {
+               // ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
-
-        private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
     }
 }

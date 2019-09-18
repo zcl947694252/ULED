@@ -17,6 +17,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -36,7 +37,6 @@ import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
 import com.dadoutek.uled.region.adapter.AreaItemAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -126,7 +126,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         toolbarTv.text = getString(R.string.area)
         img_function1.visibility = View.VISIBLE
         image_bluetooth.visibility = View.VISIBLE
-        image_bluetooth.setImageResource(R.mipmap.icon_scanning)
+        image_bluetooth.setImageResource(R.drawable.icon_scanning)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
     }
@@ -264,11 +264,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     private fun setMoreArr(isAll: Boolean, more_tv: TextView, more_arr: ImageView) {
         if (isAll) {
-            more_arr.setImageResource(R.mipmap.icon_on)
+            more_arr.setImageResource(R.drawable.icon_on)
             more_tv.text = getString(R.string.pick_up)
         } else {
             more_tv.text = getString(R.string.see_more)
-            more_arr.setImageResource(R.mipmap.icon_under)
+            more_arr.setImageResource(R.drawable.icon_under)
         }
     }
 
@@ -349,11 +349,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             if (lastUser!!.last_authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
                     && lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
                 it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
             } else {
                 it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
             }
         }
@@ -458,6 +458,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         RegionModel.removeTransferCode()!!.subscribe {
                             //设置二维码失效状态 倒计时颜色状态
                             LogUtils.e("zcl取消移交码成功")
+                            transfer_account_tv.text =getString(R.string.transfer_accounts)
                             setCancel()
                         }
                     }
@@ -492,7 +493,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
             it.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
             it.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
-            it.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_revoked)
+            it.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.drawable.icon_revoked)
             it.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
             it.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
 
@@ -514,7 +515,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
 
     private fun setQR(it: String) {
-        var mBitmap = CodeUtils.createImage(it, DensityUtil.dip2px(this, 231f), DensityUtil.dip2px(this, 231f), null)
+        var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px( 231f),  ConvertUtils.dp2px( 231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
         view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = lastUser?.phone
     }
@@ -524,7 +525,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         mCompositeDisposable.clear()
         if (expire > 0) {
             isRefresh = false//有时间就不是刷新状态
-            view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.mipmap.icon_code)
+            view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.drawable.icon_code)
             view?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
             view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.black_three)
             view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.VISIBLE
@@ -568,7 +569,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun setRefreshState() {
         //设置二维码失效状态 倒计时颜色状态
-        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_invalid)
+        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.drawable.icon_invalid)
         view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
         view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
         //设置取消二维码变为刷新状态
@@ -666,7 +667,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
             } else {
                 itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete_bb)
                 itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
             }
 
@@ -677,10 +678,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
             if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
                 itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
-                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
+                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
             } else {
                 itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
+                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
             }
 
             itView.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
@@ -699,7 +700,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 isRefresh = mExpire <= 0 //过期或者撤销需要刷新
 
                 if (mExpire > 0) {
-                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
+                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_code)
                     itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
                 } else {
                     itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
@@ -792,7 +793,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGets)
 
             view?.findViewById<LinearLayout>(R.id.pop_unbind_net_ly)?.isClickable = false
-            view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.mipmap.icon_untied)
+            view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.drawable.icon_untied)
 
             isShowType = 3
         }

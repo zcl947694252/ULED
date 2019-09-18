@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/toolbar_delete_group"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:orderInCategory="1"
         android:title="@string/delete_group"
         app:showAsAction="never" />

@@ -39,10 +39,10 @@ import com.telink.util.Strings
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
+import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -65,28 +65,16 @@ private const val MAX_RETRY_CONNECT_TIME = 1
  */
 class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private var isSeachedDevice: Boolean = false
     private var connectDisposable: Disposable? = null
-
     private lateinit var mApplication: TelinkLightApplication
-
-    private val mDisposable = CompositeDisposable()
-
     private var mRxPermission: RxPermissions? = null
-
-    private var localVersion: String? = null
-
-
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private var mScanTimeoutDisposal: Disposable? = null
-
     private var mConnectDisposal: Disposable? = null
-
     private var retryConnectCount = 0
-
-    private var isSupportInstallOldDevice=false
+    private var isSupportInstallOldDevice = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,7 +91,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun readyConnection() {
-        val b =TelinkLightService.Instance()!=null&& !TelinkLightService.Instance()!!.isLogin
+        val b = TelinkLightService.Instance() != null && !TelinkLightService.Instance()!!.isLogin
         mIntervalCheckConnection = Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -111,11 +99,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     if (b || it > 10) {
                         onInited()
                     }
-                },{})
+                }, {})
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-
     }
 
 
@@ -133,28 +120,35 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var mIsInited: Boolean = false
 
     private fun initView() {
-        mIsInited = false;
-        content.visibility = View.INVISIBLE
+        mIsInited = false
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.switch_title)
+        scanning_device_ly.visibility = View.GONE
     }
 
     private fun initListener() {
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
-        progressBtn.onClick {
-            retryConnectCount = 0
-            isSupportInstallOldDevice=false
-            progressOldBtn.progress=0
-            startScan()
+
+        device_stop_scan.setOnClickListener {
+            if (!isSeachedDevice)
+                scanFail()
+            else
+                ToastUtils.showShort(getString(R.string.connecting_tip))
         }
 
-        progressOldBtn.onClick {
+        progressBtn.onClick {
             retryConnectCount = 0
-            isSupportInstallOldDevice=true
-            progressBtn.progress=0
+            isSupportInstallOldDevice = false
             startScan()
         }
+    }
+
+    //扫描失败处理方法
+    private fun scanFail() {
+        showToast(getString(R.string.scan_end))
+        closeAnimation()
+        stopConnectTimer()
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {
@@ -186,6 +180,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
+        startAnimation()
         LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
@@ -207,7 +202,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     params.setScanFilters(getScanFilters())
                 }
                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                if(isSupportInstallOldDevice){
+                if (isSupportInstallOldDevice) {
                     params.setMeshName(DBUtils.lastUser?.controlMeshName)
                     params.setOutOfMeshName(DBUtils.lastUser?.controlMeshName)
                 }
@@ -219,15 +214,24 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 startCheckRSSITimer()
                 TelinkLightService.Instance()?.startScan(params)
-                if(isSupportInstallOldDevice){
-                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }else{
-                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }
+
+                progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
             }
-        },{})
+        }, {})
+    }
+
+    private fun startAnimation() {
+        scanning_device_ly.visibility = View.VISIBLE
+        switch_add_device_btn.visibility = View.GONE
+        device_lottieAnimationView.playAnimation()
+        isSeachedDevice = false
+    }
+
+    private fun closeAnimation() {
+        scanning_device_ly.visibility = View.GONE
+        switch_add_device_btn.visibility = View.VISIBLE
+        device_lottieAnimationView.cancelAnimation()
     }
 
     private fun startCheckRSSITimer() {
@@ -261,7 +265,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onResume() {
         super.onResume()
         progressBtn.progress = 0
-        progressOldBtn.progress=0
+        disableConnectionStatusListener()//停止base内部的设备变化监听 不让其自动创建对象否则会重复
     }
 
     override fun onPause() {
@@ -280,6 +284,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
+                closeAnimation()
             }
         }
     }
@@ -289,13 +294,13 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       LogUtils.e("蓝牙未开启")
+                        LogUtils.e("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       LogUtils.e("无法收到广播包以及响应包")
+                        LogUtils.e("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       LogUtils.e("未扫到目标设备")
+                        LogUtils.e("未扫到目标设备")
                     }
                 }
 
@@ -303,10 +308,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       LogUtils.e("未读到att表")
+                        LogUtils.e("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                       LogUtils.e("未建立物理连接")
+                        LogUtils.e("未建立物理连接")
 
                     }
                 }
@@ -316,16 +321,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                       LogUtils.e("value check失败： 密码错误")
+                        LogUtils.e("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       LogUtils.e("read login data 没有收到response")
+                        LogUtils.e("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       LogUtils.e("write login data 没有收到response")
+                        LogUtils.e("write login data 没有收到response")
                     }
                 }
-               LogUtils.e("onError login")
+                LogUtils.e("onError login")
                 retryConnect()
 
             }
@@ -335,13 +340,9 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onLeScanTimeout() {
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
-                if(isSupportInstallOldDevice){
-                    progressOldBtn.progress = -1   //控件显示Error状态
-                    progressOldBtn.text = getString(R.string.not_found_switch)
-                }else{
-                    progressBtn.progress = -1   //控件显示Error状态
-                    progressBtn.text = getString(R.string.not_found_switch)
-                }
+
+            progressBtn.progress = -1   //控件显示Error状态
+            progressBtn.text = getString(R.string.not_found_switch)
         }
     }
 
@@ -351,7 +352,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mDeviceMeshName = deviceInfo.meshName
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
-
                 onLogin()
                 stopConnectTimer()
             }
@@ -373,12 +373,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onInited() {
         mIntervalCheckConnection?.dispose()
         mIsInited = true
-        content.visibility = View.VISIBLE
-        pb.visibility = View.GONE
-
     }
 
     private fun login() {
+        isSeachedDevice = false
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
 
@@ -398,45 +396,28 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
 
-            if(isSupportInstallOldDevice){
-                progressOldBtn.progress = 100  //进度控件显示成完成状态
-            }else{
-                progressBtn.progress = 100  //进度控件显示成完成状态
-            }
+        progressBtn.progress = 100  //进度控件显示成完成状态
 
-
-        if(isSupportInstallOldDevice){
-            if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                    bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
-            } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
-            } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
-            }
-        }else{
-            if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                    bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-            } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-            }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-            }
+        closeAnimation()
+        hideLoadingDialog()
+        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         }
     }
 
 
     private fun showConnectFailed() {
+        hideLoadingDialog()
         mApplication.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
-            if(isSupportInstallOldDevice){
-                progressOldBtn.progress = -1    //控件显示Error状态
-                progressOldBtn.text = getString(R.string.connect_failed)
-            }else{
-                progressBtn.progress = -1    //控件显示Error状态
-                progressBtn.text = getString(R.string.connect_failed)
-            }
+
+        progressBtn.progress = -1    //控件显示Error状态
+        progressBtn.text = getString(R.string.connect_failed)
     }
 
     @SuppressLint("CheckResult")
@@ -445,6 +426,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 Manifest.permission.BLUETOOTH_ADMIN)
                 .subscribe {
                     if (it) {
+                        showLoadingDialog(getString(R.string.connecting))
+                        closeAnimation()
+                        switch_add_device_btn.visibility = View.GONE
+                        isSeachedDevice = true
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
                             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
@@ -452,11 +437,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                             TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
-                                if(isSupportInstallOldDevice){
-                                    progressOldBtn.text = getString(R.string.connecting)
-                                }else{
-                                    progressBtn.text = getString(R.string.connecting)
-                                }
+                            progressBtn.text = getString(R.string.connecting)
                         }
                     } else {
                         //没有授予权限
@@ -467,14 +448,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun stopConnectTimer() {
         mConnectDisposal?.dispose()
+        progressBtn.progress = 0
     }
 
     private fun startConnectTimer() {
+        isSeachedDevice = false
         mConnectDisposal?.dispose()
         mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ retryConnect() },{})
+                .subscribe({ retryConnect() }, {})
     }
 
     /**
@@ -499,6 +482,8 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        closeAnimation()
+        hideLoadingDialog()
     }
 
 
@@ -514,14 +499,14 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             return
         }
         when (leScanEvent.args.productUUID) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.SMART_CURTAIN_SWITCH -> {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
                 val MAX_RSSI = 81
                 if (leScanEvent.args.rssi < MAX_RSSI) {
 
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                           LogUtils.e("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                            LogUtils.e("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                             bestRSSIDevice = deviceInfo
                         }
                     } else {

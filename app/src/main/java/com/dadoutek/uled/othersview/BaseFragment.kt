@@ -75,7 +75,7 @@ open class BaseFragment : Fragment() {
      * 改变Toolbar上的图片和状态
      * @param isConnected       是否是连接状态
      */
-    private fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+    open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         if (isConnected) {
             if (toolbar != null) {
 
@@ -125,7 +125,6 @@ open class BaseFragment : Fragment() {
 
                 val connectDevice = TelinkLightApplication.getApp()?.connectDevice
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
-
             }
             LightAdapter.STATUS_LOGOUT -> {
                 changeDisplayImgOnToolbar(false)

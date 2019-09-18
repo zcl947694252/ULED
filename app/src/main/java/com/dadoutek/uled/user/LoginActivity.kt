@@ -195,10 +195,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             val messge = info.split("-")
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_blue)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
         } else{
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_gray)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
         }
     }
@@ -324,7 +324,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         currentUser = phoneList?.get(position)
         if (view.id == R.id.phone_text) {
             edit_user_phone_or_email!!.setText(currentUser!!.phone)
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_blue)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(currentUser!!.password)
             edit_user_password!!.visibility = View.GONE
             list_phone.visibility = View.GONE
@@ -348,14 +348,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (info != null && !info.isEmpty()) {
             message = info.split("-")
             edit_user_phone_or_email.setText(message[0])
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_blue)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(message[1])
             edit_user_password!!.visibility = View.GONE
         }
         if (currentUser!!.phone == message!![0]) {
             SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
             edit_user_phone_or_email!!.setText("")
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_gray)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
             edit_user_password!!.setText("")
             list_phone.visibility = View.GONE
             edit_user_password.visibility = View.GONE
@@ -515,9 +515,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     override fun afterTextChanged(p0: Editable?) {
         if (TextUtils.isEmpty(p0.toString())) {
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_gray)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
         } else {
-            edit_user_phone_or_email_line.background = getDrawable(R.mipmap.line_blue)
+            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
         }
     }

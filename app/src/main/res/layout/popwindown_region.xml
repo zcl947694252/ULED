@@ -157,7 +157,7 @@
                     android:id="@+id/pop_unbind_net"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
-                    android:src="@mipmap/icon_untied_b" />
+                    android:src="@drawable/icon_untied_b" />
 
 
                 <TextView
@@ -197,7 +197,7 @@
                     android:id="@+id/pop_delete_net"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
-                    android:src="@mipmap/icon_delete_bb" />
+                    android:src="@drawable/icon_delete_bb" />
 
                 <TextView
                     android:layout_width="wrap_content"

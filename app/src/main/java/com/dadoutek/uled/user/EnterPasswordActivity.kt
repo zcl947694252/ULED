@@ -21,7 +21,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
-import com.blankj.utilcode.util.*
+import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -114,8 +116,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initViewType() {
         dbUser = DbUser()
         when (type) {
-            Constant.TYPE_FORGET_PASSWORD -> {
-            }
+            Constant.TYPE_FORGET_PASSWORD -> { }
 
             Constant.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
 
@@ -133,7 +134,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                 edit_user_password.setText(s)
                 edit_user_password.setSelection(s.length)
                 btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
-                edit_user_password_line.background = getDrawable(R.mipmap.line_blue)
+                edit_user_password_line.background = getDrawable(R.drawable.line_blue)
             }
         }
     }
@@ -378,9 +379,9 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     override fun afterTextChanged(p0: Editable?) {
         if (TextUtils.isEmpty(p0.toString())) {
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
-            edit_user_password_line.background = getDrawable(R.mipmap.line_gray)
+            edit_user_password_line.background = getDrawable(R.drawable.line_gray)
         } else {
-            edit_user_password_line.background = getDrawable(R.mipmap.line_blue)
+            edit_user_password_line.background = getDrawable(R.drawable.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
         }
     }

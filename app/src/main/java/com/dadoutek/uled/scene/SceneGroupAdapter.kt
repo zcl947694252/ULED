@@ -20,6 +20,9 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -82,8 +85,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             dotRgb.visibility = View.GONE
             (0x00ff0000 shl 8) or (item.color and 0xffffff)
         })
-        Log.e("zcl", "zclSceneGroupAdapter*****************${0xff0000 shl 8}*****************" + { item.color and 0xffffff })
-
 
         helper.setText(R.id.name_gp, item.gpName)
 
@@ -141,15 +142,19 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 lessBrightnessCW!!.isEnabled = true
             }
 
-            if (item.temperature <= 0) {
-                addTemperatureCW!!.isEnabled = true
-                lessTemperatureCW!!.isEnabled = false
-            } else if (item.temperature >= 100) {
-                addTemperatureCW!!.isEnabled = false
-                lessTemperatureCW!!.isEnabled = true
-            } else {
-                addTemperatureCW!!.isEnabled = true
-                lessTemperatureCW!!.isEnabled = true
+            when {
+                item.temperature <= 0 -> {
+                    addTemperatureCW!!.isEnabled = true
+                    lessTemperatureCW!!.isEnabled = false
+                }
+                item.temperature >= 100 -> {
+                    addTemperatureCW!!.isEnabled = false
+                    lessTemperatureCW!!.isEnabled = true
+                }
+                else -> {
+                    addTemperatureCW!!.isEnabled = true
+                    lessTemperatureCW!!.isEnabled = true
+                }
             }
         }
 
@@ -266,7 +271,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun lessRGBWhiteLight(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -281,7 +285,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             whiteLight_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -307,11 +311,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun addRGBWhiteLight(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+            GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -322,16 +324,16 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             whiteLight_adds.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
 
                         }
                     }
-                }
+
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -348,7 +350,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun lessRGBBrightness(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -363,7 +364,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             brightness_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -389,7 +390,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun addRGBBrightness(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -404,7 +404,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             brightness_add.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -430,7 +430,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun lessTemperature(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -445,7 +444,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             handler_temperature_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -471,7 +470,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun addTemperature(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -486,7 +484,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             handler_temperature_add.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -512,7 +510,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun lessBrightness(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -527,7 +524,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             handler_brightness_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -553,7 +550,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun addBrightness(event: MotionEvent?, position: Int) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             val t = object : Thread() {
@@ -568,7 +564,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             handler_brightness_add.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                sleep(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
@@ -614,24 +610,28 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             seekBar!!.progress++
 
-            if (seekBar!!.progress > 100) {
-                addImage!!.isEnabled = false
-                onBtnTouch = false
-            } else if (seekBar!!.progress == 100) {
-                addImage!!.isEnabled = false
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
-                onBtnTouch = false
-                itemGroup.brightness = seekBar!!.progress
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-            } else {
-                addImage!!.isEnabled = true
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
-                itemGroup.brightness = seekBar!!.progress
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+            when {
+                seekBar!!.progress > 100 -> {
+                    addImage!!.isEnabled = false
+                    onBtnTouch = false
+                }
+                seekBar!!.progress == 100 -> {
+                    addImage!!.isEnabled = false
+                    brightnText!!.text = seekBar!!.progress.toString() + "%"
+                    onBtnTouch = false
+                    itemGroup.brightness = seekBar!!.progress
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+                else -> {
+                    addImage!!.isEnabled = true
+                    brightnText!!.text = seekBar!!.progress.toString() + "%"
+                    itemGroup.brightness = seekBar!!.progress
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
             }
 
             if (seekBar!!.progress > 0) {
@@ -857,24 +857,28 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             val itemGroup = data[pos]
             var params: ByteArray
 
-            if (seekBar!!.progress < 0) {
-                lessImage!!.isEnabled = false
-                onBtnTouch = false
-            } else if (seekBar!!.progress == 0) {
-                lessImage!!.isEnabled = false
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
-                onBtnTouch = false
-                itemGroup.brightness = seekBar!!.progress
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-            } else {
-                lessImage!!.isEnabled = true
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
-                itemGroup.brightness = seekBar!!.progress
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+            when {
+                seekBar!!.progress < 0 -> {
+                    lessImage!!.isEnabled = false
+                    onBtnTouch = false
+                }
+                seekBar!!.progress == 0 -> {
+                    lessImage!!.isEnabled = false
+                    brightnText!!.text = seekBar!!.progress.toString() + "%"
+                    onBtnTouch = false
+                    itemGroup.brightness = seekBar!!.progress
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+                else -> {
+                    lessImage!!.isEnabled = true
+                    brightnText!!.text = seekBar!!.progress.toString() + "%"
+                    itemGroup.brightness = seekBar!!.progress
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
             }
 
             if (seekBar!!.progress < 100) {
@@ -1090,6 +1094,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         notifyItemChanged(seekBar.tag as Int)
     }
 
+    @SuppressLint("SetTextI18n")
     fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
         if (seekBar.id == R.id.cw_sbBrightness) {
             val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?

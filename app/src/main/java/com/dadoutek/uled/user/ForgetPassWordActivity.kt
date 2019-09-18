@@ -54,7 +54,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         image_return.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
 
-        register_completed.addTextChangedListener(this)
+        edit_user_phone.addTextChangedListener(this)
         if (isChangePwd) {
             dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
@@ -139,9 +139,12 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        if (TextUtils.isEmpty(p0.toString()))
+        if (TextUtils.isEmpty(p0.toString())) {
             register_completed.background = getDrawable(R.drawable.btn_rec_black_bt)
-        else
+            register_phone_line.background = getDrawable(R.drawable.line_gray)
+        } else {
+            register_phone_line.background = getDrawable(R.drawable.line_blue)
             register_completed.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        }
     }
 }

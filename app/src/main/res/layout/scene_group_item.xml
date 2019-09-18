@@ -71,6 +71,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:max="100"
+            android:min="1"
             android:progress="50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tvBrightness"
@@ -116,6 +117,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:max="100"
+            android:min="1"
             android:progress="50"
             app:layout_constraintEnd_toStartOf="@+id/tvTemperature"
             app:layout_constraintStart_toEndOf="@+id/imageView5" />

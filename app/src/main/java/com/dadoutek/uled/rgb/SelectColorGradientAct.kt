@@ -22,6 +22,9 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import top.defaults.colorpicker.ColorObserver
 
 class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
@@ -227,17 +230,15 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         color_g?.text = g.toString()
         color_b?.text = b.toString()
         var w = sb_w_bright.progress
-//
+        if (w <= 0) w = 1
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-//        val color = presetColors?.get(position)?.color
-//        var brightness = light!!.brightness
+
         var ws = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-        val showBrightness = w
         var showW = ws
         Thread {
 
@@ -254,48 +255,12 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     showW = 0
                 }
 
-                var addr = 0
-//                if (currentShowGroupSetPage) {
-//                    addr = group?.meshAddr!!
-//                } else {
-//                    addr = light?.meshAddr!!
-//                }
-
-                val opcode = Opcode.SET_TEMPERATURE
-
-                val paramsW: ByteArray = byteArrayOf(ws.toByte())
-                val params: ByteArray = byteArrayOf(w!!.toByte())
-
-//                Thread.sleep(80)
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
-
                 Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
-
-//                if (currentShowGroupSetPage) {
-//                    group?.brightness = showBrightness!!
-//                    group?.color = color
-//                } else {
-//                    light?.brightness = showBrightness!!
-//                    light?.color = color
-//                }
-
-//               //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
         }.start()
-
-//        sbBrightness?.progress = showBrightness!!
-//        sb_w_bright_num.text = showBrightness.toString() + "%"
-//        if (w != -1) {
-//            sb_w_bright_num.text = showW.toString() + "%"
-//            sb_w_bright.progress = showW
-//        } else {
-//            sb_w_bright_num.text = "0%"
-//            sb_w_bright.progress = 0
-//        }
-//        scrollView?.setBackgroundColor(color)
 
         colorNode!!.rgbw = color
 
@@ -319,15 +284,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         val w = sb_w_bright.progress
 
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-//        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-//            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
             if (r == 0 && g == 0 && b == 0) {
             } else {
-                Thread {
-                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
-                }.start()
+                changeColor(r.toByte(), g.toByte(), b.toByte(), false)
             }
         }
 
@@ -339,26 +300,26 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
+        GlobalScope.launch {
+            var red = R
+            var green = G
+            var blue = B
 
-        var red = R
-        var green = G
-        var blue = B
+            val opcode = Opcode.SET_TEMPERATURE
 
-        val opcode = Opcode.SET_TEMPERATURE
+            val params = byteArrayOf(0x04, red, green, blue)
 
+            val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
+            Log.d("RGBCOLOR", logStr)
 
-        val params = byteArrayOf(0x04, red, green, blue)
-
-        val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("RGBCOLOR", logStr)
-
-        if (isOnceSet) {
-            for (i in 0..3) {
-                Thread.sleep(50)
+            if (isOnceSet) {
+                for (i in 0..3) {
+                    delay(50)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+                }
+            } else {
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
             }
-        } else {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
         }
     }
 
@@ -370,7 +331,6 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-           //("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {

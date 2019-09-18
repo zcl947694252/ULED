@@ -6,90 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".switches.ScanningSwitchActivity">
 
-    <ProgressBar
-        android:id="@+id/pb"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include" />
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/content"
+        android:id="@+id/switch_add_device_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/include"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="0dp">
-
-        <com.dd.processbutton.iml.ActionProcessButton
-            android:id="@+id/progressBtn"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/search_new_device"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvHint3"
-            app:pb_colorComplete="@color/green_complete"
-            app:pb_colorError="@color/red_error"
-            app:pb_colorNormal="@color/primary"
-            app:pb_colorPressed="@android:color/holo_blue_dark"
-            app:pb_colorProgress="@color/primary"
-            app:pb_textComplete="@string/connected"
-            app:pb_textError="@string/not_found_switch"
-            app:pb_textProgress="@string/searching" />
-
-        <com.dd.processbutton.iml.ActionProcessButton
-            android:id="@+id/progressOldBtn"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:visibility="gone"
-            android:text="@string/install_old_device_tip"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressBtn"
-            app:pb_colorComplete="@color/green_complete"
-            app:pb_colorError="@color/red_error"
-            app:pb_colorNormal="@color/primary"
-            app:pb_colorPressed="@android:color/holo_blue_dark"
-            app:pb_colorProgress="@color/primary"
-            app:pb_textComplete="@string/connected"
-            app:pb_textError="@string/not_found_switch"
-            app:pb_textProgress="@string/searching" />
-
-        <!--<com.dd.processbutton.iml.ActionProcessButton-->
-            <!--android:id="@+id/otaBtn"-->
-            <!--android:layout_width="320dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginTop="15dp"-->
-            <!--android:text="@string/ota"-->
-            <!--android:textColor="@android:color/white"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@id/progressOldBtn"-->
-            <!--app:pb_colorComplete="@color/green_complete"-->
-            <!--app:pb_colorError="@color/red_error"-->
-            <!--app:pb_colorNormal="@color/primary"-->
-            <!--app:pb_colorPressed="@android:color/holo_blue_dark"-->
-            <!--app:pb_colorProgress="@color/primary"-->
-            <!--app:pb_textComplete="@string/connected"-->
-            <!--app:pb_textError="@string/not_found_switch"-->
-            <!--app:pb_textProgress="@string/searching" />-->
 
         <TextView
             android:id="@+id/tvHint1"
@@ -132,7 +56,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvHint2" />
 
+        <com.dd.processbutton.iml.ActionProcessButton
+            android:id="@+id/progressBtn"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/search_new_device"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvHint3"
+            app:pb_colorComplete="@color/green_complete"
+            app:pb_colorError="@color/red_error"
+            app:pb_colorNormal="@color/primary"
+            app:pb_colorPressed="@android:color/holo_blue_dark"
+            app:pb_colorProgress="@color/primary"
+            app:pb_textComplete="@string/connected"
+            app:pb_textError="@string/not_found_switch"
+            app:pb_textProgress="@string/searching" />
     </android.support.constraint.ConstraintLayout>
-
+    <include layout="@layout/template_scanning_device"/>
+    <include
+        android:id="@+id/include"
+        layout="@layout/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

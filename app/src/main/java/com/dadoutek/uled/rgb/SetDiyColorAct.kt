@@ -28,7 +28,6 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
@@ -68,9 +67,8 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         saveNode.setOnClickListener(this)
         val layoutmanager = GridLayoutManager(this, 4)
         StringUtils.initEditTextFilter(editName)
-        selectColorRecyclerView.layoutManager = layoutmanager as RecyclerView.LayoutManager?
-        rgbDiyColorListAdapter = RGBDiyColorCheckAdapter(
-                R.layout.item_color1, colorNodeList)
+        selectColorRecyclerView.layoutManager = layoutmanager
+        rgbDiyColorListAdapter = RGBDiyColorCheckAdapter(R.layout.item_color1, colorNodeList)
         rgbDiyColorListAdapter?.bindToRecyclerView(selectColorRecyclerView)
         rgbDiyColorListAdapter?.onItemClickListener = onItemClickListener
         rgbDiyColorListAdapter?.onItemLongClickListener = onItemLongClickListener
@@ -493,19 +491,6 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 return false
             }
 
-//        var checkColorHaveCheck=false
-//        for(i in colorNodeList!!.indices){
-//            if(colorNodeList!![i].rgbw!=-1){
-//                checkColorHaveCheck=true
-//            }
-//        }
-//
-//        if(checkColorHaveCheck){
-//            return true
-//        }else{
-//            ToastUtils.showLong("请至少选择一个颜色")
-//            return false
-//        }
             return true
         }
 

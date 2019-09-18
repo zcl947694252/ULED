@@ -16,61 +16,56 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvHint1"
-        android:layout_width="320dp"
+    <LinearLayout
+        android:id="@+id/start_scanning_sensor_ly"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="180dp"
         android:gravity="center"
-        android:text="@string/install_sensor_tips1"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.8" />
-
-
-    <com.dd.processbutton.iml.ActionProcessButton
-        android:id="@+id/progressBtn"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/search_new_device"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include"
-        app:pb_colorComplete="@color/green_complete"
-        app:pb_colorError="@color/red_error"
-        app:pb_colorNormal="@color/primary"
-        app:pb_colorPressed="@android:color/holo_blue_dark"
-        app:pb_colorProgress="@color/primary"
-        app:pb_textComplete="@string/connected"
-        app:pb_textError="@string/not_found_switch"
-        app:pb_textProgress="@string/searching" />
-
-    <com.dd.processbutton.iml.ActionProcessButton
-        android:id="@+id/progressOldBtn"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:text="@string/install_old_device_tip"
-        android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/progressBtn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="15dp"
-        app:pb_colorComplete="@color/green_complete"
-        app:pb_colorError="@color/red_error"
-        app:pb_colorNormal="@color/primary"
-        app:pb_colorPressed="@android:color/holo_blue_dark"
-        app:pb_colorProgress="@color/primary"
+        android:orientation="vertical"
         android:visibility="gone"
-        app:pb_textComplete="@string/connected"
-        app:pb_textError="@string/not_found_switch"
-        app:pb_textProgress="@string/searching" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-16dp">
 
+        <TextView
+            android:id="@+id/tvHint1"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"
+            android:text="@string/install_sensor_tips1"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/progressBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.494"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.8"/>
+
+
+        <com.dd.processbutton.iml.ActionProcessButton
+            android:id="@+id/progressBtn"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/search_new_device"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include"
+            app:pb_colorComplete="@color/green_complete"
+            app:pb_colorError="@color/red_error"
+            app:pb_colorNormal="@color/primary"
+            app:pb_colorPressed="@android:color/holo_blue_dark"
+            app:pb_colorProgress="@color/primary"
+            app:pb_textComplete="@string/connected"
+            app:pb_textError="@string/not_found_switch"
+            app:pb_textProgress="@string/searching" />
+    </LinearLayout>
+
+    <include layout="@layout/template_scanning_device" />
 </android.support.constraint.ConstraintLayout>

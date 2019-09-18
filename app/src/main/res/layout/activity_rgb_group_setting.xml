@@ -61,8 +61,7 @@
 
 
     <include layout="@layout/fragment_rgb_group_setting"
-        android:id="@+id/rgb_set"
-        />
+        android:id="@+id/rgb_set"/>
 
     <include layout="@layout/activity_rgb_gradient"
         android:id="@+id/rgb_diy"

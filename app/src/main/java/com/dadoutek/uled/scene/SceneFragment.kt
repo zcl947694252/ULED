@@ -3,12 +3,12 @@ package com.dadoutek.uled.scene
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Builder
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -73,12 +74,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-            Log.e("zcl", "zcl******onItemChildClickListener")
+            Log.e("zcl场景", "zcl场景******onItemChildClickListener")
             when (view.id) {
                 R.id.scene_delete -> scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.scene_edit -> {
-                    Log.e("zcl", "zcl******scene_edit")
+                    Log.e("zcl场景", "zcl场景******scene_edit")
                     val scene = scenesListData!![position]
                     val intent = Intent(activity, NewSceneSetAct::class.java)
                     intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
@@ -87,7 +88,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
 
                 R.id.scene_apply -> {
-                    Log.e("zcl", "zcl******scene_apply")
+                    Log.e("zcl场景", "zcl场景******scene_apply")
                     try {
                         if (position < adapter.data.size) {
                             setScene(scenesListData!![position].id!!)
@@ -102,6 +103,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
+        LogUtils.e("zcl场景----------------onCreateView")
         val view = inflater.inflate(R.layout.fragment_scene, null)
         recyclerView = view.findViewById(R.id.recyclerView)
         no_scene = view.findViewById(R.id.no_scene)
@@ -235,7 +237,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
-    private fun initOnLayoutListener(showTypeView: Int) {
+    private fun initOnLayoutListener() {
         if (activity != null) {
             val view = activity!!.window.decorView
             val viewTreeObserver = view.viewTreeObserver
@@ -268,21 +270,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             no_scene!!.visibility = View.VISIBLE
             addNewScene!!.visibility = View.GONE
         }
-        val layoutmanager = LinearLayoutManager(activity)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = layoutmanager
-        //添加分割线
-        val decoration = DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
-        recyclerView!!.addItemDecoration(decoration)
-        //添加Item变化动画
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+        recyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+
         adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
         adaper!!.onItemClickListener = onItemClickListener
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
 
+        LogUtils.e("zcl场景重新赋值")
         isDelete = false
         adaper!!.changeState(isDelete)
         for (i in scenesListData!!.indices) {
@@ -291,7 +287,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }
         }
         adaper!!.notifyDataSetChanged()
-
     }
 
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
@@ -357,6 +352,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)) {
             stepEndGuide1()
         }
+        Log.e("zcl场景", "zcl场景******onResume")
     }
 
 
@@ -364,16 +360,16 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         super.onActivityResult(requestCode, resultCode, data)
         initData()
         initView()
+        LogUtils.e("zcl场景", "zcl场景******onActivityResult")
     }
 
 
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
-        val list = DBUtils.getActionsBySceneId(id)
-        Thread {
+        GlobalScope.launch {
             val params: ByteArray = byteArrayOf(id.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
-        }.start()
+        }
 
         TmtUtils.midToast(activity, getString(R.string.scene_apply_success))
     }
@@ -384,7 +380,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (isVisibleToUser) {
             refreshAllData()
             refreshView()
-            initOnLayoutListener(1)
+            initOnLayoutListener()
         } else {
             refreshView()
         }
@@ -408,17 +404,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
             }
 
-            if (recyclerView != null) {
+         /*   if (recyclerView != null) {
                 val layoutmanager = LinearLayoutManager(activity)
                 layoutmanager.orientation = LinearLayoutManager.VERTICAL
                 recyclerView!!.layoutManager = layoutmanager
-                //添加分割线
-                val decoration = DividerItemDecoration(activity!!,
-                        DividerItemDecoration
-                                .VERTICAL)
-                decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                        .divider)))
-                recyclerView!!.addItemDecoration(decoration)
                 //添加Item变化动画
                 recyclerView!!.itemAnimator = DefaultItemAnimator()
                 adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
@@ -428,7 +417,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     it.onItemLongClickListener = onItemChildLongClickListener
                     it.bindToRecyclerView(recyclerView)
                 }
-            }
+            }*/
 
             toolbar?.let {
                 it.navigationIcon = null
@@ -569,6 +558,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+        LogUtils.e("zcl场景---------------onAttach")
         if (context is CallbackLinkMainActAndFragment) {
             callbackLinkMainActAndFragment = context
         }
@@ -576,6 +566,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onDetach() {
         super.onDetach()
+        LogUtils.e("zcl场景---------------onDetach")
         callbackLinkMainActAndFragment = null
     }
 
@@ -603,4 +594,5 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     companion object {
         private const val SCENE_MAX_COUNT = 16
     }
+
 }

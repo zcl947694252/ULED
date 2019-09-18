@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_margin="30dp"
         android:layout_height="wrap_content"
-        android:background="@mipmap/rect_five_w"
+        android:background="@drawable/rect_five_w"
         android:maxHeight="600dp"
         android:orientation="vertical">
 

@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
@@ -174,17 +175,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getVersion() {
+        showLoadingDialog(getString(R.string.verification_version))
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             dstAdress = mDeviceInfo!!.meshAddress
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
+                        hideLoadingDialog()
                         tvPSVersion.text = it
                         var version = tvPSVersion.text.toString()
                         var num: String //N-3.1.1
                         if (version.contains("N")) {
                             num = version.substring(2, 3)
-                            if ("" != num && num!="-"&&num.toDouble() >= 3.0) {
+                            if ("" != num && num != "-" && num.toDouble() >= 3.0) {
                                 isGone()
                                 isVisibility()//显示3.0新的人体感应器
                             }
@@ -193,7 +196,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             isVisibility()//显示3.0新的人体感应器
                         }
                     },
-                    failedCallback = {})
+                    failedCallback = {
+                        hideLoadingDialog()
+
+                        doFinish()
+                    })
+        } else {
+            doFinish()
         }
     }
 
@@ -728,7 +737,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
                 showLoadingDialog(getString(R.string.configuring_switch))
             }
-
+LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
             configLightlight()
             Thread.sleep(300)
 
@@ -740,8 +749,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     failedCallback = {
                         snackbar(sensor_root, getString(R.string.pace_fail))
                         hideLoadingDialog()
-                         TelinkLightService.Instance().idleMode(true)
-                                             TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                     })
 
         }.start()
@@ -854,16 +863,21 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun saveSensor() {
         var dbSensor = DbSensor()
-
+        val allSensor = DBUtils.getAllSensor()
+        LogUtils.e("zcl---$allSensor")
         if (isConfirm) {
             dbSensor.index = mDeviceInfo.id.toInt()
+
             if ("none" != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
+            val allSensor = DBUtils.getAllSensor()
+            LogUtils.e("zcl---$allSensor")
             DBUtils.saveSensor(dbSensor, isConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
-
+        val allSensor1 = DBUtils.getAllSensor()
+        LogUtils.e("zcl---$allSensor1")
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
@@ -873,6 +887,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 
+        val allSensor2 = DBUtils.getAllSensor()
+        LogUtils.e("zcl---$allSensor2")
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
         DBUtils.recordingChange(dbSensor.id,
