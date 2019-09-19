@@ -3,7 +3,6 @@ package com.dadoutek.uled.tellink
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.text.TextUtils
-import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
@@ -65,10 +64,6 @@ class TelinkLightApplication : TelinkApplication() {
         initStompClient()
 
         LogUtils.getConfig().setBorderSwitch(false)
-//        if (!AppUtils.isAppDebug()) {
-//        } else {
-//            LogUtils.getConfig().setLog2FileSwitch(true)
-//        }
         MobSDK.init(this)
     }
 

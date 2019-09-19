@@ -170,6 +170,7 @@
     <string name="smartSwitch">开关</string>
     <string name="select_install_device">请选择需要安装的设备</string>
     <string name="search">搜索</string>
+
     <string name="complete">完成</string>
     <string name="not_found_switch">未找到开关</string>
     <string name="searching">搜索中…</string>
@@ -817,5 +818,7 @@
     <string name="have_question_look_notice">如有其他问题,请查看app说明</string>
     <string name="reset_warm_red">在恢复出厂设置之后可以通过添加设备重新添加。</string>
     <string name="connect_fail2">连接失败,请重试</string>
+    <string name="clear_one">建议先恢复出厂设置、后清除数据,避免不可预料的错误发生。</string>
+    <string name="clear_two">本地数据和云端数据将被清除且无法恢复。</string>
 
 </resources>

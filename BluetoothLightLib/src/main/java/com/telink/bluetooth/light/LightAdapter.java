@@ -24,7 +24,6 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -340,6 +339,8 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     public boolean startOta(byte[] firmware) {
         if (!this.isStarted.get())
             return false;
+        if (this.mLightCtrl==null)
+            return false;
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
         if (light == null || !this.mLightCtrl.isLogin())
             return false;
@@ -419,15 +420,11 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
 
         if (!this.isStarted.get()) {
-//            Log.d("Test", "***********TEST***********1111");
             return false;
         }
 
-
-        if (!this.mLightCtrl.isLogin()) {
-//            Log.d("Test", "***********TEST***********2222");
+        if (!this.mLightCtrl.isLogin())
             return false;
-        }
 
         if (tag == null) {
 //            Log.d("Test", "***********sendCommand***********");
