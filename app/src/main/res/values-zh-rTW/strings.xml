@@ -815,4 +815,5 @@
     <string name="reset_factory_all_device">此操作会让所有通电设备恢复出厂设置(传感器,开关除外)</string>
     <string name="have_question_look_notice">如有其他问题,请查看app说明</string>
     <string name="reset_warm_red">在恢复出厂设置之后可以通过添加设备重新添加。</string>
+    <string name="connect_fail2">连接失败,请重试</string>
 </resources>

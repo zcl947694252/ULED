@@ -12,11 +12,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbGroup
 
 class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var mContext: Context) : BaseAdapter() {
-    private val inflater: LayoutInflater
-
-    init {
-        inflater = LayoutInflater.from(mContext)
-    }
+    private val inflater: LayoutInflater = LayoutInflater.from(mContext)
 
     override fun getCount(): Int {
         return groupsInit.size
@@ -44,11 +40,10 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var convertView: View? = inflater.inflate(R.layout.grouping_item, null)
 
-        val holder: GroupItemHolder
+        val holder: GroupItemHolder = GroupItemHolder()
 
         val txtName = convertView?.findViewById<View>(R.id.tv_group_name) as TextView
 
-        holder = GroupItemHolder()
         holder.name = txtName
 
         convertView.tag = holder

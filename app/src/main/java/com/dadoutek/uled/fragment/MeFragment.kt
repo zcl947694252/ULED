@@ -50,6 +50,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -185,6 +188,7 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
     override fun onResume() {
         super.onResume()
         isVisableDeveloper()
+        disableConnectionStatusListener()
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }
@@ -523,18 +527,22 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 //ToastUtils.showLong(getString(R.string.connect_success))
-                changeDisplayImgOnToolbar(true)
-                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
-                bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
+                GlobalScope.launch(Dispatchers.Main) {
+                    bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
+                    changeDisplayImgOnToolbar(false)
+                }
             }
             LightAdapter.STATUS_LOGOUT -> {
-                changeDisplayImgOnToolbar(false)
-                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                GlobalScope.launch(Dispatchers.Main) {
+                    changeDisplayImgOnToolbar(false)
+                    bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
+                }
 
             }
 
+
             LightAdapter.STATUS_CONNECTING -> {
-               // ToastUtils.showLong(R.string.connecting_please_wait)
+                // ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
     }

@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -139,7 +140,32 @@ class SettingActivity : BaseActivity() {
         else
             confirm?.isClickable = true
 
+        setFirstePop(R.string.please_sure_all_device_power_on,R.string.reset_factory_all_device
+        ,R.string.have_question_look_notice,true)
+
         pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+    }
+
+    private fun setFirstePop(pleaseSureAllDevicePowerOn: Int,resetFactoryAllDevice : Int, haveQuestionLookNotice: Int,isShowThree:Boolean) {
+        tvOne.visibility = View.VISIBLE
+        tvThree.visibility = View.VISIBLE
+        tvTwo.visibility = View.VISIBLE
+
+        hinitOne.visibility = View.VISIBLE
+        hinitThree.visibility = View.VISIBLE
+        hinitTwo.visibility = View.VISIBLE
+
+        if (isShowThree) {
+            tvThree.visibility = View.VISIBLE
+            hinitThree.visibility = View.VISIBLE
+        } else {
+            tvThree.visibility = View.GONE
+            hinitThree.visibility = View.GONE
+        }
+
+        hinitOne.text = getString(pleaseSureAllDevicePowerOn)
+        hinitTwo.text = getString(resetFactoryAllDevice)
+        hinitThree.text = getString(haveQuestionLookNotice)
     }
 
     private fun setTimerZero() {
@@ -298,7 +324,8 @@ class SettingActivity : BaseActivity() {
 
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                ToastUtils.showShort("11111111111111111111")
+                var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
+                startActivity(intent)
             }
 
             override fun updateDrawState(ds: TextPaint) {

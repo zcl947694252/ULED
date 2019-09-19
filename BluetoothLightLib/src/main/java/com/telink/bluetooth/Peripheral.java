@@ -467,6 +467,8 @@ public class Peripheral extends BluetoothGattCallback {
         boolean success = true;
         String errorMsg = "";
 
+        if (gatt==null)
+            return;
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 
         if (service != null) {
@@ -506,6 +508,8 @@ public class Peripheral extends BluetoothGattCallback {
 
 //        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
 
+        if (gatt==null)
+            return;
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 
         if (service != null) {
@@ -694,7 +698,7 @@ public class Peripheral extends BluetoothGattCallback {
 
     private String generateHashKey(UUID serviceUUID,
                                    BluetoothGattCharacteristic characteristic) {
-        return String.valueOf(serviceUUID) + "|" + characteristic.getUuid()
+        return serviceUUID + "|" + characteristic.getUuid()
                 + "|" + characteristic.getInstanceId();
     }
 

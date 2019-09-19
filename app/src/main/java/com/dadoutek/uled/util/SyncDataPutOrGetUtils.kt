@@ -54,10 +54,10 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                    var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i].tableName,
-                            dbDataChangeList[i].changeId,
-                            dbDataChangeList[i].changeType,
-                            dbUser!!.token, dbDataChangeList[i].id!!)
+                    var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i]?.tableName,
+                            dbDataChangeList[i]?.changeId,
+                            dbDataChangeList[i]?.changeType,
+                            dbUser!!.token, dbDataChangeList[i]?.id!!)
 
                     observable?.let { observableList.add(it) }
 

@@ -209,8 +209,8 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private fun setGroupChecked() {
         for (group in mGroupList) {
             group.checked = group.id == mLight.belongGroupId
-            if (group.checked)
-                break
+           /* if (group.checked)
+                break*/
         }
     }
 

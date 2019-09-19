@@ -165,6 +165,7 @@ class GroupListFragment : BaseFragment() {
         toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar!!.setNavigationOnClickListener {
             sendGroupResterNormal()
+            setBluetoothAndAddVisableDeleteGone()
         }
     }
 

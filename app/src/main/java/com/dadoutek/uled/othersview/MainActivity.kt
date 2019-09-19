@@ -129,8 +129,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
 
-    private val mRxPermission = RxPermissions(this)
-
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -605,6 +603,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                             if (!TelinkLightService.Instance().isLogin) {
                                 ToastUtils.showLong(R.string.connecting_please_wait)
+
+
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 val meshName = DBUtils.lastUser!!.controlMeshName
@@ -616,7 +616,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
                                     connectParams.autoEnableNotification(true)
                                     connectParams.setConnectDeviceType(
-                                            mutableListOf<Int>(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY))
+                                            mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                                                    DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY,DeviceType.SMART_CURTAIN))
                                     //连接，如断开会自动重连
                                     TelinkLightService.Instance().autoConnect(connectParams)
 
@@ -730,7 +731,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
 
             LightAdapter.STATUS_ERROR_N -> onNError(event)
-
         }
     }
 

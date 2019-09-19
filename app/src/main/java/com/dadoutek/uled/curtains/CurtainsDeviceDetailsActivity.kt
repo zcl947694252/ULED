@@ -6,7 +6,6 @@ import android.bluetooth.le.ScanFilter
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -72,69 +71,43 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 窗帘
  */
 
-class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<String> ,View.OnClickListener{
+class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
 
     override fun performed(event: Event<String>?) {
 
     }
 
-    private lateinit var curtain:MutableList<DbCurtain>
-
-//    private var rvDevice:RecyclerView?=null
-
-    private var adapter:CurtainDeviceDetailsAdapter?=null
-
+    private lateinit var curtain: MutableList<DbCurtain>
+    private var adapter: CurtainDeviceDetailsAdapter? = null
     internal var showList: List<ItemTypeGroup>? = null
-
     private var gpList: List<ItemTypeGroup>? = null
-
     private var type: Int? = null
-
     private var inflater: LayoutInflater? = null
-
     private var currentLight: DbCurtain? = null
-
     private var positionCurrent: Int = 0
-
-//    private lateinit var lightList: MutableList<DbLight>
-
     private var canBeRefresh = true
-
-//    private lateinit var group: DbGroup
-
     private val REQ_LIGHT_SETTING: Int = 0x01
-
     private var acitivityIsAlive = true
-
     private var mTelinkLightService: TelinkLightService? = null
-
     private var retryConnectCount = 0
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
-    private var mNotFoundSnackBar: Snackbar? = null
     private var mApplication: TelinkLightApplication? = null
-
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-
     private var isRgbClick = false
-
     private var installId = 0
-
-    private lateinit var stepOneText:TextView
-    private lateinit var stepTwoText:TextView
-    private lateinit var stepThreeText:TextView
-    private lateinit var switchStepOne:TextView
-    private lateinit var switchStepTwo:TextView
-    private lateinit var swicthStepThree:TextView
+    private lateinit var stepOneText: TextView
+    private lateinit var stepTwoText: TextView
+    private lateinit var stepThreeText: TextView
+    private lateinit var switchStepOne: TextView
+    private lateinit var switchStepTwo: TextView
+    private lateinit var swicthStepThree: TextView
 
     private val SCENE_MAX_COUNT = 16
 
@@ -149,129 +122,122 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     override fun onResume() {
         super.onResume()
         initView()
+        initData()
     }
 
     private fun initData() {
         gpList = DBUtils.getgroupListWithType(this!!)
-
-//        curtain=DBUtils.getAllCurtains()
         showList = ArrayList()
-//        rvDevice = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
 
-        curtain= ArrayList()
-        when(type){
-           Constant.INSTALL_CURTAIN -> {
-               var all_light_data = DBUtils.getAllCurtains()
-               if (all_light_data.size > 0) {
-                   var list_group : java.util.ArrayList<DbCurtain> = ArrayList()
-                   var no_group : java.util.ArrayList<DbCurtain> = ArrayList()
-                   for(i in all_light_data.indices){
-                       if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getApp().getString(R.string.not_grouped)){
-                           no_group.add(all_light_data[i])
-                       }else{
-                           list_group.add(all_light_data[i])
-                       }
-                   }
+        curtain = ArrayList()
+        when (type) {
+            Constant.INSTALL_CURTAIN -> {
+                var all_light_data = DBUtils.getAllCurtains()
+                if (all_light_data.size > 0) {
+                    var list_group: java.util.ArrayList<DbCurtain> = ArrayList()
+                    var no_group: java.util.ArrayList<DbCurtain> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            no_group.add(all_light_data[i])
+                        } else {
+                            list_group.add(all_light_data[i])
+                        }
+                    }
 
-                   if(no_group.size>0){
-                       for(i in no_group.indices){
-                           curtain.add(no_group[i])
-                       }
-                   }
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
+                            curtain.add(no_group[i])
+                        }
+                    }
 
-                   if(list_group.size>0){
-                       for(i in list_group.indices){
-                           curtain.add(list_group[i])
-                       }
-                   }
-                   toolbar!!.tv_function1.visibility=View.VISIBLE
-                   recycleView.visibility=View.VISIBLE
-                   no_device_relativeLayout.visibility=View.GONE
-                   var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-                   toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                   toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-                   batchGroup.setText(R.string.batch_group)
-                   batchGroup.visibility = View.GONE
-                   batchGroup.setOnClickListener {
-                       val intent = Intent(this,
-                               CurtainBatchGroupActivity::class.java)
-                       intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                       intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                       intent.putExtra("curtain","all_curtain")
-                       startActivity(intent)
-                   }
-               }else {
-                   recycleView.visibility=View.GONE
-                   no_device_relativeLayout.visibility=View.VISIBLE
-                   toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
-                   toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                   toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                       if (dialog_curtain?.visibility == View.GONE) {
-                           showPopupMenu()
-                       } else {
-//                            hidePopupMenu()
-                       }
-                   }
-               }
-           }
-        Constant.INSTALL_CURTAIN_OF -> {
-            var all_light_data = DBUtils.getAllCurtains()
-            if (all_light_data.size > 0) {
-                var list_group : ArrayList<DbCurtain> = ArrayList()
-                var no_group : ArrayList<DbCurtain> = ArrayList()
-                for(i in all_light_data.indices){
-                    if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getApp().getString(R.string.not_grouped)){
-                        no_group.add(all_light_data[i])
-                    }else{
-                        list_group.add(all_light_data[i])
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
+                            curtain.add(list_group[i])
+                        }
+                    }
+                    toolbar!!.tv_function1.visibility = View.VISIBLE
+                    recycleView.visibility = View.VISIBLE
+                    no_device_relativeLayout.visibility = View.GONE
+                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.visibility = View.GONE
+                    batchGroup.setOnClickListener {
+                        val intent = Intent(this,
+                                CurtainBatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("curtain", "all_curtain")
+                        startActivity(intent)
+                    }
+                } else {
+                    recycleView.visibility = View.GONE
+                    no_device_relativeLayout.visibility = View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                        if (dialog_curtain?.visibility == View.GONE) {
+                            showPopupMenu()
+                        }
                     }
                 }
-
-                if(no_group.size>0){
-                    for(i in no_group.indices){
-                        curtain.add(no_group[i])
+            }
+            Constant.INSTALL_CURTAIN_OF -> {
+                var all_light_data = DBUtils.getAllCurtains()
+                if (all_light_data.size > 0) {
+                    var list_group: ArrayList<DbCurtain> = ArrayList()
+                    var no_group: ArrayList<DbCurtain> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            no_group.add(all_light_data[i])
+                        } else {
+                            list_group.add(all_light_data[i])
+                        }
                     }
-                }
 
-                if(list_group.size>0){
-                    for(i in list_group.indices){
-                        curtain.add(list_group[i])
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
+                            curtain.add(no_group[i])
+                        }
                     }
-                }
-                toolbar!!.tv_function1.visibility=View.VISIBLE
-                recycleView.visibility=View.VISIBLE
-                no_device_relativeLayout.visibility=View.GONE
-                var cwLightGroup=this.intent.getStringExtra("curtain_name")
-                var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-                toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-                batchGroup.setText(R.string.batch_group)
-                batchGroup.setOnClickListener(View.OnClickListener {
-                    val intent = Intent(this,
-                            CurtainBatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("curtain","group_curtain")
-                    intent.putExtra("curtain_group_name",cwLightGroup)
-                    startActivity(intent)
-                })
-            }else {
-                recycleView.visibility=View.GONE
-                no_device_relativeLayout.visibility=View.VISIBLE
-                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
-                toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                    if (dialog_curtain?.visibility == View.GONE) {
-                        showPopupMenu()
-                    } else {
-//                            hidePopupMenu()
+
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
+                            curtain.add(list_group[i])
+                        }
+                    }
+                    toolbar!!.tv_function1.visibility = View.VISIBLE
+                    recycleView.visibility = View.VISIBLE
+                    no_device_relativeLayout.visibility = View.GONE
+                    var cwLightGroup = this.intent.getStringExtra("curtain_name")
+                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.setOnClickListener {
+                        val intent = Intent(this,
+                                CurtainBatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("curtain", "group_curtain")
+                        intent.putExtra("curtain_group_name", cwLightGroup)
+                        startActivity(intent)
+                    }
+                } else {
+                    recycleView.visibility = View.GONE
+                    no_device_relativeLayout.visibility = View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                        if (dialog_curtain?.visibility == View.GONE) {
+                            showPopupMenu()
+                        }
                     }
                 }
             }
         }
-        }
-
     }
 
     private fun showPopupMenu() {
@@ -280,7 +246,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
-        recycleView!!.layoutManager = GridLayoutManager(this,3)
+        recycleView!!.layoutManager = GridLayoutManager(this, 3)
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)
@@ -308,7 +274,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -323,7 +289,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             }
             R.id.create_group -> {
                 dialog_curtain?.visibility = View.GONE
-                if (TelinkLightApplication.getApp().connectDevice==null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -332,7 +298,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             R.id.create_scene -> {
                 dialog_curtain?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getApp().connectDevice==null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -373,25 +339,25 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     }
 
     private fun showInstallDeviceList() {
-        dialog_curtain.visibility=View.GONE
+        dialog_curtain.visibility = View.GONE
 //        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
-        showInstallDeviceList(isGuide,isRgbClick)
+        showInstallDeviceList(isGuide, isRgbClick)
     }
 
-    var installDialog: android.app.AlertDialog?=null
-    var isGuide:Boolean = false
-    var clickRgb:Boolean = false
+    var installDialog: android.app.AlertDialog? = null
+    var isGuide: Boolean = false
+    var clickRgb: Boolean = false
     private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
-        this.clickRgb=clickRgb
-        val view = View.inflate(this,R.layout.dialog_install_list,null)
-        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
-        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { v ->  installDialog?.dismiss()}
+        this.clickRgb = clickRgb
+        val view = View.inflate(this, R.layout.dialog_install_list, null)
+        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
+        val install_device_recyclerView = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        close_install_list.setOnClickListener { v -> installDialog?.dismiss() }
 
         val installList: java.util.ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
 
         val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
-        val layoutManager =  LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
@@ -413,28 +379,27 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
         }
 
-        if(isGuide){
+        if (isGuide) {
             installDialog?.setCancelable(false)
         }
 
         installDialog?.show()
 
-        Thread{
+        Thread {
             Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main){
+            GlobalScope.launch(Dispatchers.Main) {
                 //                guide3(install_device_recyclerView)
             }
         }.start()
     }
 
-    val INSTALL_NORMAL_LIGHT=0
-    val INSTALL_RGB_LIGHT=1
-    val INSTALL_SWITCH=2
-    val INSTALL_SENSOR=3
-    val INSTALL_CURTAIN=4
-    val INSTALL_CONNECTOR=5
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
-        adapter, view, position ->
+    val INSTALL_NORMAL_LIGHT = 0
+    val INSTALL_RGB_LIGHT = 1
+    val INSTALL_SWITCH = 2
+    val INSTALL_SENSOR = 3
+    val INSTALL_CURTAIN = 4
+    val INSTALL_CONNECTOR = 5
+    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         var intent: Intent? = null
         //点击任何一个选项跳转页面都隐藏引导
 //        val controller=guide2()
@@ -444,20 +409,20 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 //        hidePopupMenu()
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
-                installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                installId = INSTALL_NORMAL_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
             }
             INSTALL_RGB_LIGHT -> {
-                installId=INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                installId = INSTALL_RGB_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
             }
             INSTALL_CURTAIN -> {
-                installId=INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
             }
             INSTALL_SWITCH -> {
-                installId=INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -466,28 +431,28 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                 swicthStepThree.visibility = View.VISIBLE
             }
             INSTALL_SENSOR -> {
-                installId=INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                installId = INSTALL_SENSOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
             }
-            INSTALL_CONNECTOR->{
-                installId=INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
             }
         }
     }
 
-    private fun showInstallDeviceDetail(describe : String){
-        val view = View.inflate(this,R.layout.dialog_install_detail,null)
-        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack=view.findViewById<ImageView>(R.id.btnBack)
+    private fun showInstallDeviceDetail(describe: String) {
+        val view = View.inflate(this, R.layout.dialog_install_detail, null)
+        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
+        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
         stepOneText = view.findViewById<TextView>(R.id.step_one)
         stepTwoText = view.findViewById<TextView>(R.id.step_two)
         stepThreeText = view.findViewById<TextView>(R.id.step_three)
         switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
         switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
         swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
-        val install_tip_question=view.findViewById<TextView>(R.id.install_tip_question)
-        val search_bar=view.findViewById<Button>(R.id.search_bar)
+        val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
+        val search_bar = view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
@@ -501,25 +466,27 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
         }
 
-        if(isGuide){
+        if (isGuide) {
 //            installDialog?.setCancelable(false)
         }
 
         installDialog?.show()
     }
 
-    private val dialogOnclick =View.OnClickListener{
-        var medressData=0
-        var allData=DBUtils.allLight
-        var sizeData=DBUtils.allLight.size
-        if(sizeData!=0){
-            var lightData= allData[sizeData-1]
-            medressData=lightData.meshAddr
+    private val dialogOnclick = View.OnClickListener {
+        var medressData = 0
+        var allData = DBUtils.allLight
+        var sizeData = DBUtils.allLight.size
+        if (sizeData != 0) {
+            var lightData = allData[sizeData - 1]
+            medressData = lightData.meshAddr
         }
 
-        when(it.id){
-            R.id.close_install_list->{ installDialog?.dismiss()}
-            R.id.search_bar->{
+        when (it.id) {
+            R.id.close_install_list -> {
+                installDialog?.dismiss()
+            }
+            R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
@@ -551,26 +518,26 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                     INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        if(medressData <= DEVICE_ADDRESS_MAX){
+                        if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
-                        }else{
+                        } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
                 }
             }
-            R.id.btnBack->{
+            R.id.btnBack -> {
                 installDialog?.dismiss()
-                showInstallDeviceList(isGuide,clickRgb)
+                showInstallDeviceList(isGuide, clickRgb)
             }
         }
     }
 
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.add_device_btn->addCurtainDevice()
+        when (v?.id) {
+            R.id.add_device_btn -> addCurtainDevice()
         }
     }
 
@@ -617,7 +584,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 //            if (scanPb.visibility != View.VISIBLE) {
 //                判断是否为rgb灯
             var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
-            intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_CURTAIN)
+            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
             intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
             intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
@@ -655,6 +622,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             }
         }.start()
     }
+
     fun notifyData() {
         val mOldDatas: MutableList<DbCurtain>? = curtain
         val mNewDatas: MutableList<DbCurtain>? = getNewData()
@@ -686,7 +654,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             adapter!!.setNewData(curtain)
         }
 
-        toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
@@ -695,7 +663,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 ////            lightList=DBUtils.getAllLight()
 //            filter("", false)
 //        } else {
-                curtain = DBUtils.getAllCurtains()
+        curtain = DBUtils.getAllCurtains()
 //
 //        }
 
@@ -715,7 +683,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    var root=findViewById<LinearLayout>(R.id.root)
+                    var root = findViewById<LinearLayout>(R.id.root)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
@@ -775,7 +743,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-               //("startScanLight_LightOfGroup")
+                //("startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -815,6 +783,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                         }
             }
     }
+
     private fun addScanListeners() {
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
@@ -828,7 +797,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //("onLeScanTimeout()")
+                        //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -839,7 +808,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                            //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -849,18 +818,19 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                     }
                 })
     }
+
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
         try {
             mCheckRssiDisposal?.dispose()
-            mCheckRssiDisposal= RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
                     .subscribe {
                         if (it) {
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance()?.connect(mac,CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
                             }
                         } else {
@@ -868,7 +838,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
                     }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -917,7 +887,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-       //("onErrorReport: onLeScanTimeout")
+        //("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance()?.idleMode(true)

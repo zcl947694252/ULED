@@ -35,9 +35,6 @@ public class EventBus<T> {
             new LinkedBlockingQueue<>(128);
     private static final ThreadFactory sThreadFactory = new DefaultThreadFactory();
 
-//    private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
-//            TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory); //Executors.newCachedThreadPool(new DefaultThreadFactory());
-
     private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
             TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory, new ThreadPoolExecutor.DiscardOldestPolicy());
 
@@ -47,12 +44,7 @@ public class EventBus<T> {
     protected final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
     private final Object mLock = new Object();
     protected boolean processing = false;
-    private final Runnable task = new Runnable() {
-        @Override
-        public void run() {
-            processEvent();
-        }
-    };
+    private final Runnable task = () -> processEvent();
 
     public void addEventListener(T eventType, EventListener<T> listener) {
 

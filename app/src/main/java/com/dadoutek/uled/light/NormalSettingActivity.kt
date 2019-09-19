@@ -65,7 +65,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     var gpAddress: Int = 0
     var fromWhere: String? = null
     private var updateLightDisposal: Disposable? = null
-    private val dialog: AlertDialog? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
@@ -74,10 +73,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
-    //    private var stopTracking = false
-    private var connectTimes = 0
     private var currentShowPageGroup = true
-    private var isLightSwitch = true
     private var isBrightness = true
 
     internal var downTime: Long = 0//Button被按下时的时间

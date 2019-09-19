@@ -45,7 +45,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginRight="16dp"
             android:padding="@dimen/dp_10"
-            android:src="@drawable/icon_bluetooth"
+            android:src="@drawable/bluetooth_no"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>

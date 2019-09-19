@@ -25,6 +25,12 @@ public class TmtUtils {
         TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
         v.setTextColor(context.getResources().getColor(R.color.blue_background));     //设置字体颜色
         toast.show();
+    }  public static void midToastW(Context context, String str) {
+        Toast toast = Toast.makeText(context, str, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);  //设置显示位置
+        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+        v.setTextColor(context.getResources().getColor(R.color.white));     //设置字体颜色
+        toast.show();
     }
 
     public static void midToastLong(Context context, String str) {

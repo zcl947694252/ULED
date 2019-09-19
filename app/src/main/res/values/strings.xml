@@ -892,5 +892,6 @@
     <string name="reset_factory_all_device">This will restore factory Settings(except sensor, switch) to all powered on devices.</string>
     <string name="have_question_look_notice">If you have any other questions, please check the app description</string>
     <string name="reset_warm_red">It can be added again by adding devices after factory Settings have been restored.</string>
+    <string name="connect_fail2">Connection failed, please try again</string>
 
 </resources>

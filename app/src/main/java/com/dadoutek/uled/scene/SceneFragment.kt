@@ -371,7 +371,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
         }
 
-        TmtUtils.midToast(activity, getString(R.string.scene_apply_success))
+        TmtUtils.midToastW(activity, getString(R.string.scene_apply_success))
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

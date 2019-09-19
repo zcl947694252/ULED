@@ -372,7 +372,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.disconnect()
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
-            if (!b && !singleLogin?.isShowing!!) {
+            val showing = singleLogin?.isShowing
+            if (!b && showing!=null&&!showing!!) {
                 singleLogin!!.show()
             }
         }

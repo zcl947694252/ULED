@@ -10,6 +10,7 @@ class MeshAddressGenerator {
     var meshAddress: Int = 0
         get() {
             //field代表meshAddress这个变量
+
             while (DBUtils.isDeviceExist(field)) {    //如果新的meshAddress已经存在，就继续+1
                 ++field
                 if (field == 0xFF)              //为了旧设备的兼容性，要排除0xFF此地址，因为以前的PIR，开关等控制设备的meshAddress都是0xFF

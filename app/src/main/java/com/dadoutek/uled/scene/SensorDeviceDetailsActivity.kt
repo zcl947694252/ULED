@@ -45,6 +45,7 @@ import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
+import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -486,7 +487,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 }.show()
     }
 
+    @SuppressLint("CheckResult")
     private fun autoConnectSensor(b: Boolean) {
+        retryConnectCount++
         if (b)
             showLoadingDialog(getString(R.string.please_wait))
         LogUtils.e("zcl开始连接")
@@ -500,9 +503,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         progressBar_sensor.visibility = View.VISIBLE
         //连接，如断开会自动重连
         GlobalScope.launch {
-            delay(2000)
+            delay(1000)
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
+
+        Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe( {
+            LeBluetooth.getInstance().stopScan()
+            TelinkLightService.Instance()?.idleMode(true)
+            hideLoadingDialog()
+            progressBar_sensor.visibility =View.GONE
+            ToastUtils.showShort(getString(R.string.connect_fail))
+        },{})
     }
 
     /**
@@ -521,6 +532,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             LeScanEvent.LE_SCAN_TIMEOUT -> {
                 LogUtils.e("zcl", "zcl******LE_SCAN_TIMEOUT")
                 progressBar_sensor.visibility = View.GONE
+                hideLoadingDialog()
             }
 
             DeviceEvent.STATUS_CHANGED -> {
