@@ -83,6 +83,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
 
         initStompReceiver()
+
+        singleLogin = AlertDialog.Builder(this)
+                .setTitle(R.string.other_device_login)
+                .setMessage(getString(R.string.single_login_warm))
+                .setCancelable(false)
+                .setOnDismissListener {
+                    restartApplication()
+                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    restartApplication()
+                }.create()
     }
 
 
