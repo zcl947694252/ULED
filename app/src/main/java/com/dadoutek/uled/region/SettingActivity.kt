@@ -3,7 +3,6 @@ package com.dadoutek.uled.region
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.provider.Settings
@@ -39,8 +38,10 @@ import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.GuideUtils
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.PopUtil
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -70,8 +71,8 @@ class SettingActivity : BaseActivity() {
     private lateinit var confirm: Button
     private lateinit var pop: PopupWindow
     private var compositeDisposable = CompositeDisposable()
-    lateinit var tvOne : TextView
-    lateinit var tvTwo : TextView
+    lateinit var tvOne: TextView
+    lateinit var tvTwo: TextView
     lateinit var tvThree: TextView
     lateinit var hinitOne: TextView
     lateinit var hinitTwo: TextView
@@ -79,6 +80,7 @@ class SettingActivity : BaseActivity() {
     lateinit var readTimer: TextView
     lateinit var cancelConfirmLy: LinearLayout
     lateinit var cancelConfirmVertical: View
+    var isResetFactory = false
 
     override fun initListener() {}
 
@@ -96,15 +98,9 @@ class SettingActivity : BaseActivity() {
 
         settingAdapter.setOnItemClickListener { _, _, position ->
             when (position) {
-                0 -> {
-                    emptyTheCache()
-                }
-                1 -> {
-                    checkNetworkAndSyncs(this)
-                }
-                2 -> {
-                    showSureResetDialogByApp()
-                }
+                0 -> emptyTheCache()
+                1 -> checkNetworkAndSyncs(this)
+                2 -> showSureResetDialogByApp()
             }
         }
     }
@@ -113,47 +109,20 @@ class SettingActivity : BaseActivity() {
         image_bluetooth.visibility = View.GONE
         toolbar.title = getString(R.string.setting)
         toolbar.setNavigationIcon(R.mipmap.icon_return)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
+        toolbar.setNavigationOnClickListener { finish() }
         makePop()
     }
 
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun showSureResetDialogByApp() {
-        val developMode = SharedPreferencesUtils.isDeveloperModel()
-        if (!developMode)
-            Observable.intervalRange(0, 10, 0, 1, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        var num =9 - it as Long
-                        if (num == 0L) {
-                            setTimerZero()
-                        } else {
-                            cancelConfirmVertical.backgroundColor =resources.getColor(R.color.white)
-                            cancel.isClickable = false
-                            confirm.isClickable = false
-                            readTimer.text = getString(R.string.please_read_carefully,num)
-                        }
-                    }
-        else
-            confirm?.isClickable = true
-
-        setFirstePop(R.string.please_sure_all_device_power_on,R.string.reset_factory_all_device
-        ,R.string.have_question_look_notice,true)
-
-        pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+        isResetFactory = true
+            setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
+                    , R.string.have_question_look_notice, isResetFactory)
     }
 
-    private fun setFirstePop(pleaseSureAllDevicePowerOn: Int,resetFactoryAllDevice : Int, haveQuestionLookNotice: Int,isShowThree:Boolean) {
-        tvOne.visibility = View.VISIBLE
-        tvThree.visibility = View.VISIBLE
-        tvTwo.visibility = View.VISIBLE
-
-        hinitOne.visibility = View.VISIBLE
-        hinitThree.visibility = View.VISIBLE
-        hinitTwo.visibility = View.VISIBLE
+    @SuppressLint("CheckResult", "StringFormatMatches")
+    private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Boolean) {
+        setNormalPopSetting()
 
         if (isShowThree) {
             tvThree.visibility = View.VISIBLE
@@ -166,21 +135,73 @@ class SettingActivity : BaseActivity() {
         hinitOne.text = getString(pleaseSureAllDevicePowerOn)
         hinitTwo.text = getString(resetFactoryAllDevice)
         hinitThree.text = getString(haveQuestionLookNotice)
+
+        Observable.intervalRange(0, 10, 0, 1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    var num = 9 - it as Long
+                    if (num == 0L) {
+                        setTimerZero()
+                    } else {
+                        cancelConfirmVertical.backgroundColor = resources.getColor(R.color.white)
+                        cancel.isClickable = false
+                        confirm.isClickable = false
+                        readTimer.text = getString(R.string.please_read_carefully, num)
+                    }
+                }
+
+
+        pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+    }
+
+    private fun setNormalPopSetting() {
+        confirm?.isClickable = false
+
+        tvOne.visibility = View.VISIBLE
+        tvThree.visibility = View.VISIBLE
+        tvTwo.visibility = View.VISIBLE
+
+        hinitOne.visibility = View.VISIBLE
+        hinitThree.visibility = View.VISIBLE
+        hinitTwo.visibility = View.VISIBLE
+
+        hinitTwo.textSize = 16F
+        hinitTwo.setTextColor(resources.getColor(R.color.gray_3))
+        readTimer.visibility = View.VISIBLE
+
+        cancel.text = ""
+        confirm.text = ""
+
+        cancelConfirmVertical.backgroundColor = resources.getColor(R.color.white)
     }
 
     private fun setTimerZero() {
         readTimer.visibility = View.GONE
         cancelConfirmLy.visibility = View.VISIBLE
-        cancelConfirmVertical.backgroundColor =resources.getColor(R.color.gray)
+
+        cancelConfirmVertical.backgroundColor = resources.getColor(R.color.gray)
+
         tvOne.visibility = View.INVISIBLE
         tvTwo.visibility = View.INVISIBLE
-        tvThree.visibility = View.GONE
-        hinitOne.text = getString(R.string.tip_reset_sure)
-        hinitTwo.setTextColor(resources.getColor(R.color.red))
+
+
+
+        if (isResetFactory) {
+            hinitTwo.visibility = View.VISIBLE
+            hinitOne.text = getString(R.string.tip_reset_sure)
+            hinitTwo.setTextColor(resources.getColor(R.color.red))
+        } else {
+            hinitTwo.visibility = View.GONE
+            hinitOne.text = getString(R.string.empty_cache_tip)
+        }
+
         hinitTwo.textSize = 13F
         hinitTwo.text = getString(R.string.reset_warm_red)
 
+        tvThree.visibility = View.GONE
         hinitThree.visibility = View.GONE
+
         cancel.text = getString(R.string.cancel)
         confirm.text = getString(R.string.btn_ok)
         cancel.isClickable = true
@@ -229,28 +250,33 @@ class SettingActivity : BaseActivity() {
     }
 
     //清空缓存初始化APP
-    @SuppressLint("CheckResult", "SetTextI18n")
+    @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun emptyTheCache() {
-        val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.empty_cache_title))
-                .setMessage(getString(R.string.empty_cache_tip))
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    TelinkLightService.Instance()?.idleMode(true)
-                    clearData()
-                }.setNegativeButton(getString(R.string.btn_cancel)) { _, _ -> }.create()
-        alertDialog.show()
-        val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-        btn.isEnabled = false
-        val text = getString(android.R.string.ok)
-        val timeout = 5
-        Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .takeWhile { t: Long -> t < timeout }
-                .doOnComplete {
-                    btn.isEnabled = true
-                    btn.text = text
-                }
-                .subscribe {
-                    btn.text = "$text (${timeout - it})"
-                }
+
+        isResetFactory = false
+        setFirstePopAndShow(R.string.clear_one, R.string.clear_two, R.string.clear_one, isResetFactory)
+
+
+        /*   val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.empty_cache_title))
+                   .setMessage(getString(R.string.empty_cache_tip))
+                   .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                       TelinkLightService.Instance()?.idleMode(true)
+                       clearData()
+                   }.setNegativeButton(getString(R.string.btn_cancel)) { _, _ -> }.create()
+           alertDialog.show()
+           val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+           btn.isEnabled = false
+           val text = getString(android.R.string.ok)
+           val timeout = 5
+           Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                   .takeWhile { t: Long -> t < timeout }
+                   .doOnComplete {
+                       btn.isEnabled = true
+                       btn.text = text
+                   }
+                   .subscribe {
+                       btn.text = "$text (${timeout - it})"
+                   }*/
     }
 
     /**
@@ -299,8 +325,8 @@ class SettingActivity : BaseActivity() {
      */
     private fun makePop() {
         var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
-        tvOne  = popView.findViewById(R.id.tv_one)
-        tvTwo  = popView.findViewById(R.id.tv_two)
+        tvOne = popView.findViewById(R.id.tv_one)
+        tvTwo = popView.findViewById(R.id.tv_two)
         tvThree = popView.findViewById(R.id.tv_three)
         hinitOne = popView.findViewById(R.id.hinit_one)
         hinitTwo = popView.findViewById(R.id.hinit_two)
@@ -311,16 +337,7 @@ class SettingActivity : BaseActivity() {
         cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
         cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
 
-        tvOne.visibility =View.VISIBLE
-        tvTwo.visibility =View.VISIBLE
-        tvThree.visibility =View.VISIBLE
-
-        hinitTwo.setTextColor(resources.getColor(R.color.gray_3))
-        hinitTwo.textSize = 16F
-
-        cancel.text=""
-        confirm.text = ""
-
+        setNormalPopSetting()
 
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
@@ -337,7 +354,7 @@ class SettingActivity : BaseActivity() {
 
         val str = getString(R.string.have_question_look_notice)
         var ss = SpannableString(str)
-        val start: Int =if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
+        val start: Int = if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
         val end = str.length
         ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         hinitThree.text = ss
@@ -349,10 +366,14 @@ class SettingActivity : BaseActivity() {
         confirm?.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (TelinkLightApplication.getApp().connectDevice != null)
-                resetAllLights()
-            else {
-                ToastUtils.showShort(R.string.device_not_connected)
+            if (isResetFactory) {
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+                    resetAllLights()
+                } else {
+                    ToastUtils.showShort(R.string.device_not_connected)
+                }
+            } else {
+                clearData()
             }
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -392,7 +413,6 @@ class SettingActivity : BaseActivity() {
             }
         }
 
-//        if (meshAdre.size > 0) {
         Commander.resetLights(meshAdre, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
             syncData()
@@ -402,7 +422,6 @@ class SettingActivity : BaseActivity() {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
             null
         })
-//        }
         if (meshAdre.isEmpty()) {
             hideLoadingDialog()
         }

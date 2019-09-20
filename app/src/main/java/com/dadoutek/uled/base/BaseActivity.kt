@@ -184,8 +184,7 @@ abstract class BaseActivity : AppCompatActivity() {
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {}
-        override fun error(msg: String) {
-        }
+        override fun error(msg: String) {}
     }
 
     /**
@@ -193,7 +192,6 @@ abstract class BaseActivity : AppCompatActivity() {
      * 如果没有网络，则弹出网络设置对话框
      */
     fun checkNetworkAndSync(activity: Activity?) {
-
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -340,7 +338,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                     makeCodeDialog(2, cancelBean.authorizer_user_phone, "", cancelBean.region_name)//2代表解除授权信息type
                     LogUtils.e("zcl_baseMe_______取消授权")
-                    LogUtils.e("zcl")
+
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg

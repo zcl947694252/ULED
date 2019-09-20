@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -70,42 +70,27 @@
         <service
             android:name=".service.SendLightsInfo"
             android:enabled="true" />
-        <activity
-            android:name=".othersview.SplashActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".othersview.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".light.NormalSettingActivity"
+            android:name=".othersview.HumanBodySensorActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".user.EnterConfirmationCodeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".region.NetworkActivity"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".othersview.HumanBodySensorActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan"
-            />
-        <activity android:name=".user.EnterConfirmationCodeActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-        <activity android:name=".region.NetworkActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".user.EnterPasswordActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".user.EnterPasswordActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".user.AgainEnterPasswordActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".user.AgainEnterPasswordActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.InstructionsForUsActivity"
             android:screenOrientation="portrait" />
@@ -162,30 +147,58 @@
             android:name=".switches.SwitchDeviceDetailsActivity"
             android:screenOrientation="portrait" />
 
+
+        <activity
+            android:name=".othersview.SplashActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".othersview.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".light.NormalSettingActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".othersview.DeviceBatchScanningActivity"
             android:label="@string/activity_device_scanning_label"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".group.ChooseGroupForDevice"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".group.AddGroupActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ota.OtaActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ota.OTAUpdateSwitchActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ota.OTAUpdateActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".othersview.FileSelectActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" /> <!-- <activity -->
+        <!-- android:name=".activity.DeviceScanningActivity" -->
+        <!-- android:label="@string/activity_device_scanning_label" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- /> -->
         <activity
             android:name=".qrcode.QRCodeScanActivity"
             android:screenOrientation="portrait" />
@@ -201,6 +214,7 @@
         <activity
             android:name=".othersview.SelectDeviceTypeActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".switches.ScanningSwitchActivity"
             android:screenOrientation="portrait" />
@@ -210,9 +224,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.LightsOfGroupActivity"
-            android:screenOrientation="portrait" /> <!-- <activity -->
-        <!-- android:name=".scene.SetSceneAct" -->
-        <!-- android:screenOrientation="portrait" /> -->
+            android:screenOrientation="portrait" />
         <activity
             android:name=".switches.ConfigSceneSwitchActivity"
             android:screenOrientation="portrait" />
@@ -232,18 +244,18 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.DeviceScanningNewActivity"
-            android:screenOrientation="portrait" /> <!-- <activity -->
-        <!-- android:name=".scene.ChangeSceneAct" -->
-        <!-- android:screenOrientation="portrait" /> -->
+            android:screenOrientation="portrait" />
         <activity
             android:name=".light.EmptyAddActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" /> <!-- <activity -->
+        <!-- android:name=".scene.SetSceneAct" -->
+        <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".user.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".pir.ConfigSensorAct"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
@@ -253,22 +265,18 @@
         <activity
             android:name=".rgb.RGBSettingActivity"
             android:screenOrientation="portrait" />
-        <!-- <activity -->
-        <!-- android:name=".rgb.SelectColorActivity" -->
-        <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".rgb.RGBGradientActivity"
-            android:screenOrientation="portrait" />
-
+            android:screenOrientation="portrait" /> <!-- <activity -->
+        <!-- android:name=".scene.ChangeSceneAct" -->
+        <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".scene.NewSceneSetAct"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden"/>
-
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".othersview.SelectColorAct"
-            android:theme="@style/MyDialogStyleBottom"/>
-
+            android:theme="@style/MyDialogStyleBottom" />
         <activity
             android:name=".rgb.SetDiyColorAct"
             android:screenOrientation="portrait" />
@@ -283,17 +291,21 @@
             android:name=".group.CurtainGroupingActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateVisible" />
+        <!-- <activity -->
+        <!-- android:name=".rgb.SelectColorActivity" -->
+        <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".rgb.SelectColorGradientAct"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".tellink.TelinkBaseActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".curtains.WindowCurtainsActivity"
-            android:screenOrientation="portrait" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- /> -->
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".curtain.CurtainOfGroupActivity"
             android:screenOrientation="portrait" />
@@ -303,10 +315,33 @@
         <activity
             android:name=".user.DeveloperActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".region.SettingActivity"
+        <activity
+            android:name=".region.SettingActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".region.UnbindMeNetActivity"
+        <activity
+            android:name=".region.UnbindMeNetActivity"
             android:screenOrientation="portrait" />
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="260b846a2a8f8" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="886a329e066cc1fba6db79e0d5a299bf" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- /> -->
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
+        <service
+            android:name=".tellink.TelinkLightService"
+            android:enabled="true" />
+        <service
+            android:name=".service.SendLightsInfo"
+            android:enabled="true" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
 <!--        bugly升级sdk用的-->
         <activity

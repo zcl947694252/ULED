@@ -264,7 +264,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     private fun setMoreArr(isAll: Boolean, more_tv: TextView, more_arr: ImageView) {
         if (isAll) {
-            more_arr.setImageResource(R.drawable.icon_on)
+            more_arr.setImageResource(R.mipmap.icon_on)
             more_tv.text = getString(R.string.pick_up)
         } else {
             more_tv.text = getString(R.string.see_more)
@@ -542,8 +542,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     .subscribe {
                         //Log.e("zcl", "zcl******$expire----$it")
                         mExpire = expire - it
-                        var b = mExpire == 0L
-                        // Log.e(TAG,"zcl***倒计时***$mExpire----------$expire---------$it-----$b")
                         if (mExpire == 0L) {
                             isRefresh = true //二维码已过期就是刷新状态
                             if (isTransferCode) {

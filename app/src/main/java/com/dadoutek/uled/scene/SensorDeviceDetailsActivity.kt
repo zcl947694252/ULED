@@ -175,7 +175,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
         add_device_btn.setOnClickListener { startActivity(Intent(this, ScanningSensorActivity::class.java)) }//添加设备
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { restartApplication()}
         toolbar.title = getString(R.string.sensor) + " (" + sensorData!!.size + ")"
     }
 

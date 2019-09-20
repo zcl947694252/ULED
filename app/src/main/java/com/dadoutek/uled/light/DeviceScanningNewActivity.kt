@@ -344,7 +344,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         showLoadingDialog(resources.getString(R.string.connecting_tip))
         //先断开
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         //过一秒
         val disposable = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1363,5 +1363,4 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         private val SCAN_TIMEOUT_SECOND = 10
         private val TIME_OUT_CONNECT = 15
     }
-
 }

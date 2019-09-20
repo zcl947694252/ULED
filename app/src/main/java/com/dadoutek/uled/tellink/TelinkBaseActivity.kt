@@ -1,6 +1,5 @@
 package com.dadoutek.uled.tellink
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -22,7 +21,6 @@ import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.intf.SyncCallback
@@ -38,27 +36,20 @@ import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
-import com.dd.processbutton.iml.ActionProcessButton
-import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.ErrorReportInfo
-import com.telink.bluetooth.light.LeScanParameters
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_scanning_sensor.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var mStompListener: Disposable? = null
@@ -92,7 +83,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
 
         initStompReceiver()
-//        requestPermission()
+
+        singleLogin = AlertDialog.Builder(this)
+                .setTitle(R.string.other_device_login)
+                .setMessage(getString(R.string.single_login_warm))
+                .setCancelable(false)
+                .setOnDismissListener {
+                    restartApplication()
+                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    restartApplication()
+                }.create()
     }
 
 
@@ -107,32 +108,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         dialogTip.setCancelable(false)
         dialogTip.create().show()
     }
-
-
-/*
-    private fun unregisterBluetoothReceiver() {
-        if (mReceive != null) {
-            unregisterReceiver(mReceive)
-            mReceive = null
-        }
-    }
-*/
-
-/*
-    private fun registerBluetoothReceiver() {
-        if (mReceive == null) {
-            mReceive = BluetoothStateBroadcastReceive()
-        }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
-        registerReceiver(mReceive, intentFilter)
-    }
-*/
-
 
     /**
      * 改变Toolbar上的图片和状态
@@ -155,7 +130,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     dialog.show()
                 }
             }
-
         }
     }
 
@@ -199,8 +173,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
-
-
     }
 
     override fun onResume() {
@@ -212,16 +184,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
 
-        if (LeBluetooth.getInstance().isEnabled) {
+        if (LeBluetooth.getInstance().isEnabled){
             if (lightService?.isLogin == true) {
                 changeDisplayImgOnToolbar(true)
-            } else {
+            }else{
                 changeDisplayImgOnToolbar(false)
             }
-        } else {
+        }else{
             changeDisplayImgOnToolbar(false)
         }
-
     }
 
     override fun onDestroy() {
@@ -229,9 +200,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         isRuning = false
         this.toast!!.cancel()
         this.toast = null
-//        unregisterBluetoothReceiver()
         unregisterReceiver(stompRecevice)
-
     }
 
     open fun initOnLayoutListener() {
@@ -284,53 +253,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         return StringUtils.compileExChar(str)
     }
 
-/*
-    inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-
-                    }
-                }
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                            var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
-                            dialog.show()
-                        }
-                    }
-                }
-                BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
-                        BluetoothAdapter.STATE_OFF -> {
-                            if (toolbar != null) {
-//                                retryConnect()
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                                    var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
-                                    dialog.show()
-                                }
-                            }
-                        }
-                        BluetoothAdapter.STATE_ON -> {
-                            if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
 
     override fun onPause() {
         super.onPause()
@@ -384,7 +306,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
             val showing = singleLogin?.isShowing
-            if (!b && showing != null && !showing!!) {
+            if (!b && showing!=null&&!showing!!) {
                 singleLogin!!.show()
             }
         }

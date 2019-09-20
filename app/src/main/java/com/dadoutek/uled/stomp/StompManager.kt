@@ -28,8 +28,8 @@ class StompManager private constructor() {
     val WS_AUTHOR_CODE = "/user/topic/authorization.cancel"
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
-    
-    private var mStompClient: StompClient? = null
+
+    var mStompClient: StompClient? = null
 
     companion object {
         private var instance: StompManager? = null
@@ -54,7 +54,7 @@ class StompManager private constructor() {
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
             mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_BASE_URL)
-            
+
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)
                     ?.withServerHeartbeat(5000)   //设置心跳
@@ -124,6 +124,7 @@ class StompManager private constructor() {
                     msg
                 }
     }
+
 
 
 }

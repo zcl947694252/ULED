@@ -56,7 +56,6 @@ public class NetworkFactory {
                     .build();
             api = retrofit.create(RequestInterface.class);
         }
-
         return api;
     }
 

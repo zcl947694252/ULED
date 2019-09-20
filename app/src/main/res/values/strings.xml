@@ -893,5 +893,7 @@
     <string name="have_question_look_notice">If you have any other questions, please check the app description</string>
     <string name="reset_warm_red">It can be added again by adding devices after factory Settings have been restored.</string>
     <string name="connect_fail2">Connection failed, please try again</string>
+    <string name="clear_one">It is recommended to restore factory Settings first and then clear the data to avoid unexpected errors</string>
+    <string name="clear_two">Local and cloud data will be erased and unrecoverable.</string>
 
 </resources>
