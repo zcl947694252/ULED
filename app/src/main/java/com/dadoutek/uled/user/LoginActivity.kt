@@ -41,8 +41,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
-import com.xiaomi.market.sdk.Log
-import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
@@ -77,7 +75,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         phoneList = DBUtils.getAllUser()
-        Log.d("dataSize", phoneList!!.size.toString())
         if (phoneList!!.size == 0)
             date_phone.visibility = View.GONE
 
@@ -90,8 +87,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
      * 检查App是否有新版本
      */
     private fun detectUpdate() {
-        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
-        XiaomiUpdateAgent.update(this)
+//        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
+//        XiaomiUpdateAgent.update(this)
     }
 
     private fun initData() {

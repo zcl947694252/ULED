@@ -9,6 +9,8 @@ import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
+import com.polidea.rxandroidble2.scan.ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT
+import com.polidea.rxandroidble2.scan.ScanSettings.SCAN_MODE_LOW_LATENCY
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -45,7 +47,10 @@ object RecoverMeshDeviceUtil {
         createdDeviceList.clear()
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
-        val scanSettings = ScanSettings.Builder().build()
+        val scanSettings = ScanSettings.Builder()
+                .setScanMode(SCAN_MODE_LOW_LATENCY)
+                .build()
+
 
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
@@ -206,6 +211,7 @@ object RecoverMeshDeviceUtil {
                     deviceInfo.meshUUID = meshUUID
                     deviceInfo.productUUID = productUUID
 //                    light.isSelected = false
+//                    LogUtils.d("deviceInfo = $deviceInfo")
                     return deviceInfo
                 }
             }

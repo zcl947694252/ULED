@@ -71,7 +71,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     protected var toast: Toast? = null
     protected var foreground = false
     private var loadDialog: Dialog? = null
-//    private var mReceive: BluetoothStateBroadcastReceive? = null
+    //    private var mReceive: BluetoothStateBroadcastReceive? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
@@ -116,6 +116,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             it.isOutsideTouchable = false
         }
     }
+
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {

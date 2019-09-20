@@ -13,7 +13,8 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.Bugly
+import com.tencent.bugly.beta.Beta
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
@@ -55,7 +56,11 @@ class TelinkLightApplication : TelinkApplication() {
         super.onCreate()
         app = this
         Utils.init(this)
-        CrashReport.initCrashReport(applicationContext, "ea665087a5", false)
+//        CrashReport.initCrashReport(applicationContext, "ea665087a5", false)
+        Bugly.init(applicationContext, "ea665087a5", false)
+        Beta.enableHotfix = false
+
+
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)

@@ -78,7 +78,8 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     //自动连接时最大重连次数
     private static final int CONNECT_MAX_RETRY = 2;
 
-    private static final int AUTO_CONNECT_SCAN_TIMEOUT_SECONDS = 3;
+    //自动连接前，查找设备花的时间 ms
+    private static final int AUTO_CONNECT_SCAN_TIMEOUT_SECONDS = 1500;
 
     private final EventListener<Integer> mConnectionListener = new ConnectionListener();
     private final EventListener<Integer> mResetMeshListener = new ResetMeshListener();
@@ -624,7 +625,6 @@ public static final int SMART_RELAY = 0x05;       //就是connector
                 if (!LeBluetooth.getInstance().startScan(null, filters)) {
                     setMode(MODE_IDLE);
                 }
-
 
             } else {
                 if (!LeBluetooth.getInstance().startScan(null)) {
@@ -1504,7 +1504,7 @@ public static final int SMART_RELAY = 0x05;       //就是connector
                 return;
             }
 
-            if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS * 1000)) {
+            if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                 return;
             }
 
