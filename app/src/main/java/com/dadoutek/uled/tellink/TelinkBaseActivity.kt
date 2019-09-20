@@ -108,32 +108,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         dialogTip.create().show()
     }
 
-
-/*
-    private fun unregisterBluetoothReceiver() {
-        if (mReceive != null) {
-            unregisterReceiver(mReceive)
-            mReceive = null
-        }
-    }
-*/
-
-/*
-    private fun registerBluetoothReceiver() {
-        if (mReceive == null) {
-            mReceive = BluetoothStateBroadcastReceive()
-        }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
-        registerReceiver(mReceive, intentFilter)
-    }
-*/
-
-
     /**
      * 改变Toolbar上的图片和状态
      * @param isConnected       是否是连接状态
@@ -155,7 +129,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     dialog.show()
                 }
             }
-
         }
     }
 
@@ -199,8 +172,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
-
-
     }
 
     override fun onResume() {
@@ -221,7 +192,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }else{
             changeDisplayImgOnToolbar(false)
         }
-
     }
 
     override fun onDestroy() {
@@ -229,9 +199,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         isRuning = false
         this.toast!!.cancel()
         this.toast = null
-//        unregisterBluetoothReceiver()
         unregisterReceiver(stompRecevice)
-
     }
 
     open fun initOnLayoutListener() {
@@ -284,53 +252,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         return StringUtils.compileExChar(str)
     }
 
-/*
-    inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-
-                    }
-                }
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                            var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
-                            dialog.show()
-                        }
-                    }
-                }
-                BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
-                        BluetoothAdapter.STATE_OFF -> {
-                            if (toolbar != null) {
-//                                retryConnect()
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                                    var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
-                                    dialog.show()
-                                }
-                            }
-                        }
-                        BluetoothAdapter.STATE_ON -> {
-                            if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
 
     override fun onPause() {
         super.onPause()

@@ -681,6 +681,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onDestroy() {
         super.onDestroy()
 
+        TelinkLightApplication.getApp().releseStomp()
+
         //移除事件
         this.mApplication?.removeEventListener(this)
         if (TelinkLightService.Instance() != null)
@@ -689,6 +691,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         Lights.getInstance().clear()
         mDisposable.dispose()
         disposableCamera?.dispose()
+
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 

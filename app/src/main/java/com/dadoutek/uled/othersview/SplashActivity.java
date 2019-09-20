@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.user.LoginActivity;
+import com.telink.bluetooth.TelinkLog;
 
 /**
  * Created by hejiajun on 2018/3/22.
@@ -37,7 +38,8 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
     private void init() {
         this.mApplication = (TelinkLightApplication) this.getApplication();
-        this.mApplication.doDestroy();
+        //this.mApplication.doDestroy();
+        TelinkLog.onDestroy();
         this.mApplication.doInit();
 
         //判断是否是第一次使用app，启动导航页
@@ -47,11 +49,9 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
         if (mIsLogging) {
             ActivityUtils.startActivityForResult(this, MainActivity.class, 0);
-
         } else {
             gotoLoginSetting(false);
         }
-//        }
     }
 
     private void gotoLoginSetting(Boolean isFrist) {
@@ -70,8 +70,5 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     }
 
     @Override
-    protected void onLocationEnable() {
-    }
-
-
+    protected void onLocationEnable() {}
 }

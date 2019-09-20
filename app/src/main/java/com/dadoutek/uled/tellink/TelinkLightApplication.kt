@@ -19,8 +19,6 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.LifecycleEvent
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class TelinkLightApplication : TelinkApplication() {
@@ -103,6 +101,7 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     open fun releseStomp() {
+        mStompManager.mStompClient?.disconnect()
         stompLifecycleDisposable?.dispose()
         singleLoginTopicDisposable?.dispose()
         paserCodedisposable?.dispose()
@@ -148,7 +147,6 @@ class TelinkLightApplication : TelinkApplication() {
                     sendBroadcast(intent)
                 }, { ToastUtils.showShort(it.localizedMessage) })
 
-
                 stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
                         LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
@@ -169,12 +167,8 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     override fun saveLog(action: String) {
-        val format = SimpleDateFormat("HH:mm:ss.S")
-        val time = format.format(Calendar.getInstance().timeInMillis)
         TelinkLog.w("SaveLog: $action")
     }
-
-
 }
 
 

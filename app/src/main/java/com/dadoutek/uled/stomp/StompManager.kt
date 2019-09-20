@@ -29,7 +29,7 @@ class StompManager private constructor() {
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
 
-    private var mStompClient: StompClient? = null
+    var mStompClient: StompClient? = null
 
     companion object {
         private var instance: StompManager? = null
