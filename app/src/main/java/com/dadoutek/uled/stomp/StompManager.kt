@@ -22,10 +22,12 @@ class StompManager private constructor() {
     val WS_DEBUG_HOST = "/smartlight/test"
     //虚拟主机号
     val WS_HOST = "/smartlight"
+
     //二维码频道
-    val WS_TOPIC_CODE = "/user/topic/code.parse"
+    val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
     //取消收授权频道
-    val WS_AUTHOR_CODE = "/user/topic/authorization.cancel"
+    val WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
+
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
 
@@ -49,11 +51,11 @@ class StompManager private constructor() {
     fun initStompClient() {
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
-        headers.add(StompHeader("host", WS_HOST))
+        headers.add(StompHeader("host", WS_DEBUG_HOST))
 
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
-            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_BASE_URL)
+            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_BASE_URL_DEBUG)
 
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)
@@ -77,10 +79,49 @@ class StompManager private constructor() {
 
     }
 
-    private fun getHeaders(): List<StompHeader> {
+    private fun getLoginHeaders(): List<StompHeader> {
         val headersLogin = ArrayList<StompHeader>()
-        headersLogin.add(StompHeader("id", DBUtils.lastUser?.id.toString()))
-        headersLogin.add(StompHeader("destination", WS_HOST))
+
+        /**
+         * ack	String	否	固定:auto
+        id	String	是	固定:login-state
+        exclusive	boolean	是	固定: true
+         */
+        headersLogin.add(StompHeader("ack", "auto"))
+        headersLogin.add(StompHeader("id", "login-state"))
+        headersLogin.add(StompHeader("exclusive", "login-true"))
+        return headersLogin
+    }
+
+    private fun getQRHeaders(): List<StompHeader> {
+        val headersLogin = ArrayList<StompHeader>()
+        /**
+         *ack	String	是	固定: auto
+         *  id	String	是	固定: code-parse
+         *exclusive	boolean	是	固定: true
+         *  x-queue-name	boolean	是	固定: sl-code-parse-用户id
+         */
+        headersLogin.add(StompHeader("ack", "auto"))
+        headersLogin.add(StompHeader("id", "code-parse"))
+        headersLogin.add(StompHeader("exclusive", "true"))
+        headersLogin.add(StompHeader("x-queue-name", "sl-code-parse-"+DBUtils.lastUser?.id))
+        return headersLogin
+    }
+
+    private fun getAuthorHeaders(): List<StompHeader> {
+        val headersLogin = ArrayList<StompHeader>()
+        /**
+        ack	String	是	固定: client-individual
+        id	String	是	固定: authorization-cancel
+        durable	boolean	是	固定: true
+        auto-delete	boolean	是	固定: false
+        x-queue-name	boolean	是	固定: sl-authorization-cancel-用户id
+        */
+        headersLogin.add(StompHeader("ack", "client-individual"))
+        headersLogin.add(StompHeader("id", "authorization-cancel"))
+        headersLogin.add(StompHeader("durable", "true"))
+        headersLogin.add(StompHeader("auto-delete", "false"))
+        headersLogin.add(StompHeader("x-queue-name", "sl-authorization-cancel-"+DBUtils.lastUser?.id))
         return headersLogin
     }
 
@@ -89,7 +130,7 @@ class StompManager private constructor() {
      * @return onNext中的数据为key
      */
     fun parseQRCodeTopic(): Flowable<QrCodeTopicMsg> {
-        val headersLogin = getHeaders()
+        val headersLogin = getQRHeaders()
         return mStompClient!!.topic(WS_TOPIC_CODE, headersLogin)
                 .map { topicMessage ->
                     val payloadCode = topicMessage.payload
@@ -105,18 +146,20 @@ class StompManager private constructor() {
      * @return onNext中的数据为key
      */
     fun singleLoginTopic(): Flowable<String> {
-        val headersLogin = getHeaders()
+        val headersLogin = getLoginHeaders()
         return mStompClient!!.topic(WS_TOPIC_LOGIN, headersLogin)
                 .map { topicMessage ->
                     topicMessage.payload
                 }
 
-    } /**
+    }
+
+    /**
      * 解除授权的Flowable
      * @return onNext中的数据为key
      */
     fun cancelAuthorization(): Flowable<CancelAuthorMsg> {
-        val headersLogin = getHeaders()
+        val headersLogin = getAuthorHeaders()
         return mStompClient!!.topic(WS_AUTHOR_CODE, headersLogin)
                 .map { topicMessage ->
                     val payload = topicMessage.payload

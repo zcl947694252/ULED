@@ -108,8 +108,23 @@ class TelinkLightApplication : TelinkApplication() {
         mCancelAuthorTopicDisposable?.dispose()
     }
 
+    open fun isConnectAutoInit() {
+        var connected = mStompManager.mStompClient?.isConnected
+        val bSingle = singleLoginTopicDisposable?.isDisposed
+        val bParse = paserCodedisposable?.isDisposed
+        val bCancel = mCancelAuthorTopicDisposable?.isDisposed
+        if (connected == null || bSingle == null || bParse == null || bCancel == null)
+            initStompClient()
+        else
+            if (!connected || bSingle || bParse || bCancel) {
+                releseStomp()
+                initStompClient()
+            }
+    }
+
     @SuppressLint("CheckResult")
     fun initStompClient() {
+
         GlobalScope.launch {
             if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()
@@ -117,7 +132,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
-                    if (it != key&&"no_have_key"!=it) {
+                    if (it != key && "no_have_key" != it) {
                         LogUtils.e("zcl登出")
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT

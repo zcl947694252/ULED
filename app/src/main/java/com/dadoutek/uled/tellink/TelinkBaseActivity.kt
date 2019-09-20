@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -95,7 +96,26 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     restartApplication()
                 }.create()
     }
+    private fun makeDialogAndPop() {
+        singleLogin = AlertDialog.Builder(this)
+                .setTitle(R.string.other_device_login)
+                .setMessage(getString(R.string.single_login_warm))
+                .setCancelable(false)
+                .setOnDismissListener {
+                    restartApplication()
+                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    dialog.dismiss()
+                    restartApplication()
+                }.create()
 
+        popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
+        pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        pop?.let {
+            it.isFocusable = true // 设置PopupWindow可获得焦点
+            it.isTouchable = true // 设置PopupWindow可触摸补充：
+            it.isOutsideTouchable = false
+        }
+    }
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {
