@@ -352,7 +352,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)) {
             stepEndGuide1()
         }
-        Log.e("zcl场景", "zcl场景******onResume")
+//        Log.e("zcl场景", "zcl场景******onResume")
     }
 
 
@@ -360,7 +360,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         super.onActivityResult(requestCode, resultCode, data)
         initData()
         initView()
-        LogUtils.e("zcl场景", "zcl场景******onActivityResult")
+//        LogUtils.e("zcl场景", "zcl场景******onActivityResult")
     }
 
 

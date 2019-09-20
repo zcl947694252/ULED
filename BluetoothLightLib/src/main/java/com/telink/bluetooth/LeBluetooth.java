@@ -211,7 +211,7 @@ public final class LeBluetooth {
                 {
 //                    scanSettingsBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
                     scanSettingsBuilder .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
-                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
+//                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
                 }
                 scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
 //                                .setNumOfMatches(5)

@@ -149,7 +149,7 @@ public class Peripheral extends BluetoothGattCallback {
 
 //            //确保gatt被新对象赋值时，是空的
 //            if (this.gatt != null) {
-//                close();
+//                closeGatt();
 //                try {
 //                    Thread.sleep(300);
 //                } catch (InterruptedException e) {
@@ -175,7 +175,9 @@ public class Peripheral extends BluetoothGattCallback {
     public void disconnect() {
 //        if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
 //            return;
-        close();
+        if (this.gatt != null) {
+            this.gatt.disconnect();
+        }
 
         TelinkLog.d("disconnect " + this.getDeviceName() + " -- "
                 + this.getMacAddress());
@@ -189,7 +191,7 @@ public class Peripheral extends BluetoothGattCallback {
 //                    this.gatt.disconnect();
 //                    this.mConnState.set(CONN_STATE_DISCONNECTING);
 //                } else {
-//                    close();
+//                    closeGatt();
 //                }
 //            } else {
 //                this.mConnState.set(CONN_STATE_IDLE);
@@ -768,12 +770,10 @@ public class Peripheral extends BluetoothGattCallback {
                 this.onConnect();
             }
 
-        } else {
-
+        } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
             synchronized (this.mStateLock) {
-
                 if (this.gatt != null) {
-                    close();
+                    closeGatt();
                     TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt Close");
                 }
 
@@ -782,16 +782,32 @@ public class Peripheral extends BluetoothGattCallback {
                 TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
                 this.onDisconnect();
             }
+
         }
+//        else {
+//
+//            synchronized (this.mStateLock) {
+//
+//                if (this.gatt != null) {
+//                    closeGatt();
+//                    TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt Close");
+//                }
+//
+//                this.clear();
+//                this.mConnState.set(CONN_STATE_IDLE);
+//                TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
+//                this.onDisconnect();
+//            }
+//        }
     }
 
 
-    private synchronized void close() {
+    private synchronized void closeGatt() {
         if (this.gatt != null) {
-            this.gatt.disconnect();
-            refreshDeviceCache(gatt);
+//            this.gatt.disconnect();
+//            refreshDeviceCache(gatt);
             this.gatt.close();
-            TelinkLog.d("gatt close " + this.gatt);
+            TelinkLog.d("gatt closeGatt " + this.gatt);
             this.mConnState.set(CONN_STATE_CLOSED);
             this.gatt = null;
         }

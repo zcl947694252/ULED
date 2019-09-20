@@ -1,5 +1,6 @@
 package com.dadoutek.uled.tellink
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -21,6 +22,7 @@ import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.intf.SyncCallback
@@ -36,20 +38,27 @@ import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
+import com.dd.processbutton.iml.ActionProcessButton
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.ErrorReportInfo
+import com.telink.bluetooth.light.LeScanParameters
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_scanning_sensor.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var mStompListener: Disposable? = null
@@ -70,7 +79,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     protected var toast: Toast? = null
     protected var foreground = false
     private var loadDialog: Dialog? = null
-//    private var mReceive: BluetoothStateBroadcastReceive? = null
+    //    private var mReceive: BluetoothStateBroadcastReceive? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
@@ -83,7 +92,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
 
         initStompReceiver()
+//        requestPermission()
     }
+
 
 
     //增加全局监听蓝牙开启状态
@@ -201,13 +212,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
 
-        if (LeBluetooth.getInstance().isEnabled){
+        if (LeBluetooth.getInstance().isEnabled) {
             if (lightService?.isLogin == true) {
                 changeDisplayImgOnToolbar(true)
-            }else{
+            } else {
                 changeDisplayImgOnToolbar(false)
             }
-        }else{
+        } else {
             changeDisplayImgOnToolbar(false)
         }
 
@@ -373,7 +384,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
             val showing = singleLogin?.isShowing
-            if (!b && showing!=null&&!showing!!) {
+            if (!b && showing != null && !showing!!) {
                 singleLogin!!.show()
             }
         }

@@ -119,9 +119,14 @@ dependencies {
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.tencent.bugly:crashreport:2.8.6'
+
+//    implementation 'com.tencent.bugly:crashreport:2.8.6'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+
+    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
     implementation 'com.tencent.bugly:nativecrashreport:3.6.0'
+
+
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'com.jakewharton:butterknife:8.8.1'
@@ -149,7 +154,7 @@ dependencies {
     implementation 'com.liulishuo.filedownloader:library:1.7.5'
     implementation 'com.github.maning0303:MNProgressHUD:V1.1.0'
     implementation 'com.github.skydoves:colorpickerview:2.0.1'
-    implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
+//    implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
     implementation 'com.github.duanhong169:colorpicker:1.1.5'
     implementation 'com.ccx1:EHorizontalSelectedView:1.0.0'
     implementation 'com.github.warkiz.widget:indicatorseekbar:2.1.2'

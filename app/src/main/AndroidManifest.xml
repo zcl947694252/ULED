@@ -9,9 +9,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="com.xiaomi.market.sdk.UPDATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -36,6 +36,60 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+
+
+
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="260b846a2a8f8" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="886a329e066cc1fba6db79e0d5a299bf" />
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
+        <service
+            android:name=".tellink.TelinkLightService"
+            android:enabled="true" />
+        <service
+            android:name=".service.SendLightsInfo"
+            android:enabled="true" />
+        <activity
+            android:name=".othersview.SplashActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="nosensor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".othersview.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".light.NormalSettingActivity"
+            android:screenOrientation="portrait" />
+
         <activity android:name=".othersview.HumanBodySensorActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
@@ -103,65 +157,11 @@
         <activity
             android:name=".curtains.CurtainsDeviceDetailsActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".switches.SwitchDeviceDetailsActivity"
             android:screenOrientation="portrait" />
 
-
-        <meta-data
-            android:name="Mob-AppKey"
-            android:value="260b846a2a8f8" />
-        <meta-data
-            android:name="Mob-AppSecret"
-            android:value="886a329e066cc1fba6db79e0d5a299bf" />
-
-        <meta-data
-            android:name="android.max_aspect"
-            android:value="2.1" />
-
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.dadoutek.uled.selfupdate.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/xiaomi_update_sdk_file_paths" />
-        </provider>
-
-        <service
-            android:name=".tellink.TelinkLightService"
-            android:enabled="true" />
-        <service
-            android:name=".service.SendLightsInfo"
-            android:enabled="true" />
-        <activity
-            android:name=".othersview.SplashActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".othersview.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".light.NormalSettingActivity"
-            android:screenOrientation="portrait" /> <!-- <activity -->
-        <!-- android:name=".activity.DeviceScanningActivity" -->
-        <!-- android:label="@string/activity_device_scanning_label" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- /> -->
         <activity
             android:name=".othersview.DeviceBatchScanningActivity"
             android:label="@string/activity_device_scanning_label"
@@ -307,6 +307,14 @@
             android:screenOrientation="portrait" />
         <activity android:name=".region.UnbindMeNetActivity"
             android:screenOrientation="portrait" />
+
+<!--        bugly升级sdk用的-->
+        <activity
+            android:name="com.tencent.bugly.beta.ui.BetaActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|locale"
+            android:theme="@android:style/Theme.Translucent" />
+
+
     </application>
 
 </manifest>

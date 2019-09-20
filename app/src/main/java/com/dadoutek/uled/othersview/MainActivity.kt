@@ -31,10 +31,7 @@ import com.allenliu.versionchecklib.v2.builder.UIData
 import com.allenliu.versionchecklib.v2.callback.CustomVersionDialogListener
 import com.allenliu.versionchecklib.v2.ui.VersionService.builder
 import com.app.hubert.guide.core.Controller
-import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ProcessUtils
-import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.*
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.device.DeviceFragment
@@ -58,6 +55,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.widget.BaseUpDateDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -72,7 +70,6 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -129,6 +126,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
 
+    private val mRxPermission = RxPermissions(this)
+
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -156,6 +155,26 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         TelinkLightApplication.getApp().initStompClient()
+        startToRecoverDevices()
+    }
+
+
+    private fun startToRecoverDevices(){
+        val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser!!.controlMeshName)
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        {
+                            LogUtils.d("added device ${it} ")
+                            deviceFragment.refreshView()
+                        },
+                        {
+                            LogUtils.d(it)
+                        },
+                        {
+                            LogUtils.d("added mesh devices complete")
+
+                        })
+        mCompositeDisposable.add(disposable)
     }
 
     private fun addEventListeners() {
@@ -170,8 +189,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      * 检查App是否有新版本
      */
     private fun detectUpdate() {
-        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
-        XiaomiUpdateAgent.update(this)
+//        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
+//        XiaomiUpdateAgent.update(this)
     }
 
 
@@ -616,8 +635,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
                                     connectParams.autoEnableNotification(true)
                                     connectParams.setConnectDeviceType(
+                                            mutableListOf<Int>(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY))
+
                                             mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
-                                                    DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY,DeviceType.SMART_CURTAIN))
+                                                    DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY,DeviceType.SMART_CURTAIN)
                                     //连接，如断开会自动重连
                                     TelinkLightService.Instance().autoConnect(connectParams)
 
@@ -709,21 +730,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
-                val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser!!.controlMeshName)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                {
-                                    LogUtils.d("added $it mesh devices")
-                                    deviceFragment.refreshView()
-                                },
-                                {
-                                    LogUtils.d(it)
-                                },
-                                {
-                                    LogUtils.d("added mesh devices complete")
-
-                                })
-                mCompositeDisposable.add(disposable)
 
             }
             LightAdapter.STATUS_LOGOUT -> {
