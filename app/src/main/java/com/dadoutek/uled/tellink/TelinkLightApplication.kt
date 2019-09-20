@@ -66,7 +66,7 @@ class TelinkLightApplication : TelinkApplication() {
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)
-        initStompClient()
+//        initStompClient()
 
         LogUtils.getConfig().setBorderSwitch(false)
         MobSDK.init(this)
@@ -104,7 +104,7 @@ class TelinkLightApplication : TelinkApplication() {
     override fun doDestroy() {
         TelinkLog.onDestroy()
         super.doDestroy()
-        releseStomp()
+//        releseStomp()
     }
 
     open fun releseStomp() {
@@ -123,8 +123,8 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
+                    LogUtils.d("STOMP key = $key receivedKey = $it")
                     if (it != key&&"no_have_key"!=it) {
-                        LogUtils.e("zcl登出")
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
                         intent.putExtra(Constant.LOGIN_OUT, key)

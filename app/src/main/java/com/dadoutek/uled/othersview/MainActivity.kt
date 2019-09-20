@@ -160,7 +160,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun startToRecoverDevices(){
-        val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser!!.controlMeshName)
+        val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
@@ -188,6 +188,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     /**
      * 检查App是否有新版本
      */
+
+    @Deprecated("we don't need call this function manually")
     private fun detectUpdate() {
 //        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
 //        XiaomiUpdateAgent.update(this)

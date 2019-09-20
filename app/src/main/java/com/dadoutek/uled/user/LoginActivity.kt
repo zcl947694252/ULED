@@ -86,6 +86,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     /**
      * 检查App是否有新版本
      */
+    @Deprecated("we don't need call this function manually")
     private fun detectUpdate() {
 //        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
 //        XiaomiUpdateAgent.update(this)

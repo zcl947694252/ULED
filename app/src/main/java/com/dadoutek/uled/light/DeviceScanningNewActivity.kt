@@ -940,6 +940,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initView() {
         initToolbar()
         //监听事件
+        this.mApplication?.removeEventListener(this)
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)

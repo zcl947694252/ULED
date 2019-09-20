@@ -103,7 +103,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
-        LogUtils.e("zcl场景----------------onCreateView")
         val view = inflater.inflate(R.layout.fragment_scene, null)
         recyclerView = view.findViewById(R.id.recyclerView)
         no_scene = view.findViewById(R.id.no_scene)
@@ -278,7 +277,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
 
-        LogUtils.e("zcl场景重新赋值")
         isDelete = false
         adaper!!.changeState(isDelete)
         for (i in scenesListData!!.indices) {
@@ -558,7 +556,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        LogUtils.e("zcl场景---------------onAttach")
         if (context is CallbackLinkMainActAndFragment) {
             callbackLinkMainActAndFragment = context
         }
@@ -566,7 +563,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onDetach() {
         super.onDetach()
-        LogUtils.e("zcl场景---------------onDetach")
         callbackLinkMainActAndFragment = null
     }
 

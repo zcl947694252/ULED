@@ -138,7 +138,8 @@ public class StompClient {
                 });
 
         messagesDisposable = connectionProvider.messages()
-                .map(StompMessage::from)
+                .map(StompMessage::
+                        from)
                 .filter(heartBeatTask::consumeHeartBeat)
                 .doOnNext(getMessageStream()::onNext)
                 .filter(msg -> msg.getStompCommand().equals(StompCommand.CONNECTED))

@@ -43,7 +43,7 @@ object RecoverMeshDeviceUtil {
 
     }
 
-    fun findMeshDevice(deviceName: String): Observable<Int> {
+    fun findMeshDevice(deviceName: String?): Observable<Int> {
         createdDeviceList.clear()
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()

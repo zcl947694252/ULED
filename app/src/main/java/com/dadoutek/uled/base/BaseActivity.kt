@@ -232,7 +232,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun restartApplication() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
-        TelinkLightApplication.getApp().releseStomp()
+//        TelinkLightApplication.getApp().releseStomp()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

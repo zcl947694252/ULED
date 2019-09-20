@@ -339,7 +339,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     //重启app并杀死原进程
     open fun restartApplication() {
-        TelinkLightApplication.getApp().releseStomp()
+//        TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         Log.e("zcl", "zcl******重启app并杀死原进程")
