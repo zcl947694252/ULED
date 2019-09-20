@@ -31,7 +31,7 @@ class StompManager private constructor() {
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
 
-    var mStompClient: StompClient? = null
+    private var mStompClient: StompClient? = null
 
     companion object {
         private var instance: StompManager? = null
@@ -49,6 +49,7 @@ class StompManager private constructor() {
     }
 
     fun initStompClient() {
+        LogUtils.e("zclStomp"+DBUtils.lastUser?.id)
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
         headers.add(StompHeader("host", WS_DEBUG_HOST))

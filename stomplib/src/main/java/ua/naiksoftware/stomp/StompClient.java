@@ -35,6 +35,7 @@ public class StompClient {
 
     public static final String SUPPORTED_VERSIONS = "1.1,1.2";
     public static final String DEFAULT_ACK = "auto";
+    public static final String INITIATIVE_ACK = "client-individual";
 
     private final ConnectionProvider connectionProvider;
     private ConcurrentHashMap<String, String> topics;
@@ -182,6 +183,29 @@ public class StompClient {
                 .firstElement().ignoreElement();
         return completable
                 .startWith(connectionComplete);
+    }
+    public void sendAck(@NonNull String destPath) {
+        String topicId = UUID.randomUUID().toString();
+       /* if (topics == null) topics = new ConcurrentHashMap<>();
+
+        if (topics.containsKey(destPath)) {
+            return Completable.complete();
+        }*/
+
+        topics.put(destPath, topicId);
+        List<StompHeader> headers = new ArrayList<>();
+        headers.add(new StompHeader(StompHeader.ID, topicId));
+        headers.add(new StompHeader(StompHeader.DESTINATION, destPath));
+        headers.add(new StompHeader(StompHeader.ACK, INITIATIVE_ACK));
+        StompMessage stompMessage = new StompMessage(StompCommand.SEND,
+                Collections.singletonList(new StompHeader(StompHeader.DESTINATION, destPath)), null);
+
+        Completable completable = connectionProvider.send(stompMessage.compile(legacyWhitespace));
+        CompletableSource connectionComplete = getConnectionStream()
+                .filter(isConnected -> isConnected)
+                .firstElement().ignoreElement();
+         completable.startWith(connectionComplete).onErrorComplete()
+                .subscribe();
     }
 
     @SuppressLint("CheckResult")
