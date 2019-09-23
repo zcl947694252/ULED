@@ -167,6 +167,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun lookAndMaketransferCode() {
         RegionModel.lookTransferCode(this).subscribe({
             isTransferCode = true
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.transfer_accounts_warm)
             setQR(it.code)
             downTimer(it.expire.toLong())
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
@@ -473,6 +474,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             mExpire = it.expire.toLong()
             Log.e(TAG, "zcl****是否有code判断**" + (it.code == ""))
             isTransferCode = false
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
             setQR(it.code)
             val expire = it.expire.toLong()
 
@@ -517,7 +519,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun setQR(it: String) {
         var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px( 231f),  ConvertUtils.dp2px( 231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
-        view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = lastUser?.phone
     }
 
     @SuppressLint("SetTextI18n")
@@ -553,7 +554,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             val s = mExpire % 60
                             val m = mExpire / 60 % 60
                             val h = mExpire / 60 / 60
-                            view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = "$h:$m:$s"
+                            view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.cancel_timer)+"$h:$m:$s"
                         }
                     })
         }
@@ -651,7 +652,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         view?.let { itView
             ->
             itView.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
-            itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
+           // itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
             itView.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
             //使用中不能删除 2
             val b = regionBean!!.id.toString() == lastUser?.last_region_id.toString()

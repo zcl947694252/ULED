@@ -16,6 +16,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -60,10 +61,23 @@ import java.util.*
 abstract class BaseActivity : AppCompatActivity() {
     private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
-    private var popView: View? = null
+    var popView: View? = null
+    var popViewWarm: View? = null
     var loadDialog: Dialog? = null
     val TAGS = "zcl_BaseActivity"
     private var singleLogin: AlertDialog? = null
+
+    private lateinit var cancel: Button
+    private lateinit var confirm: Button
+    lateinit var tvOne: TextView
+    lateinit var tvTwo: TextView
+    lateinit var tvThree: TextView
+    lateinit var hinitOne: TextView
+    lateinit var hinitTwo: TextView
+    lateinit var hinitThree: TextView
+    lateinit var readTimer: TextView
+    lateinit var cancelConfirmLy: LinearLayout
+    lateinit var cancelConfirmVertical: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +89,26 @@ abstract class BaseActivity : AppCompatActivity() {
         initOnLayoutListener()
         initStompReceiver()
         Constant.isTelBase = false
+
+        initPop()
+    }
+
+    private fun initPop() {
+         popViewWarm = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
+        popViewWarm?.let {
+
+        tvOne = it.findViewById(R.id.tv_one)
+        tvTwo = it.findViewById(R.id.tv_two)
+        tvThree = it.findViewById(R.id.tv_three)
+        hinitOne = it.findViewById(R.id.hinit_one)
+        hinitTwo = it.findViewById(R.id.hinit_two)
+        hinitThree = it.findViewById(R.id.hinit_three)
+        readTimer = it.findViewById(R.id.read_timer)
+        cancel = it.findViewById(R.id.btn_cancel)
+        confirm = it.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = it.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = it.findViewById(R.id.cancel_confirm_vertical)
+        }
     }
 
     private fun makeDialogAndPop() {
@@ -232,7 +266,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun restartApplication() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
-//        TelinkLightApplication.getApp().releseStomp()
+        TelinkLightApplication.getApp().releseStomp()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

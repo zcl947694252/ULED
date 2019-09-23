@@ -895,5 +895,8 @@
     <string name="connect_fail2">Connection failed, please try again</string>
     <string name="clear_one">It is recommended to restore factory Settings first and then clear the data to avoid unexpected errors</string>
     <string name="clear_two">Local and cloud data will be erased and unrecoverable.</string>
+    <string name="region_warm">Scan the qr code below to transfer the account</string>
+    <string name="cancel_timer">Expiration countdown:</string>
+    <string name="transfer_accounts_warm">The receiver will have only control, not management</string>
 
 </resources>

@@ -269,22 +269,6 @@
         android:visibility="visible">
 
         <TextView
-            android:id="@+id/pop_qr_area_name"
-            android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="8dp"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="@color/black_three"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/pop_qr_area_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -292,11 +276,30 @@
             android:gravity="center"
             android:text="@string/cur_network_owner"
             android:textColor="@color/black_three"
-            android:textSize="@dimen/sp_12"
+            android:textSize="@dimen/sp_15"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.487"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/pop_qr_area_name" />
+
+        <TextView
+            android:id="@+id/pop_qr_area_name"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center"
+            android:text="@string/region_warm"
+            android:textStyle="bold"
+            android:textColor="@color/black_three"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <ImageView
             android:id="@+id/pop_qr_img"

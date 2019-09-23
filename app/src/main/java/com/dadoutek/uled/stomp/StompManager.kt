@@ -24,14 +24,14 @@ class StompManager private constructor() {
     val WS_HOST = "/smartlight"
 
     //二维码频道
-    val WS_TOPIC_CODE = "/topic/code.parse"/* + DBUtils.lastUser?.id*/
+    val WS_TOPIC_CODE = "/user/topic/code.parse"/* + DBUtils.lastUser?.id*/
     //取消收授权频道
     val WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
 
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
 
-    private var mStompClient: StompClient? = null
+     var mStompClient: StompClient? = null
 
     companion object {
         private var instance: StompManager? = null
@@ -63,11 +63,8 @@ class StompManager private constructor() {
                     ?.withServerHeartbeat(5000)   //设置心跳
         } else if (mStompClient?.isConnected == false) { //如果断连了就再连一次
             mStompClient?.connect(headers)
-            mStompClient?.withClientHeartbeat(5000)
-                    ?.withServerHeartbeat(5000)   //设置心跳
+            mStompClient?.withClientHeartbeat(5000)?.withServerHeartbeat(5000)   //设置心跳
         }
-
-
     }
 
     /**
@@ -77,12 +74,10 @@ class StompManager private constructor() {
      */
     fun lifeCycle(): Flowable<LifecycleEvent>? {
         return mStompClient!!.lifecycle()
-
     }
 
     private fun getLoginHeaders(): List<StompHeader> {
         val headersLogin = ArrayList<StompHeader>()
-
         /**
          * ack	String	否	固定:auto
         id	String	是	固定:login-state
@@ -141,7 +136,6 @@ class StompManager private constructor() {
                 }
     }
 
-
     /**
      * 单点登录的Flowable
      * @return onNext中的数据为key
@@ -152,7 +146,6 @@ class StompManager private constructor() {
                 .map { topicMessage ->
                     topicMessage.payload
                 }
-
     }
 
     /**
@@ -168,7 +161,4 @@ class StompManager private constructor() {
                     msg
                 }
     }
-
-
-
 }

@@ -820,5 +820,8 @@
     <string name="connect_fail2">连接失败,请重试</string>
     <string name="clear_one">建议先恢复出厂设置、后清除数据,避免不可预料的错误发生。</string>
     <string name="clear_two">本地数据和云端数据将被清除且无法恢复。</string>
+    <string name="region_warm">扫描下方二维码移交账户</string>
+    <string name="cancel_timer">过期倒计时:</string>
+    <string name="transfer_accounts_warm">接收者将只有控制权，无管理权</string>
 
 </resources>

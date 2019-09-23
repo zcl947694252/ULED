@@ -75,7 +75,5 @@ class UnbindMeNetActivity : BaseActivity() {
         builder.create().show()
     }
 
-    override fun initListener() {
-
-    }
+    override fun initListener() {}
 }

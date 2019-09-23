@@ -103,14 +103,15 @@ class TelinkLightApplication : TelinkApplication() {
     override fun doDestroy() {
         TelinkLog.onDestroy()
         super.doDestroy()
-//        releseStomp()
+        releseStomp()
     }
 
     open fun releseStomp() {
-        stompLifecycleDisposable?.dispose()
+        mStompManager.mStompClient?.disconnect()
+    /*    stompLifecycleDisposable?.dispose()
         singleLoginTopicDisposable?.dispose()
         paserCodedisposable?.dispose()
-        mCancelAuthorTopicDisposable?.dispose()
+        mCancelAuthorTopicDisposable?.dispose()*/
     }
 
     @SuppressLint("CheckResult")
@@ -150,20 +151,23 @@ class TelinkLightApplication : TelinkApplication() {
                     intent.action = Constant.CANCEL_CODE
                     intent.putExtra(Constant.CANCEL_CODE, it)
                     sendBroadcast(intent)
-                }, { ToastUtils.showShort(it.localizedMessage) })
+                }, { ToastUtils.showShort(it.localizedMessage)})
 
-
+                /**
+                 * stomp断联监听
+                 */
                 stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
                         LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
                         LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
                         LifecycleEvent.Type.CLOSED -> {
                             LogUtils.d("zcl_Stomp******Stomp connection closed")
+                            GlobalScope.launch {
+                                TelinkLightApplication.getApp().initStompClient()
+                            }
                         }
                     }
-                }, {
-                    ToastUtils.showShort(it.localizedMessage)
-                })
+                }, { ToastUtils.showShort(it.localizedMessage)})
             }
         }
     }
