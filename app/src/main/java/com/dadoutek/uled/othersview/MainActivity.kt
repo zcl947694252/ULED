@@ -159,7 +159,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         GlobalScope.launch {
         TelinkLightApplication.getApp().initStompClient()
         }
-        startToRecoverDevices()
     }
 
 
@@ -168,7 +167,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
-                            LogUtils.d("added device ${it} ")
+                            LogUtils.d("added device $it ")
                             deviceFragment.refreshView()
                         },
                         {
@@ -543,6 +542,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPause() {
         super.onPause()
+        startToRecoverDevices()
         disableConnectionStatusListener()
         this.mApplication?.removeEventListener(this)
         mCompositeDisposable.clear()
@@ -837,5 +837,4 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         return super.onKeyDown(keyCode, event)
     }
-
 }

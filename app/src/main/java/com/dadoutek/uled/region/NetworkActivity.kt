@@ -167,7 +167,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun lookAndMaketransferCode() {
         RegionModel.lookTransferCode(this).subscribe({
             isTransferCode = true
-            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.transfer_accounts_warm)
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.VISIBLE
             setQR(it.code)
             downTimer(it.expire.toLong())
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
@@ -449,19 +450,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         lookAndMakeAuthorCode()
                 } else {
                     //是倒计时状态 撤销二维码
-                    if (!isTransferCode)
-                        RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
-                            LogUtils.e("zcl取消网络授权成功")
-                            setCancel()
-                            setCreatShareCodeState()
-                        }, { ToastUtils.showShort(it.message) })
-                    else {
+                    if (isTransferCode) {
                         RegionModel.removeTransferCode()!!.subscribe {
                             //设置二维码失效状态 倒计时颜色状态
                             LogUtils.e("zcl取消移交码成功")
-                            transfer_account_tv.text =getString(R.string.transfer_accounts)
+                            transfer_account_tv.text = getString(R.string.transfer_accounts)
                             setCancel()
                         }
+                    }else {
+                        RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
+                            LogUtils.e("zcl取消网络授权成功id"+ regionBean!!.id+"=======type"+regionBean!!.code_info!!.type)
+                            setCancel()
+                            setCreatShareCodeState()
+                        }, { ToastUtils.showShort(it.message) })
                     }
                 }
             }
@@ -472,9 +473,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun lookAndMakeAuthorCode() {
         lookAuthorizeCode(regionBean!!.id, this).subscribe({
             mExpire = it.expire.toLong()
-            Log.e(TAG, "zcl****是否有code判断**" + (it.code == ""))
+            regionBean!!.code_info!!.type  = it.type
+            LogUtils.e(TAG, "zcl****是否有code判断是不是空的**" + (it.code == ""))
             isTransferCode = false
-            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.authorization_warm)
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.VISIBLE
             setQR(it.code)
             val expire = it.expire.toLong()
 
@@ -487,6 +490,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun setCancel() {
         view?.let {
+            it?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.GONE
             //设置二维码失效状态 倒计时颜色状态
             it.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
             it.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)

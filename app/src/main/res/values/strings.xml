@@ -897,6 +897,6 @@
     <string name="clear_two">Local and cloud data will be erased and unrecoverable.</string>
     <string name="region_warm">Scan the qr code below to transfer the account</string>
     <string name="cancel_timer">Expiration countdown:</string>
-    <string name="transfer_accounts_warm">The receiver will have only control, not management</string>
+    <string name="authorization_warm">The receiver will have only control, not management</string>
 
 </resources>

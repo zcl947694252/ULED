@@ -14,10 +14,13 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
@@ -68,6 +71,15 @@ class SettingActivity : BaseActivity() {
     private lateinit var confirm: Button
     private lateinit var pop: PopupWindow
     private var compositeDisposable = CompositeDisposable()
+    lateinit var tvOne: TextView
+    lateinit var tvTwo: TextView
+    lateinit var tvThree: TextView
+    lateinit var hinitOne: TextView
+    lateinit var hinitTwo: TextView
+    lateinit var hinitThree: TextView
+    lateinit var readTimer: TextView
+    lateinit var cancelConfirmLy: LinearLayout
+    lateinit var cancelConfirmVertical: View
     var isResetFactory = false
 
     override fun initListener() {}
@@ -312,6 +324,19 @@ class SettingActivity : BaseActivity() {
      *  恢复出厂设置Popwindow
      */
     private fun makePop() {
+        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
+        tvOne = popView.findViewById(R.id.tv_one)
+        tvTwo = popView.findViewById(R.id.tv_two)
+        tvThree = popView.findViewById(R.id.tv_three)
+        hinitOne = popView.findViewById(R.id.hinit_one)
+        hinitTwo = popView.findViewById(R.id.hinit_two)
+        hinitThree = popView.findViewById(R.id.hinit_three)
+        readTimer = popView.findViewById(R.id.read_timer)
+        cancel = popView.findViewById(R.id.btn_cancel)
+        confirm = popView.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+
         setNormalPopSetting()
 
         var cs: ClickableSpan = object : ClickableSpan() {

@@ -20,8 +20,6 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.LifecycleEvent
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class TelinkLightApplication : TelinkApplication() {
@@ -58,14 +56,12 @@ class TelinkLightApplication : TelinkApplication() {
         super.onCreate()
         app = this
         Utils.init(this)
-//        CrashReport.initCrashReport(applicationContext, "ea665087a5", false)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
 
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)
-//        initStompClient()
 
         LogUtils.getConfig().setBorderSwitch(false)
         MobSDK.init(this)
@@ -78,14 +74,11 @@ class TelinkLightApplication : TelinkApplication() {
         // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
         //切换区域记得断开连接
         if (currentRegionID != -1L) {
-            val dbRegion = DBUtils.getCurrentRegion(currentRegionID)
-            //if (dbRegion != null) {
             val lastUser = DBUtils.lastUser ?: return
             val name = lastUser.controlMeshName//dbRegion.getControlMesh();
             val pwd = lastUser.controlMeshPwd//dbRegion.getControlMeshPwd();
 
             if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                //("mesh.setPassword = " + name);
                 mesh = Mesh()
                 mesh!!.name = name
                 mesh!!.password = name
@@ -93,7 +86,6 @@ class TelinkLightApplication : TelinkApplication() {
                 mesh!!.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
                 setupMesh(mesh)
             }
-            //}
         }
         //启动LightService
         this.startLightService(TelinkLightService::class.java)
@@ -108,10 +100,6 @@ class TelinkLightApplication : TelinkApplication() {
 
     open fun releseStomp() {
         mStompManager.mStompClient?.disconnect()
-    /*    stompLifecycleDisposable?.dispose()
-        singleLoginTopicDisposable?.dispose()
-        paserCodedisposable?.dispose()
-        mCancelAuthorTopicDisposable?.dispose()*/
     }
 
     @SuppressLint("CheckResult")
@@ -162,9 +150,6 @@ class TelinkLightApplication : TelinkApplication() {
                         LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
                         LifecycleEvent.Type.CLOSED -> {
                             LogUtils.d("zcl_Stomp******Stomp connection closed")
-                            GlobalScope.launch {
-                                TelinkLightApplication.getApp().initStompClient()
-                            }
                         }
                     }
                 }, { ToastUtils.showShort(it.localizedMessage)})
@@ -177,8 +162,6 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     override fun saveLog(action: String) {
-        val format = SimpleDateFormat("HH:mm:ss.S")
-        val time = format.format(Calendar.getInstance().timeInMillis)
         TelinkLog.w("SaveLog: $action")
     }
 }

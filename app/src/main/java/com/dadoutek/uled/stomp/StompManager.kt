@@ -158,6 +158,7 @@ class StompManager private constructor() {
                 .map { topicMessage ->
                     val payload = topicMessage.payload
                     val msg = Gson().fromJson(payload, CancelAuthorMsg::class.java)
+                    mStompClient!!.sendAck(WS_AUTHOR_CODE)
                     msg
                 }
     }

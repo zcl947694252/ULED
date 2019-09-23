@@ -82,7 +82,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
-
+        makeDialogAndPop()
         initStompReceiver()
 
         singleLogin = AlertDialog.Builder(this)
@@ -245,8 +245,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         tvContent.text = content
 
         if (loadDialog == null) {
-            loadDialog = Dialog(this,
-                    R.style.FullHeightDialog)
+            loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
         //loadDialog没显示才把它显示出来
         if (!loadDialog!!.isShowing) {
@@ -375,9 +374,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
-                    if (type == 0) {
+                    if (type == 0)
                         restartApplication()
-                    }
                 }
                 notifyWSData()
 
@@ -460,7 +458,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    Log.e(TAG, "zcl_baseMe___________收到取消消息***解析二维码***")
+                    Log.e(TAG, "zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
                 }
             }

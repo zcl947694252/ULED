@@ -51,7 +51,7 @@ public class StompClient {
     private List<StompHeader> headers;
     private HeartBeatTask heartBeatTask;
 
-    public StompClient(ConnectionProvider connectionProvider) {
+    public   StompClient(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
         streamMap = new ConcurrentHashMap<>();
         lifecyclePublishSubject = PublishSubject.create();
@@ -187,19 +187,12 @@ public class StompClient {
     }
     public void sendAck(@NonNull String destPath) {
         String topicId = UUID.randomUUID().toString();
-       /* if (topics == null) topics = new ConcurrentHashMap<>();
-
-        if (topics.containsKey(destPath)) {
-            return Completable.complete();
-        }*/
-
         topics.put(destPath, topicId);
         List<StompHeader> headers = new ArrayList<>();
         headers.add(new StompHeader(StompHeader.ID, topicId));
         headers.add(new StompHeader(StompHeader.DESTINATION, destPath));
         headers.add(new StompHeader(StompHeader.ACK, INITIATIVE_ACK));
-        StompMessage stompMessage = new StompMessage(StompCommand.SEND,
-                Collections.singletonList(new StompHeader(StompHeader.DESTINATION, destPath)), null);
+        StompMessage stompMessage = new StompMessage(StompCommand.ACK, Collections.singletonList(new StompHeader(StompHeader.DESTINATION, destPath)), null);
 
         Completable completable = connectionProvider.send(stompMessage.compile(legacyWhitespace));
         CompletableSource connectionComplete = getConnectionStream()
@@ -291,9 +284,9 @@ public class StompClient {
 
         topics.put(destinationPath, topicId);
         List<StompHeader> headers = new ArrayList<>();
-        headers.add(new StompHeader(StompHeader.ID, topicId));
+        //headers.add(new StompHeader(StompHeader.ID, topicId));
         headers.add(new StompHeader(StompHeader.DESTINATION, destinationPath));
-        headers.add(new StompHeader(StompHeader.ACK, DEFAULT_ACK));
+        //headers.add(new StompHeader(StompHeader.ACK, DEFAULT_ACK));
         if (headerList != null) headers.addAll(headerList);
         return send(new StompMessage(StompCommand.SUBSCRIBE,
                 headers, null));
