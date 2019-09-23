@@ -18,7 +18,6 @@ import com.telink.bluetooth.TelinkLog;
 
 public class SplashActivity extends TelinkMeshErrorDealActivity {
 
-    private static final int REQ_MESH_SETTING = 0x01;
     private TelinkLightApplication mApplication;
     boolean mIsFirstData = true;
     boolean mIsLogging = false;

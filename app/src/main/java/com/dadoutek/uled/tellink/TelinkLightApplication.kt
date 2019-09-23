@@ -62,7 +62,6 @@ class TelinkLightApplication : TelinkApplication() {
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
 
-
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)

@@ -24,7 +24,7 @@ class StompManager private constructor() {
     val WS_HOST = "/smartlight"
 
     //二维码频道
-    val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
+    val WS_TOPIC_CODE = "/topic/code.parse"/* + DBUtils.lastUser?.id*/
     //取消收授权频道
     val WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
 
@@ -49,6 +49,7 @@ class StompManager private constructor() {
     }
 
     fun initStompClient() {
+        LogUtils.e("zclStomp"+DBUtils.lastUser?.id)
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
         headers.add(StompHeader("host", WS_DEBUG_HOST))
@@ -104,7 +105,7 @@ class StompManager private constructor() {
         headersLogin.add(StompHeader("ack", "auto"))
         headersLogin.add(StompHeader("id", "code-parse"))
         headersLogin.add(StompHeader("exclusive", "true"))
-//        headersLogin.add(StompHeader("x-queue-name", "sl-code-parse-"+DBUtils.lastUser?.id))
+       //headersLogin.add(StompHeader("x-queue-name", "sl-code-parse-"+DBUtils.lastUser?.id))
         return headersLogin
     }
 
