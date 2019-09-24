@@ -130,7 +130,9 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
      */
     private void startScan(int delay) {
         scanedList.clear();
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         this.mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -187,7 +189,9 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         params.setUpdateDeviceList(deviceInfos);
 //        params.setUpdateMeshIndex(meshAddress);
         //params.set(Parameters.PARAM_DEVICE_LIST, deviceInfo);
-//        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         //加灯
         TelinkLightService.Instance().updateMesh(params);
     }
@@ -252,7 +256,9 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
     private void onNError(final DeviceEvent event) {
 
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(DeviceBatchScanningActivity.this);

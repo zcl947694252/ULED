@@ -9,7 +9,10 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
@@ -72,9 +75,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  */
 
 class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-
     override fun performed(event: Event<String>?) {
-
     }
 
     private lateinit var curtain: MutableList<DbCurtain>
@@ -131,9 +132,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
         showList = gpList
 
         curtain = ArrayList()
+        var all_light_data = DBUtils.getAllCurtains()
         when (type) {
             Constant.INSTALL_CURTAIN -> {
-                var all_light_data = DBUtils.getAllCurtains()
                 if (all_light_data.size > 0) {
                     var list_group: java.util.ArrayList<DbCurtain> = ArrayList()
                     var no_group: java.util.ArrayList<DbCurtain> = ArrayList()
@@ -172,6 +173,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
                         intent.putExtra("curtain", "all_curtain")
                         startActivity(intent)
                     }
+
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
@@ -185,7 +187,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
                 }
             }
             Constant.INSTALL_CURTAIN_OF -> {
-                var all_light_data = DBUtils.getAllCurtains()
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbCurtain> = ArrayList()
                     var no_group: ArrayList<DbCurtain> = ArrayList()
@@ -245,15 +246,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initView() {
-        val layoutmanager = LinearLayoutManager(this)
-        recycleView!!.layoutManager = GridLayoutManager(this, 3)
-//        val decoration = DividerItemDecoration(this!!,
-//                DividerItemDecoration
-//                        .VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
-//                .divider)))
-//        rvDevice!!.addItemDecoration(decoration)
-        //添加Item变化动画
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adapter = CurtainDeviceDetailsAdapter(R.layout.device_detail_adapter, curtain)
         adapter!!.bindToRecyclerView(recycleView)
@@ -278,11 +270,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private val onClick = View.OnClickListener {
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
-//        hidePopupMenu()
         when (it.id) {
             R.id.install_device -> {
                 showInstallDeviceList()
@@ -331,7 +318,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-//                        callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
                 }
@@ -340,7 +326,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
 
     private fun showInstallDeviceList() {
         dialog_curtain.visibility = View.GONE
-//        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
         showInstallDeviceList(isGuide, isRgbClick)
     }
 
@@ -384,13 +369,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
         }
 
         installDialog?.show()
-
-        Thread {
-            Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main) {
-                //                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
     val INSTALL_NORMAL_LIGHT = 0
@@ -400,13 +378,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         isGuide = false
         installDialog?.dismiss()
-//        hidePopupMenu()
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
@@ -464,10 +437,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
 
         installDialog?.setOnShowListener {
 
-        }
-
-        if (isGuide) {
-//            installDialog?.setCancelable(false)
         }
 
         installDialog?.show()
@@ -550,39 +519,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = curtain?.get(position)
         positionCurrent = position
-        val opcode = Opcode.LIGHT_ON_OFF
-//        if (view.id == R.id.img_light) {
-//            canBeRefresh = true
-//            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-////                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-////                        byteArrayOf(0x01, 0x00, 0x00))
-//                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-//                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-//                } else {
-//                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
-//                }
-//
-//                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-//            } else {
-////                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-////                        byteArrayOf(0x00, 0x00, 0x00))
-//                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-//                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-//                } else {
-//                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
-//                }
-//                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
-//            }
-//
-//            currentLight!!.updateIcon()
-//            DBUtils.updateCurtain(currentLight!!)
-//            runOnUiThread {
-//                adapter?.notifyDataSetChanged()
-//            }
-//        } else
         if (view.id == R.id.tv_setting) {
-//            if (scanPb.visibility != View.VISIBLE) {
-//                判断是否为rgb灯
             var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
             intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
@@ -590,10 +527,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
             Log.d("currentLight", currentLight!!.meshAddr.toString())
             startActivityForResult(intent, REQ_LIGHT_SETTING)
-//            }
-//        else {
-//                ToastUtils.showShort(R.string.reconnecting)
-//            }
         }
     }
 
@@ -606,11 +539,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
-        val isConnect = data?.getBooleanExtra("data", false) ?: false
-//        if (isConnect) {
-//            scanPb.visibility = View.VISIBLE
-//        }
-
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             Thread.sleep(2500)
@@ -658,20 +586,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            //            lightList = DBUtils.getAllLight();
-////            lightList=DBUtils.getAllLight()
-//            filter("", false)
-//        } else {
         curtain = DBUtils.getAllCurtains()
-//
-//        }
-
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            toolbar.title = getString(R.string.allLight) + " (" + curtain.size + ")"
-//        } else {
-//            toolbar.title = (currentLight!!.name ?: "")
-//        }
         return curtain
     }
 
@@ -785,6 +700,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun addScanListeners() {
+        this.mApplication?.removeEventListeners()
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)

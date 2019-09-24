@@ -199,14 +199,18 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 switch (state) {
                     case BluetoothAdapter.STATE_ON: {
                         log("蓝牙打开");
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF: {
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
                     }
@@ -265,7 +269,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
 
                 if (TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
-                    TelinkLightService.Instance().idleMode(true);
+                    TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                     return;
                 }
 
@@ -459,7 +465,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             this.sendStopMeshOTACommand();
         }
         this.mode = MODE_COMPLETE;
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }
@@ -580,7 +588,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         ScanFilter scanFilter = scanFilterBuilder.build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if (!AppUtils.Companion.isExynosSoc()) {
 

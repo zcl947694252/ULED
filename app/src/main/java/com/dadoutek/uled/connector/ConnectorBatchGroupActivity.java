@@ -277,7 +277,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+                    TelinkLightService instance = TelinkLightService.Instance();
+                    if (instance!=null)
+                        instance.sendCommandNoResponse(opcode, dstAddress, params);
                 }));
     }
 
@@ -826,7 +828,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 new Thread(() -> {
                     try {
                         Thread.sleep(300);
-                        TelinkLightService.Instance().autoConnect(connectParams);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.autoConnect(connectParams);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -839,14 +843,18 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             refreshNotifyParams.setRefreshRepeatCount(1);
             refreshNotifyParams.setRefreshInterval(2000);
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance!=null)
+                instance.autoRefreshNotify(refreshNotifyParams);
         }
     }
 
     private static final int TIME_OUT_CONNECT = 15;
 
     public void connectDevice(String mac) {
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.connect(mac, TIME_OUT_CONNECT);
     }
 
     @Override
@@ -1326,8 +1334,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
      */
 
     private void onNError(final DeviceEvent event) {
-
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");
         onLeScanTimeout();
     }
@@ -1339,7 +1348,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void onLeScanTimeout() {
 //        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess();

@@ -278,7 +278,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                  TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+                    TelinkLightService instance = TelinkLightService.Instance();
+                    if (instance!=null)
+                        instance.sendCommandNoResponse(opcode, dstAddress, params);
                 }));
     }
 
@@ -355,7 +357,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-//      TelinkLightService.Instance().idleMode(true);
+      TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -422,7 +426,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
 
-//              TelinkLightService.Instance().idleMode(true);
+             TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                 //目前测试调到主页
                 doFinish();
             } else {
@@ -802,7 +808,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 //                LeBluetooth.getApp().stopScan();
-//              TelinkLightService.Instance().idleMode(true);
+              TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
 
                 startConnect = true;
 
@@ -1325,7 +1333,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void onNError(final DeviceEvent event) {
 
-      TelinkLightService.Instance().idleMode(true);
+      TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");
         onLeScanTimeout();
     }
@@ -1337,7 +1347,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void onLeScanTimeout() {
 //        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
-      TelinkLightService.Instance().idleMode(true);
+      TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess();

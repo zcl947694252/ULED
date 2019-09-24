@@ -109,6 +109,9 @@ class TelinkLightApplication : TelinkApplication() {
                 mStompManager = StompManager.get()
                 mStompManager.initStompClient()
 
+                if (mStompManager.mStompClient ==null)
+                    return@launch
+
                 singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
                     LogUtils.d("STOMP key = $key receivedKey = $it")
@@ -118,10 +121,10 @@ class TelinkLightApplication : TelinkApplication() {
                         intent.putExtra(Constant.LOGIN_OUT, key)
                         sendBroadcast(intent)
                     }
+
                 }, {
                     ToastUtils.showShort(it.localizedMessage)
                 })
-
 
                 paserCodedisposable = mStompManager.parseQRCodeTopic().subscribe({
                     LogUtils.e("It's time to parse $it")

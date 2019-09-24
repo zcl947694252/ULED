@@ -333,8 +333,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 CurtainGroupingActivity::class.java)
         if (curtain==null){
             ToastUtils.showShort(getString(R.string.please_connect_curtain))
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
             return
         }
         intent.putExtra("curtain", curtain)

@@ -365,7 +365,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
             startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0")
         }
-
+            finish()
     }
 
 
