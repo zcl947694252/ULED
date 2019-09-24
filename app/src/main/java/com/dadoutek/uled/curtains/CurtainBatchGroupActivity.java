@@ -35,7 +35,6 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
-import com.dadoutek.uled.connector.ScanningConnectorActivity;
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
@@ -128,7 +127,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;
-    private static final String TAG = ScanningConnectorActivity.class.getSimpleName();
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();

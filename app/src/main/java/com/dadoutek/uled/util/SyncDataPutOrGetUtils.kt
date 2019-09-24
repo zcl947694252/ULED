@@ -410,7 +410,6 @@ class SyncDataPutOrGetUtils {
                                 .compose(NetworkTransformer())
                     }
                     .flatMap {
-                        LogUtils.e("zcl人体服务器数据$it")
                         for (item in it) {
                             DBUtils.saveSensor(item, true)
                         }

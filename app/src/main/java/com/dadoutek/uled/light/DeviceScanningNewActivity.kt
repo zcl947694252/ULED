@@ -299,7 +299,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribe { aLong ->
                     onLeScanTimeout()
                 }
-
     }
 
 
@@ -380,6 +379,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         disposeAllSubscribe()
 
+        this.mApplication?.removeEventListener(this)
 
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance().idleMode(true)
@@ -394,7 +394,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         ActivityUtils.startActivity(MainActivity::class.java)
                         finish()
                     }
-
                 }
 
     }
@@ -410,13 +409,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     private fun startGrouping() {
         closeAnimation()
-
         //初始化分组页面
         changeGroupView()
-
         //完成分组跳转
         changOtherView()
-
         //确定当前分组
         sureGroupingEvent()
 
@@ -558,10 +554,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 if (item.belongGroupId != allLightId) {
                     nowDeviceList[i].hasGroup = true
                     nowDeviceList[i].belongGroupId = group.id
-                    nowDeviceList[i].name = DBUtils.getGroupByID(group.id)?.name
-                            ?: getString(R.string.not_grouped)
-//                    nowDeviceList[i].groupName = DBUtils.getGroupByID(group.id)?.name
-//                            ?: getString(R.string.not_grouped)
+                    nowDeviceList[i].name = DBUtils.getGroupByID(group.id)?.name ?: getString(R.string.not_grouped)
                     updateDevice(item)
                 } else {
                     nowDeviceList[i].hasGroup = false
@@ -618,13 +611,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.isSelected = item.isSelected
                 DBUtils.saveCurtain(dbItem, false)
-
             }
         }
     }
 
     override fun onBackPressed() {
-        //        super.onBackPressed();
         if (grouping) {
             for (meshAddr in mAddedDevices) {
                 stopBlink(meshAddr)
@@ -646,8 +637,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         grouping = true
         toolbar!!.inflateMenu(R.menu.menu_grouping_select_all)
         toolbar!!.setOnMenuItemClickListener(this)
-//        deviceListView!!.onItemClickListener = this
-//        deviceListView!!.mAddedDevicesAdapter = mAddedDevicesAdapter
         mAddedDevicesAdapter.notifyDataSetChanged()
         btn_add_groups?.visibility = View.VISIBLE
         groups_bottom?.visibility = View.VISIBLE
@@ -684,7 +673,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .setTitle(getString(R.string.update_name_gp))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
@@ -692,7 +681,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         DBUtils.updateGroup(groups!![position])
                         groupsRecyclerViewAdapter.notifyItemChanged(position)
                         mAddedDevicesAdapter!!.notifyDataSetChanged()
-                        //                                DBUtils.INSTANCE.getLightByGroupMesh(groups.get(position).getMeshAddr());
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
@@ -815,30 +803,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                //                lazyLoad();
             }
         })
-    }
-
-    fun lazyLoad() {
-        guideStep1()
-    }
-
-    //第一步添加组
-    private fun guideStep1() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_INSTALL_LIGHT_KEY, false)
-        if (guideShowCurrentPage) {
-            GuideUtils.resetDeviceScanningGuide(this)
-            val guide1 = add_group_relativeLayout
-            GuideUtils.guideBuilder(this, GuideUtils.STEP3_GUIDE_CREATE_GROUP)
-                    .addGuidePage(guide1?.let {
-                        GuideUtils.addGuidePage(it, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), View.OnClickListener { v ->
-                            isGuide = true
-                            addNewGroup()
-                        }, GuideUtils.END_INSTALL_LIGHT_KEY, this)
-                    })
-                    .show()
-        }
     }
 
     //第二部选择组
@@ -929,6 +895,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
         this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+
         this.inflater = this.layoutInflater
 
         this.grouping_completed?.setBackgroundColor(resources.getColor(R.color.gray))
@@ -1007,7 +974,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
     // 如果没有网络，则弹出网络设置对话框
-    fun checkNetworkAndSync() {
+    private fun checkNetworkAndSync() {
         if (NetWorkUtils.isNetworkAvalible(this))
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
     }
@@ -1226,6 +1193,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         deviceInfo.meshAddress = meshAddress
         val params = Parameters.createUpdateParameters()
         val user = DBUtils.lastUser
+        LogUtils.e("zcl登录","zcl******mes:${mesh.factoryName}======${mesh.factoryPassword}-------${user?.controlMeshName}" +
+                "============${NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16)}")
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(user?.controlMeshName)
@@ -1239,9 +1208,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
-
         val deviceInfo = event.args
-
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
                 if (bestRssiDevice == null) {
@@ -1251,7 +1218,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         bestRssiDevice = deviceInfo
                 }
 
-                Thread { this@DeviceScanningNewActivity.mApplication!!.mesh.saveOrUpdate(this@DeviceScanningNewActivity) }.start()
+                GlobalScope.launch { this@DeviceScanningNewActivity.mApplication!!.mesh.saveOrUpdate(this@DeviceScanningNewActivity) }
 
                 LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))

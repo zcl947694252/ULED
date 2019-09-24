@@ -49,7 +49,6 @@ class StompManager private constructor() {
     }
 
     fun initStompClient() {
-        LogUtils.e("zclStomp"+DBUtils.lastUser?.id)
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
         headers.add(StompHeader("host", WS_DEBUG_HOST))

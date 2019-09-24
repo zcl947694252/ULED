@@ -152,7 +152,7 @@
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
     <string name="title_scanned_device_num">已添加 %1$d 个设备 </string>
-    <string name="title_scanned_lights_num">扫描完毕：%1$d个灯</string>
+    <string name="title_scanned_lights_num">扫描完毕：%1$d个设备</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>

@@ -31,6 +31,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
@@ -138,9 +139,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         when (v?.id) {
             R.id.light_add_device_btns -> {
                 if(DBUtils.getAllRelay().size == 0){
-                    intent = Intent(this, ScanningConnectorActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent = Intent(this, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
                     startActivityForResult(intent, 0)
                 }else{
                     addDevice()
@@ -806,7 +806,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addScanListeners() {
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)

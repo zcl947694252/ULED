@@ -159,7 +159,7 @@
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
     <string name="title_scanned_device_num">Added %1$d devices</string>
-    <string name="title_scanned_lights_num">%1$d</string>
+    <string name="title_scanned_lights_num">%1$d devices</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Need to physically reset the light before clearing the data and start clearing the data?</string>

@@ -638,7 +638,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
 
     private fun addScanListeners() {
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)//扫描jt
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)//超时jt
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)//结束jt
@@ -732,7 +732,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         if (popupWindow != null && popupWindow!!.isShowing)
             popupWindow!!.dismiss()
 
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
     }
 
 }

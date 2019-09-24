@@ -428,9 +428,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun addDevice() {
-        intent = Intent(this, ScanningConnectorActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent = Intent(this, DeviceScanningNewActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
         startActivityForResult(intent, 0)
     }
 
@@ -763,7 +762,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
             }
     }
     private fun addScanListeners() {
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)

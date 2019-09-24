@@ -127,7 +127,6 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;
-    private static final String TAG = ScanningConnectorActivity.class.getSimpleName();
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();

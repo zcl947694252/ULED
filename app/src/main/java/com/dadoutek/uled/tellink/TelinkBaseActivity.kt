@@ -47,10 +47,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var mStompListener: Disposable? = null
@@ -84,19 +80,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
         makeDialogAndPop()
         initStompReceiver()
-
-        singleLogin = AlertDialog.Builder(this)
-                .setTitle(R.string.other_device_login)
-                .setMessage(getString(R.string.single_login_warm))
-                .setCancelable(false)
-                .setOnDismissListener {
-                    restartApplication()
-                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    restartApplication()
-                }.create()
     }
     private fun makeDialogAndPop() {
+
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
@@ -157,7 +143,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun enableConnectionStatusListener() {
         //先取消，这样可以确保不会重复添加监听
         this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+       // this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
     //关闭基类的连接状态变化监听
@@ -183,7 +169,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
-
             }
             LightAdapter.STATUS_LOGOUT -> {
                 changeDisplayImgOnToolbar(false)
@@ -253,19 +238,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                GlobalScope.launch(Dispatchers.Main) {
                     loadDialog!!.show()
-                }
             }
         }
     }
 
     fun hideLoadingDialog() {
-        GlobalScope.launch(Dispatchers.Main) {
-            if (loadDialog != null && this.isActive&&!this@TelinkBaseActivity.isFinishing) {
+            if (loadDialog != null &&!this@TelinkBaseActivity.isFinishing) {
                 loadDialog!!.dismiss()
             }
-        }
     }
 
     fun compileExChar(str: String): Boolean {

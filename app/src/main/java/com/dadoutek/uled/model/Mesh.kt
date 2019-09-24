@@ -2,11 +2,7 @@ package com.dadoutek.uled.model
 
 import android.content.Context
 import android.text.TextUtils
-import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.util.FileSystem
-import com.telink.util.MeshUtils
-import com.telink.util.MeshUtils.DEVICE_ADDRESS_MIN
 import java.io.Serializable
 import java.util.*
 
@@ -114,8 +110,15 @@ class Mesh : Serializable {
         return FileSystem.writeAsObject(context, "$name.$password", this)
     }
 
-    companion object {
+    override fun toString(): String {
+        return "Mesh(name=$name, password=$password, factoryName=$factoryName, factoryPassword=$factoryPassword, otaDevice=$otaDevice, lastMeshAddress=$lastMeshAddress, devices=$devices)"
+    }
 
+    companion object {
         private const val serialVersionUID = 1L
     }
+
+
 }
+
+
