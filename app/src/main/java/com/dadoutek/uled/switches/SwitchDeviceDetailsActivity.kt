@@ -252,8 +252,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             isclickOTA = false
 
             if (currentSwitch != null) {
-                TelinkLightService.Instance().idleMode(true)
-                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
                 connect()
             }
         }

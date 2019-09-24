@@ -139,6 +139,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     private fun initToolbar() {
         toolbar.title = getString(R.string.human_body)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
@@ -749,8 +753,7 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
                     failedCallback = {
                         snackbar(sensor_root, getString(R.string.pace_fail))
                         hideLoadingDialog()
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
                     })
 
         }.start()
@@ -803,14 +806,12 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
                     successCallback = {
                         hideLoadingDialog()
                         configureComplete()
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
                     },
                     failedCallback = {
                         snackbar(sensor_root, getString(R.string.pace_fail))
                         hideLoadingDialog()
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
                     })
 
         }.start()

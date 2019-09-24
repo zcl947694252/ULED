@@ -138,7 +138,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         this.mApp.removeEventListener(this);
 
         // idle
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
     }
 
     private void showFileChooser() {
@@ -244,7 +246,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                 if (deviceInfo.macAddress.equals(this.selectedDevice.macAddress)) {
                     this.flag = true;
                     this.append("connecting");
-                    TelinkLightService.Instance().idleMode(true);
+                    TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                     TelinkLightService.Instance().connect(deviceInfo.macAddress, 10);
                 }
 

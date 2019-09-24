@@ -248,7 +248,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing) {
+        if (!loadDialog!!.isShowing&&!this@TelinkBaseActivity.isFinishing) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
@@ -262,7 +262,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         GlobalScope.launch(Dispatchers.Main) {
-            if (loadDialog != null && this.isActive) {
+            if (loadDialog != null && this.isActive&&!this@TelinkBaseActivity.isFinishing) {
                 loadDialog!!.dismiss()
             }
         }
@@ -380,6 +380,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 notifyWSData()
 
                 initOnLayoutListener()
+
                 if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && Constant.isTelBase)
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }

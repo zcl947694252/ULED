@@ -16,7 +16,6 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.SplashActivity;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 
 import static android.provider.Settings.ACTION_BLUETOOTH_SETTINGS;
@@ -76,8 +75,9 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                 if (DBUtils.INSTANCE.getAllLight().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutLight() && DBUtils.INSTANCE.getAllCurtain().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutCurtain() && DBUtils.INSTANCE.getAllRely().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutRelay()) {
                     if (isClickExlogin) {
                         SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
-                        TelinkLightService.Instance().disconnect();
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
 
                         restartApplication();
                     }
@@ -125,8 +125,9 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
         public void complete() {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(mContenxt, "IS_LOGIN", false);
-                TelinkLightService.Instance().disconnect();
-                TelinkLightService.Instance().idleMode(true);
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance!=null)
+                    instance.idleMode(true);
                 restartApplication();
             }
         }
@@ -138,7 +139,9 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
                             SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
-                            TelinkLightService.Instance().idleMode(true);
+                            TelinkLightService instance = TelinkLightService.Instance();
+                            if (instance!=null)
+                                instance.idleMode(true);
                             dismiss();
                             restartApplication();
                         })

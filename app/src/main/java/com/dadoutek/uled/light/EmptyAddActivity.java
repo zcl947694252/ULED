@@ -59,7 +59,9 @@ public class EmptyAddActivity extends TelinkBaseActivity {
 
     private void exitLogin() {
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false);
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.idleMode(true);
         ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
     }

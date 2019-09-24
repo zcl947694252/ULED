@@ -190,8 +190,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
         if (light == null) {
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            val instance = TelinkLightService.Instance()
+            instance?.idleMode(true)
             return
         }
 
@@ -1576,6 +1576,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun addScanListeners() {
+        this.mApplication?.removeEventListeners()
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)

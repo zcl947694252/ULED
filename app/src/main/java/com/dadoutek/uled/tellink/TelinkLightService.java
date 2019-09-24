@@ -9,7 +9,7 @@ import com.telink.bluetooth.light.LightService;
 
 public final class TelinkLightService extends LightService {
 
-    private static TelinkLightService mThis;
+    private static TelinkLightService mThis ;
 
     public static TelinkLightService Instance() {
         return mThis;

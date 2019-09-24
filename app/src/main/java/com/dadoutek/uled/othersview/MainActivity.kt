@@ -228,7 +228,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun LogOutAndExitApp() {
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
 
         //重启app并杀死原进程
         ActivityUtils.finishAllActivities(true)
@@ -694,14 +694,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     }
         } else {
             LogUtils.d("exceed max retry time, show connection error")
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
         }
     }
 
     override fun onStop() {
         super.onStop()
-        if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().disableAutoRefreshNotify()
+            TelinkLightService.Instance()?.disableAutoRefreshNotify()
         installDialog?.dismiss()
     }
 
@@ -712,8 +711,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         //移除事件
         this.mApplication?.removeEventListener(this)
-        if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()

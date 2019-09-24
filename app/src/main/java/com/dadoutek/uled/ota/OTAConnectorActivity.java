@@ -192,14 +192,18 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                 switch (state) {
                     case BluetoothAdapter.STATE_ON:{
                         log("蓝牙打开");
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF:{
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
                     }
@@ -572,7 +576,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
             this.sendStopMeshOTACommand();
         }
         this.mode = MODE_COMPLETE;
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }
@@ -827,7 +833,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         ScanFilter scanFilter = scanFilterBuilder.build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if(!AppUtils.Companion.isExynosSoc()){
             params.setScanFilters(scanFilters);

@@ -49,7 +49,9 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
     protected void onMeshError(MeshEvent event) {
         if (event.getArgs() == LeBluetooth.SCAN_FAILED_LOCATION_DISABLE) {
             if (mErrorDialog == null) {
-                TelinkLightService.Instance().idleMode(true);
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance!=null)
+                instance.idleMode(true);
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 dialogBuilder.setTitle("Error")
                         .setMessage("为扫描到设备，检测到定位未开启，是否打开定位？")

@@ -425,7 +425,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             group?.setOnClickListener {
                 settingType = RECOVER_SENSOR
                 isClick = RECOVER_SENSOR
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
+
                 Observable.timer(1000, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -442,7 +443,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             ota?.setOnClickListener {
                 settingType = OTA_SENSOR
                 isClick = OTA_SENSOR
-                TelinkLightService.Instance().idleMode(true)
+                val instance = TelinkLightService.Instance()
+                instance?.idleMode(true)
                 Observable.timer(1000, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -469,16 +471,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     settingType = RESET_SENSOR
                     autoConnectSensor(true)
 
-                    /*
-                      val b = TelinkLightApplication.getApp().connectDevice == null
-                    LogUtils.e("zcl", "zcl******$b")
-                    if (TelinkLightApplication.getApp().connectDevice == null) {
-                             settingType = RESET_SENSOR
-                             autoConnectSensor()
-                         } else {
-                             TelinkLightService.Instance()?.idleMode(true)
-                             settingType = NORMAL_SENSOR
-                         }*/
                     popupWindow!!.dismiss()
                     progressBar_sensor.visibility = View.VISIBLE
                 }
@@ -523,7 +515,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         isClick = NORMAL_SENSOR
         val opcode = Opcode.KICK_OUT//发送恢复出厂命令
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, 0, null)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0, null)
         LogUtils.e("zcl", "zcl******重启人体")
     }
 
@@ -567,21 +559,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         progressBar_sensor.visibility = View.GONE
 
                         when (settingType) {
-                            /*     NORMAL_SENSOR -> {// 0 断开其他灯的连接回调判断
-                                     when (isClick) {//恢复出厂设置
-                                         RESET_SENSOR -> if (TelinkLightApplication.getApp().connectDevice == null)
-                                             autoConnectSensor()
-
-                                         OTA_SENSOR -> {//OTA
-                                             if (TelinkLightApplication.getApp().connectDevice == null)
-                                                 autoConnectSensor()
-                                         }
-                                         RECOVER_SENSOR -> {//断联通知重新配置
-                                             LogUtils.e("zcl", "zcl**重新配置****" + { TelinkLightApplication.getApp().connectDevice == null })
-                                             relocationSensor()
-                                         }
-                                     }
-                                 }*/
                             RESET_SENSOR -> {//恢复出厂设置成功后判断灯能扫描
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.reset_factory_success, Toast.LENGTH_LONG).show()
                                 DBUtils.deleteSensor(currentLight!!)
@@ -661,6 +638,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
 
     private fun addScanListeners() {
+        this.mApplication?.removeEventListeners()
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)//扫描jt
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)//超时jt
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)//结束jt
@@ -677,8 +655,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             retryConnectCount++
             autoConnectSensor(true)
         } else {
-            TelinkLightService.Instance().idleMode(true)
-            if (!scanPb.isShown) {
+            TelinkLightService.Instance()?.idleMode(true)
+
+            if (scanPb!=null&&!scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
             }

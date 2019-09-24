@@ -40,7 +40,6 @@ import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
@@ -108,10 +107,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var layoutmanager: LinearLayoutManager? = null
     private var allLightId: Long = 0
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
-
     private var mAddDeviceType: Int = 0
-
-
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.device_item, mAddedDevices)
 
@@ -209,10 +205,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-
-    private var groupingSuccess = false
-    private val groupingLight: DbLight? = null
-    private val groupingGroup: DbGroup? = null
     private var bestRssiDevice: DeviceInfo? = null
 
     enum class UPDATE_MESH_STATUS {
@@ -220,7 +212,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         FAILED,
         UPDATING_MESH
     }
-
 
     private fun isSelectAll() {
         if (isSelectAll) {
@@ -254,7 +245,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun hasGroup(): Boolean {
         return groups.size != -1
-
     }
 
     /**
@@ -346,7 +336,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //先断开
         TelinkLightService.Instance()?.idleMode(true)
         //过一秒
-        val disposable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     //倒计时，出问题了就超时。
@@ -466,7 +456,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             if (isAllLightsGrouped) {//所有灯都有分组可以跳转
                 showToast(getString(R.string.group_completed))
                 //页面跳转前进行分组数据保存
-                //                TelinkLightService.Instance().idleMode(true);
+                TelinkLightService.Instance()?.idleMode(true)
                 //目前测试调到主页
                 doFinish()
             } else {
@@ -806,13 +796,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 //连接，如断开会自动重连
                 TelinkLightService.Instance().autoConnect(connectParams)
             }
-
-            /*     //刷新Notify参数
-                 val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-                 refreshNotifyParams.setRefreshRepeatCount(2)
-                 refreshNotifyParams.setRefreshInterval(1000)
-                 //开启自动刷新Notify
-                 TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)*/
         }
     }
 
@@ -1069,12 +1052,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * @param event
      */
     override fun performed(event: Event<String>) {
-
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
 
-            LeScanEvent.LE_SCAN_TIMEOUT -> {
-            }
+            LeScanEvent.LE_SCAN_TIMEOUT -> { }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             ErrorReportEvent.ERROR_REPORT -> {
@@ -1131,18 +1112,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         ToastUtils.showShort(R.string.restart_bluetooth)
     }
 
-    private fun onNError(event: DeviceEvent) {
-//        TelinkLightService.Instance().idleMode(true)
-        TelinkLog.d("DeviceScanningActivity#onNError")
-        onLeScanTimeout()
-    }
 
     /**
      * 扫描不到任何设备了
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-//        LeBluetooth.getInstance().stopScan()
         TelinkLightService.Instance().idleMode(false)
         list_devices.visibility = View.VISIBLE
         if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
@@ -1191,7 +1166,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                             params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                             params.setScanMode(true)
-                            TelinkLightService.Instance().startScan(params)
+
+                            TelinkLightService.Instance()?.startScan(params)
                         }
 
             } else {
@@ -1309,7 +1285,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 updateMeshStatus = UPDATE_MESH_STATUS.FAILED
             }
 
-            LightAdapter.STATUS_ERROR_N -> this.onNError(event)
+
             LightAdapter.STATUS_LOGIN -> {
                 Log.d("ScanningTest", "mConnectTimer = $mConnectTimer")
                 if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {

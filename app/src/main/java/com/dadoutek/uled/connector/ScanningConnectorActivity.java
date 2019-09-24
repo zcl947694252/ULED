@@ -303,7 +303,10 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+
+                    TelinkLightService instance = TelinkLightService.Instance();
+                    if (instance!=null)
+                    instance.sendCommandNoResponse(opcode, dstAddress, params);
                 },throwable -> {}));
     }
 
@@ -350,7 +353,9 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
         return Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
                     hideLoadingDialog();
-                    TelinkLightService.Instance().idleMode(true);
+                    TelinkLightService instance = TelinkLightService.Instance();
+                    if (instance!=null)
+                        instance.idleMode(true);
                     mConnectTimer = null;
                 });
     }
@@ -828,7 +833,9 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
                 new Thread(() -> {
                     try {
                         Thread.sleep(200);
-                        TelinkLightService.Instance().autoConnect(connectParams);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.autoConnect(connectParams);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -841,14 +848,18 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
             refreshNotifyParams.setRefreshRepeatCount(1);
             refreshNotifyParams.setRefreshInterval(2000);
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance!=null)
+                instance.autoRefreshNotify(refreshNotifyParams);
         }
     }
 
     private static final int TIME_OUT_CONNECT = 15;
 
     public void connectDevice(String mac) {
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.connect(mac, TIME_OUT_CONNECT);
     }
 
 
@@ -1229,7 +1240,9 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
 
     private void onNError(final DeviceEvent event) {
 
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");
         onLeScanTimeout();
     }
@@ -1245,7 +1258,9 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
         LeBluetooth.getInstance().stopScan();
         animationView.cancelAnimation();
         animationView.setVisibility(View.GONE);
-        TelinkLightService.Instance().idleMode(true);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+            instance.idleMode(true);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess();
         } else {
@@ -1269,7 +1284,9 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
                         if (grouping)
                             return;
                         handleIfSupportBle();
-                        TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService instance = TelinkLightService.Instance();
+                        if (instance!=null)
+                            instance.idleMode(true);
                         if (mApplication.isEmptyMesh()) {
                             return;
                         }

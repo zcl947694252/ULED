@@ -73,7 +73,7 @@ class StompManager private constructor() {
      *  LifecycleEvent.Type.OPENED，LifecycleEvent.Type.ERROR，LifecycleEvent.Type.CLOSED
      */
     fun lifeCycle(): Flowable<LifecycleEvent>? {
-        return mStompClient!!.lifecycle()
+        return mStompClient?.lifecycle()
     }
 
     private fun getLoginHeaders(): List<StompHeader> {
@@ -158,7 +158,6 @@ class StompManager private constructor() {
                 .map { topicMessage ->
                     val payload = topicMessage.payload
                     val msg = Gson().fromJson(payload, CancelAuthorMsg::class.java)
-                    mStompClient!!.sendAck(WS_AUTHOR_CODE)
                     msg
                 }
     }

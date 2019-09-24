@@ -224,8 +224,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 ConnectorGroupingActivity::class.java)
         if (light==null){
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
             return
         }
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)

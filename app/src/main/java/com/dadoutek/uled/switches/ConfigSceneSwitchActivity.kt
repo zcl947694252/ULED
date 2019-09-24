@@ -440,8 +440,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             fab.visibility = View.GONE
             indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                TelinkLightService.Instance().idleMode(true)
-                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
             }
             return
         }
