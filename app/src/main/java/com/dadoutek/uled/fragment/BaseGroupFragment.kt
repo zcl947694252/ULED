@@ -88,7 +88,6 @@ abstract class BaseGroupFragment : BaseFragment() {
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val sonDeleteGroup = intent.getStringExtra("delete")
-                //  val switch = intent.getStringExtra("switch")
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
@@ -120,7 +119,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 failedCallback = {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
-                                    //sendDeleteBrocastRecevicer(0)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -259,10 +257,18 @@ abstract class BaseGroupFragment : BaseFragment() {
         //以下是检索组里有多少设备的代码
         for (group in groupList) {
             when (group.deviceType) {
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
-                Constant.DEVICE_TYPE_LIGHT_RGB -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
-                Constant.DEVICE_TYPE_CONNECTOR -> group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
-                Constant.DEVICE_TYPE_CURTAIN -> group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
+                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                    group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
+                }
+                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                    group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
+                }
+                Constant.DEVICE_TYPE_CONNECTOR -> {
+                    group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
+                }
+                Constant.DEVICE_TYPE_CURTAIN -> {
+                    group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
+                }
             }
         }
 
@@ -278,8 +284,6 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     abstract fun getGroupData(): Collection<DbGroup>
-    /* for (i in deviceTypes)
-         groupList.addAll(DBUtils.getGroupsByDeviceType(i))*/
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         var currentLight = groupList[position]
@@ -494,7 +498,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             LogUtils.e("zcl---单个-------------$group")
             if (group.isSelected)
                 list.add(group)
-        LogUtils.e("zcl要删除的组-----$list")
+            LogUtils.e("zcl要删除的组-----$list")
         }
         return list
     }

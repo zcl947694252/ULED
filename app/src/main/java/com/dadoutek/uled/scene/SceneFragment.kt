@@ -17,7 +17,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Builder
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -401,21 +400,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     addNewScene!!.visibility = View.GONE
                 }
             }
-
-         /*   if (recyclerView != null) {
-                val layoutmanager = LinearLayoutManager(activity)
-                layoutmanager.orientation = LinearLayoutManager.VERTICAL
-                recyclerView!!.layoutManager = layoutmanager
-                //添加Item变化动画
-                recyclerView!!.itemAnimator = DefaultItemAnimator()
-                adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
-                adaper?.let {
-                    it.onItemClickListener = onItemClickListener
-                    it.onItemChildClickListener = onItemChildClickListener
-                    it.onItemLongClickListener = onItemChildLongClickListener
-                    it.bindToRecyclerView(recyclerView)
-                }
-            }*/
 
             toolbar?.let {
                 it.navigationIcon = null

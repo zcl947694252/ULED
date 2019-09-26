@@ -33,10 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.telink.bluetooth.light.Parameters.PARAM_SCAN_FILTER;
 
 public class LightAdapter {
-public static final int LIGHT_NORMAL = 0x04;
-public static final int LIGHT_NORMAL_OLD = 0xFF;
-public static final int LIGHT_RGB = 0x06;
-public static final int SMART_RELAY = 0x05;       //就是connector
+    public static final int LIGHT_NORMAL = 0x04;
+    public static final int LIGHT_NORMAL_OLD = 0xFF;
+    public static final int LIGHT_RGB = 0x06;
+    public static final int SMART_RELAY = 0x05;       //就是connector
 
     public static final int STATUS_CONNECTING = 0;
     public static final int STATUS_CONNECTED = 1;
@@ -167,7 +167,7 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     }
 
     public boolean isLogin() {
-        if (mLightCtrl==null)
+        if (mLightCtrl == null)
             return false;
         return this.mLightCtrl.isLogin();
     }
@@ -329,9 +329,9 @@ public static final int SMART_RELAY = 0x05;       //就是connector
 
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
         if (light == null || !light.isConnected()) {
-            Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
             return false;
         }
+        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
         TelinkLog.e("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;
@@ -340,7 +340,7 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     public boolean startOta(byte[] firmware) {
         if (!this.isStarted.get())
             return false;
-        if (this.mLightCtrl==null)
+        if (this.mLightCtrl == null)
             return false;
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
         if (light == null || !this.mLightCtrl.isLogin())
@@ -439,13 +439,13 @@ public static final int SMART_RELAY = 0x05;       //就是connector
     synchronized public void startScan(Parameters params, Callback callback) {
 
         aBoolean = this.isStarted.get();
-        TelinkLog.e("返回数据是:"+aBoolean+"-------"+mode);
+        TelinkLog.e("返回数据是:" + aBoolean + "-------" + mode);
 
         if (!aBoolean)
             return;
 
         int mode = this.getMode();
-        if (mode == MODE_SCAN_MESH){
+        if (mode == MODE_SCAN_MESH) {
             return;
         }
         TelinkLog.e("LightAdapter#startLeScan");
@@ -787,7 +787,7 @@ public static final int SMART_RELAY = 0x05;       //就是connector
         byte[] outOfMeshName;
 
         String paramsString = params.getString(Parameters.PARAM_MESH_NAME);
-        if (paramsString==null)
+        if (paramsString == null)
             return false;
         byte[] meshName = Strings.stringToBytes(paramsString, 16);
         byte[] meshName1 = light.getMeshName();
@@ -1535,12 +1535,11 @@ public static final int SMART_RELAY = 0x05;       //就是connector
             LightPeripheral light = mScannedLights.getByMaxRssi();  //改为获取信号最好的设备，很关键的改动。
             if (light != null) {
                 connect(light, timeoutSeconds);
-                Log.d(getClass().getSimpleName(), "connect to mac = " + light.getMacAddress()+ "    rssi = " + light.getRssi());
+                Log.d(getClass().getSimpleName(), "connect to mac = " + light.getMacAddress() + "    rssi = " + light.getRssi());
             } else {
                 setState(STATE_RUNNING);
             }
         }
-
 
 
         private void autoOta() {

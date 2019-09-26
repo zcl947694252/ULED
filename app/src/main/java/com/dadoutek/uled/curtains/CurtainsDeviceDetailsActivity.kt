@@ -1,6 +1,5 @@
 package com.dadoutek.uled.curtains
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -16,7 +15,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -28,43 +26,26 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.ItemTypeGroup
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.bluetooth.light.Parameters
-import com.telink.util.Event
-import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
-import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 
 /**
- * 窗帘
+ * 窗帘列表
  */
 
-class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
+class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var disposableTimer: Disposable? = null
     private lateinit var curtain: MutableList<DbCurtain>
     private var adapter: CurtainDeviceDetailsAdapter? = null
@@ -301,7 +282,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -464,7 +445,12 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SWITCH ->{
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
+                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
@@ -496,15 +482,13 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
         startActivityForResult(intent, 0)
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
         currentLight = curtain?.get(position)
         positionCurrent = position
-        if (TelinkLightApplication.getApp().connectDevice == null) {
-            TelinkLightService.Instance()?.idleMode(true)
-            autoConnectCurtains()//如果是断开状态直接重连不是就断开再重连
-        } else {
+        if (TelinkLightApplication.getApp().connectDevice == null)
+            ToastUtils.showShort(getString(R.string.connecting_tip))
+        else
             skipSetting()
-        }
     }
 
     override fun onDestroy() {
@@ -516,16 +500,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
-        GlobalScope.launch {
-            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-            delay(2500)
-            if (this@CurtainsDeviceDetailsActivity == null ||
-                    this@CurtainsDeviceDetailsActivity.isDestroyed ||
-                    this@CurtainsDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-            } else {
-                autoConnectCurtains()
-            }
-        }
     }
 
     fun notifyData() {
@@ -572,7 +546,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
     fun showOpenLocationServiceDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { dialog, which ->
+        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
             BleUtils.jumpLocationSetting()
         }
         locationServiceDialog = builder.create()
@@ -584,87 +558,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String
         locationServiceDialog?.hide()
     }
 
-
-    private fun addScanListeners() {
-        this.mApplication?.removeEventListener(this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-    /**
-     * 连接指定设备
-     */
-    @SuppressLint("CheckResult")
-    private fun autoConnectCurtains() {
-        addScanListeners()
-
-        //自动重连参数
-        val connectParams = Parameters.createAutoConnectParameters()
-        val controlMeshName = DBUtils.lastUser?.controlMeshName
-        connectParams.setMeshName(controlMeshName)
-        connectParams.setConnectMac(currentLight!!.macAddr)
-        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(controlMeshName) + controlMeshName).substring(0, 16))
-        LogUtils.e("zcl登录","zcl*****$controlMeshName=======${NetworkFactory.md5(NetworkFactory.md5(controlMeshName) + controlMeshName).substring(0, 16)}")
-        connectParams.autoEnableNotification(true)
-        connectParams.setTimeoutSeconds(10)
-        this.runOnUiThread {
-            showLoadingDialog(getString(R.string.connecting))
-        }
-
-        //连接，如断开会自动重连 自动登录 不用login
-        GlobalScope.launch {
-            delay(1000)
-            TelinkLightService.Instance()?.autoConnect(connectParams)
-        }
-
-        Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
-            LeBluetooth.getInstance().stopScan()
-            TelinkLightService.Instance()?.idleMode(true)
-            hideLoadingDialog()
-            progressBar_sensor.visibility = View.GONE
-            ToastUtils.showShort(getString(R.string.connect_fail))
-        }, {})
-    }
-
-    override fun performed(event: Event<String>?) {
-        when (event?.type) {
-            LeScanEvent.LE_SCAN -> {
-                LogUtils.e("zcl________________LeScanEvent.LE_SCAN")
-            }
-            LeScanEvent.LE_SCAN_TIMEOUT -> {
-                ToastUtils.showShort(getString(R.string.scanning_timeout))
-                hideLoadingDialog()
-            }
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            ErrorReportEvent.ERROR_REPORT -> {
-                hideLoadingDialog()
-                val info = (event as ErrorReportEvent).args
-                onErrorReportNormal(info)
-            }
-        }
-    }
-
-    fun onDeviceStatusChanged(event: DeviceEvent) {
-        val deviceInfo = event.args
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                disposableTimer?.dispose()
-                ToastUtils.showLong(getString(R.string.connect_success))
-                hideLoadingDialog()
-                skipSetting()
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                autoConnectCurtains()
-            }
-
-            LightAdapter.STATUS_CONNECTING -> {
-                ToastUtils.showLong(R.string.connecting_please_wait)
-            }
-        }
-    }
 
     private fun skipSetting() {
         var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)

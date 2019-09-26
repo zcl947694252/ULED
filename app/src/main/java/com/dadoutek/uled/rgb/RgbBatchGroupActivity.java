@@ -948,6 +948,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
 //        tvStopScan.setVisibility(View.GONE);
         scanPb.setVisibility(View.GONE);
         //监听事件
+        mApplication.removeEventListener(this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);

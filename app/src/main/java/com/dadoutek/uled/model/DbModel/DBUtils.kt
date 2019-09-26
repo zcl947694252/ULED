@@ -652,6 +652,7 @@ object DBUtils {
             db.id = existList[0].id
         }
         DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(db)
+        val key = DaoSessionInstance.getInstance().dbLightDao.getKey(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             recordingChange(db.id,
@@ -709,11 +710,11 @@ object DBUtils {
         val existList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0) {
             //如果该mesh地址的数据已经存在，就直接修改
-
             db.id = existList[0].id
         }
 
         DaoSessionInstance.getInstance().dbCurtainDao.insertOrReplace(db)
+        val key = DaoSessionInstance.getInstance().dbCurtainDao.getKey(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             recordingChange(db.id,

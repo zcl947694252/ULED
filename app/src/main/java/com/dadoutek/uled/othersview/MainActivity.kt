@@ -67,7 +67,6 @@ import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.event.ServiceEvent
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
@@ -100,7 +99,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-    private var bestRSSIDevice: DeviceInfo? = null
 
     private lateinit var deviceFragment: DeviceFragment
     private lateinit var groupFragment: GroupListFragment
@@ -157,12 +155,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         GlobalScope.launch {
-        TelinkLightApplication.getApp().initStompClient()
+            TelinkLightApplication.getApp().initStompClient()
         }
     }
 
 
-    private fun startToRecoverDevices(){
+    private fun startToRecoverDevices() {
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -182,6 +180,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun addEventListeners() {
         // 监听各种事件
+        mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
@@ -238,7 +237,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState)
-        //outState.putParcelable("android:support:fragments", null)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -331,15 +329,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
                         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                         startActivityForResult(intent, 0)
-
                     }
                     INSTALL_CURTAIN -> {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
                         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                         startActivityForResult(intent, 0)
                     }
-                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    INSTALL_SWITCH -> {
+                      /*  intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        startActivityForResult(intent, 0)*/
+                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    }
+                    INSTALL_SENSOR -> {
+                        startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    }
                     INSTALL_CONNECTOR -> {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
                         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
@@ -641,10 +645,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
                                     connectParams.autoEnableNotification(true)
                                     connectParams.setConnectDeviceType(
-                                            mutableListOf<Int>(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY))
-
-                                            mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
-                                                    DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY,DeviceType.SMART_CURTAIN)
+                                            mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
+                                                    DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
                                     //连接，如断开会自动重连
                                     TelinkLightService.Instance().autoConnect(connectParams)
 
@@ -700,7 +702,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onStop() {
         super.onStop()
-            TelinkLightService.Instance()?.disableAutoRefreshNotify()
+        TelinkLightService.Instance()?.disableAutoRefreshNotify()
         installDialog?.dismiss()
     }
 
@@ -711,7 +713,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         //移除事件
         this.mApplication?.removeEventListener(this)
-            TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()

@@ -93,7 +93,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initListener() {
-
+        this.mApplication.removeEventListener(this)
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
@@ -186,7 +186,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
             } else {
-                var dbSwitch: DbSwitch = DbSwitch()
+                var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.controlSceneId = getControlScene()
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress

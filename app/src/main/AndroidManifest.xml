@@ -133,9 +133,7 @@
         <activity
             android:name=".connector.ConnectorDeviceDetailActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".connector.ScanningConnectorActivity"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name=".scene.SensorDeviceDetailsActivity"
             android:screenOrientation="portrait" />

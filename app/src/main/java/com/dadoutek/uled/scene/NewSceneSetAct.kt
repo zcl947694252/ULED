@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import kotlin.collections.ArrayList
+
 /**
  * 描述	      ${设置场景颜色盘}$
  *
@@ -117,15 +118,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
-
-
     private fun step2Guide() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
         if (guideShowCurrentPage) {
             val guide1 = guide_location
             GuideUtils.guideBuilder(this, GuideUtils.STEP9_GUIDE_ADD_SCENE_SURE)
                     .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_2),
-                            View.OnClickListener{ guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -135,7 +134,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val guide6 = confirm
             GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
                     .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
-                            View.OnClickListener{ guide6.performClick()
+                            View.OnClickListener {
+                                guide6.performClick()
                                 GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, true)
                             }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
@@ -413,11 +413,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun save() {
+        saveCurrenEditResult()
+        if (showGroupList!!.size == 0) {
+            ToastUtils.showLong(R.string.add_scene_gp_tip)
+            return
+        }
         isToolbar = true
         if (!currentPageIsEdit) {
             saveScene()
         } else {
-            saveCurrenEditResult()
+            showDataListView()
             stepEndGuide()
         }
     }
@@ -463,7 +468,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             showGroupList?.clear()
             showGroupList?.addAll(oldResultItemList)
             showGroupList?.addAll(newResultItemList)
-            showDataListView()
         }
     }
 

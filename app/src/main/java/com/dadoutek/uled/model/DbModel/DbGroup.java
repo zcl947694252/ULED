@@ -199,6 +199,14 @@ public class DbGroup implements Serializable{
         this.status = status;
     }
 
+    public int getDeviceCount() {
+        return this.deviceCount;
+    }
+
+    public void setDeviceCount(int deviceCount) {
+        this.deviceCount = deviceCount;
+    }
+
     @Override
     public String toString() {
         return "DbGroup{" +
@@ -217,14 +225,7 @@ public class DbGroup implements Serializable{
                 ", textColor=" + textColor +
                 ", status=" + status +
                 ", isSeek=" + isSeek +
+                ", deviceCount=" + deviceCount +
                 '}';
-    }
-
-    public int getDeviceCount() {
-        return this.deviceCount;
-    }
-
-    public void setDeviceCount(int deviceCount) {
-        this.deviceCount = deviceCount;
     }
 }

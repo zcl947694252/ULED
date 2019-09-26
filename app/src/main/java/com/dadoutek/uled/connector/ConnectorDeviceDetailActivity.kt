@@ -75,7 +75,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 /**
- * 蓝牙接收器
+ * 蓝牙接收器列表
  */
 class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String>,View.OnClickListener{
 
@@ -154,6 +154,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initView() {
+        mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
@@ -401,7 +402,12 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SWITCH ->{
+                       //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                       //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                       //startActivityForResult(intent, 0)
+                    startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
                         if(medressData <= DEVICE_ADDRESS_MAX){

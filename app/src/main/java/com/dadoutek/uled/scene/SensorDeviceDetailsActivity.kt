@@ -76,7 +76,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 /**
  * 创建者     zcl
  * 创建时间   2019/7/27 16:35
- * 描述	      ${人体感应器}$
+ * 描述	      ${人体感应器列表}$
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -372,7 +372,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SWITCH -> {
+                       //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                       //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                       //startActivityForResult(intent, 0)
+                    startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {

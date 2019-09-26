@@ -85,6 +85,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         initView()
         initListener()
         readyConnection()
+        startScan()
     }
 
     private var mIntervalCheckConnection: Disposable? = null
@@ -125,9 +126,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.switch_title)
         scanning_device_ly.visibility = View.GONE
+        retryConnectCount = 0
+        isSupportInstallOldDevice = false
     }
 
     private fun initListener() {
+        mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
 
         device_stop_scan.setOnClickListener {
@@ -149,6 +153,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         showToast(getString(R.string.scan_end))
         closeAnimation()
         stopConnectTimer()
+        doFinish()
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {
@@ -192,11 +197,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 //扫描参数
                 val params = LeScanParameters.create()
-                if (BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG)
                     params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                } else {
+                else
                     params.setMeshName(mesh.factoryName)
-                }
+
 
                 if (!AppUtils.isExynosSoc) {
                     params.setScanFilters(getScanFilters())
@@ -230,7 +235,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun closeAnimation() {
         scanning_device_ly.visibility = View.GONE
-        switch_add_device_btn.visibility = View.VISIBLE
+        switch_add_device_btn.visibility = View.GONE
         device_lottieAnimationView.cancelAnimation()
     }
 
@@ -285,6 +290,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
                 closeAnimation()
+                doFinish()
             }
         }
     }
@@ -408,6 +414,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
             startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         }
+        finish()
     }
 
 
@@ -418,6 +425,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_failed)
+        doFinish()
     }
 
     @SuppressLint("CheckResult")
@@ -432,8 +440,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         isSeachedDevice = true
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
+                            mApplication.removeEventListener(this)
                             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
                             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
+                            this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
+                            this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
                             TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
@@ -502,7 +513,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
                 val MAX_RSSI = 81
                 if (leScanEvent.args.rssi < MAX_RSSI) {
-
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {

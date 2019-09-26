@@ -54,6 +54,7 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
+                    dbDataChangeList[i]?.changeId?: return@Thread
                     var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i]?.tableName,
                             dbDataChangeList[i]?.changeId,
                             dbDataChangeList[i]?.changeType,

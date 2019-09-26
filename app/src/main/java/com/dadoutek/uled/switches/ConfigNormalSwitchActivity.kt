@@ -159,6 +159,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var mIsConfiguring: Boolean = false
 
     private fun initListener() {
+        mApplication.removeEventListener(this)
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
@@ -172,19 +173,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 if (mAdapter.selectedPos != -1) {
                     progressBar.visibility = View.VISIBLE
                     Thread(Runnable {
-                        setGroupForSwitch()
-                        Thread.sleep(800)
-                        Commander.updateMeshName(successCallback = {
-                            mIsConfiguring = true
-                            disconnect()
-                        },
-                                failedCallback = {
-                                    mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        progressBar.visibility = View.GONE
-                                        mIsConfiguring = false
-                                    }
-                                })
                         setGroupForSwitch()
                         Thread.sleep(800)
                         Commander.updateMeshName(successCallback = {
@@ -394,34 +382,29 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun saveSwitch() {
-        var newMeshAdress: Int
-//            var dbSwitch:DbSwitch=DbSwitch()
-        newMeshAdress = groupAdress
-//            DBUtils.saveSwitch(dbSwitch,false)
         var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
-            dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
-            dbSwitch!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+            dbSwitch!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = mDeviceInfo.meshAddress
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch!!.index = switch.id.toInt()
             dbSwitch.id = switch.id
-//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             DBUtils.updateSwicth(dbSwitch)
         } else {
-            var dbSwitch: DbSwitch = DbSwitch()
+            var dbSwitch = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+            DBUtils.getAllCurtains()
+            dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = mDeviceInfo.meshAddress
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch.index = dbSwitch.id.toInt()
-            dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+            DBUtils.saveSwitch(dbSwitch, false)
 
-//            DBUtils.saveSwitch(dbSwitch, false)
             val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             recordingChange(gotSwitchByMac?.id,
                     DaoSessionInstance.getInstance().dbSwitchDao.tablename,
@@ -439,10 +422,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
-            pwd = mesh.factoryPassword.toString()
+        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+            mesh.factoryPassword.toString()
         } else {
-            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
+            NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
                     .substring(0, 16)
         }
         connectParams.setPassword(pwd)
@@ -479,9 +462,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val groupAddress = mGroupArrayList[mAdapter.selectedPos].meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddress shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
-                paramBytes)
-//        Commander.addGroup(mDeviceInfo.meshAddress,groupAddress,)
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
 
     private fun initView() {

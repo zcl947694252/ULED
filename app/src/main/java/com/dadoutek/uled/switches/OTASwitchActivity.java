@@ -339,6 +339,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void addEventListener() {
+        TelinkLightApplication.Companion.getApp().removeEventListener(this);
         TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
 //        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
         TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);

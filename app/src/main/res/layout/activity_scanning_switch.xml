@@ -75,7 +75,12 @@
             app:pb_textError="@string/not_found_switch"
             app:pb_textProgress="@string/searching" />
     </android.support.constraint.ConstraintLayout>
-    <include layout="@layout/template_scanning_device"/>
+
+    <include
+        layout="@layout/template_scanning_device"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="135dp" />
+
     <include
         android:id="@+id/include"
         layout="@layout/toolbar"

@@ -88,6 +88,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
         //监听事件
         this.mApplication = (TelinkLightApplication) this.getApplication();
+        mApplication.removeEventListener(this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);

@@ -326,8 +326,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                             TelinkLightService.Instance()?.idleMode(true)
                             TelinkLightService.Instance()?.disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                        }
-                        .show()
+                        }.show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -343,7 +342,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
                 DBUtils.updateSwicth(dbSwitch)
             }else{
-                var dbSwitch: DbSwitch = DbSwitch()
+                var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
                 dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
@@ -353,7 +352,6 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.index = dbSwitch.id.toInt()
 
                 DBUtils.saveSwitch(dbSwitch, false)
-                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)

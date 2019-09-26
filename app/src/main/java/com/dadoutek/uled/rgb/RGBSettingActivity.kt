@@ -1347,6 +1347,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     fun addEventListeners() {
+        mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }

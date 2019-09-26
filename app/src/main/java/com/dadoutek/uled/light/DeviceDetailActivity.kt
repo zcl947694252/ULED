@@ -66,7 +66,7 @@ import java.util.*
 /**
  * 创建者     zcl
  * 创建时间   2019/8/28 17:34
- * 描述	      ${六种 设备列表 从首页设备fragment点击跳入 以及扫描设备按钮}$
+ * 描述	      ${六种 冷暖灯列表 从首页设备fragment点击跳入 以及扫描设备按钮}$
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -142,8 +142,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
             LeScanEvent.LE_SCAN_TIMEOUT -> LogUtils.e("zcl连接超时了")
             LeScanEvent.LE_SCAN_COMPLETED -> LogUtils.e("zcl连接结束了")
-            NotificationEvent.GET_ALARM -> {
-            }
+            NotificationEvent.GET_ALARM -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
@@ -252,6 +251,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             LightAdapter.STATUS_LOGIN -> {
                 TelinkLightService.Instance()?.enableNotification()
                 TelinkLightService.Instance()?.updateNotification()
+                changeDisplayImgOnToolbar(true)
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -264,10 +264,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
                 //连接成功
-
-
             }
             LightAdapter.STATUS_LOGOUT -> {
+                changeDisplayImgOnToolbar(false)
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTING -> {
@@ -635,7 +634,12 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SWITCH ->{
+                       //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                       //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                       //startActivityForResult(intent, 0)
+                    startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
                         if(medressData <= MeshUtils.DEVICE_ADDRESS_MAX){

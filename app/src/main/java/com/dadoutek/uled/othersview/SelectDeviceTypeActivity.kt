@@ -37,6 +37,9 @@ class SelectDeviceTypeActivity : AppCompatActivity() {
     private fun initListener() {
         tvSmartSwitch.onClick {
             startActivity<ScanningSwitchActivity>()
+           // var intent = Intent(this@SelectDeviceTypeActivity, DeviceScanningNewActivity::class.java)
+           // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+           // startActivityForResult(intent, 0)
         }
 
         tvSmartLight.onClick {

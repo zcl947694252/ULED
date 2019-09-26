@@ -119,14 +119,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
      * 改变Toolbar上的图片和状态
      * @param isConnected       是否是连接状态
      */
-    private fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+    fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         if (isConnected) {
             if (toolbar != null) {
-
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
             }
-
         } else {
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)

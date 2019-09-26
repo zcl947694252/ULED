@@ -1,11 +1,9 @@
 package com.dadoutek.uled.othersview
 
 import android.app.Dialog
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -23,31 +21,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 open class BaseFragment : Fragment() {
 
     private var loadDialog: Dialog? = null
-//    private var mReceive: BluetoothStateBroadcastReceive? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        registerBluetoothReceiver()
-    }
-
-/*
-    private fun registerBluetoothReceiver() {
-        if (mReceive == null) {
-            mReceive = BluetoothStateBroadcastReceive()
-        }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
-        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
-        activity?.registerReceiver(mReceive, intentFilter)
-    }
-*/
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
 
     fun showLoadingDialog(content: String) {
         val inflater = LayoutInflater.from(activity)

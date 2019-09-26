@@ -2,8 +2,6 @@ package com.dadoutek.uled.fragment
 
 import android.view.View
 import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -23,13 +21,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
         if (group != null) {
             val num = group.deviceCount //内含设备的数量
-            val gpOn = helper.getView<ImageView>(R.id.btn_on)
-            val gpSet = helper.getView<ImageView>(R.id.btn_set)
-            val gpOff = helper.getView<ImageView>(R.id.btn_off)
-            val gpOnText = helper.getView<TextView>(R.id.textView8)
-            val gpOffText = helper.getView<TextView>(R.id.textView11)
-            val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
 
+            val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
             if (isDelete) {
                 deleteIcon.visibility = View.VISIBLE
             } else {
@@ -37,48 +30,56 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             }
 
             helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
+                    .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
 
-            gpSet.setImageResource(R.drawable.icon_setting_group)
+            if (num>0){
+                helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                        .addOnClickListener(R.id.btn_on)
+                        .addOnClickListener(R.id.btn_off)
+                        .addOnClickListener(R.id.btn_set)
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
-                    || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR||group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                if (group.connectionStatus == ConnectionStatus.ON.value) {
-                    gpOn.setImageResource(R.drawable.icon_open_group)
-                    gpOff.setImageResource(R.drawable.icon_down_group)
-                    gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
-                    gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
-                    gpOn.setImageResource(R.drawable.icon_down_group)
-                    gpOff.setImageResource(R.drawable.icon_open_group)
-                    gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                    gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+                if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                        || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_CURTAIN
+                        || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (group.connectionStatus == ConnectionStatus.ON.value) {
+                        helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
+                                .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
+                                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
+                                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.black_nine))
+
+                    } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
+                        helper.setImageResource(R.id.btn_on, R.drawable.icon_down_group)
+                                .setImageResource(R.id.btn_off, R.drawable.icon_open_group)
+                                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.black_nine))
+                                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.white))
+                    }
                 }
+            }else{
+                helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
+                        .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
+                        .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
+                        .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
+                        .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.white))
             }
-
 
             if (group.textColor == 0)
                 group.textColor = mContext.resources.getColor(R.color.black)
 
             if (group.meshAddr == 0xffff)
                 helper.setText(R.id.tv_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
-             else
+            else
                 helper.setText(R.id.tv_group_name, group.name)
 
 
             if (group.isSelected)
                 helper.setChecked(R.id.selected_group, true)
-             else
+            else
                 helper.setChecked(R.id.selected_group, false)
 
-
             helper.setTextColor(R.id.tv_group_name, group.textColor)
-                    .addOnClickListener(R.id.btn_on)
-                    .addOnClickListener(R.id.btn_off)
-                    .addOnClickListener(R.id.btn_set)
                     .addOnClickListener(R.id.selected_group)
                     .addOnClickListener(R.id.item_layout)
         }
-
     }
 
     /**

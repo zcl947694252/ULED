@@ -29,6 +29,9 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -43,10 +46,6 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
-import com.dadoutek.uled.curtains.WindowCurtainsActivity
-import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.util.MeshAddressGenerator
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -119,6 +118,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
     fun addListeners() {
+        mApplication?.removeEventListener(this)
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)

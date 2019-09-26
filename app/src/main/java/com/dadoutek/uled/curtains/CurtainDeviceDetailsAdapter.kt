@@ -20,7 +20,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.meshAddr) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
@@ -29,16 +29,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
                 }
             }
 
-            tvLightName.setText(scene.getName())
-
-//            val myGrad = tvRgbColor.background as GradientDrawable
-//            if (scene.getTextColor() == 0 || scene.getTextColor() == 0xffffff) {
-//                tvRgbColor.visibility = View.GONE
-//            } else {
-//                tvRgbColor.visibility = View.VISIBLE
-//                myGrad.setColor(-0x1000000 or scene.getTextColor())
-//            }
-
+            tvLightName.text = scene.name
             helper.addOnClickListener(R.id.tv_setting)
                     .setTag(R.id.tv_setting, helper.adapterPosition)
                     .setTag(R.id.img_light, helper.adapterPosition)

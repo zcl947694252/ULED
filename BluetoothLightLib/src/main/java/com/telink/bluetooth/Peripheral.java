@@ -516,8 +516,7 @@ public class Peripheral extends BluetoothGattCallback {
 
         if (service != null) {
             BluetoothGattCharacteristic characteristic = this
-                    .findWritableCharacteristic(service, characteristicUUID,
-                            writeType);
+                    .findWritableCharacteristic(service, characteristicUUID, writeType);
             if (characteristic != null) {
 
                 if (data.length > 20) {
@@ -527,10 +526,6 @@ public class Peripheral extends BluetoothGattCallback {
                     isOutOfSize = false;
                     characteristic.setValue(data);
                     characteristic.setWriteType(writeType);
-
-                    if (data.length > 11) {
-//                    Log.d("seekBarChangeC","--------"+success+"：："+data[10]);
-                    }
 
                     if (!this.gatt.writeCharacteristic(characteristic)) {
                         success = false;
