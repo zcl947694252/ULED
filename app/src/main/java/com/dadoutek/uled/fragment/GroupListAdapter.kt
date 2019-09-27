@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.bluetooth.light.ConnectionStatus
 
@@ -59,7 +60,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                         .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
                         .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
                         .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
-                        .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.white))
+                        .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.color_c8))
             }
 
             if (group.textColor == 0)
@@ -77,7 +78,6 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 helper.setChecked(R.id.selected_group, false)
 
             helper.setTextColor(R.id.tv_group_name, group.textColor)
-                    .addOnClickListener(R.id.selected_group)
                     .addOnClickListener(R.id.item_layout)
         }
     }
@@ -87,6 +87,9 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
      * @param isDelete  是否处于删除状态
      */
     fun changeState(isDelete: Boolean) {
+        DeviceType
         this.isDelete = isDelete
     }
 }
+
+

@@ -10,7 +10,6 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
@@ -21,7 +20,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -97,7 +95,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     //如果已经断连或者检测超过10次，直接完成。
-                    if (b || it > 10) {
+                    if (b || it > 2) {
                         onInited()
                     }
                 }, {})
@@ -197,20 +195,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 //扫描参数
                 val params = LeScanParameters.create()
-                if (BuildConfig.DEBUG)
-                    params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                else
                     params.setMeshName(mesh.factoryName)
 
 
-                if (!AppUtils.isExynosSoc) {
-                    params.setScanFilters(getScanFilters())
-                }
-                //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                if (isSupportInstallOldDevice) {
-                    params.setMeshName(DBUtils.lastUser?.controlMeshName)
-                    params.setOutOfMeshName(DBUtils.lastUser?.controlMeshName)
-                }
+//                if (!AppUtils.isExynosSoc) {
+////                    params.setScanFilters(getScanFilters())
+//                }
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
 
@@ -408,11 +398,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         hideLoadingDialog()
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
         } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
         } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
         }
         finish()
     }

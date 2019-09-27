@@ -3,6 +3,7 @@ package com.dadoutek.uled.util;
 import android.content.Context;
 import android.graphics.Color;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OtaPrepareListner;
@@ -39,40 +40,6 @@ public class OtaPrepareUtils {
 
     public void gotoUpdateView(Context context, String localVersion, OtaPrepareListner otaPrepareListner) {
         if (checkHaveNetWork(context)) {
-//            //1.获取服务器版本url
-//            switch (StringUtils.versionResolution(localVersion, 0)) {
-//                case "L":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_STROBE, localVersion, otaPrepareListner);
-//                    break;
-//                case "LN":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
-//                    break;
-//                case "LNS":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
-//                    break;
-//                case "C":
-//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
-//                    break;
-//                case "CS":
-//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
-//                    break;
-//                case "CR":
-//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_RGB, localVersion, otaPrepareListner);
-//                    break;
-//                case "LC":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN, localVersion, otaPrepareListner);
-//                    break;
-//                case "LCS":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING, localVersion, otaPrepareListner);
-//                    break;
-//                case "L36":
-//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V, localVersion, otaPrepareListner);
-//                    break;
-//                default:
-//                    ToastUtils.showLong(R.string.error_pack);
-//                    break;
-//            }
-//            transformView();
             getServerVersionNew(context,localVersion,otaPrepareListner);
         } else {
             ToastUtils.showLong(R.string.network_disconect);
@@ -81,28 +48,6 @@ public class OtaPrepareUtils {
 
     private boolean checkHaveNetWork(Context context) {
         return NetWorkUtils.isNetworkAvalible(context);
-    }
-
-    private String getServerVersion(Context context, int type, int detailType, String localVersion, OtaPrepareListner otaPrepareListner) {
-        otaPrepareListner.startGetVersion();
-        DownLoadFileModel.INSTANCE.getUrl(type, detailType).subscribe(new NetworkObserver<String>() {
-            @Override
-            public void onNext(String s) {
-//                otaPrepareListner.getVersionSuccess(s);
-               /* localPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-                        + "/" + StringUtils.versionResolutionURL(s, 2);*/
-                localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(s, 2);
-                compareServerVersion(s, localVersion, otaPrepareListner, context);
-            }
-
-            @Override
-            public void onError(@NotNull Throwable e) {
-                super.onError(e);
-                otaPrepareListner.getVersionFail();
-                ToastUtils.showLong(R.string.get_server_version_fail);
-            }
-        });
-        return "";
     }
 
     private String getServerVersionNew(Context context,String localVersion, OtaPrepareListner otaPrepareListner) {
@@ -117,6 +62,7 @@ public class OtaPrepareUtils {
                 try {
                     String data=jsonObject.getString("url");
                     localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(data, 2);
+                    LogUtils.e("zcl版本升级localPath-----------"+localVersion);
                     compareServerVersion(data, otaPrepareListner, context);
                 } catch (JSONException e) {
                     e.printStackTrace();

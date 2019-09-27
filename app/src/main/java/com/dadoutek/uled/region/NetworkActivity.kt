@@ -231,6 +231,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setMeData(it: MutableList<RegionBean>) {
+        //lastUser.lastGenMeshAddr =it[0].lastGenMeshAddr
         listAll = it
         region_me_net_num.text = getString(R.string.me_net_num, it.size)
         if (it.size > 3) {

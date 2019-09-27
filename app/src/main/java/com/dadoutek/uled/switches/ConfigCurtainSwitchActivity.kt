@@ -445,13 +445,12 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun initView() {
-        mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
-        val mesh = mApplication.mesh
-        mGroupArrayList = ArrayList<DbGroup>()
+        mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList
 
         for (group in groupList) {

@@ -40,6 +40,9 @@ public class DbUser {
     private String controlMeshName;
     //切换区域后设备登录使用的密码
     private String controlMeshPwd;
+    //lastGenMeshAddr设备地址唯一标识确保地址不重复
+    //private int lastGenMeshAddr;
+
 
 
     @Generated(hash = 2027603692)

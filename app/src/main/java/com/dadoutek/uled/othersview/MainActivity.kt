@@ -336,9 +336,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         startActivityForResult(intent, 0)
                     }
                     INSTALL_SWITCH -> {
-                      /*  intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
-                        startActivityForResult(intent, 0)*/
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
                         startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     }
                     INSTALL_SENSOR -> {
@@ -530,8 +530,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
-        bnve.setupWithViewPager(viewPager)
-    }
+        bnve.setupWithViewPager(viewPager) }
 
 
     //切换到场景Fragment

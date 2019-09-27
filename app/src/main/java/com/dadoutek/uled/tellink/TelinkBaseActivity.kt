@@ -460,12 +460,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
                         LogUtils.d("蓝牙未开启")
+                        ToastUtils.showShort(getString(R.string.close_bluetooth))
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
                         LogUtils.d("无法收到广播包以及响应包")
+                        ToastUtils.showShort("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
                         LogUtils.d("未扫到目标设备")
+                        ToastUtils.showShort("未扫到目标设备")
                     }
                 }
 
@@ -474,9 +477,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
                         LogUtils.d("未读到att表")
+                        ToastUtils.showShort("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
                         LogUtils.d("未建立物理连接")
+                        ToastUtils.showShort("未建立物理连接")
                     }
                 }
             }
@@ -484,12 +489,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
                         LogUtils.d("value check失败： 密码错误")
+                        ToastUtils.showShort("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
                         LogUtils.d("read login data 没有收到response")
+                        ToastUtils.showShort("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
                         LogUtils.d("write login data 没有收到response")
+                        ToastUtils.showShort("write login data 没有收到response")
                     }
                 }
             }

@@ -96,7 +96,7 @@ open class BaseFragment : Fragment() {
                 ToastUtils.showLong(getString(R.string.connect_success))
                 changeDisplayImgOnToolbar(true)
 
-                val connectDevice = TelinkLightApplication.getApp()?.connectDevice
+                TelinkLightApplication.getApp()?.connectDevice
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -107,8 +107,6 @@ open class BaseFragment : Fragment() {
                 ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
-
-
     }
 
 
@@ -128,103 +126,13 @@ open class BaseFragment : Fragment() {
         } else {
             changeDisplayImgOnToolbar(false)
         }
-
-//        val blueadapter = BluetoothAdapter.getDefaultAdapter()
-//        if (blueadapter?.isEnabled == false) {
-//            if(toolbar!=null){
-//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
-//                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-//                    dialog.show()
-//                })
-//            }
-//        }else{
-//            if(toolbar!=null){
-//                if (TelinkLightApplication.getApp().connectDevice == null) {
-//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-//                        var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-//                        dialog.show()
-//                    }
-//                }else{
-//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-//                }
-//            }
-//        }
-
     }
-
-/*
-    inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                    }
-                }
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                            var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-                            dialog.show()
-                        }
-                    }
-                }
-                BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
-                        BluetoothAdapter.STATE_OFF -> {
-                            if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-                                    dialog.show()
-                                }
-                            }
-                        }
-                        BluetoothAdapter.STATE_ON -> {
-                            if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-*/
-
 
     fun hideLoadingDialog() {
         if (loadDialog != null) {
             loadDialog!!.dismiss()
         }
     }
-
-/*
-    override fun onDestroy() {
-        super.onDestroy()
-//        unregisterBluetoothReceiver()
-    }
-*/
-
-/*
-    private fun unregisterBluetoothReceiver() {
-        if (mReceive != null) {
-            activity?.unregisterReceiver(mReceive)
-            mReceive = null
-        }
-    }
-*/
 
     open fun endCurrentGuide() {}
 }

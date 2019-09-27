@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class DbSwitch implements Serializable {
@@ -170,7 +170,6 @@ public class DbSwitch implements Serializable {
     }
 
     public void updateIcon() {
-
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_switch;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
@@ -178,5 +177,26 @@ public class DbSwitch implements Serializable {
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_switch;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "DbSwitch{" +
+                "id=" + id +
+                ", meshAddr=" + meshAddr +
+                ", name='" + name + '\'' +
+                ", controlGroupAddr=" + controlGroupAddr +
+                ", macAddr='" + macAddr + '\'' +
+                ", productUUID=" + productUUID +
+                ", controlSceneId='" + controlSceneId + '\'' +
+                ", index=" + index +
+                ", belongGroupId=" + belongGroupId +
+                ", selected=" + selected +
+                ", version='" + version + '\'' +
+                ", hasGroup=" + hasGroup +
+                ", textColor=" + textColor +
+                ", icon=" + icon +
+                ", connectionStatus=" + connectionStatus +
+                '}';
     }
 }

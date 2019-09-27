@@ -1350,12 +1350,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
                         if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                                 bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!)
+                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
                         } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!)
+                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
                         } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!)
+                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
                         }
+
                     } else
                         startGrouping()
                 }
@@ -1406,5 +1407,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         private val TAG = DeviceScanningNewActivity::class.java.simpleName
         private val SCAN_TIMEOUT_SECOND = 10
         private val TIME_OUT_CONNECT = 15
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //移除事件
+        this.mApplication?.removeEventListener(this)
     }
 }

@@ -934,6 +934,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
+        //移除事件
+        this.mApplication?.removeEventListener(this)
         if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()

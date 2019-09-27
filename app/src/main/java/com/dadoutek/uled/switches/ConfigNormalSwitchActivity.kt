@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -354,29 +355,33 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
-                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+
+                Log.e("zcl","zcl*****设置新的开关使用更新"+dbSwitch)
                 DBUtils.updateSwicth(dbSwitch)
             } else {
-                var dbSwitch: DbSwitch = DbSwitch()
+                var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
-                dbSwitch!!.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-//                dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                dbSwitch.index = dbSwitch.id.toInt()
+                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
+                Log.e("zcl","zcl*****设置新的开关使用插入替换"+dbSwitch)
                 DBUtils.saveSwitch(dbSwitch, false)
+
+                LogUtils.e("zcl","zcl*****设置新的开关使用插入替换"+DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
             }
         } else {
-            switchDate!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
-            switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+            switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -386,11 +391,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
             dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
-            dbSwitch!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+            dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = mDeviceInfo.meshAddress
             dbSwitch.productUUID = mDeviceInfo.productUUID
-            dbSwitch!!.index = switch.id.toInt()
+            dbSwitch.index = switch.id.toInt()
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
@@ -466,10 +471,12 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initView() {
-        mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        }else{
+            groupName = "false"
         }
         mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList
@@ -490,98 +497,4 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
     }
-
-    val groupAdress: Int
-        get() {
-            val list = DBUtils.groupList
-            val idList = java.util.ArrayList<Int>()
-            for (i in list.indices.reversed()) {
-                if (list[i].meshAddr == 0xffff) {
-                    list.removeAt(i)
-                }
-            }
-
-            for (i in list.indices) {
-                idList.add(list[i].meshAddr)
-            }
-
-            var id = 0
-            for (i in 0x8001..33023) {
-                if (idList.contains(i)) {
-                    Log.d("sceneID", "getSceneId: " + "aaaaa")
-                    continue
-                } else {
-                    id = i
-                    Log.d("sceneID", "getSceneId: bbbbb$id")
-                    break
-                }
-            }
-
-            if (list.size == 0) {
-                id = 0x8001
-            }
-
-            return id
-        }
-
-//    private fun checkPermission() {
-//        if(light!!.macAddr.length<16){
-//            ToastUtils.showLong(getString(R.string.bt_error))
-//        }else{
-///      mDisposable.add(
-//                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-//                    if (granted!!) {
-//                        var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(),Constant.IS_DEVELOPER_MODE,false)
-//                        if(isBoolean){
-//                            transformView()
-//                        }else {
-//                            OtaPrepareUtils.instance().gotoUpdateView(this@ConfigNormalSwitchActivity, localVersion, otaPrepareListner)
-//                        }
-//                    } else {
-//                        ToastUtils.showLong(R.string.update_permission_tip)
-//                    }
-//                })
-////        }
-//    }*/
-
-//    private fun transformView() {
-//        val intent = Intent(this@ConfigNormalSwitchActivity, OTASwitchActivity::class.java)
-//        intent.putExtra(Constant.UPDATE_LIGHT, Constant.SWITCH_PIR_ADDRESS)
-//        startActivity(intent)
-//        finish()
-//    }
-//
-//    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-//
-//        override fun downLoadFileStart() {
-//            showLoadingDialog(getString(R.string.get_update_file))
-//        }
-//
-//        override fun startGetVersion() {
-//            showLoadingDialog(getString(R.string.verification_version))
-//        }
-//
-//        override fun getVersionSuccess(s: String) {
-//            //            ToastUtils.showLong(.string.verification_version_success);
-//            hideLoadingDialog()
-//        }
-//
-//        override fun getVersionFail() {
-//            ToastUtils.showLong(R.string.verification_version_fail)
-//            hideLoadingDialog()
-//        }
-//
-//
-//        override fun downLoadFileSuccess() {
-//            hideLoadingDialog()
-//            transformView()
-//        }
-//
-//        override fun downLoadFileFail(message: String) {
-//            hideLoadingDialog()
-//            ToastUtils.showLong(R.string.download_pack_fail)
-//        }
-//    }
-
 }

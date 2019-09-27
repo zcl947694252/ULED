@@ -814,6 +814,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 DeviceInfo deviceInfo_1 = event.getArgs();
                 if (lightMeshAddr == deviceInfo_1.meshAddress) {
                     lightVersion = mFileVersion;
+
                 }
 
                 successCount++;

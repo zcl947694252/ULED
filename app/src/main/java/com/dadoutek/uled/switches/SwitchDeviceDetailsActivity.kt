@@ -22,14 +22,12 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.InstallDeviceListAdapter
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
-import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.InstallDeviceModel
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
@@ -328,9 +326,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                     if (this@SwitchDeviceDetailsActivity == null ||
                                             this@SwitchDeviceDetailsActivity.isDestroyed ||
                                             this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                    } else {
+                                    } else
                                         connect()
-                                    }
                                 }
                             }
                         }
@@ -396,18 +393,57 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 if ("" != s)
                     if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                         currentLight!!.version = s
-                        val intent = Intent(this@SwitchDeviceDetailsActivity, OTAUpdateActivity::class.java)
-                        intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
-                        intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
-                        intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
-                        startActivity(intent)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                        if (isBoolean) {
+                            transformView()
+                        } else {
+                            OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, s, otaPrepareListner)
+                        }
+
                     } else {
                         ToastUtils.showShort(getString(R.string.version_disabled))
                     }
-            }, {})
+            }, {ToastUtils.showShort(getString(R.string.get_server_version_fail))})
         }
     }
 
+    private fun transformView() {
+        val intent = Intent(this@SwitchDeviceDetailsActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
+        startActivity(intent)
+    }
+    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
+        override fun startGetVersion() {
+            showLoadingDialog(getString(R.string.verification_version))
+        }
+
+        override fun getVersionSuccess(s: String) {
+            hideLoadingDialog()
+        }
+
+        override fun getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail)
+            hideLoadingDialog()
+        }
+
+
+        override fun downLoadFileSuccess() {
+            hideLoadingDialog()
+            transformView()
+        }
+
+        override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
+            ToastUtils.showLong(R.string.download_pack_fail)
+        }
+    }
     private fun autoConnectSwitch() {
         this.mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
@@ -507,6 +543,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     override fun onDestroy() {
         super.onDestroy()
         acitivityIsAlive = false
+        //移除事件
+        this.mApplication?.removeEventListener(this)
     }
 
     private val onClick = View.OnClickListener {
