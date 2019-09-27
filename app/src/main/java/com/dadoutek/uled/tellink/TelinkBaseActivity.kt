@@ -310,8 +310,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
 
         override fun error(msg: String) {
-            ToastUtils.showLong(msg)
             hideLoadingDialog()
+            ToastUtils.showLong(msg)
         }
     }
 

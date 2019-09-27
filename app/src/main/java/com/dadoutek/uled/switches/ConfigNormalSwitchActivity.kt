@@ -26,6 +26,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -145,7 +146,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             this.mApplication.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
-                showConfigSuccessDialog()
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -176,10 +176,15 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     Thread(Runnable {
                         setGroupForSwitch()
                         Thread.sleep(800)
-                        Commander.updateMeshName(successCallback = {
-                            mIsConfiguring = true
-                            disconnect()
-                        },
+                        val newMeshAddr = MeshAddressGenerator().meshAddress
+                        Commander.updateMeshName(newMeshAddr = newMeshAddr,
+                                successCallback = {
+                                    mDeviceInfo.meshAddress = newMeshAddr
+                                    mIsConfiguring = true
+                                    updateSwitch()
+                                    disconnect()
+                                    showConfigSuccessDialog()
+                                },
                                 failedCallback = {
                                     mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
                                     GlobalScope.launch(Dispatchers.Main) {
@@ -335,11 +340,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
-                                updateSwitch()
-                            } else {
-                                saveSwitch()
-                            }
                             TelinkLightService.Instance()?.idleMode(true)
                             TelinkLightService.Instance()?.disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -358,7 +358,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
-                Log.e("zcl","zcl*****设置新的开关使用更新"+dbSwitch)
+                Log.e("zcl", "zcl*****设置新的开关使用更新" + dbSwitch)
                 DBUtils.updateSwicth(dbSwitch)
             } else {
                 var dbSwitch = DbSwitch()
@@ -370,10 +370,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.index = dbSwitch.id.toInt()
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
-                Log.e("zcl","zcl*****设置新的开关使用插入替换"+dbSwitch)
+                Log.e("zcl", "zcl*****设置新的开关使用插入替换" + dbSwitch)
                 DBUtils.saveSwitch(dbSwitch, false)
 
-                LogUtils.e("zcl","zcl*****设置新的开关使用插入替换"+DBUtils.getAllSwitch())
+                LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
@@ -475,7 +475,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        }else{
+        } else {
             groupName = "false"
         }
         mGroupArrayList = ArrayList()

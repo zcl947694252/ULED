@@ -225,11 +225,14 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         }
 
         override fun complete() {
+            hideLoadingDialog()
             syncComplet()
         }
 
         override fun error(msg: String) {
-           //("GetDataError:$msg")
+            hideLoadingDialog()
+            //("GetDataError:$msg")
+            ToastUtils.showShort(msg)
         }
 
     }

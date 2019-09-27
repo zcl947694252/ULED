@@ -601,29 +601,6 @@ object DBUtils {
     }
 
 
-    fun insertRegion(dbRegion: DbRegion) {
-        //判断原来是否保存过这个区域
-        val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
-        if (dbRegionOld == null) {//直接插入
-            DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
-            //暂时用本地保存区域
-            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
-
-            recordingChange(dbRegion.id,
-                    DaoSessionInstance.getInstance().dbRegionDao.tablename,
-                    Constant.DB_ADD)
-        } else {//更新数据库
-            dbRegion.id = dbRegionOld.id
-            DaoSessionInstance.getInstance().dbRegionDao.update(dbRegion)
-            //暂时用本地保存区域
-            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
-            recordingChange(dbRegion.id,
-                    DaoSessionInstance.getInstance().dbRegionDao.tablename,
-                    Constant.DB_UPDATE)
-        }
-    }
-
-
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
@@ -635,13 +612,6 @@ object DBUtils {
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_ADD)
         }
-    }
-
-
-    fun saveDeleteGroup(group: DbGroup) {
-        val dbDeleteGroup = DbDeleteGroup()
-        dbDeleteGroup.groupAress = group.meshAddr
-        DaoSessionInstance.getInstance().dbDeleteGroupDao.insertOrReplace(dbDeleteGroup)
     }
 
 
@@ -661,24 +631,8 @@ object DBUtils {
         }
 
 
-
     }
 
-/*    fun saveSensor(db: DbSensor, isFromServer: Boolean) {
-        val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(db.meshAddr)).list()
-        if (existList.size > 0) {
-            //如果该mesh地址的数据已经存在，就直接修改
-
-            db.id = existList[0].id
-        }
-        DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(db)
-        //不是从服务器下载下来的，才需要把变化写入数据变化表
-        if (!isFromServer) {
-            recordingChange(db.id,
-                    DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                    Constant.DB_ADD)
-        }
-    }*/
 
     fun saveSensor(sensor: DbSensor?, isFromServer: Boolean) {
         if (isFromServer) {
@@ -693,7 +647,6 @@ object DBUtils {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0) {
             //如果该mesh地址的数据已经存在，就直接修改
-
             db.id = existList[0].id
         }
         DaoSessionInstance.getInstance().dbSwitchDao.insertOrReplace(db)
@@ -829,107 +782,70 @@ object DBUtils {
     /********************************************更改 */
 
 
+    @Deprecated("")
     fun updateGroup(group: DbGroup) {
-        DaoSessionInstance.getInstance().dbGroupDao.update(group)
-        recordingChange(group.id,
-                DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                Constant.DB_UPDATE)
+        saveGroup(group, false)
+//        DaoSessionInstance.getInstance().dbGroupDao.update(group)
+//        recordingChange(group.id,
+//                DaoSessionInstance.getInstance().dbGroupDao.tablename,
+//                Constant.DB_UPDATE)
     }
 
     fun updateGroupList(groups: MutableList<DbGroup>) {
-        DaoSessionInstance.getInstance().dbGroupDao.updateInTx(groups)
+//        DaoSessionInstance.getInstance().dbGroupDao.updateInTx(groups)
         for (group in groups) {
-            recordingChange(group.id,
-                    DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                    Constant.DB_UPDATE)
+            saveGroup(group, false)
         }
     }
 
-    fun updateSceneList(group: MutableList<DbScene>) {
-        DaoSessionInstance.getInstance().dbSceneDao.updateInTx(group)
-        for (group in group) {
-            recordingChange(group.id,
-                    DaoSessionInstance.getInstance().dbSceneDao.tablename,
-                    Constant.DB_UPDATE)
-        }
-    }
-
+    @Deprecated("")
     fun updateLight(light: DbLight) {
-        DaoSessionInstance.getInstance().dbLightDao.update(light)
-        recordingChange(light.id,
-                DaoSessionInstance.getInstance().dbLightDao.tablename,
-                Constant.DB_UPDATE)
+        saveLight(light, false)
     }
 
+
+    @Deprecated("Use saveCurtain()")
     fun updateCurtain(curtain: DbCurtain) {
-        DaoSessionInstance.getInstance().dbCurtainDao.update(curtain)
-        recordingChange(curtain.id,
-                DaoSessionInstance.getInstance().dbCurtainDao.tablename,
-                Constant.DB_UPDATE)
+        saveCurtain(curtain, false)
     }
 
+    @Deprecated("Use saveSwitch()")
     fun updateSwicth(switch: DbSwitch) {
-        DaoSessionInstance.getInstance().dbSwitchDao.update(switch)
-        recordingChange(switch.id,
-                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                Constant.DB_UPDATE)
+        saveSwitch(switch, false)
     }
 
+    @Deprecated("use saveConnector()")
     fun updateConnector(connector: DbConnector) {
-        DaoSessionInstance.getInstance().dbConnectorDao.update(connector)
-        recordingChange(connector.id,
-                DaoSessionInstance.getInstance().dbConnectorDao.tablename,
-                Constant.DB_UPDATE)
+        saveConnector(connector, false)
     }
 
-    fun updateLightsLocal(lights: MutableList<DbLight>) {
-        DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
-    }
-
+    @Deprecated("")
     fun updateLightLocal(light: DbLight) {
-        DaoSessionInstance.getInstance().dbLightDao.update(light)
+        saveLight(light, false)
     }
 
+    @Deprecated("")
     fun updateRelayLocal(relay: DbConnector) {
-        DaoSessionInstance.getInstance().dbConnectorDao.update(relay)
+//        DaoSessionInstance.getInstance().dbConnectorDao.update(relay)
+        saveConnector(relay, false)
     }
 
-    fun updateSensor(sensor: DbSensor) {
-        DaoSessionInstance.getInstance().dbSensorDao.update(sensor)
-        recordingChange(sensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_UPDATE)
-    }
 
+    @Deprecated("")
     fun updateScene(scene: DbScene) {
-        DaoSessionInstance.getInstance().dbSceneDao.update(scene)
-        recordingChange(scene.id,
-                DaoSessionInstance.getInstance().dbSceneDao.tablename,
-                Constant.DB_UPDATE)
+        saveScene(scene, false)
+//        DaoSessionInstance.getInstance().dbSceneDao.update(scene)
+//        recordingChange(scene.id,
+//                DaoSessionInstance.getInstance().dbSceneDao.tablename,
+//                Constant.DB_UPDATE)
     }
 
 
-    fun updateDbActions(actions: DbSceneActions) {
-        DaoSessionInstance.getInstance().dbSceneActionsDao.update(actions)
-        recordingChange(actions.id,
-                DaoSessionInstance.getInstance().dbSceneActionsDao.tablename,
-                Constant.DB_UPDATE)
-    }
-
+    @Deprecated("")
     fun updateGradient(dbDiyGradient: DbDiyGradient) {
-        DaoSessionInstance.getInstance().dbDiyGradientDao.update(dbDiyGradient)
-        recordingChange(dbDiyGradient.id,
-                DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
-                Constant.DB_UPDATE)
+        saveGradient(dbDiyGradient, false)
     }
 
-
-    fun updateColorNode(colorNode: DbColorNode) {
-        DaoSessionInstance.getInstance().dbColorNodeDao.update(colorNode)
-        recordingChange(colorNode.id,
-                DaoSessionInstance.getInstance().dbColorNodeDao.tablename,
-                Constant.DB_UPDATE)
-    }
 
     fun updateDbchange(change: DbDataChange) {
         DaoSessionInstance.getInstance().dbDataChangeDao.update(change)

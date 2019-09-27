@@ -86,6 +86,7 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
         }
 
         override fun complete() {
+            hideLoadingDialog()
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance()?.disconnect()
@@ -95,10 +96,10 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
             } else {
                 ToastUtils.showLong(activity!!.getString(R.string.upload_data_success))
             }
-            hideLoadingDialog()
         }
 
         override fun error(msg: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
@@ -117,7 +118,6 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
                         }.show()
             } else {
                 isClickExlogin = false
-                hideLoadingDialog()
             }
         }
     }

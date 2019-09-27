@@ -114,7 +114,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
-                    LogUtils.d("STOMP key = $key receivedKey = $it")
+//                    LogUtils.d("STOMP key = $key receivedKey = $it")
                     if (it != key&&"no_have_key"!=it) {
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT

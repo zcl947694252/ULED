@@ -36,9 +36,7 @@ class SyncDataPutOrGetUtils {
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
             Thread {
                 val dbDataChangeList = DBUtils.dataChangeAll
-
                 val dbUser = DBUtils.lastUser
-
                 if (dbDataChangeList.size == 0) {
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
@@ -48,54 +46,46 @@ class SyncDataPutOrGetUtils {
 
                 val observableList = ArrayList<Observable<String>>()
 
-                for (i in dbDataChangeList.indices) {
-                    if (i == 0) {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            syncCallback.start()
-                        }
-                    }
-                    dbDataChangeList[i]?.changeId?: return@Thread
-                    var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i]?.tableName,
-                            dbDataChangeList[i]?.changeId,
-                            dbDataChangeList[i]?.changeType,
-                            dbUser!!.token, dbDataChangeList[i]?.id!!)
-
+                GlobalScope.launch(Dispatchers.Main) {
+                    syncCallback.start()
+                }
+                for (data in dbDataChangeList) {
+                    data.changeId?: break
+                    var observable: Observable<String>? = this.sendDataToServer(data?.tableName,
+                            data?.changeId,
+                            data?.changeType,
+                            dbUser!!.token, data?.id!!)
                     observable?.let { observableList.add(it) }
+                }
 
+                val observables = arrayOfNulls<Observable<String>>(observableList.size)
+                observableList.toArray(observables)
 
+                if (observables.isNotEmpty()) {
+                    Observable.mergeArrayDelayError<String>(*observables)
+                            .subscribe(object : NetworkObserver<String?>() {
+                                override fun onComplete() {
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        syncCallback.complete()
+                                    }
+                                }
 
-                    if (i == dbDataChangeList.size - 1) {
-                        val observables = arrayOfNulls<Observable<String>>(observableList.size)
-                        observableList.toArray(observables)
+                                override fun onSubscribe(d: Disposable) {
+                                }
 
-                        if (observables.isNotEmpty()) {
-                            Observable.mergeArrayDelayError<String>(*observables)
-                                    .doFinally {}
-                                    .subscribe(object : NetworkObserver<String?>() {
-                                        override fun onComplete() {
-                                            GlobalScope.launch(Dispatchers.Main) {
-                                                syncCallback.complete()
-                                            }
-                                        }
+                                override fun onNext(t: String) {
+                                }
 
-                                        override fun onSubscribe(d: Disposable) {
-                                        }
-
-                                        override fun onNext(t: String) {
-                                        }
-
-                                        override fun onError(e: Throwable) {
-                                            LogUtils.d(e)
-                                            GlobalScope.launch(Dispatchers.Main) {
-                                                syncCallback.error(e.cause.toString())
-                                            }
-                                        }
-                                    })
-                        } else {
-                            GlobalScope.launch(Dispatchers.Main) {
-                                syncCallback.complete()
-                            }
-                        }
+                                override fun onError(e: Throwable) {
+                                    LogUtils.d(e)
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        syncCallback.error(e.cause.toString())
+                                    }
+                                }
+                            })
+                } else {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        syncCallback.complete()
                     }
                 }
             }.start()

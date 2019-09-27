@@ -200,7 +200,8 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
 
         override fun error(msg: String) {
-           //("GetDataError:$msg")
+            hideLoadingDialog()
+            ToastUtils.showShort(msg)
         }
     }
 

@@ -18,6 +18,7 @@ import android.widget.Toast
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
@@ -31,6 +32,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
+import com.tencent.bugly.Bugly
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -320,11 +322,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
 
         override fun complete() {
+            hideLoadingDialog()
             syncComplet()
         }
 
         override fun error(msg: String) {
+            hideLoadingDialog()
             //("GetDataError:$msg")
+            ToastUtils.showShort(msg)
         }
     }
 

@@ -247,7 +247,8 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             finish()
         }
         override fun error(msg: String) {
-           //("GetDataError:$msg")
+            hideLoadingDialog()
+            ToastUtils.showShort(msg)
         }
     }
 

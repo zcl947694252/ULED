@@ -204,6 +204,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
         override fun complete() {
+            hideLoadingDialog()
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
@@ -214,6 +215,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
         override fun error(msg: String) {
+            hideLoadingDialog()
             LogUtils.d("upload data failed msg = $msg")
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
