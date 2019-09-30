@@ -16,6 +16,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.SplashActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 
 import static android.provider.Settings.ACTION_BLUETOOTH_SETTINGS;
@@ -116,6 +117,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
 //        TelinkLightApplication.Companion.getApp().releseStomp();
         ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
+        TelinkLightApplication.Companion.getApp().doDestroy();
     }
 
     private SyncCallback syncCallback = (new SyncCallback() {

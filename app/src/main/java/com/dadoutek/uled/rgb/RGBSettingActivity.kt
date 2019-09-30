@@ -1078,7 +1078,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             if (listSize.size > 0) {
                 val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
                 builder.setMessage(getString(R.string.delete_model))
-                builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+                builder.setPositiveButton(android.R.string.ok) { _, _ ->
                     showLoadingDialog(resources.getString(R.string.delete))
                     for (i in diyGradientList!!.indices) {
                         if (diyGradientList!![i].isSelected) {

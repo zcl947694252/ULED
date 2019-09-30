@@ -40,19 +40,13 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
 import com.dadoutek.uled.util.*
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
+import com.telink.TelinkApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -61,16 +55,12 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
-
-
+class MeFragment : BaseFragment(), View.OnClickListener{
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
     private var inflater: LayoutInflater? = null
-
     private var mApplication: TelinkLightApplication? = null
-
     private var sleepTime: Long = 250
     internal var isClickExlogin = false
     private var compositeDisposable = CompositeDisposable()
@@ -167,15 +157,11 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
             200
         }
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
-
-        //TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
-        //TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
-        val view = inflater.inflate(R.layout.fragment_me, null)
-        return view
+        return inflater.inflate(R.layout.fragment_me, null)
     }
 
     @SuppressLint("InvalidWakeLockTag")
@@ -190,7 +176,6 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
     override fun onResume() {
         super.onResume()
         isVisableDeveloper()
-        disableConnectionStatusListener()
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }
@@ -201,7 +186,6 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
-        this.mApplication?.removeEventListener(this)
     }
 
     private fun initClick() {
@@ -516,35 +500,17 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
         TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
+        TelinkApplication.getInstance().removeEventListeners()
+        TelinkLightApplication.getApp().doDestroy()
     }
 
-    override fun performed(event: Event<String>?) {
-        when (event?.type) {
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-        }
+    override fun setLoginChange() {
+        super.setLoginChange()
+        bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
     }
 
-
-    fun onDeviceStatusChanged(event: DeviceEvent) {
-        val deviceInfo = event.args
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                //ToastUtils.showLong(getString(R.string.connect_success))
-                GlobalScope.launch(Dispatchers.Main) {
-                    bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
-                    changeDisplayImgOnToolbar(false)
-                }
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                GlobalScope.launch(Dispatchers.Main) {
-                    changeDisplayImgOnToolbar(false)
-                    bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
-                }
-
-            }
-
-            LightAdapter.STATUS_CONNECTING -> {
-            }
-        }
+    override fun setLoginOutChange() {
+        super.setLoginOutChange()
+        bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
     }
 }

@@ -18,7 +18,9 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
                 helper.setText(R.id.tv_device_name, TelinkLightApplication.getApp().getString(R.string.no_name))
             }
 
-            helper.setText(R.id.name, StringUtils.getSwitchPirDefaultName(scene.productUUID))
+            helper.setText(R.id.name, StringUtils.getSwitchPirDefaultName(scene.productUUID)+"-"+helper.position)
+
+
             helper.setImageResource(R.id.img_light, R.drawable.icon_switch)
             helper.addOnClickListener(R.id.tv_setting)
                     .setTag(R.id.tv_setting, helper.adapterPosition)

@@ -75,8 +75,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         initListener()
         if (TelinkLightApplication.getApp().connectDevice == null)
             autoConnectSensor()
-        else
-            getVersion()
+        val version = intent.getStringExtra("version")
+        getVersion(version)
+       /* else
+            getVersion()*/
     }
 
     private fun initListener() {
@@ -120,7 +122,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         hideLoadingDialog()
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         Log.e("zcl", "zcl***STATUS_LOGIN***")
-                        getVersion()
                     }
                     LightAdapter.STATUS_LOGOUT -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
@@ -162,39 +163,23 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
 
-    private fun getVersion() {
-        var dstAdress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
-                        versionLayoutPS.visibility = View.VISIBLE
-                        tvPSVersion.text = it
-                        isSupportModeSelect = (it ?: "").contains("PS")
+    private fun getVersion(version: String) {
+        val versionNum = Integer.parseInt(StringUtils.versionResolution(version, 1))
+        versionLayoutPS.visibility = View.VISIBLE
+        tvPSVersion.text = version
+        isSupportModeSelect = (version?: "").contains("PS")
 
-                        if (isSupportModeSelect) {
-                            tvSelectStartupMode.visibility = View.VISIBLE
-                            spSelectStartupMode.visibility = View.VISIBLE
+        if (isSupportModeSelect) {
+            tvSelectStartupMode.visibility = View.VISIBLE
+            spSelectStartupMode.visibility = View.VISIBLE
 
-                            if (versionNum >= 113) {
-                                isSupportDelayUnitSelect = true
-                                tvSwitchMode.visibility = View.VISIBLE
-                                spSwitchMode.visibility = View.VISIBLE
-                                tvDelayUnit.visibility = View.VISIBLE
-                                spDelayUnit.visibility = View.VISIBLE
-                            }
-                        }
-                    },
-                    failedCallback = {
-                        versionLayoutPS.visibility = View.GONE
-                        getVersionRetryCount++
-                        if (getVersionRetryCount <= getVersionRetryMaxCount) {
-                            getVersion()
-                        }
-                    })
-        } else {
-            ToastUtils.showLong(R.string.device_not_connected)
+            if (versionNum >= 113) {
+                isSupportDelayUnitSelect = true
+                tvSwitchMode.visibility = View.VISIBLE
+                spSwitchMode.visibility = View.VISIBLE
+                tvDelayUnit.visibility = View.VISIBLE
+                spDelayUnit.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -273,14 +258,11 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun doFinish() {
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-        finish()
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     private fun configureComplete() {
-        //saveSensor()
-        TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+      doFinish()
     }
 
     override fun onBackPressed() {

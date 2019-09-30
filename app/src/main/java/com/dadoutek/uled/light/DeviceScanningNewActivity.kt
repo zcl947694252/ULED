@@ -868,7 +868,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             addNewGroup()
         }
 
-        mAddedDevicesAdapter.setOnItemClickListener { adapter, view, position ->
+        mAddedDevicesAdapter.setOnItemClickListener { _, _, position ->
             val item = this.mAddedDevicesAdapter.getItem(position)
             item?.isSelected = !(item?.isSelected ?: false)
             if (item?.isSelected == true) {
@@ -1107,11 +1107,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun onLeScanTimeout() {
         TelinkLightService.Instance().idleMode(false)
         list_devices.visibility = View.VISIBLE
-        if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
+        if (mAddedDevices.size > 0)//表示目前已经搜到了至少有一个设备
             scanSuccess()
-        } else {
+        else
             scanFail()
-        }
     }
 
     /**
@@ -1236,20 +1235,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val mesh = this.mApplication!!.mesh
         val deviceInfo = event.args
         if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
-            if (deviceInfo.productUUID==DeviceType.NORMAL_SWITCH||deviceInfo.productUUID==DeviceType.NORMAL_SWITCH2
-                    ||deviceInfo.productUUID==DeviceType.SCENE_SWITCH||deviceInfo.productUUID==DeviceType.SMART_CURTAIN_SWITCH)
-            if (deviceInfo.rssi < MAX_RSSI) {
-                LeBluetooth.getInstance().stopScan()
-                if (deviceInfo.productUUID==DeviceType.SCENE_SWITCH&&DBUtils.sceneAll.isEmpty()) {
-                    indefiniteSnackbar(topView, R.string.tip_switch, android.R.string.ok) {
-                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                        TelinkLightService.Instance()?.idleMode(true)
+            if (deviceInfo.productUUID == DeviceType.NORMAL_SWITCH || deviceInfo.productUUID == DeviceType.NORMAL_SWITCH2
+                    || deviceInfo.productUUID == DeviceType.SCENE_SWITCH || deviceInfo.productUUID == DeviceType.SMART_CURTAIN_SWITCH)
+                if (deviceInfo.rssi < MAX_RSSI) {
+                    LeBluetooth.getInstance().stopScan()
+                    if (deviceInfo.productUUID == DeviceType.SCENE_SWITCH && DBUtils.sceneAll.isEmpty()) {
+                        indefiniteSnackbar(topView, R.string.tip_switch, android.R.string.ok) {
+                            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                            TelinkLightService.Instance()?.idleMode(true)
+                        }
+                        return
                     }
-                    return
+                    bestRssiDevice = deviceInfo
+                    TelinkLightService.Instance()?.connect(deviceInfo.macAddress, 10)
                 }
-                bestRssiDevice = deviceInfo
-               TelinkLightService.Instance()?.connect(deviceInfo.macAddress,10)
-            }
         } else {
             if (deviceInfo.productUUID == mAddDeviceType && deviceInfo.rssi < MAX_RSSI) {
                 val meshAddress = mMeshAddressGenerator.meshAddress
@@ -1272,7 +1271,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
-    
+
 
     private fun updateMesh(deviceInfo: DeviceInfo, meshAddress: Int, mesh: Mesh) {
         //更新参数
@@ -1303,28 +1302,38 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 } else {
                     if (bestRssiDevice!!.rssi < deviceInfo.rssi)
                         bestRssiDevice = deviceInfo
-            }
+                }
 
                 GlobalScope.launch { this@DeviceScanningNewActivity.mApplication!!.mesh.saveOrUpdate(this@DeviceScanningNewActivity) }
 
                 LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
-                mAddedDevices.add(scannedDeviceItem)
-                updateDevice(scannedDeviceItem)
-                mAddedDevicesAdapter.notifyDataSetChanged()
+                if (mAddedDevices.contains(scannedDeviceItem))
+                    return
+                var isHave = false
+                for (item in mAddedDevices) {
+                    if (item.macAddress == scannedDeviceItem.macAddress)
+                        isHave = true
 
-                //扫描出灯就设置为非首次进入
-                if (isFirtst) {
-                    isFirtst = false
-                    SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
                 }
-                toolbar?.title = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-                scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                if (!isHave) {
+                    mAddedDevices.add(scannedDeviceItem)
+                    updateDevice(scannedDeviceItem)
+                    mAddedDevicesAdapter.notifyDataSetChanged()
 
-                updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
-                mUpdateMeshRetryCount = 0
-                mConnectRetryCount = 0
-                this.startScan()    //继续开始扫描设备
+                    //扫描出灯就设置为非首次进入
+                    if (isFirtst) {
+                        isFirtst = false
+                        SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
+                    }
+                    toolbar?.title = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                    scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                }
+                    updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
+                    mUpdateMeshRetryCount = 0
+                    mConnectRetryCount = 0
+                    this.startScan()    //继续开始扫描设备
+
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 //加灯失败继续扫描
@@ -1350,11 +1359,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
                         if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                                 bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
+                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
                         } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
+                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
                         } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!,"group" to "false")
+                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
                         }
 
                     } else

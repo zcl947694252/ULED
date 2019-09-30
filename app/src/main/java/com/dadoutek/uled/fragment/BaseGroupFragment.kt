@@ -293,7 +293,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         var intent: Intent
         val groupType = setGroupType()
         when (view!!.id) {
-            R.id.btn_on -> {
+            R.id.btn_on, R.id.tv_on -> {
                 if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                     Commander.openOrCloseLights(dstAddr, true)
                     currentLight.connectionStatus = ConnectionStatus.ON.value
@@ -304,7 +304,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     }
                 }
             }
-            R.id.btn_off -> {
+            R.id.btn_off, R.id.tv_off -> {
                 if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                     Commander.openOrCloseLights(dstAddr, false)
                     currentLight.connectionStatus = ConnectionStatus.OFF.value
@@ -360,11 +360,10 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
 
             R.id.selected_group -> {
-//                currentLight.isChecked = !currentLight.isChecked
                 groupList[position].isSelected = !groupList[position].isSelected
             }
 
-            R.id.item_layout -> {
+            R.id.group_name -> {
                 var intent: Intent =Intent()
                 when (groupType) {
                     Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
@@ -387,7 +386,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                 startActivityForResult(intent, 2)
             }
         }
-
     }
 
     abstract fun setIntentDeviceType(): String?

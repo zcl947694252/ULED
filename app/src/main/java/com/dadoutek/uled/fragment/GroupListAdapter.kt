@@ -34,24 +34,27 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                     .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
                     .addOnClickListener(R.id.selected_group)
 
-                val b = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
                         || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
+
             if (num>0){
-                if (b) {
+                if (isSuportOpenOrClose) {
+                    helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                            .addOnClickListener(R.id.btn_on)
+                            .addOnClickListener(R.id.btn_off)
+                            .addOnClickListener(R.id.tv_on)
+                            .addOnClickListener(R.id.tv_off)
+
                     if (group.connectionStatus == ConnectionStatus.ON.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
                                 .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
-                                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
-                                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
-                                .addOnClickListener(R.id.btn_on)
-                                .addOnClickListener(R.id.btn_off)
-
+                                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
+                                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.black_nine))
                     } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_down_group)
                                 .setImageResource(R.id.btn_off, R.drawable.icon_open_group)
-                                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.white))
+                                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.black_nine))
+                                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.white))
                     }
                 }else{//group.deviceType == Constant.DEVICE_TYPE_CURTAIN
                     setNoClik(helper)
@@ -78,7 +81,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 helper.setChecked(R.id.selected_group, false)
 
             helper.setTextColor(R.id.tv_group_name, group.textColor)
-                    .addOnClickListener(R.id.item_layout)
+                    .addOnClickListener(R.id.group_name)
         }
     }
 
@@ -86,8 +89,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
         helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
                 .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
                 .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
-                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
-                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.color_c8))
+                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
+                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.color_c8))
     }
 
     /**

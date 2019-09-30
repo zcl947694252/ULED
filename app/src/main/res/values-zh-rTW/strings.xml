@@ -163,7 +163,7 @@
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
-    <string name="connect_fail">连接失败！</string>
+    <string name="connect_fail">连接失败</string>
     <string name="device_not_connected">设备未连接！</string>
 
     <string name="smartSwitch">开关</string>
@@ -183,7 +183,6 @@
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
     <string name="connecting">连接中……</string>
-    <string name="connect_failed">连接失败</string>
     <string name="group_failed">分组失败</string>
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>

@@ -25,6 +25,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.CancelAuthorMsg
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -38,6 +39,7 @@ import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
+import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -68,7 +70,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     protected var toast: Toast? = null
     protected var foreground = false
     private var loadDialog: Dialog? = null
-    //    private var mReceive: BluetoothStateBroadcastReceive? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
@@ -142,7 +143,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun enableConnectionStatusListener() {
         //先取消，这样可以确保不会重复添加监听
         this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
-       // this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
     //关闭基类的连接状态变化监听
@@ -167,7 +168,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
-                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
+                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
                 changeDisplayImgOnToolbar(false)
@@ -181,7 +182,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-       // enableConnectionStatusListener()
+        enableConnectionStatusListener()
         Constant.isTelBase = true
         foreground = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
@@ -194,7 +195,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }else{
                 changeDisplayImgOnToolbar(false)
             }
-        }else{
+        } else {
             changeDisplayImgOnToolbar(false)
         }
     }
@@ -323,6 +324,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
+        TelinkLightApplication.getApp().doDestroy()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 
@@ -505,6 +507,14 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    open fun getVersion(meshAddr: Int): String? {
+        var version: String? = ""
+        if (TelinkApplication.getInstance().connectDevice != null)
+            Commander.getDeviceVersion(meshAddr, { s -> version = s }
+                    , { ToastUtils.showShort(getString(R.string.get_server_version_fail)) })
+        return version
     }
 }
 

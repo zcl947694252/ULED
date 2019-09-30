@@ -163,7 +163,7 @@
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
-    <string name="connect_fail">连接失败！</string>
+    <string name="connect_fail">连接失败</string>
     <string name="device_not_connected">设备未连接！</string>
     <string name="please_wait">请稍后…</string>
 
@@ -185,7 +185,6 @@
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
     <string name="connecting">连接中……</string>
-    <string name="connect_failed">连接失败</string>
     <string name="group_failed">分组失败</string>
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>
@@ -823,5 +822,6 @@
     <string name="region_warm">扫描下方二维码移交账户</string>
     <string name="cancel_timer">过期倒计时:</string>
     <string name="authorization_warm">接收者将只有控制权，无管理权</string>
+    <string name="get_version_fail">获取设备版本号失败</string>
 
 </resources>

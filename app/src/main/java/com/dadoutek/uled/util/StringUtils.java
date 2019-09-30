@@ -2,7 +2,6 @@ package com.dadoutek.uled.util;
 
 import android.content.Context;
 import android.text.InputFilter;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.dadoutek.uled.R;
@@ -11,12 +10,9 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -261,7 +257,7 @@ public class StringUtils {
                 break;
         }
 
-        List<DbSwitch> swtitches = DBUtils.INSTANCE.getSwtitchesByProductUUID(productUUID);
+      /*  List<DbSwitch> swtitches = DBUtils.INSTANCE.getSwtitchesByProductUUID(productUUID);
         List<String> swtitchNames = new ArrayList();
 
         for (int i = 0; i < swtitches.size(); i++) {
@@ -277,7 +273,7 @@ public class StringUtils {
             } else {
                 return name;
             }
-        }
-        return "";
+        }*/
+        return startStr;
     }
 }

@@ -184,7 +184,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
 
     private fun filter(list: MutableList<DbGroup>) {
         mGroupList?.clear()
-        for (i in list.indices) {// todo 分组 0x00是什么意思
+        for (i in list.indices) {
              if (mLight!!.productUUID == DeviceType.LIGHT_NORMAL ||
                     mLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
                     mLight!!.productUUID == 0x00) {

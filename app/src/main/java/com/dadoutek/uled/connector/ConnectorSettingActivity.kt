@@ -525,7 +525,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe({
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_failed))
+                            showLoadingDialog(getString(R.string.connect_fail))
                             finish()
                         },{})
             }

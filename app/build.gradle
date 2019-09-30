@@ -173,4 +173,6 @@ dependencies {
     implementation project(':stomplib')
     implementation "com.polidea.rxandroidble2:rxandroidble:1.10.1"
     testImplementation 'junit:junit:4.12'
+
+    implementation 'com.jakewharton.rxbinding3:rxbinding:3.0.0'
 }

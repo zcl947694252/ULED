@@ -73,16 +73,24 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         mScanTimeoutDisposal?.dispose()
         this.mApplication?.removeEventListener(this)
         hideLoadingDialog()
-        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-            finish()
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-            finish()
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-            finish()
+
+        if (bestRSSIDevice != null) {
+            val version = getVersion(bestRSSIDevice!!.meshAddress)
+            if (version != null) {
+                if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                        bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                }
+            }else{
+                ToastUtils.showShort(getString(R.string.get_version_fail))
+            }
         }
     }
 
@@ -167,6 +175,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             override fun error(msg: String?) {
                 LogUtils.e("zcl____同步开关________error")
             }
+
         })
         if (switchData.size > 0) {
             no_device_relativeLayout.visibility = View.GONE
@@ -193,7 +202,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun addDevice() {
-        //startActivity(Intent(this, ScanningSwitchActivity::class.java))
         goSearchSwitch()
     }
 
@@ -231,7 +239,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         dialog?.visibility = View.GONE
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentLight = switchData?.get(position)
         positionCurrent = position
         if (view.id == R.id.tv_setting) {
@@ -294,11 +302,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             popupWindow.dismiss()
             isOta = true
             isclickOTA = true
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                connect()
-            } else {
+            if (currentSwitch != null) {
                 TelinkLightService.Instance()?.idleMode(true)
-                TelinkLightService.Instance()?.disconnect()
+                connect()
             }
         }
         delete.setOnClickListener {
@@ -306,9 +312,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             isOta = false
             isclickOTA = true
             popupWindow.dismiss()
-            var deleteSwitch = switchData.get(position)
+            var deleteSwitch = switchData[position]
             AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
-                    .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         DBUtils.deleteSwitch(deleteSwitch)
                         notifyData()
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()

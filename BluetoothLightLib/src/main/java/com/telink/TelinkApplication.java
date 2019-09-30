@@ -41,7 +41,7 @@ public class TelinkApplication extends Application {
 
     private static TelinkApplication mThis;
 
-    protected final EventBus<String> mEventBus = new EventBus<>();
+    public final EventBus<String> mEventBus = new EventBus<>();
     public Context mContext;
     public boolean serviceStarted;
     protected boolean serviceConnected;

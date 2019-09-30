@@ -1,5 +1,6 @@
 package com.dadoutek.uled.othersview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -31,20 +32,33 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
+import com.telink.bluetooth.LeBluetooth
+import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.Parameters
+import com.telink.util.Event
+import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
+import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     zcl
@@ -55,14 +69,13 @@ import kotlin.collections.ArrayList
  * 更新时间   $Date$
  * 更新描述   ${}$
  */
-class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
+class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
 
+    private var disposable: Disposable? = null
     private var isConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
-
     private var nightLightGroupRecycleViewAdapter: NightLightGroupRecycleViewAdapter? = null
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter? = null
-
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private val CMD_OPEN_LIGHT = 0X01
     private val CMD_CLOSE_LIGHT = 0X00
@@ -84,7 +97,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
-
+    private var retryConnectCount = 0
     private var isFinish: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,12 +106,35 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
         initData()
-        getVersion()
         initView()
+
+        TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
+    }
+
+    override fun performed(event: Event<String>?) {
+        val deviceEvent = event as DeviceEvent
+        val deviceInfo = deviceEvent.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                disposable?.dispose()
+                hideLoadingDialog()
+                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+            }
+
+            LightAdapter.STATUS_LOGOUT -> {
+                autoConnectSensor()
+                image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+            }
+
+        }
     }
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        val version = intent.getStringExtra("version")
+        getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
 
         showCheckListData = DBUtils.allGroups
@@ -136,11 +172,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
         }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     private fun initToolbar() {
@@ -160,9 +191,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun doFinish() {
+        disposable?.dispose()
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-        finish()
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     private fun initView() {
@@ -178,33 +210,22 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         trigger_mode.setOnClickListener(this)
     }
 
-    private fun getVersion() {
-        showLoadingDialog(getString(R.string.verification_version))
-        var dstAdress = 0
+    private fun getVersion(version: String) {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo!!.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        hideLoadingDialog()
-                        tvPSVersion.text = it
-                        var version = tvPSVersion.text.toString()
-                        var num: String //N-3.1.1
-                        if (version.contains("N")) {
-                            num = version.substring(2, 3)
-                            if ("" != num && num != "-" && num.toDouble() >= 3.0) {
-                                isGone()
-                                isVisibility()//显示3.0新的人体感应器
-                            }
-                        } else if (version.contains("PR")) {
-                            isGone()
-                            isVisibility()//显示3.0新的人体感应器
-                        }
-                    },
-                    failedCallback = {
-                        hideLoadingDialog()
-
-                        doFinish()
-                    })
+            hideLoadingDialog()
+            tvPSVersion.text = version
+            var version = tvPSVersion.text.toString()
+            var num: String //N-3.1.1
+            if (version.contains("N")) {
+                num = version.substring(2, 3)
+                if ("" != num && num != "-" && num.toDouble() >= 3.0) {
+                    isGone()
+                    isVisibility()//显示3.0新的人体感应器
+                }
+            } else if (version.contains("PR")) {
+                isGone()
+                isVisibility()//显示3.0新的人体感应器
+            }
         } else {
             doFinish()
         }
@@ -741,7 +762,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
                 showLoadingDialog(getString(R.string.configuring_switch))
             }
-LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
+            LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
             configLightlight()
             Thread.sleep(300)
 
@@ -794,13 +815,13 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
             return
         }
 
-        Thread {
+        GlobalScope.launch {
             GlobalScope.launch(Dispatchers.Main) {
                 showLoadingDialog(getString(R.string.configuring_switch))
             }
 
             configNewlight()
-            Thread.sleep(300)
+            delay(300)
 
             Commander.updateMeshName(
                     successCallback = {
@@ -813,13 +834,10 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
                         hideLoadingDialog()
                         TelinkLightService.Instance()?.idleMode(true)
                     })
-
-        }.start()
+        }
     }
 
     private fun configLightlight() {
-        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
-
         val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
         val timeL: Byte = (selectTime and 0xff).toByte()
         val paramBytes = byteArrayOf(
@@ -856,10 +874,7 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
 
     private fun configureComplete() {
         saveSensor()
-        TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
-
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        doFinish()
     }
 
     private fun saveSensor() {
@@ -1022,5 +1037,33 @@ LogUtils.e("zcl人体版本中"+DBUtils.getAllSensor())
         if (isAllCanCheck) {
             showCheckListData!![0].enableCheck = true
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun autoConnectSensor() {
+        retryConnectCount++
+        showLoadingDialog(getString(R.string.please_wait))
+        LogUtils.e("zcl开始连接")
+        //自动重连参数
+        val connectParams = Parameters.createAutoConnectParameters()
+        connectParams?.setMeshName(DBUtils.lastUser?.controlMeshName)
+        connectParams?.setConnectMac(mDeviceInfo?.macAddress)
+        connectParams?.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
+        connectParams?.autoEnableNotification(true)
+        connectParams?.setTimeoutSeconds(5)
+        progressBar_sensor.visibility = View.VISIBLE
+        //连接，如断开会自动重连
+        GlobalScope.launch {
+            delay(1000)
+            TelinkLightService.Instance()?.autoConnect(connectParams)
+        }
+
+        disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
+            LeBluetooth.getInstance().stopScan()
+            TelinkLightService.Instance()?.idleMode(true)
+            hideLoadingDialog()
+            progressBar_sensor.visibility = View.GONE
+            ToastUtils.showShort(getString(R.string.connect_fail))
+        }, {})
     }
 }

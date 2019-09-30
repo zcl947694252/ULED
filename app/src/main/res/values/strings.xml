@@ -171,7 +171,7 @@
     <string name="rename_light">Single lamp rename</string>
     <string name="connecting_please_wait">connecting, please wait…</string>
     <string name="connect_success">Connection succeeded!</string>
-    <string name="connect_fail">Connection failed!</string>
+    <string name="connect_fail">Connection failed</string>
     <string name="device_not_connected">The device is not connected!</string>
     <string name="please_wait">Please wait…</string>
 
@@ -192,7 +192,6 @@
     <string name="select_group">Select group</string>
     <string name="please_select_group">Please select a group at least</string>
     <string name="connecting">Connecting…</string>
-    <string name="connect_failed">Connect failed</string>
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
     <string name="SceneSetting">Scene</string>
@@ -898,5 +897,6 @@
     <string name="region_warm">Scan the qr code below to transfer the account</string>
     <string name="cancel_timer">Expiration countdown:</string>
     <string name="authorization_warm">The receiver will have only control, not management</string>
+    <string name="get_version_fail">Failed to get device version number</string>
 
 </resources>

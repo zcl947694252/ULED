@@ -68,21 +68,16 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
+
 private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 /**
- * 创建者     zcl
- * 创建时间   2019/7/27 16:35
  * 描述	      ${人体感应器列表}$
- *
- * 更新者     $Author$
- * 更新时间   $Date$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private var disposable: Disposable? = null
+    private lateinit var deviceInfo: DeviceInfo
     private var delete: TextView? = null
     private var group: TextView? = null
     private var set: ImageView? = null
@@ -107,19 +102,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     var clickRgb: Boolean = false
     private lateinit var sensorData: MutableList<DbSensor>
     private var adapter: SensorDeviceDetailsAdapter? = null
-    private var mScanTimeoutDisposal: Disposable? = null
-    private var mCheckRssiDisposal: Disposable? = null
     private var retryConnectCount = 0
-    private var mTelinkLightService: TelinkLightService? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var currentLight: DbSensor? = null
     private var positionCurrent: Int = 0
     private var mConnectDevice: DeviceInfo? = null
     private var acitivityIsAlive = true
-    private var mScanDisposal: Disposable? = null
-    private var bestRSSIDevice: DeviceInfo? = null
     private var mApplication: TelinkLightApplication? = null
-    private var mConnectDisposal: Disposable? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
@@ -173,9 +162,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         group?.text = getString(R.string.relocation)
         progressBar_sensor?.setOnClickListener {}
 
-        add_device_btn.setOnClickListener { startActivity(Intent(this, ScanningSensorActivity::class.java)) }//添加设备
+        add_device_btn.setOnClickListener {
+            startActivity(Intent(this, ScanningSensorActivity::class.java))
+            finish()
+            disposable?.dispose()
+        }//添加设备
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish()}
+        toolbar.setNavigationOnClickListener { finish() }
         toolbar.title = getString(R.string.sensor) + " (" + sensorData!!.size + ")"
     }
 
@@ -204,6 +197,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         val intent = Intent(this, NewSceneSetAct::class.java)
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
+                        disposable?.dispose()
                     }
                 }
             }
@@ -373,10 +367,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         }
                     }
                     INSTALL_SWITCH -> {
-                       //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                       //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
-                       //startActivityForResult(intent, 0)
-                    startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
+                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
@@ -504,13 +498,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
 
-        Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe( {
+        disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
-            progressBar_sensor.visibility =View.GONE
+            progressBar_sensor.visibility = View.GONE
             ToastUtils.showShort(getString(R.string.connect_fail))
-        },{})
+        }, {})
     }
 
     /**
@@ -546,7 +540,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         relocationSensor()
                                     }
                             OTA_SENSOR -> {//人体感应器ota
-                                getVersion()
+                                getVersion(true)
                             }
                             RESET_SENSOR -> resetSensor() //恢复出厂设置
                         }
@@ -596,22 +590,32 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }
     }
 
-    private fun getVersion() {
+    private fun getVersion(isOTA: Boolean) {
         if (TelinkApplication.getInstance().connectDevice != null) {
             LogUtils.e("TAG", currentLight!!.meshAddr.toString())
             progressBar_sensor.visibility = View.GONE
+            disposable?.dispose()
             Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
                 if ("" != s)
-                    if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                        currentLight!!.version = s
-                        val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-                        intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
-                        intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
-                        intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
-                        startActivity(intent)
+                    if (isOTA) {
+                        if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                            currentLight!!.version = s
+                            val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
+                            intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
+                            intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
+                            intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
+                            startActivity(intent)
+
+                        } else {
+                            ToastUtils.showShort(getString(R.string.version_disabled))
+                            hideLoadingDialog()
+                        }
                     } else {
-                        ToastUtils.showShort(getString(R.string.version_disabled))
-                        hideLoadingDialog()
+                        if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+                            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
+                        }
                     }
             }, { hideLoadingDialog() })
             isClick = NORMAL_SENSOR
@@ -623,7 +627,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
      */
     @SuppressLint("CheckResult")
     private fun relocationSensor() {
-        val deviceInfo = DeviceInfo()
+        deviceInfo = DeviceInfo()
         currentLight?.let {
             deviceInfo.meshAddress = it.meshAddr
             deviceInfo.macAddress = it.macAddr
@@ -634,11 +638,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         isClick = NORMAL_SENSOR
         settingType = NORMAL_SENSOR
         hideLoadingDialog()
-        if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
-            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo)
-        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1")
-        }
+        getVersion(false)
+
     }
 
 
@@ -662,7 +663,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         } else {
             TelinkLightService.Instance()?.idleMode(true)
 
-            if (scanPb!=null&&!scanPb.isShown) {
+            if (scanPb != null && !scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
             }
@@ -736,7 +737,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         acitivityIsAlive = false
         if (popupWindow != null && popupWindow!!.isShowing)
             popupWindow!!.dismiss()
-
+        disposable?.dispose()
         this.mApplication?.removeEventListener(this)
     }
 

@@ -70,7 +70,7 @@ import java.util.*
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${}$
  */
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -113,7 +113,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null
-    private var isLinked: Boolean = false//是否是本灯连接
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

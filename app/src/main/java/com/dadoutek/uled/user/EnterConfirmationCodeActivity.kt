@@ -90,7 +90,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         when (v?.id) {
             R.id.refresh_code -> verificationCode()
 
-            R.id.image_return -> finish()
+            R.id.image_return ->{
+                SMSSDK.unregisterEventHandler(eventHandler)
+                finish()
+            }
         }
     }
 

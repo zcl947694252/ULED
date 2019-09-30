@@ -106,18 +106,10 @@ class ReconnectionBluetooth : EventListener<String> {
     }
 
     private fun onNError(event: DeviceEvent) {
-
-//        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(mApplication, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
-
-//        val builder = android.support.v7.app.AlertDialog.Builder(this)
-//        builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
-//        builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
-//        builder.setCancelable(false)
-//        builder.show()
     }
 
     private fun login() {

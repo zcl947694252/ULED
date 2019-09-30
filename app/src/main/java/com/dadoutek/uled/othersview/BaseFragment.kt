@@ -9,10 +9,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
-import com.dadoutek.uled.util.RecoverMeshDeviceUtil
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
@@ -51,7 +52,6 @@ open class BaseFragment : Fragment() {
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         if (isConnected) {
             if (toolbar != null) {
-
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
             }
@@ -89,24 +89,32 @@ open class BaseFragment : Fragment() {
         }
     }
 
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
+    fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 ToastUtils.showLong(getString(R.string.connect_success))
                 changeDisplayImgOnToolbar(true)
 
-                TelinkLightApplication.getApp()?.connectDevice
-                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
+                setLoginChange()
             }
             LightAdapter.STATUS_LOGOUT -> {
                 changeDisplayImgOnToolbar(false)
+                setLoginOutChange()
             }
 
             LightAdapter.STATUS_CONNECTING -> {
                 ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
+    }
+
+    open fun setLoginChange() {
+
+    }
+
+    open fun setLoginOutChange() {
+
     }
 
 
@@ -117,7 +125,7 @@ open class BaseFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        //enableConnectionStatusListener()
+        enableConnectionStatusListener()
 
         val lightService: TelinkLightService? = TelinkLightService.Instance()
 
@@ -132,6 +140,14 @@ open class BaseFragment : Fragment() {
         if (loadDialog != null) {
             loadDialog!!.dismiss()
         }
+    }
+
+    open fun getVersion(meshAddr: Int): String? {
+        var version: String? = ""
+        if (TelinkApplication.getInstance().connectDevice != null)
+            Commander.getDeviceVersion(meshAddr, { s -> version = s }
+                    , { ToastUtils.showShort(getString(R.string.get_server_version_fail)) })
+        return version
     }
 
     open fun endCurrentGuide() {}

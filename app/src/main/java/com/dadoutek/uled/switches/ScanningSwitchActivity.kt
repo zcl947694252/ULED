@@ -2,7 +2,6 @@ package com.dadoutek.uled.switches
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.le.ScanFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -12,7 +11,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.VENDOR_ID
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
@@ -90,12 +88,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun readyConnection() {
-        val b = TelinkLightService.Instance() != null && !TelinkLightService.Instance()!!.isLogin
+        val isLogin = TelinkLightService.Instance() != null && !TelinkLightService.Instance()!!.isLogin
         mIntervalCheckConnection = Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     //如果已经断连或者检测超过10次，直接完成。
-                    if (b || it > 2) {
+                    if (isLogin || it > 2) {
                         onInited()
                     }
                 }, {})
@@ -154,32 +152,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         doFinish()
     }
 
-    private fun getScanFilters(): MutableList<ScanFilter> {
-        val scanFilters = ArrayList<ScanFilter>()
-
-        scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(VENDOR_ID,
-                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
-                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
-                .build())
-
-        scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(VENDOR_ID,
-                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
-                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
-                .build())
-        scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(VENDOR_ID,
-                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
-                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
-                .build())
-        scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(VENDOR_ID,
-                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
-                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
-                .build())
-        return scanFilters
-    }
 
     @SuppressLint("CheckResult")
     private fun startScan() {
@@ -195,12 +167,8 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 //扫描参数
                 val params = LeScanParameters.create()
-                    params.setMeshName(mesh.factoryName)
+                params.setMeshName(mesh.factoryName)
 
-
-//                if (!AppUtils.isExynosSoc) {
-////                    params.setScanFilters(getScanFilters())
-//                }
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
 
@@ -391,20 +359,27 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
-
         progressBtn.progress = 100  //进度控件显示成完成状态
 
         closeAnimation()
         hideLoadingDialog()
-        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "false")
+
+        if (bestRSSIDevice != null) {
+            val version = getVersion(bestRSSIDevice!!.meshAddress)
+            if (version != null) {
+                if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH || bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                }
+                finish()
+
+            }else{
+                ToastUtils.showShort(getString(R.string.get_version_fail))
+            }
         }
-        finish()
     }
 
 
@@ -414,7 +389,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance()?.idleMode(true)
 
         progressBtn.progress = -1    //控件显示Error状态
-        progressBtn.text = getString(R.string.connect_failed)
+        progressBtn.text = getString(R.string.connect_fail)
         doFinish()
     }
 

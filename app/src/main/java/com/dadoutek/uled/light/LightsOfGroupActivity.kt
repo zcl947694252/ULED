@@ -897,10 +897,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     private fun onNError(event: DeviceEvent) {
-
-//        ToastUtils.showLong(getString(R.string.connect_fail))
-
-
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 

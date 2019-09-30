@@ -24,6 +24,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
@@ -258,7 +259,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     /**
      * 自动重连
      */
-    private void autoConnect() {// todo 登录后的升级
+    private void autoConnect() {
         if (TelinkApplication.getInstance().getConnectDevice() == null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 ToastUtils.showLong(getString(R.string.connecting));
@@ -543,10 +544,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void beginToOta() {
+        parseFile();
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null && TelinkLightApplication.Companion.getApp().getConnectDevice().meshAddress == lightMeshAddr) {
             startOTA();
         } else {
-            // startScan();
             autoConnect();
         }
     }
@@ -636,6 +637,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null) {
             OTA_IS_HAVEN_START = true;
+            LogUtils.e("zcl-----------升级版本"+mFirmwareData);
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             //startScan();
@@ -661,8 +663,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 onDeviceEvent((DeviceEvent) event);
                 break;
             case NotificationEvent.GET_DEVICE_STATE:
-
-                // onNotificationEvent((NotificationEvent) event);
                 break;
         }
     }
@@ -852,7 +852,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             Bundle b = data.getExtras(); //data为B中回传的Intent
             mPath = b.getString("path");//str即为回传的值
             tvFile.setText(mPath);
-            parseFile();
             Log.e("zcl", "返回数据是:" + requestCode + "---" + resultCode + "---mPath-" + mPath);
         }
     }

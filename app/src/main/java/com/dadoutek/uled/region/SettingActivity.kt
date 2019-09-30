@@ -21,7 +21,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -35,7 +34,6 @@ import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
-import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
@@ -431,13 +429,6 @@ class SettingActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-    }
-
-    //重启app并杀死原进程
-    private fun restartApplication() {
-        TelinkLightApplication.getApp().releseStomp()
-        ActivityUtils.finishAllActivities(true)
-        ActivityUtils.startActivity(SplashActivity::class.java)
     }
 }
 

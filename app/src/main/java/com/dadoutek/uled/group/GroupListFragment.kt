@@ -217,8 +217,8 @@ class GroupListFragment : BaseFragment() {
         btnOn = view.findViewById(R.id.btn_on)
         btnOff = view.findViewById(R.id.btn_off)
         btnSet = view.findViewById(R.id.btn_set)
-        onText = view.findViewById(R.id.textView8)
-        offText = view.findViewById(R.id.textView11)
+        onText = view.findViewById(R.id.tv_on)
+        offText = view.findViewById(R.id.tv_off)
 
 
         totalNum = view.findViewById(R.id.total_num)

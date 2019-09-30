@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
@@ -23,6 +24,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -56,20 +58,15 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 20
     private val CONNECT_TIMEOUT_SECONDS: Int = 5
     private val MAX_RETRY_CONNECT_TIME = 3
-
     private var mRetryConnectCount: Int = 0
-
+    private var getVersionRetryMaxCount = 2
+    private var getVersionRetryCount = 0
     private var mDeviceInfo: DeviceInfo? = null
-
     private var connectDisposable: Disposable? = null
-
     private lateinit var mApplication: TelinkLightApplication
-
     private var scanDisposable: Disposable? = null
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
-
     private var isSupportInstallOldDevice = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_sensor)
@@ -112,8 +109,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     //扫描失败处理方法
     private fun scanFail() {
         showToast(getString(R.string.scan_end))
-        closeAnimal()
-        finish()
+        doFinish()
     }
 
 
@@ -243,7 +239,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
-                closeAnimal()
+                doFinish()
             }
         }
     }
@@ -305,8 +301,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         GlobalScope.launch(Dispatchers.Main) {
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
-            closeAnimal()
-            finish()
+            doFinish()
         }
     }
 
@@ -323,7 +318,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
             LightAdapter.STATUS_LOGIN -> {//3
                 onLogin()
-                LogUtils.e("zcl 登陆成功")
+
             }
 
             LightAdapter.STATUS_LOGOUT -> {//4
@@ -357,39 +352,59 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
-
+        isSearchedDevice = false
 
         progressBtn.progress = 100  //进度控件显示成完成状态
 
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
 
-        hideLoadingDialog()
+        getVersion()
+    }
 
-        if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
-            startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
-        } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0")
+    private fun getVersion() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null&&mDeviceInfo?.meshAddress!=null) {
+            dstAdress = mDeviceInfo?.meshAddress!!
+            Commander.getDeviceVersion(dstAdress,
+                    successCallback = {
+                        if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                            startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
+                        } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
+                            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
+                        }
+                        closeAnimal()
+                        finish()
+                    },
+                    failedCallback = {
+                        getVersionRetryCount++
+                        if (getVersionRetryCount <= getVersionRetryMaxCount) {
+                            getVersion()
+                        }
+                    })
+        } else {
+            doFinish()
         }
-            finish()
     }
 
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
-        TelinkLightService.Instance()?.idleMode(true)
         hideLoadingDialog()
         LogUtils.e("zcl  showConnectFailed")
         progressBtn.progress = -1    //控件显示Error状态
-        progressBtn.text = getString(R.string.connect_failed)
+        progressBtn.text = getString(R.string.connect_fail)
+        isSearchedDevice = false
+        doFinish()
     }
 
 
     private fun connect() {
-        showLoadingDialog(resources.getString(R.string.connecting_tip))
-        closeAnimal()
+        //showLoadingDialog(resources.getString(R.string.connecting_tip))
+       // closeAnimal()
+        mApplication.removeEventListener(this)
+        mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         Thread {
-            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
-            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
             LogUtils.e("zcl开始连接")
         }.start()
@@ -405,10 +420,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                         retryConnect()
                     }
         }
-
     }
 
     private fun doFinish() {
+        closeAnimal()
         this.mApplication.removeEventListener(this)
         if (TelinkLightService.Instance() != null) {
             TelinkLightService.Instance()?.idleMode(true)
@@ -440,6 +455,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     isSearchedDevice = true
                     connect()
                     progressBtn.text = getString(R.string.connecting)
+                    device_stop_scan.text = getString(R.string.connecting_tip)
                 } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }

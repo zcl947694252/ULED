@@ -54,7 +54,7 @@ import java.util.*
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${//GlobalScope.launch { delay(1000) } //todo 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程}$
+ * 更新描述   ${//GlobalScope.launch { delay(1000) } // 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程}$
  */
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -229,10 +229,11 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     //重启app并杀死原进程
-    private fun restartApplication() {
+    fun restartApplication() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().releseStomp()
+        TelinkLightApplication.getApp().doDestroy()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 
