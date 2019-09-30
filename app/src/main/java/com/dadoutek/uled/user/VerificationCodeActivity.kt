@@ -45,6 +45,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         setContentView(R.layout.activity_verification_code)
         initView()
         dbUser = DbUser()
+        SMSSDK.registerEventHandler(eventHandler)
     }
 
 
@@ -59,7 +60,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         sms_login.setOnClickListener(this)
         edit_user_phone.addTextChangedListener(this)
         password_login.setOnClickListener(this)
-        SMSSDK.registerEventHandler(eventHandler)
     }
 
     override fun onClick(v: View?) {

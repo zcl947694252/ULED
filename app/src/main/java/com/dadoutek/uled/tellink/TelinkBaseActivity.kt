@@ -19,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -204,6 +205,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast!!.cancel()
         this.toast = null
         unregisterReceiver(stompRecevice)
+        SMSSDK.unregisterAllEventHandler()
+
     }
 
     open fun initOnLayoutListener() {

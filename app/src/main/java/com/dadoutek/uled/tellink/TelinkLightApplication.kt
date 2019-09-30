@@ -98,7 +98,7 @@ class TelinkLightApplication : TelinkApplication() {
         releseStomp()
     }
 
-    open fun releseStomp() {
+    fun releseStomp() {
         mStompManager.mStompClient?.disconnect()
     }
 

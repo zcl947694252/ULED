@@ -51,7 +51,11 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         initViewType()
         initView()
         timing()
+
+        SMSSDK.registerEventHandler(eventHandler)
     }
+
+
 
     @SuppressLint("SetTextI18n")
     private fun initViewType() {
@@ -77,7 +81,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             submitCode(countryCode
                     ?: "", phone!!, code.toString().trim { it <= ' ' })
         }
-        SMSSDK.registerEventHandler(eventHandler)
         refresh_code.setOnClickListener(this)
         image_return.setOnClickListener(this)
 

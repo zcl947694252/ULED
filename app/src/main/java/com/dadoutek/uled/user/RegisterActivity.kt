@@ -68,6 +68,13 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         setContentView(R.layout.activity_register)
         ButterKnife.bind(this)
         initView()
+
+        SMSSDK.registerEventHandler(eventHandler)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SMSSDK.unregisterEventHandler(eventHandler)
     }
 
     private fun initView() {
@@ -91,7 +98,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
         }
-        SMSSDK.registerEventHandler(eventHandler)
     }
 
 

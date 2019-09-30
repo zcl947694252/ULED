@@ -587,7 +587,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.isSelected = item.isSelected
 
                 DBUtils.saveLight(dbItem, false)
-                LogUtils.e("zcl保存分组RGB----${DBUtils.getLightByGroupID(item.belongGroupId).size}")
             }
             DeviceType.SENSOR -> {
                 val dbItem = DbSensor()
@@ -598,7 +597,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.productUUID = item.deviceInfo.productUUID
 
                 DBUtils.saveSensor(dbItem, false)
-                LogUtils.e("zcl保存分组sensor----${DBUtils.getGroupsByDeviceType(DeviceType.SENSOR)}")
             }
             DeviceType.SMART_RELAY -> {
                 val dbItem = DbConnector()
@@ -907,6 +905,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
         this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+
+        LogUtils.d("addEventListener(DeviceEvent.STATUS_CHANGED, this)")
 
         this.inflater = this.layoutInflater
 
@@ -1280,8 +1280,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         deviceInfo.meshAddress = meshAddress
         val params = Parameters.createUpdateParameters()
         val user = DBUtils.lastUser
-        LogUtils.e("zcl登录", "zcl******mes:${mesh.factoryName}======${mesh.factoryPassword}-------${user?.controlMeshName}" +
-                "============${NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16)}")
+//        LogUtils.e("zcl登录", "zcl******mes:${mesh.factoryName}======${mesh.factoryPassword}-------${user?.controlMeshName}" +
+//                "============${NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16)}")
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(user?.controlMeshName)

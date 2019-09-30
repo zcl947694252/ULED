@@ -33,7 +33,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
                 if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
-                    LogUtils.d("pos = " + helper.adapterPosition + " meshAddr = " + scene.getMeshAddr())
+//                    LogUtils.d("pos = " + helper.adapterPosition + " meshAddr = " + scene.getMeshAddr())
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
