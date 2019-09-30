@@ -154,6 +154,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
+       // addEventListeners()
         GlobalScope.launch {
             TelinkLightApplication.getApp().initStompClient()
         }
@@ -186,6 +187,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
+
+
 
     /**
      * 检查App是否有新版本
@@ -547,9 +550,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPause() {
         super.onPause()
-        startToRecoverDevices()
         disableConnectionStatusListener()
-        this.mApplication?.removeEventListener(this)
+        this.mApplication?.removeEventListeners()
         mCompositeDisposable.clear()
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
@@ -569,9 +571,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         enableConnectionStatusListener()
         checkVersionAvailable()
         //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null) {
+        if (TelinkLightService.Instance() == null)
             mApplication?.startLightService(TelinkLightService::class.java)
-        }
+
+        startToRecoverDevices()
 
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -584,7 +587,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
-        addEventListeners()
         autoConnect()
     }
 
@@ -713,7 +715,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightApplication.getApp().releseStomp()
 
         //移除事件
-        this.mApplication?.removeEventListener(this)
+        this.mApplication?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()

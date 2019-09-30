@@ -117,7 +117,7 @@ open class BaseFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        enableConnectionStatusListener()
+        //enableConnectionStatusListener()
 
         val lightService: TelinkLightService? = TelinkLightService.Instance()
 
@@ -135,4 +135,8 @@ open class BaseFragment : Fragment() {
     }
 
     open fun endCurrentGuide() {}
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+    }
 }

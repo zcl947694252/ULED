@@ -64,9 +64,10 @@ import java.util.concurrent.TimeUnit
  */
 class SettingActivity : BaseActivity() {
     override fun setLayoutID(): Int {
+        this.mApplication = this.application as TelinkLightApplication
         return R.layout.activity_setting
     }
-
+    private var mApplication: TelinkLightApplication? = null
     private lateinit var cancel: Button
     private lateinit var confirm: Button
     private lateinit var pop: PopupWindow
@@ -136,11 +137,11 @@ class SettingActivity : BaseActivity() {
         hinitTwo.text = getString(resetFactoryAllDevice)
         hinitThree.text = getString(haveQuestionLookNotice)
 
-        Observable.intervalRange(0, 10, 0, 1, TimeUnit.SECONDS)
+        Observable.intervalRange(0, 2, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = 9 - it as Long
+                    var num = 1 - it as Long
                     if (num == 0L) {
                         setTimerZero()
                     } else {
@@ -255,28 +256,6 @@ class SettingActivity : BaseActivity() {
 
         isResetFactory = false
         setFirstePopAndShow(R.string.clear_one, R.string.clear_two, R.string.clear_one, isResetFactory)
-
-
-        /*   val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.empty_cache_title))
-                   .setMessage(getString(R.string.empty_cache_tip))
-                   .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                       TelinkLightService.Instance()?.idleMode(true)
-                       clearData()
-                   }.setNegativeButton(getString(R.string.btn_cancel)) { _, _ -> }.create()
-           alertDialog.show()
-           val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-           btn.isEnabled = false
-           val text = getString(android.R.string.ok)
-           val timeout = 5
-           Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                   .takeWhile { t: Long -> t < timeout }
-                   .doOnComplete {
-                       btn.isEnabled = true
-                       btn.text = text
-                   }
-                   .subscribe {
-                       btn.text = "$text (${timeout - it})"
-                   }*/
     }
 
     /**
@@ -308,7 +287,6 @@ class SettingActivity : BaseActivity() {
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
-
                 restartApplication()
             }
 
@@ -449,6 +427,10 @@ class SettingActivity : BaseActivity() {
 
             override fun start() {}
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     //重启app并杀死原进程

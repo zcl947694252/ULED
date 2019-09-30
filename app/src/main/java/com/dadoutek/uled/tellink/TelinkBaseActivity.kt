@@ -180,7 +180,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        enableConnectionStatusListener()
+       // enableConnectionStatusListener()
         Constant.isTelBase = true
         foreground = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()

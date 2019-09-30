@@ -471,12 +471,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun transformView() {
-        if (DBUtils.allLight.isEmpty()) {
+
             startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
-//            finish()
-        } else {
-            startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

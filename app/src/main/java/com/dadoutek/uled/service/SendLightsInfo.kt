@@ -211,6 +211,11 @@ class SendLightsInfo : Service(), EventListener<String> {
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        this.mApplication?.removeEventListener(this)
+    }
+
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
         val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND

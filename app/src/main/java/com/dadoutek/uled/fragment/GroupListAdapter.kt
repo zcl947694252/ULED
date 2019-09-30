@@ -32,21 +32,20 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
             helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
                     .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                    .addOnClickListener(R.id.selected_group)
 
+                val b = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                        || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
             if (num>0){
-                helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
-                        .addOnClickListener(R.id.btn_on)
-                        .addOnClickListener(R.id.btn_off)
-                        .addOnClickListener(R.id.btn_set)
-
-                if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
-                        || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_CURTAIN
-                        || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                if (b) {
                     if (group.connectionStatus == ConnectionStatus.ON.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
                                 .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
                                 .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
                                 .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.black_nine))
+                        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                                .addOnClickListener(R.id.btn_on)
+                                .addOnClickListener(R.id.btn_off)
 
                     } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_down_group)
@@ -54,13 +53,14 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                                 .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.black_nine))
                                 .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.white))
                     }
+                }else{//group.deviceType == Constant.DEVICE_TYPE_CURTAIN
+                    setNoClik(helper)
                 }
-            }else{
-                helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
-                        .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
-                        .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
-                        .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
-                        .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.color_c8))
+
+                helper.addOnClickListener(R.id.btn_set)
+                        .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+            }else if (num<=0){
+                setNoClik(helper)
             }
 
             if (group.textColor == 0)
@@ -80,6 +80,14 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             helper.setTextColor(R.id.tv_group_name, group.textColor)
                     .addOnClickListener(R.id.item_layout)
         }
+    }
+
+    private fun setNoClik(helper: BaseViewHolder) {
+        helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
+                .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
+                .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
+                .setTextColor(R.id.textView8, TelinkLightApplication.getApp().getColor(R.color.white))
+                .setTextColor(R.id.textView11, TelinkLightApplication.getApp().getColor(R.color.color_c8))
     }
 
     /**

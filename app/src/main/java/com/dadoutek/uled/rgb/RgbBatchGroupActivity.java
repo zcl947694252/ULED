@@ -57,6 +57,7 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
+import com.telink.TelinkApplication;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -1005,6 +1006,12 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         });
 
         startGrouping();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        TelinkApplication.getInstance().removeEventListener(this);
     }
 
     private View.OnClickListener onClick = v -> {

@@ -221,6 +221,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        this.mApplication?.removeEventListener(this)
+    }
+
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {

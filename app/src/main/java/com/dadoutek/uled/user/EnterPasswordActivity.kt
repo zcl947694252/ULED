@@ -76,13 +76,14 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private var NONE: Int = 0
     private var ME: Int = 1
     private var AUTHOR: Int = 2
+    var isRunning = false
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
-
+        isRunning = true
         makePop()
         initViewType()
         initView()
@@ -356,8 +357,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
             hideLoadingDialog()
+            ActivityUtils.finishAllActivities(true)
             ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
-            ActivityUtils.finishAllActivities(false)
         }
     }
 
@@ -366,10 +367,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
+        ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
-        ActivityUtils.finishAllActivities(false)
-
-
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -427,10 +426,16 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     fun hideLoadingDialog() {
         GlobalScope.launch(Dispatchers.Main) {
-            if (loadDialog != null && this.isActive) {
+            if (loadDialog != null && this.isActive&&isRunning) {
                 loadDialog!!.dismiss()
             }
         }
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        isRunning = false
     }
 
 }

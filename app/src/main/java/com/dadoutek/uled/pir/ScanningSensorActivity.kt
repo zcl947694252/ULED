@@ -203,6 +203,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        this.mApplication?.removeEventListener(this)
+    }
+
     private fun retryConnect() {
         mRetryConnectCount++
         LogUtils.e("zcl reconnect time = $mRetryConnectCount")

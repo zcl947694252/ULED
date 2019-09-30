@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cn.smssdk.SMSSDK
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
@@ -92,7 +93,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                             override fun onNext(stringResponse: Response<String>) {
                                 hideLoadingDialog()
                                 if (stringResponse.errorCode == 0) {
-                                   //("logging" + stringResponse.errorCode + "获取成功account")
+                                   LogUtils.e("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t
                                     //正式代码走短信验证
                                     val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)

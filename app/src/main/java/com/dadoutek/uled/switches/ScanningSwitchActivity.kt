@@ -519,4 +519,9 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.mApplication?.removeEventListener(this)
+    }
 }

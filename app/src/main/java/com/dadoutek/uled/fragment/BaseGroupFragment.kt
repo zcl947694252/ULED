@@ -25,7 +25,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
+import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
@@ -52,7 +54,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
-
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -83,13 +84,14 @@ abstract class BaseGroupFragment : BaseFragment() {
         intentFilter.addAction("delete")
         intentFilter.addAction("switch")
         intentFilter.addAction("switch_here")
+        intentFilter.addAction("delete_true")
         br = object : BroadcastReceiver() {
-
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val sonDeleteGroup = intent.getStringExtra("delete")
                 val lightStatus = intent.getStringExtra("switch_here")
-                if (key == "true") {
+                val delete = intent.getStringExtra("delete_true")
+                if (key == "true"||delete =="true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
                     groupList.let {
@@ -289,7 +291,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-
+        val groupType = setGroupType()
         when (view!!.id) {
             R.id.btn_on -> {
                 if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
@@ -316,27 +318,44 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                val groupType = setGroupType()
-
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType/*Constant.DEVICE_TYPE_LIGHT_RGB*/ && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                    var intent: Intent? = null
+                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
+                     var num = 0
                     when (groupType) {
                         Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            intent = Intent(mContext, NormalSettingActivity::class.java)
+                            num =DBUtils.getLightByGroupID(currentLight.id).size
                         }
                         Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                            intent = Intent(mContext, RGBSettingActivity::class.java)
+                            num =DBUtils.getLightByGroupID(currentLight.id).size
                         }
                         Constant.DEVICE_TYPE_CONNECTOR -> {
-                            intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                            num =DBUtils.getConnectorByGroupID(currentLight.id).size
                         }//蓝牙接收器
                         Constant.DEVICE_TYPE_CURTAIN -> {
-                            intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                            num =DBUtils.getCurtainByGroupID(currentLight.id).size
                         }
                     }
-                    intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intent?.putExtra("group", currentLight)
-                    startActivityForResult(intent, 2)
+
+                    if (num != 0) {
+                        var intent: Intent? = null
+
+                        when (groupType) {
+                            Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                intent = Intent(mContext, NormalSettingActivity::class.java)
+                            }
+                            Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                intent = Intent(mContext, RGBSettingActivity::class.java)
+                            }
+                            Constant.DEVICE_TYPE_CONNECTOR -> {
+                                intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                            }//蓝牙接收器
+                            Constant.DEVICE_TYPE_CURTAIN -> {
+                                intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                            }
+                        }
+                        intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intent?.putExtra("group", currentLight)
+                        startActivityForResult(intent, 2)
+                    }
                 }
             }
 
@@ -346,9 +365,25 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
 
             R.id.item_layout -> {
-                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                var intent: Intent =Intent()
+                when (groupType) {
+                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "cw_light")
+                    }
+                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "rgb_light")
+                    }
+                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                    }//蓝牙接收器
+                    Constant.DEVICE_TYPE_CURTAIN -> {
+                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                    }
+                }
                 intent.putExtra("group", currentLight)
-                intent.putExtra("light", setIntentDeviceType())
+               //intent.putExtra("light", setIntentDeviceType())
                 startActivityForResult(intent, 2)
             }
         }

@@ -622,6 +622,7 @@ object DBUtils {
             db.id = existList[0].id
         }
         DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(db)
+
         val key = DaoSessionInstance.getInstance().dbLightDao.getKey(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {

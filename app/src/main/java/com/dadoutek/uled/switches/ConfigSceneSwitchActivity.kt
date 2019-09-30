@@ -277,6 +277,11 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkApplication.getInstance().removeEventListener(this)
+    }
+
     private fun onErrorReport(info: ErrorReportInfo) {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {

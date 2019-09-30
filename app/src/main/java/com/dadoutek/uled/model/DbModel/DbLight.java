@@ -258,4 +258,28 @@ public class DbLight implements Serializable {
     public boolean isSeek() {
         return isSeek;
     }
+
+    @Override
+    public String toString() {
+        return "DbLight{" +
+                "id=" + id +
+                ", meshAddr=" + meshAddr +
+                ", name='" + name + '\'' +
+                ", brightness=" + brightness +
+                ", colorTemperature=" + colorTemperature +
+                ", macAddr='" + macAddr + '\'' +
+                ", meshUUID=" + meshUUID +
+                ", productUUID=" + productUUID +
+                ", belongGroupId=" + belongGroupId +
+                ", index=" + index +
+                ", color=" + color +
+                ", selected=" + selected +
+                ", version='" + version + '\'' +
+                ", hasGroup=" + hasGroup +
+                ", textColor=" + textColor +
+                ", isSeek=" + isSeek +
+                ", status=" + status +
+                ", icon=" + icon +
+                '}';
+    }
 }

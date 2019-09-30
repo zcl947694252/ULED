@@ -793,7 +793,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
-
     val CREATE_SCENE_REQUESTCODE = 2
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

@@ -137,6 +137,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var mCheckRssiDisposal: Disposable? = null
 
     private var acitivityIsAlive = true
+    var isReset =false
 
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
@@ -159,12 +160,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
                         DBUtils.deleteLight(light!!)
+                        isReset =true
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
                         }
@@ -1338,11 +1340,14 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()
         mCheckRssiDisposal?.dispose()
+        if (!isReset){
         if (currentShowGroupSetPage) {
             DBUtils.updateGroup(group!!)
             updateLights(group!!.color, "rgb_color", group!!)
         } else {
             DBUtils.updateLight(light!!)
+            LogUtils.e("彩灯 onPasue更细后"+DBUtils.getAllRGBLight())
+        }
         }
     }
 
@@ -1757,15 +1762,19 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         sbBrightness!!.progress = group!!.brightness
         sbBrightness_num.text = group!!.brightness.toString() + "%"
 
-        if (sbBrightness!!.progress >= 100) {
-            sbBrightness_add.isEnabled = false
-            sbBrightness_less.isEnabled = true
-        } else if (sbBrightness!!.progress <= 0) {
-            sbBrightness_less.isEnabled = false
-            sbBrightness_add.isEnabled = true
-        } else {
-            sbBrightness_less.isEnabled = true
-            sbBrightness_add.isEnabled = true
+        when {
+            sbBrightness!!.progress >= 100 -> {
+                sbBrightness_add.isEnabled = false
+                sbBrightness_less.isEnabled = true
+            }
+            sbBrightness!!.progress <= 0 -> {
+                sbBrightness_less.isEnabled = false
+                sbBrightness_add.isEnabled = true
+            }
+            else -> {
+                sbBrightness_less.isEnabled = true
+                sbBrightness_add.isEnabled = true
+            }
         }
 
         var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
@@ -1949,6 +1958,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         mDisposable.dispose()
         acitivityIsAlive = false
         mScanDisposal?.dispose()
+        this.mApplication?.removeEventListener(this)
         val s = postionAndNum?.position.toString() + "-" + postionAndNum?.speed
         SharedPreferencesHelper.putString(this, POSIONANDNUM, s)
         LogUtils.e("zcl渐变设置保存"+postionAndNum.toString()+"---------"+s)

@@ -167,7 +167,9 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
             200
         }
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
-        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
+
+        //TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+        //TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -199,6 +201,7 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
+        this.mApplication?.removeEventListener(this)
     }
 
     private fun initClick() {
@@ -540,9 +543,7 @@ class MeFragment : BaseFragment(), View.OnClickListener, EventListener<String> {
 
             }
 
-
             LightAdapter.STATUS_CONNECTING -> {
-                // ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
     }

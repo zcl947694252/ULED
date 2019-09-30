@@ -280,7 +280,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     override fun onDestroy() {
         super.onDestroy()
-        //        this.mApplication.removeEventListener(this);
+                this.mApplication?.removeEventListener(this)
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()

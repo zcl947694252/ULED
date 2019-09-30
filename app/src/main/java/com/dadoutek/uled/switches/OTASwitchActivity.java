@@ -559,7 +559,6 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
         if (this.delayHandler != null) {
             this.delayHandler.removeCallbacksAndMessages(null);
         }
-        TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }
 
     private void updateSuccess() {

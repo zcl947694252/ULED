@@ -227,6 +227,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     finish()
             } else showExitSaveDialog()
         }
+        step2Guide()
     }
 
     private fun showExitSaveDialog() {
@@ -303,7 +304,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             changeCheckedViewData()
             sceneEditListAdapter?.notifyDataSetChanged()
         }
-        step2Guide()
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {

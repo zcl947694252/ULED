@@ -36,7 +36,7 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ((TelinkLightApplication) getApplication()).removeEventListener(this);
+        ((TelinkLightApplication) getApplication()).removeEventListeners();
     }
 
     private void dismissDialog() {
