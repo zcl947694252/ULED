@@ -39,6 +39,7 @@ import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.telink.TelinkApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
@@ -230,6 +231,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     //重启app并杀死原进程
     fun restartApplication() {
+        TelinkApplication.getInstance().removeEventListeners()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().releseStomp()

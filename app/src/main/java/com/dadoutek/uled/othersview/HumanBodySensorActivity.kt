@@ -194,7 +194,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         disposable?.dispose()
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        else {
+            ActivityUtils.startActivity(MainActivity::class.java)
+            finish()
+        }
     }
 
     private fun initView() {
@@ -227,7 +232,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 isVisibility()//显示3.0新的人体感应器
             }
         } else {
-            doFinish()
+            autoConnectSensor()
         }
     }
 
@@ -249,6 +254,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         view18.visibility = View.VISIBLE
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.triggering_conditions -> {
@@ -340,7 +346,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     AlertDialog.Builder(this)
                             .setTitle(R.string.target_brightness)
                             .setView(textGp)
-                            .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                            .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                                 var brin = textGp.text.toString().toInt()
                                 if (brin == 0) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot))
@@ -354,7 +360,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                 modeStartUpMode = MODE_START_UP_MODE_OPEN
                                 dialog.dismiss()
                             }
-                            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
 
                     val timer = Timer()
                     timer.schedule(object : TimerTask() {
@@ -1051,7 +1057,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         connectParams?.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams?.autoEnableNotification(true)
         connectParams?.setTimeoutSeconds(5)
-        progressBar_sensor.visibility = View.VISIBLE
+        progressBar_sensor?.visibility = View.VISIBLE
         //连接，如断开会自动重连
         GlobalScope.launch {
             delay(1000)
@@ -1062,7 +1068,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
-            progressBar_sensor.visibility = View.GONE
+            progressBar_sensor?.visibility = View.GONE
             ToastUtils.showShort(getString(R.string.connect_fail))
         }, {})
     }

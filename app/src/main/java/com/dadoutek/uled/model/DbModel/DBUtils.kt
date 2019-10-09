@@ -2,6 +2,7 @@ package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
@@ -404,7 +405,8 @@ object DBUtils {
 
 
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
-        val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -414,7 +416,8 @@ object DBUtils {
     }
 
     fun getCurtainByMeshAddr(meshAddr: Int): DbCurtain? {
-        val dbCurtianList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbCurtianList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
+                .where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbCurtianList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -424,14 +427,16 @@ object DBUtils {
     }
 
     fun getRelyByMeshAddr(meshAddr: Int): DbConnector? {
-        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
+                .where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbRelyList.size > 0) {
             dbRelyList[0]
         } else null
     }
 
     fun getSwitchByMacAddr(macAddr: String): DbSwitch? {
-        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
+                .where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -604,7 +609,7 @@ object DBUtils {
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
-            val groups = DBUtils.allGroups
+            val groups = allGroups
             Log.e("zcl", "zcl******$groups")
         } else {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
@@ -623,15 +628,18 @@ object DBUtils {
         }
         DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(db)
 
-        val key = DaoSessionInstance.getInstance().dbLightDao.getKey(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
-            recordingChange(db.id,
-                    DaoSessionInstance.getInstance().dbLightDao.tablename,
-                    Constant.DB_ADD)
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbLightDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbLightDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
-
-
     }
 
 
@@ -651,12 +659,18 @@ object DBUtils {
             db.id = existList[0].id
         }
         DaoSessionInstance.getInstance().dbSwitchDao.insertOrReplace(db)
+
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
-            recordingChange(db.id,
-                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD)
-
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
     }
 
@@ -668,12 +682,17 @@ object DBUtils {
         }
 
         DaoSessionInstance.getInstance().dbCurtainDao.insertOrReplace(db)
-        val key = DaoSessionInstance.getInstance().dbCurtainDao.getKey(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
-            recordingChange(db.id,
-                    DaoSessionInstance.getInstance().dbCurtainDao.tablename,
-                    Constant.DB_ADD)
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbCurtainDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbCurtainDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
 
     }
@@ -689,9 +708,15 @@ object DBUtils {
 
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
-            recordingChange(db.id,
-                    DaoSessionInstance.getInstance().dbConnectorDao.tablename,
-                    Constant.DB_ADD)
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbConnectorDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbConnectorDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
     }
 
@@ -729,8 +754,8 @@ object DBUtils {
 
     fun saveSceneActions(sceneActions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
-        recordingChange(sceneActions.getId(),
-                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+        recordingChange(sceneActions.id,
+                DaoSessionInstance.getInstance().dbSceneActionsDao.tablename,
                 Constant.DB_ADD)
     }
 
@@ -1177,8 +1202,7 @@ object DBUtils {
         if (dataChangeList.size == 0) {
             saveChange(changeIndex, operating, changeTable)
             return
-        } else
-
+        } else {
             for (i in dataChangeList.indices) {
                 //首先确定是同一张表的同一条数据进行操作
                 if ((dataChangeList[i].tableName == changeTable) and (dataChangeList[i].changeId == changeIndex)) {
@@ -1195,7 +1219,6 @@ object DBUtils {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
                         continue
-                        //                        deleteDbDataChange(dataChangeList.get(i).getId());
                     } else if (dataChangeList[i].changeType == Constant.DB_ADD && operating == Constant.DB_UPDATE) {
                         break
                     } else if (dataChangeList[i].changeType == Constant.DB_DELETE && operating == Constant.DB_ADD) {
@@ -1210,6 +1233,8 @@ object DBUtils {
                     break
                 }//如果数据表没有该数据直接添加
             }
+        }
+        LogUtils.e("zcl-------添加表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

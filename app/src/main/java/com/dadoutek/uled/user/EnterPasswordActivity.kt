@@ -272,7 +272,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initMe() {
         RegionModel.get()?.subscribe({
             setMeRegion(it)
-        }) { ToastUtils.showShort(it.message) }
+        }) {ToastUtils.showShort(it.message)}
     }
 
     @SuppressLint("StringFormatMatches")
@@ -289,7 +289,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                     //上次点击的自己不用便利其他人
                     AUTHOR -> for (i in itemAdapter.data.indices)
                         itemAdapter.data[i].is_selected = i == position
-
                     //上次点击个人区域 这次自己 个人全是false
                     ME -> initMe()
                 }

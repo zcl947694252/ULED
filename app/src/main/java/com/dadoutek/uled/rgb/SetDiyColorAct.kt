@@ -29,6 +29,9 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     var colorNodeList: ArrayList<DbColorNode>? = null
@@ -39,10 +42,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var dstAddress: Int = 0
     private val NODE_MODE_RGB_GRADIENT = 0
 
-    internal var downTime: Long = 0//Button被按下时的时间
-    internal var thisTime: Long = 0//while每次循环时的时间
+    private var downTime: Long = 0//Button被按下时的时间
+    private var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
-    internal var tvValue = 0//TextView中的值
+    private var tvValue = 0//TextView中的值
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +65,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("StringFormatMatches")
+    @SuppressLint("StringFormatMatches", "SetTextI18n")
     private fun initView() {
         saveNode.setOnClickListener(this)
         val layoutmanager = GridLayoutManager(this, 4)
@@ -88,15 +91,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         })
 
         editName.setSelection(editName.text.toString().length)
-
-//        set_diy_color.setOnTouchListener(View.OnTouchListener(){
-//            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//            val v = window.peekDecorView()
-//            if (null != v) {
-//                imm.hideSoftInputFromWindow(v.windowToken, 0)
-//            }
-//        })
-        set_diy_color.setOnTouchListener { v, event ->
+        set_diy_color.setOnTouchListener { _, _ ->
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             val v = window.peekDecorView()
             if (null != v) {
@@ -105,12 +100,12 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 true
             }
 
-            speed_add.setOnTouchListener { v, event ->
+            speed_add.setOnTouchListener { _, event ->
                 addSpeed(event)
                 true
             }
 
-            speed_less.setOnTouchListener { v, event ->
+            speed_less.setOnTouchListener { _, event ->
                 lessSpeed(event)
                 true
             }
@@ -120,32 +115,41 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 editName.setText(diyGradient?.name)
                 editName.setSelection(editName.text.toString().length)
                 sbSpeed.progress = diyGradient?.speed!!
-                speed_num.text = diyGradient?.speed.toString()!! + "%"
-                if (sbSpeed.progress >= 100) {
-                    speed_add.isEnabled = false
-                    speed_less.isEnabled = true
-                } else if (sbSpeed.progress <= 0) {
-                    speed_less.isEnabled = false
-                    speed_add.isEnabled = true
-                } else {
-                    speed_less.isEnabled = true
-                    speed_add.isEnabled = true
+                speed_num.text = diyGradient?.speed.toString() + "%"
+                when {
+                    sbSpeed.progress >= 100 -> {
+                        speed_add.isEnabled = false
+                        speed_less.isEnabled = true
+                    }
+                    sbSpeed.progress <= 0 -> {
+                        speed_less.isEnabled = false
+                        speed_add.isEnabled = true
+                    }
+                    else -> {
+                        speed_less.isEnabled = true
+                        speed_add.isEnabled = true
+                    }
                 }
             } else {
-                if (sbSpeed.progress >= 100) {
-                    speed_add.isEnabled = false
-                    speed_less.isEnabled = true
-                } else if (sbSpeed.progress <= 0) {
-                    speed_less.isEnabled = false
-                    speed_add.isEnabled = true
-                } else {
-                    speed_less.isEnabled = true
-                    speed_add.isEnabled = true
+                when {
+                    sbSpeed.progress >= 100 -> {
+                        speed_add.isEnabled = false
+                        speed_less.isEnabled = true
+                    }
+                    sbSpeed.progress <= 0 -> {
+                        speed_less.isEnabled = false
+                        speed_add.isEnabled = true
+                    }
+                    else -> {
+                        speed_less.isEnabled = true
+                        speed_add.isEnabled = true
+                    }
                 }
                 toolbar.title = getString(R.string.add_gradient)
                 editName.setText(DBUtils.getDefaultModeName())
                 editName.setSelection(editName.text.toString().length)
                 sbSpeed.progress = 50
+
                 speed_num.text = 50.toString() + "%"
             }
 
@@ -156,32 +160,27 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         private fun lessSpeed(event: MotionEvent?) {
             if (event!!.action == MotionEvent.ACTION_DOWN) {
-                //                    tvValue = Integer.parseInt(textView.getText().toString());
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
-                val t = object : Thread() {
-                    override fun run() {
-                        while (onBtnTouch) {
-                            thisTime = System.currentTimeMillis()
-                            if (thisTime - downTime >= 500) {
-                                tvValue++
-                                val msg = less_speed_handler.obtainMessage()
-                                msg.arg1 = tvValue
-                                less_speed_handler.sendMessage(msg)
-                                Log.e("TAG_TOUCH", tvValue++.toString())
-                                try {
-                                    Thread.sleep(100)
-                                } catch (e: InterruptedException) {
-                                    e.printStackTrace()
-                                }
-
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = less_speed_handler.obtainMessage()
+                            msg.arg1 = tvValue
+                            less_speed_handler.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                delay(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
                             }
                         }
                     }
                 }
-                t.start()
             } else if (event.action == MotionEvent.ACTION_UP) {
-                onBtnTouch = false
+                    onBtnTouch = false
                 if (thisTime - downTime < 500) {
                     tvValue++
                     val msg = less_speed_handler.obtainMessage()
@@ -195,30 +194,27 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         private fun addSpeed(event: MotionEvent?) {
             if (event!!.action == MotionEvent.ACTION_DOWN) {
-                //                    tvValue = Integer.parseInt(textView.getText().toString());
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
-                val t = object : Thread() {
-                    override fun run() {
-                        while (onBtnTouch) {
-                            thisTime = System.currentTimeMillis()
-                            if (thisTime - downTime >= 500) {
-                                tvValue++
-                                val msg = add_speed_handler.obtainMessage()
-                                msg.arg1 = tvValue
-                                add_speed_handler.sendMessage(msg)
-                                Log.e("TAG_TOUCH", tvValue++.toString())
-                                try {
-                                    Thread.sleep(100)
-                                } catch (e: InterruptedException) {
-                                    e.printStackTrace()
-                                }
-
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = add_speed_handler.obtainMessage()
+                            msg.arg1 = tvValue
+                            add_speed_handler.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                delay(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
                             }
+
                         }
                     }
                 }
-                t.start()
+
             } else if (event.action == MotionEvent.ACTION_UP) {
                 onBtnTouch = false
                 if (thisTime - downTime < 500) {
@@ -237,17 +233,21 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             override fun handleMessage(msg: Message) {
                 super.handleMessage(msg)
                 sbSpeed.progress++
-                if (sbSpeed.progress > 100) {
-                    speed_add.isEnabled = false
-                    onBtnTouch = false
-                } else if (sbSpeed.progress == 100) {
-                    speed_add.isEnabled = false
-                    speed_num.text = sbSpeed.progress.toString() + "%"
-                    onBtnTouch = false
-                    speed = sbSpeed.progress
-                } else {
-                    speed_add.isEnabled = true
-                    speed = sbSpeed.progress
+                when {
+                    sbSpeed.progress > 100 -> {
+                        speed_add.isEnabled = false
+                        onBtnTouch = false
+                    }
+                    sbSpeed.progress == 100 -> {
+                        speed_add.isEnabled = false
+                        speed_num.text = sbSpeed.progress.toString() + "%"
+                        onBtnTouch = false
+                        speed = sbSpeed.progress
+                    }
+                    else -> {
+                        speed_add.isEnabled = true
+                        speed = sbSpeed.progress
+                    }
                 }
 
                 if (sbSpeed.progress > 0) {
@@ -261,18 +261,20 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             override fun handleMessage(msg: Message) {
                 super.handleMessage(msg)
                 sbSpeed.progress--
-                if (sbSpeed.progress < 0) {
-                    speed_less.isEnabled = false
-                    onBtnTouch = false
-                } else if (sbSpeed.progress == 0) {
-//                speed_less.isEnabled = false
-                    sbSpeed.progress = 1
-                    speed_num.text = sbSpeed.progress.toString() + "%"
-//                onBtnTouch = false
-                    speed = sbSpeed.progress
-                } else {
-                    speed_less.isEnabled = true
-                    speed = sbSpeed.progress
+                when {
+                    sbSpeed.progress < 0 -> {
+                        speed_less.isEnabled = false
+                        onBtnTouch = false
+                    }
+                    sbSpeed.progress == 0 -> {
+                        sbSpeed.progress = 1
+                        speed_num.text = sbSpeed.progress.toString() + "%"
+                        speed = sbSpeed.progress
+                    }
+                    else -> {
+                        speed_less.isEnabled = true
+                        speed = sbSpeed.progress
+                    }
                 }
 
                 if (sbSpeed.progress < 100) {
@@ -299,6 +301,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                            fromUser: Boolean) {
                 speed_num.text = progress.toString() + "%"
@@ -311,21 +314,20 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     speed = 1
                 }
                 speed_num.text = speed.toString() + "%"
-                if (speed >= 100) {
-                    speed_add.isEnabled = false
-                    speed_less.isEnabled = true
-                } else if (speed <= 0) {
-                    speed_less.isEnabled = false
-                    speed_add.isEnabled = true
-                } else {
-                    speed_less.isEnabled = true
-                    speed_add.isEnabled = true
+                when {
+                    speed >= 100 -> {
+                        speed_add.isEnabled = false
+                        speed_less.isEnabled = true
+                    }
+                    speed <= 0 -> {
+                        speed_less.isEnabled = false
+                        speed_add.isEnabled = true
+                    }
+                    else -> {
+                        speed_less.isEnabled = true
+                        speed_add.isEnabled = true
+                    }
                 }
-                //            if (positionState != 0) {
-//                stopGradient()
-//                Thread.sleep(200)
-//                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
-//            }
             }
         }
 
@@ -342,7 +344,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         private fun updateNode() {
             showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
 
-            Thread {
+            GlobalScope.launch {
                 diyGradient?.name = editName.text.toString().trim()
                 diyGradient?.type = NODE_MODE_RGB_GRADIENT
                 diyGradient?.speed = speed
@@ -357,13 +359,14 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 }
 
                 deleteGradient(belongDynamicModeId)
-                Thread.sleep(200)
+                delay(200)
                 startSendCmdToAddDiyGradient(diyGradient!!)
                 hideLoadingDialog()
 
                 setResult(Activity.RESULT_OK)
+
                 finish()
-            }.start()
+            }
         }
 
         private fun deleteGradient(id: Long) {
@@ -401,9 +404,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         private fun startSendCmdToAddDiyGradient(diyGradient: DbDiyGradient) {
             var addNodeList: ArrayList<DbColorNode> = ArrayList()
             for (item in colorNodeList!!) {
-//            if(item.rgbw!=-1){
                 addNodeList.add(item)
-//            }
             }
 
             val address = dstAddress
@@ -494,7 +495,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             return true
         }
 
-        val onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+        val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, view, position ->
             val intent = Intent(this, SelectColorGradientAct::class.java)
             colorNodeList!![position].dstAddress = dstAddress
             intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])

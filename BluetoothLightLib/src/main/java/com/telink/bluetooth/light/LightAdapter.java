@@ -32,6 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.telink.bluetooth.light.Parameters.PARAM_SCAN_FILTER;
 
+/**
+ * 蓝牙扫描相关
+ */
 public class LightAdapter {
     public static final int LIGHT_NORMAL = 0x04;
     public static final int LIGHT_NORMAL_OLD = 0xFF;
@@ -558,7 +561,6 @@ public class LightAdapter {
         this.enableLoop(true);
     }
 
-//    private AtomicBoolean isScanStopping = new AtomicBoolean(false);
 
     // 扫描结果未空
     private AtomicBoolean scanEmpty = new AtomicBoolean(false);
@@ -590,23 +592,6 @@ public class LightAdapter {
             autoConnectScanLastTime = System.currentTimeMillis();
         }
         return true;
-
-        /*
-        mScanDelayHandler.removeCallbacks(stopScanTask);
-
-
-        if (!LeBluetooth.getInstance().isScanning()) {
-            scanEmpty.set(true);
-            scanNoTarget.set(true);
-
-            if (!LeBluetooth.getInstance().startScan(null))
-                return false;
-            lastLogoutTime = 0;
-        }
-
-        return true;
-
-        */
     }
 
     private void stopLeScan() {
@@ -617,9 +602,6 @@ public class LightAdapter {
     private Runnable startScanTask = new Runnable() {
         @Override
         public void run() {
-//            if (!LeBluetooth.getInstance().startScan(null)) {
-//                setMode(MODE_IDLE);
-//            }
             List<ScanFilter> filters = (List<ScanFilter>) mParams.get(PARAM_SCAN_FILTER);
             if (mParams.get(PARAM_SCAN_FILTER) != null) {
                 if (!LeBluetooth.getInstance().startScan(null, filters)) {
@@ -740,7 +722,7 @@ public class LightAdapter {
     }
 
     /********************************************************************************
-     * Protected API
+     * Protected API   扫描
      *******************************************************************************/
 
     protected LightPeripheral onLeScan(BluetoothDevice device, int rssi,
@@ -767,10 +749,11 @@ public class LightAdapter {
 
     protected boolean onLeScanFilter(LightPeripheral light) {
 
+        if (light==null)
+            return false;
         int mode = this.getMode();
 
         Parameters params = this.getParameters();
-
 
         List<Integer> targetDevices = mParams
                 .getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
@@ -1001,8 +984,7 @@ public class LightAdapter {
                 return;
 //            }
 
-            LightPeripheral light = LightAdapter.this.onLeScan(device,
-                    rssi, scanRecord);
+            LightPeripheral light = LightAdapter.this.onLeScan(device, rssi, scanRecord);
 
             if (light == null)
                 return;

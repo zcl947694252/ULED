@@ -138,7 +138,7 @@
     <string name="selected_lamp_tip">Please Select at Least ONE Light to Group</string>
     <string name="select_group_tip">Please Select at Least ONE group</string>
     <string name="much_lamp_tip">Supports up to 32768 lights</string>
-    <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone</string>
+    <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone bluetooth</string>
     <string name="chear_cache">Clear Data</string>
     <string name="update_ite">Sync ITE</string>
     <string name="clean_tip">Cache empty, App Reboot soon</string>
@@ -171,7 +171,7 @@
     <string name="rename_light">Single lamp rename</string>
     <string name="connecting_please_wait">connecting, please wait…</string>
     <string name="connect_success">Connection succeeded!</string>
-    <string name="connect_fail">Connection failed</string>
+    <string name="connect_fail">Disconnect </string>
     <string name="device_not_connected">The device is not connected!</string>
     <string name="please_wait">Please wait…</string>
 
@@ -387,7 +387,7 @@
     <string name="scan_and_connect">Scan and Connect…</string>
     <string name="network_disconect">Network Unavailable</string>
     <string name="getVsersionFail">Get version failed</string>
-    <string name="get_server_version_fail">Get version on service failed!</string>
+    <string name="get_server_version_fail">Get server version...</string>
     <string name="download_pack_fail">Update package download failed</string>
     <string name="error_pack">Update package error!</string>
     <string name="verification_version">Verifying version…</string>

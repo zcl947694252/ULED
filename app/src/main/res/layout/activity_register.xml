@@ -7,12 +7,6 @@
     android:background="#ffffff"
     >
 
-    <!--<include-->
-        <!--android:id="@+id/tb"-->
-        <!--layout="@layout/toolbar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp" />-->
-
     <ProgressBar
         android:id="@+id/regist_frist_progress"
         android:layout_width="118dp"

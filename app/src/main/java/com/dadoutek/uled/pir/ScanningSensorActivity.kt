@@ -367,13 +367,13 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             dstAdress = mDeviceInfo?.meshAddress!!
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
+                        closeAnimal()
+                        finish()
                         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
                             startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
                         } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
                             startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
                         }
-                        closeAnimal()
-                        finish()
                     },
                     failedCallback = {
                         getVersionRetryCount++
@@ -428,7 +428,12 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         if (TelinkLightService.Instance() != null) {
             TelinkLightService.Instance()?.idleMode(true)
         }
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        else {
+            ActivityUtils.startActivity(MainActivity::class.java)
+            finish()
+        }
     }
 
 

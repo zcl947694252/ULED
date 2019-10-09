@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -18,7 +17,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -126,6 +124,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     LightAdapter.STATUS_LOGOUT -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
+                        autoConnectSensor()
                     }
                 }
             }
@@ -200,20 +199,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
-//        LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
-//                "   triggerValue = $triggerValue")
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = byteArrayOf(0x01, groupH, groupL,
-                delayTime.toByte(),
-                minBrightness.toByte(),
-                triggerValue.toByte(),
-                mode.toByte()
-        )
+                delayTime.toByte(), minBrightness.toByte(), triggerValue.toByte(), mode.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_PIR,
-                mDeviceInfo.meshAddress,
-                paramBytes)
-
+                mDeviceInfo.meshAddress, paramBytes)
         Thread.sleep(300)
     }
 
@@ -258,7 +249,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun doFinish() {
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+       /* if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        else {
+            ActivityUtils.startActivity(MainActivity::class.java)*/
+            finish()
+        //}
     }
 
     private fun configureComplete() {

@@ -131,7 +131,7 @@
     <string name="selected_lamp_tip">至少选择一个灯进行分组</string>
     <string name="select_group_tip">请至少选择一个分组</string>
     <string name="much_lamp_tip">最高支持32768个灯</string>
-    <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机</string>
+    <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机蓝牙</string>
     <string name="chear_cache">清除数据</string>
     <string name="update_ite">同步ITE</string>
     <string name="clean_tip">缓存清空,App即将重启</string>
@@ -163,7 +163,7 @@
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
-    <string name="connect_fail">连接失败</string>
+    <string name="connect_fail">连接断开</string>
     <string name="device_not_connected">设备未连接！</string>
     <string name="please_wait">请稍后…</string>
 

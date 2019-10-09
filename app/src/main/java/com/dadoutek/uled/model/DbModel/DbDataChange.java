@@ -63,4 +63,14 @@ public class DbDataChange {
     public void setChangeType(String changeType) {
         this.changeType = changeType;
     }
+
+    @Override
+    public String toString() {
+        return "DbDataChange{" +
+                "id=" + id +
+                ", changeId=" + changeId +
+                ", tableName='" + tableName + '\'' +
+                ", changeType='" + changeType + '\'' +
+                '}';
+    }
 }

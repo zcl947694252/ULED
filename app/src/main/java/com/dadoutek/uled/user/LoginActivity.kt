@@ -3,7 +3,6 @@ package com.dadoutek.uled.user
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.PowerManager
@@ -33,7 +32,9 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -41,6 +42,8 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
@@ -59,7 +62,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
     private var mWakeLock: PowerManager.WakeLock? = null
-    private var SAVE_USER_NAME_KEY = "SAVE_USER_NAME_KEY"
     private var recyclerView: RecyclerView? = null
     private var adapter: PhoneListRecycleViewAdapter? = null
     private var phoneList: ArrayList<DbUser>? = null
@@ -77,7 +79,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phoneList = DBUtils.getAllUser()
         if (phoneList!!.size == 0)
             date_phone.visibility = View.GONE
-
         initData()
         initView()
         initListener()
@@ -138,32 +139,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     @SuppressLint("CheckResult")
     private fun haveNewVersion() {
         val info = this.packageManager.getPackageInfo(this.packageName, 0)
-        //LogUtils.e("zcl**********************VersionBean${info.versionName}")
         UpdateModel.getVersion(info.versionName)!!.subscribe({
             object : NetworkObserver<VersionBean>() {
                 override fun onNext(t: VersionBean) {
                     LogUtils.e("zcl**********************VersionBean$t")
                 }
-
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    ToastUtils.showLong(R.string.get_server_version_fail)
-                }
             }
         }, {})
 
-    }
-
-    private fun getMyVersion(): String? {
-        //获取包管理器
-        try {
-            val packageInfo = packageManager.getPackageInfo(packageName, 0)
-            //返回版本号
-            return packageInfo.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        }
-        return null
     }
 
     private fun initListener() {
@@ -432,15 +415,28 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
 
+    @SuppressLint("CheckResult")
     private fun login() {
         phone = edit_user_phone_or_email!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
         if (!StringUtils.isTrimEmpty(phone)) {
-            val intent = Intent(this, EnterPasswordActivity::class.java)
-            intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-            intent.putExtra("phone", phone)
-            startActivityForResult(intent, 0)
+            NetworkFactory.getApi()
+                    .getAccount(phone, "dadou")
+                    .compose(NetworkTransformer())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        val intent = Intent(this, EnterPasswordActivity::class.java)
+                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
+                        intent.putExtra("phone", phone)
+                        startActivityForResult(intent, 0)
+                        LogUtils.e("zcl获取账户$it")
+                    },{
+                        ToastUtils.showShort(it.localizedMessage)
+                        if (getString(R.string.account_not_exist)==it.localizedMessage)
+                            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+                    })
         } else {
             ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
         }
@@ -471,7 +467,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun transformView() {
-
             startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
     }
 
@@ -484,17 +479,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
         }
     }
-
-//    /**
-//     * 进入引导流程，也就是进入DeviceActivity。
-//     */
-//    private fun gotoDeviceScanning() {
-//        //首次进入APP才进入引导流程
-//        val intent = Intent(this@LoginActivity, DeviceScanningNewActivity::class.java)
-//        intent.putExtra("isInit", true)
-//        startActivity(intent)
-//        finish()
-//    }
 
     companion object {
         private val REQ_MESH_SETTING = 0x01
@@ -516,6 +500,5 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
     }
 
-    override fun loginOutMethod() {
-    }
+    override fun loginOutMethod() {}
 }

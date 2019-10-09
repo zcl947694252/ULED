@@ -87,6 +87,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 更新描述   ${TODO}$
  */
 class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
+    private var clickPostion: Int = 100
     private var postionAndNum: ItemRgbGradient? = null
     private var mApplication: TelinkLightApplication? = null
     private var retryConnectCount = 0
@@ -94,7 +95,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
     private var group: DbGroup? = null
-    private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
     private var localVersion: String? = null
     private var light: DbLight? = null
@@ -115,7 +115,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var isDelete = false
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
-    var type = Constant.TYPE_GROUP
+    var type: String = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
@@ -123,10 +123,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var rgbGradientAdapter: RGBGradientAdapter? = null
     private var rgbDiyGradientAdapter: RGBDiyGradientAdapter? = null
     private var applyDisposable: Disposable? = null
-    internal var downTime: Long = 0//Button被按下时的时间
-    internal var thisTime: Long = 0//while每次循环时的时间
+    private var downTime: Long = 0//Button被按下时的时间
+    private var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
-    internal var tvValue = 0//TextView中的值
+    private var tvValue = 0//TextView中的值
     private var redColor: Int? = null
     private var greenColor: Int? = null
     private var blueColor: Int? = null
@@ -783,18 +783,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
 
             }
-
             R.id.mode_diy_layout -> {
                 changeToDiyPage()
             }
             R.id.mode_preset_layout -> {
                 changeToBuildInPage()
             }
-
             R.id.btnAdd -> {
                 transAddAct()
             }
-
             R.id.ll_g -> {
                 var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
                     redColor = red.toInt()
@@ -810,7 +807,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
 
             }
-
             R.id.ll_b -> {
                 var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
                     redColor = red.toInt()
@@ -922,6 +918,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList = DBUtils.diyGradientList
+
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         isDelete = false
         rgbDiyGradientAdapter!!.changeState(isDelete)
@@ -930,6 +927,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         toolbar!!.title = getString(R.string.dynamic_gradient)
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
         setDate()
+        if (clickPostion!=100&&diyPosition!=100){
+        diyGradientList!![diyPosition].isSelect = false//开关状态
+        diyGradientList!![clickPostion].isSelect = true//开关状态
+          diyPosition =  clickPostion
+        }else{
+            diyGradientList!![diyPosition].isSelect = true//开关状态
+        }
         isExitGradient = false
         isDiyMode = true
         changeToDiyPage()
@@ -968,9 +972,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun applyDiyView() {
-        val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        builtDiyModeRecycleView!!.layoutManager = layoutmanager
+        builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -982,8 +984,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
     }
 
-    private var onItemChildClickListenerDiy = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-
+    private var onItemChildClickListenerDiy = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
+        clickPostion = position
         when (view!!.id) {
             R.id.diy_mode_on -> {
                 postionAndNum?.position = 100
@@ -1362,8 +1364,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
             NotificationEvent.GET_ALARM -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
-            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
+            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected()
+            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected()
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
@@ -1371,29 +1373,26 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }
     }
 
-    private fun onServiceConnected(event: ServiceEvent) {
+    private fun onServiceConnected() {
     }
 
-    private fun onServiceDisconnected(event: ServiceEvent) {
+    private fun onServiceDisconnected() {
         TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
 
     private fun onErrorReport(info: ErrorReportInfo) {
-        if (bestRSSIDevice != null) {
-//            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
-        }
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        //"蓝牙未开启")
+                        LogUtils.e("zcl--蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        //"无法收到广播包以及响应包")
+                        LogUtils.e("zcl--无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        //"未扫到目标设备")
+                        LogUtils.e("zcl--未扫到目标设备")
                     }
                 }
 
@@ -1401,10 +1400,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        //"未读到att表")
+                        LogUtils.e("zcl--未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        //"未建立物理连接")
+                        LogUtils.e("zcl--未建立物理连接")
                     }
                 }
                 retryConnect()
@@ -1413,13 +1412,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        //"value check失败： 密码错误")
+                        LogUtils.e("zcl--value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        //"read login data 没有收到response")
+                        LogUtils.e("zcl--read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        //"write login data 没有收到response")
+                        LogUtils.e("zcl--write login data 没有收到response")
                     }
                 }
                 retryConnect()
@@ -1466,7 +1465,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
             else -> {
                 false
-
             }
         }
     }
@@ -1505,7 +1503,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     login()
                 hideLoadingDialog()
             }
-            LightAdapter.STATUS_ERROR_N -> onNError(event)
+            LightAdapter.STATUS_ERROR_N -> onNError()
         }
     }
 
@@ -1513,7 +1511,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         mConnectDisposal?.dispose()
     }
 
-    private fun onNError(event: DeviceEvent) {
+    private fun onNError() {
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 

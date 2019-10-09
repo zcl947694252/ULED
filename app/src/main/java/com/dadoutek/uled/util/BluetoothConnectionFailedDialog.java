@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.AppUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
@@ -118,6 +119,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
         ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
         TelinkLightApplication.Companion.getApp().doDestroy();
+        AppUtils.relaunchApp();
     }
 
     private SyncCallback syncCallback = (new SyncCallback() {

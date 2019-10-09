@@ -81,7 +81,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 helper.setChecked(R.id.selected_group, false)
 
             helper.setTextColor(R.id.tv_group_name, group.textColor)
-                    .addOnClickListener(R.id.group_name)
+                    .addOnClickListener(R.id.item_layout)
         }
     }
 

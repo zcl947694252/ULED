@@ -362,17 +362,16 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
-        hideLoadingDialog()
         val deviceInfo = deviceEvent.args
         mDeviceMeshName = deviceInfo.meshName ?: getString(R.string.unnamed)
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
+                hideLoadingDialog()
                 if (isOta) {
                     getVersion()
                 } else {
                     bestRSSIDevice = deviceInfo
                     onLogin()//判断进入那个开关设置界面
-
                     stopConnectTimer()
                     LogUtils.d("connected22")
                 }
@@ -385,6 +384,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
             LightAdapter.STATUS_CONNECTED -> {
                 LogUtils.d("connected11")
+                hideLoadingDialog()
             }
         }
 
@@ -451,6 +451,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         }
     }
     private fun autoConnectSwitch() {
+        this.runOnUiThread {
+            showLoadingDialog(getString(R.string.connecting))
+        }
         this.mApplication?.removeEventListener(this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -462,9 +465,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
         connectParams.setTimeoutSeconds(10)
-        this.runOnUiThread {
-            showLoadingDialog(getString(R.string.connecting))
-        }
 
         //连接，如断开会自动重连 自动登录 不用login
         GlobalScope.launch {

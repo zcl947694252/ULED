@@ -363,8 +363,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                 groupList[position].isSelected = !groupList[position].isSelected
             }
 
-            R.id.group_name -> {
-                var intent: Intent =Intent()
+            //不能使用group_name否则会造成长按监听无效
+            R.id.item_layout -> {
+                var intent =Intent()
                 when (groupType) {
                     Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)

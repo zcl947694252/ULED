@@ -149,7 +149,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        detectUpdate()
+       // detectUpdate()
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
@@ -162,6 +162,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun startToRecoverDevices() {
+        LogUtils.e("zcl------------要删除的数据"+DBUtils.getAllRGBLight())
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -193,7 +194,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     /**
      * 检查App是否有新版本
      */
-
     @Deprecated("we don't need call this function manually")
     private fun detectUpdate() {
 //        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)

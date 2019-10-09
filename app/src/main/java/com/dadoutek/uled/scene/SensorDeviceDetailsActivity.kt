@@ -498,7 +498,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
 
-        disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        disposable = Observable.timer(30000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
@@ -516,6 +516,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0, null)
         LogUtils.e("zcl", "zcl******重启人体")
+        disposable?.dispose()
     }
 
     override fun performed(event: Event<String>) {
@@ -560,9 +561,11 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         when (settingType) {
                             RESET_SENSOR -> {//恢复出厂设置成功后判断灯能扫描
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.reset_factory_success, Toast.LENGTH_LONG).show()
+                                disposable?.dispose()
                                 DBUtils.deleteSensor(currentLight!!)
                                 hideLoadingDialog()
                                 notifyData()//重新设置传感器数量
+                                DeviceType
                                 settingType = NORMAL_SENSOR
                                 if (mConnectDevice != null) {
                                     LogUtils.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
@@ -576,8 +579,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                                     this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
                                             } else autoConnectSensor(false)
                                         }
-                                    } else {
-                                        hideLoadingDialog()
                                     }
                                 }
                             }
@@ -616,6 +617,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
                             startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
                         }
+                        finish()
                     }
             }, { hideLoadingDialog() })
             isClick = NORMAL_SENSOR
@@ -639,7 +641,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         settingType = NORMAL_SENSOR
         hideLoadingDialog()
         getVersion(false)
-
     }
 
 

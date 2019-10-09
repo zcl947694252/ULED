@@ -1133,7 +1133,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe {
-
                             val mesh = mApplication!!.mesh
                             //扫描参数
                             val params = LeScanParameters.create()
@@ -1308,15 +1307,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
                 LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
-                if (mAddedDevices.contains(scannedDeviceItem))
-                    return
-                var isHave = false
-                for (item in mAddedDevices) {
-                    if (item.macAddress == scannedDeviceItem.macAddress)
-                        isHave = true
-
-                }
-                if (!isHave) {
+                    //刚开始扫的设备mac是null所以不能个毛蕨,mac去重
                     mAddedDevices.add(scannedDeviceItem)
                     updateDevice(scannedDeviceItem)
                     mAddedDevicesAdapter.notifyDataSetChanged()
@@ -1328,7 +1319,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     }
                     toolbar?.title = getString(R.string.title_scanned_device_num, mAddedDevices.size)
                     scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-                }
+
                     updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
                     mUpdateMeshRetryCount = 0
                     mConnectRetryCount = 0

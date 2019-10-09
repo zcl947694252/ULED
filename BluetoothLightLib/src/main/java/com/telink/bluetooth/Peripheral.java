@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 蓝牙发送数据相关
+ */
 public class Peripheral extends BluetoothGattCallback {
 
     public static final int CONNECTION_PRIORITY_BALANCED = 0;
@@ -133,70 +136,32 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public boolean isConnected() {
-        /*synchronized (this.mStateLock) {
-            return this.mConnState == CONN_STATE_CONNECTED;
-        }*/
         return this.mConnState.get() == CONN_STATE_CONNECTED;
     }
 
     public void connect(Context context) {
-
         this.lastTime = 0;
         if (this.mConnState.get() == CONN_STATE_IDLE) {
-            TelinkLog.d("Peripheral#connect " + this.getDeviceName() + " -- "
-                    + this.getMacAddress());
+            TelinkLog.d("Peripheral#connect " + this.getDeviceName() + " -- " + this.getMacAddress());
             this.mConnState.set(CONN_STATE_CONNECTING);
 
-//            //确保gatt被新对象赋值时，是空的
-//            if (this.gatt != null) {
-//                closeGatt();
-//                try {
-//                    Thread.sleep(300);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             this.gatt = this.device.connectGatt(context, false, this, BluetoothDevice.TRANSPORT_LE);
             if (this.gatt == null) {
                 this.disconnect();
                 this.mConnState.set(CONN_STATE_IDLE);
                 TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
                         + this.getMacAddress());
-//                this.onDisconnect();
                 this.disconnect();
             }
-//            else{
-//                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
-//            }
         }
-
     }
 
     public void disconnect() {
-//        if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
-//            return;
         if (this.gatt != null) {
             this.gatt.disconnect();
         }
 
-        TelinkLog.d("disconnect " + this.getDeviceName() + " -- "
-                + this.getMacAddress());
-
-//        this.clear();
-//
-//        synchronized (this.mStateLock) {
-//            if (this.gatt != null) {
-//                int connState = this.mConnState.get();
-//                if (connState == CONN_STATE_CONNECTED) {
-//                    this.gatt.disconnect();
-//                    this.mConnState.set(CONN_STATE_DISCONNECTING);
-//                } else {
-//                    closeGatt();
-//                }
-//            } else {
-//                this.mConnState.set(CONN_STATE_IDLE);
-//            }
-//        }
+        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this.getMacAddress());
     }
 
     private void clear() {
@@ -944,8 +909,6 @@ public class Peripheral extends BluetoothGattCallback {
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         super.onServicesDiscovered(gatt, status);
 
-//        gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
-
         if (status == BluetoothGatt.GATT_SUCCESS) {
             List<BluetoothGattService> services = gatt.getServices();
             this.mServices = services;
@@ -961,7 +924,6 @@ public class Peripheral extends BluetoothGattCallback {
         super.onReadRemoteRssi(gatt, rssi, status);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-
             if (rssi != this.rssi) {
                 this.rssi = rssi;
                 this.onRssiChanged();
@@ -974,7 +936,6 @@ public class Peripheral extends BluetoothGattCallback {
         super.onMtuChanged(gatt, mtu, status);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-//            this.supportedMTU = mtu;//local var to record MTU size
             Log.d("mtu changed-->", "onMtuChanged: " + mtu);
         }
         TelinkLog.d("mtu changed : " + mtu + "    status==" + status);
@@ -1076,11 +1037,4 @@ public class Peripheral extends BluetoothGattCallback {
         }
     }
 
-    private final class ConnectTimeoutRunnable implements Runnable {
-
-        @Override
-        public void run() {
-
-        }
-    }
 }

@@ -9,7 +9,6 @@ import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
-import com.polidea.rxandroidble2.scan.ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT
 import com.polidea.rxandroidble2.scan.ScanSettings.SCAN_MODE_LOW_LATENCY
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
@@ -51,8 +50,7 @@ object RecoverMeshDeviceUtil {
                 .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
 
-
-        LogUtils.d("findMeshDevice name = $deviceName")
+        LogUtils.d("findMeshDevice name add前 = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
                 .map { parseData(it) }          //解析数据
@@ -69,7 +67,6 @@ object RecoverMeshDeviceUtil {
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-
     }
 
 

@@ -72,7 +72,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
-            showLoadingDialog(activity!!.getString(R.string.tip_start_sync))
+            showLoadingDialog(getString(R.string.tip_start_sync))
         }
 
         override fun complete() {
@@ -369,7 +369,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { aLong -> }
+                        .subscribe { _ -> }
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }
@@ -397,7 +397,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                     SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                     TelinkLightService.Instance()?.disconnect()
                     TelinkLightService.Instance()?.idleMode(true)
-
                     restartApplication()
                 }
                 hideLoadingDialog()
@@ -437,10 +436,10 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
-                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
                     TelinkLightService.Instance()?.idleMode(true)
                     clearData()
-                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }.create()
+                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, _ -> }.create()
         alertDialog.show()
         val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
         btn.isEnabled = false

@@ -269,7 +269,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    fun checkNetworkAndSync(activity: Activity?) {
+    private fun checkNetworkAndSync(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)

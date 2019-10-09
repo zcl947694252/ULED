@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/set_diy_color"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background_color"
-    >
+    android:background="@color/background_color">
 
     <include layout="@layout/toolbar" android:id="@+id/topView"/>
     
@@ -131,7 +129,6 @@
             android:layout_marginTop="10dp"
             android:max="100"
             android:min="1"
-            android:progress="50"
             style="@style/SeekBarStyle"
             />
 

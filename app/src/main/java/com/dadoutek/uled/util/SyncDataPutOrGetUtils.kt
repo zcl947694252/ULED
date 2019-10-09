@@ -49,12 +49,12 @@ class SyncDataPutOrGetUtils {
                 GlobalScope.launch(Dispatchers.Main) {
                     syncCallback.start()
                 }
+                LogUtils.e("zcl得删除添加表$dbDataChangeList")
+
                 for (data in dbDataChangeList) {
                     data.changeId?: break
                     var observable: Observable<String>? = this.sendDataToServer(data?.tableName,
-                            data?.changeId,
-                            data?.changeType,
-                            dbUser!!.token, data?.id!!)
+                            data?.changeId, data?.changeType, dbUser!!.token, data?.id!!)
                     observable?.let { observableList.add(it) }
                 }
 
@@ -98,7 +98,7 @@ class SyncDataPutOrGetUtils {
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
-                            Constant.DB_ADD -> {//todo 添加token lastReginID
+                            Constant.DB_ADD -> {// 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
                                 return group?.let { GroupMdodel.add(token, it, /*group.belongRegionId, */id, changeId) }!!
                             }
@@ -112,7 +112,6 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     "DB_LIGHT" -> {
-
                         when (type) {
                             Constant.DB_ADD -> {
                                 val light = DBUtils.getLightByID(changeId)
@@ -151,7 +150,6 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
-
                     "DB_SWITCH" -> {
                         when (type) {
                             Constant.DB_ADD -> {
@@ -471,24 +469,6 @@ class SyncDataPutOrGetUtils {
                     syncCallBack.error(it.message)
                     ToastUtils.showLong(it.message)
                 }
-                /*  object : NetworkObserver<List<DbScene>>() {
-                      override fun onNext(item: List<DbScene>) {
-                          //登录后同步数据完成再上传一次数据
-                          syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
-                          SharedPreferencesUtils.saveCurrentUserList(accountNow)
-//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-                          GlobalScope.launch(Dispatchers.Main) {
-                              syncCallBack.complete()
-                          }
-                      }
-
-                      override fun onError(e: Throwable) {
-                          super.onError(e)
-                          GlobalScope.launch(Dispatchers.Main) {
-                              syncCallBack.error(e.message)
-                          }
-                      }
-                  }*/
             }
             )
         }

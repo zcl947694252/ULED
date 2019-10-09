@@ -164,6 +164,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                     startActivity(intent)
                                 } else {
                                     ToastUtils.showLong(stringResponse.message)
+                                    if (stringResponse.message.contains("20001"))
+                                        startActivity(Intent(this@VerificationCodeActivity, RegisterActivity::class.java))
                                 }
                             }
                             override fun onError(e: Throwable) {

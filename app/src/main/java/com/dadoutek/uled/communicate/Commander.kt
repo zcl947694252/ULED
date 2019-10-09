@@ -95,12 +95,13 @@ object Commander : EventListener<String> {
 
     fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
                        failedCallback: () -> Unit1) {
+
+        LogUtils.e("zcl---添加表 更新数据$lightList")
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
-                ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
@@ -118,7 +119,7 @@ object Commander : EventListener<String> {
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, null)
                         Thread.sleep(sleepTime)
                     }
-                    DBUtils.deleteAll()
+                    DBUtils.deleteAll()//删除人体感应器和开关
                     Thread.sleep(sleepTime)
                     for (k in lightList.indices) {
                         if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
@@ -151,7 +152,6 @@ object Commander : EventListener<String> {
                 delay(500)
                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, null) //延时后再给直连灯发恢复出厂设置指令
             }
-
             failedCallback.invoke()
         }
 
@@ -160,12 +160,11 @@ object Commander : EventListener<String> {
     @Synchronized
     fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
                     failedCallback: () -> Unit1) {
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
-                ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
 
 
         var isSupportFastResetFactory: Boolean = false
-        Commander.getDeviceVersion(connectDeviceMeshAddr,
+        getDeviceVersion(connectDeviceMeshAddr,
                 {
                     isSupportFastResetFactory = AppUtils.isSupportFastResetFactory(it)
                     if (isSupportFastResetFactory) {
@@ -177,17 +176,14 @@ object Commander : EventListener<String> {
                             DBUtils.deleteAllRGBLight()
                             DBUtils.deleteAllConnector()
                             DBUtils.deleteAllCurtain()
-                        }
                         successCallback.invoke()
+                        }
                     } else {
                         resetLightsOld(lightList, successCallback, failedCallback)
-
                     }
-
                 },
                 {
                     resetLightsOld(lightList, successCallback, failedCallback)
-
                 })
 
 

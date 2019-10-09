@@ -97,24 +97,19 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         localVersion = it
                         versionLayout.visibility = View.VISIBLE
                         tvLightVersion.text = it
-//                        tvOta!!.visibility = View.VISIBLE
-                        if (it!!.startsWith("STS")) {
+                        if (it!!.startsWith("STS"))
                             isGlassSwitch = true
-                        }
                     },
                     failedCallback = {
                         versionLayout.visibility = View.GONE
-//                        tvOta!!.visibility = View.GONE
                     })
-        } else {
-            dstAdress = 0
         }
     }
 
     private fun showCancelDialog() {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance() != null && TelinkLightService.Instance().isLogin) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true

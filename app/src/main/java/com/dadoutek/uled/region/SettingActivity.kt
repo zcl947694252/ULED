@@ -362,7 +362,7 @@ class SettingActivity : BaseActivity() {
     /**
      * 所有灯恢复出厂设置
      */
-    fun resetAllLights() {
+    private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
         //val lightList = allLights
@@ -408,10 +408,10 @@ class SettingActivity : BaseActivity() {
         SyncDataPutOrGetUtils.syncPutDataStart(this@SettingActivity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()
-                val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                //时间太短会导致无法删除数据库数据故此设置1500秒
+                val disposable = Observable.timer(1500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-
                         }
                 if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
@@ -427,9 +427,6 @@ class SettingActivity : BaseActivity() {
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }
 
 
