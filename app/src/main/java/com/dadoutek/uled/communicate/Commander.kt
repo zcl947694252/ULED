@@ -253,7 +253,6 @@ object Commander : EventListener<String> {
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
-
         mDstAddr = lightMeshAddr
         mTargetGroupAddr = 0xFFFF
         mGroupSuccess = false
@@ -263,7 +262,7 @@ object Commander : EventListener<String> {
         val params = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte()) //0x00 代表删除组
 
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+        Observable.interval(0, 500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
@@ -278,8 +277,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        val timeOut = 30
-                        //("mGroupSuccess = $mGroupSuccess")
+                        val timeOut = 10
                         if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
@@ -601,29 +599,14 @@ object Commander : EventListener<String> {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
-//
-//          val version = Strings.bytesToString(data)
-            val meshAddress = event.args.src
-
-//            val light = DBUtils.getLightByMeshAddr(meshAddress)
-//            light.version = version
-
             if (version != "") {
                 mGetVersionSuccess = true
             }
-//            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
             version = Strings.bytesToString(data)
-//            val version = Strings.bytesToString(data)
-            val meshAddress = event.args.src
-
-//            val light = DBUtils.getLightByMeshAddr(meshAddress)
-//            light.version = version
-
             if (version != "") {
                 mGetVersionSuccess = true
             }
-//            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }
 
@@ -631,9 +614,7 @@ object Commander : EventListener<String> {
         val data = notificationEvent.args.params
         for (i in data.indices) {
         }
-//        if(data[0].toInt()== mDstAddr){
         mResetSuccess = true
-//        }
     }
 
     /**

@@ -2,7 +2,7 @@ package com.dadoutek.uled.user
 
 import android.os.Bundle
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import kotlinx.android.synthetic.main.activtiy_devloper.*
 import kotlinx.android.synthetic.main.toolbar.*

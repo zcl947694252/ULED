@@ -86,8 +86,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 /**
@@ -478,17 +476,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private void setGroupOneByOne(DbGroup dbGroup, List<DbLight> selectLights, int index) {
         DbLight dbLight = selectLights.get(index);
         int lightMeshAddr = dbLight.getMeshAddr();
-        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                dbLight.setBelongGroupId(dbGroup.getId());
-                updateGroupResult(dbLight, dbGroup);
-                if (index + 1 > selectLights.size() - 1)
-                    completeGroup(selectLights);
-                else
-                    setGroupOneByOne(dbGroup, selectLights, index + 1);
-                return null;
-            }
+        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), () -> {
+            dbLight.setBelongGroupId(dbGroup.getId());
+            updateGroupResult(dbLight, dbGroup);
+            if (index + 1 > selectLights.size() - 1)
+                completeGroup(selectLights);
+            else
+                setGroupOneByOne(dbGroup, selectLights, index + 1);
+            return null;
         }, () -> {
             dbLight.setBelongGroupId(allLightId);
             ToastUtils.showLong(R.string.group_fail_tip);
@@ -1013,11 +1008,6 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         TelinkApplication.getInstance().removeEventListener(this);
     }
 
-    private View.OnClickListener onClick = v -> {
-        stopTimer();
-        onLeScanTimeout();
-    };
-
     private void initToolbar() {
 //        toolbar.setTitle(R.string.batch_group);
 //        setSupportActionBar(toolbar);
@@ -1169,63 +1159,41 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         public CheckBox selected;
         public TextView lightName;
     }
-
     final class DeviceListAdapter extends BaseAdapter {
-
         private List<DbLight> lights;
-
-        private  Context context;
-
-        public DeviceListAdapter(List<DbLight> connectors,Context mContext) {
-            lights=connectors;
-            context=mContext;
-        }
-
+        public DeviceListAdapter(List<DbLight> connectors,Context mContext) { lights=connectors; }
         @Override
         public int getCount() {
             return this.lights == null ? 0 : this.lights.size();
         }
-
         @Override
         public DbLight getItem(int position) {
             return this.lights.get(position);
         }
-
         @Override
         public long getItemId(int position) {
             return 0;
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             DeviceItemHolder holder;
-
             convertView = inflater.inflate(R.layout.device_item, null);
-            ImageView icon = (ImageView) convertView
-                    .findViewById(R.id.img_icon);
-            TextView txtName = (TextView) convertView
-                    .findViewById(R.id.tv_group_name);
-            CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
-            TextView lightName = (TextView) convertView.findViewById(R.id.tv_device_name);
-
+            ImageView icon = convertView.findViewById(R.id.img_icon);
+            TextView txtName = convertView.findViewById(R.id.tv_group_name);
+            CheckBox selected = convertView.findViewById(R.id.selected);
+            TextView lightName = convertView.findViewById(R.id.tv_device_name);
             holder = new DeviceItemHolder();
-
             holder.icon = icon;
             holder.txtName = txtName;
             holder.selected = selected;
             holder.lightName = lightName;
-
             convertView.setTag(holder);
-
-
             DbLight light = this.getItem(position);
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.LIGHT_RGB){
                 holder.icon.setImageResource(R.drawable.icon_rgblight);
-            }
-            else{
+            } else{
                 holder.icon.setImageResource(R.drawable.icon_rgblight_down);
             }
 

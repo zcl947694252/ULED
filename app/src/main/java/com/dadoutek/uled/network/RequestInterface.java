@@ -392,8 +392,17 @@ public interface RequestInterface {
     Observable<Response<String>> deleteCurtain(@Header("token") String token,
                                                @Path("lid") int lid);
 
+    /**
+     *  <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Length: 92
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Connection: keep-alive
+     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: {"data":null,"errorCode":20001,"serverTime":1570865397299,"message":"20001 用户不存在"}
+     */
     @GET("app/isAvailable")
-//    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
+//    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)   todo 此处报错  用户不存在
     Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
                                                                @Query("currentVersion") String version);
     //用于检测是都注册

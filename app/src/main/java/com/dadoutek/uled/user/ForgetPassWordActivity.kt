@@ -15,7 +15,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import io.reactivex.Observer

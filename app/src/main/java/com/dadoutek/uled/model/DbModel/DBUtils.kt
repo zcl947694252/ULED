@@ -1,8 +1,6 @@
 package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
-import android.util.Log
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
@@ -457,9 +455,6 @@ object DBUtils {
     fun getSwitchByMeshAddr(meshAddr: Int): DbSwitch? {
         val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
-            //            for(int i=0;i<dbLightList.size();i++){
-            ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
-            //            }
             dbLightList[0]
         } else null
     }
@@ -609,8 +604,6 @@ object DBUtils {
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
-            val groups = allGroups
-            Log.e("zcl", "zcl******$groups")
         } else {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
             recordingChange(group.id,
@@ -1234,7 +1227,7 @@ object DBUtils {
                 }//如果数据表没有该数据直接添加
             }
         }
-        LogUtils.e("zcl-------添加表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
+       // LogUtils.e("zcl-------添加变化表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

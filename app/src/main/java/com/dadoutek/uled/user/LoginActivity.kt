@@ -37,7 +37,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil

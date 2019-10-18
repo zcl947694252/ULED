@@ -22,6 +22,7 @@ import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -31,11 +32,12 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -54,6 +56,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -151,15 +155,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
                         device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     } else {
-                        if (light_current.colorTemperature <= 0) {
-                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
-                        } else if (light_current.colorTemperature >= 100) {
-                            device_light_add.setImageResource(R.drawable.icon_puls_no)
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                        } else {
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
+                        when {
+                            light_current.colorTemperature <= 0 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                            light_current.colorTemperature >= 100 -> {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            }
+                            else -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
                         }
 
                     }
@@ -184,15 +192,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
                         device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     } else {
-                        if (light_current.colorTemperature <= 0) {
-                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
-                        } else if (light_current.colorTemperature >= 100) {
-                            device_light_add.setImageResource(R.drawable.icon_puls_no)
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                        } else {
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
+                        when {
+                            light_current.colorTemperature <= 0 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                            light_current.colorTemperature >= 100 -> {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            }
+                            else -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
                         }
                     }
                 }
@@ -447,54 +459,57 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     light_sbBrightness!!.setOnTouchListener { v, event -> false }
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
-                        if (light_current!!.brightness <= 0) {
-                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
-                        } else if (light_current.brightness >= 100) {
-                            device_light_add.setImageResource(R.drawable.icon_puls_no)
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                        } else {
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
+                        when {
+                            light_current!!.brightness <= 0 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                            light_current.brightness >= 100 -> {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            }
+                            else -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
                         }
                     } else {
-                        if (light_current!!.colorTemperature <= 0) {
-                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
-                        } else if (light_current.colorTemperature >= 100) {
-                            device_light_add.setImageResource(R.drawable.icon_puls_no)
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                        } else {
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
+                        when {
+                            light_current!!.colorTemperature <= 0 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                            light_current.colorTemperature >= 100 -> {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            }
+                            else -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
                         }
                     }
-                    device_light_add.setOnTouchListener { v, event ->
+                    device_light_add.setOnTouchListener { _, event ->
                         if (event.action == MotionEvent.ACTION_DOWN) {
-                            //                    tvValue = Integer.parseInt(textView.getText().toString());
                             downTime = System.currentTimeMillis()
                             onBtnTouch = true
-                            val t = object : Thread() {
-                                override fun run() {
-                                    while (onBtnTouch) {
-                                        thisTime = System.currentTimeMillis()
-                                        if (thisTime - downTime >= 500) {
-                                            tvValue++
-                                            val msg = handler.obtainMessage()
-                                            msg.arg1 = tvValue
-                                            handler_handler.sendMessage(msg)
-                                            Log.e("TAG_TOUCH", tvValue++.toString())
-                                            try {
-                                                sleep(100)
-                                            } catch (e: InterruptedException) {
-                                                e.printStackTrace()
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                            t.start()
+                           GlobalScope.launch {
+                               while (onBtnTouch) {
+                                   thisTime = System.currentTimeMillis()
+                                   if (thisTime - downTime >= 500) {
+                                       tvValue++
+                                       val msg = handler.obtainMessage()
+                                       msg.arg1 = tvValue
+                                       handler_handler.sendMessage(msg)
+                                       Log.e("TAG_TOUCH", tvValue++.toString())
+                                       try {
+                                           Thread.sleep(100)
+                                       } catch (e: InterruptedException) {
+                                           e.printStackTrace()
+                                       }
+                                   }
+                               }
+                           }
                         } else if (event.action == MotionEvent.ACTION_UP) {
                             onBtnTouch = false
                             if (thisTime - downTime < 500) {
@@ -869,6 +884,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
                                 }
+                                LogUtils.e("zcl删除组后"+DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
                             },
                             failedCallback = {
                                 deleteGroup(lights, group, retryCount = retryCount + 1,

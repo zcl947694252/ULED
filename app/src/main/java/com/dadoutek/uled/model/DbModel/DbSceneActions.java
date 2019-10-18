@@ -1,10 +1,9 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by hejiajun on 2018/5/7.
@@ -154,5 +153,23 @@ public class DbSceneActions {
 
     public void setCircleFour(int circleFour) {
         this.circleFour = circleFour;
+    }
+
+    @Override
+    public String toString() {
+        return "DbSceneActions{" +
+                "id=" + id +
+                ", belongSceneId=" + belongSceneId +
+                ", groupAddr=" + groupAddr +
+                ", colorTemperature=" + colorTemperature +
+                ", brightness=" + brightness +
+                ", color=" + color +
+                ", isOn=" + isOn +
+                ", deviceType=" + deviceType +
+                ", circleOne=" + circleOne +
+                ", circleTwo=" + circleTwo +
+                ", circleThree=" + circleThree +
+                ", circleFour=" + circleFour +
+                '}';
     }
 }

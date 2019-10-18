@@ -29,7 +29,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SpeedDialog
 import com.dadoutek.uled.widget.ActionSheetDialog
 import io.reactivex.Observable

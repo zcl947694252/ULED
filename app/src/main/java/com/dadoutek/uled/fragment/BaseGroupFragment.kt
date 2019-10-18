@@ -29,12 +29,14 @@ import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -42,8 +44,11 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
@@ -72,6 +77,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private lateinit var br: BroadcastReceiver
     private lateinit var deleteList: ArrayList<DbGroup>
     private var addNewGroup: Button? = null
+    private var compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +97,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 val sonDeleteGroup = intent.getStringExtra("delete")
                 val lightStatus = intent.getStringExtra("switch_here")
                 val delete = intent.getStringExtra("delete_true")
-                if (key == "true"||delete =="true") {
+                if (key == "true" || delete == "true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
                     groupList.let {
@@ -216,6 +222,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             return@Comparator o1.name.compareTo(o2.name)
         })
 
+        LogUtils.e("zcl删除组前$groupList")
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
@@ -255,7 +262,6 @@ abstract class BaseGroupFragment : BaseFragment() {
     fun refreshData() {
         groupList.clear()
         groupList.addAll(getGroupData())//根据设备类型获取设备组数
-
         //以下是检索组里有多少设备的代码
         for (group in groupList) {
             when (group.deviceType) {
@@ -290,7 +296,6 @@ abstract class BaseGroupFragment : BaseFragment() {
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
-        var intent: Intent
         val groupType = setGroupType()
         when (view!!.id) {
             R.id.btn_on, R.id.tv_on -> {
@@ -314,24 +319,23 @@ abstract class BaseGroupFragment : BaseFragment() {
                         updateLights(true, currentLight)
                     }
                 }
-
             }
 
             R.id.btn_set -> {
                 if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
-                     var num = 0
+                    var num = 0
                     when (groupType) {
                         Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            num =DBUtils.getLightByGroupID(currentLight.id).size
+                            num = DBUtils.getLightByGroupID(currentLight.id).size
                         }
                         Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                            num =DBUtils.getLightByGroupID(currentLight.id).size
+                            num = DBUtils.getLightByGroupID(currentLight.id).size
                         }
                         Constant.DEVICE_TYPE_CONNECTOR -> {
-                            num =DBUtils.getConnectorByGroupID(currentLight.id).size
+                            num = DBUtils.getConnectorByGroupID(currentLight.id).size
                         }//蓝牙接收器
                         Constant.DEVICE_TYPE_CURTAIN -> {
-                            num =DBUtils.getCurtainByGroupID(currentLight.id).size
+                            num = DBUtils.getCurtainByGroupID(currentLight.id).size
                         }
                     }
 
@@ -365,7 +369,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
             //不能使用group_name否则会造成长按监听无效
             R.id.item_layout -> {
-                var intent =Intent()
+                var intent = Intent()
                 when (groupType) {
                     Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
@@ -374,16 +378,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                     Constant.DEVICE_TYPE_LIGHT_RGB -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("light", "rgb_light")
-                    }
+                    }//蓝牙接收器
                     Constant.DEVICE_TYPE_CONNECTOR -> {
                         intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                    }//蓝牙接收器
+                    }
                     Constant.DEVICE_TYPE_CURTAIN -> {
                         intent = Intent(mContext, CurtainOfGroupActivity::class.java)
                     }
                 }
                 intent.putExtra("group", currentLight)
-               //intent.putExtra("light", setIntentDeviceType())
                 startActivityForResult(intent, 2)
             }
         }
@@ -469,6 +472,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
+
             if (lights.count() != 0) {
                 val maxRetryCount = 3
                 if (retryCount <= maxRetryCount) {
@@ -479,8 +483,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
                                 DBUtils.updateLight(light)
                                 lights.remove(light)
+
                                 //修改分组成功后删除场景信息。
-                                deleteAllSceneByLightAddr(light.meshAddr)
+                               // deleteAllSceneByLightAddr(light.meshAddr)
                                 Thread.sleep(100)
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组
@@ -494,6 +499,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
                                 }
+
+                                LogUtils.e("zcl删除组后" + DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
                             },
                             failedCallback = {
                                 deleteGroup(lights, group, retryCount = retryCount + 1,
@@ -535,5 +542,30 @@ abstract class BaseGroupFragment : BaseFragment() {
             LogUtils.e("zcl要删除的组-----$list")
         }
         return list
+    }
+
+
+    private fun syncData() {
+        mContext?.let {
+            SyncDataPutOrGetUtils.syncPutDataStart(it, object : SyncCallback {
+                override fun complete() {
+                    hideLoadingDialog()
+                    val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe { }
+                    if (compositeDisposable.isDisposed) {
+                        compositeDisposable = CompositeDisposable()
+                    }
+                    compositeDisposable.add(disposable)
+                }
+
+                override fun error(msg: String) {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(R.string.backup_failed)
+                }
+
+                override fun start() {}
+            })
+        }
     }
 }

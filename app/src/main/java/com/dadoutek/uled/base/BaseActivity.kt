@@ -61,14 +61,18 @@ import java.util.*
 abstract class BaseActivity : AppCompatActivity() {
     private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
-    var popView: View? = null
-    var loadDialog: Dialog? = null
-    val TAGS = "zcl_BaseActivity"
+    private var popView: View? = null
+    private var loadDialog: Dialog? = null
     private var singleLogin: AlertDialog? = null
+    private var isRuning: Boolean = false
+    protected var foreground = false
+    private var mApplication: TelinkLightApplication? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutID())
+        foreground = true
+        this.mApplication = this.application as TelinkLightApplication
         makeDialogAndPop()
         initView()
         initData()
@@ -181,6 +185,12 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        isRuning = false
+        foreground = false
+
+    }
 
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
@@ -345,7 +355,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    Log.e(TAGS, "zcl_baseMe___________解析二维码")
+                    LogUtils.e("zcl_baseMe___________解析二维码")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
                 }
             }

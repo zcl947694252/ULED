@@ -159,7 +159,6 @@ public abstract class LightService extends Service implements
      * @see com.telink.bluetooth.event.DeviceEvent
      */
     public void updateMesh(Parameters params) {
-
         if (this.mAdapter == null)
             return;
 
@@ -429,7 +428,6 @@ public abstract class LightService extends Service implements
     @Override
     public void onStatusChanged(LightController controller, int mode, int oldStatus,
                                 int newStatus) {
-
         LightPeripheral light = controller.getCurrentLight();
 
         Intent intent = new Intent();

@@ -4,9 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -30,6 +27,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
@@ -37,11 +35,9 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -106,21 +102,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private var acitivityIsAlive = true
     private var recyclerView: RecyclerView? = null
 
-    override fun onStart() {
-        super.onStart()
-        // 监听各种事件
-        ("____onStart")
-    }
 
     override fun onPostResume() {
         super.onPostResume()
         addListeners()
     }
 
-    fun addListeners() {
+    private fun addListeners() {
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
@@ -162,31 +152,13 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
      override fun initOnLayoutListener() {
-        val view = getWindow().getDecorView()
-        val viewTreeObserver = view.getViewTreeObserver()
+        val view = window.decorView
+        val viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                lazyLoad()
             }
         })
-    }
-
-    fun lazyLoad() {
-//        if (lightList.size != 0) {
-//            val guide2: View? = adapter!!.getViewByPosition(0, R.id.img_light)
-//            val guide3 = adapter!!.getViewByPosition(0, R.id.tv_setting)
-//
-//            val builder = GuideUtils.guideBuilder(this@LightsOfGroupActivity, Constant.TAG_LightsOfGroupActivity)
-//            builder.addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout
-//                    .view_guide_simple_light_1, getString(R.string.light_guide_1), View
-//                    .OnClickListener {
-//                        ActivityUtils.startActivity(ScanningSensorActivity::class.java)
-//                    }))
-//            builder.addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_light_1, getString(R.string.light_guide_2)))
-//            val guide = builder.show()
-//
-//        }
     }
 
     private fun initToolbar() {
@@ -224,14 +196,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
-//        val nameList : ArrayList<String> = ArrayList()
         if (lightList != null && lightList.size > 0) {
             lightList.clear()
         }
-
-//        for(i in list.indices){
-//            nameList.add(list[i].name)
-//        }
 
         if (isSearch) {
             for (i in list.indices) {
@@ -242,7 +209,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
         } else {
             for (i in list.indices) {
-                if (list.get(i).meshAddr == 0xffff) {
+                if (list[i].meshAddr == 0xffff) {
                     Collections.swap(list, 0, i)
                 }
             }
@@ -266,46 +233,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         initData()
         initView()
         initOnLayoutListener()
-//        initData()
-//        initView()
-//        Thread {
-//            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-//            Thread.sleep(2500)
-//            if (this@LightsOfGroupActivity == null ||
-//                    this@LightsOfGroupActivity.isDestroyed ||
-//                    this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
-//            } else {
-//                autoConnect()
-//            }
-//        }.start()
-//
-//        val filter = IntentFilter()
-//        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-//        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
-//        registerReceiver(mReceiver, filter)
     }
-
-//    private val mReceiver = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context, intent: Intent) {
-//            val action = intent.action
-//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-//
-//                when (state) {
-//                    BluetoothAdapter.STATE_ON -> {
-//                        TelinkLightService.Instance()?.idleMode(true)
-//                        retryConnectCount = 0
-//                        autoConnect()
-//                        LogUtil.d("STATE_ON")
-//                    }
-//                    BluetoothAdapter.STATE_OFF -> {
-//                        LogUtil.d("STATE_OFF")
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     override fun onStop() {
         super.onStop()
         this.mApplication!!.removeEventListener(this)
@@ -315,7 +243,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onDestroy() {
         super.onDestroy()
-        //        this.mApplication.removeEventListener(this);
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
@@ -328,8 +255,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun initData() {
         lightList = ArrayList()
         if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
             filter("", false)
         } else {
             lightList = DBUtils.getConnectorByGroupID(group.id)
@@ -341,15 +266,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
             batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener({
-                val intent = Intent(this,
-                        ConnectorBatchGroupActivity::class.java)
+            batchGroup.visibility=View.GONE
+            batchGroup.setOnClickListener {
+                val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                 intent.putExtra("relayType","relayGroup")
                 intent.putExtra("group",group.id.toInt())
                 startActivity(intent)
-            })
+            }
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
@@ -359,8 +284,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun getNewData(): MutableList<DbConnector> {
         if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
             filter("", false)
         } else {
             lightList = DBUtils.getConnectorByGroupID(group.id)
@@ -408,49 +331,23 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (group.meshAddr == 0xffff) {
-            getMenuInflater().inflate(R.menu.menu_search, menu)
+            menuInflater.inflate(R.menu.menu_search, menu)
             searchView = (menu!!.findItem(R.id.action_search)).actionView as SearchView
             searchView!!.setOnQueryTextListener(this)
             searchView!!.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            searchView!!.setQueryHint(getString(R.string.input_groupAdress))
-            searchView!!.setSubmitButtonEnabled(true)
+            searchView!!.queryHint = getString(R.string.input_groupAdress)
+            searchView!!.isSubmitButtonEnabled = true
             searchView!!.backgroundColor = resources.getColor(R.color.blue)
             searchView!!.alpha = 0.3f
-//            val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
             return super.onCreateOptionsMenu(menu)
         }
         return true
     }
 
-    fun getAlphaBitmap(mBitmap: Bitmap, mColor: Int): Bitmap {
-        //	    	BitmapDrawable mBitmapDrawable = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.enemy_infantry_ninja);
-        //	    	Bitmap mBitmap = mBitmapDrawable.getBitmap();
-
-        //BitmapDrawable的getIntrinsicWidth（）方法，Bitmap的getWidth（）方法
-        //注意这两个方法的区别
-        //Bitmap mAlphaBitmap = Bitmap.createBitmap(mBitmapDrawable.getIntrinsicWidth(), mBitmapDrawable.getIntrinsicHeight(), Config.ARGB_8888);
-        val mAlphaBitmap = Bitmap.createBitmap(mBitmap.width, mBitmap.height, Bitmap.Config.ARGB_8888)
-
-        val mCanvas = Canvas(mAlphaBitmap)
-        val mPaint = Paint()
-
-        mPaint.color = mColor
-        //从原位图中提取只包含alpha的位图
-        val alphaBitmap = mBitmap.extractAlpha()
-        //在画布上（mAlphaBitmap）绘制alpha位图
-        mCanvas.drawBitmap(alphaBitmap, 0f, 0f, mPaint)
-
-        return mAlphaBitmap
-    }
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
             toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
-//            if(searchView==null){
-//                toolbar.inflateMenu(R.menu.menu_search)
-//                searchView = MenuItemCompat.getActionView(toolbar.menu.findItem(R.id.action_search)) as SearchView
-//                searchView!!.setOnQueryTextListener(this)
-//            }
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
@@ -475,12 +372,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = lightList[position]
         positionCurrent = position
-        val opcode = Opcode.LIGHT_ON_OFF
         if (view.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x01, 0x00, 0x00))
                 if(currentLight!!.productUUID== DeviceType.SMART_CURTAIN){
                     Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
                 }else{
@@ -489,8 +383,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x00, 0x00, 0x00))
                 if(currentLight!!.productUUID== DeviceType.SMART_CURTAIN){
                     Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
                 }else{
@@ -660,22 +552,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         }
     }
 
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { dialog, which ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
-
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
-    }
-
     @SuppressLint("CheckResult")
     private fun startScan() {
         //当App在前台时，才进行扫描。
@@ -691,7 +567,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                                 //扫描参数
                                 val account = DBUtils.lastUser?.account
 
-                                val scanFilters = java.util.ArrayList<ScanFilter>()
+                                val scanFilters = ArrayList<ScanFilter>()
                                 val scanFilter = ScanFilter.Builder()
                                         .setDeviceName(account)
                                         .build()

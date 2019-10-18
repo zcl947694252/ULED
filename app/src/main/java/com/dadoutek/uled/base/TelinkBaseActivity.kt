@@ -1,4 +1,4 @@
-package com.dadoutek.uled.tellink
+package com.dadoutek.uled.base
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -24,7 +24,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -38,6 +37,8 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -63,9 +64,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var stompLifecycleDisposable: Disposable? = null
     var singleLoginTopicDisposable: Disposable? = null
     var codeStompClient: Disposable? = null
-    val TAG = "zcl"
     private lateinit var stompRecevice: StompReceiver
-
+    private var locationServiceDialog: android.support.v7.app.AlertDialog? = null
     private lateinit var mStompManager: StompManager
     protected var toast: Toast? = null
     protected var foreground = false
@@ -83,8 +83,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialogAndPop()
         initStompReceiver()
     }
-    private fun makeDialogAndPop() {
 
+    private fun makeDialogAndPop() {
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
@@ -189,10 +189,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
 
-        if (LeBluetooth.getInstance().isEnabled){
+        if (LeBluetooth.getInstance().isEnabled) {
             if (lightService?.isLogin == true) {
                 changeDisplayImgOnToolbar(true)
-            }else{
+            } else {
                 changeDisplayImgOnToolbar(false)
             }
         } else {
@@ -207,7 +207,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast = null
         unregisterReceiver(stompRecevice)
         SMSSDK.unregisterAllEventHandler()
-
     }
 
     open fun initOnLayoutListener() {
@@ -215,7 +214,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
             isRuning = true
-            view.viewTreeObserver.removeOnGlobalLayoutListener({})
+            view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
     }
 
@@ -235,20 +234,20 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing&&!this@TelinkBaseActivity.isFinishing) {
+        if (!loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                    loadDialog!!.show()
+                loadDialog!!.show()
             }
         }
     }
 
     fun hideLoadingDialog() {
-            if (loadDialog != null &&!this@TelinkBaseActivity.isFinishing) {
-                loadDialog!!.dismiss()
-            }
+        if (loadDialog != null && !this@TelinkBaseActivity.isFinishing) {
+            loadDialog!!.dismiss()
+        }
     }
 
     fun compileExChar(str: String): Boolean {
@@ -269,7 +268,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    private fun checkNetworkAndSync(activity: Activity?) {
+    protected fun checkNetworkAndSync(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -308,7 +307,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
             val showing = singleLogin?.isShowing
-            if (!b && showing!=null&&!showing!!) {
+            if (!b && showing != null && !showing!!) {
                 singleLogin!!.show()
             }
         }
@@ -443,7 +442,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    Log.e(TAG, "zcl_baseMe___________收到消息***解析二维码***")
+                    LogUtils.e( "zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
                 }
             }
@@ -465,15 +464,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
                         LogUtils.d("蓝牙未开启")
-                        ToastUtils.showShort(getString(R.string.close_bluetooth))
+                        showToast(getString(R.string.close_bluetooth))
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
                         LogUtils.d("无法收到广播包以及响应包")
-                        ToastUtils.showShort("无法收到广播包以及响应包")
+                        showToast("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
                         LogUtils.d("未扫到目标设备")
-                        ToastUtils.showShort("未扫到目标设备")
+                        showToast("未扫到目标设备")
                     }
                 }
 
@@ -482,11 +481,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
                         LogUtils.d("未读到att表")
-                        ToastUtils.showShort("未读到att表")
+                        showToast("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
                         LogUtils.d("未建立物理连接")
-                        ToastUtils.showShort("未建立物理连接")
+                        showToast("未建立物理连接")
                     }
                 }
             }
@@ -494,15 +493,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
                         LogUtils.d("value check失败： 密码错误")
-                        ToastUtils.showShort("value check失败： 密码错误")
+                        showToast("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
                         LogUtils.d("read login data 没有收到response")
-                        ToastUtils.showShort("read login data 没有收到response")
+                        showToast("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
                         LogUtils.d("write login data 没有收到response")
-                        ToastUtils.showShort("write login data 没有收到response")
+                        showToast("write login data 没有收到response")
                     }
                 }
             }
@@ -513,8 +512,24 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var version: String? = ""
         if (TelinkApplication.getInstance().connectDevice != null)
             Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , { ToastUtils.showShort(getString(R.string.get_server_version_fail)) })
+                    , { showToast(getString(R.string.get_server_version_fail)) })
         return version
+    }
+
+
+    fun showOpenLocationServiceDialog() {
+        val builder = android.support.v7.app.AlertDialog.Builder(this)
+        builder.setTitle(R.string.open_location_service)
+        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
+            BleUtils.jumpLocationSetting()
+        }
+        locationServiceDialog = builder.create()
+        locationServiceDialog?.setCancelable(false)
+        locationServiceDialog?.show()
+    }
+
+    fun hideLocationServiceDialog() {
+        locationServiceDialog?.hide()
     }
 }
 

@@ -369,7 +369,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { _ -> }
+                        .subscribe {}
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }

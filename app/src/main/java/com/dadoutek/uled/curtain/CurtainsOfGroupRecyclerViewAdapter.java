@@ -47,14 +47,6 @@ public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter
 
         tvLightName.setText(item.getName());
 
-//        GradientDrawable myGrad = (GradientDrawable)tvRgbColor.getBackground();
-//        if(item.getColor()==0||item.getColor()==0xffffff){
-//            tvRgbColor.setVisibility(View.GONE);
-//        }else{
-//            tvRgbColor.setVisibility(View.VISIBLE);
-//            myGrad.setColor(0Xff000000|item.getColor());
-//        }
-
         helper.addOnClickListener(R.id.tv_setting)
                 .setTag(R.id.tv_setting,helper.getAdapterPosition())
                 .setTag(R.id.img_light,helper.getAdapterPosition())

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 

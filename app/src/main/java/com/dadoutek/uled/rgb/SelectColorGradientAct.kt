@@ -17,7 +17,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
@@ -53,9 +53,9 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
     }
 
-    @SuppressLint("ClickableViewAccessibility", "StringFormatMatches")
+    @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
     private fun initView() {
-        toolbar.title = getString(R.string.color_check)
+        toolbar.title = getString(R.string.color_checked_set)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -96,27 +96,35 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             sbBrightness_num.text = 100.toString() + "%"
             sb_w_bright_num.text = 0.toString() + "%"
 
-            if (sbBrightness!!.progress >= 100) {
-                sbBrightness_add.isEnabled = false
-                sbBrightness_less.isEnabled = true
-            } else if (sbBrightness!!.progress <= 0) {
-                sbBrightness_less.isEnabled = false
-                sbBrightness_add.isEnabled = true
-            } else {
-                sbBrightness_less.isEnabled = true
-                sbBrightness_add.isEnabled = true
+            when {
+                sbBrightness!!.progress >= 100 -> {
+                    sbBrightness_add.isEnabled = false
+                    sbBrightness_less.isEnabled = true
+                }
+                sbBrightness!!.progress <= 0 -> {
+                    sbBrightness_less.isEnabled = false
+                    sbBrightness_add.isEnabled = true
+                }
+                else -> {
+                    sbBrightness_less.isEnabled = true
+                    sbBrightness_add.isEnabled = true
+                }
             }
 
 
-            if (sb_w_bright.progress >= 100) {
-                sb_w_bright_add.isEnabled = false
-                sb_w_bright_less.isEnabled = true
-            } else if (sb_w_bright.progress <= 0) {
-                sb_w_bright_less.isEnabled = false
-                sb_w_bright_add.isEnabled = true
-            } else {
-                sb_w_bright_less.isEnabled = true
-                sb_w_bright_add.isEnabled = true
+            when {
+                sb_w_bright.progress >= 100 -> {
+                    sb_w_bright_add.isEnabled = false
+                    sb_w_bright_less.isEnabled = true
+                }
+                sb_w_bright.progress <= 0 -> {
+                    sb_w_bright_less.isEnabled = false
+                    sb_w_bright_add.isEnabled = true
+                }
+                else -> {
+                    sb_w_bright_less.isEnabled = true
+                    sb_w_bright_add.isEnabled = true
+                }
             }
         } else {
 
@@ -129,29 +137,37 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             sbBrightness.progress = colorNode!!.brightness
             sb_w_bright.progress = w
             sbBrightness_num.text = colorNode!!.brightness.toString() + "%"
-            sb_w_bright_num.text = w.toString() + "%"
+            sb_w_bright_num.text = "$w%"
 
-            if (sbBrightness!!.progress >= 100) {
-                sbBrightness_add.isEnabled = false
-                sbBrightness_less.isEnabled = true
-            } else if (sbBrightness!!.progress <= 0) {
-                sbBrightness_less.isEnabled = false
-                sbBrightness_add.isEnabled = true
-            } else {
-                sbBrightness_less.isEnabled = true
-                sbBrightness_add.isEnabled = true
+            when {
+                sbBrightness!!.progress >= 100 -> {
+                    sbBrightness_add.isEnabled = false
+                    sbBrightness_less.isEnabled = true
+                }
+                sbBrightness!!.progress <= 0 -> {
+                    sbBrightness_less.isEnabled = false
+                    sbBrightness_add.isEnabled = true
+                }
+                else -> {
+                    sbBrightness_less.isEnabled = true
+                    sbBrightness_add.isEnabled = true
+                }
             }
 
 
-            if (sb_w_bright.progress >= 100) {
-                sb_w_bright_add.isEnabled = false
-                sb_w_bright_less.isEnabled = true
-            } else if (sb_w_bright.progress <= 0) {
-                sb_w_bright_less.isEnabled = false
-                sb_w_bright_add.isEnabled = true
-            } else {
-                sb_w_bright_less.isEnabled = true
-                sb_w_bright_add.isEnabled = true
+            when {
+                sb_w_bright.progress >= 100 -> {
+                    sb_w_bright_add.isEnabled = false
+                    sb_w_bright_less.isEnabled = true
+                }
+                sb_w_bright.progress <= 0 -> {
+                    sb_w_bright_less.isEnabled = false
+                    sb_w_bright_add.isEnabled = true
+                }
+                else -> {
+                    sb_w_bright_less.isEnabled = true
+                    sb_w_bright_add.isEnabled = true
+                }
             }
 
             color_r.text = r.toString()
@@ -173,10 +189,6 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_save -> {
-//                redColor = color_r.text.toString().toInt()
-//                greenColor = color_g.text.toString().toInt()
-//                blueColor = color_b.text.toString().toInt()
-//                setColorPicker()
                 doFinish()
             }
 
@@ -239,8 +251,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-        var showW = ws
-        Thread {
+        GlobalScope.launch {
 
             try {
 
@@ -252,15 +263,14 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                 }
                 if (ws == -1) {
                     ws = 0
-                    showW = 0
                 }
 
-                Thread.sleep(80)
+                delay(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+        }
 
         colorNode!!.rgbw = color
 
@@ -341,7 +351,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
-            onValueChangeView(seekBar, progress, true)
+            onValueChangeView(seekBar, progress)
             val currentTime = System.currentTimeMillis()
 
             if (currentTime - this.preTime > this.delayTime) {
@@ -350,11 +360,12 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
-        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean) {
+        @SuppressLint("SetTextI18n")
+        private fun onValueChangeView(view: View, progress: Int) {
             if (view === sbBrightness) {
-                sbBrightness_num.text = progress.toString() + "%"
+                sbBrightness_num.text = "$progress%"
             } else if (view === sb_w_bright) {
-                sb_w_bright_num.text = progress.toString() + "%"
+                sb_w_bright_num.text = "$progress%"
             }
         }
 
@@ -414,8 +425,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+            GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -425,16 +435,15 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             handler_brightness_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
 
                         }
                     }
-                }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -453,8 +462,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+            GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -464,16 +472,15 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             handler_brightness_add.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
 
                         }
                     }
-                }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -492,8 +499,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+            GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -503,16 +509,15 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             handler_less.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
 
                         }
                     }
-                }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -531,8 +536,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+            GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -542,16 +546,14 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             handler.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
-                                Thread.sleep(100)
+                                delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
 
                         }
                     }
-                }
             }
-            t.start()
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -570,18 +572,22 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             sb_w_bright.progress++
-            if (sb_w_bright.progress > 100) {
-                sb_w_bright_add.isEnabled = false
-                stopTracking = false
-                onBtnTouch = false
-            } else if (sb_w_bright.progress == 100) {
-                sb_w_bright_add.isEnabled = false
-                sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
-                stopTracking = false
-                onBtnTouch = false
-            } else {
-                sb_w_bright_add.isEnabled = true
-                stopTracking = true
+            when {
+                sb_w_bright.progress > 100 -> {
+                    sb_w_bright_add.isEnabled = false
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                sb_w_bright.progress == 100 -> {
+                    sb_w_bright_add.isEnabled = false
+                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                else -> {
+                    sb_w_bright_add.isEnabled = true
+                    stopTracking = true
+                }
             }
         }
     }
@@ -591,18 +597,22 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             sbBrightness.progress++
-            if (sbBrightness.progress > 100) {
-                sbBrightness_add.isEnabled = false
-                stopTracking = false
-                onBtnTouch = false
-            } else if (sbBrightness.progress == 100) {
-                sbBrightness_add.isEnabled = false
-                sbBrightness_num.text = sbBrightness.progress.toString() + "%"
-                stopTracking = false
-                onBtnTouch = false
-            } else {
-                sbBrightness_add.isEnabled = true
-                stopTracking = true
+            when {
+                sbBrightness.progress > 100 -> {
+                    sbBrightness_add.isEnabled = false
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                sbBrightness.progress == 100 -> {
+                    sbBrightness_add.isEnabled = false
+                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                else -> {
+                    sbBrightness_add.isEnabled = true
+                    stopTracking = true
+                }
             }
         }
     }
@@ -612,18 +622,22 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             sbBrightness.progress--
-            if (sbBrightness.progress < 0) {
-                sbBrightness_less.isEnabled = false
-                stopTracking = false
-                onBtnTouch = false
-            } else if (sbBrightness.progress == 0) {
-                sbBrightness_less.isEnabled = false
-                sbBrightness_num.text = sbBrightness.progress.toString() + "%"
-                stopTracking = false
-                onBtnTouch = false
-            } else {
-                sbBrightness_less.isEnabled = true
-                stopTracking = true
+            when {
+                sbBrightness.progress < 0 -> {
+                    sbBrightness_less.isEnabled = false
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                sbBrightness.progress == 0 -> {
+                    sbBrightness_less.isEnabled = false
+                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                else -> {
+                    sbBrightness_less.isEnabled = true
+                    stopTracking = true
+                }
             }
         }
     }
@@ -633,18 +647,22 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             sb_w_bright.progress--
-            if (sb_w_bright.progress < 0) {
-                sb_w_bright_less.isEnabled = false
-                stopTracking = false
-                onBtnTouch = false
-            } else if (sb_w_bright.progress == 0) {
-                sb_w_bright_less.isEnabled = false
-                sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
-                stopTracking = false
-                onBtnTouch = false
-            } else {
-                sb_w_bright_less.isEnabled = true
-                stopTracking = true
+            when {
+                sb_w_bright.progress < 0 -> {
+                    sb_w_bright_less.isEnabled = false
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                sb_w_bright.progress == 0 -> {
+                    sb_w_bright_less.isEnabled = false
+                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    stopTracking = false
+                    onBtnTouch = false
+                }
+                else -> {
+                    sb_w_bright_less.isEnabled = true
+                    stopTracking = true
+                }
             }
         }
     }

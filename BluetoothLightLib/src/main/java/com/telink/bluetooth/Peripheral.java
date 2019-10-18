@@ -30,7 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 蓝牙发送数据相关
+ * 蓝牙发送数据相关类
+ * 蓝牙操作类
  */
 public class Peripheral extends BluetoothGattCallback {
 
@@ -165,6 +166,7 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     private void clear() {
+
         this.processing.set(false);
         this.stopMonitoringRssi();
         this.cancelCommandTimeoutTask();
@@ -340,13 +342,10 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     private void commandCompleted() {
-
         TelinkLog.d("commandCompleted");
 
-//        synchronized (this.mProcessLock) {
         if (this.processing.get())
             this.processing.set(false);
-//        }
 
         this.processCommand();
     }
@@ -427,7 +426,12 @@ public class Peripheral extends BluetoothGattCallback {
     /********************************************************************************
      * Private API
      *******************************************************************************/
-
+    /**
+     * 蓝牙读取操作
+     * @param commandContext
+     * @param serviceUUID
+     * @param characteristicUUID
+     */
     private void readCharacteristic(CommandContext commandContext,
                                     UUID serviceUUID, UUID characteristicUUID) {
 
@@ -465,11 +469,17 @@ public class Peripheral extends BluetoothGattCallback {
         }
     }
 
+    /**
+     * 蓝牙写入操作
+     * @param commandContext
+     * @param serviceUUID
+     * @param characteristicUUID
+     * @param writeType
+     * @param data
+     */
     private void writeCharacteristic(CommandContext commandContext,
                                      UUID serviceUUID, UUID characteristicUUID, int writeType,
                                      byte[] data) {
-
-
         boolean success = true;
         String errorMsg = "";
 
@@ -713,7 +723,6 @@ public class Peripheral extends BluetoothGattCallback {
                 + newState);
 
         if (newState == BluetoothGatt.STATE_CONNECTED) {
-
 //            setMTU(103);
 
             this.mConnState.set(CONN_STATE_CONNECTED);
@@ -721,11 +730,8 @@ public class Peripheral extends BluetoothGattCallback {
 //            Log.d("dadouhjj", "onConnectionStateChange: "+a);
 
             if (this.gatt == null || !this.gatt.discoverServices()) {
-                TelinkLog.d("remote service discovery has been stopped status = "
-                        + newState);
-
+                TelinkLog.d("remote service discovery has been stopped status = " + newState);
                 this.disconnect();
-
             } else {
                 this.onConnect();
             }
@@ -742,30 +748,12 @@ public class Peripheral extends BluetoothGattCallback {
                 TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
                 this.onDisconnect();
             }
-
         }
-//        else {
-//
-//            synchronized (this.mStateLock) {
-//
-//                if (this.gatt != null) {
-//                    closeGatt();
-//                    TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt Close");
-//                }
-//
-//                this.clear();
-//                this.mConnState.set(CONN_STATE_IDLE);
-//                TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
-//                this.onDisconnect();
-//            }
-//        }
     }
 
 
     private synchronized void closeGatt() {
         if (this.gatt != null) {
-//            this.gatt.disconnect();
-//            refreshDeviceCache(gatt);
             this.gatt.close();
             TelinkLog.d("gatt closeGatt " + this.gatt);
             this.mConnState.set(CONN_STATE_CLOSED);
@@ -782,8 +770,6 @@ public class Peripheral extends BluetoothGattCallback {
         CommandContext commandContext = this.mNotificationCallbacks.get(key);
 
         if (commandContext != null) {
-            byte[] value = characteristic.getValue();
-
             this.onNotify(characteristic.getValue(),
                     commandContext.command.serviceUUID,
                     commandContext.command.characteristicUUID,

@@ -38,7 +38,7 @@ public class EventBus<T> {
     private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
             TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory, new ThreadPoolExecutor.DiscardOldestPolicy());
 
-    protected final Map<T, List<EventListener<T>>> mEventListeners = new ConcurrentHashMap<>();
+    public final Map<T, List<EventListener<T>>> mEventListeners = new ConcurrentHashMap<>();
     protected final Queue<Event<T>> mEventQueue = new ConcurrentLinkedQueue<>();
     protected final Handler mCurrentThreadHandler = new Handler(Looper.myLooper());
     protected final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());

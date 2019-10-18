@@ -48,7 +48,6 @@ import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -60,7 +59,6 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.LeBluetooth;
-import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.ErrorReportEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -1151,23 +1149,6 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 currentGroupIndex = -1;
             }
         }
-
-//        if (groups.size() > 1) {
-//            for (int i = 0; i < groups.size(); i++) {
-//                if (i == groups.size() - 1) {
-//                    groups.get(i).checked = true;
-//                    currentGroupIndex = i;
-//                    SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-//                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-//                } else {
-//                    groups.get(i).checked = false;
-//                }
-//            }
-//            initHasGroup = true;
-//        } else {
-//            initHasGroup = false;
-//            currentGroupIndex = -1;
-//        }
     }
 
     @Override
@@ -1177,11 +1158,6 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() == null) {
             mApplication.startLightService(TelinkLightService.class);
         }
-//
-//        if(TelinkLightApplication.Companion.getApp().getConnectDevice()==null){
-//            autoConnect();
-//            mConnectTimer = createConnectTimeout();
-//        }
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -1195,20 +1171,15 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
         @Override
         public void start() {
-//            showLoadingDialog(getString(R.string.tip_start_sync));
-//            ToastUtils.showShort(R.string.uploading_data);
         }
 
         @Override
         public void complete() {
-//            ToastUtils.showShort(R.string.upload_data_success);
-//            hideLoadingDialog();
         }
 
         @Override
         public void error(String msg) {
             ToastUtils.showLong(R.string.upload_data_failed);
-//            hideLoadingDialog();
         }
 
     };
@@ -1230,11 +1201,8 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
         private List<DbConnector> lights;
 
-        private Context context;
-
         public DeviceListAdapter(List<DbConnector> connectors, Context mContext) {
             lights = connectors;
-            context = mContext;
         }
 
         @Override
@@ -1334,25 +1302,10 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     /*********************************泰凌微后台数据部分*********************************************/
 
     /**
-     * 事件处理方法
-     *
-     * @param event
-     */
-
-    private void onNError(final DeviceEvent event) {
-        TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
-            instance.idleMode(true);
-        TelinkLog.d("DeviceScanningActivity#onNError");
-        onLeScanTimeout();
-    }
-
-    /**
      * 扫描不到任何设备了
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance!=null)
@@ -1373,106 +1326,8 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    private void addDevice(DeviceInfo deviceInfo) {
-        int meshAddress = deviceInfo.meshAddress & 0xFF;
-        DbConnector light = this.adapter.get(meshAddress);
-
-        if (light == null) {
-            light = new DbConnector();
-            light.setName(getString(R.string.unnamed));
-            light.setMeshAddr(meshAddress);
-            light.textColor = this.getResources().getColor(
-                    R.color.black);
-            light.setBelongGroupId(allLightId);
-            light.setMacAddr(deviceInfo.macAddress);
-            light.setProductUUID(deviceInfo.productUUID);
-            light.setSelected(false);
-            this.adapter.add(light);
-            this.adapter.notifyDataSetChanged();
-            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
-        }
-    }
 
     private DeviceInfo bestRssiDevice = null;
-
-    private void onDeviceStatusChanged(DeviceEvent event) {
-
-        DeviceInfo deviceInfo = event.getArgs();
-
-        switch (deviceInfo.status) {
-            case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
-                //加灯完成继续扫描,直到扫不到设备
-                com.dadoutek.uled.model.DeviceInfo deviceInfo1 = new com.dadoutek.uled.model.DeviceInfo();
-                deviceInfo1.deviceName = deviceInfo.deviceName;
-                deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
-                deviceInfo1.longTermKey = deviceInfo.longTermKey;
-                deviceInfo1.macAddress = deviceInfo.macAddress;
-                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
-                deviceInfo1.meshAddress = deviceInfo.meshAddress;
-                deviceInfo1.meshUUID = deviceInfo.meshUUID;
-                deviceInfo1.productUUID = deviceInfo.productUUID;
-                deviceInfo1.status = deviceInfo.status;
-                deviceInfo1.meshName = deviceInfo.meshName;
-                if (bestRssiDevice == null) {
-                    bestRssiDevice = deviceInfo;
-                    if (bestRssiDevice.rssi < deviceInfo.rssi) {
-                        bestRssiDevice = deviceInfo;
-                    }
-                }
-//                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
-
-                new Thread(() -> this.mApplication.getMesh().saveOrUpdate(this)).start();
-
-                if (scanCURTAIN) {
-                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_RELAY) {
-                        addDevice(deviceInfo);
-                    }
-                } else {
-                }
-
-                //扫描出灯就设置为非首次进入
-                if (isFirtst) {
-                    isFirtst = false;
-                    SharedPreferencesHelper.putBoolean(this, SplashActivity.IS_FIRST_LAUNCH, false);
-                }
-                toolbar.setTitle(getString(R.string.title_connector_lights_num, adapter.getCount()));
-                tvStopScan.setVisibility(View.VISIBLE);
-
-                Log.d("ScanningTest", "update mesh success");
-                mRetryCount = 0;
-//                this.startScan(0);
-                break;
-            case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
-                //加灯失败继续扫描
-                if (mRetryCount < MAX_RETRY_COUNT) {
-                    mRetryCount++;
-                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
-                    stopTimer();
-//                    this.startScan(0);
-                } else {
-                    Log.d("ScanningTest", "update mesh failed , do not retry");
-                }
-                break;
-
-            case LightAdapter.STATUS_ERROR_N:
-                this.onNError(event);
-                break;
-            case LightAdapter.STATUS_LOGIN:
-                Log.d("ScanningTest", "mConnectTimer = " + mConnectTimer);
-                if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
-                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
-                    mConnectTimer.dispose();
-                    isLoginSuccess = true;
-                    //进入分组
-                    hideLoadingDialog();
-                    startGrouping();
-                }
-                break;
-            case LightAdapter.STATUS_LOGOUT:
-                isLoginSuccess = false;
-                break;
-        }
-    }
 
 
 }

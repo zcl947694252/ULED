@@ -404,7 +404,6 @@
     <string name="register">Register</string>
     <string name="set_password">Set password</string>
     <string name="update_permission_tip">Please allow some permissions</string>
-    <string name="select_color_title">Select color</string>
     <string name="switch_mode">Light-open mode</string>
     <string name="delay_unit">Delay-time unit</string>
     <string name="edit">Edit</string>
@@ -564,7 +563,6 @@
     <string name="str_strobe">Strobe</string>
     <string name="save">Save</string>
     <string name="diy_action_tip">Click the button to change the color, long press to delete the color</string>
-    <string name="color_check">Selection of color</string>
     <string name="name_not_null_tip">Name cannot be empty</string>
     <string name="mode_str">Mode</string>
     <string name="save_gradient_dialog_tip">Save gradient…</string>
@@ -898,5 +896,6 @@
     <string name="cancel_timer">Expiration countdown:</string>
     <string name="authorization_warm">The receiver will have only control, not management</string>
     <string name="get_version_fail">Failed to get device version number</string>
+    <string name="please_select_update_file">Select OTA files to upgrade</string>
 
 </resources>

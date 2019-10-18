@@ -24,7 +24,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*

@@ -94,7 +94,7 @@ import io.reactivex.schedulers.Schedulers;
  * <p>
  * 校验通过后，会开始动作
  * <p>
- *  todo 人体感应器在线升级速度过快可能有bug
+ * todo 人体感应器在线升级速度过快可能有bug
  * Action Start by choose correct bin file!
  * <p>
  * Created by Administrator on 2017/4/20.
@@ -201,7 +201,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     case BluetoothAdapter.STATE_ON: {
                         log("蓝牙打开");
                         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
+                        if (instance != null)
                             instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
@@ -210,7 +210,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
                         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
+                        if (instance != null)
                             instance.idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
@@ -245,9 +245,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         lightVersion = getIntent().getStringExtra(Constant.OTA_VERSION);
         boolean b = "".equals(lightVersion) || lightVersion == null;
         btn_start_update.setClickable(!b);
-        if (b){
-            btn_start_update.setText(getString(R.string.get_server_version_fail));
+        if (b) {
+            btn_start_update.setText(getString(R.string.get_version_fail));
             TmtUtils.midToastLong(this, getString(R.string.get_server_version_fail));
+        } else {
+            local_version.setVisibility(View.VISIBLE);
+            local_version.setText(getString(R.string.local_version, lightVersion));
         }
         log("current-light-mesh" + lightMeshAddr);
         autoConnect();
@@ -271,8 +274,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
                 if (TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
                     TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+                    if (instance != null)
+                        instance.idleMode(true);
                     return;
                 }
 
@@ -326,9 +329,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         sv_log = findViewById(R.id.sv_log);
         tv_version = findViewById(R.id.tv_version);
 
-        if (SharedPreferencesUtils.isDeveloperModel()){
+        if (SharedPreferencesUtils.isDeveloperModel()) {
             select.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             select.setVisibility(View.GONE);
         }
     }
@@ -358,7 +361,13 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 chooseFile();
                 break;
             case R.id.btn_start_update:
-                beginToOta();
+                LogUtils.e("zcl 升级路径--" + mPath);
+                if (SharedPreferencesUtils.isDeveloperModel() && mPath == null) {
+                    TmtUtils.midToastLong(this, getString(R.string.please_select_update_file));
+                    return;
+                } else {
+                    beginToOta();
+                }
                 break;
         }
     }
@@ -467,8 +476,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
         this.mode = MODE_COMPLETE;
         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+        if (instance != null)
+            instance.idleMode(true);
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }
@@ -531,8 +540,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             tv_version.setText("File Version: " + mFileVersion);
             tv_version.setVisibility(View.GONE);
 
-            local_version.setVisibility(View.VISIBLE);
-            local_version.setText(getString(R.string.local_version, lightVersion));
             server_version.setVisibility(View.VISIBLE);
             server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
 
@@ -590,8 +597,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+        if (instance != null)
+            instance.idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if (!AppUtils.Companion.isExynosSoc()) {
 
@@ -637,7 +644,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null) {
             OTA_IS_HAVEN_START = true;
-            LogUtils.e("zcl-----------升级版本"+mFirmwareData);
+            LogUtils.e("zcl-----------升级版本" + mFirmwareData);
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             //startScan();

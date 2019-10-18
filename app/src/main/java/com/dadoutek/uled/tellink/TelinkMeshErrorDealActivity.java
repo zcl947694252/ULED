@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.event.MeshEvent;
 import com.telink.util.ContextUtil;

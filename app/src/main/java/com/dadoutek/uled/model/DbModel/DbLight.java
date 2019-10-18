@@ -23,6 +23,7 @@ public class DbLight implements Serializable {
     private Long id;
     private int meshAddr;
     private String name;
+    private String deviceName;
     private int brightness;
     private int colorTemperature;
     private String macAddr;
@@ -60,13 +61,14 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 1472949581)
-    public DbLight(Long id, int meshAddr, String name, int brightness,
-            int colorTemperature, String macAddr, int meshUUID, int productUUID,
-            Long belongGroupId, int index, int color, int status) {
+    @Generated(hash = 2051794788)
+    public DbLight(Long id, int meshAddr, String name, String deviceName,
+            int brightness, int colorTemperature, String macAddr, int meshUUID,
+            int productUUID, Long belongGroupId, int index, int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
+        this.deviceName = deviceName;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.macAddr = macAddr;
@@ -210,10 +212,6 @@ public class DbLight implements Serializable {
         this.icon = icon;
     }
 
-    public String getLabel() {
-        return Integer.toString(this.getMeshAddr(), 16) + ":" + this.brightness;
-    }
-
     public void updateIcon() {
 
         if (this.status == ConnectionStatus.OFFLINE.getValue()) {
@@ -265,6 +263,7 @@ public class DbLight implements Serializable {
                 "id=" + id +
                 ", meshAddr=" + meshAddr +
                 ", name='" + name + '\'' +
+                ", deviceName='" + deviceName + '\'' +
                 ", brightness=" + brightness +
                 ", colorTemperature=" + colorTemperature +
                 ", macAddr='" + macAddr + '\'' +
@@ -281,5 +280,13 @@ public class DbLight implements Serializable {
                 ", status=" + status +
                 ", icon=" + icon +
                 '}';
+    }
+
+    public String getDeviceName() {
+        return this.deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 }

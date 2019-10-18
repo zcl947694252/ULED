@@ -20,6 +20,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.LifecycleEvent
+import java.util.*
 
 
 class TelinkLightApplication : TelinkApplication() {
@@ -34,6 +35,10 @@ class TelinkLightApplication : TelinkApplication() {
     private var stompLifecycleDisposable: Disposable? = null
     private lateinit var mStompManager: StompManager
     private var singleLoginTopicDisposable: Disposable? = null
+    private var  MIN_CLICK_DELAY_TIME = 10000
+    private var  lastClickTime:Long= 0
+    private
+
     var mCancelAuthorTopicDisposable: Disposable? = null
     var paserCodedisposable: Disposable? = null
 
@@ -152,6 +157,11 @@ class TelinkLightApplication : TelinkApplication() {
                         LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
                         LifecycleEvent.Type.CLOSED -> {
                             LogUtils.d("zcl_Stomp******Stomp connection closed")
+                                var currentTime = Calendar.getInstance().timeInMillis
+                                if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
+                                    lastClickTime = currentTime
+                                    initStompClient()
+                                }
                         }
                     }
                 }, { ToastUtils.showShort(it.localizedMessage)})

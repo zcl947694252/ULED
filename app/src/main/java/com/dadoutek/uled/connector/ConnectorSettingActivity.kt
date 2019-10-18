@@ -20,8 +20,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
@@ -32,7 +34,6 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAConnectorActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
@@ -103,16 +104,16 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             }
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        (this as ConnectorSettingActivity).showLoadingDialog(getString(R.string.deleting))
+                        this.showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getConnectorByGroupID(group!!.id), group!!,
                                 successCallback = {
-                                    (this as ConnectorSettingActivity).hideLoadingDialog()
+                                    (this ).hideLoadingDialog()
                                     this?.setResult(Constant.RESULT_OK)
                                     this?.finish()
                                 },
                                 failedCallback = {
-                                    (this as ConnectorSettingActivity).hideLoadingDialog()
+                                    (this ).hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
@@ -131,32 +132,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun renameGroup() {
-//        val intent = Intent(this, RenameActivity::class.java)
-//        intent.putExtra("group", group)
-//        startActivity(intent)
-//        this?.finish()
-
-
-//        editTitle.visibility=View.VISIBLE
-//        titleCenterName.visibility=View.GONE
-//        editTitle?.setFocusableInTouchMode(true)
-//        editTitle?.setFocusable(true)
-//        editTitle?.requestFocus()
-//        editTitle.setSelection(editTitle.getText().toString().length)
-//        tvRename.visibility = View.VISIBLE
-//        tvRename.setText(android.R.string.ok)
-//        tvRename.setOnClickListener {
-//            saveName()
-//            tvRename.visibility = View.GONE
-//        }
-//        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-//        editTitle?.setOnEditorActionListener(this)
-
         val textGp = EditText(this)
         textGp.setText(group?.name)
         StringUtils.initEditTextFilter(textGp)
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this@ConnectorSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
@@ -190,25 +169,23 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
                         DBUtils.deleteConnector(light!!)
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.getMeshAddr())) {
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
                         if (mConnectDevice != null) {
-                            Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                            Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + light?.getMeshAddr())
+                            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
                             if (light?.meshAddr == mConnectDevice?.meshAddress) {
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                             }
                         }
                         this.finish()
-
-
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                         this.finish()
@@ -279,7 +256,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -293,16 +269,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     private fun saveName() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-        editTitle?.setFocusableInTouchMode(false)
-        editTitle?.setFocusable(false)
+        imm.hideSoftInputFromWindow(editTitle?.windowToken, 0)
+        editTitle?.isFocusableInTouchMode = false
+        editTitle?.isFocusable = false
         if (!currentShowPageGroup) {
             checkAndSaveName()
             isRenameState = false
@@ -363,7 +338,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 //        }else{
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe({ granted ->
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
@@ -374,11 +349,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                }))
+                })
 //        }
     }
 
-    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
         override fun downLoadFileStart() {
             showLoadingDialog(getString(R.string.get_update_file))
@@ -418,36 +393,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun renameGp() {
-//        val intent = Intent(this, RenameActivity::class.java)
-//        intent.putExtra("group", group)
-//        startActivity(intent)
-//        this?.finish()
-//        editTitle.visibility=View.VISIBLE
-//        titleCenterName.visibility=View.GONE
-//        isRenameState=true
-//        tvOta.setText(android.R.string.ok)
-//        editTitle?.setFocusableInTouchMode(true)
-//        editTitle?.setFocusable(true)
-//        editTitle?.requestFocus()
-//        //设置光标默认在最后
-//        editTitle.setSelection(editTitle.getText().toString().length)
-////        btn_sure_edit_rename.visibility = View.VISIBLE
-////        btn_sure_edit_rename.setOnClickListener {
-////            saveName()
-////            btn_sure_edit_rename.visibility = View.GONE
-////        }
-//        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-//        editTitle?.setOnEditorActionListener(this)
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this@ConnectorSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
@@ -462,7 +416,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//       //("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+        LogUtils.e("onErrorReport current device mac ")
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
@@ -524,7 +478,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe({
-                            com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
+                            LogUtils.d("STATUS_LOGOUT")
                             showLoadingDialog(getString(R.string.connect_fail))
                             finish()
                         },{})
@@ -543,7 +497,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     override fun onResume() {
         super.onResume()
         addEventListeners()
-//        test()
     }
 
     override fun onStop() {

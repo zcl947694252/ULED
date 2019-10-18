@@ -11,9 +11,9 @@ import android.view.*
 import android.widget.SeekBar
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog

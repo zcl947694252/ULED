@@ -3,7 +3,6 @@ package com.dadoutek.uled.light
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -33,7 +32,6 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
                 if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
-//                    LogUtils.d("pos = " + helper.adapterPosition + " meshAddr = " + scene.getMeshAddr())
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
@@ -42,7 +40,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 }
             }
 
-            tvLightName.setText(scene.getName())
+            tvLightName.text = scene.name
 
             val myGrad = tvRgbColor.background as GradientDrawable
             if (scene.getColor() == 0 || scene.getColor() == 0xffffff) {

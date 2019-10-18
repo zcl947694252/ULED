@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -37,7 +38,6 @@ import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -669,23 +669,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 connectFailedDeviceMacList.clear()
             }
         }
-    }
-
-
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
-
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
     }
 
     fun notifyData() {

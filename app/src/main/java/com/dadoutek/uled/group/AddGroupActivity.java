@@ -3,7 +3,7 @@ package com.dadoutek.uled.group;
 import android.os.Bundle;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.base.TelinkBaseActivity;
 
 public class AddGroupActivity extends TelinkBaseActivity {
 

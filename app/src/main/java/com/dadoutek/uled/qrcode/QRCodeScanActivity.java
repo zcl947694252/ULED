@@ -5,7 +5,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.base.TelinkBaseActivity;
 
 /**
  * 二维码扫描页面

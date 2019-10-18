@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit
  *
  */
 object RecoverMeshDeviceUtil {
-    private val rxBleClient: RxBleClient = RxBleClient.create(TelinkLightApplication.getApp())
+    val rxBleClient: RxBleClient = RxBleClient.create(TelinkLightApplication.getApp())
 
     private val createdDeviceList: MutableList<DeviceInfo> = mutableListOf()  //需要重新配置的设备的mac地址
 
-    private val SCAN_TIMEOUT_SECONDS: Long = 20
+    val SCAN_TIMEOUT_SECONDS: Long = 20
 
 
     private fun getAllDeviceAddressList(): List<Int> {
@@ -50,7 +50,8 @@ object RecoverMeshDeviceUtil {
                 .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
 
-        LogUtils.d("findMeshDevice name add前 = $deviceName")
+
+        LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
                 .map { parseData(it) }          //解析数据
@@ -67,6 +68,7 @@ object RecoverMeshDeviceUtil {
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+
     }
 
 
@@ -146,9 +148,8 @@ object RecoverMeshDeviceUtil {
      * 解析数据
      * @return 返回DbLight对象
      */
-    private fun parseData(scanResult: ScanResult): DeviceInfo? {
+    fun parseData(scanResult: ScanResult): DeviceInfo? {
         val scanRecord = scanResult.scanRecord.bytes
-
         val length = scanRecord.size
         var packetPosition = 0
         var packetContentLength: Int
@@ -158,8 +159,6 @@ object RecoverMeshDeviceUtil {
         var meshName: ByteArray? = null
 
         var rspData = 0
-
-
 
         while (packetPosition < length) {
 
@@ -199,6 +198,7 @@ object RecoverMeshDeviceUtil {
 
 
                     val deviceInfo = DeviceInfo()
+                    deviceInfo.rssi =scanResult.rssi
 //                    deviceInfo.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
                     deviceInfo.meshAddress = meshAddress
 //                    light.textColor = TelinkLightApplication.getApp().getColor(
@@ -207,6 +207,8 @@ object RecoverMeshDeviceUtil {
                     deviceInfo.macAddress = scanResult.bleDevice.macAddress
                     deviceInfo.meshUUID = meshUUID
                     deviceInfo.productUUID = productUUID
+//                    LogUtils.e("zcl---------productUUID----$productUUID")
+
 //                    light.isSelected = false
 //                    LogUtils.d("deviceInfo = $deviceInfo")
                     return deviceInfo

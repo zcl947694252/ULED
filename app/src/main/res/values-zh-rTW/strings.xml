@@ -404,7 +404,6 @@
     <string name="register">注册</string>
     <string name="set_password">设置密码</string>
     <string name="update_permission_tip">请同意相关权限才能升级</string>
-    <string name="select_color_title">颜色选择</string>
     <string name="switch_mode">开关灯方式</string>
     <string name="delay_unit">延时时间单位</string>
     <string name="edit">修改</string>
@@ -512,7 +511,6 @@
     <string name="str_strobe">频闪</string>
     <string name="save">保存</string>
     <string name="diy_action_tip">点击按钮修改颜色,长按删除颜色</string>
-    <string name="color_check">颜色选择</string>
     <string name="name_not_null_tip">名称不可以为空</string>
     <string name="mode_str">模式</string>
     <string name="save_gradient_dialog_tip">保存渐变中...</string>

@@ -47,11 +47,11 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
                     if (group.connectionStatus == ConnectionStatus.ON.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
-                                .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
+                                .setImageResource(R.id.btn_off, R.drawable.icon_down)
                                 .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
                                 .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.black_nine))
                     } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
-                        helper.setImageResource(R.id.btn_on, R.drawable.icon_down_group)
+                        helper.setImageResource(R.id.btn_on, R.drawable.icon_down)
                                 .setImageResource(R.id.btn_off, R.drawable.icon_open_group)
                                 .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.black_nine))
                                 .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.white))
@@ -60,8 +60,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                     setNoClik(helper)
                 }
 
-                helper.addOnClickListener(R.id.btn_set)
-                        .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                helper.addOnClickListener(R.id.btn_set).setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
             }else if (num<=0){
                 setNoClik(helper)
             }
@@ -86,8 +85,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
     }
 
     private fun setNoClik(helper: BaseViewHolder) {
-        helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
-                .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
+        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group_no)
+                .setImageResource(R.id.btn_on, R.drawable.icon_open_group_no)
                 .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
                 .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
                 .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.color_c8))

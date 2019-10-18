@@ -145,6 +145,10 @@
             android:name=".switches.SwitchDeviceDetailsActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".group.BatchGroupFourDevice"
+            android:screenOrientation="portrait" />
+
 
         <activity
             android:name=".othersview.SplashActivity"
@@ -297,7 +301,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".tellink.TelinkBaseActivity"
+            android:name=".base.TelinkBaseActivity"
             android:screenOrientation="portrait" />
 
         <activity

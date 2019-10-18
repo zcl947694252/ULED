@@ -21,7 +21,7 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers

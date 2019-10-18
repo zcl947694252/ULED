@@ -29,7 +29,6 @@ import android.widget.Toast
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.allenliu.versionchecklib.v2.builder.UIData
 import com.allenliu.versionchecklib.v2.callback.CustomVersionDialogListener
-import com.allenliu.versionchecklib.v2.ui.VersionService.builder
 import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -37,6 +36,7 @@ import com.blankj.utilcode.util.ProcessUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.group.GroupListFragment
@@ -54,7 +54,6 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.switches.ScanningSwitchActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -126,8 +125,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
 
-    private val mRxPermission = RxPermissions(this)
-
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -154,7 +151,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
-       // addEventListeners()
         GlobalScope.launch {
             TelinkLightApplication.getApp().initStompClient()
         }
@@ -179,17 +175,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         })
         mCompositeDisposable.add(disposable)
     }
-
-    private fun addEventListeners() {
-        // 监听各种事件
-        mApplication?.removeEventListener(this)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-
 
     /**
      * 检查App是否有新版本
@@ -232,8 +217,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun LogOutAndExitApp() {
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
+        this.mApplication?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
-
         //重启app并杀死原进程
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
@@ -443,7 +428,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     /**
-     * 检查App版本是否可用
+     * 检查App版本是否可用  报用户不存在  版本失败
+     *  <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Length: 92
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Connection: keep-alive
+    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: {"data":null,"errorCode":20001,"serverTime":1570865397299,"message":"20001 用户不存在"}
      */
     private fun checkVersionAvailable() {
         var version = packageName(this)
@@ -461,26 +453,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         ToastUtils.showLong(R.string.get_server_version_fail)
                     }
                 })
-    }
-
-
-    private fun CreateDialog(t: VersionBean) {
-        builder = AllenVersionChecker
-                .getInstance()
-                .downloadOnly(crateUIData(t))
-        //下载完毕直接安装
-        builder.isDirectDownload = true
-        builder.isShowNotification = false
-        builder.isShowDownloadingDialog = false
-        builder.isShowDownloadFailDialog = false
-
-        builder.customVersionDialogListener = createCustomDialogOne(t)
-        builder.setForceUpdateListener { forceUpdate() }
-        builder.executeMission(this)
-    }
-
-    private fun forceUpdate() {
-        //上传数据，推出登录
     }
 
     private fun createCustomDialogOne(t: VersionBean): CustomVersionDialogListener {
@@ -551,7 +523,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onPause() {
         super.onPause()
         disableConnectionStatusListener()
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
         mCompositeDisposable.clear()
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
@@ -568,7 +540,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-        enableConnectionStatusListener()
+       // enableConnectionStatusListener()
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -591,18 +563,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
-
     override fun changeToScene() {
         transScene()
     }
@@ -611,11 +571,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         tranHome()
     }
 
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
-    }
 
 
+    @SuppressLint("CheckResult")
     fun autoConnect() {
         //如果支持蓝牙就打开蓝牙
         if (LeBluetooth.getInstance().isSupport(applicationContext))
@@ -628,7 +586,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             hideLocationServiceDialog()
             mTelinkLightService = TelinkLightService.Instance()
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                val rx = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -715,7 +673,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightApplication.getApp().releseStomp()
 
         //移除事件
-        this.mApplication?.removeEventListeners()
+        this.mApplication?.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()

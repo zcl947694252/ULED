@@ -11,7 +11,6 @@ import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
 import android.widget.GridView
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -21,8 +20,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
@@ -61,7 +59,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showLong(R.string.group_fail)
             } else {
                 showLoadingDialog(getString(R.string.grouping))
-
+                var allocDeviceGroupCount = 2
                 object : Thread({
                     //发两次，确保成功
                     for (i in 0..1) {
@@ -89,9 +87,12 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                             DBUtils.updateGroup(group)
                             DBUtils.updateLight(mLight)
                             runOnUiThread {
-                                hideLoadingDialog()
-                                ActivityUtils.finishActivity(RGBSettingActivity::class.java)
-                                finish()
+                                if (allocDeviceGroupCount - 1 == 0) {
+                                    hideLoadingDialog()
+                                    finish()
+                                }else{
+                                    allocDeviceGroupCount--
+                                }
                             }
                         }, {
                             runOnUiThread {
@@ -99,7 +100,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                                 ToastUtils.showShort(R.string.group_failed)
                             }
                         })
-                        sleep(100)
                     }
                 }) {
                 }.start()
@@ -185,7 +185,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         mGroupList?.clear()
         for (i in list.indices) {
-             if (mLight!!.productUUID == DeviceType.LIGHT_NORMAL ||
+            if (mLight!!.productUUID == DeviceType.LIGHT_NORMAL ||
                     mLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
                     mLight!!.productUUID == 0x00) {
                 if (OtherUtils.isNormalGroup(list[i])) {
@@ -209,8 +209,8 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private fun setGroupChecked() {
         for (group in mGroupList) {
             group.checked = group.id == mLight.belongGroupId
-           /* if (group.checked)
-                break*/
+            /* if (group.checked)
+                 break*/
         }
     }
 

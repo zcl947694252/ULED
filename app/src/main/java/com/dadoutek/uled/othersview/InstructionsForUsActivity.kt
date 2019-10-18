@@ -2,16 +2,13 @@ package com.dadoutek.uled.othersview
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.View
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 
 class InstructionsForUsActivity : TelinkBaseActivity() {
 

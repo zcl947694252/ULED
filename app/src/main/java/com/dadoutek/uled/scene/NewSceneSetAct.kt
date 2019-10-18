@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -27,13 +28,10 @@ import com.dadoutek.uled.model.DeviceType.SMART_RELAY
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * 描述	      ${设置场景颜色盘}$
@@ -86,10 +84,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     /**
      * 根据EditText所在坐标和用户点击的坐标相对比，来判断是否隐藏键盘，因为当用户点击EditText时则不能隐藏
-     *
-     * @param v
-     * @param event
-     * @return
      */
     private fun isShouldHideKeyboard(v: View?, event: MotionEvent): Boolean {
         if (v != null && v is EditText) {
@@ -154,6 +148,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
         if (isChangeScene && !isResult) {
             scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
+            edit_name.setText(scene?.name)
+            //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
@@ -178,7 +174,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initChangeState() {
-        showCheckListData = DBUtils.allGroups
+        if (showCheckListData == null)
+            showCheckListData = mutableListOf()
+        showCheckListData?.clear()
+        val allGroups = DBUtils.allGroups
+        LogUtils.e("zcl---------所有灯组${DBUtils.allGroups}")
+        for (gp in allGroups)
+            if (gp.deviceCount > 0||"所有灯"==gp.name)
+                showCheckListData?.add(gp)
+        LogUtils.e("zcl----------$showCheckListData")
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
                 for (j in showGroupList!!.indices) {
@@ -233,10 +237,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private fun showExitSaveDialog() {
         val exitDialogBuilder = AlertDialog.Builder(this)
         exitDialogBuilder.setMessage(getString(R.string.save_scene_tip))
-        exitDialogBuilder.setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+        exitDialogBuilder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             save()
         }
-        exitDialogBuilder.setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+        exitDialogBuilder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
             finish()
         }
 
@@ -307,6 +311,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
+        if (showCheckListData != null)
+            showCheckListData?.remove(showCheckListData!![position])
         adapter.remove(position)
     }
 
@@ -350,13 +356,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_name.isFocusableInTouchMode = true
         edit_name.requestFocus()
         edit_name.setOnClickListener(this)
-        val timer = Timer()
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputManager.showSoftInput(edit_name, 0)
-            }
-        }, 200)
+
+        val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.showSoftInput(edit_name, 0)
 
         initChangeState()
 
@@ -364,14 +366,14 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_select_group_list_view.layoutManager = layoutmanager
 
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, this!!.showCheckListData!!)
         var list = ArrayList<DbGroup>()
         for (h in showCheckListData!!.indices) {
             if (!OtherUtils.isCurtain(showCheckListData!![h]) || !OtherUtils.isConnector(showCheckListData!![h])) {
                 list!!.add(showCheckListData!![h])
             }
         }
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list)
+
 
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener = onItemClickListenerCheck
@@ -392,7 +394,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 }
 
                 if (i > 0 && showCheckListData!![i].checked) {
-                    isAllCanCheck = false
+                    isAllCanCheck = false//有其他组选中的情况下不允许再次选中所有组
                 }
             }
         }
@@ -414,7 +416,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun save() {
         saveCurrenEditResult()
-        if (showGroupList!!.size == 0) {
+
+        if (edit_name.text.toString().isEmpty()) {
+            ToastUtils.showLong(getString(R.string.name_can_not_null))
+            return
+        }
+
+        if (showGroupList!!.size <= 0) {
             ToastUtils.showLong(R.string.add_scene_gp_tip)
             return
         }
@@ -428,64 +436,50 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveCurrenEditResult() {
-        if (checkName()) {
-            editSceneName = edit_name.text.toString()
-            val oldResultItemList = ArrayList<ItemGroup>()
-            val newResultItemList = ArrayList<ItemGroup>()
+        editSceneName = edit_name.text.toString()
+        val oldResultItemList = ArrayList<ItemGroup>()
+        val newResultItemList = ArrayList<ItemGroup>()
 
-            for (i in showCheckListData!!.indices) {
-                if (showCheckListData!![i].checked) {
-                    if (showGroupList!!.size == 0) {
-                        val newItemGroup = ItemGroup()
-                        newItemGroup.brightness = 50
-                        newItemGroup.temperature = 50
-                        newItemGroup.color = 0xffffff
-                        newItemGroup.checked = true
-                        newItemGroup.enableCheck = true
-                        newItemGroup.gpName = showCheckListData!![i].name
-                        newItemGroup.groupAress = showCheckListData!![i].meshAddr
-                        newResultItemList.add(newItemGroup)
-                    } else {
-                        for (j in showGroupList!!.indices) {
-                            if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
-                                oldResultItemList.add(showGroupList!![j])
-                                break
-                            } else if (j == showGroupList!!.size - 1) {
-                                val newItemGroup = ItemGroup()
-                                newItemGroup.brightness = 50
-                                newItemGroup.temperature = 50
-                                newItemGroup.color = 0xffffff
-                                newItemGroup.checked = true
-                                newItemGroup.enableCheck = true
-                                newItemGroup.gpName = showCheckListData!![i].name
-                                newItemGroup.groupAress = showCheckListData!![i].meshAddr
-                                newResultItemList.add(newItemGroup)
-                            }
+        for (i in showCheckListData!!.indices) {
+            if (showCheckListData!![i].checked) {
+                if (showGroupList!!.size == 0) {
+                    val newItemGroup = ItemGroup()
+                    newItemGroup.brightness = 50
+                    newItemGroup.temperature = 50
+                    newItemGroup.color = 0xffffff
+                    newItemGroup.checked = true
+                    newItemGroup.enableCheck = true
+                    newItemGroup.gpName = showCheckListData!![i].name
+                    newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                    newResultItemList.add(newItemGroup)
+                } else {
+                    for (j in showGroupList!!.indices) {
+                        if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
+                            oldResultItemList.add(showGroupList!![j])
+                            break
+                        } else if (j == showGroupList!!.size - 1) {
+                            val newItemGroup = ItemGroup()
+                            newItemGroup.brightness = 50
+                            newItemGroup.temperature = 50
+                            newItemGroup.color = 0xffffff
+                            newItemGroup.checked = true
+                            newItemGroup.enableCheck = true
+                            newItemGroup.gpName = showCheckListData!![i].name
+                            newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                            newResultItemList.add(newItemGroup)
                         }
                     }
                 }
             }
-            showGroupList?.clear()
-            showGroupList?.addAll(oldResultItemList)
-            showGroupList?.addAll(newResultItemList)
         }
-    }
-
-    private fun checkName(): Boolean {
-        if (edit_name.text.toString().isEmpty()) {
-            ToastUtils.showLong(getString(R.string.name_can_not_null))
-            return false
-        }
-        return true
+        showGroupList?.clear()
+        showGroupList?.addAll(oldResultItemList)
+        showGroupList?.addAll(newResultItemList)
     }
 
     private fun saveScene() {
         if (checked()) {
-//            if(notCheckedGroupList?.size?:0>0){
-//                showChangeOtherGroupCloseDialog()
-//            }else{
             saveAndFinish()
-//            }
         }
     }
 
@@ -559,18 +553,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x04
                     DBUtils.saveSceneActions(sceneActions)
                 }
-//                sceneActions.belongSceneId = idAction
-//                sceneActions.brightness = itemGroups.get(i).brightness
-//                sceneActions.setColor(itemGroups.get(i).color)
-//                sceneActions.colorTemperature = itemGroups.get(i).temperature
-                //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
-                //                sceneActions.setGroupAddr(0xFFFF);
-                //                DBUtils.saveSceneActions(sceneActions);
-                //                break;
-//                //            } else {
-//                sceneActions.groupAddr = itemGroups.get(i).groupAress
-//                DBUtils.saveSceneActions(sceneActions)
-                //            }
             }
 
             try {
@@ -671,56 +653,61 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
             scene?.name = name
             DBUtils.updateScene(scene!!)
-            val idAction = scene?.getId()!!
+            val idAction = scene?.id!!
 
             DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.getId()!!))
 
             for (i in itemGroups!!.indices) {
                 val sceneActions = DbSceneActions()
 
-                if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
-                    sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
-                    sceneActions.deviceType = 0x10
-                    sceneActions.isOn = itemGroups.get(i).isNo
+                when {
+                    OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress)) -> {
+                        sceneActions.belongSceneId = idAction
+                        sceneActions.brightness = itemGroups[i].brightness
+                        sceneActions.colorTemperature = itemGroups[i].temperature
+                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.setColor(itemGroups[i].color)
+                        sceneActions.deviceType = 0x10
+                        sceneActions.isOn = itemGroups[i].isNo
 
 
-                    nameList.add(itemGroups[i].groupAress)
-                    DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
-                    sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups[i].brightness
-                    sceneActions.colorTemperature = itemGroups[i].temperature
-                    sceneActions.groupAddr = itemGroups[i].groupAress
-                    sceneActions.setColor(itemGroups[i].color)
-                    sceneActions.deviceType = 0x05
-                    sceneActions.isOn = itemGroups[i].isNo
+                        nameList.add(itemGroups[i].groupAress)
+                        DBUtils.saveSceneActions(sceneActions)
+                    }
+                    OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress)) -> {
+                        sceneActions.belongSceneId = idAction
+                        sceneActions.brightness = itemGroups[i].brightness
+                        sceneActions.colorTemperature = itemGroups[i].temperature
+                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.setColor(itemGroups[i].color)
+                        sceneActions.deviceType = 0x05
+                        sceneActions.isOn = itemGroups[i].isNo
 
-                    nameList.add(itemGroups[i].groupAress)
-                    DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAress))) {
-                    sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups[i].brightness
-                    sceneActions.colorTemperature = itemGroups[i].temperature
-                    sceneActions.groupAddr = itemGroups[i].groupAress
-                    sceneActions.setColor(itemGroups[i].color)
+                        nameList.add(itemGroups[i].groupAress)
+                        DBUtils.saveSceneActions(sceneActions)
+                    }
+                    OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAress)) -> {
+                        sceneActions.belongSceneId = idAction
+                        sceneActions.brightness = itemGroups[i].brightness
+                        sceneActions.colorTemperature = itemGroups[i].temperature
+                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.setColor(itemGroups[i].color)
 
-                    sceneActions.deviceType = 0x06
-                    nameList.add(itemGroups[i].groupAress)
-                    DBUtils.saveSceneActions(sceneActions)
-                } else {
-                    sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups[i].brightness
-                    sceneActions.colorTemperature = itemGroups[i].temperature
-                    sceneActions.groupAddr = itemGroups[i].groupAress
-                    sceneActions.setColor(itemGroups[i].color)
-                    sceneActions.deviceType = 0x04
+                        sceneActions.deviceType = 0x06
+                        nameList.add(itemGroups[i].groupAress)
+                        DBUtils.saveSceneActions(sceneActions)
+                    }
+                    else -> {
+                        sceneActions.belongSceneId = idAction
+                        sceneActions.brightness = itemGroups[i].brightness
+                        sceneActions.colorTemperature = itemGroups[i].temperature
+                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.setColor(itemGroups[i].color)
+                        sceneActions.deviceType = 0x04
 
-                    nameList.add(itemGroups[i].groupAress)
-                    DBUtils.saveSceneActions(sceneActions)
+                        nameList.add(itemGroups[i].groupAress)
+                        DBUtils.saveSceneActions(sceneActions)
+                    }
                 }
             }
 

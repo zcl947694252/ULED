@@ -22,7 +22,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_register.*

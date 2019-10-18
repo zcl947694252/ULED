@@ -43,7 +43,6 @@ import com.dadoutek.uled.model.DbModel.DbDeviceName
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.ItemTypeGroup
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
@@ -283,11 +282,11 @@ class GroupListFragment : BaseFragment() {
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
                 btnOn?.setBackgroundResource(R.drawable.icon_open_group)
-                btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                btnOff?.setBackgroundResource(R.drawable.icon_down)
                 onText?.setTextColor(resources.getColor(R.color.white))
                 offText?.setTextColor(resources.getColor(R.color.black_nine))
             } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                btnOn?.setBackgroundResource(R.drawable.icon_down)
                 btnOff?.setBackgroundResource(R.drawable.icon_open_group)
                 onText?.setTextColor(resources.getColor(R.color.black_nine))
                 offText?.setTextColor(resources.getColor(R.color.white))
@@ -419,7 +418,9 @@ class GroupListFragment : BaseFragment() {
             SharedPreferencesUtils.setDelete(false)
 
 
-            if (allGroup != null) {
+
+          /*取消广播否则容易全部改成开或者关
+          if (allGroup != null) {
                 if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
                     btnOn?.setBackgroundResource(R.drawable.icon_open_group)
                     btnOff?.setBackgroundResource(R.drawable.icon_down_group)
@@ -443,7 +444,7 @@ class GroupListFragment : BaseFragment() {
                                 .sendBroadcast(intent)
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -609,7 +610,7 @@ class GroupListFragment : BaseFragment() {
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
-                                showLoadingDialog(getString(R.string.deleting))
+                                //showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
                                 intent.putExtra("delete", "true")
                                 LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
@@ -663,10 +664,6 @@ class GroupListFragment : BaseFragment() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    override fun endCurrentGuide() {
-        super.endCurrentGuide()
     }
 
     private fun updateLights(isOpen: Boolean, group: DbGroup) {

@@ -48,7 +48,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var adaper: SceneRecycleListAdapter? = null
     private var toolbar: Toolbar? = null
     private var telinkLightApplication: TelinkLightApplication? = null
-    private var scenesListData: MutableList<DbScene>? = null
+    private var scenesListData: MutableList<DbScene> =  ArrayList()
     private var isDelete = false
     internal var builder: Builder? = null
     private var recyclerView: RecyclerView? = null
@@ -259,7 +259,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun initView() {
-        if (scenesListData!!.size > 0) {
+        if (scenesListData.size > 0) {
             recyclerView!!.visibility = View.VISIBLE
             no_scene!!.visibility = View.GONE
             addNewScene!!.visibility = View.VISIBLE
@@ -278,9 +278,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
         isDelete = false
         adaper!!.changeState(isDelete)
-        for (i in scenesListData!!.indices) {
-            if (scenesListData!![i].isSelected) {
-                scenesListData!![i].isSelected = false
+        for (i in scenesListData.indices) {
+            if (scenesListData[i].isSelected) {
+                scenesListData[i].isSelected = false
             }
         }
         adaper!!.notifyDataSetChanged()
@@ -308,9 +308,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             img_function1?.visibility = View.VISIBLE
             isDelete = false
             adaper!!.changeState(isDelete)
-            for (i in scenesListData!!.indices) {
-                if (scenesListData!![i].isSelected) {
-                    scenesListData!![i].isSelected = false
+            for (i in scenesListData.indices) {
+                if (scenesListData[i].isSelected) {
+                    scenesListData[i].isSelected = false
                 }
             }
             adaper!!.notifyDataSetChanged()
@@ -321,9 +321,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-            Log.e("TAG_SIZE", scenesListData!!.size.toString())
-            for (i in scenesListData!!.indices) {
-                if (scenesListData!![i].isSelected) {
+            Log.e("TAG_SIZE", scenesListData.size.toString())
+            for (i in scenesListData.indices) {
+                if (scenesListData[i].isSelected) {
                     val opcode = Opcode.SCENE_ADD_OR_DEL
                     val params: ByteArray
                     if (scenesListData!!.size > 0) {
@@ -337,7 +337,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     }
                 }
             }
-            refreshView()
+            refreshAllData()
+                refreshView()
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
         val dialog = builder.show()
@@ -385,7 +386,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     fun refreshView() {
         if (activity != null) {
             scenesListData = DBUtils.sceneList
-            if (scenesListData!!.size > 0) {
+
+            if (scenesListData.size > 0) {
                 if (recyclerView != null) {
                     recyclerView!!.visibility = View.VISIBLE
                     no_scene!!.visibility = View.GONE
@@ -409,9 +411,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
             isDelete = false
             adaper?.changeState(isDelete)
-            for (i in scenesListData!!.indices) {
-                if (scenesListData!![i].isSelected) {
-                    scenesListData!![i].isSelected = false
+            for (i in scenesListData.indices) {
+                if (scenesListData[i].isSelected) {
+                    scenesListData[i].isSelected = false
                 }
             }
             adaper?.notifyDataSetChanged()

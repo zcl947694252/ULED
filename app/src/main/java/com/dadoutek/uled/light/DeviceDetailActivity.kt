@@ -24,8 +24,10 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupActivity
+import com.dadoutek.uled.group.BatchGroupFourDevice
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -35,10 +37,8 @@ import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -740,13 +740,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
+                    batchGroup.visibility = View.VISIBLE
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this,
-                                BatchGroupActivity::class.java)
+                /*        val intent = Intent(this,BatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("lightType", "all_light")
+                        intent.putExtra("lightType", "all_light")*/
+                        val intent = Intent(this, BatchGroupFourDevice::class.java)
+                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_NORMAL)
                         startActivity(intent)
                     }
                 } else {
@@ -794,12 +795,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
 
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
+                    batchGroup.visibility = View.VISIBLE
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this, RgbBatchGroupActivity::class.java)
+                        /*val intent = Intent(this, RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("lightType", "all_light")
+                        intent.putExtra("lightType", "all_light")*/
+                        val intent = Intent(this, BatchGroupFourDevice::class.java)
+                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_RGB)
                         startActivity(intent)
                     }
                 } else {
@@ -901,13 +904,15 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
+                    batchGroup.visibility = View.VISIBLE
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this, RgbBatchGroupActivity::class.java)
+                        /*val intent = Intent(this, RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "rgb_light")
-                        intent.putExtra("rgb_light_group_name", rgbLightGroup)
+                        intent.putExtra("rgb_light_group_name", rgbLightGroup)*/
+                        val intent = Intent(this, BatchGroupFourDevice::class.java)
+                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_RGB)
                         startActivity(intent)
                     }
                 } else {
@@ -1005,21 +1010,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         }
         return lightsData
     }
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
 
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
-    }
 
     private fun addScanListeners() {
         this.mApplication?.removeEventListener(this)

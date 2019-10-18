@@ -42,7 +42,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.rgb.RgbBatchGroupActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -737,21 +737,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         }
     }
 
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { dialog, which ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
-
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
-    }
 
     @SuppressLint("CheckResult")
     private fun startScan() {

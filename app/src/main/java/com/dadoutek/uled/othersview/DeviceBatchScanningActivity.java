@@ -22,7 +22,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.MeshAddressGenerator;

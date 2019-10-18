@@ -49,7 +49,7 @@
             android:padding="5dp"
             android:text="@string/install_device"
             android:textColor="@color/white"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <ImageView
             android:id="@+id/img_function2"

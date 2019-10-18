@@ -5,6 +5,7 @@
 package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.os.Build;
@@ -106,7 +107,7 @@ public class LightAdapter {
     protected Context mContext;
     protected Parameters mParams;
     public LightController mLightCtrl;
-    private LightPeripherals mScannedLights;
+    private static LightPeripherals mScannedLights;
     private LightPeripherals mUpdateLights;
     private Handler mLoopHandler;
     private Runnable mLoopTask;
@@ -136,6 +137,7 @@ public class LightAdapter {
     private HandlerThread mThread;
     private boolean aBoolean;
     private long autoConnectScanLastTime;
+    private BluetoothGattService servicem;
 
     /********************************************************************************
      * Public API
@@ -468,25 +470,19 @@ public class LightAdapter {
     }
 
     synchronized public void updateMesh(Parameters params, Callback callback) {
-
         if (!this.isStarted.get())
             return;
-
         if (this.getMode() == MODE_UPDATE_MESH)
             return;
         TelinkLog.e("LightAdapter#updateMesh");
         this.setMode(MODE_IDLE);
-
         stopLeScan();
-
         this.mParams = params;
         this.mCallback = callback;
-
         Object updateObj = this.mParams.get(Parameters.PARAM_DEVICE_LIST);
         this.mUpdateLights.clear();
 
         if (updateObj != null) {
-
             if (updateObj instanceof DeviceInfo) {
                 DeviceInfo deviceInfo = (DeviceInfo) updateObj;
                 LightPeripheral peripheral = this.mScannedLights.get(deviceInfo.macAddress);
@@ -495,19 +491,13 @@ public class LightAdapter {
                     this.mUpdateLights.put(peripheral);
                 }
             } else if (updateObj instanceof Iterable) {
-                @SuppressWarnings("unchecked")
                 Iterable<DeviceInfo> iterable = (Iterable<DeviceInfo>) updateObj;
                 Iterator<DeviceInfo> iterator = iterable.iterator();
-
                 DeviceInfo deviceInfo;
-
                 while (iterator.hasNext()) {
-
                     deviceInfo = iterator.next();
-
                     if (deviceInfo != null) {
                         LightPeripheral peripheral = this.mScannedLights.get(deviceInfo.macAddress);
-
                         if (peripheral != null) {
                             peripheral.setNewMeshAddress(deviceInfo.meshAddress);
                             this.mUpdateLights.put(peripheral);
@@ -515,19 +505,15 @@ public class LightAdapter {
                     }
                 }
             }
-
         } else {
             this.mScannedLights.copyTo(this.mUpdateLights);
         }
-
         this.nextLightIndex.set(0);
         this.updateCount.set(0);
         this.lightCount = this.mUpdateLights.size();
         this.mLightCtrl.disconnect();
-
         this.setMode(MODE_UPDATE_MESH);
         this.setState(STATE_RUNNING);
-
         this.enableLoop(true);
     }
 
@@ -596,6 +582,7 @@ public class LightAdapter {
 
     private void stopLeScan() {
         mScanDelayHandler.removeCallbacks(startScanTask);
+
         LeBluetooth.getInstance().stopScan();
     }
 
@@ -822,7 +809,6 @@ public class LightAdapter {
             this.mCallback.onNotify(this.mLightCtrl.getCurrentLight(), getMode(),
                     opcode, src, params);
 
-//        Log.d("dadouDD", "onNotification: " + data[5]);
     }
 
     /********************************************************************************
@@ -852,7 +838,6 @@ public class LightAdapter {
 
         if (!ignoreStatus) {
             if (this.status.get() == newStatus) {
-//                Log.d("Saw", "return cause same status, status = " + newStatus);
                 return;
             }
         }
@@ -889,19 +874,13 @@ public class LightAdapter {
 
         if (this.mLoopHandler == null || this.mLoopTask == null)
             return;
-
         if (running) {
-
             if (!this.mainLoopRunning) {
-                this.mLoopHandler.postDelayed(this.mLoopTask,
-                        this.mInterval);
-//                this.mLoopHandler.post(this.mLoopTask);
+                this.mLoopHandler.postDelayed(this.mLoopTask, this.mInterval);
             }
-
         } else {
             this.mLoopHandler.removeCallbacks(this.mLoopTask);
         }
-
         this.mainLoopRunning = running;
     }
 
@@ -925,6 +904,10 @@ public class LightAdapter {
             this.mNotifyHandler.removeCallbacks(this.mNotifyTask);
             this.autoRefreshRunning = false;
         }
+    }
+
+    public static void addLightPeripheral(LightPeripheral light) {
+        mScannedLights.put(light);
     }
 
     public interface Callback {
@@ -1009,12 +992,10 @@ public class LightAdapter {
                 boolean isSingleScan = mParams.getBoolean(Parameters.PARAM_SCAN_TYPE_SINGLE, false);
 
                 if (isSingleScan) {
-
                     if (mScannedLights.size() == 0) {
                         mScannedLights.put(light);
                         mCallback.onLeScan(light, mode, scanRecord);
                     }
-
                 } else {
                     mScannedLights.put(light);
                     mCallback.onLeScan(light, mode, scanRecord);
@@ -1204,7 +1185,6 @@ public class LightAdapter {
     private final class ResetMeshListener implements EventListener<Integer> {
 
         private void onResetMeshSuccess() {
-
             TelinkLog.e("onResetMeshSuccess "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
@@ -1217,8 +1197,6 @@ public class LightAdapter {
                 setState(STATE_PENDING);
                 disconnect();
 
-//                updateCount.getAndIncrement();
-//                setState(STATE_RUNNING);
             }
         }
 
@@ -1404,9 +1382,7 @@ public class LightAdapter {
             }
 
             boolean isSingleScan = mParams.getBoolean(Parameters.PARAM_SCAN_TYPE_SINGLE, false);
-
             if (isSingleScan) {
-
                 if (mScannedLights.size() == 1) {
                     setStatus(STATUS_MESH_SCAN_COMPLETED);
                     idleMode(false);
@@ -1436,7 +1412,6 @@ public class LightAdapter {
         }
 
         private void update() {
-
             if (getState() == STATE_PENDING)
                 return;
 
@@ -1451,14 +1426,12 @@ public class LightAdapter {
             setState(STATE_PENDING);
 
             LightPeripheral light = mUpdateLights.get(nextLightIndex.getAndIncrement());
-
             if (light == null || light.meshChanged) {
                 setState(STATE_RUNNING);
                 return;
             }
 
-            int timeoutSeconds = mParams
-                    .getInt(Parameters.PARAM_TIMEOUT_SECONDS);
+            int timeoutSeconds = mParams.getInt(Parameters.PARAM_TIMEOUT_SECONDS);
             connect(light, timeoutSeconds);
         }
 
@@ -1486,6 +1459,7 @@ public class LightAdapter {
                 return;
             }
 
+            //如果小于扫描间隔时间就停止执行否则就走过去停止扫描
             if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                 return;
             }
@@ -1632,7 +1606,7 @@ public class LightAdapter {
         private CopyOnWriteArrayList<LightPeripheral> mPeripherals;
 
         public LightPeripherals() {
-            this.mPeripherals = new CopyOnWriteArrayList<LightPeripheral>();
+            this.mPeripherals = new CopyOnWriteArrayList<>();
         }
 
         public void put(LightPeripheral light) {

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <Button
+        android:id="@+id/grouping_completed"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_rec_blue_bt"
+        android:text="@string/grouping_completed"
+        android:textColor="@android:color/white"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/batch_four_device_recycleview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/grouping_completed"
+        app:layout_constraintTop_toBottomOf="@+id/batch_four_device_title"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/batch_four_device_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="设备列表(1个)"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/batch_four_group_recycle" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/batch_four_group_recycle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/batch_four_group_title"/>
+
+    <TextView
+        android:id="@+id/batch_four_group_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="组列表(1个)"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include8" />
+
+    <include
+        android:id="@+id/include8"
+        layout="@layout/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="73dp" />
+
+</android.support.constraint.ConstraintLayout>

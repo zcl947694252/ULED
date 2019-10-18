@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
@@ -18,6 +17,7 @@ import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
@@ -29,9 +29,7 @@ import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
@@ -540,24 +538,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         curtain = DBUtils.getAllCurtains()
         return curtain
     }
-
-
-    var locationServiceDialog: AlertDialog? = null
-    fun showOpenLocationServiceDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
-            BleUtils.jumpLocationSetting()
-        }
-        locationServiceDialog = builder.create()
-        locationServiceDialog?.setCancelable(false)
-        locationServiceDialog?.show()
-    }
-
-    fun hideLocationServiceDialog() {
-        locationServiceDialog?.hide()
-    }
-
 
     private fun skipSetting() {
         var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)

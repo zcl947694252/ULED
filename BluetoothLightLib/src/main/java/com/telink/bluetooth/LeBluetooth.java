@@ -213,7 +213,8 @@ public final class LeBluetooth {
                     scanSettingsBuilder .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
 //                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
                 }
-                scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+                //scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+                scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//低延迟
 //                                .setNumOfMatches(5)
                 ScanSettings scanSettings=scanSettingsBuilder.build();
 //                mScanner.startScan(mScanCallback);
