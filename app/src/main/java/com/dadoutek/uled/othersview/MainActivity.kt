@@ -96,6 +96,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
     private var retryDisposable: Disposable? = null
+    private lateinit var receiver: HomeKeyEventBroadCastReceiver
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -147,14 +148,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       // detectUpdate()
+        // detectUpdate()
 
+        LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         GlobalScope.launch {
             TelinkLightApplication.getApp().initStompClient()
         }
+
+         receiver = HomeKeyEventBroadCastReceiver()
+        registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+
     }
 
 
@@ -508,7 +514,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
-        bnve.setupWithViewPager(viewPager) }
+        bnve.setupWithViewPager(viewPager)
+    }
 
 
     //切换到场景Fragment
@@ -783,8 +790,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
-                LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
                 return true
             } else {
                 if (secondTime - firstTime > 2000) {
@@ -794,12 +800,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     LogUtils.d("App id = ${ProcessUtils.getCurrentProcessName()}")
                     LogUtils.d("activity stack size = ${ActivityUtils.getActivityList()}")
-
                     setResult(Activity.RESULT_FIRST_USER)
+                    TelinkLightApplication.getApp().releseStomp()
+                    ActivityUtils.finishAllActivities(true)
+                    TelinkApplication.getInstance().removeEventListeners()
+                    TelinkLightApplication.getApp().doDestroy()
                     finish()
                 }
             }
         }
         return super.onKeyDown(keyCode, event)
     }
+
+
+    class HomeKeyEventBroadCastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            TelinkLightApplication.getApp().releseStomp()
+            ActivityUtils.finishAllActivities(true)
+            TelinkApplication.getInstance().removeEventListeners()
+            TelinkLightApplication.getApp().doDestroy()
+        }
+    }
 }
+
+

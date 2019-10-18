@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -180,7 +181,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         val allGroups = DBUtils.allGroups
         LogUtils.e("zcl---------所有灯组${DBUtils.allGroups}")
         for (gp in allGroups)
-            if (gp.deviceCount > 0||"所有灯"==gp.name)
+            if (gp.deviceCount > 0 || "所有灯" == gp.name)
                 showCheckListData?.add(gp)
         LogUtils.e("zcl----------$showCheckListData")
         if (showGroupList!!.size != 0) {
@@ -824,5 +825,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         return true
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_DOWN)
+            if (currentPageIsEdit) {
+                if (currentPageIsEdit && !isToolbar)
+                    showExitSaveDialog()
+                else
+                    finish()
+            } else showExitSaveDialog()
+        return super.onKeyDown(keyCode, event)
     }
 }

@@ -147,7 +147,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     override fun onResume() {
         super.onResume()
         inflater = this.layoutInflater
-        disableConnectionStatusListener()
+        //disableConnectionStatusListener()
         initDate()
         initView()
     }

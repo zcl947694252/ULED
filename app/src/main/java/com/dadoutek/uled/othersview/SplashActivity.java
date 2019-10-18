@@ -33,6 +33,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        disableConnectionStatusListener();
     }
 
     private void init() {

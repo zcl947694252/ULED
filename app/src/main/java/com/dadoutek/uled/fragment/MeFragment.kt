@@ -56,6 +56,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class MeFragment : BaseFragment(), View.OnClickListener{
+
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
@@ -175,7 +176,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
     override fun onResume() {
         super.onResume()
-        isVisableDeveloper()
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }

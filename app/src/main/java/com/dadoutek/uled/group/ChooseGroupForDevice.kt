@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.GridView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -20,7 +21,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
@@ -51,7 +51,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private var type: String? = null
 
 
-    private val itemClickListener = OnItemClickListener { parent, view, position, id ->
+    private val itemClickListener = OnItemClickListener { _, _, position, _ ->
         val group = adapter!!.getItem(position)
         group?.deviceType = mLight.productUUID.toLong()
         if (group != null) {
