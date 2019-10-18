@@ -9,15 +9,16 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-<!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
+    <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="com.xiaomi.market.sdk.UPDATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.autofocus"/>
+    <uses-feature android:name="android.hardware.autofocus" />
 
     <uses-permission
         android:name="android.permission.DEVICE_POWER"
@@ -36,7 +37,6 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-
 
 
         <meta-data
@@ -61,7 +61,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
         <service
@@ -323,6 +323,11 @@
         <activity
             android:name=".region.UnbindMeNetActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.MeshAddDeviceActivity"
+            android:screenOrientation="portrait" />
+
+
         <meta-data
             android:name="Mob-AppKey"
             android:value="260b846a2a8f8" />
@@ -341,11 +346,12 @@
         <service
             android:name=".service.SendLightsInfo"
             android:enabled="true" />
+
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-<!--        bugly升级sdk用的-->
+        <!--        bugly升级sdk用的-->
         <activity
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale"

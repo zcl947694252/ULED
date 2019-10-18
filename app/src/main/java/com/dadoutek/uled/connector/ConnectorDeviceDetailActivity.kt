@@ -442,7 +442,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         Opcode.LIGHT_ON_OFF
         when {
             view.id == R.id.img_light -> {
-                if (TelinkApplication.getInstance().connectDevice != null) {
+                if (TelinkLightService.Instance()?.isLogin == false) {
                     autoConnect()
                 } else {
                     canBeRefresh = true

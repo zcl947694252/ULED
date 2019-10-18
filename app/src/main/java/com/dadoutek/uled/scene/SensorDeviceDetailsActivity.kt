@@ -40,13 +40,13 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -75,8 +75,9 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private val CONNECT_SENSOR_TIMEOUT: Long = 20000
 
-    private var disposable: Disposable? = null
+    private var connectSensorTimeoutDisposable: Disposable? = null
     private lateinit var deviceInfo: DeviceInfo
     private var delete: TextView? = null
     private var group: TextView? = null
@@ -137,6 +138,21 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         popupWindow?.dismiss()
     }
 
+    override fun onPause() {
+        super.onPause()
+        LogUtils.d("connectSensorTimeoutDisposable?.dispose()")
+        connectSensorTimeoutDisposable?.dispose()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        acitivityIsAlive = false
+        if (popupWindow != null && popupWindow!!.isShowing)
+            popupWindow!!.dismiss()
+        this.mApplication?.removeEventListener(this)
+    }
+
+
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         adapter = SensorDeviceDetailsAdapter(R.layout.sensor_detail_adapter, sensorData)
@@ -165,7 +181,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         add_device_btn.setOnClickListener {
             startActivity(Intent(this, ScanningSensorActivity::class.java))
             finish()
-            disposable?.dispose()
+            connectSensorTimeoutDisposable?.dispose()
         }//添加设备
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
@@ -197,7 +213,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         val intent = Intent(this, NewSceneSetAct::class.java)
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
-                        disposable?.dispose()
+                        connectSensorTimeoutDisposable?.dispose()
                     }
                 }
             }
@@ -481,8 +497,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     @SuppressLint("CheckResult")
     private fun autoConnectSensor(b: Boolean) {
         retryConnectCount++
-        if (b)
-            showLoadingDialog(getString(R.string.please_wait))
+        GlobalScope.launch(Dispatchers.Main) {
+            if (b)
+                showLoadingDialog(getString(R.string.please_wait))
+        }
         LogUtils.e("zcl开始连接")
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
@@ -498,14 +516,20 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
 
-        disposable = Observable.timer(30000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        //确保上一个订阅被取消了
+        connectSensorTimeoutDisposable?.dispose()
+        connectSensorTimeoutDisposable = Observable.timer(CONNECT_SENSOR_TIMEOUT, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
             progressBar_sensor.visibility = View.GONE
             ToastUtils.showShort(getString(R.string.connect_fail))
-        }, {})
+        }, {
+            LogUtils.e(it)
+        })
+
     }
+
 
     /**
      * 恢复出厂设置
@@ -516,7 +540,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0, null)
         LogUtils.e("zcl", "zcl******重启人体")
-        disposable?.dispose()
+        connectSensorTimeoutDisposable?.dispose()
     }
 
     override fun performed(event: Event<String>) {
@@ -527,14 +551,19 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 hideLoadingDialog()
             }
 
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReportNormal(info)
+            }
+
             DeviceEvent.STATUS_CHANGED -> {
                 var status = (event as DeviceEvent).args.status
-                LogUtils.e("zcl", "zcl******STATUS_CHANGED$status")
+//                LogUtils.e("zcl", "zcl******STATUS_CHANGED$status")
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {//3
                         progressBar_sensor.visibility = View.GONE
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                        LogUtils.e("zcl", "zcl***STATUS_LOGIN***$isClick")
+//                        LogUtils.e("zcl", "zcl***STATUS_LOGIN***$isClick")
                         when (isClick) {//重新配置
                             RECOVER_SENSOR -> Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                                     .subscribe {
@@ -555,13 +584,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         if (isClick != RESET_SENSOR)//恢复
                             retryConnect()
 
-                        LogUtils.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
+//                        LogUtils.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
                         progressBar_sensor.visibility = View.GONE
 
                         when (settingType) {
                             RESET_SENSOR -> {//恢复出厂设置成功后判断灯能扫描
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.reset_factory_success, Toast.LENGTH_LONG).show()
-                                disposable?.dispose()
+                                connectSensorTimeoutDisposable?.dispose()
                                 DBUtils.deleteSensor(currentLight!!)
                                 hideLoadingDialog()
                                 notifyData()//重新设置传感器数量
@@ -595,7 +624,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         if (TelinkApplication.getInstance().connectDevice != null) {
             LogUtils.e("TAG", currentLight!!.meshAddr.toString())
             progressBar_sensor.visibility = View.GONE
-            disposable?.dispose()
+            connectSensorTimeoutDisposable?.dispose()
             Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
                 if ("" != s)
                     if (isOTA) {
@@ -651,6 +680,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)//结束jt
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)//设备状态JT
         this.mApplication?.addEventListener(DeviceEvent.CURRENT_CONNECT_CHANGED, this)//设备状态JT
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)//设备状态JT
     }
 
     /**
@@ -716,13 +746,5 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         return sensorData
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        acitivityIsAlive = false
-        if (popupWindow != null && popupWindow!!.isShowing)
-            popupWindow!!.dismiss()
-        disposable?.dispose()
-        this.mApplication?.removeEventListener(this)
-    }
 
 }

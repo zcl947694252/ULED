@@ -95,6 +95,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
+    private var retryDisposable: Disposable? = null
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -158,7 +159,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun startToRecoverDevices() {
-        LogUtils.e("zcl------------要删除的数据"+DBUtils.getAllRGBLight())
+//        LogUtils.e("zcl------------要删除的数据"+DBUtils.getAllRGBLight())
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -651,13 +652,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             TelinkLightService.Instance().idleMode(true)
-            val retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
+
+            retryDisposable?.dispose()
+            retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
                     .subscribe {
                         autoConnect()
                     }
         } else {
             LogUtils.d("exceed max retry time, show connection error")
-            TelinkLightService.Instance()?.idleMode(true)
+            //不调用断开，这样它就会在后台一直重连
+//            TelinkLightService.Instance()?.idleMode(true)
         }
     }
 

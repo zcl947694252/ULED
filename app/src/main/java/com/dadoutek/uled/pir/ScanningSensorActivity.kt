@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
 class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private var isSearchedDevice: Boolean = false
     private val SCAN_TIMEOUT_SECOND: Int = 20
-    private val CONNECT_TIMEOUT_SECONDS: Int = 5
+    private val CONNECT_TIMEOUT_SECONDS: Int = 30
     private val MAX_RETRY_CONNECT_TIME = 3
     private var mRetryConnectCount: Int = 0
     private var getVersionRetryMaxCount = 2
@@ -317,6 +317,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             }
 
             LightAdapter.STATUS_LOGIN -> {//3
+                connectDisposable?.dispose()
                 onLogin()
 
             }
@@ -328,7 +329,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
             LightAdapter.STATUS_CONNECTED -> {//11
                 LogUtils.e("zcl 开始登陆")
-                connectDisposable?.dispose()
                 login()
             }
         }

@@ -25,5 +25,8 @@ object Opcode {
     const val CURTAIN_PACK_START: Byte = 0xE1.toByte()
     const val CURTAIN_PACK_END: Byte = 0xEF.toByte()
     const val MESH_KICK_OUT: Byte = 0xF4.toByte()
+
+    const val MESH_PROVISION: Byte = 0xC9.toByte()
+    const val FIX_MESHADDR_CONFLICT: Byte = 0xF4.toByte()
 //    const val CURTAIN_MOTOR_COMMUTATION: Byte = 0x01.toByte()
 }

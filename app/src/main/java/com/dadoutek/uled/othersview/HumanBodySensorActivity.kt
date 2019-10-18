@@ -25,6 +25,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.NightLightEditGroupAdapter
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
@@ -33,7 +34,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
@@ -102,14 +102,25 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
         initToolbar()
         initData()
         initView()
 
-        TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+        initListener()
+    }
+
+    private fun initListener() {
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightApplication.getApp().removeEventListener(this)
     }
 
     override fun performed(event: Event<String>?) {
@@ -193,7 +204,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun doFinish() {
         disposable?.dispose()
         TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
+//        TelinkLightService.Instance()?.disconnect()
         if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
@@ -232,6 +243,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 isVisibility()//显示3.0新的人体感应器
             }
         } else {
+            LogUtils.d("device isn't connected, auto connect it")
             autoConnectSensor()
         }
     }
@@ -1049,7 +1061,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun autoConnectSensor() {
         retryConnectCount++
         showLoadingDialog(getString(R.string.please_wait))
-        LogUtils.e("zcl开始连接")
+        LogUtils.d("zcl开始连接")
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams?.setMeshName(DBUtils.lastUser?.controlMeshName)

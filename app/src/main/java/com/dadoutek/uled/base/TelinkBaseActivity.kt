@@ -73,6 +73,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
+    var enableBaseConnectionStatusListener = true
+
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -182,7 +184,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        enableConnectionStatusListener()
+        if (enableBaseConnectionStatusListener)
+            enableConnectionStatusListener()
         Constant.isTelBase = true
         foreground = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
@@ -259,6 +262,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onPause()
         isRuning = false
         foreground = false
+
+
 
         disableConnectionStatusListener()
     }
@@ -464,15 +469,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
                         LogUtils.d("蓝牙未开启")
-                        showToast(getString(R.string.close_bluetooth))
+//                        showToast(getString(R.string.close_bluetooth))
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
                         LogUtils.d("无法收到广播包以及响应包")
-                        showToast("无法收到广播包以及响应包")
+//                        showToast("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
                         LogUtils.d("未扫到目标设备")
-                        showToast("未扫到目标设备")
+//                        showToast("未扫到目标设备")
                     }
                 }
 
@@ -481,11 +486,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
                         LogUtils.d("未读到att表")
-                        showToast("未读到att表")
+//                        showToast("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
                         LogUtils.d("未建立物理连接")
-                        showToast("未建立物理连接")
+//                        showToast("未建立物理连接")
                     }
                 }
             }
@@ -493,15 +498,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
                         LogUtils.d("value check失败： 密码错误")
-                        showToast("value check失败： 密码错误")
+//                        showToast("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
                         LogUtils.d("read login data 没有收到response")
-                        showToast("read login data 没有收到response")
+//                        showToast("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
                         LogUtils.d("write login data 没有收到response")
-                        showToast("write login data 没有收到response")
+//                        showToast("write login data 没有收到response")
                     }
                 }
             }

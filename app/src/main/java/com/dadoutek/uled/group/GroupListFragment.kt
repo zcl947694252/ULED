@@ -231,6 +231,8 @@ class GroupListFragment : BaseFragment() {
         btnOn?.setOnClickListener(onClick)
         btnOff?.setOnClickListener(onClick)
         btnSet?.setOnClickListener(onClick)
+        onText?.setOnClickListener(onClick)
+        offText?.setOnClickListener(onClick)
         btn_delete.setOnClickListener(onClick)
         allLightText?.setOnClickListener(onClick)
 
@@ -448,6 +450,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+/*
     var onItemChildClickListener = object : MyBaseQuickAdapterOnClickListner {
         override fun onItemChildClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int, groupPosition: Int) {
             if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
@@ -460,11 +463,11 @@ class GroupListFragment : BaseFragment() {
                     checkConnect()
                 } else {
                     when (view!!.id) {
-                        R.id.btn_on -> {
+                        R.id.btn_on, R.id.tv_on -> {
                             Commander.openOrCloseLights(dstAddr, true)
                             updateLights(true, group)
                         }
-                        R.id.btn_off -> {
+                        R.id.btn_off, R.id.tv_off -> {
                             Commander.openOrCloseLights(dstAddr, false)
                             updateLights(false, group)
                         }
@@ -506,6 +509,7 @@ class GroupListFragment : BaseFragment() {
             }
         }
     }
+*/
 
     private val onClick = View.OnClickListener {
         var intent: Intent?
@@ -537,7 +541,7 @@ class GroupListFragment : BaseFragment() {
                 }
             }
 
-            R.id.btn_on -> {
+            R.id.btn_on, R.id.tv_on -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
@@ -558,7 +562,7 @@ class GroupListFragment : BaseFragment() {
                 }
             }
 
-            R.id.btn_off -> {
+            R.id.btn_off, R.id.tv_off -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()

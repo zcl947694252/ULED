@@ -28,6 +28,10 @@ object RecoverMeshDeviceUtil {
 
     val SCAN_TIMEOUT_SECONDS: Long = 20
 
+    data class ResultOfAddDevice(val deviceInfo: DeviceInfo, val hasConflict: Boolean)
+
+    private val scannedDeviceHm = hashMapOf<String, DeviceInfo>()
+
 
     private fun getAllDeviceAddressList(): List<Int> {
         val lights = DBUtils.allLight.map { it.meshAddr }
@@ -72,6 +76,85 @@ object RecoverMeshDeviceUtil {
     }
 
 
+    /**
+     * 通过mesh网络添加Device，实际就是通过scan恢复设备，但返回的数据略有不同
+     */
+    fun addDeviceByMesh(deviceName: String?): Observable<ResultOfAddDevice> {
+        scannedDeviceHm.clear()
+
+        val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
+        val scanSettings = ScanSettings.Builder()
+                .setScanMode(SCAN_MODE_LOW_LATENCY)
+                .build()
+
+        return rxBleClient.scanBleDevices(scanSettings, scanFilter)
+                .observeOn(Schedulers.io())
+                .map {
+
+                    parseData(it)    //解析数据
+                }
+                .map { deviceInfo ->
+                    val hasConflict = hasMeshAddrConflict(deviceInfo)
+                    ResultOfAddDevice(deviceInfo, hasConflict)
+                }
+                .filter {
+                    var isFilter: Boolean
+                    if (it.hasConflict) {   //有冲突不过滤掉
+                        isFilter = true
+                    } else {  //无冲突就保存数据
+                        isFilter = addDevicesToDb(it.deviceInfo)       //addDevicesToDb返回False代表已有此数据，把isFilter设成false，过滤掉
+                    }
+                    //如果之前已经发送过的结果，就不发送了。
+                    if (scannedDeviceHm.containsKey(it.deviceInfo.macAddress)) {
+                        isFilter = false
+//                        LogUtils.d("sent result , filtered it. ")
+                    } else {
+                        scannedDeviceHm.put(it.deviceInfo.macAddress, it.deviceInfo)
+                    }
+
+                    //false是过滤，true是不过滤
+                    isFilter
+                }
+                .timeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
+                    //                    LogUtils.d("restoreDeviceByMesh name complete. size = ${createdDeviceList.size}")
+                    it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    /**
+     * 是否有地址冲突
+     */
+    private fun hasMeshAddrConflict(deviceInfo: DeviceInfo): Boolean {
+        var isConflict: Boolean = false
+        val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
+        if (isExist) {
+            when (deviceInfo.productUUID) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
+                    val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+                    isConflict = dbLight?.macAddr != deviceInfo.macAddress
+                }
+                DeviceType.SMART_RELAY -> {
+                    val relay = DBUtils.getRelyByMeshAddr(deviceInfo.meshAddress)
+                    isConflict = relay?.macAddr != deviceInfo.macAddress
+                }
+
+                DeviceType.SMART_CURTAIN -> {
+                    val curtain = DBUtils.getCurtainByMeshAddr(deviceInfo.meshAddress)
+                    isConflict = curtain?.macAddr != deviceInfo.macAddress
+                }
+
+                DeviceType.NIGHT_LIGHT -> {
+                    val sensor = DBUtils.getSensorByMeshAddr(deviceInfo.meshAddress)
+                    isConflict = sensor?.macAddr != deviceInfo.macAddress
+                }
+
+            }
+        }
+        return isConflict
+    }
+
 
     /**
      * 如果该deviceInfo不存在于数据库，则创建
@@ -94,7 +177,7 @@ object RecoverMeshDeviceUtil {
                     dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
                     dbLightNew.macAddr = deviceInfo.macAddress
                     DBUtils.saveLight(dbLightNew, false)
-                    LogUtils.d("create meshAddress=  " + dbLightNew.meshAddr)
+                    LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
                 }
                 DeviceType.SMART_RELAY -> {
                     val relay = DbConnector()
