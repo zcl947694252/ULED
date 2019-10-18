@@ -222,7 +222,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             return@Comparator o1.name.compareTo(o2.name)
         })
 
-        LogUtils.e("zcl删除组前$groupList")
+//        LogUtils.e("zcl删除组前$groupList")
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))

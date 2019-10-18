@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.TelinkLog;
@@ -166,6 +167,21 @@ public abstract class LightService extends Service implements
     }
 
     /**
+     * 打印函數的調用棧
+     *
+     * @return 調用棧
+     */
+    public String getStackTrace() {
+        StringBuilder sb = new StringBuilder("");
+        Exception e = new Exception();
+        StackTraceElement[] trace = e.getStackTrace();
+        for (int i = 0; i < trace.length; i++) {
+            sb.append(trace[i] + "\n");
+        }
+        return sb.toString();
+    }
+
+    /**
      * 空闲模式
      *
      * @param disconnect 是否断开当前的连接
@@ -174,6 +190,18 @@ public abstract class LightService extends Service implements
 
         if (this.mAdapter == null)
             return;
+
+
+        try {
+            Exception e = null;
+            e.getCause();
+        } catch (Exception e) {
+            String trace = getStackTrace();
+//            String trace = e.getStackTrace();
+            Log.d("Saw", trace);
+            //用来跟踪调用栈
+        }
+
         this.mAdapter.idleMode(disconnect);
     }
 

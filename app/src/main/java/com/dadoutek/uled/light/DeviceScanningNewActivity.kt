@@ -1279,7 +1279,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
         val deviceInfo = event.args
-        LogUtils.e("zcl------搜索设备rssi${deviceInfo.rssi}")
+//        LogUtils.e("zcl------搜索设备rssi${deviceInfo.rssi}")
         if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
             if (deviceInfo.productUUID == DeviceType.NORMAL_SWITCH || deviceInfo.productUUID == DeviceType.NORMAL_SWITCH2
                     || deviceInfo.productUUID == DeviceType.SCENE_SWITCH || deviceInfo.productUUID == DeviceType.SMART_CURTAIN_SWITCH)

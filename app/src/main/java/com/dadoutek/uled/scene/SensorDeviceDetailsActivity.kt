@@ -75,7 +75,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
-    private val CONNECT_SENSOR_TIMEOUT: Long = 20000
+    private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
 
     private var connectSensorTimeoutDisposable: Disposable? = null
     private lateinit var deviceInfo: DeviceInfo
@@ -508,7 +508,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         connectParams?.setConnectMac(currentLight?.macAddr)
         connectParams?.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams?.autoEnableNotification(true)
-        connectParams?.setTimeoutSeconds(5)
+        connectParams?.setTimeoutSeconds(CONNECT_SENSOR_TIMEOUT.toInt())
         progressBar_sensor.visibility = View.VISIBLE
         //连接，如断开会自动重连
         GlobalScope.launch {
