@@ -407,6 +407,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         super.onPause()
         if (mConnectTimer != null)
             mConnectTimer!!.dispose()
+        this.mApplication?.removeEventListener(this)
     }
 
     /**

@@ -322,6 +322,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     open fun restartApplication() {
         TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
+        TelinkApplication.getInstance().removeEventListeners()
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().doDestroy()
         Log.e("zcl", "zcl******重启app并杀死原进程")
@@ -531,6 +532,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
     }
+
 }
 
 

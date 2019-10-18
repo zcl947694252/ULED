@@ -95,6 +95,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
+    private lateinit var receiver: HomeKeyEventBroadCastReceiver
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -146,19 +147,24 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       // detectUpdate()
+        // detectUpdate()
 
+        LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         GlobalScope.launch {
             TelinkLightApplication.getApp().initStompClient()
         }
+
+         receiver = HomeKeyEventBroadCastReceiver()
+        registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+
     }
 
 
     private fun startToRecoverDevices() {
-        LogUtils.e("zcl------------要删除的数据"+DBUtils.getAllRGBLight())
+        LogUtils.e("zcl------------要删除的数据" + DBUtils.getAllRGBLight())
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
@@ -507,7 +513,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
-        bnve.setupWithViewPager(viewPager) }
+        bnve.setupWithViewPager(viewPager)
+    }
 
 
     //切换到场景Fragment
@@ -523,7 +530,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onPause() {
         super.onPause()
         disableConnectionStatusListener()
-        this.mApplication?.removeEventListener(this)
+        LogUtils.v("zcl首页----onPause")
+        this.mApplication?.removeEventListeners()
         mCompositeDisposable.clear()
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
@@ -540,7 +548,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-       // enableConnectionStatusListener()
+
+        LogUtils.v("zcl首页---onResume")
+        enableConnectionStatusListener()
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -556,6 +566,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
+        LogUtils.v("zcl首页---onPostResume")
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
@@ -570,7 +581,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun changeToGroup() {
         tranHome()
     }
-
 
 
     @SuppressLint("CheckResult")
@@ -663,13 +673,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onStop() {
         super.onStop()
+        LogUtils.v("zcl首页----onstop")
         TelinkLightService.Instance()?.disableAutoRefreshNotify()
         installDialog?.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
+        LogUtils.v("zcl首页----onstop")
+        unregisterReceiver(receiver)
         TelinkLightApplication.getApp().releseStomp()
 
         //移除事件
@@ -779,8 +791,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
-                LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(intent)
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
                 return true
             } else {
                 if (secondTime - firstTime > 2000) {
@@ -790,12 +801,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     LogUtils.d("App id = ${ProcessUtils.getCurrentProcessName()}")
                     LogUtils.d("activity stack size = ${ActivityUtils.getActivityList()}")
-
                     setResult(Activity.RESULT_FIRST_USER)
+                    TelinkLightApplication.getApp().releseStomp()
+                    ActivityUtils.finishAllActivities(true)
+                    TelinkApplication.getInstance().removeEventListeners()
+                    TelinkLightApplication.getApp().doDestroy()
                     finish()
                 }
             }
         }
         return super.onKeyDown(keyCode, event)
     }
+
+
+    class HomeKeyEventBroadCastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            TelinkLightApplication.getApp().releseStomp()
+            ActivityUtils.finishAllActivities(true)
+            TelinkApplication.getInstance().removeEventListeners()
+            TelinkLightApplication.getApp().doDestroy()
+        }
+    }
 }
+
+
