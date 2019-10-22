@@ -22,20 +22,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.connector.ConnectorOfGroupActivity
-import com.dadoutek.uled.connector.ConnectorSettingActivity
-import com.dadoutek.uled.curtain.CurtainOfGroupActivity
-import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.fragment.CWLightFragmentList
 import com.dadoutek.uled.fragment.CurtainFragmentList
 import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
-import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
-import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -46,10 +39,12 @@ import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
-import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.GuideUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -133,7 +128,7 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     setBluetoothAndAddVisableDeleteGone()
                 }
-                if (switchFragment == "true"||delete == "true") {
+                if (switchFragment == "true" || delete == "true") {
                     setBluetoothAndAddVisableDeleteGone()
                     sendGroupResterNormal()
                 }
@@ -203,11 +198,18 @@ class GroupListFragment : BaseFragment() {
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-            isGuide = false
-            if (dialog_pop?.visibility == View.GONE) {
-                showPopupMenu()
-            } else {
-                hidePopupMenu()
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else {
+                    isGuide = false
+                    if (dialog_pop?.visibility == View.GONE) {
+                        showPopupMenu()
+                    } else {
+                        hidePopupMenu()
+                    }
+                }
             }
         }
 
@@ -420,33 +422,32 @@ class GroupListFragment : BaseFragment() {
             SharedPreferencesUtils.setDelete(false)
 
 
-
-          /*取消广播否则容易全部改成开或者关
-          if (allGroup != null) {
-                if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
-                    btnOn?.setBackgroundResource(R.drawable.icon_open_group)
-                    btnOff?.setBackgroundResource(R.drawable.icon_down_group)
-                    onText?.setTextColor(resources.getColor(R.color.white))
-                    offText?.setTextColor(resources.getColor(R.color.black_nine))
-                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                        val intent = Intent("switch_here")
-                        intent.putExtra("switch_here", "on")
-                        LocalBroadcastManager.getInstance(this.mContext!!)
-                                .sendBroadcast(intent)
-                    }
-                } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    btnOn?.setBackgroundResource(R.drawable.icon_down_group)
-                    btnOff?.setBackgroundResource(R.drawable.icon_open_group)
-                    onText?.setTextColor(resources.getColor(R.color.black_nine))
-                    offText?.setTextColor(resources.getColor(R.color.white))
-                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                        val intent = Intent("switch_here")
-                        intent.putExtra("switch_here", "false")
-                        LocalBroadcastManager.getInstance(this.mContext!!)
-                                .sendBroadcast(intent)
-                    }
-                }
-            }*/
+            /*取消广播否则容易全部改成开或者关
+            if (allGroup != null) {
+                  if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
+                      btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+                      btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                      onText?.setTextColor(resources.getColor(R.color.white))
+                      offText?.setTextColor(resources.getColor(R.color.black_nine))
+                      if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                          val intent = Intent("switch_here")
+                          intent.putExtra("switch_here", "on")
+                          LocalBroadcastManager.getInstance(this.mContext!!)
+                                  .sendBroadcast(intent)
+                      }
+                  } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
+                      btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                      btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+                      onText?.setTextColor(resources.getColor(R.color.black_nine))
+                      offText?.setTextColor(resources.getColor(R.color.white))
+                      if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                          val intent = Intent("switch_here")
+                          intent.putExtra("switch_here", "false")
+                          LocalBroadcastManager.getInstance(this.mContext!!)
+                                  .sendBroadcast(intent)
+                      }
+                  }
+              }*/
         }
     }
 
@@ -584,32 +585,39 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                    checkConnect()
-                } else {
-                    intent = Intent(mContext, NormalSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intent.putExtra("group", allGroup)
-                    startActivityForResult(intent, 2)
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        if (TelinkLightApplication.getApp().connectDevice == null) {
+                            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                            checkConnect()
+                        } else {
+                            intent = Intent(mContext, NormalSettingActivity::class.java)
+                            intent!!.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intent!!.putExtra("group", allGroup)
+                            startActivityForResult(intent, 2)
+                        }
+                    }
                 }
             }
 
             R.id.img_function2 -> {
-                var deleteList:ArrayList<DbGroup> = ArrayList()
+                var deleteList: ArrayList<DbGroup> = ArrayList()
                 deleteList.addAll(cwLightFragment.getGroupDeleteList())
                 deleteList.addAll(rgbLightFragment.getGroupDeleteList())
                 deleteList.addAll(curtianFragment.getGroupDeleteList())
                 deleteList.addAll(relayFragment.getGroupDeleteList())
 
-            /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
-                if (listLight.size > 0) {
-                    for (i in listLight.indices) {
-                        if (listLight[i].isSelected) {
-                            deleteList.add(listLight[i])
+                /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
+                    if (listLight.size > 0) {
+                        for (i in listLight.indices) {
+                            if (listLight[i].isSelected) {
+                                deleteList.add(listLight[i])
+                            }
                         }
-                    }
-                }*/
+                    }*/
 
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)

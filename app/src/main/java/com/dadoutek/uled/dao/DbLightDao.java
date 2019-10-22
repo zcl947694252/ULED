@@ -27,7 +27,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property MeshAddr = new Property(1, int.class, "meshAddr", false, "MESH_ADDR");
         public final static Property Name = new Property(2, String.class, "name", false, "NAME");
-        public final static Property DeviceName = new Property(3, String.class, "deviceName", false, "DEVICE_NAME");
+        public final static Property GroupName = new Property(3, String.class, "groupName", false, "GROUP_NAME");
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
         public final static Property ColorTemperature = new Property(5, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property MacAddr = new Property(6, String.class, "macAddr", false, "MAC_ADDR");
@@ -55,7 +55,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"MESH_ADDR\" INTEGER NOT NULL ," + // 1: meshAddr
                 "\"NAME\" TEXT," + // 2: name
-                "\"DEVICE_NAME\" TEXT," + // 3: deviceName
+                "\"GROUP_NAME\" TEXT," + // 3: groupName
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 5: colorTemperature
                 "\"MAC_ADDR\" TEXT," + // 6: macAddr
@@ -88,9 +88,9 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             stmt.bindString(3, name);
         }
  
-        String deviceName = entity.getDeviceName();
-        if (deviceName != null) {
-            stmt.bindString(4, deviceName);
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(4, groupName);
         }
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColorTemperature());
@@ -126,9 +126,9 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             stmt.bindString(3, name);
         }
  
-        String deviceName = entity.getDeviceName();
-        if (deviceName != null) {
-            stmt.bindString(4, deviceName);
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(4, groupName);
         }
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColorTemperature());
@@ -160,7 +160,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // meshAddr
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // deviceName
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // groupName
             cursor.getInt(offset + 4), // brightness
             cursor.getInt(offset + 5), // colorTemperature
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // macAddr
@@ -179,7 +179,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setMeshAddr(cursor.getInt(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setDeviceName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setGroupName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setBrightness(cursor.getInt(offset + 4));
         entity.setColorTemperature(cursor.getInt(offset + 5));
         entity.setMacAddr(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));

@@ -822,5 +822,10 @@
     <string name="authorization_warm">接收者将只有控制权，无管理权</string>
     <string name="get_version_fail">获取设备版本号失败</string>
     <string name="please_select_update_file">请选择需要升级的OTA文件</string>
+    <string name="choose_device">选择设备(长按设备名修改名称)</string>
+    <string name="choose_group_change">选择分组(长按分组名修改名称)</string>
+    <string name="no_group_device_num">未分组(%1$s个)</string>
+    <string name="grouped_num">已分组(%1$s个）</string>
+    <string name="author_region_warm">权限不足,当前区域为授权区域您只有使用权限</string>
 
 </resources>

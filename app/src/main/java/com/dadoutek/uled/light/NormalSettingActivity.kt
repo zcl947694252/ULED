@@ -1110,8 +1110,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }
             LightAdapter.STATUS_LOGOUT -> {
                 autoConnect()
+                mConnectTimer?.dispose()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe { aLong ->
+                        .subscribe {
                             ToastUtil.showToast(this, getString(R.string.connecting))
                         }
             }

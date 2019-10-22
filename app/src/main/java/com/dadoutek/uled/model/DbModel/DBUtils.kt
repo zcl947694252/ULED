@@ -1227,7 +1227,7 @@ object DBUtils {
                 }//如果数据表没有该数据直接添加
             }
         }
-       // LogUtils.e("zcl-------添加变化表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
+        //LogUtils.v("zcl-------添加变化表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

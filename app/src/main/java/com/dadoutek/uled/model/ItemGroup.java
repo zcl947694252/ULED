@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 
 public class ItemGroup implements Serializable {
-    public int groupAress = 0;
+    public int groupAddress = 0;
     public int brightness = 50;
     public int temperature = 50;
     public int color = 0x4FFFE0;
@@ -20,7 +20,7 @@ public class ItemGroup implements Serializable {
     @Override
     public String toString() {
         return "ItemGroup{" +
-                "groupAress=" + groupAress +
+                "groupAddress=" + groupAddress +
                 ", brightness=" + brightness +
                 ", temperature=" + temperature +
                 ", color=" + color +

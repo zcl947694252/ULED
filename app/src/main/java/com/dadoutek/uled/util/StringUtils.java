@@ -172,7 +172,7 @@ public class StringUtils {
         return chs1[i];
     }
 
-    public static String getLightName(DbLight light) {
+    public static String getLightGroupName(DbLight light) {
         if (light.getBelongGroupId() != null) {
             if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()) == null) {
                 return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);

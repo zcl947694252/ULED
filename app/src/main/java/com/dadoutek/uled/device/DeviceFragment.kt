@@ -76,7 +76,6 @@ class DeviceFragment : BaseFragment() {
     }
 
 
-
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser);
         if (userVisibleHint) {
@@ -162,15 +161,22 @@ class DeviceFragment : BaseFragment() {
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-            isGuide = false
-            if (dialog_pop?.visibility == View.GONE) {
-                showPopupMenu()
-            } else {
-                hidePopupMenu()
+
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else {
+                    isGuide = false
+                    if (dialog_pop?.visibility == View.GONE) {
+                        showPopupMenu()
+                    } else {
+                        hidePopupMenu()
+                    }
+                }
             }
         }
     }
-
 
 
     private fun initView() {

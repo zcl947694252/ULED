@@ -25,8 +25,8 @@ public class NetworkFactory {
     private static OkHttpClient okHttpClient;
 
     private static OkHttpClient initHttpClient() {
-//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
@@ -48,8 +48,8 @@ public class NetworkFactory {
         if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-                    //.baseUrl(Constant.BASE_URL)
-                   // .baseUrl(Constant.BASE_URL_JAVA)
+                    .baseUrl(Constant.BASE_URL)
+                    //.baseUrl(Constant.BASE_URL_JAVA)
                     .baseUrl(Constant.BASE_DEBUG_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)

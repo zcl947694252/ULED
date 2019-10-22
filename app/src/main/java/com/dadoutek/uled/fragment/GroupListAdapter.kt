@@ -34,16 +34,25 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                     .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
                     .addOnClickListener(R.id.selected_group)
 
-                val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
-                        || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
+            val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                    || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
 
-            if (num>0){
-                if (isSuportOpenOrClose) {
+            if (isSuportOpenOrClose) {//支持点击 使用设置开关三个图标 将其显示 不支持设置按钮图标使其隐藏
+                if (num > 0) {
                     helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
                             .addOnClickListener(R.id.btn_on)
                             .addOnClickListener(R.id.btn_off)
                             .addOnClickListener(R.id.tv_on)
                             .addOnClickListener(R.id.tv_off)
+                            .setVisible(R.id.view3, true)
+                            .setVisible(R.id.view4, true)
+                            .setVisible(R.id.btn_on, true)
+                            .setVisible(R.id.btn_on, true)
+                            .setVisible(R.id.btn_off, true)
+                            .setVisible(R.id.btn_set, true)
+                            .setVisible(R.id.tv_on, true)
+                            .setVisible(R.id.tv_off, true)
+                            .setVisible(R.id.curtain_setting, false)
 
                     if (group.connectionStatus == ConnectionStatus.ON.value) {
                         helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
@@ -56,12 +65,11 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                                 .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.black_nine))
                                 .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.white))
                     }
-                }else{//group.deviceType == Constant.DEVICE_TYPE_CURTAIN
-                    setNoClik(helper)
+                } else if (num <= 0) {//group.deviceType == Constant.DEVICE_TYPE_CURTAIN  窗帘不使用原本三个图标 使用新的按钮
+                    setCanNotClik(helper)
                 }
-
                 helper.addOnClickListener(R.id.btn_set).setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
-            }else if (num<=0){
+            } else {
                 setNoClik(helper)
             }
 
@@ -84,12 +92,34 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
         }
     }
 
-    private fun setNoClik(helper: BaseViewHolder) {
-        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group_no)
-                .setImageResource(R.id.btn_on, R.drawable.icon_open_group_no)
+    private fun setCanNotClik(helper: BaseViewHolder) {
+        helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
+                .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
                 .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
+                .setVisible(R.id.view3, true)
+                .setVisible(R.id.view4, true)
+                .setVisible(R.id.btn_on, true)
+                .setVisible(R.id.btn_on, true)
+                .setVisible(R.id.btn_off, true)
+                .setVisible(R.id.btn_set, true)
+                .setVisible(R.id.tv_on, true)
+                .setVisible(R.id.tv_off, true)
+                .setVisible(R.id.curtain_setting, false)
                 .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
                 .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.color_c8))
+    }
+
+    private fun setNoClik(helper: BaseViewHolder) {
+        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group_no)
+                .setVisible(R.id.view3, false)
+                .setVisible(R.id.view4, false)
+                .setVisible(R.id.btn_on, false)
+                .setVisible(R.id.btn_off, false)
+                .setVisible(R.id.tv_on, false)
+                .setVisible(R.id.tv_off, false)
+                .setVisible(R.id.btn_set, false)
+                .setVisible(R.id.curtain_setting, true)
+                .addOnClickListener(R.id.curtain_setting)
     }
 
     /**

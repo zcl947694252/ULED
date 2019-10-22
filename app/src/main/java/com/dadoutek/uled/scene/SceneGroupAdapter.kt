@@ -89,7 +89,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         helper.setText(R.id.name_gp, item.gpName)
 
 
-        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
+        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setProgress(R.id.sbBrightness, item.brightness)
             helper.setProgress(R.id.sb_w_bright, item.temperature)
             helper.setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
@@ -158,7 +158,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
         }
 
-        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
+        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setGone(R.id.textView7, true)
             helper.setGone(R.id.oval, true)
             helper.setGone(R.id.rgb_scene, true)
@@ -166,7 +166,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             helper.setGone(R.id.switch_scene, false)
             helper.setGone(R.id.scene_curtain, false)
             helper.setGone(R.id.scene_relay, false)
-        } else if (OtherUtils.isNormalGroup(DBUtils.getGroupByMesh(item.groupAress))) {
+        } else if (OtherUtils.isNormalGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
@@ -174,7 +174,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             helper.setGone(R.id.switch_scene, false)
             helper.setGone(R.id.scene_curtain, false)
             helper.setGone(R.id.scene_relay, false)
-        } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAress))) {
+        } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
@@ -189,7 +189,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setChecked(R.id.rg_yy, true)
                 helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
             }
-        } else if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))) {
+        } else if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
@@ -603,7 +603,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             var lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -657,7 +657,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             seekBar!!.progress--
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -704,7 +704,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -753,7 +753,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -802,7 +802,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             var lessImage = getViewByPosition(pos, R.id.sbBrightness_less) as ImageView?
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -852,7 +852,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             seekBar!!.progress--
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -904,7 +904,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             seekBar!!.progress--
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -952,7 +952,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             seekBar!!.progress++
 
-            val address = data[pos].groupAress
+            val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
             var params: ByteArray
@@ -994,7 +994,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         if (currentTime - this.preTime > this.delayTime) {
             if (fromUser) {
-                val address = data[position].groupAress
+                val address = data[position].groupAddress
                 val opcode: Byte
                 if (seekBar.id == R.id.cw_sbBrightness) {
                     opcode = Opcode.SET_LUM
@@ -1020,7 +1020,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         val pos = seekBar.tag as Int
-        val address = data[pos].groupAress
+        val address = data[pos].groupAddress
         val opcode: Byte
         val itemGroup = data[pos]
         if (seekBar.id == R.id.cw_sbBrightness) {

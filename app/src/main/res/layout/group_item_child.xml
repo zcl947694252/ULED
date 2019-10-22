@@ -77,7 +77,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/btn_on"
             app:layout_constraintEnd_toEndOf="@+id/btn_on"
             app:layout_constraintStart_toStartOf="@+id/btn_on"
-            app:layout_constraintTop_toTopOf="@+id/btn_on" />
+            app:layout_constraintTop_toTopOf="@+id/btn_on"/>
+        <TextView
+            android:id="@+id/curtain_setting"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="25dp"
+            android:text="@string/setting"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@drawable/btn_rec_blue_r3"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_on"
+            app:layout_constraintEnd_toEndOf="@+id/btn_on"
+            app:layout_constraintStart_toStartOf="@+id/btn_on"
+            app:layout_constraintTop_toTopOf="@+id/btn_on"/>
 
 
         <View

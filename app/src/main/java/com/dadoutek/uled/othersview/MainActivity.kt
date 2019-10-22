@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -116,7 +117,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
 
-    private var mTelinkLightService: TelinkLightService? = null
     private var guideShowCurrentPage = false
     private var installId = 0
 
@@ -165,20 +165,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun startToRecoverDevices() {
-//        LogUtils.e("zcl------------要删除的数据"+DBUtils.getAllRGBLight())
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
-                            LogUtils.d("added device $it ")
+                            LogUtils.d("zcl--重加-----added device $it ")
                             deviceFragment.refreshView()
                         },
                         {
                             LogUtils.d(it)
+                            LogUtils.d("zcl--重加-----added device throwable$it")
                         },
                         {
+                            LogUtils.d("zcl--重加-----added device complete")
                             LogUtils.d("added mesh devices complete")
-
+                            //autoConnect()
                         })
         mCompositeDisposable.add(disposable)
     }
@@ -515,6 +516,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(p0: Int) {
+            }
+
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+            }
+
+            override fun onPageSelected(p0: Int) {
+                val intent = Intent("isDelete")
+                intent.putExtra("isDelete", "true")
+                LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(intent)
+            }
+        })
     }
 
 
@@ -548,14 +562,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-       // enableConnectionStatusListener()
+        enableConnectionStatusListener()
+        LogUtils.v("zcl--重加---------onResume")
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
             mApplication?.startLightService(TelinkLightService::class.java)
-
         startToRecoverDevices()
-
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
@@ -564,9 +577,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
+        LogUtils.v("zcl--重加---------onPostResume")
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
+
         autoConnect()
     }
 
@@ -592,16 +607,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             showOpenLocationServiceDialog()
         } else {
             hideLocationServiceDialog()
-            mTelinkLightService = TelinkLightService.Instance()
-            while (TelinkApplication.getInstance()?.serviceStarted == true) {
+            //LogUtils.v("zcl--重加---------isstart"+TelinkApplication.getInstance()?.serviceStarted)
+            if (TelinkApplication.getInstance()?.serviceStarted == true) {
                 RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-
                             if (!TelinkLightService.Instance().isLogin) {
                                 ToastUtils.showLong(R.string.connecting_please_wait)
-
 
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
@@ -616,23 +629,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setConnectDeviceType(
                                             mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                                     DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
+                                    LogUtils.v("zcl--重加---------开始自动连接")
                                     //连接，如断开会自动重连
                                     TelinkLightService.Instance().autoConnect(connectParams)
-
                                 }
                             }
-                        },
-                                {
-                                    LogUtils.d(it)
-                                })
-                break
+                        }, { LogUtils.d(it) })
+            }else{
+                this.mApplication?.startLightService(TelinkLightService::class.java)
+                autoConnect()
             }
         }
 
         val deviceInfo = this.mApplication?.connectDevice
         if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
-                    ?: 0x00) and 0xFF
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
         }
     }
 
@@ -682,7 +693,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onDestroy()
 
         TelinkLightApplication.getApp().releseStomp()
-
+        unregisterReceiver(receiver)
         //移除事件
         this.mApplication?.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
@@ -697,7 +708,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun onDeviceStatusChanged(event: DeviceEvent) {
 
         val deviceInfo = event.args
-
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 mScanTimeoutDisposal?.dispose()
@@ -804,7 +814,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     TelinkLightApplication.getApp().releseStomp()
                     ActivityUtils.finishAllActivities(true)
                     TelinkApplication.getInstance().removeEventListeners()
-                    TelinkLightApplication.getApp().doDestroy()
+                    //TelinkLightApplication.getApp().doDestroy()
                     finish()
                 }
             }
@@ -815,10 +825,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     class HomeKeyEventBroadCastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            TelinkLightApplication.getApp().releseStomp()
+         /*   TelinkLightApplication.getApp().releseStomp()
             ActivityUtils.finishAllActivities(true)
             TelinkApplication.getInstance().removeEventListeners()
-            TelinkLightApplication.getApp().doDestroy()
+            TelinkLightApplication.getApp().doDestroy()*/
         }
     }
 }

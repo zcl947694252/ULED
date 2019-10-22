@@ -30,7 +30,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
                 if (item != null) {
                     itemGroup.gpName = item.name
                     itemGroup.enableCheck = false
-                    itemGroup.groupAress = actions[i].groupAddr
+                    itemGroup.groupAddress = actions[i].groupAddr
                     itemGroup.brightness = actions[i].brightness
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color = actions[i].color

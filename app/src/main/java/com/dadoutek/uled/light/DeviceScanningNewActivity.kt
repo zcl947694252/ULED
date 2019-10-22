@@ -77,6 +77,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var disposableTimer: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
     private var connectInfo: DeviceInfo? = null
@@ -342,7 +343,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //先断开
         TelinkLightService.Instance()?.idleMode(true)
         //过一秒
-        Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     //倒计时，出问题了就超时。
@@ -389,7 +391,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.mApplication?.removeEventListener(this)
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance().idleMode(true)
-        Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableTimer?.dispose()
+         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1174,7 +1177,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         LeBluetooth.getInstance().stopScan()
 
         //断连后延时一段时间再开始扫描
-        Observable.timer(1000, TimeUnit.MILLISECONDS)
+        disposableTimer?.dispose()
+         disposableTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe {
@@ -1434,7 +1438,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mConnectRetryCount++
         if (mConnectRetryCount < MAX_CONNECT_RETRY_COUNT) {
             showLoadingDialog(resources.getString(R.string.connecting_tip))
-            Observable.timer(1500, TimeUnit.MILLISECONDS)
+            disposableTimer?.dispose()
+            disposableTimer=Observable.timer(1500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext {
                         //倒计时，出问题了就超时。

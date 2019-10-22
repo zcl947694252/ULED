@@ -426,7 +426,16 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.add_device_btn -> addDevice()
+            R.id.add_device_btn -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        addDevice()
+                    }
+                }
+            }
         }
     }
 
@@ -472,15 +481,23 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
             }
 
             view.id == R.id.tv_setting -> {
-                var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                    intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                            intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                        }
+                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                        startActivityForResult(intent, REQ_LIGHT_SETTING)
+                    }
                 }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                startActivityForResult(intent, REQ_LIGHT_SETTING)
+
             }
             else -> ToastUtils.showShort(R.string.reconnecting)
         }
@@ -535,8 +552,15 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_relay?.visibility == View.GONE) {
-                            showPopupMenu()
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else {
+                                if (dialog_relay?.visibility == View.GONE) {
+                                    showPopupMenu()
+                                }
+                            }
                         }
                     }
                 }

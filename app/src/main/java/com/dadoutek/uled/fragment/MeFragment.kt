@@ -41,9 +41,11 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
+import com.telink.bluetooth.LeBluetooth
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
@@ -57,6 +59,7 @@ import java.util.concurrent.TimeUnit
 
 class MeFragment : BaseFragment(), View.OnClickListener{
 
+    private var disposable: Disposable? = null
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
@@ -251,7 +254,9 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         } else {
             compositeDisposable.dispose()
         }
+        refreshView()
     }
+
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -367,13 +372,14 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         SyncDataPutOrGetUtils.syncPutDataStart(activity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()
-                val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                disposable?.dispose()
+                 disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {}
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }
-                compositeDisposable.add(disposable)
+                compositeDisposable.add(disposable!!)
             }
 
             override fun error(msg: String) {
@@ -501,7 +507,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkApplication.getInstance().removeEventListeners()
         TelinkLightApplication.getApp().doDestroy()
-    }
+}
 
     override fun setLoginChange() {
         super.setLoginChange()
@@ -511,5 +517,15 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     override fun setLoginOutChange() {
         super.setLoginOutChange()
         bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
+    }
+
+
+    private fun refreshView() {
+        if (LeBluetooth.getInstance().isEnabled&&TelinkLightService.Instance()?.isLogin == true&&TelinkLightApplication.getApp().connectDevice!=null) {
+                setLoginChange()
+            } else {
+                setLoginOutChange()
+            }
+
     }
 }

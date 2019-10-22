@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
+import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.NetWorkUtils
@@ -43,6 +44,7 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_setting.*
@@ -65,6 +67,9 @@ class SettingActivity : BaseActivity() {
         this.mApplication = this.application as TelinkLightApplication
         return R.layout.activity_setting
     }
+
+    private var disposableInterval: Disposable? = null
+    private var disposable: Disposable? = null
     private var mApplication: TelinkLightApplication? = null
     private lateinit var cancel: Button
     private lateinit var confirm: Button
@@ -96,10 +101,17 @@ class SettingActivity : BaseActivity() {
         settingAdapter.bindToRecyclerView(recycleView_setting)
 
         settingAdapter.setOnItemClickListener { _, _, position ->
-            when (position) {
-                0 -> emptyTheCache()
-                1 -> checkNetworkAndSyncs(this)
-                2 -> showSureResetDialogByApp()
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else {
+                    when (position) {
+                        0 -> emptyTheCache()
+                        1 -> checkNetworkAndSyncs(this)
+                        2 -> showSureResetDialogByApp()
+                    }
+                }
             }
         }
     }
@@ -115,8 +127,8 @@ class SettingActivity : BaseActivity() {
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun showSureResetDialogByApp() {
         isResetFactory = true
-            setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
-                    , R.string.have_question_look_notice, isResetFactory)
+        setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
+                , R.string.have_question_look_notice, isResetFactory)
     }
 
     @SuppressLint("CheckResult", "StringFormatMatches")
@@ -134,8 +146,8 @@ class SettingActivity : BaseActivity() {
         hinitOne.text = getString(pleaseSureAllDevicePowerOn)
         hinitTwo.text = getString(resetFactoryAllDevice)
         hinitThree.text = getString(haveQuestionLookNotice)
-
-        Observable.intervalRange(0, 2, 0, 1, TimeUnit.SECONDS)
+        disposableInterval?.dispose()
+        disposableInterval = Observable.intervalRange(0, 2, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -409,13 +421,14 @@ class SettingActivity : BaseActivity() {
             override fun complete() {
                 hideLoadingDialog()
                 //时间太短会导致无法删除数据库数据故此设置1500秒
-                val disposable = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                disposable?.dispose()
+                disposable = Observable.timer(1500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                         }
                 if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
-                compositeDisposable.add(disposable)
+                compositeDisposable.add(disposable!!)
             }
 
             override fun error(msg: String) {

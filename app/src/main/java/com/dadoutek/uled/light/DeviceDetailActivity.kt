@@ -23,6 +23,7 @@ import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
@@ -41,7 +42,6 @@ import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
@@ -123,7 +123,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
         lightsData = mutableListOf()
     }
-    
+
     override fun onPostResume() {
         super.onPostResume()
         addListeners()
@@ -141,7 +141,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
             LeScanEvent.LE_SCAN_TIMEOUT -> LogUtils.e("zcl连接超时了")
             LeScanEvent.LE_SCAN_COMPLETED -> LogUtils.e("zcl连接结束了")
-            NotificationEvent.GET_ALARM -> {}
+            NotificationEvent.GET_ALARM -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
@@ -300,7 +301,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
     override fun onResume() {
         super.onResume()
-       // type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        // type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
         initView()
@@ -338,7 +339,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
          *单个设备列表适配器页面设置
          */
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
-        adaper!!.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        adaper!!.onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
             currentLight = lightsData[position]
             positionCurrent = position
 
@@ -350,7 +351,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         connectFailedDeviceMacList.clear()
                         TelinkLightService.Instance().idleMode(true)
                         LeBluetooth.getInstance().stopScan()
-                        if (TelinkApplication.getInstance()?.connectDevice == null){
+                        if (TelinkApplication.getInstance()?.connectDevice == null) {
                             autoConnect(false)
                         }
                         LogUtils.e("zcl设备列表页重连开始扫描设备" + DBUtils.lastUser?.controlMeshName)
@@ -393,15 +394,22 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     }
 
                     R.id.tv_setting -> {
-                        var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
-                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                            intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else {
+                                var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
+                                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                                    intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
+                                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                                }
+                                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                                intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                                startActivityForResult(intent, REQ_LIGHT_SETTING)
+                            }
                         }
-                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                        startActivityForResult(intent, REQ_LIGHT_SETTING)
                     }
                 }
         }
@@ -518,7 +526,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         }
 
         installDialog?.show()
-
     }
 
     val INSTALL_NORMAL_LIGHT = 0
@@ -633,19 +640,19 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH ->{
-                       //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                       //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
-                       //startActivityForResult(intent, 0)
-                    startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SWITCH -> {
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
+                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        if(medressData <= MeshUtils.DEVICE_ADDRESS_MAX){
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
                             startActivityForResult(intent, 0)
-                        }else{
+                        } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
@@ -686,7 +693,16 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.add_device_btn -> addDeviceLight()
+            R.id.add_device_btn -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        addDeviceLight()
+                    }
+                }
+            }
         }
     }
 
@@ -695,13 +711,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             Constant.INSTALL_NORMAL_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                intent.putExtra(Constant.DEVICE_TYPE,  DeviceType.LIGHT_NORMAL)
+                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                 startActivityForResult(intent, 0)
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.DEVICE_TYPE,  DeviceType.LIGHT_RGB)
+                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                 startActivityForResult(intent, 0)
             }
         }
@@ -716,7 +732,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -733,45 +749,39 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             lightsData.add(list_group[i])
                         }
                     }
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.VISIBLE
-                    batchGroup.setOnClickListener {
-                /*        val intent = Intent(this,BatchGroupActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("lightType", "all_light")*/
-                        val intent = Intent(this, BatchGroupFourDevice::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_NORMAL)
-                        startActivity(intent)
-                    }
-                } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_device?.visibility == View.GONE) {
-                            showPopupMenu()
+                    var batchGroup = changeHaveDeviceView()
+                    batchGroup?.setOnClickListener {
+                        /*        val intent = Intent(this,BatchGroupActivity::class.java)
+                                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                                intent.putExtra("lightType", "all_light")*/
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else {
+                                if (dialog_device?.visibility == View.GONE) {
+                                    val intent = Intent(this, BatchGroupFourDevice::class.java)
+                                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                    startActivity(intent)
+                                }
+                            }
                         }
                     }
+                } else {
+                    changeNoDeviceView()
                 }
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 var all_light_data = DBUtils.getAllRGBLight()
-                LogUtils.e("zcl----彩灯"+DBUtils.getAllRGBLight())
+                LogUtils.e("zcl----彩灯" + DBUtils.getAllRGBLight())
 
                 lightsData.clear()
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group = ArrayList<DbLight>()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -788,32 +798,27 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             lightsData.add(list_group[i])
                         }
                     }
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.VISIBLE
-                    batchGroup.setOnClickListener {
+                    var batchGroup = changeHaveDeviceView()
+                    batchGroup?.setOnClickListener {
                         /*val intent = Intent(this, RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "all_light")*/
-                        val intent = Intent(this, BatchGroupFourDevice::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_RGB)
-                        startActivity(intent)
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else {
+                                if (dialog_device?.visibility == View.GONE) {
+                                    val intent = Intent(this, BatchGroupFourDevice::class.java)
+                                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                                    startActivity(intent)
+                                }
+                            }
+                        }
                     }
                 } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_device?.visibility == View.GONE)
-                            showPopupMenu()
-                    }
+                 changeNoDeviceView()
                 }
             }
             Constant.INSTALL_LIGHT_OF_CW -> {
@@ -822,7 +827,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -841,33 +846,26 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
                     var cwLightGroup = this.intent.getStringExtra("cw_light_name")
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
-                    batchGroup.setOnClickListener {
-                        val intent = Intent(this,
-                                BatchGroupActivity::class.java)
+                    var batchGroup = changeHaveDeviceView()
+                    batchGroup?.setOnClickListener {
+
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else{
+                        val intent = Intent(this, BatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "cw_light")
                         intent.putExtra("cw_light_group_name", cwLightGroup)
                         startActivity(intent)
+                            }
+                        }
+
                     }
                 } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_device?.visibility == View.GONE) {
-                            showPopupMenu()
-                        }
-                    }
+                    changeNoDeviceView()
                 }
             }
 
@@ -877,7 +875,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -898,37 +896,54 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     }
                     var rgbLightGroup = this.intent.getStringExtra("rgb_light_name")
                     LogUtils.e("zcl---rgb_light_name----$rgbLightGroup")
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.VISIBLE
-                    batchGroup.setOnClickListener {
+
+                    var batchGroup = changeHaveDeviceView()
+                    batchGroup?.setOnClickListener {
                         /*val intent = Intent(this, RgbBatchGroupActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("lightType", "rgb_light")
-                        intent.putExtra("rgb_light_group_name", rgbLightGroup)*/
+                                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                                    intent.putExtra("lightType", "rgb_light")
+                                    intent.putExtra("rgb_light_group_name", rgbLightGroup)*/
                         val intent = Intent(this, BatchGroupFourDevice::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE,DeviceType.LIGHT_RGB)
+                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                         startActivity(intent)
                     }
                 } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_device?.visibility == View.GONE) {
-                            showPopupMenu()
-                        }
-                    }
+                    changeNoDeviceView()
                 }
             }
         }
 
+    }
+
+    private fun changeHaveDeviceView(): TextView? {
+        toolbar!!.tv_function1.visibility = View.VISIBLE
+        recycleView.visibility = View.VISIBLE
+        no_device_relativeLayout.visibility = View.GONE
+        var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+        batchGroup.setText(R.string.batch_group)
+        batchGroup.visibility = View.VISIBLE
+        return batchGroup
+    }
+
+    private fun changeNoDeviceView() {
+        recycleView.visibility = View.GONE
+        no_device_relativeLayout.visibility = View.VISIBLE
+        toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else {
+                    if (dialog_device?.visibility == View.GONE) {
+                        showPopupMenu()
+                    }
+                }
+            }
+        }
     }
 
     private fun showPopupMenu() {
@@ -942,10 +957,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         mScanDisposal?.dispose()
         //移除事件
         this.mApplication?.removeEventListener(this)
-        if (TelinkLightApplication.getApp().connectDevice == null) {
-            TelinkLightService.Instance()?.idleMode(true)
-            LeBluetooth.getInstance().stopScan()
-        }
     }
 
 
@@ -965,7 +976,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         if (lightsData.size > 0) {
             val mOldDatas: MutableList<DbLight>? = lightsData
             val mNewDatas: MutableList<DbLight>? = getNewData()
-            
+
             val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                     return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get

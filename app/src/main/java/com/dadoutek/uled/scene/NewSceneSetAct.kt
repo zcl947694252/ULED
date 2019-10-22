@@ -158,7 +158,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 if (item != null) {
                     itemGroup.gpName = item.name
                     itemGroup.enableCheck = false
-                    itemGroup.groupAress = actions[i].groupAddr
+                    itemGroup.groupAddress = actions[i].groupAddr
                     itemGroup.brightness = actions[i].brightness
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color = actions[i].color
@@ -180,17 +180,22 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         showCheckListData?.clear()
         val allGroups = DBUtils.allGroups
         LogUtils.e("zcl---------所有灯组${DBUtils.allGroups}")
-        for (gp in allGroups)
-            if (gp.deviceCount > 0 || "所有灯" == gp.name)
-                showCheckListData?.add(gp)
+        for (index in allGroups.indices) {
+            val gp = allGroups[index]
+            if (gp.deviceCount > 0 || index == 0)
+                if (index == 0)
+                    gp.name = getString(R.string.allLight)
+            showCheckListData?.add(gp)
+        }
+
         LogUtils.e("zcl----------$showCheckListData")
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
                 for (j in showGroupList!!.indices) {
-                    if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
+                    if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAddress) {
                         showCheckListData!![i].checked = true
                         break
-                    } else if (j == showGroupList!!.size - 1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress) {
+                    } else if (j == showGroupList!!.size - 1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAddress) {
                         showCheckListData!![i].checked = false
                     }
                 }
@@ -312,8 +317,14 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
-        if (showCheckListData != null)
+       /* if (showCheckListData != null)
             showCheckListData?.remove(showCheckListData!![position])
+        if (showGroupList != null)
+            howGroupList?.remove(adapter.getItem(position))*/
+        for (index in showCheckListData!!.indices) {
+            if (showCheckListData!![index].meshAddr ==showGroupList!![position].groupAddress)
+                showCheckListData!![index].isChecked = false
+        }
         adapter.remove(position)
     }
 
@@ -451,11 +462,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     newItemGroup.checked = true
                     newItemGroup.enableCheck = true
                     newItemGroup.gpName = showCheckListData!![i].name
-                    newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                    newItemGroup.groupAddress = showCheckListData!![i].meshAddr
                     newResultItemList.add(newItemGroup)
                 } else {
                     for (j in showGroupList!!.indices) {
-                        if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
+                        if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAddress) {
                             oldResultItemList.add(showGroupList!![j])
                             break
                         } else if (j == showGroupList!!.size - 1) {
@@ -466,7 +477,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                             newItemGroup.checked = true
                             newItemGroup.enableCheck = true
                             newItemGroup.gpName = showCheckListData!![i].name
-                            newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                            newItemGroup.groupAddress = showCheckListData!![i].meshAddr
                             newResultItemList.add(newItemGroup)
                         }
                     }
@@ -515,31 +526,31 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 LogUtils.e("zcl**********************$item")
 
 
-                if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))) {
+                if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAddress))) {
                     sceneActions.belongSceneId = idAction
 
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
-                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.groupAddr = item.groupAddress
                     sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x10
                     sceneActions.isOn = item.isNo
 
                     DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAress))) {
+                } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAddress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
-                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.groupAddr = item.groupAddress
                     sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x05
                     sceneActions.isOn = item.isNo
                     DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
+                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
-                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.groupAddr = item.groupAddress
                     sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x06
 
@@ -548,7 +559,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
-                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.groupAddr = item.groupAddress
                     sceneActions.setColor(item.color)
 
                     sceneActions.deviceType = 0x04
@@ -662,51 +673,51 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 val sceneActions = DbSceneActions()
 
                 when {
-                    OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress)) -> {
+                    OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups.get(i).groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
-                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.groupAddr = itemGroups[i].groupAddress
                         sceneActions.setColor(itemGroups[i].color)
                         sceneActions.deviceType = 0x10
                         sceneActions.isOn = itemGroups[i].isNo
 
 
-                        nameList.add(itemGroups[i].groupAress)
+                        nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress)) -> {
+                    OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
-                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.groupAddr = itemGroups[i].groupAddress
                         sceneActions.setColor(itemGroups[i].color)
                         sceneActions.deviceType = 0x05
                         sceneActions.isOn = itemGroups[i].isNo
 
-                        nameList.add(itemGroups[i].groupAress)
+                        nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAress)) -> {
+                    OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
-                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.groupAddr = itemGroups[i].groupAddress
                         sceneActions.setColor(itemGroups[i].color)
 
                         sceneActions.deviceType = 0x06
-                        nameList.add(itemGroups[i].groupAress)
+                        nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     else -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
-                        sceneActions.groupAddr = itemGroups[i].groupAress
+                        sceneActions.groupAddr = itemGroups[i].groupAddress
                         sceneActions.setColor(itemGroups[i].color)
                         sceneActions.deviceType = 0x04
 
-                        nameList.add(itemGroups[i].groupAress)
+                        nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
                 }
@@ -819,7 +830,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     newItemGroup.checked = true
                     newItemGroup.enableCheck = true
                     newItemGroup.gpName = showCheckListData!![i].name
-                    newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                    newItemGroup.groupAddress = showCheckListData!![i].meshAddr
                     notCheckedGroupList!!.add(newItemGroup)
                 }
             }

@@ -60,6 +60,7 @@ class TelinkLightApplication : TelinkApplication() {
     override fun onCreate() {
         super.onCreate()
         app = this
+        super.doInit()
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
@@ -72,8 +73,7 @@ class TelinkLightApplication : TelinkApplication() {
         MobSDK.init(this)
     }
 
-    override fun doInit() {
-        super.doInit()
+    open fun initData() {
         //AES.Security = true;
         val currentRegionID = SharedPreferencesUtils.getCurrentUseRegion()
         // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
@@ -85,10 +85,10 @@ class TelinkLightApplication : TelinkApplication() {
 
             if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
                 mesh = Mesh()
-                mesh!!.name = name
-                mesh!!.password = name
-                mesh!!.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
-                mesh!!.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+                mesh.name = name
+                mesh.password = name
+                mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
+                mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
                 setupMesh(mesh)
             }
         }

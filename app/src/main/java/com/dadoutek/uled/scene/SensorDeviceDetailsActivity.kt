@@ -6,12 +6,14 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +35,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
@@ -57,6 +60,7 @@ import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
@@ -66,6 +70,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -75,6 +80,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var disposable: Disposable? = null
     private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
 
     private var connectSensorTimeoutDisposable: Disposable? = null
@@ -171,6 +177,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         ota = views?.findViewById<TextView>(R.id.ota)
         delete = views?.findViewById<TextView>(R.id.deleteBtn)
         rename = views?.findViewById<TextView>(R.id.rename)
+        delete?.text = getString(R.string.delete)
 
         rename?.visibility = View.GONE
         ota?.visibility = View.VISIBLE
@@ -179,9 +186,16 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         progressBar_sensor?.setOnClickListener {}
 
         add_device_btn.setOnClickListener {
-            startActivity(Intent(this, ScanningSensorActivity::class.java))
-            finish()
-            connectSensorTimeoutDisposable?.dispose()
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else {
+                    startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    finish()
+                    connectSensorTimeoutDisposable?.dispose()
+                }
+            }
         }//添加设备
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
@@ -419,9 +433,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             no_device_relativeLayout.visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                if (dialog_pir?.visibility == View.GONE) {
-                    dialog_pir?.visibility = View.VISIBLE//showPopupMenu
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        if (dialog_pir?.visibility == View.GONE) {
+                            dialog_pir?.visibility = View.VISIBLE//showPopupMenu
+                        }
+                    }
                 }
+
             }
         }
     }
@@ -429,47 +451,94 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
         currentLight = sensorData[position]
         positionCurrent = position
-        if (view.id == R.id.tv_setting) {
-            set = view!!.findViewById<ImageView>(R.id.tv_setting)
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            else {
 
-            popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            popupWindow!!.contentView = views
-            popupWindow!!.isFocusable = true
-            popupWindow!!.showAsDropDown(set, 40, -15)
+                if (view.id == R.id.tv_setting) {
+                    set = view!!.findViewById<ImageView>(R.id.tv_setting)
 
-            group?.setOnClickListener {
-                settingType = RECOVER_SENSOR
-                isClick = RECOVER_SENSOR
-                TelinkLightService.Instance()?.idleMode(true)
+                    popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    popupWindow!!.contentView = views
+                    popupWindow!!.isFocusable = true
+                    popupWindow!!.showAsDropDown(set, 40, -15)
+                    group?.setOnClickListener {
+                        settingType = RECOVER_SENSOR
+                        isClick = RECOVER_SENSOR
+                        TelinkLightService.Instance()?.idleMode(true)
+                        disposable?.dispose()
+                        disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    autoConnectSensor(true)//如果是断开状态直接重连不是就断开再重连
+                                }
+                        popupWindow?.dismiss()
+                    }
 
-                Observable.timer(1000, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            autoConnectSensor(true)//如果是断开状态直接重连不是就断开再重连
-                        }
+                    delete?.setOnClickListener {
+                        //添加恢复出厂设置
+                        //showResetConfirmDialog()
+                        popupWindow?.dismiss()
+                        var deleteSensor = sensorData[position]
+                        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+                                .setPositiveButton(android.R.string.ok) { _, _ ->
+                                    DBUtils.deleteSensor(deleteSensor)
+                                    notifyData()
+                                    NetworkFactory.getApi()
+                                            .deleteSensor(DBUtils.lastUser?.token, deleteSensor.id.toInt())
+                                            .compose(NetworkTransformer())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                LogUtils.v("zcl-----删除服务器内传感器$it")
+                                                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                                            }, {})
 
-                popupWindow!!.dismiss()
-            }
+                                    if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSensor.meshAddr)) {
+                                        TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                                    }
+                                    if (mConnectDevice != null) {
+                                        Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+                                        Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
+                                        if (deleteSensor.meshAddr == mConnectDevice?.meshAddress) {
+                                            GlobalScope.launch {
+                                                delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+                                                if (this@SensorDeviceDetailsActivity == null ||
+                                                        this@SensorDeviceDetailsActivity.isDestroyed ||
+                                                        this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
+                                                } else
+                                                    autoConnectSensor(true)
+                                            }
+                                        }
+                                    }
 
-            delete?.setOnClickListener {
-                //添加恢复出厂设置
-                showResetConfirmDialog()
-            }
-            ota?.setOnClickListener {
-                settingType = OTA_SENSOR
-                isClick = OTA_SENSOR
-                val instance = TelinkLightService.Instance()
-                instance?.idleMode(true)
-                Observable.timer(1000, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            autoConnectSensor(true)
-                        }
+                                    LogUtils.v("zc-----DBUtils.getAllSensor()删除后" + DBUtils.getAllSensor())
+                                }
+                                .setNegativeButton(R.string.btn_cancel, null)
+                                .show()
 
-                popupWindow!!.dismiss()
+                    }
+                    ota?.setOnClickListener {
+                        settingType = OTA_SENSOR
+                        isClick = OTA_SENSOR
+                        val instance = TelinkLightService.Instance()
+                        instance?.idleMode(true)
+                        disposable?.dispose()
+                        disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    autoConnectSensor(true)
+                                }
+
+                        popupWindow!!.dismiss()
+                    }
+                }
             }
         }
     }
+
 
     private fun showResetConfirmDialog() {
         var textView = TextView(this)
@@ -565,10 +634,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
 //                        LogUtils.e("zcl", "zcl***STATUS_LOGIN***$isClick")
                         when (isClick) {//重新配置
-                            RECOVER_SENSOR -> Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        relocationSensor()
-                                    }
+                            RECOVER_SENSOR -> {
+                                disposable?.dispose()
+                                disposable = Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            relocationSensor()
+                                        }
+                            }
                             OTA_SENSOR -> {//人体感应器ota
                                 getVersion(true)
                             }
@@ -612,7 +684,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 }
                             }
                         }
-
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     }
                 }

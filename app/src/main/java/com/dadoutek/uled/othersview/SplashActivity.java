@@ -40,7 +40,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         this.mApplication = (TelinkLightApplication) this.getApplication();
         //this.mApplication.doDestroy();
         TelinkLog.onDestroy();
-        this.mApplication.doInit();
+        this.mApplication.initData();
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);

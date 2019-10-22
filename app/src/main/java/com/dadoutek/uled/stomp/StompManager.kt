@@ -25,8 +25,9 @@ class StompManager private constructor() {
 
     //二维码频道
     val WS_TOPIC_CODE = "/user/topic/code.parse"/* + DBUtils.lastUser?.id*/
+
     //取消收授权频道
-    val WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
+    var WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
 
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
@@ -153,7 +154,10 @@ class StompManager private constructor() {
      */
     fun cancelAuthorization(): Flowable<CancelAuthorMsg> {
         val headersLogin = getAuthorHeaders()
-        return mStompClient!!.topic(WS_AUTHOR_CODE, headersLogin)
+//        LogUtils.e("解除授权的订阅id  ----${DBUtils.lastUser}")
+        var WSAUTHOR_CODE_NOW="/topic/authorization.cancel."+ DBUtils.lastUser?.id
+
+        return mStompClient!!.topic(WSAUTHOR_CODE_NOW, headersLogin)
                 .map { topicMessage ->
                     val payload = topicMessage.payload
                     val msg = Gson().fromJson(payload, CancelAuthorMsg::class.java)

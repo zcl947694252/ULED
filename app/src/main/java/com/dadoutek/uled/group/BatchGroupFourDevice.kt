@@ -28,6 +28,8 @@ import com.dadoutek.uled.scene.SceneEditListAdapter
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.widget.RecyclerSpace
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -59,11 +61,26 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
     private lateinit var deviceListLight: ArrayList<DbLight>
     private var groupsByDeviceType: MutableList<DbGroup>? = null
     private var deviceType: Int = 100
-    private var lastCheckedPostion: Int = 0
+    private var lastCheckedGroupPostion: Int = 0
     private var allLightId: Long = 0//有设备等于0说明没有分组成功
     private var retryConnectCount = 0
     private var connectMeshAddress: Int = 0
     private var mApplication: TelinkLightApplication? = null
+
+    private var noGroup: MutableList<DbLight>? = null
+    private var listGroup: MutableList<DbLight>? = null
+    private var deviceData: MutableList<DbLight>? = null
+
+    private var noGroupCutain: MutableList<DbCurtain>? = null
+    private var listGroupCutain: MutableList<DbCurtain>? = null
+    private var deviceDataCurtain: MutableList<DbCurtain>? = null
+
+    private var noGroupRelay: MutableList<DbConnector>? = null
+    private var listGroupRelay: MutableList<DbConnector>? = null
+    private var deviceDataRelay: MutableList<DbConnector>? = null
+
+    private var isHaveGrouped: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,14 +97,101 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbar.setNavigationOnClickListener { finish() }
 
-        if (TelinkApplication.getInstance().connectDevice==null)
+        if (TelinkApplication.getInstance().connectDevice == null)
             image_bluetooth.setImageResource(R.drawable.bluetooth_no)
         else
             image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
 
         footerViewAdd = LayoutInflater.from(this).inflate(R.layout.add_group, null)
-
         autoConnect()
+    }
+
+
+    private fun initData() {
+        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
+        setDevicesData(deviceType, isHaveGrouped)
+        setGroupData(deviceType)
+    }
+
+    /**
+     * 设置组数据
+     */
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    private fun setGroupData(deviceType: Int) {
+        groupsByDeviceType = DBUtils.getGroupsByDeviceType(deviceType)
+        if (groupsByDeviceType == null) {
+            groupsByDeviceType = mutableListOf()
+        } else if (groupsByDeviceType!!.size > 0) {
+            for (index in groupsByDeviceType!!.indices)
+                groupsByDeviceType!![index].isChecked = index == 0
+        }
+
+        batch_four_group_title.text = getString(R.string.grouped_num, groupsByDeviceType?.size)
+
+        batch_four_group_recycle.layoutManager = LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false)
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+        batch_four_group_recycle.addItemDecoration(decoration)
+
+        groupAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, groupsByDeviceType!!)
+        groupAdapter.bindToRecyclerView(batch_four_group_recycle)
+    }
+
+    /**
+     * 设置设备数据
+     */
+    @SuppressLint("StringFormatInvalid")
+    private fun setDevicesData(deviceType: Int, isHaveGrouped: Boolean) {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL -> {
+                noGroup = mutableListOf()
+                listGroup = mutableListOf()
+                deviceListLight = DBUtils.getAllNormalLight()
+            }
+            DeviceType.LIGHT_RGB -> {
+                noGroup = mutableListOf()
+                listGroup = mutableListOf()
+                deviceListLight = DBUtils.getAllRGBLight()
+            }
+            DeviceType.SMART_CURTAIN -> {
+                noGroupCutain = mutableListOf()
+                listGroupCutain = mutableListOf()
+                deviceListCurtains = DBUtils.getAllCurtains()
+            }
+            DeviceType.SMART_RELAY -> {
+                noGroupRelay = mutableListOf()
+                listGroupRelay = mutableListOf()
+                deviceListRelay = DBUtils.getAllRelay()
+            }
+        }
+        batch_four_device_recycle.layoutManager = GridLayoutManager(this, 2)
+        batch_four_device_recycle.addItemDecoration(RecyclerSpace(1,getColor(R.color.gray)))
+
+        when (deviceType) {
+            DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
+                groupingLight(deviceListLight, noGroup, listGroup)
+                deviceData = if (                                      !isHaveGrouped) {
+                    noGroup
+                } else {
+                    listGroup
+                }
+                if (deviceData!!.size > 8)
+                    batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 250)
+
+                LogUtils.e("zcl---批量分组4----灯设备信息$deviceData")
+
+                lightAdapter = BatchFourLightAdapter(R.layout.batch_device_item, deviceData!!)
+
+                lightAdapter?.bindToRecyclerView(batch_four_device_recycle)
+            }
+            DeviceType.SMART_CURTAIN -> {
+                deviceListCurtains = DBUtils.getAllCurtains()
+            }
+            DeviceType.SMART_RELAY -> {
+                deviceListRelay = DBUtils.getAllRelay()
+            }
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -103,7 +207,7 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
             hideLocationServiceDialog()
             mTelinkLightService = TelinkLightService.Instance()
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                 RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -134,101 +238,57 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
         }
         val deviceInfo = this.mApplication?.connectDevice
         if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
+                    ?: 0x00) and 0xFF
         }
     }
 
-    private fun initData() {
-        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
-        setGroupData(deviceType)
-        setDevicesData(deviceType)
+
+    @SuppressLint("StringFormatMatches")
+    private fun groupingLight(deviceListLight: ArrayList<DbLight>, noGroup: MutableList<DbLight>?, listGroup: MutableList<DbLight>?) {
+        for (i in deviceListLight.indices) {//获取组名 将分组与未分组的拆分
+            if (StringUtils.getLightGroupName(deviceListLight[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                deviceListLight[i].groupName = ""
+                noGroup!!.add(deviceListLight[i])
+            } else {
+                deviceListLight[i].groupName = StringUtils.getLightGroupName(deviceListLight[i])
+                listGroup!!.add(deviceListLight[i])
+            }
+        }
+
+        batch_four_no_group.text = getString(R.string.no_group_device_num, noGroup?.size)
+        batch_four_grouped.text = getString(R.string.grouped_num, listGroup?.size)
     }
-
-    /**
-     * 设置组数据
-     */
-    private fun setGroupData(deviceType: Int) {
-        groupsByDeviceType = DBUtils.getGroupsByDeviceType(deviceType)
-
-        if (groupsByDeviceType == null) {
-            groupsByDeviceType = mutableListOf()
-        }else if (groupsByDeviceType!!.size > 0) {
-            for (index in groupsByDeviceType!!.indices)
-                groupsByDeviceType!![index].isChecked = index == 0
-
-            if (groupsByDeviceType!!.size>3)
-                batch_four_group_recycle.layoutParams.height = ScreenUtils.dp2px(this,150)
-        }
-
-        batch_four_group_title.text = "组(${groupsByDeviceType?.size})"
-
-        batch_four_group_recycle.layoutManager = LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL, false)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        batch_four_group_recycle.addItemDecoration(decoration)
-
-        groupAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, groupsByDeviceType!!)
-        groupAdapter.bindToRecyclerView(batch_four_group_recycle)
-    }
-
-    /**
-     * 设置设备数据
-     */
-    private fun setDevicesData(deviceType: Int) {
-        when (deviceType) {
-            DeviceType.LIGHT_NORMAL -> {
-                deviceListLight = DBUtils.getAllNormalLight()
-            }
-            DeviceType.LIGHT_RGB -> {
-                deviceListLight = DBUtils.getAllRGBLight()
-            }
-            DeviceType.SMART_CURTAIN -> {
-                deviceListCurtains = DBUtils.getAllCurtains()
-            }
-            DeviceType.SMART_RELAY -> {
-                deviceListRelay = DBUtils.getAllRelay()
-            }
-        }
-
-        batch_four_device_title.text = "设备(${deviceListLight.size})"
-        LogUtils.e("zcl---批量分组4----设备信息$groupsByDeviceType")
-
-        batch_four_device_recycleview.layoutManager = GridLayoutManager(this, 3)
-        when (deviceType) {
-            DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
-                lightAdapter = BatchFourLightAdapter(R.layout.device_item, deviceListLight)
-                lightAdapter?.bindToRecyclerView(batch_four_device_recycleview)
-            }
-            DeviceType.SMART_CURTAIN -> {
-                deviceListCurtains = DBUtils.getAllCurtains()
-            }
-            DeviceType.SMART_RELAY -> {
-                deviceListRelay = DBUtils.getAllRelay()
-            }
-        }
-
-        for (index in deviceListLight.indices){
-            deviceListLight[index].deviceName = getDeviceName(deviceListLight[index])
-        }
-    }
-
 
     private fun initListener() {
+        batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
+            isHaveGrouped = checkedId != R.id.batch_four_grouped
+            if (checkedId == R.id.batch_four_no_group) {
+                batch_four_no_group_line.visibility = View.VISIBLE
+                batch_four_grouped_line.visibility = View.INVISIBLE
+            } else {
+                batch_four_no_group_line.visibility = View.INVISIBLE
+                batch_four_grouped_line.visibility = View.VISIBLE
+            }
+            setChangeDevice()
+        }
         groupAdapter.setOnItemClickListener { _, _, position ->
             //如果点中的不是上次选中的组则恢复未选中状态
-            if (lastCheckedPostion != position  && groupsByDeviceType?.get(lastCheckedPostion) != null)
-                groupsByDeviceType?.get(lastCheckedPostion)!!.checked = false
+            if (lastCheckedGroupPostion != position && groupsByDeviceType?.get(lastCheckedGroupPostion) != null)
+                groupsByDeviceType?.get(lastCheckedGroupPostion)!!.checked = false
 
-            lastCheckedPostion = position
+            lastCheckedGroupPostion = position
             if (groupsByDeviceType?.get(position) != null)
                 groupsByDeviceType?.get(position)!!.checked = !groupsByDeviceType?.get(position)!!.checked
             groupAdapter.notifyDataSetChanged()
         }
 
-        lightAdapter?.setOnItemChildClickListener { _, _, _ ->
-
+        lightAdapter?.setOnItemChildClickListener { _, _, position ->
+            deviceData?.get(position)!!.selected = !deviceData?.get(position)!!.selected
+            lightAdapter?.notifyDataSetChanged()
         }
+
+
 
         grouping_completed.setOnClickListener {
             //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
@@ -239,6 +299,28 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
                 doFinish()
             } else {
                 showToast(getString(R.string.have_lamp_no_group_tip))
+            }
+        }
+    }
+
+    private fun setChangeDevice() {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                deviceData = if (isHaveGrouped)
+                    listGroup
+                else
+                    noGroup
+                lightAdapter?.notifyDataSetChanged()
+            }
+            DeviceType.SMART_CURTAIN -> {
+                noGroupCutain = mutableListOf()
+                listGroupCutain = mutableListOf()
+                deviceListCurtains = DBUtils.getAllCurtains()
+            }
+            DeviceType.SMART_RELAY -> {
+                noGroupRelay = mutableListOf()
+                listGroupRelay = mutableListOf()
+                deviceListRelay = DBUtils.getAllRelay()
             }
         }
     }
@@ -257,8 +339,6 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
     }
 
 
-
-
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -268,20 +348,13 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> {}
+                    BluetoothAdapter.STATE_OFF -> {
+                    }
                 }
             }
         }
     }
 
-
-    private fun getDeviceName(light: DbLight): String {
-        return if (light.belongGroupId != allLightId) {
-            DBUtils.getGroupNameByID(light.belongGroupId)
-        } else {
-            getString(R.string.not_grouped)
-        }
-    }
     /**
      * 是否所有灯都分了组
      *
@@ -301,10 +374,9 @@ class BatchGroupFourDevice : TelinkBaseActivity() {
         if (deviceListLight != null && deviceListLight.size > 0) {
             checkNetworkAndSync(this)
         }
-         TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         finish()
     }
-
 
 
 }

@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -18,7 +19,6 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
@@ -404,22 +404,23 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+        progressBtn.text = getString(R.string.connecting)
+        device_stop_scan.text = getString(R.string.connecting_tip)
+        scanDisposable?.dispose()
+
         Thread {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
+
             LogUtils.e("zcl开始连接")
         }.start()
-
-        GlobalScope.launch(Dispatchers.Main) {
             connectDisposable?.dispose()    //取消掉上一个超时计时器
-            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
-                    .SECONDS)
+            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         LogUtils.e("zcl timeout retryConnect")
                         retryConnect()
                     }
-        }
     }
 
     private fun doFinish() {
@@ -459,8 +460,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     mDeviceInfo = leScanEvent.args
                     isSearchedDevice = true
                     connect()
-                    progressBtn.text = getString(R.string.connecting)
-                    device_stop_scan.text = getString(R.string.connecting_tip)
                 } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }

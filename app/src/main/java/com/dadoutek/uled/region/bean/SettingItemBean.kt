@@ -1,4 +1,4 @@
-package com.dadoutek.uled.region
+package com.dadoutek.uled.region.bean
 
 import java.io.Serializable
 

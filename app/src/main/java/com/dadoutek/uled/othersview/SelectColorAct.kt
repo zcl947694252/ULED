@@ -255,9 +255,9 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         if (isOnceSet) {
             Thread.sleep(50)
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
         } else {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
         }
     }
 
@@ -280,7 +280,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             itemGroup!!.color = (wValue shl 24) or (red shl 16) or (green shl 8) or blue
 
             Thread.sleep(50)
-//            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+//            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
 
         } catch (e: InterruptedException) {
             e.printStackTrace()
@@ -335,7 +335,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         @SuppressLint("StringFormatInvalid")
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
 
-            var addr = itemGroup!!.groupAress
+            var addr = itemGroup!!.groupAddress
 
             val opcode: Byte
             val params: ByteArray

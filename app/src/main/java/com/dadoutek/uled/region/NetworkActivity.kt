@@ -143,7 +143,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         image_bluetooth.setOnClickListener {
             openScan()
         }
-         disposableEnsure = RxView.clicks(image_bluetooth)
+        disposableEnsure = RxView.clicks(image_bluetooth)
                 .compose(mRxPermission.ensure(Manifest.permission.CAMERA))
                 .subscribe({
                     if (it) {
@@ -168,7 +168,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         RegionModel.lookTransferCode(this).subscribe({
             isTransferCode = true
             view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
-            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.VISIBLE
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.VISIBLE
             setQR(it.code)
             downTimer(it.expire.toLong())
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
@@ -445,7 +445,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             R.id.pop_qr_undo -> {//取消二维码
                 if (isRefresh) {//过期要生成
                     //刷新二维码
-                        if (isTransferCode)
+                    if (isTransferCode)
                         lookAndMaketransferCode()
                     else
                         lookAndMakeAuthorCode()
@@ -458,9 +458,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             transfer_account_tv.text = getString(R.string.transfer_accounts)
                             setCancel()
                         }
-                    }else {
+                    } else {
                         RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
-                            LogUtils.e("zcl取消网络授权成功id"+ regionBean!!.id+"=======type"+regionBean!!.code_info!!.type)
+                            LogUtils.e("zcl取消网络授权成功id" + regionBean!!.id + "=======type" + regionBean!!.code_info!!.type)
                             setCancel()
                             setCreatShareCodeState()
                         }, { ToastUtils.showShort(it.message) })
@@ -474,11 +474,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun lookAndMakeAuthorCode() {
         lookAuthorizeCode(regionBean!!.id, this).subscribe({
             mExpire = it.expire.toLong()
-            regionBean!!.code_info!!.type  = it.type
+            regionBean!!.code_info!!.type = it.type
             LogUtils.e(TAG, "zcl****是否有code判断是不是空的**" + (it.code == ""))
             isTransferCode = false
             view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.authorization_warm)
-            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.VISIBLE
+            view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.VISIBLE
             setQR(it.code)
             val expire = it.expire.toLong()
 
@@ -491,7 +491,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun setCancel() {
         view?.let {
-            it?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility =View.GONE
+            it?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.GONE
             //设置二维码失效状态 倒计时颜色状态
             it.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
             it.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
@@ -522,7 +522,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
 
     private fun setQR(it: String) {
-        var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px( 231f),  ConvertUtils.dp2px( 231f), null)
+        var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px(231f), ConvertUtils.dp2px(231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
     }
 
@@ -559,7 +559,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             val s = mExpire % 60
                             val m = mExpire / 60 % 60
                             val h = mExpire / 60 / 60
-                            view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.cancel_timer)+"$h:$m:$s"
+                            view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.cancel_timer) + "$h:$m:$s"
                         }
                     })
         }
@@ -652,69 +652,71 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         regionBean = list[position]
         Log.e(TAG, "zcl******" + regionBean.toString())
 
-        if (regionBean == null)
+        if (regionBean == null) {
             return
-        view?.let { itView
-            ->
-            itView.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
-           // itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
-            itView.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            //使用中不能删除 2
-            val b = regionBean!!.id.toString() == lastUser?.last_region_id.toString()
-            val b1 = regionBean!!.authorizer_id.toString() == lastUser?.last_authorizer_user_id.toString()
+        }else {
+            view?.let { itView
+                ->
+                itView.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
+                // itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
+                itView.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + regionBean!!.count_all
+                //使用中不能删除 2
+                val b = regionBean!!.id.toString() == lastUser?.last_region_id.toString()
+                val b1 = regionBean!!.authorizer_id.toString() == lastUser?.last_authorizer_user_id.toString()
 
-            Log.e("zcl", "zcl***tankuang***$b-----------$b1")
+                Log.e("zcl", "zcl***tankuang***$b-----------$b1")
 
-            if (b && b1) {// 2 300551
-                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
-            } else {
-                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete_bb)
-                itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
-            }
-
-            if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
-                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
-            }
-
-            if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
-                itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
-                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
-            } else {
-                itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
-            }
-
-            itView.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
-            itView.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
-
-            mExpire = regionBean!!.code_info!!.expire.toLong()
-            Log.e(TAG, "zcl****regionBean**${regionBean.toString()}")
-            itView.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
-            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
-            view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
-
-            RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe({
-                LogUtils.e("zcl_network-------授权码信息是否可用-------$it")
-                mExpire = it.expire.toLong()
-
-                isRefresh = mExpire <= 0 //过期或者撤销需要刷新
-
-                if (mExpire > 0) {
-                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_code)
-                    itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
+                if (b && b1) {// 2 300551
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                    itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
                 } else {
-                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
-                    itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete_bb)
+                    itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
                 }
-                showPop(pop!!, Gravity.BOTTOM)
-            }, {
-                ToastUtils.showShort(it.message)
-                showPop(pop!!, Gravity.BOTTOM)
-            })
+
+                if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+                }
+
+                if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
+                    itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
+                    itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
+                } else {
+                    itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+                    itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
+                }
+
+                itView.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
+                itView.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
+
+                mExpire = regionBean!!.code_info!!.expire.toLong()
+                Log.e(TAG, "zcl****regionBean**${regionBean.toString()}")
+                itView.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
+                view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
+                view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
+
+                RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe({
+                    LogUtils.e("zcl_network-------授权码信息是否可用-------$it")
+                    mExpire = it.expire.toLong()
+
+                    isRefresh = mExpire <= 0 //过期或者撤销需要刷新
+
+                    if (mExpire > 0) {
+                        itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_code)
+                        itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
+                    } else {
+                        itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
+                        itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
+                    }
+                    showPop(pop!!, Gravity.BOTTOM)
+                }, {
+                    ToastUtils.showShort(it.message)
+                    showPop(pop!!, Gravity.BOTTOM)
+                })
+            }
         }
     }
 

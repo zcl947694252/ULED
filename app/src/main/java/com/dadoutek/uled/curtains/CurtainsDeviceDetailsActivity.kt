@@ -201,8 +201,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        if (dialog_curtain?.visibility == View.GONE) {
-                            showPopupMenu()
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                            else {
+                                if (dialog_curtain?.visibility == View.GONE) {
+                                    showPopupMenu()
+                                }
+                            }
                         }
                     }
                 }
@@ -443,7 +450,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    INSTALL_SWITCH ->{
+                    INSTALL_SWITCH -> {
                         //intent = Intent(this, DeviceScanningNewActivity::class.java)
                         //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
                         //startActivityForResult(intent, 0)
@@ -470,7 +477,16 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.add_device_btn -> addCurtainDevice()
+            R.id.add_device_btn -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        addCurtainDevice()
+                    }
+                }
+            }
         }
     }
 
@@ -483,10 +499,17 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
         currentLight = curtain?.get(position)
         positionCurrent = position
-        if (TelinkLightApplication.getApp().connectDevice == null)
-            ToastUtils.showShort(getString(R.string.connecting_tip))
-        else
-            skipSetting()
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            else {
+                if (TelinkLightApplication.getApp().connectDevice == null)
+                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                else
+                    skipSetting()
+            }
+        }
     }
 
     override fun onDestroy() {

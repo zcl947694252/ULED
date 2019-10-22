@@ -2,7 +2,10 @@ package com.dadoutek.uled.util
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.polidea.rxandroidble2.RxBleClient
@@ -208,7 +211,7 @@ object RecoverMeshDeviceUtil {
                     LogUtils.d("create = $curtain  " + curtain.meshAddr)
                 }
 
-                DeviceType.NIGHT_LIGHT -> {
+            /*    DeviceType.NIGHT_LIGHT -> {
                     val sensor = DbSensor()
 //                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
                     sensor.productUUID = productUUID
@@ -217,8 +220,7 @@ object RecoverMeshDeviceUtil {
                     sensor.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
                     sensor.macAddr = deviceInfo.macAddress
                     DBUtils.saveSensor(sensor, false)
-                }
-
+                }*/
             }
 
         }
@@ -251,7 +253,7 @@ object RecoverMeshDeviceUtil {
                 break
 
             position = packetPosition + 1
-            type = (scanRecord[position].toInt() and 0xFF).toInt()
+            type = (scanRecord[position].toInt() and 0xFF)
             position++
 
             if (type == 0x09) {

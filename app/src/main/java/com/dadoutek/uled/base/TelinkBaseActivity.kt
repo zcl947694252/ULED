@@ -73,7 +73,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
-    var enableBaseConnectionStatusListener = true
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -165,6 +164,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
+                LogUtils.v("zcl---baseactivity收到登入广播")
                 ToastUtils.showLong(getString(R.string.connect_success))
                 changeDisplayImgOnToolbar(true)
 
@@ -173,6 +173,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
+                LogUtils.v("zcl---baseactivity收到登出广播")
                 changeDisplayImgOnToolbar(false)
             }
 
@@ -184,8 +185,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (enableBaseConnectionStatusListener)
-            enableConnectionStatusListener()
+        enableConnectionStatusListener()
         Constant.isTelBase = true
         foreground = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
@@ -193,7 +193,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LeBluetooth.getInstance().enable(applicationContext)
 
         if (LeBluetooth.getInstance().isEnabled) {
-            if (lightService?.isLogin == true) {
+            if (lightService?.isLogin == true&&TelinkLightApplication.getApp().connectDevice!=null) {
                 changeDisplayImgOnToolbar(true)
             } else {
                 changeDisplayImgOnToolbar(false)
@@ -448,7 +448,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    LogUtils.e( "zcl_baseMe___________收到消息***解析二维码***")
+                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
                 }
             }
@@ -537,6 +537,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
     }
+
 
 }
 

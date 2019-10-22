@@ -23,7 +23,7 @@ public class DbLight implements Serializable {
     private Long id;
     private int meshAddr;
     private String name;
-    private String deviceName;
+    private String groupName;
     private int brightness;
     private int colorTemperature;
     private String macAddr;
@@ -61,14 +61,14 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 2051794788)
-    public DbLight(Long id, int meshAddr, String name, String deviceName,
+    @Generated(hash = 1395507821)
+    public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
             int productUUID, Long belongGroupId, int index, int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
-        this.deviceName = deviceName;
+        this.groupName = groupName;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.macAddr = macAddr;
@@ -263,7 +263,7 @@ public class DbLight implements Serializable {
                 "id=" + id +
                 ", meshAddr=" + meshAddr +
                 ", name='" + name + '\'' +
-                ", deviceName='" + deviceName + '\'' +
+                ", groupName='" + groupName + '\'' +
                 ", brightness=" + brightness +
                 ", colorTemperature=" + colorTemperature +
                 ", macAddr='" + macAddr + '\'' +
@@ -282,11 +282,12 @@ public class DbLight implements Serializable {
                 '}';
     }
 
-    public String getDeviceName() {
-        return this.deviceName;
+
+    public String getGroupName() {
+        return this.groupName;
     }
 
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

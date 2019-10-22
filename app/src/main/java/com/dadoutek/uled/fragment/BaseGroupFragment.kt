@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -91,13 +92,16 @@ abstract class BaseGroupFragment : BaseFragment() {
         intentFilter.addAction("switch")
         intentFilter.addAction("switch_here")
         intentFilter.addAction("delete_true")
+        intentFilter.addAction("isDelete")
+        intentFilter.addAction("is")
         br = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val sonDeleteGroup = intent.getStringExtra("delete")
                 val lightStatus = intent.getStringExtra("switch_here")
                 val delete = intent.getStringExtra("delete_true")
-                if (key == "true" || delete == "true") {
+                val isDeleteRecevice = intent.getStringExtra("isDelete")//必定将删除模式恢复掉
+                if (key == "true" || delete == "true" || isDeleteRecevice == "true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
                     groupList.let {
@@ -222,7 +226,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             return@Comparator o1.name.compareTo(o2.name)
         })
 
-//        LogUtils.e("zcl删除组前$groupList")
+        //LogUtils.e("zcl删除组前$groupList")
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
@@ -232,30 +236,41 @@ abstract class BaseGroupFragment : BaseFragment() {
         groupAdapter!!.addFooterView(lin)
 
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
+        val lastUser = DBUtils.lastUser
+        //如果是自己的区域才允许长按删除
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
+
         groupAdapter!!.bindToRecyclerView(recyclerView)
     }
 
     private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { _, _, postion ->
-        if (!isDelete) {
-            isDelete = true
-            SharedPreferencesUtils.setDelete(true)
-            val intent = Intent("showPro")
-            intent.putExtra("is_delete", "true")
-            this.activity?.let {
-                LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
-            }
-        } else {//先长按  选中 在长按 就会通知外面关闭了
-            isDelete = false
-            val intent = Intent("showPro")
-            intent.putExtra("is_delete", "false")
-            this.activity?.let {
-                LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id) {
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            } else {
+                if (!isDelete) {
+                    isDelete = true
+                    SharedPreferencesUtils.setDelete(true)
+                    val intent = Intent("showPro")
+                    intent.putExtra("is_delete", "true")
+                    this.activity?.let {
+                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    }
+                } else {//先长按  选中 在长按 就会通知外面关闭了
+                    isDelete = false
+                    val intent = Intent("showPro")
+                    intent.putExtra("is_delete", "false")
+                    this.activity?.let {
+                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    }
+                }
+                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, isDelete)
+                groupAdapter?.changeState(isDelete)
+                groupList[postion].isSelected = isDelete
+                refreshData()
             }
         }
-        groupAdapter?.changeState(isDelete)
-        groupList[postion].isSelected = isDelete
-        refreshData()
         return@OnItemLongClickListener true
     }
 
@@ -321,44 +336,51 @@ abstract class BaseGroupFragment : BaseFragment() {
                 }
             }
 
-            R.id.btn_set -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
-                    var num = 0
-                    when (groupType) {
-                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            num = DBUtils.getLightByGroupID(currentLight.id).size
-                        }
-                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                            num = DBUtils.getLightByGroupID(currentLight.id).size
-                        }
-                        Constant.DEVICE_TYPE_CONNECTOR -> {
-                            num = DBUtils.getConnectorByGroupID(currentLight.id).size
-                        }//蓝牙接收器
-                        Constant.DEVICE_TYPE_CURTAIN -> {
-                            num = DBUtils.getCurtainByGroupID(currentLight.id).size
-                        }
-                    }
+            R.id.btn_set, R.id.curtain_setting -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
+                            var num = 0
+                            when (groupType) {
+                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                    num = DBUtils.getLightByGroupID(currentLight.id).size
+                                }
+                                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                    num = DBUtils.getLightByGroupID(currentLight.id).size
+                                }
+                                Constant.DEVICE_TYPE_CONNECTOR -> {
+                                    num = DBUtils.getConnectorByGroupID(currentLight.id).size
+                                }//蓝牙接收器
+                                Constant.DEVICE_TYPE_CURTAIN -> {
+                                    num = DBUtils.getCurtainByGroupID(currentLight.id).size
+                                }
+                            }
 
-                    if (num != 0) {
-                        var intent: Intent? = null
+                            if (num != 0) {
+                                var intent: Intent? = null
 
-                        when (groupType) {
-                            Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                intent = Intent(mContext, NormalSettingActivity::class.java)
-                            }
-                            Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                                intent = Intent(mContext, RGBSettingActivity::class.java)
-                            }
-                            Constant.DEVICE_TYPE_CONNECTOR -> {
-                                intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                            }//蓝牙接收器
-                            Constant.DEVICE_TYPE_CURTAIN -> {
-                                intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                                when (groupType) {
+                                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                        intent = Intent(mContext, NormalSettingActivity::class.java)
+                                    }
+                                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                        intent = Intent(mContext, RGBSettingActivity::class.java)
+                                    }
+                                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                                        intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                                    }//蓝牙接收器
+                                    Constant.DEVICE_TYPE_CURTAIN -> {
+                                        intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                                    }
+                                }
+                                intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intent?.putExtra("group", currentLight)
+                                startActivityForResult(intent, 2)
                             }
                         }
-                        intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent?.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
                     }
                 }
             }
@@ -427,10 +449,17 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     private val onClickAddGroup = View.OnClickListener {
-        if (TelinkLightApplication.getApp().connectDevice == null) {
-            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-        } else {
-            addNewGroup()
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            else {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                } else {
+                    addNewGroup()
+                }
+            }
         }
     }
 
@@ -485,7 +514,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 lights.remove(light)
 
                                 //修改分组成功后删除场景信息。
-                               // deleteAllSceneByLightAddr(light.meshAddr)
+                                // deleteAllSceneByLightAddr(light.meshAddr)
                                 Thread.sleep(100)
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组

@@ -1079,8 +1079,7 @@ public class LightAdapter {
 
         private void onLoginFailure() {
 
-            TelinkLog.e("onLoginFail "
-                    + mLightCtrl.getCurrentLight().getMacAddress());
+            TelinkLog.e("onLoginFail " + mLightCtrl.getCurrentLight().getMacAddress());
 
             int mode = getMode();
 

@@ -176,7 +176,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         newItemGroup.checked = true
                         newItemGroup.enableCheck = true
                         newItemGroup.gpName = showCheckListData!![0].name
-                        newItemGroup.groupAress = showCheckListData!![0].meshAddr
+                        newItemGroup.groupAddress = showCheckListData!![0].meshAddr
                         it.add(newItemGroup)
                         showDataListView()
                     }
@@ -359,7 +359,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                             .setTitle(R.string.target_brightness)
                             .setView(textGp)
                             .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                                var brin = textGp.text.toString().toInt()
+                                var brightness = textGp.text.toString()
+                                if (brightness == "")
+                                    brightness = "0"
+                                var brin = brightness.toInt()
                                 if (brin == 0) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot))
                                     return@setPositiveButton
@@ -651,10 +654,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     if (showGroupList!!.size != 0) {
                         for (i in it.indices)//0-1
                             for (j in showGroupList!!.indices)//0-1-3
-                                if (it[i].meshAddr == showGroupList!![j].groupAress) {
+                                if (it[i].meshAddr == showGroupList!![j].groupAddress) {
                                     it[i].checked = true
                                     break //j = 0-1-2   3-1=2
-                                } else if (j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAress) {
+                                } else if (j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAddress) {
                                     it[i].checked = false
                                 }
                         changeCheckedViewData()
@@ -709,11 +712,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                             newItemGroup.checked = true
                             newItemGroup.enableCheck = true
                             newItemGroup.gpName = showCheckListData!![i].name
-                            newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                            newItemGroup.groupAddress = showCheckListData!![i].meshAddr
                             newResultItemList.add(newItemGroup)
                         } else {
                             for (j in showGroupList!!.indices) {
-                                if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
+                                if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAddress) {
                                     oldResultItemList.add(showGroupList!![j])
                                     break
                                 } else if (j == showGroupList!!.size - 1) {
@@ -724,7 +727,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                     newItemGroup.checked = true
                                     newItemGroup.enableCheck = true
                                     newItemGroup.gpName = showCheckListData!![i].name
-                                    newItemGroup.groupAress = showCheckListData!![i].meshAddr
+                                    newItemGroup.groupAddress = showCheckListData!![i].meshAddr
                                     newResultItemList.add(newItemGroup)
                                 }
                             }
@@ -868,11 +871,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         var canSendGroup = true
         for (i in showGroupList!!.indices) {
-            if (showGroupList!![i].groupAress == 0xffff) {
+            if (showGroupList!![i].groupAddress == 0xffff) {
                 paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
             } else {
-                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                val groupL: Byte = (showGroupList!![i].groupAddress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
             }
         }
@@ -934,9 +937,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var controlGroupListStr = ""
         for (j in showGroupList!!.indices) {
             if (j == 0) {
-                controlGroupListStr = showGroupList!![j].groupAress.toString()
+                controlGroupListStr = showGroupList!![j].groupAddress.toString()
             } else {
-                controlGroupListStr += "," + showGroupList!![j].groupAress.toString()
+                controlGroupListStr += "," + showGroupList!![j].groupAddress.toString()
             }
         }
         return controlGroupListStr
@@ -978,11 +981,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         var canSendGroup = true
         for (i in showGroupList!!.indices) {
-            if (showGroupList!![i].groupAress == 0xffff) {
+            if (showGroupList!![i].groupAddress == 0xffff) {
                 paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
             } else {
-                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                val groupL: Byte = (showGroupList!![i].groupAddress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
             }
         }
@@ -1075,7 +1078,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             delay(1000)
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
-
+        disposable?.dispose()
         disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)

@@ -1006,7 +1006,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         List<DbLight> all_light = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
+            if (StringUtils.getLightGroupName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
                 no_list.add(list.get(i));
             } else {
                 group_list.add(list.get(i));

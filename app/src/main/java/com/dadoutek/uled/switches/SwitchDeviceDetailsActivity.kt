@@ -26,9 +26,12 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
@@ -189,10 +192,18 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             recycleView.visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                if (dialog?.visibility == View.GONE) {
-                    showPopupMenu()
-                } else {
-                    hidePopupMenu()
+
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else{
+                        if (dialog?.visibility == View.GONE) {
+                            showPopupMenu()
+                        } else {
+                            hidePopupMenu()
+                        }
+                    }
                 }
             }
         }
@@ -200,12 +211,21 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.add_device_btn -> addDevice()
+            R.id.add_device_btn ->{
+            addDevice()
+            }
         }
     }
 
     private fun addDevice() {
-        goSearchSwitch()
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            else{
+                goSearchSwitch()
+            }
+        }
     }
 
     private fun initView() {
@@ -246,7 +266,19 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         currentLight = switchData?.get(position)
         positionCurrent = position
         if (view.id == R.id.tv_setting) {
-            showPopupWindow(view, position)
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                else{
+                    if (dialog?.visibility == View.GONE) {
+                        showPopupMenu()
+                    } else {
+                        hidePopupMenu()
+                    }
+                }
+            }
+
         }
     }
 
@@ -321,8 +353,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         DBUtils.deleteSwitch(deleteSwitch)
                         notifyData()
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                        val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, deleteSwitch.meshAddr, null)
+
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
@@ -518,7 +549,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 return if (!beanOld?.name.equals(beanNew?.name)) {
                     return false//如果有内容不同，就返回false
                 } else true
-
             }
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
@@ -596,11 +626,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         install_device_recyclerView?.addItemDecoration(decoration)
 
@@ -695,8 +722,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 .setView(view)
                 .create()
 
-        installDialog?.setOnShowListener {
-        }
+        installDialog?.setOnShowListener {}
         installDialog?.show()
     }
 

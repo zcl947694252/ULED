@@ -476,6 +476,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             }
             LightAdapter.STATUS_LOGOUT -> {
                 autoConnect()
+                mConnectTimer?.dispose()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe({
                             LogUtils.d("STATUS_LOGOUT")

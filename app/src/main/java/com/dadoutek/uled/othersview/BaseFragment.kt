@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -54,6 +55,7 @@ open class BaseFragment : Fragment() {
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+                setLoginChange()
             }
 
         } else {
@@ -64,6 +66,7 @@ open class BaseFragment : Fragment() {
                     val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                     dialog.show()
                 }
+                setLoginOutChange()
             }
 
         }
@@ -96,11 +99,9 @@ open class BaseFragment : Fragment() {
                 ToastUtils.showLong(getString(R.string.connect_success))
                 changeDisplayImgOnToolbar(true)
 
-                setLoginChange()
             }
             LightAdapter.STATUS_LOGOUT -> {
                 changeDisplayImgOnToolbar(false)
-                setLoginOutChange()
             }
 
             LightAdapter.STATUS_CONNECTING -> {
@@ -120,6 +121,7 @@ open class BaseFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        LogUtils.v("zcl-----取消主页订阅")
         disableConnectionStatusListener()
     }
 
