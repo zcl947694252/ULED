@@ -158,7 +158,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             TelinkLightApplication.getApp().initStompClient()
         }
 
-         receiver = HomeKeyEventBroadCastReceiver()
+        receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
 
     }
@@ -447,20 +447,23 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     private fun checkVersionAvailable() {
         var version = packageName(this)
-        UpdateModel.isVersionAvailable(0, version)
-                .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
-                    override fun onNext(s: ResponseVersionAvailable) {
-                        if (!s.isUsable) {
-                            syncDataAndExit()
+        UpdateModel.run {
+            isVersionAvailable(0, version)
+                    .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
+                        override fun onNext(s: ResponseVersionAvailable) {
+                            if (!s.isUsable) {
+                                syncDataAndExit()
+                            }
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
                         }
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
-                    }
 
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        ToastUtils.showLong(R.string.get_server_version_fail)
-                    }
-                })
+                        override fun onError(e: Throwable) {
+                            super.onError(e)
+                            if (isRuning)
+                                ToastUtils.showLong(R.string.get_server_version_fail)
+                        }
+                    })
+        }
     }
 
     private fun createCustomDialogOne(t: VersionBean): CustomVersionDialogListener {
@@ -595,7 +598,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-
     @SuppressLint("CheckResult")
     fun autoConnect() {
         //如果支持蓝牙就打开蓝牙
@@ -635,7 +637,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                 }
                             }
                         }, { LogUtils.d(it) })
-            }else{
+            } else {
                 this.mApplication?.startLightService(TelinkLightService::class.java)
                 autoConnect()
             }
@@ -643,7 +645,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         val deviceInfo = this.mApplication?.connectDevice
         if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
+                    ?: 0x00) and 0xFF
         }
     }
 
@@ -825,10 +828,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     class HomeKeyEventBroadCastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-         /*   TelinkLightApplication.getApp().releseStomp()
-            ActivityUtils.finishAllActivities(true)
-            TelinkApplication.getInstance().removeEventListeners()
-            TelinkLightApplication.getApp().doDestroy()*/
+            /*   TelinkLightApplication.getApp().releseStomp()
+               ActivityUtils.finishAllActivities(true)
+               TelinkApplication.getInstance().removeEventListeners()
+               TelinkLightApplication.getApp().doDestroy()*/
         }
     }
 }

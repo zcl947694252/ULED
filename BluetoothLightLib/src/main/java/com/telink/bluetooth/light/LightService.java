@@ -23,8 +23,7 @@ import com.telink.bluetooth.TelinkLog;
  * @see LeOtaParameters
  * @see LeRefreshNotifyParameters
  */
-public abstract class LightService extends Service implements
-        LightAdapter.Callback, AdvanceStrategy.Callback {
+public abstract class LightService extends Service implements LightAdapter.Callback, AdvanceStrategy.Callback {
 
     public static final String ACTION_LE_SCAN = "com.telink.bluetooth.light.ACTION_LE_SCAN";
     public static final String ACTION_SCAN_COMPLETED = "com.telink.bluetooth.light.ACTION_SCAN_COMPLETED";

@@ -11,6 +11,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -21,7 +22,6 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
@@ -72,24 +72,24 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         initData()
         initView()
         initListener()
-        getVersion()
     }
 
-    private fun getVersion() {
-        var dstAddress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAddress = mDeviceInfo.meshAddress
-            Commander.getDeviceVersion(dstAddress,
-                    successCallback = {
-                        if (tvLightVersion != null && tvLightVersionText != null) {
-                            versionLayout.visibility = View.VISIBLE
-                        }
-                        tvLightVersion.text = it
-                    },
-                    failedCallback = {
-                        versionLayout.visibility = View.GONE
-                    })
+
+    private fun initData() {
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        tvLightVersion?.text = intent.getStringExtra("version")
+
+        groupName = intent.getStringExtra("group")
+        if (groupName != null && groupName == "true") {
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
+        mSwitchList = ArrayList()
+        mSwitchList.add(getString(R.string.button1))
+        mSwitchList.add(getString(R.string.button3))
+        mSwitchList.add(getString(R.string.button2))
+        mSwitchList.add(getString(R.string.button4))
+
+        mSceneList = DBUtils.sceneAll
     }
 
     private fun initListener() {
@@ -454,20 +454,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mAdapter.bindToRecyclerView(recyclerView)
     }
 
-    private fun initData() {
-        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        groupName = intent.getStringExtra("group")
-        if (groupName != null && groupName == "true") {
-            switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        }
-        mSwitchList = ArrayList()
-        mSwitchList.add(getString(R.string.button1))
-        mSwitchList.add(getString(R.string.button3))
-        mSwitchList.add(getString(R.string.button2))
-        mSwitchList.add(getString(R.string.button4))
-
-        mSceneList = DBUtils.sceneAll
-    }
 
     val groupAdress: Int
         get() {

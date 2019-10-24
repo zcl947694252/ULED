@@ -1,5 +1,6 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -9,23 +10,20 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Toast
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.jetbrains.anko.toast
@@ -134,6 +132,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         finish()
     }
 
+    @SuppressLint("CheckResult")
     private fun getAccount() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
             val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
@@ -148,31 +147,20 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 NetworkFactory.getApi()
                         .getAccount(userName, dbUser!!.channel)
                         .subscribeOn(Schedulers.io())
+                        .compose(NetworkTransformer())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object: Observer<Response<String>> {
-                            override fun onSubscribe(d: Disposable) {}
-                            override fun onNext(stringResponse: Response<String>) {
-                                if (stringResponse.errorCode == 0) {
-                                   //("logging" + stringResponse.errorCode + "获取成功account")
-                                    dbUser!!.account = stringResponse.t
-                                    verificationCode()
-                                    val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
-                                    intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
-                                    intent.putExtra("country_code",countryCode)
-                                    intent.putExtra("phone", userName)
-                                    intent.putExtra("account", dbUser!!.account)
-                                    startActivity(intent)
-                                } else {
-                                    ToastUtils.showLong(stringResponse.message)
-                                    if (stringResponse.message.contains("20001"))
-                                        startActivity(Intent(this@VerificationCodeActivity, RegisterActivity::class.java))
-                                }
-                            }
-                            override fun onError(e: Throwable) {
-                                hideLoadingDialog()
-                                Toast.makeText(this@VerificationCodeActivity, "onError:$e", Toast.LENGTH_SHORT).show()
-                            }
-                            override fun onComplete() {}
+                        .subscribe({
+                                dbUser.account =it
+                                verificationCode()
+                                val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
+                                intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
+                                intent.putExtra("country_code",countryCode)
+                                intent.putExtra("phone", userName)
+                                intent.putExtra("account", dbUser.account)
+                                startActivity(intent)
+                        },{
+                            hideLoadingDialog()
+                            ToastUtils.showShort(it.localizedMessage)
                         })
             }
         } else {

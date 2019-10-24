@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.*
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.CurtainGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -24,7 +25,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -44,7 +44,6 @@ import java.util.*
 
 class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
     override fun performed(event: Event<String>?) {}
-    private var showList: List<DbCurtain>? = null
     private var localVersion: String? = null
     private var curtain: DbCurtain? = null
     private var ctAdress: Int? = null
@@ -273,8 +272,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun updateGroup() {
-        val intent = Intent(this,
-                CurtainGroupingActivity::class.java)
+        val intent = Intent(this, CurtainGroupingActivity::class.java)
         if (curtain==null){
             ToastUtils.showShort(getString(R.string.please_connect_curtain))
             TelinkLightService.Instance()?.idleMode(true)

@@ -186,6 +186,7 @@ public abstract class AdvanceStrategy {
                         now = true;
                         lastSampleTime = currentTime;
                     } else {
+
                         commandSender.removeCallbacks(task);
                         task.setCommandArgs(opcode, address, params, delay, tag);
 //                        Log.d(TAG, "postCommand22: "+delay);

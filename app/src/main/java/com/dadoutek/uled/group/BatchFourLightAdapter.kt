@@ -40,7 +40,6 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
                 icon.setImageResource(R.drawable.icon_rgblight)
             } else {
                 icon.setImageResource(R.drawable.icon_device_open)
-                icon.setImageResource(R.drawable.icon_rgblight_down)
             }
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))

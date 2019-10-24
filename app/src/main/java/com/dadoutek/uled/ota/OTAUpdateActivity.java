@@ -52,7 +52,6 @@ import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
-import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LeScanParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.OtaDeviceInfo;
@@ -124,11 +123,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     public static final String INTENT_KEY_CONTINUE_MESH_OTA = "com.telink.bluetooth.light.INTENT_KEY_CONTINUE_MESH_OTA";
     // 有进度状态上报 时跳转进入的
     public static final int CONTINUE_BY_REPORT = 0x21;
-
     private static final int REQUEST_CODE_CHOOSE_FILE = 11;
-
     private PowerManager.WakeLock mWakeLock = null;
-
     private byte[] mFirmwareData;
     private String mPath;
     private SimpleDateFormat mTimeFormat;
@@ -147,7 +143,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_CONNECT = 15;
     private boolean OTA_IS_HAVEN_START = false;
     int lightMeshAddr;
-    int lightMacAddr;
+    String lightMacAddr;
     Handler handler;
     String lightVersion;
     private Handler delayHandler = new Handler();
@@ -241,7 +237,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void initData() {
         lightMeshAddr = getIntent().getIntExtra(Constant.OTA_MES_Add, 0);
-        lightMacAddr = getIntent().getIntExtra(Constant.OTA_MAC, 0);
+        lightMacAddr = getIntent().getStringExtra(Constant.OTA_MAC);
         lightVersion = getIntent().getStringExtra(Constant.OTA_VERSION);
         boolean b = "".equals(lightVersion) || lightVersion == null;
         btn_start_update.setClickable(!b);
@@ -253,8 +249,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             local_version.setText(getString(R.string.local_version, lightVersion));
         }
         log("current-light-mesh" + lightMeshAddr);
-        autoConnect();
-
+        LogUtils.v("zcl---current-light-mesh"+lightMeshAddr+"-----"+lightMacAddr+"===="+lightVersion);
         if (!SharedPreferencesUtils.isDeveloperModel())
             mPath = SharedPreferencesUtils.getUpdateFilePath();
     }
@@ -264,8 +259,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      */
     private void autoConnect() {
         if (TelinkApplication.getInstance().getConnectDevice() == null) {
-            if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                ToastUtils.showLong(getString(R.string.connecting));
+           // if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                //ToastUtils.showLong(getString(R.string.connecting));
+                showLoadingDialog(getString(R.string.connecting));
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false);
 
                 if (TelinkLightApplication.Companion.getApp().isEmptyMesh() != false)
@@ -276,6 +272,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     TelinkLightService instance = TelinkLightService.Instance();
                     if (instance != null)
                         instance.idleMode(true);
+                    hideLoadingDialog();
+                    LogUtils.v("zcl----登录升级中断");
                     return;
                 }
 
@@ -285,22 +283,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.INSTANCE.getLastUser().getControlMeshName())
                         + DBUtils.INSTANCE.getLastUser().getControlMeshName()));
                 connectParams.autoEnableNotification(true);
-
-                // 之前是否有在做MeshOTA操作，是则继续
+                connectParams.setConnectMac(lightMacAddr);
+               /* // 之前是否有在做MeshOTA操作，是则继续
                 if (mesh.isOtaProcessing())
-                    connectParams.setConnectMac(mesh.getOtaDevice().mac);
+                    connectParams.setConnectMac(mesh.getOtaDevice().mac);*/
 
                 //自动重连
                 TelinkLightService.Instance().autoConnect(connectParams);
             }
-
-            //刷新Notify参数
-            LeRefreshNotifyParameters refreshNotifyParams = Parameters.createRefreshNotifyParameters();
-            refreshNotifyParams.setRefreshRepeatCount(2);
-            refreshNotifyParams.setRefreshInterval(2000);
-            //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
-        }
+       // }
     }
 
     @SuppressLint("WakelockTimeout")
@@ -310,6 +301,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         if (mWakeLock != null) {
             mWakeLock.acquire();
         }
+    }
+
+    @Override
+    public void afterLogin() {
+        super.afterLogin();
+        hideLoadingDialog();
+        LogUtils.v("zcl----登录升级");
+        startOTA();
     }
 
     @SuppressLint({"InvalidWakeLockTag", "SimpleDateFormat"})
@@ -547,15 +546,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
             btn_start_update.setClickable(true);
+            startOTA();
         }
     }
 
     private void beginToOta() {
-        parseFile();
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null && TelinkLightApplication.Companion.getApp().getConnectDevice().meshAddress == lightMeshAddr) {
-            startOTA();
+            parseFile();
         } else {
-            autoConnect();
+            autoConnectMac(lightMacAddr);
         }
     }
 
@@ -644,11 +643,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null) {
             OTA_IS_HAVEN_START = true;
-            LogUtils.e("zcl-----------升级版本" + mFirmwareData);
+            LogUtils.e("zcl-----------升级版本" + mFirmwareData.toString()+"--------------"+TelinkLightService.Instance().isLogin());
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             //startScan();
-            autoConnect();
+            autoConnectMac(lightMacAddr);
         }
         log("startOTA ");
     }
@@ -800,7 +799,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 if (this.mode == MODE_COMPLETE) return;
                 TelinkLightService.Instance().enableNotification();
 
-                startOTA();
+                parseFile();
                 break;
 
             case LightAdapter.STATUS_CONNECTED:

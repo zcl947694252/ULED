@@ -33,7 +33,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -44,7 +43,6 @@ import kotlinx.android.synthetic.main.toolbar.view.*
  */
 
 class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var disposableTimer: Disposable? = null
     private lateinit var curtain: MutableList<DbCurtain>
     private var adapter: CurtainDeviceDetailsAdapter? = null
     internal var showList: List<ItemTypeGroup>? = null

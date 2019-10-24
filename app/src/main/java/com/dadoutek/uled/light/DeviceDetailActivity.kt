@@ -124,6 +124,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         lightsData = mutableListOf()
     }
 
+
     override fun onPostResume() {
         super.onPostResume()
         addListeners()
@@ -727,34 +728,38 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         lightsData = ArrayList()
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                var all_light_data = DBUtils.getAllNormalLight()
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbLight> = ArrayList()
-                    var no_group: ArrayList<DbLight> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                var allLightData = DBUtils.getAllNormalLight()
+                if (allLightData.size > 0) {
+                    var listGroup: ArrayList<DbLight> = ArrayList()
+                    var noGroup: ArrayList<DbLight> = ArrayList()
+                    for (i in allLightData.indices) {
+                        if (StringUtils.getLightGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            noGroup.add(allLightData[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(allLightData[i])
                         }
                     }
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            lightsData.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            lightsData.add(listGroup[i])
                         }
                     }
                     var batchGroup = changeHaveDeviceView()
+
                     batchGroup?.setOnClickListener {
-                        /*        val intent = Intent(this,BatchGroupActivity::class.java)
+                        /*      val intent = Intent(this,BatchGroupActivity::class.java)
                                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                                 intent.putExtra("lightType", "all_light")*/
+
+                        if (TelinkLightApplication.getApp().connectDevice!=null){
+
                         val lastUser = DBUtils.lastUser
                         lastUser?.let {
                             if (it.id.toString() != it.last_authorizer_user_id)
@@ -767,6 +772,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                                 }
                             }
                         }
+                        }else{
+                            autoConnect(true)
+                        }
                     }
                 } else {
                     changeNoDeviceView()
@@ -778,24 +786,24 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                 lightsData.clear()
                 if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbLight> = ArrayList()
-                    var no_group = ArrayList<DbLight>()
+                    var listGroup: ArrayList<DbLight> = ArrayList()
+                    var noGroup = ArrayList<DbLight>()
                     for (i in all_light_data.indices) {
                         if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                            noGroup.add(all_light_data[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(all_light_data[i])
                         }
                     }
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            lightsData.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            lightsData.add(listGroup[i])
                         }
                     }
                     var batchGroup = changeHaveDeviceView()
@@ -822,27 +830,27 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 }
             }
             Constant.INSTALL_LIGHT_OF_CW -> {
-                var all_light_data = DBUtils.getAllNormalLight()
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbLight> = ArrayList()
-                    var no_group: ArrayList<DbLight> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                var allLightData = DBUtils.getAllNormalLight()
+                if (allLightData.size > 0) {
+                    var listGroup: ArrayList<DbLight> = ArrayList()
+                    var noGroup: ArrayList<DbLight> = ArrayList()
+                    for (i in allLightData.indices) {
+                        if (StringUtils.getLightGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            noGroup.add(allLightData[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(allLightData[i])
                         }
                     }
 
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            lightsData.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            lightsData.add(listGroup[i])
                         }
                     }
                     var cwLightGroup = this.intent.getStringExtra("cw_light_name")
@@ -870,28 +878,27 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
 
             Constant.INSTALL_LIGHT_OF_RGB -> {
-                var all_light_data = DBUtils.getAllRGBLight()
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbLight> = ArrayList()
-                    var no_group: ArrayList<DbLight> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getLightGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                var allLightData = DBUtils.getAllRGBLight()
+                if (allLightData.size > 0) {
+                    var listGroup: ArrayList<DbLight> = ArrayList()
+                    var noGroup: ArrayList<DbLight> = ArrayList()
+                    for (i in allLightData.indices) {
+                        if (StringUtils.getLightGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            noGroup.add(allLightData[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(allLightData[i])
                         }
                     }
 
-
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            lightsData.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            lightsData.add(listGroup[i])
                         }
                     }
                     var rgbLightGroup = this.intent.getStringExtra("rgb_light_name")
@@ -923,7 +930,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         batchGroup.setText(R.string.batch_group)
-        batchGroup.visibility = View.VISIBLE
+        batchGroup.visibility = View.GONE
         return batchGroup
     }
 

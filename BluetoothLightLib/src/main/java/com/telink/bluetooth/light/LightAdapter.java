@@ -736,7 +736,7 @@ public class LightAdapter {
 
     protected boolean onLeScanFilter(LightPeripheral light) {
 
-        if (light==null)
+        if (light == null)
             return false;
         int mode = this.getMode();
 
@@ -788,7 +788,7 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-//        Log.d("LightAdapter:", "light_mesh_2:  " + "data=" + Arrays.bytesToHexString(data, "-"));
+        Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;
@@ -808,7 +808,6 @@ public class LightAdapter {
         if (this.mCallback != null)
             this.mCallback.onNotify(this.mLightCtrl.getCurrentLight(), getMode(),
                     opcode, src, params);
-
     }
 
     /********************************************************************************
@@ -890,15 +889,10 @@ public class LightAdapter {
             return;
 
         if (enable) {
-
             if (this.autoRefreshRunning)
                 return;
-
             this.autoRefreshCount = 0;
             this.autoRefreshRunning = true;
-            /*int delay = mParams.getInt(
-                    Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY,
-                    AUTO_REFRESH_NOTIFICATION_DELAY);*/
             this.mNotifyHandler.postDelayed(this.mNotifyTask, 0);
         } else {
             this.mNotifyHandler.removeCallbacks(this.mNotifyTask);
@@ -1563,38 +1557,39 @@ public class LightAdapter {
     private final class RefreshNotifyTask implements Runnable {
 
         @Override
-        public void run() {
+        public void run() {//解决多线程问题
+            synchronized (this) {
+                if (getMode() != MODE_AUTO_CONNECT_MESH)
+                    return;
 
-            if (getMode() != MODE_AUTO_CONNECT_MESH)
-                return;
+                if (autoRefreshParams == null)
+                    return;
 
-            if (autoRefreshParams == null)
-                return;
-            if (!mLightCtrl.isLogin())
-                return;
+                if (!mLightCtrl.isLogin())
+                    return;
 
-            int delay = autoRefreshParams.getInt(
-                    Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY,
-                    AUTO_REFRESH_NOTIFICATION_DELAY);
+                int delay = autoRefreshParams.getInt(
+                        Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY, AUTO_REFRESH_NOTIFICATION_DELAY);
 
-            if (delay <= 0)
-                delay = AUTO_REFRESH_NOTIFICATION_DELAY;
+                if (delay <= 0)
+                    delay = AUTO_REFRESH_NOTIFICATION_DELAY;
 
-            mLightCtrl.updateNotification();
-            int repeat = autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
+                mLightCtrl.updateNotification();
+                int repeat = autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
 
-            if (repeat > 0) {
-                int count = autoRefreshCount + 1;
+                if (repeat > 0) {
+                    int count = autoRefreshCount + 1;
 
-                if (count > repeat) {
-                    autoRefreshRunning = false;
-                } else {
-                    autoRefreshCount = count;
-                    TelinkLog.e("AutoRefresh : " + count);
+                    if (count > repeat) {
+                        autoRefreshRunning = false;
+                    } else {
+                        autoRefreshCount = count;
+                        TelinkLog.e("AutoRefresh : " + count);
+                        mNotifyHandler.postDelayed(this, delay);
+                    }
+                } else if (repeat <= 0) {
                     mNotifyHandler.postDelayed(this, delay);
                 }
-            } else if (repeat <= 0) {
-                mNotifyHandler.postDelayed(this, delay);
             }
         }
     }

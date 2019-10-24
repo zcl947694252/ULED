@@ -1,5 +1,6 @@
 package com.dadoutek.uled.base
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -40,21 +41,26 @@ import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.Parameters
 import com.telink.util.EventListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var mStompListener: Disposable? = null
-    private var isRuning: Boolean = false
+    protected var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
     private var pop: PopupWindow? = null
     private var popView: View? = null
@@ -72,6 +78,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var loadDialog: Dialog? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
+    var disposableTimer: Disposable? = null
 
 
     @SuppressLint("ShowToast")
@@ -165,22 +172,37 @@ open class TelinkBaseActivity : AppCompatActivity() {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 LogUtils.v("zcl---baseactivity收到登入广播")
+                GlobalScope.launch(Dispatchers.Main) {
                 ToastUtils.showLong(getString(R.string.connect_success))
-                changeDisplayImgOnToolbar(true)
+                    changeDisplayImgOnToolbar(true)
+                    afterLogin()
+                }
 
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
+
             }
             LightAdapter.STATUS_LOGOUT -> {
                 LogUtils.v("zcl---baseactivity收到登出广播")
+                GlobalScope.launch(Dispatchers.Main) {
                 changeDisplayImgOnToolbar(false)
+                afterLoginOut()
+                }
             }
 
             LightAdapter.STATUS_CONNECTING -> {
                 ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
+    }
+
+    open fun afterLogin() {
+
+    }
+
+    open fun afterLoginOut() {
+
     }
 
     override fun onResume() {
@@ -262,9 +284,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onPause()
         isRuning = false
         foreground = false
-
-
-
         disableConnectionStatusListener()
     }
 
@@ -518,7 +537,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var version: String? = ""
         if (TelinkApplication.getInstance().connectDevice != null)
             Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , { showToast(getString(R.string.get_server_version_fail)) })
+                    , {showToast(getString(R.string.get_server_version_fail)) })
         return version
     }
 
@@ -536,6 +555,52 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
+    }
+
+    /**
+     * 自动重连
+     */
+    @SuppressLint("CheckResult")
+    fun autoConnectMac(macAddr: String?) {
+        //如果支持蓝牙就打开蓝牙
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
+
+        //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
+        if (!BleUtils.isLocationEnable(this)) {
+            showOpenLocationServiceDialog()
+        } else {
+            hideLocationServiceDialog()
+            TelinkLightService.Instance().idleMode(true)
+            Thread.sleep(200)
+            if (TelinkApplication.getInstance()?.serviceStarted == true) {
+                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            if (!TelinkLightService.Instance().isLogin) {
+                                showLoadingDialog(getString(R.string.please_wait))
+
+                                val meshName = DBUtils.lastUser!!.controlMeshName
+
+                                GlobalScope.launch {
+                                    //自动重连参数
+                                    val connectParams = Parameters.createAutoConnectParameters()
+                                    connectParams.setMeshName(meshName)
+                                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                                    connectParams.autoEnableNotification(true)
+                                    connectParams.setConnectMac(macAddr)
+                                    LogUtils.v("zcl--重加---------开始自动连接")
+                                    //连接，如断开会自动重连
+                                    TelinkLightService.Instance().autoConnect(connectParams)
+                                }
+                            }
+                        }, { LogUtils.d(it) })
+            } else {
+                this.mApplication?.startLightService(TelinkLightService::class.java)
+                autoConnectMac(macAddr)
+            }
+        }
     }
 
 

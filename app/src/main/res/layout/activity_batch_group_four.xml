@@ -14,7 +14,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/btn_rec_blue_bt"
-        android:text="@string/grouping_completed"
+        android:text="@string/set_group"
         android:textColor="@android:color/white"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,25 +24,44 @@
     <LinearLayout
         android:id="@+id/batch_four_device_ly"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="78dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include8">
-        <TextView
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="35dp"
-            android:background="@color/gray_e"
-            android:gravity="center_vertical"
-            android:paddingStart="@dimen/dp_10"
-            android:text="@string/choose_device"
-            android:textColor="@color/gray_6"
-            android:textSize="13sp" />
-
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:background="@color/gray_e"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/dp_10"
+                android:text="@string/choose_device"
+                android:textColor="@color/gray_6"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/batch_four_device_all"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/gray_e"
+                android:gravity="center_vertical|end"
+                android:paddingLeft="@dimen/dp_10"
+                android:paddingStart="10dp"
+                android:paddingEnd="@dimen/dp_10"
+                android:text="@string/select_all"
+                android:textColor="@color/black_three"
+                android:textSize="13sp" />
+        </LinearLayout>
+        
         <RadioGroup
             android:id="@+id/batch_four_group_rg"
             android:layout_width="match_parent"
-            android:layout_height="37dp"
+            android:layout_height="32dp"
             android:paddingTop="2dp"
             android:orientation="horizontal">
                 <RadioButton
@@ -72,7 +91,6 @@
                     android:text="@string/grouped_num"
                     android:textColor="@color/selector_batch_group_color"
                     android:textSize="18sp" />
-
 
         </RadioGroup>
 
@@ -121,25 +139,44 @@
             android:layout_height="1dp"
             android:background="@color/gray_e" />
     </LinearLayout>
-
+    <LinearLayout
+        android:id="@+id/batch_four_group_ly"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/batch_four_device_recycle" >
     <TextView
         android:id="@+id/batch_four_group_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
         android:background="@color/gray_e"
         android:gravity="center_vertical"
-        android:padding="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="@dimen/dp_10"
         android:text="@string/choose_group_change"
         android:textColor="@color/gray_6"
-        android:textSize="13sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/batch_four_device_recycle" />
+        android:textSize="13sp" />
+    <TextView
+        android:id="@+id/batch_four_group_add_group"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/gray_e"
+        android:gravity="center_vertical|end"
+        android:paddingLeft="@dimen/dp_10"
+        android:paddingStart="10dp"
+        android:paddingEnd="@dimen/dp_10"
+        android:text="@string/add_groups"
+        android:textColor="@color/black_three"
+        android:textSize="13sp" />
 
+    </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/batch_four_device_recycle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/batch_four_group_title"
+        app:layout_constraintBottom_toTopOf="@+id/batch_four_group_ly"
         app:layout_constraintTop_toBottomOf="@+id/batch_four_device_ly"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -149,7 +186,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/grouping_completed"
-        app:layout_constraintTop_toBottomOf="@+id/batch_four_group_title"
+        app:layout_constraintTop_toBottomOf="@+id/batch_four_group_ly"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp" />
 

@@ -13,23 +13,24 @@ import android.widget.GridView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import java.lang.Thread.sleep
 import java.util.*
 
 
@@ -53,54 +54,46 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 if(!isStartGroup){
                     isStartGroup=true
                     showLoadingDialog(getString(R.string.grouping))
-                    object : Thread({
-                        val sceneIds = getRelatedSceneIds(group.meshAddr)
-                        for(i in 0..1){
-                            deletePreGroup(curtain!!.meshAddr)
-                            Thread.sleep(100)
-                        }
+                     Thread{
+                         val sceneIds = getRelatedSceneIds(group.meshAddr)
+                         for(i in 0..1){
+                             deletePreGroup(curtain!!.meshAddr)
+                             sleep(100)
+                         }
 
-                        for(i in 0..1){
-                            deleteAllSceneByLightAddr(curtain!!.meshAddr)
-                            Thread.sleep(100)
-                        }
+                         for(i in 0..1){
+                             deleteAllSceneByLightAddr(curtain!!.meshAddr)
+                             sleep(100)
+                         }
 
-                        for(i in 0..1){
-                            allocDeviceGroup(group)
-                            Thread.sleep(100)
-                        }
+                         for(i in 0..1){
+                             allocDeviceGroup(group)
+                             sleep(100)
+                         }
 
-                        for (sceneId in sceneIds) {
-                            val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
-                            if (action != null) {
-                                for(i in 0..1){
-                                    Commander.addScene(sceneId, curtain!!.meshAddr, action.color)
-                                    Thread.sleep(100)
-                                }
-                            }
-                        }
+                         for (sceneId in sceneIds) {
+                             val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
+                             if (action != null) {
+                                 for(i in 0..1){
+                                     Commander.addScene(sceneId, curtain!!.meshAddr, action.color)
+                                     sleep(100)
+                                 }
+                             }
+                         }
+                         group.deviceType=curtain!!.productUUID.toLong()
 
-
-                        group.deviceType=curtain!!.productUUID.toLong()
-
-                        DBUtils.updateGroup(group)
-                        DBUtils.updateCurtain(curtain!!)
-                        runOnUiThread {
-                            hideLoadingDialog()
-                            ActivityUtils.finishActivity(WindowCurtainsActivity::class.java)
-                            finish()
-                        }
-                    }) {
-
-                    }.start()
+                         DBUtils.updateGroup(group)
+                         DBUtils.updateCurtain(curtain!!)
+                         runOnUiThread {
+                             hideLoadingDialog()
+                             ActivityUtils.finishActivity(WindowCurtainsActivity::class.java)
+                             finish()
+                         }
+                     }.start()
                 }
             }
-        } else {
-            //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
-           //"group is null")
         }
     }
-    //        }
 
     private val mHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
@@ -139,8 +132,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      */
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
@@ -171,9 +163,9 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         this.setContentView(R.layout.activity_device_grouping)
 
         initData()
+        getDeviceGroup()
         initView()
 
-        this.getDeviceGroup()
         //        getScene();
     }
 
@@ -194,6 +186,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         this.curtain = this.intent.extras?.get("curtain") as DbCurtain
         this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
+
         groupsInit = ArrayList()
 
         val list = DBUtils.groupList
@@ -204,15 +197,18 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
         for (i in list.indices) {
+
             if (curtain?.productUUID == DeviceType.SMART_CURTAIN){
                 if (OtherUtils.isCurtain(list[i])) {
                     groupsInit?.add(list[i])
+                    list[i].checked = list[i].id == this.curtain?.belongGroupId
                 }
             }
 
             if(OtherUtils.isDefaultGroup(list[i])){
                 groupsInit?.add(list[i])
             }
+
         }
     }
 

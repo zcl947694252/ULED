@@ -741,12 +741,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        return if (keyCode == KeyEvent.KEYCODE_BACK) {
             setResult(Constant.RESULT_OK)
             finish()
-            return false
+            false
         } else {
-            return super.onKeyDown(keyCode, event)
+            super.onKeyDown(keyCode, event)
         }
     }
 }

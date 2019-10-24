@@ -49,7 +49,7 @@ class SyncDataPutOrGetUtils {
                 GlobalScope.launch(Dispatchers.Main) {
                     syncCallback.start()
                 }
-                LogUtils.e("zcl得删除添加表$dbDataChangeList")
+                LogUtils.v("zcl得删除添加表$dbDataChangeList")
 
                 for (data in dbDataChangeList) {
                     data.changeId?: break

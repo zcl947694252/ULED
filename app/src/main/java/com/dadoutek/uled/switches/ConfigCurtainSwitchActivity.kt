@@ -10,6 +10,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -20,12 +21,10 @@ import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -49,6 +48,7 @@ private const val CONNECT_TIMEOUT = 5
 
 class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private var version: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
@@ -77,25 +77,37 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
         initView()
         initListener()
-        getVersion()
     }
 
-    private fun getVersion() {
-        var dstAdress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        versionLayout.visibility = View.VISIBLE
-                        tvLightVersion.text = it
-                        if (it!!.startsWith("ST")) {
-                            isGlassSwitch = true
-                        }
-                    },
-                    failedCallback = {
-                        versionLayout.visibility = View.GONE
-                    })
+    private fun initView() {
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+       version =intent.getStringExtra("version")
+
+        tvLightVersion.text = version
+        if (version!!.startsWith("ST")) {
+            isGlassSwitch = true
         }
+        groupName = intent.getStringExtra("group")
+        if (groupName != null && groupName == "true") {
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        }
+        mGroupArrayList = ArrayList()
+        val groupList = DBUtils.groupList
+
+        for (group in groupList) {
+            if (OtherUtils.isCurtain(group)) {
+                group.checked = false
+                mGroupArrayList.add(group)
+            }
+        }
+        if (mGroupArrayList.size > 0) {
+            mGroupArrayList[0].checked = true
+        }
+
+        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun showCancelDialog() {
@@ -283,22 +295,24 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
-                if (mIsDisconnecting) {
-                    this.mApplication.removeEventListener(this)
+                when {
+                    mIsDisconnecting -> {
+                        this.mApplication.removeEventListener(this)
 
-                    GlobalScope.launch(Dispatchers.Main) {
-                        delay(200)
-                        progressBar.visibility = View.GONE
-                        finish()
+                        GlobalScope.launch(Dispatchers.Main) {
+                            delay(200)
+                            progressBar.visibility = View.GONE
+                            finish()
+                        }
                     }
-                } else if (mIsConfiguring) {
-                    this.mApplication.removeEventListener(this)
-                    GlobalScope.launch(Dispatchers.Main) {
-                        progressBar.visibility = View.GONE
-                        showConfigSuccessDialog()
+                    mIsConfiguring -> {
+                        this.mApplication.removeEventListener(this)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            progressBar.visibility = View.GONE
+                            showConfigSuccessDialog()
+                        }
                     }
-                } else {
-                    showDisconnectSnackBar()
+                    else -> showDisconnectSnackBar()
                 }
             }
         }
@@ -442,32 +456,6 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 (groupAddress shr 8 and 0xFF).toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
                 paramBytes)
-    }
-
-    private fun initView() {
-        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        groupName = intent.getStringExtra("group")
-        if (groupName != null && groupName == "true") {
-            switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        }
-        mGroupArrayList = ArrayList()
-        val groupList = DBUtils.groupList
-
-        for (group in groupList) {
-            if (OtherUtils.isCurtain(group)) {
-                group.checked = false
-                mGroupArrayList.add(group)
-            }
-        }
-        if (mGroupArrayList.size > 0) {
-            mGroupArrayList[0].checked = true
-        }
-
-        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mAdapter.bindToRecyclerView(recyclerView)
-
     }
 
 }

@@ -113,7 +113,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             it.isOutsideTouchable = false
         }
     }
-
     private fun initViewType() {
         dbUser = DbUser()
         when (type) {
@@ -209,7 +208,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     @SuppressLint("CheckResult")
     private fun login() {
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-
+        Log.e("zcl", "zcl登录******")
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
             AccountModel.login(phone!!, editPassWord!!)
@@ -225,6 +224,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
+                            Log.e("zcl", "zcl登录******${e.localizedMessage}")
                             hideLoadingDialog()
                         }
                     })
@@ -393,6 +393,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     override fun onResume() {
         super.onResume()
+        isRunning = true
         if (mWakeLock != null) {
             mWakeLock!!.acquire()
         }

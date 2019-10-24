@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -23,13 +24,11 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -54,6 +53,7 @@ private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private var version: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
@@ -85,25 +85,39 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         initView()
         initListener()
-        getVersion()
     }
 
-    private fun getVersion() {
-        var dstAdress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        localVersion = it
-                        versionLayout.visibility = View.VISIBLE
-                        tvLightVersion.text = it
-                        if (it!!.startsWith("STS"))
-                            isGlassSwitch = true
-                    },
-                    failedCallback = {
-                        versionLayout.visibility = View.GONE
-                    })
+    private fun initView() {
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        groupName = intent.getStringExtra("group")
+        localVersion = intent.getStringExtra("version")
+        tvLightVersion.text = localVersion
+        if (localVersion!!.startsWith("STS"))
+            isGlassSwitch = true
+
+        if (groupName != null && groupName == "true") {
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        } else {
+            groupName = "false"
         }
+        mGroupArrayList = ArrayList()
+        val groupList = DBUtils.groupList
+
+        for (group in groupList) {
+            if (OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group) || OtherUtils.isConnector(group)) {
+                group.checked = false
+                mGroupArrayList.add(group)
+            }
+        }
+        if (mGroupArrayList.size > 0) {
+            mGroupArrayList[0].checked = true
+        }
+
+        mRxPermission = RxPermissions(this)
+        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun showCancelDialog() {
@@ -470,31 +484,5 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
 
-    private fun initView() {
-        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        groupName = intent.getStringExtra("group")
-        if (groupName != null && groupName == "true") {
-            switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        } else {
-            groupName = "false"
-        }
-        mGroupArrayList = ArrayList()
-        val groupList = DBUtils.groupList
 
-        for (group in groupList) {
-            if (OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group) || OtherUtils.isConnector(group)) {
-                group.checked = false
-                mGroupArrayList.add(group)
-            }
-        }
-        if (mGroupArrayList.size > 0) {
-            mGroupArrayList[0].checked = true
-        }
-
-        mRxPermission = RxPermissions(this)
-        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mAdapter.bindToRecyclerView(recyclerView)
-    }
 }

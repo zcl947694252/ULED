@@ -236,7 +236,6 @@ public class OtaPrepareUtils {
                     //已存在相同下载
                     @Override
                     protected void warn(BaseDownloadTask task) {
-
                     }
                 }).start();
     }

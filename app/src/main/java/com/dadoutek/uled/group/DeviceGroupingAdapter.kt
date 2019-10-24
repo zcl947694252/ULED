@@ -50,8 +50,6 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         val group = this.getItem(position)
 
-
-
         if (group != null) {
             holder.name!!.text = group.name
 

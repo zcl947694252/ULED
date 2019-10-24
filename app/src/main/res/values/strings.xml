@@ -898,7 +898,7 @@
     <string name="get_version_fail">Failed to get device version number</string>
     <string name="please_select_update_file">Select OTA files to upgrade</string>
     <string name="choose_device">Select device (Long press change name)</string>
-    <string name="choose_group_change">Select group (change the name by group name)</string>
+    <string name="choose_group_change">Select group (Long press change name)</string>
     <string name="no_group_device_num">Ungrouped (%1$s)</string>
     <string name="grouped_num">grouped(%1$s)</string>
     <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>

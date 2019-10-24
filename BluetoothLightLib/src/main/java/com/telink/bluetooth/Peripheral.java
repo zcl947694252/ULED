@@ -223,8 +223,7 @@ public class Peripheral extends BluetoothGattCallback {
     protected void onServicesDiscovered(List<BluetoothGattService> services) {
     }
 
-    protected void onNotify(byte[] data, UUID serviceUUID,
-                            UUID characteristicUUID, Object tag) {
+    protected void onNotify(byte[] data, UUID serviceUUID, UUID characteristicUUID, Object tag) {
     }
 
     protected void onRssiChanged() {
@@ -664,8 +663,7 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     private String generateHashKey(BluetoothGattCharacteristic characteristic) {
-        return this.generateHashKey(characteristic.getService().getUuid(),
-                characteristic);
+        return this.generateHashKey(characteristic.getService().getUuid(), characteristic);
     }
 
     private String generateHashKey(UUID serviceUUID,
@@ -765,7 +763,6 @@ public class Peripheral extends BluetoothGattCallback {
     public void onCharacteristicChanged(BluetoothGatt gatt,
                                         BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt, characteristic);
-
         String key = this.generateHashKey(characteristic);
         CommandContext commandContext = this.mNotificationCallbacks.get(key);
 

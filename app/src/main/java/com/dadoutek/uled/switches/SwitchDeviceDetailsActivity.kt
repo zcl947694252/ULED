@@ -81,21 +81,22 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         hideLoadingDialog()
 
         if (bestRSSIDevice != null) {
-            val version = getVersion(bestRSSIDevice!!.meshAddress)
-            if (version != null) {
+            val version = getVersion(currentLight!!.meshAddr)
+            if (version != null&&version!="") {
                 if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                         bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
                     finish()
                 } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
                     finish()
                 } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
                     finish()
                 }
             } else {
                 ToastUtils.showShort(getString(R.string.get_version_fail))
+                initData()
             }
         }
     }
@@ -173,15 +174,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             override fun start() {
                 LogUtils.e("zcl____同步开关________start")
             }
-
             override fun complete() {
                 LogUtils.e("zcl____同步开关________complete")
             }
-
             override fun error(msg: String?) {
                 LogUtils.e("zcl____同步开关________error")
             }
-
         })
         if (switchData.size > 0) {
             no_device_relativeLayout.visibility = View.GONE
@@ -197,7 +195,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showShort(getString(R.string.author_region_warm))
-                    else{
+                    else {
                         if (dialog?.visibility == View.GONE) {
                             showPopupMenu()
                         } else {
@@ -211,8 +209,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.add_device_btn ->{
-            addDevice()
+            R.id.add_device_btn -> {
+                addDevice()
             }
         }
     }
@@ -222,7 +220,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showShort(getString(R.string.author_region_warm))
-            else{
+            else {
                 goSearchSwitch()
             }
         }
@@ -269,16 +267,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
-                else{
-                    if (dialog?.visibility == View.GONE) {
-                        showPopupMenu()
-                    } else {
-                        hidePopupMenu()
-                    }
+                    ToastUtils.showShort(   getString(R.string.author_region_warm))
+                else {
+                    showPopupWindow(view, position)
                 }
             }
-
         }
     }
 
@@ -299,7 +292,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
         rename.setOnClickListener {
             isOta = false
-            isclickOTA = true
+            isclickOTA = false
             popupWindow.dismiss()
             val textGp = EditText(this)
             StringUtils.initEditTextFilter(textGp)
@@ -441,7 +434,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 } else {
                     ToastUtils.showShort(getString(R.string.get_version_fail))
                 }
-            }, { ToastUtils.showShort(getString(R.string.get_server_version_fail)) })
+            }, { ToastUtils.showShort(getString(R.string.get_version_fail)) })
         isclickOTA = false
     }
 

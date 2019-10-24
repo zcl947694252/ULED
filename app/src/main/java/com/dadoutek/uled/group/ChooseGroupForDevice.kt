@@ -226,7 +226,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
             failedCallback.invoke()
         })
         mLight.belongGroupId = group.id
-
     }
 
 

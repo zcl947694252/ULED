@@ -77,7 +77,6 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private var disposableTimer: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
     private var connectInfo: DeviceInfo? = null
@@ -657,9 +656,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         layoutmanager!!.orientation = LinearLayoutManager.HORIZONTAL
         recycler_view_groups.layoutManager = layoutmanager
         groupsRecyclerViewAdapter = GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener,
-                OnRecyclerviewItemLongClickListener { _, position ->
-                    showGroupForUpdateNameDialog(position)
-                })
+                OnRecyclerviewItemLongClickListener { _, position -> showGroupForUpdateNameDialog(position) })
         recycler_view_groups?.adapter = groupsRecyclerViewAdapter
 
         if (groups.size > 0) {
@@ -1362,7 +1359,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
                 LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
-                //刚开始扫的设备mac是null所以不能个毛蕨,mac去重
+                //刚开始扫的设备mac是null所以不能mac去重
                 mAddedDevices.add(scannedDeviceItem)
                 updateDevice(scannedDeviceItem)
                 mAddedDevicesAdapter.notifyDataSetChanged()

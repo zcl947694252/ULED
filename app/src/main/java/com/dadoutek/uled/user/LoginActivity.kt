@@ -26,6 +26,7 @@ import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -37,7 +38,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
@@ -431,7 +431,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
                         intent.putExtra("phone", phone)
                         startActivityForResult(intent, 0)
-                        LogUtils.e("zcl获取账户$it")
+                        LogUtils.v("zcl获取账户$it")
                     },{
                         ToastUtils.showShort(it.localizedMessage)
                         if (getString(R.string.account_not_exist)==it.localizedMessage)

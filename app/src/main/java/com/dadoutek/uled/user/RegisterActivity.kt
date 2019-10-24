@@ -17,12 +17,12 @@ import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_register.*
@@ -94,13 +94,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     }
 
                     UpdateModel.isRegister(userName!!)?.subscribe({
-
                             if (!it) {
-                                goSkipActivity()
+                                regist_frist_progress.visibility = View.GONE
                                 SMSSDK.getVerificationCode(countryCode, userName)
 
-                                regist_frist_progress.visibility = View.VISIBLE
-                                register_completed.isClickable = false
                             }else{
                                 ToastUtils.showShort(getString(R.string.account_exist))
                             }
@@ -170,6 +167,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     }
 
     private fun goSkipActivity() {
+        register_completed.isClickable = false
         var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
         intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
         intent.putExtra("country_code", countryCode)

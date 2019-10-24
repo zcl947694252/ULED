@@ -366,18 +366,18 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         if (bestRSSIDevice != null) {
             val version = getVersion(bestRSSIDevice!!.meshAddress)
-            if (version != null) {
+            if (version != null&&version!="") {
                 if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH || bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
                 } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
                 } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false")
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
                 }
                 finish()
-
             }else{
                 ToastUtils.showShort(getString(R.string.get_version_fail))
+                finish()
             }
         }
     }
