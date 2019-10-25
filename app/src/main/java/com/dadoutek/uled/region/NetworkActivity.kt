@@ -606,7 +606,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         setPopSetting(popAdd!!)
 
         view?.let {
-            it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner) + lastUser!!.phone
+            it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner) + lastUser?.phone
             it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
 
             it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
@@ -912,5 +912,4 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         isShowType = 3
         initData()
     }
-
 }
