@@ -232,7 +232,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun performed(event: Event<String>?) {
         event ?: return
-        LogUtils.e("zcl**********************Event${event.type}")
+//        LogUtils.e("zcl**********************Event${event.type}")
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)

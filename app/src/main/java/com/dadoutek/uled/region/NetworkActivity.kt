@@ -244,7 +244,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         list = if (!isMeRegionAll) subMeList else listAll
 
-        Log.e(TAG, "zcl******me**${list!!.size}")
+//        Log.e(TAG, "zcl******me**${list!!.size}")
         region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
         Log.e("zcl_NetworkActivity", "zcl***设置adapter***$lastUser")

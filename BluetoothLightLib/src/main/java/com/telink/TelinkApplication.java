@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -201,7 +202,23 @@ public class TelinkApplication extends Application {
      * @param listener
      */
     public void removeEventListener(EventListener<String> listener) {
+        Log.d("Saw", "removeEventListener");
         this.mEventBus.removeEventListener(listener);
+    }
+
+    /**
+     * 打印函數的調用棧
+     *
+     * @return 調用棧
+     */
+    public String getStackTrace() {
+        StringBuilder sb = new StringBuilder("");
+        Exception e = new Exception();
+        StackTraceElement[] trace = e.getStackTrace();
+        for (int i = 0; i < trace.length; i++) {
+            sb.append(trace[i] + "\n");
+        }
+        return sb.toString();
     }
 
     /**
@@ -211,6 +228,8 @@ public class TelinkApplication extends Application {
      * @param listener
      */
     public void removeEventListener(String eventType, EventListener<String> listener) {
+        getStackTrace();
+//        Log.d("Saw", "removeEventListener eventType =" + eventType + "stack = " + getStackTrace());
         this.mEventBus.removeEventListener(eventType, listener);
     }
 
@@ -218,6 +237,7 @@ public class TelinkApplication extends Application {
      * 移除所有的事件监听器
      */
     public void removeEventListeners() {
+        Log.d("Saw", "removeAllEventListeners");
         this.mEventBus.removeEventListeners();
     }
 
