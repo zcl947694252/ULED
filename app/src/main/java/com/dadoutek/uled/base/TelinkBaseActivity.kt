@@ -215,7 +215,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LeBluetooth.getInstance().enable(applicationContext)
 
         if (LeBluetooth.getInstance().isEnabled) {
-            if (lightService?.isLogin == true&&TelinkLightApplication.getApp().connectDevice!=null) {
+            if (lightService?.isLogin == true) {
                 changeDisplayImgOnToolbar(true)
             } else {
                 changeDisplayImgOnToolbar(false)

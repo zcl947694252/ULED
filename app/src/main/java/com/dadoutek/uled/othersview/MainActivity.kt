@@ -584,7 +584,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
-
         autoConnect()
     }
 
@@ -771,15 +770,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    private fun isSwitch(uuid: Int): Boolean {
-        return when (uuid) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
-                LogUtils.d("This is switch")
-                true
-            }
-            else -> false
-        }
-    }
 
     private fun onNotificationEvent(event: NotificationEvent) {
         if (!foreground) return

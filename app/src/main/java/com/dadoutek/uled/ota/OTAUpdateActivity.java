@@ -303,13 +303,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
-    @Override
-    public void afterLogin() {
-        super.afterLogin();
-        hideLoadingDialog();
-        LogUtils.v("zcl----登录升级");
-        startOTA();
-    }
 
     @SuppressLint({"InvalidWakeLockTag", "SimpleDateFormat"})
     private void initView() {
@@ -791,14 +784,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 break;
 
             case LightAdapter.STATUS_LOGIN:
-                TelinkLog.i("OTAUpdate#STATUS_LOGIN");
                 log("login success");
                 LeBluetooth.getInstance().stopScan();
                 stopConnectTimer();
                 connectRetryCount = 0;
                 if (this.mode == MODE_COMPLETE) return;
                 TelinkLightService.Instance().enableNotification();
-
                 parseFile();
                 break;
 

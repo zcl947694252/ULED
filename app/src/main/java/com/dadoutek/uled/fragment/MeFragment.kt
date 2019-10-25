@@ -227,7 +227,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         confirm?.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (TelinkLightApplication.getApp().connectDevice != null)
+            if (TelinkLightService.Instance()?.isLogin == true)
                 resetAllLight()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)
@@ -235,7 +235,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         confirm?.isClickable = false
-        pop!!.isOutsideTouchable = true
+        pop.isOutsideTouchable = true
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
@@ -520,8 +520,8 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     }
 
 
-    private fun refreshView() {
-        if (LeBluetooth.getInstance().isEnabled&&TelinkLightService.Instance()?.isLogin == true&&TelinkLightApplication.getApp().connectDevice!=null) {
+    fun refreshView() {
+        if (LeBluetooth.getInstance().isEnabled&&TelinkLightService.Instance()?.isLogin == true) {
                 setLoginChange()
             } else {
                 setLoginOutChange()

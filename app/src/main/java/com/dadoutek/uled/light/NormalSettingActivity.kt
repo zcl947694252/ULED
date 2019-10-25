@@ -25,6 +25,7 @@ import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -37,7 +38,6 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -1014,6 +1014,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun transformView() {
         val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.UPDATE_LIGHT, light)
         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
         intent.putExtra(Constant.OTA_VERSION, light?.version)

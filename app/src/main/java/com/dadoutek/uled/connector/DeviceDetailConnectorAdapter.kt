@@ -34,7 +34,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
                 }
             }
 
-            tvLightName.setText(scene.getName())
+            tvLightName.text = scene.name
 
             val myGrad = tvRgbColor.background as GradientDrawable
             if (scene.getColor() == 0 || scene.getColor() == 0xffffff) {

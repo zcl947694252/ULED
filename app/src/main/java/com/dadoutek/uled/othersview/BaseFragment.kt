@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -55,8 +54,8 @@ open class BaseFragment : Fragment() {
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+            }//meFragment 不存在toolbar 所以要拉出来
                 setLoginChange()
-            }
 
         } else {
             if (toolbar != null) {
@@ -66,9 +65,8 @@ open class BaseFragment : Fragment() {
                     val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                     dialog.show()
                 }
-                setLoginOutChange()
             }
-
+                setLoginOutChange()
         }
     }
 
@@ -91,6 +89,8 @@ open class BaseFragment : Fragment() {
             }
         }
     }
+
+
 
     fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
@@ -118,17 +118,9 @@ open class BaseFragment : Fragment() {
 
     }
 
-
-    override fun onPause() {
-        super.onPause()
-        LogUtils.v("zcl-----取消主页订阅")
-        disableConnectionStatusListener()
-    }
-
     override fun onResume() {
         super.onResume()
         enableConnectionStatusListener()
-
         val lightService: TelinkLightService? = TelinkLightService.Instance()
 
         if (lightService?.isLogin == true) {
@@ -136,6 +128,11 @@ open class BaseFragment : Fragment() {
         } else {
             changeDisplayImgOnToolbar(false)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        disableConnectionStatusListener()
     }
 
     fun hideLoadingDialog() {
@@ -153,8 +150,5 @@ open class BaseFragment : Fragment() {
     }
 
     open fun endCurrentGuide() {}
-    override fun onDestroy() {
-        super.onDestroy()
-        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
-    }
+
 }

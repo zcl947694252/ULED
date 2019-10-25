@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -52,7 +51,6 @@ import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -90,13 +88,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private var retryConnectCount = 0
     private var bestRSSIDevice: DeviceInfo? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
-    private var mConnectDisposal: Disposable? = null
-    private var mScanDisposal: Disposable? = null
-    private var mScanTimeoutDisposal: Disposable? = null
-    private var mCheckRssiDisposal: Disposable? = null
-
-    private var mNotFoundSnackBar: Snackbar? = null
     private var mApplication: TelinkLightApplication? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -120,14 +111,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         this.mApplication = this.application as TelinkLightApplication
-
-        lightsData = mutableListOf()
-    }
-
-
-    override fun onPostResume() {
-        super.onPostResume()
         addListeners()
+        lightsData = mutableListOf()
     }
 
 
@@ -254,7 +239,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 TelinkLightService.Instance()?.updateNotification()
                 changeDisplayImgOnToolbar(true)
                 GlobalScope.launch(Dispatchers.Main) {
-                    stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
                     delay(300)
@@ -283,9 +267,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         }
     }
 
-    private fun stopConnectTimer() {
-        mConnectDisposal?.dispose()
-    }
 
     private fun onNError(event: DeviceEvent) {
 
@@ -304,6 +285,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onResume()
         // type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
+        changeDisplayImgOnToolbar(TelinkLightService.Instance().isLogin)
         initData()
         initView()
         initToolbar()
@@ -758,21 +740,20 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                                 intent.putExtra("lightType", "all_light")*/
 
-                        if (TelinkLightApplication.getApp().connectDevice!=null){
-
-                        val lastUser = DBUtils.lastUser
-                        lastUser?.let {
-                            if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
-                            else {
-                                if (dialog_device?.visibility == View.GONE) {
-                                    val intent = Intent(this, BatchGroupFourDevice::class.java)
-                                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                                    startActivity(intent)
+                        if (TelinkLightService.Instance()?.isLogin == true) {
+                            val lastUser = DBUtils.lastUser
+                            lastUser?.let {
+                                if (it.id.toString() != it.last_authorizer_user_id)
+                                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                                else {
+                                    if (dialog_device?.visibility == View.GONE) {
+                                        val intent = Intent(this, BatchGroupFourDevice::class.java)
+                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                        startActivity(intent)
+                                    }
                                 }
                             }
-                        }
-                        }else{
+                        } else {
                             autoConnect(true)
                         }
                     }
@@ -826,7 +807,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
                 } else {
-                 changeNoDeviceView()
+                    changeNoDeviceView()
                 }
             }
             Constant.INSTALL_LIGHT_OF_CW -> {
@@ -861,13 +842,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         lastUser?.let {
                             if (it.id.toString() != it.last_authorizer_user_id)
                                 ToastUtils.showShort(getString(R.string.author_region_warm))
-                            else{
-                        val intent = Intent(this, BatchGroupActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("lightType", "cw_light")
-                        intent.putExtra("cw_light_group_name", cwLightGroup)
-                        startActivity(intent)
+                            else {
+                                val intent = Intent(this, BatchGroupActivity::class.java)
+                                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                                intent.putExtra("lightType", "cw_light")
+                                intent.putExtra("cw_light_group_name", cwLightGroup)
+                                startActivity(intent)
                             }
                         }
 
@@ -961,7 +942,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onDestroy()
         canBeRefresh = false
         acitivityIsAlive = false
-        mScanDisposal?.dispose()
         //移除事件
         this.mApplication?.removeEventListener(this)
     }
@@ -1082,14 +1062,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     override fun onPause() {
         super.onPause()
         getPositionAndOffset()
-        mScanTimeoutDisposal?.dispose()
-        mConnectDisposal?.dispose()
-        mCheckRssiDisposal?.dispose()
-
-        mNotFoundSnackBar?.dismiss()
-        //移除事件
-        this.mApplication?.removeEventListener(this)
-        stopConnectTimer()
     }
 
 
