@@ -788,7 +788,7 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-        Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
+        //Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;

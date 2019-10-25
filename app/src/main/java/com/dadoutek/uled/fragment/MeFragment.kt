@@ -506,7 +506,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkApplication.getInstance().removeEventListeners()
-        TelinkLightApplication.getApp().doDestroy()
+       // TelinkLightApplication.getApp().doDestroy()
 }
 
     override fun setLoginChange() {

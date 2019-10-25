@@ -285,7 +285,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onResume()
         // type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-        changeDisplayImgOnToolbar(TelinkLightService.Instance().isLogin)
         initData()
         initView()
         initToolbar()
