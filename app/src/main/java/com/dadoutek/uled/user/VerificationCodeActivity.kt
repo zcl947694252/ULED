@@ -70,7 +70,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                     return
                 }
             //login()
-                getAccount()
+                verificationCode()
             }
             R.id.password_login -> passwordLogin()
             R.id.date_phone_list -> phoneList()
@@ -134,6 +134,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
     @SuppressLint("CheckResult")
     private fun getAccount() {
+
         if (NetWorkUtils.isNetworkAvalible(this)) {
             val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
                     .replace(" ".toRegex(), "")
@@ -150,8 +151,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         .compose(NetworkTransformer())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
+                            hideLoadingDialog()
                                 dbUser.account =it
-                                verificationCode()
                                 val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
                                 intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
                                 intent.putExtra("country_code",countryCode)
@@ -184,6 +185,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理成功得到验证码的结果
                         ToastUtils.showLong(R.string.send_message_success)
+                        getAccount()
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {

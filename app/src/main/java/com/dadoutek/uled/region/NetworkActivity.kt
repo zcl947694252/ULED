@@ -298,7 +298,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         adapterAuthorize = AreaAuthorizeItemAdapter(R.layout.item_area_net, listAuthorize!!, lastUser)
         adapterAuthorize!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 2
-
             setClickActionAuthorize(position, view, listAuthorize!!)
         }
         region_authorize_recycleview.adapter = adapterAuthorize
@@ -331,38 +330,39 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         isShowType = 2
         regionBeanAuthorize = list[position]
 
-        if (regionBeanAuthorize == null)
-            return
+        if (regionBeanAuthorize != null) {
 
-        view?.let {
-            it.findViewById<TextView>(R.id.pop_net_name).text = regionBeanAuthorize!!.name
-            it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            //授权区域只有解绑和使用功能
-            it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-            it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+            view?.let {
+                it.findViewById<TextView>(R.id.pop_net_name).text = regionBeanAuthorize!!.name
+                it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + regionBeanAuthorize!!.count_all
+                //授权区域只有解绑和使用功能
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
 
-            //分享
-            it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_share)
-            it.findViewById<ImageView>(R.id.pop_share_net).isClickable = false
-            //修改不能用
-            it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.mipmap.icon_modify)
-            it.findViewById<ImageView>(R.id.pop_update_net).isClickable = false
+                //分享
+                it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_share)
+                it.findViewById<ImageView>(R.id.pop_share_net).isClickable = false
+                //修改不能用
+                it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.mipmap.icon_modify)
+                it.findViewById<ImageView>(R.id.pop_update_net).isClickable = false
 
+                it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + regionBeanAuthorize?.phone
 
-            if (lastUser!!.last_authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
-                    && lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
-                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-            } else {
-                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+                if (lastUser!!.last_authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
+                        && lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
+                    it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
+                    it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied)
+                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                } else {
+                    it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+                    it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.drawable.icon_untied_b)
+                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+                }
             }
+            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
+            view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
+            showPop(pop!!, Gravity.BOTTOM)
         }
-        view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
-        view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
-        showPop(pop!!, Gravity.BOTTOM)
     }
 
     private fun setChangeDialog() {
@@ -421,16 +421,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                if (regionBean!!.count_all <= 0) {
-                    RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
-                        PopUtil.dismiss(pop)
-                        initData()
-                    }, {
-                        ToastUtils.showShort(it.message)
-                    })
-                } else {
-                    ToastUtils.showLong(getString(R.string.please_restore_device))
-                }
+                // if (regionBean!!.count_all <= 0) {
+                RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
+                    LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
+                    PopUtil.dismiss(pop)
+                    initData()
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+                /*  } else {
+                      ToastUtils.showLong(getString(R.string.please_restore_device))
+                  }*/
             }
             R.id.pop_share_net -> {
                 lookAndMakeAuthorCode()
@@ -607,7 +608,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         view?.let {
             it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner) + lastUser?.phone
-            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
 
             it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_user_net).setOnClickListener(this)
@@ -654,32 +654,35 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         if (regionBean == null) {
             return
-        }else {
+        } else {
             view?.let { itView
                 ->
                 itView.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
                 // itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
                 itView.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + regionBean!!.count_all
                 //使用中不能删除 2
-                val b = regionBean!!.id.toString() == lastUser?.last_region_id.toString()
-                val b1 = regionBean!!.authorizer_id.toString() == lastUser?.last_authorizer_user_id.toString()
+                val isUseingRegionId = regionBean!!.id.toString() == lastUser?.last_region_id.toString()
+                val isLastUserID = regionBean!!.authorizer_id.toString() == lastUser?.last_authorizer_user_id.toString()
+                val isFristRegionBean = regionBean!!.id.toInt() == 1
 
-                Log.e("zcl", "zcl***tankuang***$b-----------$b1")
 
-                if (b && b1) {// 2 300551
+                itView.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + regionBean?.authorizer_id
+
+                LogUtils.e("zcl", "zcl***tankuang***$isUseingRegionId-----------$isLastUserID")
+
+                if (isUseingRegionId && isLastUserID) {// 2 300551
                     itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
                     itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
                     itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
                 } else {
-                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                    itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete_bb)
+                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = !isFristRegionBean
+                    if (isFristRegionBean) //如果是第一个或者是授权区域不允许删除
+                        itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+                    else
+                        itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete_bb)
                     itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
                 }
 
-                if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
-                    itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                    itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
-                }
 
                 if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
                     itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
@@ -693,7 +696,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 itView.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
 
                 mExpire = regionBean!!.code_info!!.expire.toLong()
-                Log.e(TAG, "zcl****regionBean**${regionBean.toString()}")
+                LogUtils.e(TAG, "zcl****regionBean**${regionBean.toString()}")
                 itView.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
                 view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
                 view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
@@ -779,18 +782,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         lastUser?.let {
             //更新user
             when (isShowType) {
-                1 -> {
+                1 -> {//自己的区域
                     it.last_region_id = regionBean?.id.toString()
                     it.last_authorizer_user_id = regionBean?.authorizer_id.toString()
                 }
-                2 -> {
+                2 -> {//授权的区域
                     it.last_region_id = regionBeanAuthorize?.id.toString()
                     it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
                 }
             }
 
             DBUtils.deleteAllData()
-
             //创建数据库
             AccountModel.initDatBase(it)
             //更新last—region-id

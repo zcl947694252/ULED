@@ -30,7 +30,6 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -40,8 +39,6 @@ import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
@@ -145,10 +142,11 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && !Constant.isTelBase)
+                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && !Constant.isTelBase&&window.decorView!=null)
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
         }
+
 
 
         when (type) {
@@ -160,9 +158,9 @@ abstract class BaseActivity : AppCompatActivity() {
                     if (split.size < 3)
                         return@let
                     Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
-
+/*
                     NetworkFactory.getApi()
-                            .putPassword(account.toString(), NetworkFactory.md5(split[1]))
+                            .putPassword(account.toString(), NetworkFactory.md5("1"))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
@@ -171,7 +169,8 @@ abstract class BaseActivity : AppCompatActivity() {
                                 TelinkLightService.Instance()?.disconnect()
                                 TelinkLightService.Instance()?.idleMode(true)
                                 SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
-                            }
+                            }*/
+                                restartApplication()
                 }
             }
         }
@@ -189,7 +188,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onPause()
         isRuning = false
         foreground = false
-
+        PopUtil.dismiss(pop)
     }
 
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
@@ -245,7 +244,7 @@ abstract class BaseActivity : AppCompatActivity() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().releseStomp()
-        TelinkLightApplication.getApp().doDestroy()
+        SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

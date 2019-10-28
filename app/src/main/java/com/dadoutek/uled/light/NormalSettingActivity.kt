@@ -493,23 +493,23 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         if (event.action == MotionEvent.ACTION_DOWN) {
                             downTime = System.currentTimeMillis()
                             onBtnTouch = true
-                           GlobalScope.launch {
-                               while (onBtnTouch) {
-                                   thisTime = System.currentTimeMillis()
-                                   if (thisTime - downTime >= 500) {
-                                       tvValue++
-                                       val msg = handler.obtainMessage()
-                                       msg.arg1 = tvValue
-                                       handler_handler.sendMessage(msg)
-                                       Log.e("TAG_TOUCH", tvValue++.toString())
-                                       try {
-                                           Thread.sleep(100)
-                                       } catch (e: InterruptedException) {
-                                           e.printStackTrace()
-                                       }
-                                   }
-                               }
-                           }
+                            GlobalScope.launch {
+                                while (onBtnTouch) {
+                                    thisTime = System.currentTimeMillis()
+                                    if (thisTime - downTime >= 500) {
+                                        tvValue++
+                                        val msg = handler.obtainMessage()
+                                        msg.arg1 = tvValue
+                                        handler_handler.sendMessage(msg)
+                                        Log.e("TAG_TOUCH", tvValue++.toString())
+                                        try {
+                                            Thread.sleep(100)
+                                        } catch (e: InterruptedException) {
+                                            e.printStackTrace()
+                                        }
+                                    }
+                                }
+                            }
                         } else if (event.action == MotionEvent.ACTION_UP) {
                             onBtnTouch = false
                             if (thisTime - downTime < 500) {
@@ -808,10 +808,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (currentShowPageGroup) {
-            menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-        } else {
-            menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)
+                if (currentShowPageGroup) {
+                    menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                } else {
+                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                }
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -820,7 +823,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val textGp = EditText(this)
         textGp.setText(group?.name)
         StringUtils.initEditTextFilter(textGp)
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this@NormalSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
@@ -884,7 +887,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
                                 }
-                                LogUtils.e("zcl删除组后"+DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
+                                LogUtils.e("zcl删除组后" + DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
                             },
                             failedCallback = {
                                 deleteGroup(lights, group, retryCount = retryCount + 1,
@@ -1148,33 +1151,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
 
-    var count = 0
-    private fun getVersionTest() {
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            Commander.getDeviceVersion(light!!.meshAddr, { s ->
-                localVersion = s
-                if (!localVersion!!.startsWith("LC")) {
-                    ToastUtils.showLong("版本号出错：$localVersion")
-                    textTitle!!.visibility = View.VISIBLE
-                    textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
-                    light!!.version = localVersion
-                } else {
-                    count++
-                    ToastUtils.showShort("版本号正确次数：$localVersion")
-                    textTitle!!.visibility = View.GONE
-                    tvOta!!.visibility = View.GONE
-                }
-                null
-            }, {
-                if (textTitle != null) {
-                    textTitle!!.visibility = View.GONE
-                    tvOta!!.visibility = View.GONE
-                }
-                null
-            })
-        }
-    }
-
     private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
@@ -1353,12 +1329,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun initToolbarLight() {
-        toolbar.title = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                toolbar.title = ""
+                setSupportActionBar(toolbar)
+                val actionBar = supportActionBar
+                actionBar?.setDisplayHomeAsUpEnabled(true)
+                toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+                toolbar.setOnMenuItemClickListener(menuItemClickListener)
+            }
+        }
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->

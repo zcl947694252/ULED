@@ -335,6 +335,7 @@ class SyncDataPutOrGetUtils {
         @Synchronized
         fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
+            DBUtils.saveUser(dbUser)
             startGet(token, dbUser.account, syncCallBack)
         }
 
@@ -376,8 +377,9 @@ class SyncDataPutOrGetUtils {
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
                         SharedPreferencesUtils.saveCurrentUseRegion(it.id)
                         application.setupMesh(mesh)
-                        Log.e("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.lastUser+"------------------"+mesh)
+                        LogUtils.v("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.lastUser+"------------------"+mesh)
                         DBUtils.saveUser(DBUtils.lastUser!!)
+                        LogUtils.v("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.getAllUser().size+"------------------"+DBUtils.getAllUser())
                         NetworkFactory.getApi()
                                 .getLightList(token)
                                 .compose(NetworkTransformer())

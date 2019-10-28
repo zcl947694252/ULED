@@ -14,14 +14,15 @@ import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -62,15 +63,19 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         countryCode = this.intent.extras!!.getString("country_code")?:""
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
-        if (type == Constant.TYPE_VERIFICATION_CODE) {
-            tv_notice.visibility = View.VISIBLE
-            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode+" "  + phone
-        } else if (type == Constant.TYPE_REGISTER) {
-            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
-            tv_notice.visibility = View.GONE
-        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
-            tv_notice.visibility = View.GONE
-            codePhone.text = resources.getString(R.string.follow_the_steps)
+        when (type) {
+            Constant.TYPE_VERIFICATION_CODE -> {
+                tv_notice.visibility = View.VISIBLE
+                codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode+" "  + phone
+            }
+            Constant.TYPE_REGISTER -> {
+                codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
+                tv_notice.visibility = View.GONE
+            }
+            Constant.TYPE_FORGET_PASSWORD -> {
+                tv_notice.visibility = View.GONE
+                codePhone.text = resources.getString(R.string.follow_the_steps)
+            }
         }
     }
 
@@ -135,20 +140,22 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果
-                        if (type == Constant.TYPE_VERIFICATION_CODE) {
-                            verificationLogin()
-                        } else if (type == Constant.TYPE_REGISTER) {
-                            val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                            intent.putExtra("phone", phone)
-                            intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
-                            startActivity(intent)
-                            finish()
-                        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
-                            val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                            intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
-                            intent.putExtra("phone", account)
-                            startActivity(intent)
-                            finish()
+                        when (type) {
+                            Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
+                            Constant.TYPE_REGISTER -> {
+                                val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                                intent.putExtra("phone", phone)
+                                intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
+                                startActivity(intent)
+                                finish()
+                            }
+                            Constant.TYPE_FORGET_PASSWORD -> {
+                                val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                                intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
+                                intent.putExtra("phone", account)
+                                startActivity(intent)
+                                finish()
+                            }
                         }
                     } else {
                         // TODO 处理错误的结果
@@ -226,12 +233,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
+                            SharedPreferencesHelper.putString(this@EnterConfirmationCodeActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            //("logging: " + "登录成功错误")
                         }
 
                         override fun onError(e: Throwable) {
@@ -249,6 +256,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         override fun start() { showLoadingDialog(getString(R.string.tip_start_sync)) }
         override fun complete() {
             hideLoadingDialog()
+            SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constant.IS_LOGIN, true)
             startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
             finish()
         }

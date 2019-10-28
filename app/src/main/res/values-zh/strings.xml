@@ -428,7 +428,7 @@
     <string name="add_scene_guide_3">这里可以设置分组亮度</string>
     <string name="add_scene_guide_4">这里可以设置分组色温</string>
     <string name="add_scene_guide_5">这里可以设置分组颜色</string>
-    <string name="add_scene_guide_6">点击保存保存场景</string>
+    <string name="add_scene_guide_6">点击保存场景</string>
     <!---->
 
     <string name="config_pir_guide_1">灯亮度变为最终亮度的延迟时间</string>

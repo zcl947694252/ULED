@@ -69,11 +69,11 @@ public class VerCodeInputView extends FrameLayout {
         super(context, attrs, defStyleAttr);
         TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.VerCodeInputView, defStyleAttr, 0);
         inputNum = ta.getInteger(R.styleable.VerCodeInputView_inputNum, 6);
-        inputWidth = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputWidth,120);
+        inputWidth = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputWidth,140);
         inputHeight = inputWidth;
-        childPadding = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputPadding, 50);
+        childPadding = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputPadding, 30);
         textColor = ta.getColor(R.styleable.VerCodeInputView_inputTxtColor, Color.parseColor("#333333"));
-        textSize = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputTxtSize, 24);
+        textSize = ta.getDimensionPixelSize(R.styleable.VerCodeInputView_inputTxtSize, 20);
         editTextBg = ta.getResourceId(R.styleable.VerCodeInputView_inputBg, R.drawable.bg_edit_vercode);
         inputType = ta.getInt(R.styleable.VerCodeInputView_inputType, InputType.TYPE_CLASS_NUMBER);
         ta.recycle();
@@ -89,6 +89,7 @@ public class VerCodeInputView extends FrameLayout {
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         llTextViewRoot.setLayoutParams(layoutParams);
         llTextViewRoot.setOrientation(LinearLayout.HORIZONTAL);
+        llTextViewRoot.setGravity(Gravity.CENTER_VERTICAL);
         addView(llTextViewRoot);
         for (int i = 0; i < inputNum; i++) {
             TextView textView = new TextView(getContext());
@@ -111,6 +112,7 @@ public class VerCodeInputView extends FrameLayout {
         editText = new EditText(getContext());
         LayoutParams layoutParam2 = new LayoutParams(LayoutParams.MATCH_PARENT, inputHeight);
         editText.setLayoutParams(layoutParam2);
+        layoutParam2.bottomMargin = 3;
         editText.setTextSize(0.01f);
         //设置透明光标，如果直接不显示光标的话，长按粘贴会没效果
         try {

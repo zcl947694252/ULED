@@ -222,7 +222,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 google_btn.visibility = View.VISIBLE
                 facebook_btn.visibility = View.VISIBLE
                 isPhone = true
-                date_phone.setImageResource(R.drawable.icon_down)
+                date_phone.setImageResource(R.drawable.icon_down_arr)
             }
         }
     }
@@ -297,7 +297,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
             isPhone = true
-            date_phone.setImageResource(R.drawable.icon_down)
+            date_phone.setImageResource(R.drawable.icon_down_arr)
         }
     }
 
@@ -350,7 +350,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
             isPhone = true
-            date_phone.setImageResource(R.drawable.icon_down)
+            date_phone.setImageResource(R.drawable.icon_down_arr)
         }
         notifyData()
     }
@@ -431,7 +431,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
                         intent.putExtra("phone", phone)
                         startActivityForResult(intent, 0)
-                        LogUtils.v("zcl获取账户$it")
+                        LogUtils.e("zcl获取账户$it")
                     },{
                         ToastUtils.showShort(it.localizedMessage)
                         if (getString(R.string.account_not_exist)==it.localizedMessage)

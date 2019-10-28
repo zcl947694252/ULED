@@ -29,12 +29,9 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
@@ -348,7 +345,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         ActivityUtils.finishAllActivities(true)
         TelinkApplication.getInstance().removeEventListeners()
         ActivityUtils.startActivity(SplashActivity::class.java)
-        TelinkLightApplication.getApp().doDestroy()
+        SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 
@@ -403,7 +400,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         return@let
                     Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
 
-                    NetworkFactory.getApi()
+           /*         NetworkFactory.getApi()
                             .putPassword(account.toString(), NetworkFactory.md5(split[1]))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -418,7 +415,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                                     TelinkLightService.Instance()?.idleMode(true)
                                     SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
                                 }
-                            })
+                            })*/
                 }
             }
         }
@@ -467,7 +464,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
+                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***$codeBean")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
                 }
             }
@@ -537,7 +534,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var version: String? = ""
         if (TelinkApplication.getInstance().connectDevice != null)
             Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , {showToast(getString(R.string.get_server_version_fail)) })
+                    , {showToast(getString(R.string.get_version_fail)) })
         return version
     }
 

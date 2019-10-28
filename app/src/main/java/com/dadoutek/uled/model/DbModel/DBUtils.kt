@@ -1,11 +1,11 @@
 package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.USER_CHANNEL
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import java.util.*
@@ -252,7 +252,7 @@ object DBUtils {
     /********************************************查询 */
 
     fun getAllUser(): ArrayList<DbUser> {
-        val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Channel.eq(USER_CHANNEL)).build()
+        val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().build()
         return ArrayList(query.list())
     }
 
@@ -723,6 +723,7 @@ object DBUtils {
 
     fun saveUser(dbUser: DbUser) {
         DaoSessionInstance.getInstance().dbUserDao.insertOrReplace(dbUser)
+        LogUtils.v("zcl-0--------------"+ getAllUser())
         recordingChange(dbUser.id,
                 DaoSessionInstance.getInstance().dbUserDao.tablename,
                 Constant.DB_ADD)

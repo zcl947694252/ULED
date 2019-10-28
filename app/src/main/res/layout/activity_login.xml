@@ -128,7 +128,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:src="@drawable/icon_down"
+        android:src="@drawable/icon_down_arr"
         app:layout_constraintBottom_toBottomOf="@+id/edit_user_phone_or_email"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_phone_or_email"
         app:layout_constraintTop_toTopOf="@+id/edit_user_phone_or_email" />

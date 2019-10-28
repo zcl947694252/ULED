@@ -52,7 +52,8 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("auth/login")
     Observable<Response<DbUser>> login(@Field("account") String account,
-                                       @Field("password") String password);
+                                       @Field("password") String password,
+                                       @Field("nativePassword") String nativePassword);
 
 
     @FormUrlEncoded
@@ -157,7 +158,16 @@ public interface RequestInterface {
     //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
     //http://dev.dadoutek.com/smartlight/auth/region/clear
     //DELETE
+
     @DELETE("auth/region/clear/{rid}")
+    Observable<Response<String>> clearRegion(@Path("rid") int rid);
+
+    //6.5.删除区域
+    //删除一个区域
+    //http://dev.dadoutek.com/smartlight/auth/region/remove/{rid}
+    //rid：区域id
+    //请求方式：DELETE
+    @DELETE("auth/region/remove/{rid}")
     Observable<Response<String>> removeRegion(@Path("rid") int rid);
 
     //组相关接口

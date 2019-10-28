@@ -376,22 +376,15 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     }
 
                     R.id.tv_setting -> {
-                        val lastUser = DBUtils.lastUser
-                        lastUser?.let {
-                            if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
-                            else {
-                                var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
-                                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                                    intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-                                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
-                                }
-                                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                                intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                                startActivityForResult(intent, REQ_LIGHT_SETTING)
-                            }
+                        var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
+                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                            intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
                         }
+                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                        startActivityForResult(intent, REQ_LIGHT_SETTING)
                     }
                 }
         }

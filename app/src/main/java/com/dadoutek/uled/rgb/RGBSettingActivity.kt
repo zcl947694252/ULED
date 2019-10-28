@@ -26,6 +26,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -36,7 +37,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -670,8 +670,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 sbBrightness.progress == 100 -> {
                     sbBrightness_add.isEnabled = false
                     when {
-                        currentShowGroupSetPage -> group?.brightness =sbBrightness.progress
-                        else -> light?.brightness =sbBrightness.progress
+                        currentShowGroupSetPage -> group?.brightness = sbBrightness.progress
+                        else -> light?.brightness = sbBrightness.progress
                     }
                     sbBrightness_num.text = sbBrightness.progress.toString() + "%"
                     stopTracking = false
@@ -700,8 +700,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     sbBrightness_less.isEnabled = false
 
                     when {
-                        currentShowGroupSetPage -> group?.brightness =sbBrightness.progress
-                        else -> light?.brightness =sbBrightness.progress
+                        currentShowGroupSetPage -> group?.brightness = sbBrightness.progress
+                        else -> light?.brightness = sbBrightness.progress
                     }
 
                     sbBrightness_num.text = sbBrightness.progress.toString() + "%"
@@ -744,17 +744,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
 
     private fun initToolbar() {
-        toolbar.title = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+            setSupportActionBar(toolbar)
+            val actionBar = supportActionBar
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+                toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+            toolbar.setOnMenuItemClickListener(menuItemClickListener)
+
     }
 
     private fun initToolbarGroup() {
         toolbar.title = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+                toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -762,11 +762,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (currentShowGroupSetPage) {
-            menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-        } else {
-            menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)
+                if (currentShowGroupSetPage) {
+                    menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                } else {
+                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                }
         }
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -1231,8 +1235,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             currentShowGroupSetPage -> group?.brightness ?: 1
             else -> light?.brightness ?: 1
         }
-          ws = if (ws>0)ws else 1
-           w = if (w>0)w else 1
+        ws = if (ws > 0) ws else 1
+        w = if (w > 0) w else 1
 
         var showW = ws
 

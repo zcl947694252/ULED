@@ -21,7 +21,6 @@ object AccountModel {
     var userPassword: String? = null
     fun login(phone: String, password: String): Observable<DbUser> {
         userPassword = password
-        var userphone = phone
         lateinit var account: String
 
         return NetworkFactory.getApi()
@@ -35,10 +34,9 @@ object AccountModel {
                             .compose(NetworkTransformer())
                 }
                 .flatMap { response: String ->
-                    val salt = response
                     val md5Pwd = (NetworkFactory.md5(//登录接口
-                            NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
-                    NetworkFactory.getApi().login(account, md5Pwd)
+                            NetworkFactory.md5(NetworkFactory.md5(password) + account) + response))
+                    NetworkFactory.getApi().login(account, md5Pwd,NetworkFactory.md5(password))
                             .compose(NetworkTransformer())
                 }
                 .observeOn(Schedulers.io())
