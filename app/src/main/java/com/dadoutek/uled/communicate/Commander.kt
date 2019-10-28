@@ -1,5 +1,7 @@
 package com.dadoutek.uled.communicate
 
+import android.os.Looper
+import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -11,14 +13,18 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.event.NotificationEvent
+import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -33,6 +39,7 @@ import kotlin.experimental.and
 import kotlin.Unit as Unit1
 
 object Commander : EventListener<String> {
+    private var mConnectObservable: ObservableEmitter<DeviceInfo>? = null
     private var mTargetGroupAddr: Int = 0   //要把device分到的Group的地址
     private var mGotGroupAddr: Int = 0  //从Device获取到的Group地址
     private var mDstAddr: Int = 0
@@ -101,7 +108,8 @@ object Commander : EventListener<String> {
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
+                ?: 0x00
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
@@ -160,7 +168,8 @@ object Commander : EventListener<String> {
     @Synchronized
     fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
                     failedCallback: () -> Unit1) {
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
+                ?: 0x00
 
 
         var isSupportFastResetFactory: Boolean = false
@@ -176,7 +185,7 @@ object Commander : EventListener<String> {
                             DBUtils.deleteAllRGBLight()
                             DBUtils.deleteAllConnector()
                             DBUtils.deleteAllCurtain()
-                        successCallback.invoke()
+                            successCallback.invoke()
                         }
                     } else {
                         resetLightsOld(lightList, successCallback, failedCallback)
@@ -413,7 +422,6 @@ object Commander : EventListener<String> {
                     }
 
 
-
                     override fun onError(e: Throwable) {
                         LogUtils.e("zcl", "zcl**********updateMeshName*******onError***${e.message}")
                     }
@@ -428,9 +436,69 @@ object Commander : EventListener<String> {
             NotificationEvent.USER_ALL_NOTIFY -> this.onKickoutEvent(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
+            }
+
         }
 
     }
+
+    private fun onErrorReport(info: ErrorReportInfo) {
+        if (mConnectObservable != null) {
+            LogUtils.d("onErrorReport mConnectObservable?.onError")
+            TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+            TelinkLightApplication.getApp().removeEventListener(ErrorReportEvent.ERROR_REPORT, this)
+            mConnectObservable?.onError(Throwable("Connect Failed"))
+//            mConnectObservable = null
+        }else{
+            LogUtils.d("mConnectObservable == null")
+        }
+
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        LogUtils.e("zcl--蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        LogUtils.e("zcl--无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        LogUtils.e("zcl--未扫到目标设备")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        LogUtils.e("zcl--未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        LogUtils.e("zcl--未建立物理连接")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        LogUtils.e("zcl--value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        LogUtils.e("zcl--read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        LogUtils.e("zcl--write login data 没有收到response")
+                    }
+                }
+
+            }
+        }
+    }
+
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
@@ -441,6 +509,27 @@ object Commander : EventListener<String> {
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
             }
+            LightAdapter.STATUS_LOGIN -> {
+                if (mConnectObservable != null) {
+                    LogUtils.d("mConnectObservable?.onNext(deviceInfo)")
+                    mConnectObservable?.onNext(deviceInfo)
+                    mConnectObservable?.onComplete()
+
+//                    mConnectObservable?.onError(Throwable("Connect Failed"))
+//                    TelinkLightService.Instance()?.idleMode(true)
+//                    mConnectObservable = null
+                    TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+                    TelinkLightApplication.getApp().removeEventListener(ErrorReportEvent.ERROR_REPORT, this)
+                } else{
+                    LogUtils.d("mConnectObservable == $mConnectObservable")
+                }
+            }
+//            LightAdapter.STATUS_LOGOUT -> {
+//                if (mConnectObservable?.isDisposed == false) {
+//                    mConnectObservable?.onError(Throwable("Connect Failed"))
+//                    TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+//                }
+//            }
         }
     }
 
@@ -623,37 +712,33 @@ object Commander : EventListener<String> {
      * 自动重连
      * 此处用作设备登录
      */
-    fun autoConnect(macAddress: String, successCallback: (version: String?) -> Unit1,
-                    failedCallback: () -> Unit1) {
-        if (TelinkLightService.Instance() != null) {
-            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                TelinkLightService.Instance()?.idleMode(true);
+    fun autoConnect(macAddress: String): Observable<DeviceInfo> {
+        return Observable.create<DeviceInfo> { emitter ->
+            TelinkLightService.Instance().idleMode(true)
+            mConnectObservable = emitter
+            val meshName = DBUtils.lastUser?.controlMeshName
+            val meshPwd = NetworkFactory.md5(
+                    NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+            val connectParams = Parameters.createAutoConnectParameters()
+            connectParams.setMeshName(meshName)
+            connectParams.setConnectMac(macAddress)
+            connectParams.setPassword(meshPwd)
+            connectParams.autoEnableNotification(true)
 
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
-                connectParams.setConnectMac(macAddress)
-                connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
-                connectParams.autoEnableNotification(true)
+            TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
+            TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+            LogUtils.d("Commander auto connect meshName = $meshName, mConnectObservable = ${mConnectObservable}, mac = $macAddress")
 
-                //连接，如断开会自动重连
-                Thread {
-                    try {
-                        Thread.sleep(300)
-                        TelinkLightService.Instance()?.autoConnect(connectParams)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                }.start()
-            }
-
-            //刷新Notify参数
-            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-            refreshNotifyParams.setRefreshRepeatCount(1)
-            refreshNotifyParams.setRefreshInterval(2000)
-            //开启自动刷新Notify
-            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
+            TelinkLightService.Instance()?.autoConnect(connectParams)
         }
+                .retry(1)
+//                .timeout(30, TimeUnit.SECONDS) {
+//                    if (TelinkLightService.Instance()?.isLogin == true) {
+//                        it.onNext(TelinkLightApplication.getApp().connectDevice)
+//                    }else {
+//                        it.onError(Throwable("timeout"))
+//                    }
+//                }
+
     }
 }

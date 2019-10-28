@@ -169,15 +169,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
-                            LogUtils.d("zcl--重加-----added device $it ")
+//                            LogUtils.d("zcl--重加-----added device $it ")
                             deviceFragment.refreshView()
                         },
                         {
                             LogUtils.d(it)
-                            LogUtils.d("zcl--重加-----added device throwable$it")
+//                            LogUtils.d("zcl--重加-----added device throwable$it")
                         },
                         {
-                            LogUtils.d("zcl--重加-----added device complete")
+//                            LogUtils.d("zcl--重加-----added device complete")
                             LogUtils.d("added mesh devices complete")
                             //autoConnect()
                         })
@@ -630,7 +630,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setConnectDeviceType(
                                             mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                                     DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
-                                    LogUtils.v("zcl--重加---------开始自动连接")
+                                    LogUtils.v("autoconnect  meshName = $meshName   meshPwd = ${NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)} ")
                                     //连接，如断开会自动重连
                                     TelinkLightService.Instance().autoConnect(connectParams)
                                 }

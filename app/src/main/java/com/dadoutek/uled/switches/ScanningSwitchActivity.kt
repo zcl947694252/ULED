@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
@@ -21,6 +22,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DialogUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -365,20 +367,22 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         hideLoadingDialog()
 
         if (bestRSSIDevice != null) {
-            val version = getVersion(bestRSSIDevice!!.meshAddress)
-            if (version != null&&version!="") {
-                if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH || bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
-                } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
-                } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
-                }
-                finish()
-            }else{
-                ToastUtils.showShort(getString(R.string.get_version_fail))
-                finish()
-            }
+            if (TelinkApplication.getInstance().connectDevice != null)
+                Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress, { version ->
+                    if (version != null&&version!="") {
+                        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH || bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
+                        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
+                        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false","version" to version)
+                        }
+                        finish()
+                    }else{
+                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                        finish()
+                    }
+                },{ showToast(getString(R.string.get_server_version_fail)) })
         }
     }
 

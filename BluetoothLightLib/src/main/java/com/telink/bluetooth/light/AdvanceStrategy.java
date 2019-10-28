@@ -198,8 +198,7 @@ public abstract class AdvanceStrategy {
             }
 
             if (now && this.mCallback != null) {
-                Log.d(TAG, "Sample Opcode : " + Integer.toHexString(opcode & 0xFF) + " delay:" + delay);
-
+//                Log.d(TAG, "Sample Opcode : " + Integer.toHexString(opcode & 0xFF) + " delay:" + delay);
                 long during = currentTime - this.lastCmdTime;
                 if (during < 0) {
                     delay = COMMAND_DELAY;

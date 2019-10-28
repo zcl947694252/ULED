@@ -168,23 +168,20 @@ open class TelinkBaseActivity : AppCompatActivity() {
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
-                LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
-                ToastUtils.showLong(getString(R.string.connect_success))
+                    ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
-                    afterLogin()
                 }
 
                 val connectDevice = this.mApplication?.connectDevice
-                LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
+//                LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
 
             }
             LightAdapter.STATUS_LOGOUT -> {
-                LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
-                changeDisplayImgOnToolbar(false)
-                afterLoginOut()
+                    changeDisplayImgOnToolbar(false)
+                    afterLoginOut()
                 }
             }
 
@@ -194,9 +191,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun afterLogin() {
-
-    }
 
     open fun afterLoginOut() {
 
@@ -532,9 +526,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     open fun getVersion(meshAddr: Int): String? {
         var version: String? = ""
-        if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , {showToast(getString(R.string.get_version_fail)) })
+
         return version
     }
 
@@ -570,33 +562,29 @@ open class TelinkBaseActivity : AppCompatActivity() {
             hideLocationServiceDialog()
             TelinkLightService.Instance().idleMode(true)
             Thread.sleep(200)
-            if (TelinkApplication.getInstance()?.serviceStarted == true) {
-                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            if (!TelinkLightService.Instance().isLogin) {
-                                showLoadingDialog(getString(R.string.please_wait))
+            RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        if (!TelinkLightService.Instance().isLogin) {
+                            showLoadingDialog(getString(R.string.please_wait))
 
-                                val meshName = DBUtils.lastUser!!.controlMeshName
+                            val meshName = DBUtils.lastUser!!.controlMeshName
 
-                                GlobalScope.launch {
-                                    //自动重连参数
-                                    val connectParams = Parameters.createAutoConnectParameters()
-                                    connectParams.setMeshName(meshName)
-                                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                                    connectParams.autoEnableNotification(true)
-                                    connectParams.setConnectMac(macAddr)
-                                    LogUtils.v("zcl--重加---------开始自动连接")
-                                    //连接，如断开会自动重连
-                                    TelinkLightService.Instance().autoConnect(connectParams)
-                                }
+                            GlobalScope.launch {
+                                //自动重连参数
+                                val connectParams = Parameters.createAutoConnectParameters()
+                                connectParams.setMeshName(meshName)
+                                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                                connectParams.autoEnableNotification(true)
+                                connectParams.setConnectMac(macAddr)
+                                LogUtils.v("autoconnect  meshName = $meshName   meshPwd = ${NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)}   macAddress = ${macAddr}")
+
+                                //连接，如断开会自动重连
+                                TelinkLightService.Instance().autoConnect(connectParams)
                             }
-                        }, { LogUtils.d(it) })
-            } else {
-                this.mApplication?.startLightService(TelinkLightService::class.java)
-                autoConnectMac(macAddr)
-            }
+                        }
+                    }, { LogUtils.d(it) })
         }
     }
 

@@ -34,7 +34,6 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_PASSWORD = "123";
 
     public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadousmart" : "dadousmart";
-   //public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadoutek" : "dadoutek";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -52,7 +51,7 @@ public class Constant implements Serializable {
 
     public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "out_of_mesh" : "out_of_mesh";
 
-    public static final String PIR_SWITCH_MESH_NAME = "dadousmart";
+    public static final String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadoutek";
 
     public static final int RESULT_OK = 1;

@@ -81,23 +81,25 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         hideLoadingDialog()
 
         if (bestRSSIDevice != null) {
-            val version = getVersion(currentLight!!.meshAddr)
-            if (version != null&&version!="") {
-                if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                        bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                    finish()
-                } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                    finish()
-                } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                    finish()
-                }
-            } else {
-                ToastUtils.showShort(getString(R.string.get_version_fail))
-                initData()
-            }
+            if (TelinkApplication.getInstance().connectDevice != null)
+                Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress, { version ->
+                    if (version != null&&version!="") {
+                        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                            finish()
+                        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                            finish()
+                        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                            finish()
+                        }
+                    } else {
+                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                        initData()
+                    }
+                },{ showToast(getString(R.string.get_server_version_fail)) })
         }
     }
 
