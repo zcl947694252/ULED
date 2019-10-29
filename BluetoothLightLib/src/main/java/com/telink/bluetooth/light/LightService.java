@@ -190,17 +190,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         if (this.mAdapter == null)
             return;
 
-
-        try {
-            Exception e = null;
-            e.getCause();
-        } catch (Exception e) {
-            String trace = getStackTrace();
-//            String trace = e.getStackTrace();
-            Log.d("Saw", trace);
-            //用来跟踪调用栈
-        }
-
+//        Log.d("Saw", getStackTrace());
         this.mAdapter.idleMode(disconnect);
     }
 

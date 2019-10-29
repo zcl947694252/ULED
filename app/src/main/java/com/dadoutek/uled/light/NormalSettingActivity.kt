@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
     private var localVersion: String? = null
-    private var light: DbLight? = null
+    private lateinit var light: DbLight
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
@@ -961,8 +961,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
+//            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+//            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
         }
     }
 
@@ -1015,14 +1015,45 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 })
     }
 
-    private fun transformView() {
-        val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
-        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, light?.version)
+    private fun startOtaAct() {
+       val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
+          intent.putExtra(Constant.UPDATE_LIGHT, light)
+         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+         intent.putExtra(Constant.OTA_VERSION, light?.version)
+
         startActivity(intent)
         finish()
+    }
+
+    private fun transformView() {
+        disableConnectionStatusListener()
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
+            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
+            startOtaAct()
+        } else {
+            showLoadingDialog(getString(R.string.please_wait))
+            TelinkLightService.Instance()?.idleMode(true)
+            val disposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMap {
+                        Commander.autoConnect(light.macAddr)
+                    }
+                    .subscribe(
+                            {
+                                hideLoadingDialog()
+                                startOtaAct()
+                            }
+                            ,
+                            {
+                                hideLoadingDialog()
+                                ToastUtils.showLong(R.string.connect_fail2)
+                                LogUtils.d(it)
+                            })
+        }
+
+
     }
 
     private fun getVersion() {

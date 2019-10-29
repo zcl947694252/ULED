@@ -382,7 +382,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showShort(getString(R.string.get_version_fail))
                         finish()
                     }
-                }, {showToast(getString(R.string.get_version_fail)) })
+                },{ showToast(getString(R.string.get_server_version_fail)) })
         }
     }
 

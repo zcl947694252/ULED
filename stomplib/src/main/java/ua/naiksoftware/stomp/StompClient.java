@@ -99,12 +99,12 @@ public class StompClient {
      */
     public void connect(@Nullable List<StompHeader> _headers) {
 
-        Log.d(TAG, "Connect");
+//        Log.d(TAG, "Connect");
 
         this.headers = _headers;
 
         if (isConnected()) {
-            Log.d(TAG, "Already connected, ignore");
+//            Log.d(TAG, "Already connected, ignore");
             return;
         }
         lifecycleDisposable = connectionProvider.lifecycle()
@@ -120,18 +120,18 @@ public class StompClient {
 
                             connectionProvider.send(new StompMessage(StompCommand.CONNECT, headers, null).compile(legacyWhitespace))
                                     .subscribe(() -> {
-                                        Log.d(TAG, "Publish open");
+//                                        Log.d(TAG, "Publish open");
                                         lifecyclePublishSubject.onNext(lifecycleEvent);
                                     });
                             break;
 
                         case CLOSED:
-                            Log.d(TAG, "Socket closed");
+//                            Log.d(TAG, "Socket closed");
                             disconnect();
                             break;
 
                         case ERROR:
-                            Log.d(TAG, "Socket closed with error");
+//                            Log.d(TAG, "Socket closed with error");
                             lifecyclePublishSubject.onNext(lifecycleEvent);
                             break;
                     }
@@ -249,7 +249,7 @@ public class StompClient {
 
         return connectionProvider.disconnect()
                 .doFinally(() -> {
-                    Log.d(TAG, "Stomp disconnected");
+//                    Log.d(TAG, "Stomp disconnected");
                     getConnectionStream().onComplete();
                     getMessageStream().onComplete();
                     lifecyclePublishSubject.onNext(new LifecycleEvent(LifecycleEvent.Type.CLOSED));
@@ -302,7 +302,7 @@ public class StompClient {
         String topicId = topics.get(dest);
         topics.remove(dest);
 
-        Log.d(TAG, "Unsubscribe path: " + dest + " id: " + topicId);
+//        Log.d(TAG, "Unsubscribe path: " + dest + " id: " + topicId);
 
         return send(new StompMessage(StompCommand.UNSUBSCRIBE,
                 Collections.singletonList(new StompHeader(StompHeader.ID, topicId)), null)).onErrorComplete();

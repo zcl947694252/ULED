@@ -107,11 +107,11 @@ public class LightAdapter {
     protected Context mContext;
     protected Parameters mParams;
     public LightController mLightCtrl;
-    private static LightPeripherals mScannedLights;
+    public static LightPeripherals mScannedLights;
     private LightPeripherals mUpdateLights;
     private Handler mLoopHandler;
     private Runnable mLoopTask;
-    private int mInterval = 200;
+    private int mInterval = 5000;
     private Handler mNotifyHandler;
     private Runnable mNotifyTask;
 
@@ -336,7 +336,7 @@ public class LightAdapter {
         if (light == null || !light.isConnected()) {
             return false;
         }
-        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
+//        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
         TelinkLog.e("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;
@@ -788,7 +788,7 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-        //Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
+//        Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;
@@ -1453,8 +1453,12 @@ public class LightAdapter {
             }
 
             //如果小于扫描间隔时间就停止执行否则就走过去停止扫描
-            if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
-                return;
+            //只有当没有指定mac时，需要这样做。
+            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
+            if (scanMac != null && !scanMac.isEmpty()) {
+                if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
+                    return;
+                }
             }
 
             int count = mScannedLights.size();
@@ -1568,28 +1572,29 @@ public class LightAdapter {
                 if (!mLightCtrl.isLogin())
                     return;
 
-                int delay = autoRefreshParams.getInt(
-                        Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY, AUTO_REFRESH_NOTIFICATION_DELAY);
+                if (autoRefreshParams != null) {
+                    int delay = autoRefreshParams.getInt(
+                            Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY, AUTO_REFRESH_NOTIFICATION_DELAY);
+                    if (delay <= 0)
+                        delay = AUTO_REFRESH_NOTIFICATION_DELAY;
 
-                if (delay <= 0)
-                    delay = AUTO_REFRESH_NOTIFICATION_DELAY;
+                    mLightCtrl.updateNotification();
+                    int repeat = autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
+                    if (repeat > 0) {
+                        int count = autoRefreshCount + 1;
 
-                mLightCtrl.updateNotification();
-                int repeat = autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
-
-                if (repeat > 0) {
-                    int count = autoRefreshCount + 1;
-
-                    if (count > repeat) {
-                        autoRefreshRunning = false;
-                    } else {
-                        autoRefreshCount = count;
-                        TelinkLog.e("AutoRefresh : " + count);
+                        if (count > repeat) {
+                            autoRefreshRunning = false;
+                        } else {
+                            autoRefreshCount = count;
+                            TelinkLog.e("AutoRefresh : " + count);
+                            mNotifyHandler.postDelayed(this, delay);
+                        }
+                    } else if (repeat <= 0) {
                         mNotifyHandler.postDelayed(this, delay);
                     }
-                } else if (repeat <= 0) {
-                    mNotifyHandler.postDelayed(this, delay);
                 }
+
             }
         }
     }

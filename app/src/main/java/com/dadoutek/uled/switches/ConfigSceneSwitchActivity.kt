@@ -77,7 +77,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        tvLightVersion?.text = intent.getStringExtra("version")
+        tvLightVersionText?.text = intent.getStringExtra("version")
 
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {

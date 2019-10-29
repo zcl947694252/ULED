@@ -174,6 +174,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         val havePhone = info != null && !info.isEmpty()
         if (havePhone) {
             val messge = info.split("-")
+            if (messge.size>1)
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)

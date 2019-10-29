@@ -154,10 +154,10 @@ class TelinkLightApplication : TelinkApplication() {
                  */
                 stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
-                        LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
-                        LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
+//                        LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
+//                        LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
                         LifecycleEvent.Type.CLOSED -> {
-                            LogUtils.d("zcl_Stomp******Stomp connection closed")
+//                            LogUtils.d("zcl_Stomp******Stomp connection closed")
                                 var currentTime = Calendar.getInstance().timeInMillis
                                 if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
                                     lastClickTime = currentTime

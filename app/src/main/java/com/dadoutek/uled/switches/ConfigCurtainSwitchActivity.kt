@@ -83,7 +83,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
        version =intent.getStringExtra("version")
 
-        tvLightVersion.text = version
+        tvLightVersionText.text = version
         if (version!!.startsWith("ST")) {
             isGlassSwitch = true
         }
