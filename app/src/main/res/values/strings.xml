@@ -902,5 +902,6 @@
     <string name="no_group_device_num">Ungrouped (%1$s)</string>
     <string name="grouped_num">grouped(%1$s)</string>
     <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>
+    <string name="beta_version">(beta version) : https://www.pgyer.com/dadou</string>
 
 </resources>

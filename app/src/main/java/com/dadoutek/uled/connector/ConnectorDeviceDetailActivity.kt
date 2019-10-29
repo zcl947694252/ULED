@@ -47,6 +47,7 @@ import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
@@ -76,64 +77,56 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 /**
  * 蓝牙接收器列表
+ *
+ *  todo  保证是该设备才可以进行分组
  */
 class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-
+    private var isChangeGroup: Boolean = false
     private var type: Int? = null
-
     private lateinit var lightsData: MutableList<DbConnector>
-
     private var inflater: LayoutInflater? = null
-
     private var adaper: DeviceDetailConnectorAdapter? = null
-
     private var currentLight: DbConnector? = null
-
     private var positionCurrent: Int = 0
-
-//    private lateinit var lightList: MutableList<DbLight>
-
     private var canBeRefresh = true
-
-//    private lateinit var group: DbGroup
-
     private val REQ_LIGHT_SETTING: Int = 0x01
-
     private var acitivityIsAlive = true
-
-
     private var retryConnectCount = 0
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var mApplication: TelinkLightApplication? = null
-
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-
     private var isRgbClick = false
-
     private var installId = 0
-
     private lateinit var stepOneText: TextView
     private lateinit var stepTwoText: TextView
     private lateinit var stepThreeText: TextView
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-
     private val SCENE_MAX_COUNT = 16
 
     override fun performed(event: Event<String>?) {
-
+        val deviceEvent = event as DeviceEvent
+        val deviceInfo = deviceEvent.args
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                hideLoadingDialog()
+               if (isChangeGroup)
+                   skipChangeGroup()
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.connect_fail))
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -487,21 +480,39 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showShort(getString(R.string.author_region_warm))
                     else {
-                        var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                            intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == currentLight?.meshAddr) {
+                            skipChangeGroup()
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            isChangeGroup = true
+                            TelinkLightService.Instance().idleMode(true)
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe {
+                                        autoConnect()
+                                    }
                         }
-                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                        startActivityForResult(intent, REQ_LIGHT_SETTING)
                     }
                 }
 
             }
             else -> ToastUtils.showShort(R.string.reconnecting)
         }
+    }
+
+    private fun skipChangeGroup() {
+        isChangeGroup = false
+        var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+            intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
+            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+        }
+        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+        startActivityForResult(intent, REQ_LIGHT_SETTING)
     }
 
     private fun initDate() {

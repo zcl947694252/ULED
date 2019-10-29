@@ -32,7 +32,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.othersview.MainActivity;
@@ -44,14 +43,12 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.TmtUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
-import com.telink.TelinkApplication;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
-import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeScanParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.OtaDeviceInfo;
@@ -606,7 +603,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             //startScan();
             autoConnectMac(lightMacAddr);
         }
-        log("startOTA ");
+        LogUtils.v("startOTA ");
     }
 
     @Override

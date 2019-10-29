@@ -1016,11 +1016,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun startOtaAct() {
-        val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
-        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr ?: 0)
-        intent.putExtra(Constant.OTA_VERSION, light?.version)
+       val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
+          intent.putExtra(Constant.UPDATE_LIGHT, light)
+         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+         intent.putExtra(Constant.OTA_VERSION, light?.version)
+
         startActivity(intent)
         finish()
     }
@@ -1028,6 +1029,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun transformView() {
         disableConnectionStatusListener()
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
+            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             startOtaAct()
         } else {
             showLoadingDialog(getString(R.string.please_wait))

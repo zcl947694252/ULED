@@ -827,5 +827,6 @@
     <string name="no_group_device_num">未分组(%1$s个)</string>
     <string name="grouped_num">已分组(%1$s个）</string>
     <string name="author_region_warm">权限不足,当前区域为授权区域您只有使用权限</string>
+    <string name="beta_version">（内测版本）：https://www.pgyer.com/dadou</string>
 
 </resources>

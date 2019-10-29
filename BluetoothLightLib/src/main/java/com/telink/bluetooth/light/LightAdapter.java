@@ -107,11 +107,11 @@ public class LightAdapter {
     protected Context mContext;
     protected Parameters mParams;
     public LightController mLightCtrl;
-    private static LightPeripherals mScannedLights;
+    public static LightPeripherals mScannedLights;
     private LightPeripherals mUpdateLights;
     private Handler mLoopHandler;
     private Runnable mLoopTask;
-    private int mInterval = 200;
+    private int mInterval = 5000;
     private Handler mNotifyHandler;
     private Runnable mNotifyTask;
 
