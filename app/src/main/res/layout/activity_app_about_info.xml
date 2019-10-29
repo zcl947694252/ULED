@@ -70,7 +70,7 @@
                     android:visibility="gone"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:text="（内侧版本）：https://www.pgyer.com/dadou"
+                    android:text="@string/beta_version"
                     android:autoLink="web"
                     />
             </LinearLayout>

@@ -1339,7 +1339,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         params.setUpdateDeviceList(deviceInfo)
         TelinkLightService.Instance().updateMesh(params)
 
-        LogUtils.d("updateMesh: " + deviceInfo.meshAddress + "" +
+        LogUtils.d("窗帘升级updateMesh: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
 

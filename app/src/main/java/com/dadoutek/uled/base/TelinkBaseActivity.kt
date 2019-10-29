@@ -25,7 +25,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -43,6 +42,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
@@ -87,6 +87,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
         makeDialogAndPop()
         initStompReceiver()
+        initChangeRecevicer()
+    }
+
+    private fun initChangeRecevicer() {
+        val changeRecevicer = ChangeRecevicer()
+        val filter = IntentFilter()
+        filter.addAction("STATUS_CHANGED")
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
+        registerReceiver(changeRecevicer, filter)
     }
 
     private fun makeDialogAndPop() {
@@ -166,11 +175,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
+        hideLoadingDialog()
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
-                ToastUtils.showLong(getString(R.string.connect_success))
+                    ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                     afterLogin()
                 }
@@ -183,8 +193,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LightAdapter.STATUS_LOGOUT -> {
                 LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
-                changeDisplayImgOnToolbar(false)
-                afterLoginOut()
+                    changeDisplayImgOnToolbar(false)
+                    afterLoginOut()
                 }
             }
 
@@ -400,22 +410,22 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         return@let
                     Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
 
-           /*         NetworkFactory.getApi()
-                            .putPassword(account.toString(), NetworkFactory.md5(split[1]))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(object : NetworkObserver<Response<DbUser>?>() {
-                                override fun onNext(t: Response<DbUser>) {
-                                    Log.e("zcl", "zcl修改密码******${t.message}")
-                                    SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
-                                    codeStompClient?.dispose()
-                                    singleLoginTopicDisposable?.isDisposed
-                                    stompLifecycleDisposable?.dispose()
-                                    TelinkLightService.Instance()?.disconnect()
-                                    TelinkLightService.Instance()?.idleMode(true)
-                                    SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
-                                }
-                            })*/
+                    /*         NetworkFactory.getApi()
+                                     .putPassword(account.toString(), NetworkFactory.md5(split[1]))
+                                     .subscribeOn(Schedulers.io())
+                                     .observeOn(AndroidSchedulers.mainThread())
+                                     .subscribe(object : NetworkObserver<Response<DbUser>?>() {
+                                         override fun onNext(t: Response<DbUser>) {
+                                             Log.e("zcl", "zcl修改密码******${t.message}")
+                                             SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
+                                             codeStompClient?.dispose()
+                                             singleLoginTopicDisposable?.isDisposed
+                                             stompLifecycleDisposable?.dispose()
+                                             TelinkLightService.Instance()?.disconnect()
+                                             TelinkLightService.Instance()?.idleMode(true)
+                                             SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
+                                         }
+                                     })*/
                 }
             }
         }
@@ -532,9 +542,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     open fun getVersion(meshAddr: Int): String? {
         var version: String? = ""
-        if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , {showToast(getString(R.string.get_version_fail)) })
+
         return version
     }
 
@@ -558,7 +566,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
      * 自动重连
      */
     @SuppressLint("CheckResult")
-    fun autoConnectMac(macAddr: String?) {
+    fun autoConnectMac(macAddr: String?, isShowLoading: Boolean) {
         //如果支持蓝牙就打开蓝牙
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
@@ -576,7 +584,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             if (!TelinkLightService.Instance().isLogin) {
-                                showLoadingDialog(getString(R.string.please_wait))
+                                hideLoadingDialog()
+                                if (isShowLoading)
+                                    showLoadingDialog(getString(R.string.please_wait))
+                                else
+                                    ToastUtils.showShort(getString(R.string.connecting_tip))
 
                                 val meshName = DBUtils.lastUser!!.controlMeshName
 
@@ -595,12 +607,31 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         }, { LogUtils.d(it) })
             } else {
                 this.mApplication?.startLightService(TelinkLightService::class.java)
-                autoConnectMac(macAddr)
+                autoConnectMac(macAddr,false)
             }
         }
     }
 
 
+    inner class ChangeRecevicer :BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
+            LogUtils.e("zcl获取通知$deviceInfo")
+            when (deviceInfo.status) {
+                LightAdapter.STATUS_LOGIN -> {
+                    ToastUtils.showLong(getString(R.string.connect_success))
+                    changeDisplayImgOnToolbar(true)
+
+                }
+                LightAdapter.STATUS_LOGOUT -> {
+                    changeDisplayImgOnToolbar(false)
+                }
+
+            }
+        }
+    }
 }
+
+
 
 

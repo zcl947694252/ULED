@@ -85,8 +85,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
         mSwitchList = ArrayList()
         mSwitchList.add(getString(R.string.button1))
-        mSwitchList.add(getString(R.string.button3))
         mSwitchList.add(getString(R.string.button2))
+        mSwitchList.add(getString(R.string.button3))
         mSwitchList.add(getString(R.string.button4))
 
         mSceneList = DBUtils.sceneAll
@@ -211,7 +211,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun saveSwitch() {
         //确认配置成功后,添加开关到服务器
-
         var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
@@ -223,7 +222,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
-            val dbSwitch: DbSwitch = DbSwitch()
+            val dbSwitch = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
@@ -340,7 +339,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun reconnect() {
-
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)
@@ -418,7 +416,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         params.setUpdateDeviceList(mDeviceInfo)
 
-        var keyNum: Int = 0
+        var keyNum = 0
         val map: Map<Int, DbScene> = mAdapter.sceneMap
         for (key in map.keys) {
             when (key) {
@@ -427,14 +425,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 2 -> keyNum = 0x06          //左下按键
                 3 -> keyNum = 0x04          //右下按键
             }
-            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, map.getValue(key).id.toByte(),
-                    0x00)
-
+            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, map.getValue(key).id.toByte(), 0x00)
 
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH,
-                    mDeviceInfo.meshAddress,
-                    paramBytes)
-
+                    mDeviceInfo.meshAddress, paramBytes)
             Thread.sleep(200)
         }
     }

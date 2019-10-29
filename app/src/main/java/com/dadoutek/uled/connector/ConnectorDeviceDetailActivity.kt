@@ -39,16 +39,10 @@ import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
-import com.telink.util.Event
-import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import com.telink.util.Strings
 import io.reactivex.Observable
@@ -77,64 +71,37 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 /**
  * 蓝牙接收器列表
  */
-class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-
+class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private var type: Int? = null
-
     private lateinit var lightsData: MutableList<DbConnector>
-
     private var inflater: LayoutInflater? = null
-
     private var adaper: DeviceDetailConnectorAdapter? = null
-
     private var currentLight: DbConnector? = null
-
     private var positionCurrent: Int = 0
-
-//    private lateinit var lightList: MutableList<DbLight>
-
     private var canBeRefresh = true
-
-//    private lateinit var group: DbGroup
-
     private val REQ_LIGHT_SETTING: Int = 0x01
-
     private var acitivityIsAlive = true
-
-
     private var retryConnectCount = 0
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var mApplication: TelinkLightApplication? = null
-
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-
     private var isRgbClick = false
-
     private var installId = 0
-
     private lateinit var stepOneText: TextView
     private lateinit var stepTwoText: TextView
     private lateinit var stepThreeText: TextView
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-
     private val SCENE_MAX_COUNT = 16
-
-    override fun performed(event: Event<String>?) {
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,9 +121,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initView() {
-        mApplication?.removeEventListener(this)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper = DeviceDetailConnectorAdapter(R.layout.device_detail_adapter, lightsData)
@@ -218,7 +182,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -234,7 +198,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     private fun showInstallDeviceList() {
@@ -259,20 +223,13 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         install_device_recyclerView?.addItemDecoration(decoration)
-
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
-        installDialog = android.app.AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
+        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {
 
         }
@@ -487,15 +444,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showShort(getString(R.string.author_region_warm))
                     else {
-                        var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                            intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                        if (TelinkLightService.Instance()?.isLogin == false) {
+                            autoConnect()
+                        } else {
+                            var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+                            if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                                intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
+                                intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                            }
+                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                            startActivityForResult(intent, REQ_LIGHT_SETTING)
                         }
-                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                        startActivityForResult(intent, REQ_LIGHT_SETTING)
                     }
                 }
 
@@ -601,8 +562,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     batchGroup.setText(R.string.batch_group)
                     batchGroup.visibility = View.GONE
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this,
-                                ConnectorBatchGroupActivity::class.java)
+                        val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("relayType", "group_relay")
@@ -622,6 +582,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        disposableTimer?.dispose()
     }
 
     private fun showPopupMenu() {
@@ -710,23 +675,37 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                 } else {
                     GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
-                    }
-                    if (TelinkLightApplication.getApp().connectDevice == null) {
-                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
+                        if (TelinkLightApplication.getApp().connectDevice == null) {
+                                autoConnectMac(currentLight!!.macAddr,false)
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(6000, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                    }
+                        } else {
                             GlobalScope.launch(Dispatchers.Main) {
-                                retryConnectCount = 0
-                                connectFailedDeviceMacList.clear()
-                                startScan()
+                                scanPb?.visibility = View.GONE
+                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                             }
-                            break
                         }
-
+                    }
+                    /*if (TelinkLightApplication.getApp().connectDevice == null) {
+                          while (TelinkApplication.getInstance()?.serviceStarted == true) {
+                               GlobalScope.launch(Dispatchers.Main) {
+                                   retryConnectCount = 0
+                                   connectFailedDeviceMacList.clear()
+                                   startScan()
+                               }
+                               break
+                           }
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
-                    }
+                    }*/
 
                 }
             }
@@ -765,7 +744,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                                 params.setScanMode(false)
 
-                                addScanListeners()
+                                //addScanListeners()
                                 TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
 
@@ -781,10 +760,10 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun addScanListeners() {
-        this.mApplication?.removeEventListener(this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+//        this.mApplication?.removeEventListener(this)
+//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
+//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
     }
 
     private fun startCheckRSSITimer() {

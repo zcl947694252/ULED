@@ -31,7 +31,6 @@ class MeshAddressGenerator {
 //                DBUtils.saveRegion(curRegion, false)
 //            }
             return field
-
         }
 
     init {

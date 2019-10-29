@@ -14,6 +14,7 @@ import android.widget.GridView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.DeviceGroupingAdapter
 import com.dadoutek.uled.model.Constant
@@ -23,7 +24,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
@@ -66,57 +66,68 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 if(!isStartGroup){
                     isStartGroup=true
                     showLoadingDialog(getString(R.string.grouping))
-                    object : Thread({
-                        val sceneIds = getRelatedSceneIds(group.meshAddr)
-                        for(i in 0..1){
-                            deletePreGroup(lights!!.meshAddr)
-                            Thread.sleep(100)
-                        }
+                    //如果修改分组成功,才改数据库之类的操作
+                    allocDeviceGroup(group,{
+                        Thread {
+                            val sceneIds = getRelatedSceneIds(group.meshAddr)
+                            for(i in 0..1){
+                                deletePreGroup(lights!!.meshAddr)
+                                Thread.sleep(100)
+                            }
 
-                        for(i in 0..1){
-                            deleteAllSceneByLightAddr(lights!!.meshAddr)
-                            Thread.sleep(100)
-                        }
+                            for(i in 0..1){
+                                deleteAllSceneByLightAddr(lights!!.meshAddr)
+                                Thread.sleep(100)
+                            }
 
-                        for(i in 0..1){
-                            allocDeviceGroup(group)
-                            Thread.sleep(100)
-                        }
+                            for(i in 0..1){
+                                allocDeviceGroup(group)
+                                Thread.sleep(100)
+                            }
 
-                        for (sceneId in sceneIds) {
-                            val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
-                            if (action != null) {
-                                for(i in 0..1){
-                                    Commander.addScene(sceneId, lights!!.meshAddr, action.color)
-                                    Thread.sleep(100)
+                            for (sceneId in sceneIds) {
+                                val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
+                                if (action != null) {
+                                    for(i in 0..1){
+                                        Commander.addScene(sceneId, lights!!.meshAddr, action.color)
+                                        Thread.sleep(100)
+                                    }
                                 }
                             }
-                        }
-
-                        group.deviceType= lights!!.productUUID.toLong()
-                        Log.d("message", "deviceType="+group.deviceType.toString()+",address="+lights!!.meshAddr+",productUUID="+lights!!.productUUID)
-
-//                                var dbLight=DBUtils.getLightByMeshAddr(this!!.address!!)
-
-                        Log.d("message",lights.toString())
-
-                        DBUtils.updateGroup(group)
-                        DBUtils.updateConnector(lights!!)
+                            group.deviceType= lights!!.productUUID.toLong()
+                            Log.d("窗帘升级用的productUUID", "deviceType="+group.deviceType.toString()+",address="+lights!!.meshAddr+",productUUID="+lights!!.productUUID)
+                            Log.d("message",lights.toString())
+                            DBUtils.updateGroup(group)
+                            DBUtils.updateConnector(lights!!)
+                            runOnUiThread {
+                                hideLoadingDialog()
+                                ActivityUtils.finishActivity(RGBSettingActivity::class.java)
+                                finish()
+                            }
+                        }.start()
+                    }, {
                         runOnUiThread {
                             hideLoadingDialog()
-                            ActivityUtils.finishActivity(RGBSettingActivity::class.java)
-                            finish()
+                            ToastUtils.showShort(R.string.group_failed)
                         }
-                    }) {
-
-                    }.start()
+                    })
                 }
             }
-        } else {
-            //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
         }
     }
-    //        }
+
+    /**
+     *  start to group
+     *  设置设备分组
+     */
+    private fun allocDeviceGroup(group: DbGroup, successCallback: () -> Unit, failedCallback: () -> Unit) {
+        Commander.addGroup(lights!!.meshAddr, group.meshAddr, {
+            successCallback.invoke()
+        }, {
+            failedCallback.invoke()
+        })
+        lights!!.belongGroupId = group.id
+    }
 
     private val mHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
