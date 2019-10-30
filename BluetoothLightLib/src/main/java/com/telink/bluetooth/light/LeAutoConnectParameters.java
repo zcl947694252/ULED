@@ -80,4 +80,9 @@ public final class LeAutoConnectParameters extends Parameters {
         this.set(PARAM_AUTO_CONNECT_MAC, mac);
         return this;
     }
+
+    public LeAutoConnectParameters setFastestMode(Boolean isFastestMode){
+        this.set(PARAM_FATEST_MODE, isFastestMode);
+        return this;
+    }
 }

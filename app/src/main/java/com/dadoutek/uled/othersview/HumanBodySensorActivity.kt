@@ -208,7 +208,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
-            ActivityUtils.startActivity(MainActivity::class.java)
+//            ActivityUtils.startActivity(MainActivity::class.java)
+            LogUtils.d("MainActivity doesn't exist in stack")
             finish()
         }
     }

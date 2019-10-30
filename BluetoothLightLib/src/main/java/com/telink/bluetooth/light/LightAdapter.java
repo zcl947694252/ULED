@@ -6,6 +6,7 @@ package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.os.Build;
@@ -111,7 +112,7 @@ public class LightAdapter {
     private LightPeripherals mUpdateLights;
     private Handler mLoopHandler;
     private Runnable mLoopTask;
-    private int mInterval = 5000;
+    private int mInterval = 100;
     private Handler mNotifyHandler;
     private Runnable mNotifyTask;
 
@@ -519,11 +520,15 @@ public class LightAdapter {
 
     synchronized public void autoConnect(Parameters params, Callback callback) {
 
-        if (!this.isStarted.get())
+        if (!this.isStarted.get()) {
+            Log.d("Saw", "return because of this.isStarted.get() == " + this.isStarted.get());
             return;
+        }
 
-        if (this.getMode() == MODE_AUTO_CONNECT_MESH)
+        if (this.getMode() == MODE_AUTO_CONNECT_MESH) {
+            Log.d("Saw", "Return because of MODE_AUTO_CONNECT_MESH  this.mScannedLights.size = " + this.mScannedLights.size());
             return;
+        }
         TelinkLog.e("LightAdapter#autoConnect");
         this.setMode(MODE_IDLE);
 
@@ -563,6 +568,7 @@ public class LightAdapter {
 
             long delay = 0;
             if (isSupportN()) {
+                //决不能删，两次扫描的间隔必须在6s以外，否则会出现调了接口没回调的问题
                 long scanDuring = System.currentTimeMillis() - scanStartTime;
                 if (scanDuring < MIN_SCAN_PERIOD) {
                     delay = MIN_SCAN_PERIOD - (System.currentTimeMillis() - scanStartTime);
@@ -623,6 +629,8 @@ public class LightAdapter {
             return;
         if (this.getMode() == MODE_IDLE)
             return;
+
+//        Log.d("Saw", getStackTrace());
         TelinkLog.e("LightAdapter#idleMode");
         this.setMode(MODE_IDLE);
         this.status.getAndSet(-1);
@@ -996,6 +1004,7 @@ public class LightAdapter {
                 }
 
             } else if (mode == MODE_AUTO_CONNECT_MESH) {
+                Log.d("Saw", "mScannedLights.put(light) = " + light.getMacAddress());
                 mScannedLights.put(light);
             } else if (mode == MODE_OTA) {
                 mScannedLights.put(light);
@@ -1429,39 +1438,28 @@ public class LightAdapter {
         }
 
         private void autoConnect() {
-
             if (getState() == STATE_PENDING)
                 return;
-
-            if (pause) {
-                long currentTime = System.currentTimeMillis();
-                long delay = currentTime - lastUpdateTime;
-
-                if (delay < waitSeconds)
-                    return;
-                else
-                    pause = false;
-            }
 
             if (!startLeScan()) {
                 setMode(MODE_IDLE);
                 return;
             }
 
-            if (this.checkOffLine()) {
-                return;
-            }
-
-            //如果小于扫描间隔时间就停止执行否则就走过去停止扫描
             //只有当没有指定mac时，需要这样做。
+            boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
             String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
-            if (scanMac != null && !scanMac.isEmpty()) {
+            if (!fastestMode && scanMac != null && !scanMac.isEmpty()) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
                 }
             }
 
+
+
             int count = mScannedLights.size();
+
+//            Log.d("Saw", "mScannedLights.size = " + count);
 
             if (count <= 0) {
 //                this.checkOffLine();
@@ -1477,9 +1475,14 @@ public class LightAdapter {
                 return;
             }*/
 
+            Log.d("Saw", "STATE_PENDING ");
+
             setState(STATE_PENDING);
 //            LeBluetooth.getInstance().stopScan();
-            stopScan();
+//            stopScan();
+            stopLeScan();
+
+            Log.d("Saw", "stopLeScan() ");
 //            lastLogoutTime = 0;
             int timeoutSeconds = mParams
                     .getInt(Parameters.PARAM_TIMEOUT_SECONDS);
@@ -1487,9 +1490,11 @@ public class LightAdapter {
 //            LightPeripheral light = mScannedLights.get(0);           // 默认用的是这个
             LightPeripheral light = mScannedLights.getByMaxRssi();  //改为获取信号最好的设备，很关键的改动。
             if (light != null) {
+                Log.d("Saw", "connect(light, timeoutSeconds) ");
                 connect(light, timeoutSeconds);
-                Log.d(getClass().getSimpleName(), "connect to mac = " + light.getMacAddress() + "    rssi = " + light.getRssi());
+                Log.d("Saw", "connect to mac = " + light.getMacAddress() + "    rssi = " + light.getRssi());
             } else {
+                Log.d("Saw", "the lastest setState(STATE_RUNNING); ");
                 setState(STATE_RUNNING);
             }
         }

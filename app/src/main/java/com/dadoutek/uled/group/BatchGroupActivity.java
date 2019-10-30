@@ -1207,7 +1207,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         }
 //
 //        if(TelinkLightApplication.Companion.getApp().getConnectDevice()==null){
-//            autoConnect();
+//            connect();
 //            mConnectTimer = createConnectTimeout();
 //        }
     }

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.rnorth.duct-tape:duct-tape:1.0.7@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rnorth.duct-tape/duct-tape/1.0.7/a26b5d90d88c91321dc7a3734ea72d2fc019ebb6/duct-tape-1.0.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.rnorth.duct-tape/duct-tape/1.0.7/f284c5ce9d3b7bd612dcdd754fb9d09b021dcb05/duct-tape-1.0.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

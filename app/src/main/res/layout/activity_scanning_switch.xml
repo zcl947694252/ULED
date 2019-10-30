@@ -6,88 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".switches.ScanningSwitchActivity">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/switch_add_device_btn"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@+id/include"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
-
-        <TextView
-            android:id="@+id/tvHint1"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center_vertical"
-            android:text="@string/install_switch_tips1"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/tvHint2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/tvHint2"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center_vertical"
-            android:text="@string/install_switch_tips2"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.508" />
-
-        <TextView
-            android:id="@+id/tvHint3"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center_vertical"
-            android:text="@string/install_switch_tips3"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvHint2" />
-
-        <com.dd.processbutton.iml.ActionProcessButton
-            android:id="@+id/progressBtn"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/search_new_device"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvHint3"
-            app:pb_colorComplete="@color/green_complete"
-            app:pb_colorError="@color/red_error"
-            app:pb_colorNormal="@color/primary"
-            app:pb_colorPressed="@android:color/holo_blue_dark"
-            app:pb_colorProgress="@color/primary"
-            app:pb_textComplete="@string/connected"
-            app:pb_textError="@string/not_found_switch"
-            app:pb_textProgress="@string/searching" />
-    </android.support.constraint.ConstraintLayout>
 
     <include
-        layout="@layout/template_scanning_device"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="135dp" />
-
-    <include
-        android:id="@+id/include"
+        android:id="@+id/rvToolbar"
         layout="@layout/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <include layout="@layout/template_lottie_animation" />
+
+    <Button
+        android:id="@+id/btn_stop_scan"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/rect_blue"
+        android:text="@string/stop_scan"
+        android:textColor="@color/gray_3"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/scanning_num"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/scanning"
+        android:textColor="@color/gray_3"
+        android:visibility="visible"
+        android:gravity="center"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_stop_scan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.386"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+
 
 </android.support.constraint.ConstraintLayout>

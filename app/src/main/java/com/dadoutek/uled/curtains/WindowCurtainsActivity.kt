@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -102,25 +103,30 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             Log.e("TAG",curtain!!.meshAddr.toString())
-            Commander.getDeviceVersion(curtain!!.meshAddr, { s ->
-                localVersion = s
-                if(localVersion!=""){
-                    if (versionText != null) {
-                        if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                            curtain!!.version = localVersion
-                            this.versionText.visibility = View.VISIBLE
-                        } else {
-                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                            curtain!!.version = localVersion
-                            this.versionText.visibility = View.VISIBLE
-                        }
-                    }
-                }
-                null
-            }, {
-                null
-            })
+            val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
+                    .subscribe(
+                            {s ->
+                                localVersion = s
+                                if(localVersion!=""){
+                                    if (versionText != null) {
+                                        if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                                            curtain!!.version = localVersion
+                                            this.versionText.visibility = View.VISIBLE
+                                        } else {
+                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                                            curtain!!.version = localVersion
+                                            this.versionText.visibility = View.VISIBLE
+                                        }
+                                    }
+                                }
+                                null
+
+                            },
+                            {
+                                LogUtils.d(it)
+                            }
+                    )
         }
     }
 

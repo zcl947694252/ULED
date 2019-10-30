@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;

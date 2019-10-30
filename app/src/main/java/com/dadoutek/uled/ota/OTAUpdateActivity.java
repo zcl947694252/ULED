@@ -508,7 +508,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 //            parseFile();
             startOTA();
         } else {
-            autoConnectMac(lightMacAddr);
+            connectOld(lightMacAddr);
         }
     }
 
@@ -601,7 +601,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             //startScan();
-            autoConnectMac(lightMacAddr);
+            connectOld(lightMacAddr);
         }
         LogUtils.v("startOTA ");
     }

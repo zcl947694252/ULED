@@ -29,6 +29,21 @@ public final class MeshUtils {
     private MeshUtils() {
     }
 
+    /**
+     * 打印函數的調用棧
+     *
+     * @return 調用棧
+     */
+    public static String getStackTrace() {
+        StringBuilder sb = new StringBuilder("");
+        Exception e = new Exception();
+        StackTraceElement[] trace = e.getStackTrace();
+        for (int i = 0; i < trace.length; i++) {
+            sb.append(trace[i] + "\n");
+        }
+        return sb.toString();
+    }
+
     public static byte[] generateRandom(int length) {
 
         byte[] data = new byte[length];

@@ -17,9 +17,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.telink.util.ContextUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,6 +121,8 @@ public final class LeBluetooth {
                             scanRecord = result.getScanRecord().getBytes();
                         if (mCallback != null)
                             mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
+
+//                        Log.d("Saw","result.getScanRecord() = " + result.getScanRecord() + ", mCallback = " + mCallback);
                     }
 
                     if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
@@ -128,6 +132,7 @@ public final class LeBluetooth {
 
                 @Override
                 public void onScanFailed(int errorCode) {
+                    Log.d("Saw", "##### onScanFailed = " + errorCode);
                     if (errorCode != ScanCallback.SCAN_FAILED_ALREADY_STARTED)
                         if (mCallback != null)
                             mCallback.onScanFail(LeBluetooth.SCAN_FAILED_FEATURE_UNSUPPORTED);
@@ -158,7 +163,7 @@ public final class LeBluetooth {
                 return true;
         }
 
-        TelinkLog.w("LeBluetooth#StartScan");
+        TelinkLog.w("LeBluetooth#startScan(final UUID[] serviceUUIDs)");
         if (!this.isEnabled())
             return false;
 
@@ -179,7 +184,7 @@ public final class LeBluetooth {
                 return true;
         }
 
-        TelinkLog.w("LeBluetooth#StartScan");
+        TelinkLog.w("LeBluetooth#StartScan with filters");
         if (!this.isEnabled())
             return false;
 
@@ -192,53 +197,36 @@ public final class LeBluetooth {
     }
 
     private void scan(final UUID[] serviceUUIDs, List<ScanFilter> scanFilters) {
-        if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
-            mDelayHandler.removeCallbacks(mLocationCheckTask);
-            mDelayHandler.postDelayed(mLocationCheckTask, LOCATION_CHECK_PERIOD);
-            return;
-        }
-        if (isSupportLollipop()) {
-            mScanner = mAdapter.getBluetoothLeScanner();
-            if (mScanner == null) {
-                synchronized (this) {
-                    mScanning = false;
-                }
-                if (mCallback != null)
-                    mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
-            } else {
-                ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
-                if(Build.VERSION.SDK_INT >= 23)
-                {
-//                    scanSettingsBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
-                    scanSettingsBuilder .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
-//                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
-                }
-                //scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_BALANCED);
-                scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//低延迟
-//                                .setNumOfMatches(5)
-                ScanSettings scanSettings=scanSettingsBuilder.build();
-//                mScanner.startScan(mScanCallback);
-                mScanner.startScan(scanFilters, scanSettings, mScanCallback);
-                synchronized (this) {
-                    mScanning = true;
-                }
-                mCallback.onStartedScan();
+        mScanner = mAdapter.getBluetoothLeScanner();
+        if (mScanner == null) {
+            synchronized (this) {
+                mScanning = false;
             }
+            if (mCallback != null)
+                mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
 
+            Log.d("Saw", "scan mCallback = " + mCallback + "mScanner = " + mScanner);
         } else {
-            if (!mAdapter.startLeScan(serviceUUIDs,
-                    mLeScanCallback)) {
-                synchronized (this) {
-                    mScanning = false;
-                }
-                if (mCallback != null)
-                    mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
-            } else {
-                synchronized (this) {
-                    mScanning = true;
-                }
-                mCallback.onStartedScan();
+            ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
+            if (Build.VERSION.SDK_INT >= 23) {
+//                    scanSettingsBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
+                scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
+//                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
             }
+            //scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_BALANCED);
+            scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//低延迟
+//                                .setNumOfMatches(5)
+            ScanSettings scanSettings = scanSettingsBuilder.build();
+//                mScanner.startScan(mScanCallback);
+            mScanner.startScan(scanFilters, scanSettings, mScanCallback);
+            for (int i = 0; i < scanFilters.size(); i++){
+                
+            }
+            Log.d("Saw", "mScanner.startScan  scanFilters = " + scanFilters + ", mScanCallback = " + mScanCallback);
+            synchronized (this) {
+                mScanning = true;
+            }
+            mCallback.onStartedScan();
         }
     }
 
@@ -257,7 +245,10 @@ public final class LeBluetooth {
                 }
                 if (mCallback != null)
                     mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
+
+                Log.d("Saw", "######## mScanner = null, mCallback =  " + mScanCallback);
             } else {
+                Log.d("Saw", "######## mScanner.startScan(mScanCallback) = " + mScanCallback);
                 mScanner.startScan(mScanCallback);
                 synchronized (this) {
                     mScanning = true;
@@ -297,15 +288,24 @@ public final class LeBluetooth {
      */
     synchronized public void stopScan() {
         TelinkLog.w("LeBluetooth#stopScan");
+/*
         synchronized (this) {
-            if (!mScanning)
+            if (!mScanning){
+                Log.d("Saw", "no need to stop Scan");
                 return;
+            }
         }
+*/
 
         try {
             if (isSupportLollipop()) {
-                if (mScanner != null)
+                if (mScanner != null) {
+                    Log.d("Saw", "mScanner.stopScan(mScanCallback)");
                     mScanner.stopScan(mScanCallback);
+                } else {
+                    Log.d("Saw", "mScanner == null");
+
+                }
             } else {
                 if (mAdapter != null)
                     mAdapter.stopLeScan(mLeScanCallback);

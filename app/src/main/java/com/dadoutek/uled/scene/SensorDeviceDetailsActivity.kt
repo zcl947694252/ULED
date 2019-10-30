@@ -704,34 +704,40 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             LogUtils.e("TAG", currentLight!!.meshAddr.toString())
             progressBar_sensor.visibility = View.GONE
             connectSensorTimeoutDisposable?.dispose()
-            Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
-                hideLoadingDialog()
-                if ("" != s){
-                    if (isOTA) {
-                        currentLight!!.version = s
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                        if (isBoolean) {
-                            transformView()
-                        } else {
-                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
-                            } else {
-                                ToastUtils.showShort(getString(R.string.version_disabled))
+
+            val disposable = Commander.getDeviceVersion(currentLight!!.meshAddr)
+                    .subscribe(
+                            { s ->
+                                hideLoadingDialog()
+                                if ("" != s){
+                                    if (isOTA) {
+                                        currentLight!!.version = s
+                                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                                        if (isBoolean) {
+                                            transformView()
+                                        } else {
+                                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
+                                            } else {
+                                                ToastUtils.showShort(getString(R.string.version_disabled))
+                                                hideLoadingDialog()
+                                            }
+                                        }
+                                    } else {
+                                        if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                                            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                                        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+                                            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
+                                        }
+                                        doFinish()
+                                    }
+                                    isClick = SENSOR_FINISH
+                                }
+                            },
+                            {
                                 hideLoadingDialog()
                             }
-                        }
-                    } else {
-                        if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
-                            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
-                        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-                            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
-                        }
-                       doFinish()
-                    }
-                isClick = SENSOR_FINISH
-                }
-            }, {hideLoadingDialog()})
-
+                    )
         }
     }
 

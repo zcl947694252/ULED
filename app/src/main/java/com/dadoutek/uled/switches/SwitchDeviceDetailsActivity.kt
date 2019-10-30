@@ -82,24 +82,30 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
         if (bestRSSIDevice != null) {
             if (TelinkApplication.getInstance().connectDevice != null)
-                Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress, { version ->
-                    if (version != null&&version!="") {
-                        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                            finish()
-                        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                            finish()
-                        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
-                            finish()
-                        }
-                    } else {
-                        ToastUtils.showShort(getString(R.string.get_version_fail))
-                        initData()
-                    }
-                },{ showToast(getString(R.string.get_server_version_fail)) })
+                Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+                        .subscribe(
+                                { version ->
+                                    if (version != null&&version!="") {
+                                        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                                                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                                            finish()
+                                        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                                            finish()
+                                        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch,"version" to version)
+                                            finish()
+                                        }
+                                    } else {
+                                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                                        initData()
+                                    }
+                                },
+                                {
+                                    showToast(getString(R.string.get_server_version_fail))
+                                }
+                        )
         }
     }
 
@@ -419,24 +425,34 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun getDeviceVersion() {
-        if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress, { s ->
-                if ("" != s) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                        currentLight!!.version = s
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                        if (isBoolean) {
-                            transformView()
-                        } else {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, s, otaPrepareListner)
-                        }
-                    } else {
-                        ToastUtils.showShort(getString(R.string.version_disabled))
-                    }
-                } else {
-                    ToastUtils.showShort(getString(R.string.get_version_fail))
-                }
-            }, { ToastUtils.showShort(getString(R.string.get_version_fail)) })
+        if (TelinkApplication.getInstance().connectDevice != null){
+            val disposable =  Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+                    .subscribe(
+                            {s ->
+                                if ("" != s) {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                        currentLight!!.version = s
+                                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                                        if (isBoolean) {
+                                            transformView()
+                                        } else {
+                                            OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, s, otaPrepareListner)
+                                        }
+                                    } else {
+                                        ToastUtils.showShort(getString(R.string.version_disabled))
+                                    }
+                                } else {
+                                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                                }
+
+                            },
+                            {
+                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                            }
+                    )
+
+        }
+
         isclickOTA = false
     }
 

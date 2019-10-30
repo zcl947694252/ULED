@@ -309,7 +309,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 //                    this@LightsOfGroupActivity.isDestroyed ||
 //                    this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
 //            } else {
-//                autoConnect()
+//                connect()
 //            }
 //        }.start()
 //
@@ -329,7 +329,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 //                    BluetoothAdapter.STATE_ON -> {
 //                        TelinkLightService.Instance()?.idleMode(true)
 //                        retryConnectCount = 0
-//                        autoConnect()
+//                        connect()
 //                        LogUtil.d("STATE_ON")
 //                    }
 //                    BluetoothAdapter.STATE_OFF -> {

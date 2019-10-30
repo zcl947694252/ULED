@@ -202,7 +202,7 @@ public class TelinkApplication extends Application {
      * @param listener
      */
     public void removeEventListener(EventListener<String> listener) {
-        Log.d("Saw", "removeEventListener");
+//        Log.d("Saw", "removeEventListener");
         this.mEventBus.removeEventListener(listener);
     }
 
@@ -228,8 +228,9 @@ public class TelinkApplication extends Application {
      * @param listener
      */
     public void removeEventListener(String eventType, EventListener<String> listener) {
-        getStackTrace();
-//        Log.d("Saw", "removeEventListener eventType =" + eventType + "stack = " + getStackTrace());
+//        getStackTrace();
+//        Log.d("Saw", "removeEventListener eventType =" + eventType + "stack = "
+//                + getStackTrace() + "mEventListeners = " + mEventBus.mEventListeners.toString());
         this.mEventBus.removeEventListener(eventType, listener);
     }
 

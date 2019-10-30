@@ -325,27 +325,32 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            Commander.getDeviceVersion(light!!.meshAddr, { s ->
-                localVersion = s
-                if (toolbar.title != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                        lightVersion.visibility = View.VISIBLE
-                        lightVersion.text = getString(R.string.firware_version, localVersion)
-                        light!!.version = localVersion
-                    } else {
-                        lightVersion!!.visibility = View.VISIBLE
-                        lightVersion!!.text = resources.getString(R.string.firmware_version, localVersion)
-                        light!!.version = localVersion
-                    }
-                }
-                null
-            }, {
-                if (toolbar.title != null) {
-                    lightVersion.visibility = View.VISIBLE
-                    tvOta!!.visibility = View.GONE
-                }
-                null
-            })
+            Commander.getDeviceVersion(light!!.meshAddr)
+                    .subscribe(
+                            { s ->
+                                localVersion = s
+                                if (toolbar.title != null) {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                        lightVersion.visibility = View.VISIBLE
+                                        lightVersion.text = getString(R.string.firware_version, localVersion)
+                                        light!!.version = localVersion
+                                    } else {
+                                        lightVersion!!.visibility = View.VISIBLE
+                                        lightVersion!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        light!!.version = localVersion
+                                    }
+                                }
+                                null
+
+                            },
+                            {
+                                if (toolbar.title != null) {
+                                    lightVersion.visibility = View.VISIBLE
+                                    tvOta!!.visibility = View.GONE
+                                }
+                                LogUtils.d(it)
+                            }
+                    )
         }
     }
 
@@ -744,17 +749,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
 
     private fun initToolbar() {
-            setSupportActionBar(toolbar)
-            val actionBar = supportActionBar
-            actionBar?.setDisplayHomeAsUpEnabled(true)
-                toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-            toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
 
     }
 
     private fun initToolbarGroup() {
         toolbar.title = ""
-                toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)

@@ -30,6 +30,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -46,10 +47,12 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.EventListener
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -59,6 +62,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private var mConnectDisposable: Disposable? = null
     private var mStompListener: Disposable? = null
     protected var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
@@ -73,8 +77,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private lateinit var stompRecevice: StompReceiver
     private var locationServiceDialog: android.support.v7.app.AlertDialog? = null
     private lateinit var mStompManager: StompManager
-    protected var toast: Toast? = null
-    protected var foreground = false
     private var loadDialog: Dialog? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
@@ -84,10 +86,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initOnLayoutListener()//加载view监听
-        this.toast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
-        foreground = true
         this.mApplication = this.application as TelinkLightApplication
+
+        enableConnectionStatusListener()    //尽早注册监听
+        initOnLayoutListener()//加载view监听
         makeDialogAndPop()
         initStompReceiver()
     }
@@ -149,9 +151,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     //打开基类的连接状态变化监听
     fun enableConnectionStatusListener() {
-        //先取消，这样可以确保不会重复添加监听
-        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        LogUtils.d("enableConnectionStatusListener, current listeners = ${mApplication?.mEventBus?.mEventListeners}")
     }
 
     //关闭基类的连接状态变化监听
@@ -175,9 +176,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                 }
-
-                val connectDevice = this.mApplication?.connectDevice
-//                LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
 
             }
@@ -201,29 +199,30 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        enableConnectionStatusListener()
         Constant.isTelBase = true
-        foreground = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
 
         if (LeBluetooth.getInstance().isEnabled) {
             if (lightService?.isLogin == true) {
+//                LogUtils.d("changeDisplayImgOnToolbar(true)")
                 changeDisplayImgOnToolbar(true)
             } else {
+//                LogUtils.d("changeDisplayImgOnToolbar(false)")
                 changeDisplayImgOnToolbar(false)
             }
         } else {
+//            LogUtils.d("changeDisplayImgOnToolbar(true)")
             changeDisplayImgOnToolbar(false)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        disableConnectionStatusListener()
+        mConnectDisposable?.dispose()
         isRuning = false
-        this.toast!!.cancel()
-        this.toast = null
         unregisterReceiver(stompRecevice)
         SMSSDK.unregisterAllEventHandler()
     }
@@ -276,9 +275,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        mConnectDisposable?.dispose()
         isRuning = false
-        foreground = false
-        disableConnectionStatusListener()
     }
 
 
@@ -527,16 +525,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun getVersion(meshAddr: Int): String? {
-        var version: String? = ""
-        if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(meshAddr, {
-                s -> version = s
-            }
-                    , { showToast(getString(R.string.get_server_version_fail)) })
-        return version
-    }
-
 
     fun showOpenLocationServiceDialog() {
         val builder = android.support.v7.app.AlertDialog.Builder(this)
@@ -553,11 +541,34 @@ open class TelinkBaseActivity : AppCompatActivity() {
         locationServiceDialog?.hide()
     }
 
+
+    fun connect(macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+                meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, fastestMode: Boolean = false): Observable<DeviceInfo>? {
+        //mConnectDisposable == null 代表这是第一次执行
+        //!TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
+        if (mConnectDisposable == null && !TelinkLightService.Instance().isLogin) {
+            return Commander.connect(macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
+                    ?.doOnSubscribe {
+                        mConnectDisposable = it
+                    }
+                    ?.doFinally {
+                        mConnectDisposable = null
+                    }
+
+        } else {
+            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance().isLogin}")
+            return null
+        }
+
+    }
+
     /**
      * 自动重连
      */
     @SuppressLint("CheckResult")
-    fun autoConnectMac(macAddr: String?) {
+    @Deprecated("use connect()")
+    fun connectOld(macAddr: String?) {
         //如果支持蓝牙就打开蓝牙
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开

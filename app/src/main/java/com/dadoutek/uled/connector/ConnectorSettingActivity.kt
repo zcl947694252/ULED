@@ -665,29 +665,29 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-            Commander.getDeviceVersion(light!!.meshAddr, { s ->
-                localVersion = s
-                if (txtTitle != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                        txtTitle!!.visibility = View.VISIBLE
-                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
-                        light!!.version = localVersion
+          val disposable =  Commander.getDeviceVersion(light!!.meshAddr)
+                    .subscribe(
+                            {s ->
+                                localVersion = s
+                                if (txtTitle != null) {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                        txtTitle!!.visibility = View.VISIBLE
+                                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        light!!.version = localVersion
 //                        tvOta!!.visibility = View.VISIBLE
-                    } else {
-                        txtTitle!!.visibility = View.VISIBLE
-                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
-                        light!!.version = localVersion
+                                    } else {
+                                        txtTitle!!.visibility = View.VISIBLE
+                                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        light!!.version = localVersion
 //                        tvOta!!.visibility = View.GONE
-                    }
-                }
-                null
-            }, {
-                if (txtTitle != null) {
-//                    txtTitle!!.visibility = View.GONE
-//                    tvOta!!.visibility = View.GONE
-                }
-                null
-            })
+                                    }
+                                }
+                            },
+                            {
+
+                                LogUtils.d(it)
+                            }
+                    )
         } else {
             dstAdress = 0
         }

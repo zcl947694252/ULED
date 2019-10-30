@@ -365,22 +365,25 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null&&mDeviceInfo?.meshAddress!=null) {
             dstAdress = mDeviceInfo?.meshAddress!!
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        closeAnimal()
-                        finish()
-                        if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
-                            startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
-                        } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-                            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                        }
-                    },
-                    failedCallback = {
-                        getVersionRetryCount++
-                        if (getVersionRetryCount <= getVersionRetryMaxCount) {
-                            getVersion()
-                        }
-                    })
+           val disposable = Commander.getDeviceVersion(dstAdress)
+                    .subscribe(
+                            {
+                                closeAnimal()
+                                finish()
+                                if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                                    startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
+                                } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
+                                    startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
+                                }
+                            },
+                            {
+                                getVersionRetryCount++
+                                if (getVersionRetryCount <= getVersionRetryMaxCount) {
+                                    getVersion()
+                                }
+                            }
+                    )
+
         } else {
             doFinish()
         }
@@ -432,7 +435,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
-            ActivityUtils.startActivity(MainActivity::class.java)
+            LogUtils.d("MainActivity doesn't exist in stack")
             finish()
         }
     }

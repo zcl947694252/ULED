@@ -62,6 +62,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
+    private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
     private lateinit var light: DbLight
     private val mDisposable = CompositeDisposable()
@@ -1016,11 +1017,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun startOtaAct() {
-       val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-          intent.putExtra(Constant.UPDATE_LIGHT, light)
-         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
-         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
-         intent.putExtra(Constant.OTA_VERSION, light?.version)
+        val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
 
         startActivity(intent)
         finish()
@@ -1034,13 +1035,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         } else {
             showLoadingDialog(getString(R.string.please_wait))
             TelinkLightService.Instance()?.idleMode(true)
-            val disposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+           mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        Commander.autoConnect(light.macAddr)
+                        connect(light.macAddr)
                     }
-                    .subscribe(
+                    ?.subscribe(
                             {
                                 hideLoadingDialog()
                                 startOtaAct()
@@ -1058,29 +1059,32 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            Commander.getDeviceVersion(light!!.meshAddr, { s ->
-                localVersion = s
-                if (textTitle != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                        textTitle!!.visibility = View.VISIBLE
-                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
-                        light!!.version = localVersion
+            Commander.getDeviceVersion(light!!.meshAddr)
+                    .subscribe(
+                            { s ->
+                                localVersion = s
+                                if (textTitle != null) {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                        textTitle!!.visibility = View.VISIBLE
+                                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        light!!.version = localVersion
 //                        tvOta!!.visibility = View.VISIBLE
-                    } else {
-                        textTitle!!.visibility = View.VISIBLE
-                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
-                        light!!.version = localVersion
-                        tvOta!!.visibility = View.GONE
-                    }
-                }
-                null
-            }, {
-                if (textTitle != null) {
-                    textTitle!!.visibility = View.GONE
-                    tvOta!!.visibility = View.GONE
-                }
-                null
-            })
+                                    } else {
+                                        textTitle!!.visibility = View.VISIBLE
+                                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        light!!.version = localVersion
+                                        tvOta!!.visibility = View.GONE
+                                    }
+                                }
+
+                            },
+                            {
+                                if (textTitle != null) {
+                                    textTitle!!.visibility = View.GONE
+                                    tvOta!!.visibility = View.GONE
+                                }
+                                LogUtils.d(it)
+                            })
         }
     }
 

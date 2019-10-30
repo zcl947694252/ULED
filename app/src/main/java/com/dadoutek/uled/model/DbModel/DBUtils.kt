@@ -723,7 +723,7 @@ object DBUtils {
 
     fun saveUser(dbUser: DbUser) {
         DaoSessionInstance.getInstance().dbUserDao.insertOrReplace(dbUser)
-        LogUtils.v("zcl-0--------------"+ getAllUser())
+//        LogUtils.v("zcl-0--------------"+ getAllUser())
         recordingChange(dbUser.id,
                 DaoSessionInstance.getInstance().dbUserDao.tablename,
                 Constant.DB_ADD)

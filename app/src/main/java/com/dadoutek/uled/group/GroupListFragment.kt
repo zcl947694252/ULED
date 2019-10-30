@@ -421,96 +421,9 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.setTitle(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 
-
-            /*取消广播否则容易全部改成开或者关
-            if (allGroup != null) {
-                  if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
-                      btnOn?.setBackgroundResource(R.drawable.icon_open_group)
-                      btnOff?.setBackgroundResource(R.drawable.icon_down_group)
-                      onText?.setTextColor(resources.getColor(R.color.white))
-                      offText?.setTextColor(resources.getColor(R.color.black_nine))
-                      if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                          val intent = Intent("switch_here")
-                          intent.putExtra("switch_here", "on")
-                          LocalBroadcastManager.getInstance(this.mContext!!)
-                                  .sendBroadcast(intent)
-                      }
-                  } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                      btnOn?.setBackgroundResource(R.drawable.icon_down_group)
-                      btnOff?.setBackgroundResource(R.drawable.icon_open_group)
-                      onText?.setTextColor(resources.getColor(R.color.black_nine))
-                      offText?.setTextColor(resources.getColor(R.color.white))
-                      if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                          val intent = Intent("switch_here")
-                          intent.putExtra("switch_here", "false")
-                          LocalBroadcastManager.getInstance(this.mContext!!)
-                                  .sendBroadcast(intent)
-                      }
-                  }
-              }*/
         }
     }
 
-/*
-    var onItemChildClickListener = object : MyBaseQuickAdapterOnClickListner {
-        override fun onItemChildClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int, groupPosition: Int) {
-            if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-                val group = showList!![groupPosition].list[position]
-                val dstAddr = group.meshAddr
-                var intent: Intent
-
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                    checkConnect()
-                } else {
-                    when (view!!.id) {
-                        R.id.btn_on, R.id.tv_on -> {
-                            Commander.openOrCloseLights(dstAddr, true)
-                            updateLights(true, group)
-                        }
-                        R.id.btn_off, R.id.tv_off -> {
-                            Commander.openOrCloseLights(dstAddr, false)
-                            updateLights(false, group)
-                        }
-                        R.id.btn_set -> {
-                            intent = Intent(mContext, NormalSettingActivity::class.java)
-                            if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
-                                intent = Intent(mContext, RGBSettingActivity::class.java)
-                            } else if (OtherUtils.isCurtain(group) && group.meshAddr != 0xffff) {
-                                intent = Intent(mContext, WindowCurtainsActivity::class.java)
-                            } else if (OtherUtils.isConnector(group) && group.meshAddr != 0xfffff) {
-                                intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                            }
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                            intent.putExtra("group", group)
-                            startActivityForResult(intent, 2)
-                        }
-                        R.id.tv_group_name -> {
-                            if (group.meshAddr != 0xffff) {
-                                if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
-                                    intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                                    intent.putExtra("group", group)
-                                    startActivityForResult(intent, 2)
-                                } else if (group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
-                                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                                    intent.putExtra("group", group)
-                                    startActivityForResult(intent, 2)
-                                } else {
-                                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                                    intent.putExtra("group", group)
-                                    startActivityForResult(intent, 2)
-                                }
-                            } else if (group.deviceType == Constant.DEVICE_TYPE_NO) {
-                                Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-*/
 
     private val onClick = View.OnClickListener {
         var intent: Intent?

@@ -367,7 +367,7 @@ class RelayFragmentList : BaseGroupFragment() {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (isFristUserClickCheckConnect) {
                     val activity = activity as MainActivity
-                    activity.autoConnect()
+                    activity.connect()
                     isFristUserClickCheckConnect = false
                 }
             }

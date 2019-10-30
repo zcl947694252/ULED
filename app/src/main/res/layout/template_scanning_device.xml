@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scanning_device_ly"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/include"
-    tools:layout_editor_absoluteX="16dp"
-    tools:showIn="@layout/activity_scanning_sensor">
+    android:layout_height="match_parent">
     <!--lottie_fileName代表json文件在assets目录下的路径，是必须提供的
 lottie_imageAssetsFolder代表该json文件在assets下依赖的图片目录，注意是一个目录，有可能图片会有很多张
 auto_play代表是否自动播报
 lottie_loop代表是否循环播报
 lottie_scale代表lottie所显示的视图缩放，屏幕密度为3的，那么lottie_scale为1/3=0.33,当然lottie_scale也可以代码动态设置-->
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/device_lottieAnimationView"
         android:layout_width="246dp"
         android:layout_height="246dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="48dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/tv_tip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="false"
-        app:lottie_loop="true"
-        android:layout_marginTop="30dp"
-        app:lottie_fileName="scanning.json"/>
+        app:lottie_fileName="scanning.json"
+        app:lottie_loop="true" />
 
     <TextView
+        android:id="@+id/tv_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginBottom="48dp"
+        android:gravity="center"
         android:text="@string/scanning"
         android:textColor="@color/gray_3"
+        android:textSize="15sp"
         android:visibility="visible"
-        android:gravity="center"
-        android:textSize="15sp" />
+        app:layout_constraintBottom_toTopOf="@+id/device_stop_scan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/device_stop_scan"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginBottom="64dp"
         android:background="@drawable/rectangle"
         android:text="@string/stop_scan"
         android:textColor="@color/gray_3"
@@ -55,7 +55,7 @@ lottie_scale代表lottie所显示的视图缩放，屏幕密度为3的，那么l
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
 

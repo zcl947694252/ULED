@@ -141,13 +141,6 @@ open class BaseFragment : Fragment() {
         }
     }
 
-    open fun getVersion(meshAddr: Int): String? {
-        var version: String? = ""
-        if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(meshAddr, { s -> version = s }
-                    , { ToastUtils.showShort(getString(R.string.get_version_fail)) })
-        return version
-    }
 
     open fun endCurrentGuide() {}
 

@@ -298,13 +298,28 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun startTimer() {
         stopScanTimer()
-        // 防止onLescanTimeout不调用，导致UI卡住的问题。设为正常超时时间的2倍
         if (mTimer != null && !mTimer!!.isDisposed)
             mTimer!!.dispose()
-        mTimer = Observable.timer((SCAN_TIMEOUT_SECOND * 2).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        LogUtils.d("startTimer")
+        mTimer = Observable.timer((SCAN_TIMEOUT_SECOND).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe {
+                    LogUtils.d("onLeScanTimeout" )
                     onLeScanTimeout()
+//                    retryScan()
                 }
+    }
+
+
+    private fun retryScan(){
+        if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
+            mUpdateMeshRetryCount++
+            Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
+            stopScanTimer()
+            this.startScan()
+        } else {
+            Log.d("ScanningTest", "update mesh failed , do not retry")
+        }
+        updateMeshStatus = UPDATE_MESH_STATUS.FAILED
     }
 
 
@@ -340,7 +355,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         showLoadingDialog(resources.getString(R.string.connecting_tip))
         //先断开
-        TelinkLightService.Instance()?.idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
         //过一秒
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
@@ -399,7 +414,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     else {
-                        ActivityUtils.startActivity(MainActivity::class.java)
+//                        ActivityUtils.startActivity(MainActivity::class.java)
+                        LogUtils.d("MainActivity doesn't exist in stack")
+
                         finish()
                     }
                 }
@@ -1171,13 +1188,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         startTimer()
         startAnimation()
         handleIfSupportBle()
-        LeBluetooth.getInstance().stopScan()
 
         //断连后延时一段时间再开始扫描
         disposableTimer?.dispose()
          disposableTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     val mesh = mApplication!!.mesh
                     //扫描参数
@@ -1200,13 +1216,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun connectBestRssiDevice() {
         val mesh = this.mApplication!!.mesh
         disposable?.dispose()
-        disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
+        disposable = Observable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (bestRssiDevice != null) {
                         rxBleDispose?.dispose()
-                        LogUtils.e("zcl------连接设备rssi${bestRssiDevice?.rssi}")
+//                        LogUtils.e("zcl------连接设备rssi${bestRssiDevice?.rssi}")
                         updateMesh(bestRssiDevice!!, mMeshAddressGenerator.meshAddress, mesh)
                     }
                 }
@@ -1339,6 +1355,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         params.setUpdateDeviceList(deviceInfo)
         TelinkLightService.Instance().updateMesh(params)
 
+        stopScanTimer()
+
         LogUtils.d("updateMesh: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
@@ -1379,16 +1397,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                //加灯失败继续扫描
-                if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
-                    mUpdateMeshRetryCount++
-                    Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
-                    stopScanTimer()
-                    this.startScan()
-                } else {
-                    Log.d("ScanningTest", "update mesh failed , do not retry")
-                }
-                updateMeshStatus = UPDATE_MESH_STATUS.FAILED
+
+                retryScan()
             }
 
 
@@ -1454,7 +1464,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
     companion object {
-        private val MAX_RETRY_COUNT = 10   //update mesh failed的重试次数设置为4次
+        private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
         private val MAX_CONNECT_RETRY_COUNT = 8   //update mesh failed的重试次数设置为4次
         private val MAX_RSSI = 90
         private val SCAN_TIMEOUT_SECOND = 10
