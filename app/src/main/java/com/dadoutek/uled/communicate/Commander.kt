@@ -518,13 +518,11 @@ object Commander : EventListener<String> {
             }
             LightAdapter.STATUS_LOGIN -> {
                 if (mConnectEmitter != null) {
-//                    LogUtils.d("mConnectEmitter?.onNext(deviceInfo)")
+                    LogUtils.d("Commander connect login success")
+
                     mConnectEmitter?.onNext(deviceInfo)
                     mConnectEmitter?.onComplete()
 
-//                    mConnectEmitter?.onError(Throwable("Connect Failed"))
-//                    TelinkLightService.Instance()?.idleMode(true)
-//                    mConnectEmitter = null
                     TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
                     TelinkLightApplication.getApp().removeEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 } else {
@@ -675,7 +673,7 @@ object Commander : EventListener<String> {
                         it.onError(Throwable("connect timeout"))
                     }
                     .doFinally {
-//                        LogUtils.d("connect doFinally")
+                        LogUtils.d("connect doFinally")
                         mConnectObservable = null
                     }
                     .retry(retryTimes)
@@ -733,12 +731,10 @@ object Commander : EventListener<String> {
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
-                LogUtils.d("mConnectEmitter?.onNext(deviceInfo)")
                 mGetVersionObservable?.onNext(version!!)
                 mGetVersionObservable?.onComplete()
 
             } else {
-                LogUtils.d("mConnectEmitter == $mConnectEmitter")
             }
         } else {
             mGetVersionObservable?.onError(Throwable("get empty version"))

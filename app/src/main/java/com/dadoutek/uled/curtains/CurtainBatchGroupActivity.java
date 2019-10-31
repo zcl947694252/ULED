@@ -124,7 +124,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     @BindView(R.id.add_group)
     RelativeLayout add_group;
 
-    private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
+    private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;

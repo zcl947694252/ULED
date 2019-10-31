@@ -180,7 +180,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
-        hideLoadingDialog()
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 LogUtils.v("zcl---baseactivity收到登入广播")
@@ -195,7 +194,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             }
             LightAdapter.STATUS_LOGOUT -> {
-                LogUtils.v("zcl---baseactivity收到登出广播")
+//                LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     changeDisplayImgOnToolbar(false)
 
@@ -574,7 +573,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
         } else {
             LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance().isLogin}")
-            return null
+            return Observable.create {
+                it.onNext(TelinkLightApplication.getApp().connectDevice)
+            }
         }
 
     }

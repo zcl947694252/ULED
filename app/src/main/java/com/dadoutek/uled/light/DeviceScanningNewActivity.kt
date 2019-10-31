@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.RomUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -47,7 +48,6 @@ import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.light.*
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -59,7 +59,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_scanning.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
@@ -76,6 +75,13 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
+    private val MAX_RSSI = 90
+    private val SCAN_TIMEOUT_SECOND = 15
+    private val TIME_OUT_CONNECT = 15
+    private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
+    private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
+
     private var mAutoConnectDisposable: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
@@ -343,6 +349,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     //处理扫描成功后
     @SuppressLint("CheckResult")
     private fun scanSuccess() {
+        TelinkLightService.Instance()?.idleMode(true)
         closeAnimation()
         //更新Title
         toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
@@ -355,16 +362,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         nowDeviceList.addAll(elements)
 
         showLoadingDialog(resources.getString(R.string.connecting_tip))
-        //先断开
-//        TelinkLightService.Instance()?.idleMode(true)
-        //过一秒
+
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    //倒计时，出问题了就超时。
-                    mConnectTimer = createConnectTimeout()
-                }
                 .subscribe {
                     autoConnect()
                 }
@@ -1169,14 +1170,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun oldStartScan() {
-//        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
+        LogUtils.d("#### start scan idleMode true ####")
         startTimer()
         startAnimation()
         handleIfSupportBle()
 
         //断连后延时一段时间再开始扫描
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(300, TimeUnit.MILLISECONDS)
+        val delay = if (RomUtils.isHuawei()) HUAWEI_DELAY else SCAN_DELAY
+        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1405,33 +1408,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun onLogin() {
-        Log.d("ScanningTest", "mConnectTimer = $mConnectTimer")
-        if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
-            Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer!!.isDisposed)
-            mConnectTimer?.dispose()
-            //进入分组
-            hideLoadingDialog()
-            if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
-                if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                        bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                }
+        //进入分组
+        hideLoadingDialog()
+        if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
+            if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                    bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+            } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+            } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+            }
 
-            } else
-                startGrouping()
-        }
-    }
-
-
-    companion object {
-        private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
-        private val MAX_RSSI = 90
-        private val SCAN_TIMEOUT_SECOND = 15
-        private val TIME_OUT_CONNECT = 15
+        } else
+            startGrouping()
     }
 
 

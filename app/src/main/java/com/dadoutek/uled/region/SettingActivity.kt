@@ -421,7 +421,9 @@ class SettingActivity : BaseActivity() {
                 //时间太短会导致无法删除数据库数据故此设置1500秒
                 if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
-                compositeDisposable.add(disposable!!)
+                disposable?.let {
+                    compositeDisposable.add(disposable!!)
+                }
             }
 
             override fun error(msg: String) {

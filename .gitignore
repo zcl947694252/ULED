@@ -3,3 +3,9 @@
 app/release/app-release.apk
 app/app.iml
 androidSpace-ULED.iml
+src/androidTest/
+src/androidTestDebug/
+src/test/aidl/
+src/test/rs/
+src/test/shaders/
+src/testDebug/

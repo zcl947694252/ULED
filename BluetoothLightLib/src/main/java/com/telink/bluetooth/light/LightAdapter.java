@@ -338,7 +338,7 @@ public class LightAdapter {
             return false;
         }
 //        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
-        TelinkLog.e("LightAdapter#login");
+//        TelinkLog.e("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;
     }
@@ -512,7 +512,7 @@ public class LightAdapter {
         this.nextLightIndex.set(0);
         this.updateCount.set(0);
         this.lightCount = this.mUpdateLights.size();
-        this.mLightCtrl.disconnect();
+//        this.mLightCtrl.disconnect();
         this.setMode(MODE_UPDATE_MESH);
         this.setState(STATE_RUNNING);
         this.enableLoop(true);
@@ -538,7 +538,7 @@ public class LightAdapter {
         this.mCallback = callback;
         this.mScannedLights.clear();
         this.mUpdateLights.clear();
-        this.mLightCtrl.disconnect();
+//        this.mLightCtrl.disconnect();
         this.lightCount = 0;
         this.updateCount.set(0);
         this.nextLightIndex.set(0);
@@ -1448,8 +1448,8 @@ public class LightAdapter {
 
             //只有当没有指定mac时，需要这样做。
             boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
-            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
-            if (!fastestMode && scanMac != null && !scanMac.isEmpty()) {
+//            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
+            if ((!fastestMode) ) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
                 }
@@ -1459,7 +1459,6 @@ public class LightAdapter {
 
             int count = mScannedLights.size();
 
-//            Log.d("Saw", "mScannedLights.size = " + count);
 
             if (count <= 0) {
 //                this.checkOffLine();

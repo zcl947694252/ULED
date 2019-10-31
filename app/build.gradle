@@ -100,7 +100,7 @@ greendao {
 dependencies {
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
-    implementation 'com.blankj:utilcode:1.20.3'
+    implementation 'com.blankj:utilcode:1.25.5'
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 

@@ -162,7 +162,7 @@ public class Peripheral extends BluetoothGattCallback {
             this.gatt.disconnect();
         }
 
-        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this.getMacAddress());
+//        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this.getMacAddress());
     }
 
     private void clear() {

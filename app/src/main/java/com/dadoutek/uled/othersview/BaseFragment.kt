@@ -140,13 +140,12 @@ open class BaseFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         enableConnectionStatusListener()
-        val lightService: TelinkLightService? = TelinkLightService.Instance()
 
-      /*  if (lightService?.isLogin == true) {
+        if (TelinkLightService.Instance()?.isLogin == true) {
             changeDisplayImgOnToolbar(true)
         } else {
             changeDisplayImgOnToolbar(false)
-        }*/
+        }
     }
 
     override fun onPause() {

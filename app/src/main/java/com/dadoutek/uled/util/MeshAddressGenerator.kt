@@ -1,5 +1,6 @@
 package com.dadoutek.uled.util
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.telink.util.MeshUtils
 
@@ -9,27 +10,13 @@ import com.telink.util.MeshUtils
 class MeshAddressGenerator {
     var meshAddress: Int = 0
         get() {
-//            val currentRegionID = SharedPreferencesUtils.getCurrentUseRegion()
-//            val curRegion = DBUtils.getCurrentRegion(currentRegionID)
-//            field = curRegion?.lastGenMeshAddr ?: 1
-//
-//            //获取最大的Mesh地址，确保新的Mesh地址比它更大
-//            val latestMeshAddr = DBUtils.getLatestMeshAddr()
-//            if (field <= latestMeshAddr) {
-//                field = latestMeshAddr
-//                field++
-//            }
             //field代表meshAddress这个变量
-            while (DBUtils.isDeviceExist(field) || field == 0) {    //如果新的meshAddress已经存在，就继续+1，如果meshAddr等于0，也继续+1
+            do {
                 ++field
                 if (field == 0xFF) {      //为了旧设备的兼容性，要排除0xFF此地址，因为以前的PIR，开关等控制设备的meshAddress都是0xFF
-                 ++field
+                    ++field
                 }
-            }
-//            curRegion?.lastGenMeshAddr = field
-//            curRegion?.let {
-//                DBUtils.saveRegion(curRegion, false)
-//            }
+            } while (DBUtils.isDeviceExist(field) || field == 0)
             return field
         }
 
