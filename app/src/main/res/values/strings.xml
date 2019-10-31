@@ -121,7 +121,7 @@
     <string name="set_group">CONFIRM GROUPING</string>
     <string name="loading">Loading</string>
     <string name="scan_end">No device found!</string>
-    <string name="connecting_tip">Connecting…</string>
+    <string name="connecting_tip">Connecting... Later, please</string>
     <string name="grouping_completed">Grouping completed</string>
     <string name="openBluetooth">Open Bluetooth, Play the smart light!</string>
     <string name="quite">Quit</string>
@@ -903,5 +903,7 @@
     <string name="grouped_num">grouped(%1$s)</string>
     <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>
     <string name="beta_version">(beta version) : https://www.pgyer.com/dadou</string>
+    <string name="no_device">No equipment</string>
+    <string name="compatible_mode">compatible_mode</string>
 
 </resources>

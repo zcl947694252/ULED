@@ -231,9 +231,7 @@ class SettingActivity : BaseActivity() {
                     .setPositiveButton(android.R.string.ok
                     ) { _, _ ->
                         // 跳转到设置界面
-                        activity.startActivityForResult(Intent(
-                                Settings.ACTION_WIRELESS_SETTINGS),
-                                0)
+                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
             if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
@@ -421,11 +419,6 @@ class SettingActivity : BaseActivity() {
             override fun complete() {
                 hideLoadingDialog()
                 //时间太短会导致无法删除数据库数据故此设置1500秒
-                disposable?.dispose()
-                disposable = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                        }
                 if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
                 compositeDisposable.add(disposable!!)

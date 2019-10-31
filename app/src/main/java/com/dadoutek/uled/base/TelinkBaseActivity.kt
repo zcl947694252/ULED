@@ -56,6 +56,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     protected var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
@@ -91,7 +92,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     private fun initChangeRecevicer() {
-        val changeRecevicer = ChangeRecevicer()
+         changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
@@ -238,6 +239,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast!!.cancel()
         this.toast = null
         unregisterReceiver(stompRecevice)
+        unregisterReceiver(changeRecevicer)
         SMSSDK.unregisterAllEventHandler()
     }
 

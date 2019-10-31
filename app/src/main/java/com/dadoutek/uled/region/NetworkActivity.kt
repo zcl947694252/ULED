@@ -429,9 +429,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 }, {
                     ToastUtils.showShort(it.message)
                 })
-                /*  } else {
-                      ToastUtils.showLong(getString(R.string.please_restore_device))
-                  }*/
             }
             R.id.pop_share_net -> {
                 lookAndMakeAuthorCode()

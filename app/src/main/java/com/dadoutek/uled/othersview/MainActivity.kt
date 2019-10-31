@@ -154,9 +154,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
-        GlobalScope.launch {
-            TelinkLightApplication.getApp().initStompClient()
-        }
+
+        checkVersionAvailable()
 
         receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))

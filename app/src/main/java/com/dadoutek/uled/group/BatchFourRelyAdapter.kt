@@ -6,7 +6,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
 
 
@@ -18,8 +18,8 @@ import com.dadoutek.uled.model.DeviceType
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
-    override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
+class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
+    override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.batch_img_icon)
         val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)

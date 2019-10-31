@@ -48,6 +48,8 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
 
         if (mIsLogging) {
+                TelinkLightApplication.Companion.getApp().initStompClient();
+
             ActivityUtils.startActivityForResult(this, MainActivity.class, 0);
         } else {
             gotoLoginSetting(false);

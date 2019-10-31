@@ -30,6 +30,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
@@ -177,6 +178,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                             if (light!!.meshAddr == mConnectDevice!!.meshAddress)
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                         }
+                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                            override fun start() {}
+
+                            override fun complete() {}
+
+                            override fun error(msg: String?) {}
+                        })
                         this.finish()
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))

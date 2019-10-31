@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseFragment : Fragment() {
 
+    private lateinit var changeRecevicer: ChangeRecevicer
     private var loadDialog: Dialog? = null
 
     fun showLoadingDialog(content: String) {
@@ -129,7 +130,7 @@ open class BaseFragment : Fragment() {
         initChangeRecevicer()
     }
     private fun initChangeRecevicer() {
-        val changeRecevicer = ChangeRecevicer()
+         changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
@@ -185,5 +186,10 @@ open class BaseFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        context?.unregisterReceiver(changeRecevicer)
     }
 }

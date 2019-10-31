@@ -29,6 +29,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -1987,6 +1988,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                     this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                                 }
                             }
+                            SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                                override fun start() {}
+
+                                override fun complete() {}
+
+                                override fun error(msg: String?) {}
+                            })
                             this.finish()
 
 
