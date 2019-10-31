@@ -1,6 +1,6 @@
 package com.dadoutek.uled.qrcode;
 
-import com.dadoutek.uled.model.DeviceInfo;
+import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.google.gson.Gson;
@@ -26,12 +26,12 @@ public class QRCodeDataOperator {
             List<TmpDeviceInfo> deviceInfoList = new ArrayList<>();
 
             TmpDeviceInfo tmpDeviceInfo;
-            for (DeviceInfo deviceInfo : mesh.getDevices()) {
+            for (DadouDeviceInfo dadouDeviceInfo : mesh.getDevices()) {
                 tmpDeviceInfo = new TmpDeviceInfo();
-                tmpDeviceInfo.m = deviceInfo.macAddress;
-                tmpDeviceInfo.a = deviceInfo.meshAddress;
-                tmpDeviceInfo.v = deviceInfo.firmwareRevision;
-                tmpDeviceInfo.pu = deviceInfo.productUUID;
+                tmpDeviceInfo.m = dadouDeviceInfo.macAddress;
+                tmpDeviceInfo.a = dadouDeviceInfo.meshAddress;
+                tmpDeviceInfo.v = dadouDeviceInfo.firmwareRevision;
+                tmpDeviceInfo.pu = dadouDeviceInfo.productUUID;
 
                 deviceInfoList.add(tmpDeviceInfo);
             }

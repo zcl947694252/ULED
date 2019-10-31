@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
@@ -184,7 +185,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         params.setNewMeshName(mesh.getName());
         params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
 
-        /*DeviceInfo deviceInfo = event.getArgs();
+        /*DadouDeviceInfo deviceInfo = event.getArgs();
         deviceInfo.meshAddress = meshAddress;*/
         DeviceInfo[] deviceInfos = scanedList.toArray(new DeviceInfo[scanedList.size()]);
         params.setUpdateDeviceList(deviceInfos);
@@ -214,17 +215,17 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
                 //加灯完成继续扫描,直到扫不到设备
-                com.dadoutek.uled.model.DeviceInfo deviceInfo1 = new com.dadoutek.uled.model.DeviceInfo();
-                deviceInfo1.deviceName = deviceInfo.deviceName;
-                deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
-                deviceInfo1.longTermKey = deviceInfo.longTermKey;
-                deviceInfo1.macAddress = deviceInfo.macAddress;
-                deviceInfo1.meshAddress = deviceInfo.meshAddress;
-                deviceInfo1.meshUUID = deviceInfo.meshUUID;
-                deviceInfo1.productUUID = deviceInfo.productUUID;
-                deviceInfo1.status = deviceInfo.status;
-                deviceInfo1.meshName = deviceInfo.meshName;
-                this.mApplication.getMesh().getDevices().add(deviceInfo1);
+                DadouDeviceInfo dadouDeviceInfo1 = new DadouDeviceInfo();
+                dadouDeviceInfo1.deviceName = deviceInfo.deviceName;
+                dadouDeviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
+                dadouDeviceInfo1.longTermKey = deviceInfo.longTermKey;
+                dadouDeviceInfo1.macAddress = deviceInfo.macAddress;
+                dadouDeviceInfo1.meshAddress = deviceInfo.meshAddress;
+                dadouDeviceInfo1.meshUUID = deviceInfo.meshUUID;
+                dadouDeviceInfo1.productUUID = deviceInfo.productUUID;
+                dadouDeviceInfo1.status = deviceInfo.status;
+                dadouDeviceInfo1.meshName = deviceInfo.meshName;
+                this.mApplication.getMesh().getDevices().add(dadouDeviceInfo1);
                 this.mApplication.getMesh().saveOrUpdate(this);
                 int meshAddress = deviceInfo.meshAddress & 0xFF;
                 Light light = this.adapter.get(meshAddress);

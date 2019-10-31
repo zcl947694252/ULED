@@ -101,7 +101,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
-        registerReceiver(changeRecevicer, filter)
+//        registerReceiver(changeRecevicer, filter)
     }
 
     private fun makeDialogAndPop() {
@@ -187,7 +187,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
-                    afterLogin()
                 }
 
                 val connectDevice = this.mApplication?.connectDevice
@@ -240,7 +239,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable?.dispose()
         isRuning = false
         unregisterReceiver(stompRecevice)
-        unregisterReceiver(changeRecevicer)
+//        unregisterReceiver(changeRecevicer)
         SMSSDK.unregisterAllEventHandler()
     }
 

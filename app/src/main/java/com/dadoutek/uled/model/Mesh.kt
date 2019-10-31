@@ -18,7 +18,7 @@ class Mesh : Serializable {
     //public String otaDevice;
 
     //    public List<Integer> allocDeviceAddress;
-    var devices: MutableList<DeviceInfo>? = ArrayList()
+    var devices: MutableList<DadouDeviceInfo>? = ArrayList()
 
 /*
     fun generateMeshAddr(): Int {
@@ -80,7 +80,7 @@ class Mesh : Serializable {
             false
         } else name == otaDevice!!.meshName && password == otaDevice!!.meshPwd
 
-    fun getDevice(meshAddress: Int): DeviceInfo? {
+    fun getDevice(meshAddress: Int): DadouDeviceInfo? {
         if (this.devices == null)
             return null
 

@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.base.TelinkBaseActivity;
@@ -46,7 +47,7 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
     private int meshAddress;
     private String version;
     private String macAddress;
-    private com.dadoutek.uled.model.DeviceInfo selectedDevice;
+    private DadouDeviceInfo selectedDevice;
     private TextView name;
     private TextView mac;
     private TextView tip;

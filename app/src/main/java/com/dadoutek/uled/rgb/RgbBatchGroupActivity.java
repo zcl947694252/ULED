@@ -39,6 +39,7 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -1313,29 +1314,29 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
                 //加灯完成继续扫描,直到扫不到设备
-                com.dadoutek.uled.model.DeviceInfo deviceInfo1 = new com.dadoutek.uled.model.DeviceInfo();
-                deviceInfo1.deviceName = deviceInfo.deviceName;
-                deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
-                deviceInfo1.longTermKey = deviceInfo.longTermKey;
-                deviceInfo1.macAddress = deviceInfo.macAddress;
+                DadouDeviceInfo dadouDeviceInfo1 = new DadouDeviceInfo();
+                dadouDeviceInfo1.deviceName = deviceInfo.deviceName;
+                dadouDeviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
+                dadouDeviceInfo1.longTermKey = deviceInfo.longTermKey;
+                dadouDeviceInfo1.macAddress = deviceInfo.macAddress;
                 TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
-                deviceInfo1.meshAddress = deviceInfo.meshAddress;
-                deviceInfo1.meshUUID = deviceInfo.meshUUID;
-                deviceInfo1.productUUID = deviceInfo.productUUID;
-                deviceInfo1.status = deviceInfo.status;
-                deviceInfo1.meshName = deviceInfo.meshName;
+                dadouDeviceInfo1.meshAddress = deviceInfo.meshAddress;
+                dadouDeviceInfo1.meshUUID = deviceInfo.meshUUID;
+                dadouDeviceInfo1.productUUID = deviceInfo.productUUID;
+                dadouDeviceInfo1.status = deviceInfo.status;
+                dadouDeviceInfo1.meshName = deviceInfo.meshName;
                 if (bestRssiDevice == null) {
                     bestRssiDevice = deviceInfo;
                     if (bestRssiDevice.rssi < deviceInfo.rssi) {
                         bestRssiDevice = deviceInfo;
                     }
                 }
-//                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
+//                Log.d(TAG, "onDeviceStatusChanged: " + dadouDeviceInfo1.macAddress + "-----" + dadouDeviceInfo1.meshAddress);
 
                 new Thread(() -> this.mApplication.getMesh().saveOrUpdate(this)).start();
 
                 if(scanCURTAIN){
-                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
+                    if (checkIsCurtain(dadouDeviceInfo1.productUUID) && dadouDeviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
                         addDevice(deviceInfo);
                     }
                 } else {

@@ -134,7 +134,7 @@ open class BaseFragment : Fragment() {
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
-        context?.registerReceiver(changeRecevicer, filter)
+//        context?.registerReceiver(changeRecevicer, filter)
     }
 
     override fun onResume() {
@@ -167,7 +167,7 @@ open class BaseFragment : Fragment() {
     inner class ChangeRecevicer : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
-            LogUtils.e("zcl获取通知$deviceInfo")
+//            LogUtils.e("zcl获取通知$deviceInfo")
             when (deviceInfo.status) {
                 LightAdapter.STATUS_LOGIN -> {
                     ToastUtils.showLong(getString(R.string.connect_success))
@@ -183,6 +183,6 @@ open class BaseFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        context?.unregisterReceiver(changeRecevicer)
+//        context?.unregisterReceiver(changeRecevicer)
     }
 }
