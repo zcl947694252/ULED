@@ -3,6 +3,7 @@
     android:id="@+id/no_device_relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     tools:showIn="@layout/activity_connector_device_detail">
 
     <ImageView
@@ -10,12 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/no_device"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="170dp" />
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/add_groups_btn"
         style="@style/ButtonStyle"
         android:text="@string/add_groups"
-        android:layout_below="@id/image_no_group" />
+        android:layout_below="@id/image_no_group"/>
 </RelativeLayout>

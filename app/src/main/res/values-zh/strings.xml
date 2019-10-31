@@ -114,7 +114,7 @@
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">未扫描到设备！</string>
-    <string name="connecting_tip">正在连接……</string>
+    <string name="connecting_tip">正在连接……,请稍后</string>
     <string name="grouping_completed">分组完成</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
     <string name="quite">退出</string>
@@ -181,11 +181,10 @@
     <string name="install_switch_tips3">3.开关底部右边的指示灯会常亮</string>
     <string name="install_sensor_tips1">请先把传感器连上电源</string>
 
-
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
     <string name="connecting">连接中……</string>
-    <string name="group_failed">分组失败</string>
+    <string name="group_failed">分组失败,请检查要分组的设备是否已经通电</string>
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
@@ -828,5 +827,7 @@
     <string name="grouped_num">已分组(%1$s个）</string>
     <string name="author_region_warm">权限不足,当前区域为授权区域您只有使用权限</string>
     <string name="beta_version">（内测版本）：https://www.pgyer.com/dadou</string>
+    <string name="no_device">暂无设备</string>
+    <string name="compatible_mode">兼容模式</string>
 
 </resources>

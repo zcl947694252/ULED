@@ -19,6 +19,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.CurtainGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -30,6 +31,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -172,6 +174,13 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                                 this!!.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                             }
                         }
+                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                            override fun start() {}
+
+                            override fun complete() {}
+
+                            override fun error(msg: String?) {}
+                        })
                         this!!.finish()
 
 

@@ -32,8 +32,10 @@ import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
+import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -196,6 +198,10 @@ class DeviceFragment : BaseFragment() {
      * 刷新UI
      */
     fun refreshView() {
+        if (TelinkLightService.Instance()?.isLogin == false)
+            bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
+        else
+            bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
         if (activity != null) {
             initAdapterData()
             deviceAdapter.notifyDataSetChanged()

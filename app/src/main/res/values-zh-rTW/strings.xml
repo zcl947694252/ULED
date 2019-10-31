@@ -114,7 +114,7 @@
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">未扫描到设备！</string>
-    <string name="connecting_tip">正在连接……</string>
+    <string name="connecting_tip">正在连接……,请稍后</string>
     <string name="grouping_completed">分组完成</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
     <string name="quite">退出</string>
@@ -151,7 +151,7 @@
     <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanned_device_num">已扫到 %1$d 个灯</string>
+    <string name="title_scanned_device_num">已添加 %1$d 个设备 </string>
     <string name="title_scanned_lights_num">扫描完毕：%1$d个设备</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
@@ -165,10 +165,12 @@
     <string name="connect_success">连接成功！</string>
     <string name="connect_fail">连接断开</string>
     <string name="device_not_connected">设备未连接！</string>
+    <string name="please_wait">请稍后…</string>
 
     <string name="smartSwitch">开关</string>
     <string name="select_install_device">请选择需要安装的设备</string>
     <string name="search">搜索</string>
+
     <string name="complete">完成</string>
     <string name="not_found_switch">未找到开关</string>
     <string name="searching">搜索中…</string>
@@ -179,11 +181,10 @@
     <string name="install_switch_tips3">3.开关底部右边的指示灯会常亮</string>
     <string name="install_sensor_tips1">请先把传感器连上电源</string>
 
-
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
     <string name="connecting">连接中……</string>
-    <string name="group_failed">分组失败</string>
+    <string name="group_failed">分组失败,请检查要分组的设备是否已经通电</string>
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
@@ -387,7 +388,7 @@
     <string name="scan_and_connect">扫描连接…</string>
     <string name="network_disconect">网络未连接</string>
     <string name="getVsersionFail">已经是最新版本</string>
-    <string name="get_server_version_fail">获取服务器版本中...</string>
+    <string name="get_server_version_fail">获取服务器版本失败！</string>
     <string name="download_pack_fail">升级包下载失败</string>
     <string name="error_pack">升级包错误！</string>
     <string name="verification_version">正在验证版本…</string>
@@ -813,4 +814,20 @@
     <string name="have_question_look_notice">如有其他问题,请查看app说明</string>
     <string name="reset_warm_red">在恢复出厂设置之后可以通过添加设备重新添加。</string>
     <string name="connect_fail2">连接失败,请重试</string>
+    <string name="clear_one">建议先恢复出厂设置、后清除数据,避免不可预料的错误发生。</string>
+    <string name="clear_two">本地数据和云端数据将被清除且无法恢复。</string>
+    <string name="region_warm">扫描下方二维码移交账户</string>
+    <string name="cancel_timer">过期倒计时:</string>
+    <string name="authorization_warm">接收者将只有控制权，无管理权</string>
+    <string name="get_version_fail">获取设备版本号失败</string>
+    <string name="please_select_update_file">请选择需要升级的OTA文件</string>
+    <string name="choose_device">选择设备(长按设备名修改名称)</string>
+    <string name="choose_group_change">选择分组(长按分组名修改名称)</string>
+    <string name="no_group_device_num">未分组(%1$s个)</string>
+    <string name="grouped_num">已分组(%1$s个）</string>
+    <string name="author_region_warm">权限不足,当前区域为授权区域您只有使用权限</string>
+    <string name="beta_version">（内测版本）：https://www.pgyer.com/dadou</string>
+    <string name="no_device">暂无设备</string>
+    <string name="compatible_mode">兼容模式</string>
+
 </resources>

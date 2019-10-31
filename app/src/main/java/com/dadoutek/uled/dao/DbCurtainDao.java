@@ -37,6 +37,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property CloseSlowStart = new Property(10, boolean.class, "closeSlowStart", false, "CLOSE_SLOW_START");
         public final static Property Index = new Property(11, int.class, "index", false, "INDEX");
         public final static Property BelongGroupId = new Property(12, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
+        public final static Property GroupName = new Property(13, String.class, "groupName", false, "GROUP_NAME");
     }
 
 
@@ -64,7 +65,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"SPEED\" INTEGER NOT NULL ," + // 9: speed
                 "\"CLOSE_SLOW_START\" INTEGER NOT NULL ," + // 10: closeSlowStart
                 "\"INDEX\" INTEGER NOT NULL ," + // 11: index
-                "\"BELONG_GROUP_ID\" INTEGER);"); // 12: belongGroupId
+                "\"BELONG_GROUP_ID\" INTEGER," + // 12: belongGroupId
+                "\"GROUP_NAME\" TEXT);"); // 13: groupName
     }
 
     /** Drops the underlying database table. */
@@ -105,6 +107,11 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(13, belongGroupId);
         }
+ 
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(14, groupName);
+        }
     }
 
     @Override
@@ -139,6 +146,11 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(13, belongGroupId);
         }
+ 
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(14, groupName);
+        }
     }
 
     @Override
@@ -161,7 +173,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.getInt(offset + 9), // speed
             cursor.getShort(offset + 10) != 0, // closeSlowStart
             cursor.getInt(offset + 11), // index
-            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12) // belongGroupId
+            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // belongGroupId
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // groupName
         );
         return entity;
     }
@@ -181,6 +194,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setCloseSlowStart(cursor.getShort(offset + 10) != 0);
         entity.setIndex(cursor.getInt(offset + 11));
         entity.setBelongGroupId(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
+        entity.setGroupName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
      }
     
     @Override

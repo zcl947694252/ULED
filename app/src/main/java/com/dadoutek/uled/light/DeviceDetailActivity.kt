@@ -23,7 +23,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.group.BatchGroupFourDevice
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
@@ -573,13 +572,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
                     var batchGroup = changeHaveDeviceView()
-
                     batchGroup?.setOnClickListener {
-                        /*      val intent = Intent(this,BatchGroupActivity::class.java)
-                                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                                intent.putExtra("lightType", "all_light")*/
-
                         if (TelinkLightService.Instance()?.isLogin == true) {
                             val lastUser = DBUtils.lastUser
                             lastUser?.let {
@@ -595,6 +588,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             }
                         } else {
                             autoConnect(true)
+                            ToastUtils.showShort(getString(R.string.connecting_tip))
                         }
                     }
                 } else {
@@ -677,22 +671,27 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var cwLightGroup = this.intent.getStringExtra("cw_light_name")
                     var batchGroup = changeHaveDeviceView()
                     batchGroup?.setOnClickListener {
-
-                        val lastUser = DBUtils.lastUser
-                        lastUser?.let {
-                            if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
-                            else {
-                                val intent = Intent(this, BatchGroupActivity::class.java)
-                                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                                intent.putExtra("lightType", "cw_light")
-                                intent.putExtra("cw_light_group_name", cwLightGroup)
-                                startActivity(intent)
+                        if (TelinkLightService.Instance()?.isLogin == true) {
+                            val lastUser = DBUtils.lastUser
+                            lastUser?.let {
+                                if (it.id.toString() != it.last_authorizer_user_id)
+                                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                                else {
+                                    val intent = Intent(this, BatchGroupFourDevice::class.java)
+                                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                                    intent.putExtra("lightType", "cw_light")
+                                    intent.putExtra("cw_light_group_name", cwLightGroup)
+                                    startActivity(intent)
+                                }
                             }
+                        } else {
+                            autoConnect(true)
                         }
-
                     }
+
+
                 } else {
                     changeNoDeviceView()
                 }
@@ -741,7 +740,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 }
             }
         }
-
     }
 
     private fun changeHaveDeviceView(): TextView? {
@@ -751,7 +749,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         batchGroup.setText(R.string.batch_group)
-        batchGroup.visibility = View.GONE
+        batchGroup.visibility = View.VISIBLE
         return batchGroup
     }
 

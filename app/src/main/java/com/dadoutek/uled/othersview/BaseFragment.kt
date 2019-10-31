@@ -1,12 +1,18 @@
 package com.dadoutek.uled.othersview
 
 import android.app.Dialog
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -15,12 +21,14 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseFragment : Fragment() {
 
+    private lateinit var changeRecevicer: ChangeRecevicer
     private var loadDialog: Dialog? = null
 
     fun showLoadingDialog(content: String) {
@@ -56,7 +64,6 @@ open class BaseFragment : Fragment() {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
             }//meFragment 不存在toolbar 所以要拉出来
                 setLoginChange()
-
         } else {
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
@@ -118,22 +125,36 @@ open class BaseFragment : Fragment() {
 
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initChangeRecevicer()
+    }
+    private fun initChangeRecevicer() {
+         changeRecevicer = ChangeRecevicer()
+        val filter = IntentFilter()
+        filter.addAction("STATUS_CHANGED")
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
+        context?.registerReceiver(changeRecevicer, filter)
+    }
+
     override fun onResume() {
         super.onResume()
         enableConnectionStatusListener()
         val lightService: TelinkLightService? = TelinkLightService.Instance()
 
-        if (lightService?.isLogin == true) {
+      /*  if (lightService?.isLogin == true) {
             changeDisplayImgOnToolbar(true)
         } else {
             changeDisplayImgOnToolbar(false)
-        }
+        }*/
     }
 
     override fun onPause() {
         super.onPause()
         disableConnectionStatusListener()
+
     }
+
 
     fun hideLoadingDialog() {
         if (loadDialog != null) {
@@ -143,5 +164,25 @@ open class BaseFragment : Fragment() {
 
 
     open fun endCurrentGuide() {}
+    inner class ChangeRecevicer : BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
+            LogUtils.e("zcl获取通知$deviceInfo")
+            when (deviceInfo.status) {
+                LightAdapter.STATUS_LOGIN -> {
+                    ToastUtils.showLong(getString(R.string.connect_success))
+                    changeDisplayImgOnToolbar(true)
 
+                }
+                LightAdapter.STATUS_LOGOUT -> {
+                    changeDisplayImgOnToolbar(false)
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        context?.unregisterReceiver(changeRecevicer)
+    }
 }

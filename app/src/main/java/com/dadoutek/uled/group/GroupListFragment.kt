@@ -378,6 +378,7 @@ class GroupListFragment : BaseFragment() {
      * 刷新数据
      */
     fun refreshView() {
+
         if (activity != null) {
             cwLightFragment.refreshData()
             curtianFragment.refreshData()

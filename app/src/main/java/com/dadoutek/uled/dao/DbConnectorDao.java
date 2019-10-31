@@ -33,8 +33,9 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property ProductUUID = new Property(6, int.class, "productUUID", false, "PRODUCT_UUID");
         public final static Property BelongGroupId = new Property(7, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property Index = new Property(8, int.class, "index", false, "INDEX");
-        public final static Property Color = new Property(9, int.class, "color", false, "COLOR");
-        public final static Property Status = new Property(10, int.class, "status", false, "STATUS");
+        public final static Property GroupName = new Property(9, String.class, "groupName", false, "GROUP_NAME");
+        public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
+        public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
     }
 
 
@@ -59,8 +60,9 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 6: productUUID
                 "\"BELONG_GROUP_ID\" INTEGER," + // 7: belongGroupId
                 "\"INDEX\" INTEGER NOT NULL ," + // 8: index
-                "\"COLOR\" INTEGER NOT NULL ," + // 9: color
-                "\"STATUS\" INTEGER NOT NULL );"); // 10: status
+                "\"GROUP_NAME\" TEXT," + // 9: groupName
+                "\"COLOR\" INTEGER NOT NULL ," + // 10: color
+                "\"STATUS\" INTEGER NOT NULL );"); // 11: status
     }
 
     /** Drops the underlying database table. */
@@ -97,8 +99,13 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindLong(8, belongGroupId);
         }
         stmt.bindLong(9, entity.getIndex());
-        stmt.bindLong(10, entity.getColor());
-        stmt.bindLong(11, entity.getStatus());
+ 
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(10, groupName);
+        }
+        stmt.bindLong(11, entity.getColor());
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -129,8 +136,13 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindLong(8, belongGroupId);
         }
         stmt.bindLong(9, entity.getIndex());
-        stmt.bindLong(10, entity.getColor());
-        stmt.bindLong(11, entity.getStatus());
+ 
+        String groupName = entity.getGroupName();
+        if (groupName != null) {
+            stmt.bindString(10, groupName);
+        }
+        stmt.bindLong(11, entity.getColor());
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -150,8 +162,9 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.getInt(offset + 6), // productUUID
             cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7), // belongGroupId
             cursor.getInt(offset + 8), // index
-            cursor.getInt(offset + 9), // color
-            cursor.getInt(offset + 10) // status
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // groupName
+            cursor.getInt(offset + 10), // color
+            cursor.getInt(offset + 11) // status
         );
         return entity;
     }
@@ -167,8 +180,9 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setProductUUID(cursor.getInt(offset + 6));
         entity.setBelongGroupId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
         entity.setIndex(cursor.getInt(offset + 8));
-        entity.setColor(cursor.getInt(offset + 9));
-        entity.setStatus(cursor.getInt(offset + 10));
+        entity.setGroupName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setColor(cursor.getInt(offset + 10));
+        entity.setStatus(cursor.getInt(offset + 11));
      }
     
     @Override

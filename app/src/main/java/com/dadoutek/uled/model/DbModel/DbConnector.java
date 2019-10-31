@@ -8,6 +8,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -25,7 +26,7 @@ public class DbConnector implements Serializable {
     private int productUUID;
     private Long belongGroupId;
     private int index;
-
+    public String groupName;
     public int color=0xffffff;//颜色
 
     @Expose(serialize = false, deserialize = false)
@@ -45,10 +46,12 @@ public class DbConnector implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
-    @Generated(hash = 1722784662)
+
+
+    @Generated(hash = 1193846907)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, int color, int status) {
+            int index, String groupName, int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -58,6 +61,7 @@ public class DbConnector implements Serializable {
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
         this.index = index;
+        this.groupName = groupName;
         this.color = color;
         this.status = status;
     }
@@ -193,5 +197,11 @@ public class DbConnector implements Serializable {
     }
     public void setStatus(int status) {
         this.status = status;
+    }
+    public String getGroupName() {
+        return this.groupName;
+    }
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

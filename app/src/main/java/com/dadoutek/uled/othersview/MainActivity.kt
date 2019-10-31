@@ -151,9 +151,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
-        GlobalScope.launch {
-            TelinkLightApplication.getApp().initStompClient()
-        }
+
+        checkVersionAvailable()
 
         receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
@@ -660,7 +659,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun onNError(event: DeviceEvent) {
         TelinkLog.d("DeviceScanningActivity#onNError")
-
         val builder = AlertDialog.Builder(this)
         builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
         builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
@@ -676,7 +674,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             TelinkLightService.Instance().idleMode(true)
-
+            ToastUtils.showShort(getString(R.string.reconnecting))
             retryDisposable?.dispose()
             retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
                     .subscribe {
@@ -704,6 +702,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
+
         mDisposable.dispose()
         disposableCamera?.dispose()
 

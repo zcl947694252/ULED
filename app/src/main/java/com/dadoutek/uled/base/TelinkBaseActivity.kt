@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var mConnectDisposable: Disposable? = null
+    private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     protected var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
@@ -92,6 +93,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
         initStompReceiver()
+        initChangeRecevicer()
+    }
+
+    private fun initChangeRecevicer() {
+         changeRecevicer = ChangeRecevicer()
+        val filter = IntentFilter()
+        filter.addAction("STATUS_CHANGED")
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
+        registerReceiver(changeRecevicer, filter)
     }
 
     private fun makeDialogAndPop() {
@@ -170,19 +180,26 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
+        hideLoadingDialog()
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
+                LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
+                    afterLogin()
                 }
+
+                val connectDevice = this.mApplication?.connectDevice
+                LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
 
             }
             LightAdapter.STATUS_LOGOUT -> {
+                LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     changeDisplayImgOnToolbar(false)
-                    afterLoginOut()
+
                 }
             }
 
@@ -209,7 +226,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 //                LogUtils.d("changeDisplayImgOnToolbar(true)")
                 changeDisplayImgOnToolbar(true)
             } else {
-//                LogUtils.d("changeDisplayImgOnToolbar(false)")
                 changeDisplayImgOnToolbar(false)
             }
         } else {
@@ -224,6 +240,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable?.dispose()
         isRuning = false
         unregisterReceiver(stompRecevice)
+        unregisterReceiver(changeRecevicer)
         SMSSDK.unregisterAllEventHandler()
     }
 
@@ -607,6 +624,23 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
 
+    inner class ChangeRecevicer :BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
+            LogUtils.e("zcl获取通知$deviceInfo")
+            when (deviceInfo.status) {
+                LightAdapter.STATUS_LOGIN -> {
+                    ToastUtils.showLong(getString(R.string.connect_success))
+                    changeDisplayImgOnToolbar(true)
+
+                }
+                LightAdapter.STATUS_LOGOUT -> {
+                    changeDisplayImgOnToolbar(false)
+                }
+
+            }
+        }
+    }
 }
 
 

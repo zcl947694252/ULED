@@ -26,6 +26,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
@@ -39,6 +40,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -108,12 +110,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
                         deleteGroup(DBUtils.getConnectorByGroupID(group!!.id), group!!,
                                 successCallback = {
-                                    (this ).hideLoadingDialog()
+                                    (this).hideLoadingDialog()
                                     this?.setResult(Constant.RESULT_OK)
                                     this?.finish()
                                 },
                                 failedCallback = {
-                                    (this ).hideLoadingDialog()
+                                    (this).hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
@@ -185,6 +187,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                             }
                         }
+
+                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
                         this.finish()
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -199,7 +207,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun updateGroup() {
         val intent = Intent(this,
                 ConnectorGroupingActivity::class.java)
-        if (light==null){
+        if (light == null) {
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
@@ -209,7 +217,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
         intent.putExtra("uuid", light!!.productUUID)
-        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
+        Log.d("窗帘升级点击的设备Light", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
         this!!.finish()
     }
@@ -482,7 +490,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                             LogUtils.d("STATUS_LOGOUT")
                             showLoadingDialog(getString(R.string.connect_fail))
                             finish()
-                        },{})
+                        }, {})
             }
         }
     }
@@ -584,6 +592,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbConnector
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
+        // intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+        //intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+        //intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
         txtTitle.visibility = View.VISIBLE
         txtTitle!!.text = ""
 //        editTitle!!.setText(light?.name)

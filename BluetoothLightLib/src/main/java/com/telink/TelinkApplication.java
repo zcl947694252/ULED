@@ -85,6 +85,7 @@ public class TelinkApplication extends Application {
         TelinkLog.d("TelinkApplication Created.");
     }
 
+
     public void doInit() {
         this.doInit(this);
     }
@@ -178,7 +179,7 @@ public class TelinkApplication extends Application {
         filter.addAction(LightService.ACTION_OFFLINE);
         filter.addAction(LightService.ACTION_ERROR);
         filter.addAction(LightService.ACTION_ERROR_REPORT);
-        TelinkLog.d("onLeScanResult"+"register_action");
+        TelinkLog.d("onLeScanResult" + "register_action");
         return filter;
     }
 
@@ -310,7 +311,7 @@ public class TelinkApplication extends Application {
     protected void onLeScan(Intent intent) {
         DeviceInfo deviceInfo = intent.getParcelableExtra(LightService.EXTRA_DEVICE);
         this.dispatchEvent(LeScanEvent.newInstance(this, LeScanEvent.LE_SCAN, deviceInfo));
-        TelinkLog.d("dispatchEvent_device"+deviceInfo.macAddress+"--"+deviceInfo.rssi);
+        TelinkLog.d("dispatchEvent_device" + deviceInfo.macAddress + "--" + deviceInfo.rssi);
     }
 
     protected void onLeScanCompleted(Intent intent) {
@@ -330,6 +331,12 @@ public class TelinkApplication extends Application {
         } else if (deviceInfo.status == LightAdapter.STATUS_LOGOUT) {
             mCurrentConnect = null;
         }
+
+        Intent intents = new Intent();
+        intents.setAction("STATUS_CHANGED");
+        intents.putExtra("STATUS_CHANGED",deviceInfo);
+        sendBroadcast(intents);
+
         this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.STATUS_CHANGED, deviceInfo));
     }
 
