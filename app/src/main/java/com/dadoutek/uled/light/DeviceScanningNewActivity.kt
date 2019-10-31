@@ -40,7 +40,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
-import com.polidea.rxandroidble2.scan.ScanResult
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -77,6 +76,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var mAutoConnectDisposable: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
     private var connectInfo: DeviceInfo? = null
@@ -303,14 +303,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         LogUtils.d("startTimer")
         mTimer = Observable.timer((SCAN_TIMEOUT_SECOND).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe {
-                    LogUtils.d("onLeScanTimeout" )
+                    LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
 //                    retryScan()
                 }
     }
 
 
-    private fun retryScan(){
+    private fun retryScan() {
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
             Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
@@ -358,7 +358,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 //        TelinkLightService.Instance()?.idleMode(true)
         //过一秒
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     //倒计时，出问题了就超时。
@@ -406,7 +406,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance().idleMode(true)
         disposableTimer?.dispose()
-         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -797,6 +797,18 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 此处用作设备登录
      */
     private fun autoConnect() {
+
+        mAutoConnectDisposable = connect()
+                ?.subscribe(
+                        {
+                            onLogin()
+                        },
+                        {
+                            LogUtils.d(it)
+                        }
+                )
+
+/*
         if (TelinkLightService.Instance() != null) {
             if (!TelinkLightService.Instance().isLogin) {
                 startConnect = true
@@ -811,6 +823,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 TelinkLightService.Instance().autoConnect(connectParams)
             }
         }
+*/
     }
 
     private fun closeAnimation() {
@@ -1153,45 +1166,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
 
-    private fun choseBestRssi(it: ScanResult) {
-        val deviceInfo = RecoverMeshDeviceUtil.parseData(it)
-
-        deviceInfo?.let {
-            if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
-                if (deviceInfo.productUUID == DeviceType.NORMAL_SWITCH || deviceInfo.productUUID == DeviceType.NORMAL_SWITCH2
-                        || deviceInfo.productUUID == DeviceType.SCENE_SWITCH || deviceInfo.productUUID == DeviceType.SMART_CURTAIN_SWITCH)
-                    if (deviceInfo.rssi < MAX_RSSI) {
-                        LeBluetooth.getInstance().stopScan()
-                        if (deviceInfo.productUUID == DeviceType.SCENE_SWITCH && DBUtils.sceneAll.isEmpty()) {
-                            indefiniteSnackbar(topView, R.string.tip_switch, android.R.string.ok) {
-                                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                                TelinkLightService.Instance()?.idleMode(true)
-                            }
-                            return
-                        }
-                        bestRssiDevice = deviceInfo
-                        TelinkLightService.Instance()?.connect(deviceInfo.macAddress, 10)
-                    }
-            } else {
-                if (bestRssiDevice == null)
-                    connectBestRssiDevice()
-                if (deviceInfo.productUUID == mAddDeviceType && deviceInfo.rssi < MAX_RSSI)
-                    if (bestRssiDevice == null || deviceInfo.rssi < bestRssiDevice!!.rssi)
-                        bestRssiDevice = deviceInfo
-            }
-        }
-    }
-
     @SuppressLint("CheckResult")
     private fun oldStartScan() {
-        TelinkLightService.Instance()?.idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
         startTimer()
         startAnimation()
         handleIfSupportBle()
 
         //断连后延时一段时间再开始扫描
         disposableTimer?.dispose()
-         disposableTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1403,71 +1387,49 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
             LightAdapter.STATUS_LOGIN -> {
-                Log.d("ScanningTest", "mConnectTimer = $mConnectTimer")
-                if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
-                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer!!.isDisposed)
-                    mConnectTimer?.dispose()
-                    //进入分组
-                    hideLoadingDialog()
-                    if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
-                        if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                                bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                        } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                        } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
-                        }
-
-                    } else
-                        startGrouping()
-                }
+//                onLogin()
             }
-            LightAdapter.STATUS_LOGOUT -> {
-                if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
-                    mConnectTimer?.dispose()
-                    GlobalScope.launch(Dispatchers.Main) {
-                        retryConnect()
-                    }
-                }
-            }
-            LightAdapter.STATUS_CONNECTED -> {
-                connectInfo?.meshName?.let { login(it) }
-            }
+//            LightAdapter.STATUS_LOGOUT -> {
+//                if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
+//                    mConnectTimer?.dispose()
+//                    GlobalScope.launch(Dispatchers.Main) {
+//                        retryConnect()
+//                    }
+//                }
+//            }
+//            LightAdapter.STATUS_CONNECTED -> {
+//                connectInfo?.meshName?.let { login(it) }
+//            }
         }
     }
 
-    /**
-     * 加设备结束之后的连接
-     */
-    @SuppressLint("CheckResult")
-    private fun retryConnect() {
-        mConnectRetryCount++
-        if (mConnectRetryCount < MAX_CONNECT_RETRY_COUNT) {
-            showLoadingDialog(resources.getString(R.string.connecting_tip))
-            disposableTimer?.dispose()
-            disposableTimer=Observable.timer(1500, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext {
-                        //倒计时，出问题了就超时。
-                        mConnectTimer = createConnectTimeout()
-                    }
-                    .subscribe {
-                        autoConnect()
-                    }
-        } else {
-            Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
+    private fun onLogin() {
+        Log.d("ScanningTest", "mConnectTimer = $mConnectTimer")
+        if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
+            Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer!!.isDisposed)
+            mConnectTimer?.dispose()
+            //进入分组
             hideLoadingDialog()
-            mConnectTimer = null
+            if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
+                if (bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                        bestRssiDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                } else if (bestRssiDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                } else if (bestRssiDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                }
+
+            } else
+                startGrouping()
         }
     }
 
 
     companion object {
         private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
-        private val MAX_CONNECT_RETRY_COUNT = 8   //update mesh failed的重试次数设置为4次
         private val MAX_RSSI = 90
-        private val SCAN_TIMEOUT_SECOND = 10
+        private val SCAN_TIMEOUT_SECOND = 15
         private val TIME_OUT_CONNECT = 15
     }
 

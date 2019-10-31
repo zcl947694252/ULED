@@ -1,27 +1,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/toolbar_rename_light"
+        android:orderInCategory="1"
+        android:title="@string/btn_rename_light"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/toolbar_update_group"
         android:icon="@drawable/ic_launcher"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:title="@string/update_group"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/toolbar_reset"
-        android:orderInCategory="2"
-        android:title="@string/factory_reset"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/toolbar_rename_light"
-        android:orderInCategory="2"
-        android:title="@string/btn_rename_light"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/toolbar_ota"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         app:showAsAction="never"
         android:title="@string/online_upgrade"
         />
+    <item
+        android:id="@+id/toolbar_reset"
+        android:orderInCategory="4"
+        android:title="@string/factory_reset"
+        app:showAsAction="never" />
+
+
 
 </menu>

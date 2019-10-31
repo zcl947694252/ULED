@@ -166,21 +166,6 @@ public abstract class LightService extends Service implements LightAdapter.Callb
     }
 
     /**
-     * 打印函數的調用棧
-     *
-     * @return 調用棧
-     */
-    public String getStackTrace() {
-        StringBuilder sb = new StringBuilder("");
-        Exception e = new Exception();
-        StackTraceElement[] trace = e.getStackTrace();
-        for (int i = 0; i < trace.length; i++) {
-            sb.append(trace[i] + "\n");
-        }
-        return sb.toString();
-    }
-
-    /**
      * 空闲模式
      *
      * @param disconnect 是否断开当前的连接
