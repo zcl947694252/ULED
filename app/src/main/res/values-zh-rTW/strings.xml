@@ -829,5 +829,7 @@
     <string name="beta_version">（内测版本）：https://www.pgyer.com/dadou</string>
     <string name="no_device">暂无设备</string>
     <string name="compatible_mode">兼容模式</string>
+    <string name="direck_light">直连灯:</string>
+    <string name="get_data_please_wait">加载数据中,请稍后</string>
 
 </resources>

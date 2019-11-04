@@ -147,7 +147,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".group.BatchGroupFourDevice"
+            android:name=".group.BatchGroupFourDeviceActivity"
             android:screenOrientation="portrait" />
 
 

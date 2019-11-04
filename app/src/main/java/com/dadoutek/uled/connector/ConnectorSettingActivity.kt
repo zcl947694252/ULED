@@ -496,8 +496,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connector_setting)
         initType()
         this.mApplication = this.application as TelinkLightApplication

@@ -29,8 +29,8 @@ public abstract class BaseDialog extends Dialog {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        super.onCreate(savedInstanceState);
         View view = LayoutInflater.from(activity).inflate(setLayoutId(), null);
         setContentView(view);
         ButterKnife.bind(this, view);

@@ -236,4 +236,30 @@ public class DbCurtain implements Serializable {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
+    @Override
+    public String toString() {
+        return "DbCurtain{" +
+                "id=" + id +
+                ", meshAddr=" + meshAddr +
+                ", name='" + name + '\'' +
+                ", belongGroupAddr=" + belongGroupAddr +
+                ", macAddr='" + macAddr + '\'' +
+                ", productUUID=" + productUUID +
+                ", status=" + status +
+                ", inverse=" + inverse +
+                ", closePull=" + closePull +
+                ", speed=" + speed +
+                ", closeSlowStart=" + closeSlowStart +
+                ", index=" + index +
+                ", belongGroupId=" + belongGroupId +
+                ", groupName='" + groupName + '\'' +
+                ", selected=" + selected +
+                ", version='" + version + '\'' +
+                ", hasGroup=" + hasGroup +
+                ", textColor=" + textColor +
+                ", icon=" + icon +
+                ", connectionStatus=" + connectionStatus +
+                '}';
+    }
 }

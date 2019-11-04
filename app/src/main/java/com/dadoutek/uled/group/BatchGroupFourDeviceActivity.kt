@@ -3,6 +3,7 @@ package com.dadoutek.uled.group
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.util.SparseArray
@@ -45,6 +46,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -57,23 +59,27 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  * 更新描述
  */
-class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
+class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String> {
 
-    private var relayAdapter: BatchFourRelayAdapter? = null
-    private var curtainAdapter: BatchFourCurtainAdapter? = null
     private var disposable: Disposable? = null
     private var currentGroup: DbGroup? = null
     private var btnAddGroups: TextView? = null
     private var emptyGroupView: View? = null
     private var mTelinkLightService: TelinkLightService? = null
+
     private var groupAdapter: BatchGrouopEditListAdapter? = null
     private var lightAdapter: BatchFourLightAdapter? = null
-    private lateinit var deviceListRelay: ArrayList<DbConnector>
-    private lateinit var deviceListCurtains: ArrayList<DbCurtain>
-    private lateinit var deviceListLight: ArrayList<DbLight>
+    private var relayAdapter: BatchFourRelayAdapter? = null
+    private var curtainAdapter: BatchFourCurtainAdapter? = null
+
+    private lateinit var deviceDataRelays: ArrayList<DbConnector>
+    private lateinit var deviceDataCurtains: ArrayList<DbCurtain>
+    private lateinit var deviceDataLights: ArrayList<DbLight>
+
+    private var scanDeviceData: Array<Parcelable>? = null
     private var groupsByDeviceType: MutableList<DbGroup>? = null
     private var deviceType: Int = 100
-    private var lastCheckedGroupPostion: Int = 0
+    private var lastCheckedGroupPostion: Int = 1000
     private var allLightId: Long = 0//有设备等于0说明没有分组成功
     private var retryConnectCount = 0
     private var connectMeshAddress: Int = 0
@@ -114,7 +120,8 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
-            finish() }
+            finish()
+        }
 
         if (TelinkApplication.getInstance().connectDevice == null)
             image_bluetooth.setImageResource(R.drawable.bluetooth_no)
@@ -136,6 +143,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
+        scanDeviceData = intent.getParcelableArrayExtra("data")
         setDevicesData(deviceType, isHaveGrouped)
         setGroupData(deviceType)
     }
@@ -145,7 +153,6 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
      */
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setGroupData(deviceType: Int) {
-        ClearSelectors()
         groupsByDeviceType = DBUtils.getGroupsByDeviceType(deviceType)
         if (groupsByDeviceType == null) {
             groupsByDeviceType = mutableListOf()
@@ -172,15 +179,20 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
             }
         }
 
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL,DeviceType.LIGHT_RGB -> {changeGroupingCompleteState(selectLights.size)}
+            DeviceType.SMART_CURTAIN -> {changeGroupingCompleteState(selectCurtains.size)}
+            DeviceType.SMART_RELAY -> {changeGroupingCompleteState(selectRelays.size)}
+        }
+
         groupAdapter?.setOnItemClickListener { _, _, position ->
             //如果点中的不是上次选中的组则恢复未选中状态
-
             changeGroupSelectView(position)
         }
 
     }
 
-    private fun ClearSelectors() {
+    private fun clearSelectors() {
         selectLights.clear()
         selectCurtains.clear()
         selectRelays.clear()
@@ -191,32 +203,33 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
      */
     @SuppressLint("StringFormatInvalid")
     private fun setDevicesData(deviceType: Int, isHaveGrouped: Boolean) {
+        clearSelectors()
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 noGroup = mutableListOf()
                 listGroup = mutableListOf()
-                deviceListLight = DBUtils.getAllNormalLight()
+                deviceDataLights = DBUtils.getAllNormalLight()
             }
             DeviceType.LIGHT_RGB -> {
                 noGroup = mutableListOf()
                 listGroup = mutableListOf()
-                deviceListLight = DBUtils.getAllRGBLight()
+                deviceDataLights = DBUtils.getAllRGBLight()
             }
             DeviceType.SMART_CURTAIN -> {
                 noGroupCutain = mutableListOf()
                 listGroupCutain = mutableListOf()
-                deviceListCurtains = DBUtils.getAllCurtains()
+                deviceDataCurtains = DBUtils.getAllCurtains()
             }
             DeviceType.SMART_RELAY -> {
                 noGroupRelay = mutableListOf()
                 listGroupRelay = mutableListOf()
-                deviceListRelay = DBUtils.getAllRelay()
+                deviceDataRelays = DBUtils.getAllRelay()
             }
         }
 
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
-                groupingLight(DeviceType.LIGHT_RGB)
+                groupingLight(deviceType)
                 deviceData = if (!isHaveGrouped && noGroup?.size ?: 0 > 0) {
                     isSelectNo(true)
                     noGroup
@@ -230,7 +243,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 setLightAdatpter()
             }
             DeviceType.SMART_CURTAIN -> {
-                deviceListCurtains = DBUtils.getAllCurtains()
+                deviceDataCurtains = DBUtils.getAllCurtains()
                 groupingLight(DeviceType.SMART_CURTAIN)
                 deviceDataCurtain = if (!isHaveGrouped && noGroupCutain?.size ?: 0 > 0) {
                     isSelectNo(true)
@@ -245,6 +258,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 setCurtainAdatpter()
             }
             DeviceType.SMART_RELAY -> {
+                deviceDataRelays = DBUtils.getAllRelay()
                 groupingLight(DeviceType.SMART_RELAY)
                 deviceDataRelay = if (!isHaveGrouped && noGroupRelay?.size ?: 0 > 0) {
                     isSelectNo(true)
@@ -309,31 +323,30 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
                 disposable?.dispose()
                 if (!this.isDestroyed)
-                disposable = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            if (!TelinkLightService.Instance().isLogin) {
-                                ToastUtils.showLong(R.string.connecting_please_wait)
+                    disposable = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                if (!TelinkLightService.Instance().isLogin) {
+                                    ToastUtils.showLong(R.string.connecting_please_wait)
 
-                                retryConnectCount = 0
-                                val meshName = DBUtils.lastUser!!.controlMeshName
+                                    retryConnectCount = 0
+                                    val meshName = DBUtils.lastUser!!.controlMeshName
 
-                                GlobalScope.launch {
-                                    //自动重连参数
-                                    val connectParams = Parameters.createAutoConnectParameters()
-                                    connectParams.setMeshName(meshName)
-                                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                                    connectParams.autoEnableNotification(true)
-                                    connectParams.setConnectDeviceType(
-                                            mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
-                                                    DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
-                                    //连接，如断开会自动重连
-                                    TelinkLightService.Instance().autoConnect(connectParams)
-
+                                    GlobalScope.launch {
+                                        //自动重连参数
+                                        val connectParams = Parameters.createAutoConnectParameters()
+                                        connectParams.setMeshName(meshName)
+                                        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                                        connectParams.autoEnableNotification(true)
+                                        connectParams.setConnectDeviceType(
+                                                mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
+                                                        DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
+                                        //连接，如断开会自动重连
+                                        TelinkLightService.Instance().autoConnect(connectParams)
+                                    }
                                 }
-                            }
-                        }, { LogUtils.d(it) })
+                            }, { LogUtils.d(it) })
                 break
             }
         }
@@ -349,37 +362,37 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
     private fun groupingLight(deviceType: Int) {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                for (i in deviceListLight.indices) {//获取组名 将分组与未分组的拆分
-                    if (StringUtils.getLightGroupName(deviceListLight[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                        deviceListLight[i].groupName = ""
-                        noGroup!!.add(deviceListLight[i])
+                for (i in deviceDataLights.indices) {//获取组名 将分组与未分组的拆分
+                    if (StringUtils.getLightGroupName(deviceDataLights[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        deviceDataLights[i].groupName = ""
+                        noGroup!!.add(deviceDataLights[i])
                     } else {
-                        deviceListLight[i].groupName = StringUtils.getLightGroupName(deviceListLight[i])
-                        listGroup!!.add(deviceListLight[i])
+                        deviceDataLights[i].groupName = StringUtils.getLightGroupName(deviceDataLights[i])
+                        listGroup!!.add(deviceDataLights[i])
                     }
                 }
                 setNoOrHavedGroupText(noGroup?.size, listGroup?.size)
             }
             DeviceType.SMART_CURTAIN -> {
-                for (i in deviceListCurtains.indices) {//获取组名 将分组与未分组的拆分
-                    if (StringUtils.getCurtainName(deviceListCurtains[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                        deviceListCurtains[i].groupName = ""
-                        noGroupCutain!!.add(deviceListCurtains[i])
+                for (i in deviceDataCurtains.indices) {//获取组名 将分组与未分组的拆分
+                    if (StringUtils.getCurtainName(deviceDataCurtains[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        deviceDataCurtains[i].groupName = ""
+                        noGroupCutain!!.add(deviceDataCurtains[i])
                     } else {
-                        deviceListLight[i].groupName = StringUtils.getLightGroupName(deviceListLight[i])
-                        listGroupCutain!!.add(deviceListCurtains[i])
+                        deviceDataCurtains[i].groupName = StringUtils.getCurtainName(deviceDataCurtains[i])
+                        listGroupCutain!!.add(deviceDataCurtains[i])
                     }
                 }
                 setNoOrHavedGroupText(noGroupCutain?.size, listGroupCutain?.size)
             }
             DeviceType.SMART_RELAY -> {
-                for (i in deviceListRelay.indices) {//获取组名 将分组与未分组的拆分
-                    if (StringUtils.getConnectorName(deviceListRelay[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                        deviceListRelay[i].groupName = ""
-                        noGroupRelay!!.add(deviceListRelay[i])
+                for (i in deviceDataRelays.indices) {//获取组名 将分组与未分组的拆分
+                    if (StringUtils.getConnectorName(deviceDataRelays[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        deviceDataRelays[i].groupName = ""
+                        noGroupRelay!!.add(deviceDataRelays[i])
                     } else {
-                        deviceListLight[i].groupName = StringUtils.getLightGroupName(deviceListLight[i])
-                        listGroupRelay!!.add(deviceListRelay[i])
+                        deviceDataRelays[i].groupName = StringUtils.getConnectorName(deviceDataRelays[i])
+                        listGroupRelay!!.add(deviceDataRelays[i])
                     }
                 }
                 setNoOrHavedGroupText(noGroupRelay?.size, listGroupRelay?.size)
@@ -415,7 +428,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 stopBlink(deviceData?.get(position)!!.meshAddr)
                 selectLights.remove(deviceData!![position])
             }
-            changeGroupingCompleteState()
+            changeGroupingCompleteState(selectLights.size)
             lightAdapter?.notifyDataSetChanged()
         }
 
@@ -428,7 +441,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 stopBlink(deviceDataCurtain?.get(position)!!.meshAddr)
                 selectCurtains.remove(deviceDataCurtain!![position])
             }
-            changeGroupingCompleteState()
+            changeGroupingCompleteState(selectCurtains.size)
             curtainAdapter?.notifyDataSetChanged()
         }
 
@@ -441,7 +454,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 stopBlink(deviceDataRelay?.get(position)!!.meshAddr)
                 selectRelays.remove(deviceDataRelay!![position])
             }
-        changeGroupingCompleteState()
+            changeGroupingCompleteState(selectRelays.size)
             relayAdapter?.notifyDataSetChanged()
         }
         grouping_completed.setOnClickListener {
@@ -449,8 +462,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun changeGroupingCompleteState() {
-        if (selectLights.size > 0 && currentGroup != null) {
+    private fun changeGroupingCompleteState(size: Int) {
+
+        if (size > 0 && currentGroup != null) {
             grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
             grouping_completed.isClickable = true
         } else {
@@ -474,22 +488,21 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                     DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
                                 selectLights.size.toString()))
-                        setGroup(DeviceType.LIGHT_RGB)
+
                     }
                     DeviceType.SMART_CURTAIN -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
                                 selectCurtains.size.toString()))
-                        setGroup(DeviceType.SMART_CURTAIN)
                     }
                     DeviceType.SMART_RELAY -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
                                 selectRelays.size.toString()))
-                        setGroup(DeviceType.SMART_RELAY)
+
                     }
                 }
+                setGroup(deviceType)
                 //将灯列表的灯循环设置分组
                 setGroupForLights(currentGroup, deviceType)
-
             } else {
                 Toast.makeText(mApplication, R.string.select_group_tip, Toast.LENGTH_SHORT).show()
             }
@@ -557,24 +570,28 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         hideLoadingDialog()
         if (isAllLightsGrouped()) {
             //grouping_completed.setText(R.string.complete)
-            ToastUtils.showShort(getString(R.string.grouping_completed))
             SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
                 override fun start() {
+                    LogUtils.v("zcl更新start")
                 }
 
                 override fun complete() {
+                    LogUtils.v("zcl更新结束")
+                    refreshData()
+                    setDevicesData(deviceType, isHaveGrouped)
+                    setGroupData(deviceType)
                 }
 
                 override fun error(msg: String?) {
+                    LogUtils.v("zcl更新错误")
                 }
             })
-            setGroupData(deviceType)
-            ClearSelectors()
+            ToastUtils.showShort(getString(R.string.grouping_completed))
+            clearSelectors()
         }
     }
 
     private fun setGroupForLights(group: DbGroup?, deviceType: Int) {
-
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 for (i in selectLights.indices) {
@@ -611,6 +628,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
             }
         }
     }
+
     private fun updateGroupResultCurtain(light: DbCurtain, group: DbGroup) {
         for (i in selectCurtains.indices) {
             if (light.meshAddr == selectCurtains[i].meshAddr) {
@@ -624,7 +642,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 }
             }
         }
-    }   private fun updateGroupResultRelay(light: DbConnector, group: DbGroup) {
+    }
+
+    private fun updateGroupResultRelay(light: DbConnector, group: DbGroup) {
         for (i in selectRelays.indices) {
             if (light.meshAddr == selectRelays[i].meshAddr) {
                 if (light.belongGroupId != allLightId) {
@@ -641,22 +661,22 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
 
     //等待解决无法加入窗帘如组
     private fun setGroupOneByOne(dbGroup: DbGroup, deviceType: Int, index: Int) {
-        var deviceMeshAddr  =0
-        var dbLight:DbLight?=null
-        var dbCurtain:DbCurtain?=null
-        var dbRelay:DbConnector?=null
+        var deviceMeshAddr = 0
+        var dbLight: DbLight? = null
+        var dbCurtain: DbCurtain? = null
+        var dbRelay: DbConnector? = null
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                 dbLight = selectLights[index]
+                dbLight = selectLights[index]
                 deviceMeshAddr = dbLight.meshAddr
             }
             DeviceType.SMART_CURTAIN -> {
-                 dbCurtain = selectCurtains[index]
+                dbCurtain = selectCurtains[index]
                 deviceMeshAddr = dbCurtain.meshAddr
             }
             DeviceType.SMART_RELAY -> {
-                 dbRelay = selectRelays[index]
+                dbRelay = selectRelays[index]
                 deviceMeshAddr = dbRelay.meshAddr
             }
         }
@@ -667,30 +687,30 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                     dbLight?.belongGroupId = dbGroup.id
                     updateGroupResultLight(dbLight!!, dbGroup)
                     if (index + 1 > selectLights.size - 1)
-                        completeGroup(DeviceType.LIGHT_RGB)
+                        completeGroup(deviceType)
                     else
-                        setGroupOneByOne(dbGroup, DeviceType.LIGHT_RGB, index + 1)
+                        setGroupOneByOne(dbGroup, deviceType, index + 1)
                 }
                 DeviceType.SMART_CURTAIN -> {
                     dbCurtain?.belongGroupId = dbGroup.id
                     updateGroupResultCurtain(dbCurtain!!, dbGroup)
                     if (index + 1 > selectCurtains.size - 1)
-                        completeGroup(DeviceType.SMART_CURTAIN)
+                        completeGroup(deviceType)
                     else
-                        setGroupOneByOne(dbGroup, DeviceType.SMART_CURTAIN, index + 1)
+                        setGroupOneByOne(dbGroup, deviceType, index + 1)
                 }
                 DeviceType.SMART_RELAY -> {
                     dbRelay?.belongGroupId = dbGroup.id
                     updateGroupResultRelay(dbRelay!!, dbGroup)
                     if (index + 1 > selectRelays.size - 1)
-                        completeGroup(DeviceType.SMART_RELAY)
+                        completeGroup(deviceType)
                     else
-                        setGroupOneByOne(dbGroup, DeviceType.SMART_RELAY, index + 1)
+                        setGroupOneByOne(dbGroup, deviceType, index + 1)
                 }
             }
         }
         val failedCallback: () -> Unit = {
-                    ToastUtils.showLong(R.string.group_fail_tip)
+            ToastUtils.showLong(R.string.group_fail_tip)
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     dbLight?.belongGroupId = allLightId
@@ -699,9 +719,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showLong(getString(R.string.connect_fail))
                     } else {
                         if (index + 1 > selectLights.size - 1)
-                          completeGroup(DeviceType.LIGHT_RGB)
+                            completeGroup(deviceType)
                         else
-                          setGroupOneByOne(dbGroup, DeviceType.LIGHT_RGB, index + 1)
+                            setGroupOneByOne(dbGroup, deviceType, index + 1)
                     }
                 }
                 DeviceType.SMART_CURTAIN -> {
@@ -711,9 +731,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showLong(getString(R.string.connect_fail))
                     } else {
                         if (index + 1 > selectCurtains.size - 1)
-                            completeGroup(DeviceType.SMART_CURTAIN)
+                            completeGroup(deviceType)
                         else
-                            setGroupOneByOne(dbGroup, DeviceType.SMART_CURTAIN, index + 1)
+                            setGroupOneByOne(dbGroup, deviceType, index + 1)
                     }
                 }
                 DeviceType.SMART_RELAY -> {
@@ -723,9 +743,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showLong(getString(R.string.connect_fail))
                     } else {
                         if (index + 1 > selectRelays.size - 1)
-                            completeGroup(DeviceType.SMART_RELAY)
+                            completeGroup(deviceType)
                         else
-                            setGroupOneByOne(dbGroup, DeviceType.SMART_RELAY, index + 1)
+                            setGroupOneByOne(dbGroup, deviceType, index + 1)
                     }
                 }
             }
@@ -790,15 +810,15 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         if (b) {
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                    if (deviceData?.size?:0 > 8)
+                    if (deviceData?.size ?: 0 > 8)
                         batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 220)
                 }
                 DeviceType.SMART_CURTAIN -> {
-                    if (deviceDataCurtain?.size?:0 > 8)
+                    if (deviceDataCurtain?.size ?: 0 > 8)
                         batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 220)
                 }
                 DeviceType.SMART_RELAY -> {
-                    if (deviceDataRelay?.size?:0 > 8)
+                    if (deviceDataRelay?.size ?: 0 > 8)
                         batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 220)
                 }
             }
@@ -807,7 +827,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         } else {
             batch_four_no_group_line.visibility = View.INVISIBLE
             batch_four_grouped_line.visibility = View.VISIBLE
-            ClearSelectors()
+            clearSelectors()
         }
     }
 
@@ -821,7 +841,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun changeGroupSelectView(position: Int) {
-        if (lastCheckedGroupPostion != position && groupsByDeviceType?.get(lastCheckedGroupPostion) != null){
+        if (lastCheckedGroupPostion != position && groupsByDeviceType?.get(lastCheckedGroupPostion) != null) {
             groupsByDeviceType?.get(lastCheckedGroupPostion)!!.checked = false
         }
 
@@ -833,8 +853,9 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
         else
             null
 
-        changeGroupingCompleteState()
+        changeGroupingCompleteState(selectLights.size)
         groupAdapter?.notifyDataSetChanged()
+        changeGroupingCompleteState(selectLights.size)
     }
 
     private fun addNewGroup() {
@@ -868,8 +889,29 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
+    fun refreshData() {
+        val groupList = DBUtils.getGroupsByDeviceType(deviceType)
+        //以下是检索组里有多少设备的代码
+        for (group in groupList) {
+            when (group.deviceType) {
+                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                    group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
+                }
+                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                    group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
+                }
+                Constant.DEVICE_TYPE_CONNECTOR -> {
+                    group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
+                }
+                Constant.DEVICE_TYPE_CURTAIN -> {
+                    group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
+                }
+            }
+        }
+    }
+
     private fun setAllSelect(isSelectAll: Boolean) {
-        ClearSelectors()//清理所有选中
+        clearSelectors()//清理所有选中
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 deviceData ?: return
@@ -892,7 +934,7 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
                 if (isSelectAll)
                     selectCurtains = deviceDataCurtain as MutableList<DbCurtain>
 
-                for (i in deviceData!!.indices) {
+                for (i in deviceDataCurtain!!.indices) {
                     deviceDataCurtain!![i].selected = isSelectAll
                     if (isSelectAll)
                         startBlink(deviceDataCurtain!![i].belongGroupId, deviceDataCurtain!![i].meshAddr)
@@ -988,11 +1030,11 @@ class BatchGroupFourDevice : TelinkBaseActivity(), EventListener<String> {
      * @return false还有没有分组的灯 true所有灯都已经分组
      */
     private fun isAllLightsGrouped(): Boolean {
-        for (j in deviceListLight.indices) {
-            if (deviceListLight[j].belongGroupId == allLightId) {
-                return false
-            }
-        }
+        /*   for (j in deviceDataLights.indices) {//分设备类型使用不同的devicedata
+               if (deviceDataLights[j].belongGroupId == allLightId) {
+                   return false
+               }
+           }*/
         return true
     }
 

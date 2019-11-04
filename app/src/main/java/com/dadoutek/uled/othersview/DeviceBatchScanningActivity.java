@@ -80,9 +80,9 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_scanning);
 
         mMeshAddressGenerator = new MeshAddressGenerator();

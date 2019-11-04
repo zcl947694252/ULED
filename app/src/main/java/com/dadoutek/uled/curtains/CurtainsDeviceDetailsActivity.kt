@@ -27,7 +27,6 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.OtherUtils
@@ -74,6 +73,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_curtains_device_details)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
@@ -90,6 +90,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         gpList = DBUtils.getgroupListWithType(this)
         showList = ArrayList()
         showList = gpList
+        setScanningMode(true)
 
         curtain = ArrayList()
         var all_light_data = DBUtils.getAllCurtains()

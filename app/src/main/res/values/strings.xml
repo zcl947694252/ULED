@@ -905,5 +905,7 @@
     <string name="beta_version">(beta version) : https://www.pgyer.com/dadou</string>
     <string name="no_device">No equipment</string>
     <string name="compatible_mode">compatible_mode</string>
+    <string name="direck_light">Direct light:</string>
+    <string name="get_data_please_wait">Loading data, please wait</string>
 
 </resources>

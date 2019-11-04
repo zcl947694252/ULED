@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.bluetooth.le.ScanFilter
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener
@@ -631,6 +633,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 DBUtils.saveConnector(dbItem, false)
             }
             DeviceType.SMART_CURTAIN -> {
+                LogUtils.e("zcl保存分组curtain----${DBUtils.getCurtainByGroupID(item.belongGroupId).size}")
                 val dbItem = DbCurtain()
                 dbItem.name = getString(R.string.unnamed)
                 dbItem.meshAddr = item.deviceInfo.meshAddress
@@ -640,7 +643,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.isSelected = item.isSelected
                 DBUtils.saveCurtain(dbItem, false)
-                LogUtils.e("zcl保存分组curtain----${DBUtils.getCurtainByGroupID(item.belongGroupId).size}")
+                LogUtils.e("zcl保存分组curtain----${DBUtils.getCurtainByGroupID(item.belongGroupId).size}----------${DBUtils.getAllCurtains().size}")
             }
         }
     }
@@ -981,6 +984,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mMeshAddressGenerator = MeshAddressGenerator()
         val intent = intent
         mAddDeviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+
+        LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
 
         if (DBUtils.getGroupByMesh(0xffff) != null) {
             allLightId = DBUtils.getGroupByMesh(0xffff)?.id?.toLong() ?: 0
@@ -1420,8 +1425,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }
 
-        } else
-            startGrouping()
+        } else{
+            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+            intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
+            LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
+            //intent.putParcelableArrayListExtra("data",mAddedDevices as ArrayList<ScannedDeviceItem>)
+            startActivity(intent)
+            finish()
+         //   startGrouping()
+        }
     }
 
 

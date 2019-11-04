@@ -429,6 +429,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private fun initData() {
         sensorData = DBUtils.getAllSensor()
 //        LogUtils.e("zcl人体本地数据----------$sensorData")
+        setScanningMode(true)
         if (sensorData.size > 0) {
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE

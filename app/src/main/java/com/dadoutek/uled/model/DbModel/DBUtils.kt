@@ -668,6 +668,7 @@ object DBUtils {
     }
 
     fun saveCurtain(db: DbCurtain, isFromServer: Boolean) {
+        LogUtils.e("zcl保存分组前curtain-------------${DBUtils.getAllCurtains().size}")
         val existList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0) {
             //如果该mesh地址的数据已经存在，就直接修改
@@ -675,6 +676,7 @@ object DBUtils {
         }
 
         DaoSessionInstance.getInstance().dbCurtainDao.insertOrReplace(db)
+        LogUtils.e("zcl保存分组后curtain-------------${DBUtils.getAllCurtains().size}")
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             if (existList.size > 0) {
@@ -685,6 +687,7 @@ object DBUtils {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbCurtainDao.tablename,
                         Constant.DB_ADD)
+
             }
         }
 

@@ -88,7 +88,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     var adapterAuthorize: AreaAuthorizeItemAdapter? = null
     var pop: PopupWindow? = null
     var view: View? = null
-    var root: View? = null
     var regionBean: RegionBean? = null
     var regionBeanAuthorize: RegionAuthorizeBean? = null
     var mCompositeDisposable = CompositeDisposable()
@@ -204,6 +203,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult", "SetTextI18n")
     override fun initData() {
+        hideLoadingDialog()
+        showLoadingDialog(getString(R.string.get_data_please_wait))
         if (lastUser != null) {
             region_account_num.text = lastUser!!.phone
             Log.e(TAG, "zcl******isShowType****$isShowType" + "user${lastUser.toString()}")
@@ -231,6 +232,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setMeData(it: MutableList<RegionBean>) {
+        hideLoadingDialog()
         //lastUser.lastGenMeshAddr =it[0].lastGenMeshAddr
         listAll = it
         region_me_net_num.text = getString(R.string.me_net_num, it.size)
@@ -280,6 +282,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     @SuppressLint("StringFormatMatches")
     private fun setAuthorizeData(it: MutableList<RegionAuthorizeBean>) {
+        hideLoadingDialog()
         listAuthorizeAll = it
         region_authorize_net_num.text = getString(R.string.received_net_num, it.size)
 
@@ -910,5 +913,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         PopUtil.dismiss(popAdd)
         isShowType = 3
         initData()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        hideLoadingDialog()
     }
 }

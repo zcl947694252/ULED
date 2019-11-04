@@ -1,20 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
     android:id="@+id/root"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
-    <include
-        android:id="@+id/topView"
-        layout="@layout/toolbar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+    <LinearLayout
+        android:id="@+id/device_detail_have_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topView"
+        android:orientation="vertical"
+        android:visibility="visible">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:paddingStart="@dimen/dp_10"
+            android:paddingEnd="@dimen/dp_10"
+            android:gravity="center_vertical"
+            android:id="@+id/device_detail_direct_item"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/device_detail_direct_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="13sp"
+                android:textColor="@color/black_three"
+                android:text="@string/direck_light"/>
+
+            <ImageView
+                android:id="@+id/device_detail_direct_icon"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
+                android:layout_marginLeft="77dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/device_detail_direct_text"
+                android:src="@drawable/icon_device_open" />
+
+            <ImageView
+                android:id="@+id/device_detail_direct_go_arr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/icon_arrow"
+                 />
+            <LinearLayout
+                android:id="@+id/device_detail_direct_name_ly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:layout_toEndOf="@id/device_detail_direct_icon"
+                android:layout_toStartOf="@id/device_detail_direct_go_arr"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/device_detail_direct_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="1234"
+                    android:gravity="bottom"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp"/>
+                <TextView
+                    android:id="@+id/device_detail_direct_group_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="1234"
+                    android:gravity="top"
+                    android:textColor="@color/black_three"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleView"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 
 
     <RelativeLayout
@@ -22,21 +93,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/add_device_btn"
+            style="@style/ButtonStyle"
+            android:layout_below="@id/image_no_device"
+            android:text="@string/device_scan_scan" />
+
         <ImageView
             android:id="@+id/image_no_device"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/no_device"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="170dp"
-            />
-
-        <Button
-            android:id="@+id/add_device_btn"
-            android:text="@string/device_scan_scan"
-            style="@style/ButtonStyle"
-            android:layout_below="@id/image_no_device"
-            />
+            android:src="@drawable/no_device" />
     </RelativeLayout>
 
     <include
@@ -45,16 +114,12 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/topView"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginRight="18dp"
-        android:id="@+id/recycleView"
-        android:visibility="gone"
-        android:layout_below="@+id/topView"
-        />
+    <include
+        android:id="@+id/topView"
+        layout="@layout/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </RelativeLayout>

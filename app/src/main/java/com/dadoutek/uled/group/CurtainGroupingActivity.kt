@@ -153,13 +153,13 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
 
         this.mApplication = this.application as TelinkLightApplication
         this.mApplication!!.addEventListener(NotificationEvent.GET_GROUP, this)
-        //        this.mApplication.addEventListener(NotificationEvent.GET_SCENE, this);
+        //this.mApplication.addEventListener(NotificationEvent.GET_SCENE, this);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_device_grouping)
 
         initData()

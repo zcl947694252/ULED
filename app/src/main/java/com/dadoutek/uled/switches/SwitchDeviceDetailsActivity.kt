@@ -171,6 +171,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun initData() {
         switchData = DBUtils.getAllSwitch()
+        setScanningMode(true)
         SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
             override fun start() {
                 LogUtils.e("zcl____同步开关________start")

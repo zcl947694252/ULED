@@ -182,10 +182,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         LogUtils.e("zcl---------所有灯组${DBUtils.allGroups}")
         for (index in allGroups.indices) {
             val gp = allGroups[index]
-            if (gp.deviceCount > 0 || index == 0)
+            if (gp.deviceCount > 0 || index == 0) {
                 if (index == 0)
                     gp.name = getString(R.string.allLight)
-            showCheckListData?.add(gp)
+                showCheckListData?.add(gp)
+            }
         }
 
         LogUtils.e("zcl----------$showCheckListData")
@@ -317,12 +318,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
-       /* if (showCheckListData != null)
-            showCheckListData?.remove(showCheckListData!![position])
-        if (showGroupList != null)
-            howGroupList?.remove(adapter.getItem(position))*/
+        /* if (showCheckListData != null)
+             showCheckListData?.remove(showCheckListData!![position])
+         if (showGroupList != null)
+             howGroupList?.remove(adapter.getItem(position))*/
         for (index in showCheckListData!!.indices) {
-            if (showCheckListData!![index].meshAddr ==showGroupList!![position].groupAddress)
+            if (showCheckListData!![index].meshAddr == showGroupList!![position].groupAddress)
                 showCheckListData!![index].isChecked = false
         }
         adapter.remove(position)

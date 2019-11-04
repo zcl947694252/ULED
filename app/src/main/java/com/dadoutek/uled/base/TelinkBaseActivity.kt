@@ -19,7 +19,10 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -30,7 +33,6 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -82,13 +84,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
     var disposableTimer: Disposable? = null
+    var isScanning = false
 
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
-
         enableConnectionStatusListener()    //尽早注册监听
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
@@ -97,7 +99,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     private fun initChangeRecevicer() {
-         changeRecevicer = ChangeRecevicer()
+        changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
@@ -187,17 +189,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                 }
-
+                afterLogin()
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
-                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
-
+                if (!isScanning)
+                    RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
-//                LogUtils.v("zcl---baseactivity收到登出广播")
+//              LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     changeDisplayImgOnToolbar(false)
-
+                    afterLoginOut()
                 }
             }
 
@@ -211,6 +213,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
     open fun afterLoginOut() {
 
     }
+    open fun afterLogin() {
+
+    }
 
     override fun onResume() {
         super.onResume()
@@ -221,13 +226,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
         if (LeBluetooth.getInstance().isEnabled) {
             if (lightService?.isLogin == true) {
-//                LogUtils.d("changeDisplayImgOnToolbar(true)")
                 changeDisplayImgOnToolbar(true)
             } else {
                 changeDisplayImgOnToolbar(false)
             }
         } else {
-//            LogUtils.d("changeDisplayImgOnToolbar(true)")
             changeDisplayImgOnToolbar(false)
         }
     }
@@ -238,7 +241,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable?.dispose()
         isRuning = false
         unregisterReceiver(stompRecevice)
-//        unregisterReceiver(changeRecevicer)
         SMSSDK.unregisterAllEventHandler()
     }
 
@@ -624,7 +626,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
 
-    inner class ChangeRecevicer :BroadcastReceiver(){
+    inner class ChangeRecevicer : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
             LogUtils.e("zcl获取通知$deviceInfo")
@@ -640,6 +642,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    fun setScanningMode(isScanning: Boolean) {
+        this.isScanning = isScanning
     }
 }
 
