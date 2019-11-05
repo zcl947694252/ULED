@@ -826,6 +826,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                TelinkLightApplication.getApp().doDestroy()*/
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
 }
 
 

@@ -69,7 +69,7 @@
                     android:id="@+id/batch_four_no_group"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:button="@null"
                     android:gravity="center"
                     android:checked="true"
@@ -101,9 +101,10 @@
             android:gravity="center"
             android:orientation="horizontal">
             <LinearLayout
+                android:id="@+id/batch_four_no_group_line_ly"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center">
 
             <View
@@ -119,6 +120,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/gray_e" />
             <LinearLayout
+                android:id="@+id/batch_four_grouped_line_ly"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

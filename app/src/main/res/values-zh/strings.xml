@@ -128,7 +128,7 @@
     <string name="group_completed">分组完成！</string>
     <string name="have_lamp_no_group_tip">还有灯没有分组，请完成分组操作</string>
     <string name="sure_group">确定分组</string>
-    <string name="selected_lamp_tip">至少选择一个灯进行分组</string>
+    <string name="selected_lamp_tip">至少选择一个设备进行分组</string>
     <string name="select_group_tip">请至少选择一个分组</string>
     <string name="much_lamp_tip">最高支持32768个灯</string>
     <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机蓝牙</string>
@@ -293,7 +293,7 @@
     <string name="empty_tip">当前还没有任何灯,点击添加</string>
     <string name="grouping_fail">分组失败</string>
     <string name="add_scene_gp_tip">请选择需要的分组</string>
-    <string name="group_fail_tip">有灯分组失败，请检查并重试！</string>
+    <string name="group_fail_tip">有设备分组失败，请检查要分组的设备是否通电并重试！</string>
     <string name="one_click_reset">恢复出厂设置</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>

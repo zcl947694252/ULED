@@ -666,4 +666,5 @@ class GroupListFragment : BaseFragment() {
         super.onResume()
         sendGroupResterNormal()
     }
+
 }

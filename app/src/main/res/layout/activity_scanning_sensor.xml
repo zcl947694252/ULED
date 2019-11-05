@@ -67,5 +67,8 @@
             app:pb_textProgress="@string/searching" />
     </LinearLayout>
 
-    <include layout="@layout/template_scanning_device" />
+    <include
+        layout="@layout/template_scanning_device"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 </android.support.constraint.ConstraintLayout>

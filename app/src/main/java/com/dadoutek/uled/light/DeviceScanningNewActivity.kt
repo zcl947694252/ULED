@@ -52,7 +52,6 @@ import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.Strings
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -79,8 +78,8 @@ import java.util.concurrent.TimeUnit
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
     private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 15
-    private val TIME_OUT_CONNECT = 15
+    private val SCAN_TIMEOUT_SECOND = 10
+    private val TIME_OUT_CONNECT = 10
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
 
@@ -314,7 +313,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribe {
                     LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
-//                    retryScan()
                 }
     }
 
@@ -1215,7 +1213,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribe {
                     if (bestRssiDevice != null) {
                         rxBleDispose?.dispose()
-//                        LogUtils.e("zcl------连接设备rssi${bestRssiDevice?.rssi}")
                         updateMesh(bestRssiDevice!!, mMeshAddressGenerator.meshAddress, mesh)
                     }
                 }
@@ -1289,7 +1286,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
         val deviceInfo = event.args
-//        LogUtils.e("zcl------搜索设备rssi${deviceInfo.rssi}")
         if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
             if (deviceInfo.productUUID == DeviceType.NORMAL_SWITCH || deviceInfo.productUUID == DeviceType.NORMAL_SWITCH2
                     || deviceInfo.productUUID == DeviceType.SCENE_SWITCH || deviceInfo.productUUID == DeviceType.SMART_CURTAIN_SWITCH)
@@ -1305,7 +1301,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     }
                     bestRssiDevice = deviceInfo
                     TelinkLightService.Instance()?.connect(deviceInfo.macAddress, 10)
-
                 }
         } else {
             if (bestRssiDevice == null)
@@ -1316,20 +1311,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-
-    private fun login(meshName: String) {
-        val mesh = TelinkLightApplication.getApp().mesh
-        val pwd: String
-
-        pwd = if (meshName == Constant.PIR_SWITCH_MESH_NAME) {
-            mesh.factoryPassword.toString()
-        } else {
-            val meshName = DBUtils.lastUser?.controlMeshName
-            NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
-        }
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
-                , Strings.stringToBytes(pwd, 16))
-    }
 
 
     private fun updateMesh(deviceInfo: DeviceInfo, meshAddress: Int, mesh: Mesh) {

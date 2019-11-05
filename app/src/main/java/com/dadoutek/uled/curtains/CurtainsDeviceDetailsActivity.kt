@@ -27,6 +27,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.OtherUtils
@@ -53,6 +54,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var acitivityIsAlive = true
+    private var mApplication: TelinkLightApplication? = null
+    private var install_device: TextView? = null
+    private var create_group: TextView? = null
+    private var create_scene: TextView? = null
+    private var isRgbClick = false
     private var installId = 0
     private lateinit var stepOneText: TextView
     private lateinit var stepTwoText: TextView
@@ -143,6 +149,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                        if (dialog_curtain?.visibility == View.GONE)
+                            showPopupMenu()
                     }
                 }
             }
@@ -197,6 +205,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                             if (it.id.toString() != it.last_authorizer_user_id)
                                 ToastUtils.showShort(getString(R.string.author_region_warm))
                             else {
+                                if (dialog_curtain?.visibility == View.GONE) {
+                                    showPopupMenu()
+                                }
                             }
                         }
                     }
@@ -214,7 +225,18 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
+    private fun showPopupMenu() {
+        dialog_curtain?.visibility = View.VISIBLE
+    }
+
     private fun initView() {
+        install_device = findViewById(R.id.install_device)
+        create_group = findViewById(R.id.create_group)
+        create_scene = findViewById(R.id.create_scene)
+        install_device?.setOnClickListener(onClick)
+        create_group?.setOnClickListener(onClick)
+        create_scene?.setOnClickListener(onClick)
+
         add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
@@ -225,6 +247,39 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         recycleView.layoutManager = GridLayoutManager(this, 3)
     }
 
+    /**
+     * 弹框添加设备
+     */
+    private val onClick = View.OnClickListener {
+        when (it.id) {
+            R.id.install_device -> {
+                showInstallDeviceList()
+            }
+            R.id.create_group -> {
+                dialog_curtain?.visibility = View.GONE
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    ToastUtils.showLong(getString(R.string.device_not_connected))
+                } else {
+                    addNewGroup()
+                }
+            }
+            R.id.create_scene -> {
+                dialog_curtain?.visibility = View.GONE
+                val nowSize = DBUtils.sceneList.size
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    ToastUtils.showLong(getString(R.string.device_not_connected))
+                } else {
+                    if (nowSize >= SCENE_MAX_COUNT) {
+                        ToastUtils.showLong(R.string.scene_16_tip)
+                    } else {
+                        val intent = Intent(this, NewSceneSetAct::class.java)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        startActivity(intent)
+                    }
+                }
+            }
+        }
+    }
 
     private fun addNewGroup() {
         val textGp = EditText(this)
@@ -248,6 +303,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    private fun showInstallDeviceList() {
+        dialog_curtain.visibility = View.GONE
+        showInstallDeviceList(isGuide, isRgbClick)
     }
 
     private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {

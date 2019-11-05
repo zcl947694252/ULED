@@ -1,6 +1,7 @@
 package com.dadoutek.uled.switches
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
@@ -8,7 +9,11 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
+import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -24,6 +29,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -47,7 +53,14 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
-
+    private var popReNameView: View? = null
+    private var renameDialog: Dialog? = null
+    private var renameCancel: TextView? = null
+    private var popRename: PopupWindow? = null
+    private var renameConfirm: TextView? = null
+    private var renameEditText: EditText? = null
+    private var newMeshAddr: Int = 0
+    private var alertDialog: android.app.AlertDialog? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SwitchSceneGroupAdapter
@@ -88,7 +101,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mSwitchList.add(getString(R.string.button2))
         mSwitchList.add(getString(R.string.button3))
         mSwitchList.add(getString(R.string.button4))
-
         mSceneList = DBUtils.sceneAll
     }
 
@@ -107,7 +119,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 progressBar.visibility = View.VISIBLE
                 GlobalScope.launch {
                     setSceneForSwitch()
-                    Commander.updateMeshName(successCallback = {
+                     newMeshAddr = MeshAddressGenerator().meshAddress
+                    Commander.updateMeshName(newMeshAddr = newMeshAddr,successCallback = {
                         mIsConfiguring = true
                         disconnect()
                     },
@@ -120,6 +133,25 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                             })
                 }
             }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showRenameDialog() {
+        hideLoadingDialog()
+        popRename?.dismiss()
+        StringUtils.initEditTextFilter(renameEditText)
+
+        if (switchDate != null&&switchDate?.name!="")
+            renameEditText?.setText(switchDate?.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
+                    + DBUtils.getAllSwitch().size)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        if(this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+        renameDialog?.show()
         }
     }
 
@@ -145,7 +177,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             this.mApplication.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
-                showConfigSuccessDialog()
+                if (switchDate == null)
+                    switchDate = DBUtils.getSwitchByMeshAddr(newMeshAddr)
+                showRenameDialog()
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -435,6 +469,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("RestrictedApi")
     private fun initView() {
+        makePop()
+
         if (mSceneList.isEmpty()) {
             fab.visibility = View.GONE
             indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
@@ -446,6 +482,40 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         mAdapter.bindToRecyclerView(recyclerView)
+    }
+
+    private fun makePop() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
+        renameConfirm?.setOnClickListener {
+            // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showShort(getString(R.string.rename_tip_check))
+            } else {
+                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                DBUtils.updateSwicth(switchDate!!)
+                if(this != null && !this.isFinishing)
+                    renameDialog?.dismiss()
+            }
+        }
+
+
+        renameCancel?.setOnClickListener {
+            if(this != null && !this.isFinishing)
+                renameDialog?.dismiss()
+            }
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+
+        renameDialog?.setOnDismissListener {
+            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            DBUtils.updateSwicth(switchDate!!)
+            showConfigSuccessDialog()
+        }
     }
 
 

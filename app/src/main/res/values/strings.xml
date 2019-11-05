@@ -294,7 +294,7 @@
     <string name="empty_tip">No lights, click to add</string>
     <string name="grouping_fail">Group failed</string>
     <string name="add_scene_gp_tip">Please Choose a Group</string>
-    <string name="group_fail_tip">There is a light grouped failed, please check and try again!</string>
+    <string name="group_fail_tip">Some devices failed to group, please check whether the devices to be grouped are powered on and try again!</string>
     <string name="one_click_reset">Reset all lights</string>
     <string name="reset_all_now">Restoring factory settings</string>
     <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>

@@ -88,6 +88,15 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
+/**
+ * 创建者     zcl
+ * 创建时间   2019/11/5 10:54
+ * 描述	      {批量分组}
+ * <p>
+ * 更新者    $author$
+ * 更新时间   $Date$
+ * 更新描述   ${}$
+ */
 public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)

@@ -39,6 +39,15 @@
             />
     </RelativeLayout>
 
+    <include
+        android:id="@+id/dialog_curtain"
+        layout="@layout/popwindow_install_deive_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/topView"
+        android:visibility="gone"
+        />
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

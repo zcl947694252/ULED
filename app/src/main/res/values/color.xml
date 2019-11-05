@@ -41,4 +41,6 @@
     <color name="gray_f8">#F8F8F8</color>
     <color name="blue_text">#18B4ED</color>
     <color name="blue_dark">#0083B3</color>
+    <color name="gray_c">#ccc</color>
+    <color name="gray_d">#ddd</color>
 </resources>

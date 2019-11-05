@@ -10,6 +10,8 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbSensor;
+import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 
@@ -177,7 +179,6 @@ public class StringUtils {
             if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()) == null) {
                 return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
             }
-
             //如果当前灯没分组  显示未分组
             if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr() == 0xffff) {
                 return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
@@ -193,27 +194,45 @@ public class StringUtils {
         if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
-
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getMeshAddr() == 0xffff) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         } else {
             return DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getName();
         }
-
     }
 
     public static String getCurtainName(DbCurtain curtain) {
-
         if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
-
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getMeshAddr() == 0xffff) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         } else {
             return DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getName();
+        }
+    }
+    public static String getSwitchName(DbSwitch dbSwitch) {
+        if (DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()) == null) {
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+        }
+        //如果当前灯没分组  显示未分组
+        if (DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()).getMeshAddr() == 0xffff) {
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+        } else {
+            return DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()).getName();
+        }
+    }
+    public static String getSensorName(DbSensor dbSensor) {
+        if (DBUtils.INSTANCE.getGroupByID(dbSensor.getBelongGroupId()) == null) {
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+        }
+        //如果当前灯没分组  显示未分组
+        if (DBUtils.INSTANCE.getGroupByID(dbSensor.getBelongGroupId()).getMeshAddr() == 0xffff) {
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+        } else {
+            return DBUtils.INSTANCE.getGroupByID(dbSensor.getBelongGroupId()).getName();
         }
     }
 
