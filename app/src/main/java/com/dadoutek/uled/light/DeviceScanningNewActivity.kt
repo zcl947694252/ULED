@@ -477,7 +477,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         grouping_completed?.setOnClickListener { v ->
             //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
             if (isAllLightsGrouped) {//所有灯都有分组可以跳转
-                showToast(getString(R.string.group_completed))
+                showToast(getString(R.string.grouping_completed))
                 //页面跳转前进行分组数据保存
                 TelinkLightService.Instance()?.idleMode(true)
                 //目前测试调到主页

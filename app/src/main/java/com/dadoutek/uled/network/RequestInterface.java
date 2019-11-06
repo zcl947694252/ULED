@@ -39,7 +39,7 @@ import retrofit2.http.Query;
 /**
  * 创建者     zcl
  * 创建时间   2019/8/7 11:54
- * 描述	      ${TODO}$
+ * 描述	      ${
  * <p>
  * 更新者     $Author$
  * 更新时间   $Date$

@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
+class NormalSettingActivity : TelinkBaseActivity(),  TextView.OnEditorActionListener {
     private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
     private lateinit var light: DbLight
@@ -919,27 +919,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
      */
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-    }
-
-    fun addEventListeners() {
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     override fun onStop() {
         super.onStop()
         mConnectTimer?.dispose()
-        this.mApplication?.removeEventListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
         mDisposable.dispose()
-        this.mApplication?.removeEventListener(this)
     }
 
     private fun updateGroup() {//更新分组 断开提示
@@ -961,14 +953,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     }
 
-    override fun performed(event: Event<String>?) {
-        when (event?.type) {
-//            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
-        }
-    }
-
-    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
         override fun downLoadFileStart() {
             showLoadingDialog(getString(R.string.get_update_file))
@@ -1169,7 +1154,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     override fun onResume() {
         super.onResume()
-        addEventListeners()
     }
 
     private fun initType() {

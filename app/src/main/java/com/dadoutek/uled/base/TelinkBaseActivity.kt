@@ -163,16 +163,16 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     //打开基类的连接状态变化监听
     fun enableConnectionStatusListener() {
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, statusChangedListener)
         LogUtils.d("enableConnectionStatusListener, current listeners = ${mApplication?.mEventBus?.mEventListeners}")
     }
 
     //关闭基类的连接状态变化监听
     fun disableConnectionStatusListener() {
-        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, statusChangedListener)
     }
 
-    private val StatusChangedListener = EventListener<String?> { event ->
+    private val statusChangedListener = EventListener<String?> { event ->
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
                 onDeviceStatusChanged(event as DeviceEvent)

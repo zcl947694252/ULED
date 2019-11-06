@@ -166,7 +166,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         val versionNum = Integer.parseInt(StringUtils.versionResolution(version, 1))
         versionLayoutPS.visibility = View.VISIBLE
         tvPSVersion.text = version
-        isSupportModeSelect = (version?: "").contains("PS")
+        isSupportModeSelect = (version).contains("PS")
 
         if (isSupportModeSelect) {
             tvSelectStartupMode.visibility = View.VISIBLE
@@ -194,7 +194,13 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mGroups = DBUtils.allGroups
         mGroupsName = ArrayList()
         for (item in mGroups) {
-            mGroupsName!!.add(item.name)
+            when (item.deviceType) {
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
+                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                    if (item.deviceCount>0)
+                        mGroupsName!!.add(item.name)
+                }
+            }
         }
     }
 

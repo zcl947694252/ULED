@@ -14,7 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${
  */
 class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
 
@@ -40,8 +40,9 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 .addOnClickListener(R.id.device_detail_item_arr)
                 .addOnClickListener(R.id.device_detail_item_img_icon)
 
-
-   /*     if (scene != null) {
+   /*
+    下个版本待删
+    if (scene != null) {
             val tvName = helper.getView<TextView>(R.id.name)
             val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
             val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)

@@ -221,7 +221,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
         for (i in curtain?.indices!!) {
-            curtain!![i].updateIcon()
+            //curtain!![i].updateIcon()
+            curtain!![i].icon = R.drawable.icon_curtain
         }
     }
 
