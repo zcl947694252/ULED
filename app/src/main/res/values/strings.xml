@@ -608,7 +608,7 @@
     <string name="install_tip5">If you encounter problems, please try the following steps to reset the device </string>
     <string name="guide_tip_reset_light"> Lamp: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
     <string name="guide_tip_reset_switch"> panel switch: Connect the power supply while holding down the upper left button and the lower right button in the switch button. The blue light will always be on during the period. </string>
-    <string name="guide_tip_reset_sensor">Connect the power for 1 second, disconnect the power for 1 second, repeat about 5–6 times until the sensor flashes. </string>
+    <string name="guide_tip_reset_sensor">Sensor (with key) : press and hold the side reset key until the light flashes.\n Sensor (no button) : turn on the power for 3 seconds, turn off the power for 3 seconds, repeat about 5-6 times until the sensor flashes. </string>
     <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
     <string name="guide_tip_reset_relay">Bluetooth receiver: long press the white button of the receiver for 5 seconds, until the bluetooth receiver flashes. </string>
 

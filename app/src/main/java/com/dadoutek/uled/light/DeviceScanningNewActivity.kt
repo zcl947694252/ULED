@@ -78,8 +78,8 @@ import java.util.concurrent.TimeUnit
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
     private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 10
-    private val TIME_OUT_CONNECT = 10
+    private val SCAN_TIMEOUT_SECOND = 15
+    private val TIME_OUT_CONNECT = 15
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
 
