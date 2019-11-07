@@ -1060,7 +1060,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     override fun onDestroy() {
         super.onDestroy()
-        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
         disposable?.dispose()
         this.mApplication?.removeEventListener(this)
         isAddGroupEmptyView = false

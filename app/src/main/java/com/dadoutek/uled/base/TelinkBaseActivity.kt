@@ -572,6 +572,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     ?.doFinally {
                         mConnectDisposable = null
                     }
+                    ?.doOnError {
+                        TelinkLightService.Instance().idleMode(false)
+                    }
 
         } else {
             LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance().isLogin}")

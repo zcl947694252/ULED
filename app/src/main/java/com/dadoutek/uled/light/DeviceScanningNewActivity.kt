@@ -807,6 +807,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             onLogin()
                         },
                         {
+                            hideLoadingDialog()
                             LogUtils.d(it)
                         }
                 )
