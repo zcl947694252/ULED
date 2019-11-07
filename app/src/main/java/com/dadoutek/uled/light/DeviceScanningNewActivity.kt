@@ -810,23 +810,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             LogUtils.d(it)
                         }
                 )
-
-/*
-        if (TelinkLightService.Instance() != null) {
-            if (!TelinkLightService.Instance().isLogin) {
-                startConnect = true
-                val meshName = DBUtils.lastUser!!.controlMeshName
-
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(meshName)
-                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                connectParams.autoEnableNotification(true)
-                //连接，如断开会自动重连
-                TelinkLightService.Instance().autoConnect(connectParams)
-            }
-        }
-*/
     }
 
     private fun closeAnimation() {

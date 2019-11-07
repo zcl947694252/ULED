@@ -465,11 +465,12 @@ class SyncDataPutOrGetUtils {
                         GlobalScope.launch(Dispatchers.Main) {
                             syncCallBack.complete()
                         }
-                    }, {
+                    }, {throwable ->
                 GlobalScope.launch(Dispatchers.Main) {
-                    it?:return@launch
-                    syncCallBack.error(it.message)
-                    ToastUtils.showLong(it.message)
+                        syncCallBack.error(throwable.message ?: "no message")
+                    throwable.message?.let {
+                            ToastUtils.showLong(throwable.message)
+                        }
                 }
             }
             )

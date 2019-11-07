@@ -565,7 +565,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
             mApplication?.startLightService(TelinkLightService::class.java)
-//        startToRecoverDevices()
+        startToRecoverDevices()
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
