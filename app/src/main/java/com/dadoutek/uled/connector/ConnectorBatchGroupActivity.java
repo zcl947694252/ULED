@@ -72,6 +72,7 @@ import com.telink.bluetooth.light.Parameters;
 import com.telink.util.EventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;

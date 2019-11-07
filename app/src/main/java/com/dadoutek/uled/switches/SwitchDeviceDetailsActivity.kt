@@ -179,7 +179,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 }
                             },
                             {
-                                showToast(getString(R.string.get_server_version_fail))
+                                showToast(getString(R.string.get_version_fail))
                             }
                     )
     }

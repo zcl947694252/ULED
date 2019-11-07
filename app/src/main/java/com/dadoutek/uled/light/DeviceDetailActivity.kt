@@ -577,6 +577,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 if (groupName != getString(R.string.not_grouped))
                                     allLightData[i].groupName = groupName
                                 lightsData.add(allLightData[i])
+
+                                // 获取当前位置的首字母(int表示ascii码)
+                                // mData!![position].letter[0].toInt()
+
+                                lightsData.sortWith(Comparator { o1, o2 -> o1.groupName.hashCode() - o2.groupName.hashCode()})
                             }
                         }
 

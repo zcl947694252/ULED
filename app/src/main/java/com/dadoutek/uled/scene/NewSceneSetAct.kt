@@ -65,6 +65,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         init(savedInstanceState)
         if (!isChangeScene) {
             edit_name.setText(DBUtils.getDefaultNewSceneName())
+            edit_name.setSelection(DBUtils.getDefaultNewSceneName().length)
             initOnLayoutListener()
         }
     }

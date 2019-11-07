@@ -919,7 +919,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     buildInModeList!![i].select = false
                 }
                 rgbGradientAdapter!!.notifyDataSetChanged()
-                stopGradient()
+                if (postionAndNum?.position == position)
+                    stopGradient()
 
                 for (i in diyGradientList!!.indices) {
                     diyGradientList!![i].select = false
@@ -933,10 +934,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
                     GlobalScope.launch {
                         speed = it
-                        stopGradient()
+                        //stopGradient()
                         delay(200)
                         postionAndNum?.speed = speed
-                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                       // Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                     }
                 })
                 dialog.show()
@@ -1049,17 +1050,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
 
             R.id.diy_mode_off -> {
-                diyPosition = 100
-                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
-                diyGradientList!![position].select = false
-                rgbDiyGradientAdapter!!.notifyItemChanged(position)
-                DBUtils.updateGradient(diyGradientList!![position])
+                if (diyPosition == position) {
+                    Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
+                    diyPosition = 100
+                    diyGradientList!![position].select = false
+                    rgbDiyGradientAdapter!!.notifyItemChanged(position)
+                    DBUtils.updateGradient(diyGradientList!![position])
 
-                for (i in buildInModeList!!.indices) {
-                    buildInModeList!![i].select = false
+                    for (i in buildInModeList!!.indices) {
+                        buildInModeList!![i].select = false
+                    }
+                    rgbGradientAdapter!!.notifyDataSetChanged()
                 }
-                rgbGradientAdapter!!.notifyDataSetChanged()
-
             }
 
             R.id.diy_mode_set -> {
