@@ -52,7 +52,7 @@ class SyncDataPutOrGetUtils {
 //                LogUtils.v("zcl得删除添加表$dbDataChangeList")
 
                 for (data in dbDataChangeList) {
-                    data.changeId?: break
+                    data.changeId ?: break
                     var observable: Observable<String>? = this.sendDataToServer(data?.tableName,
                             data?.changeId, data?.changeType, dbUser!!.token, data?.id!!)
                     observable?.let { observableList.add(it) }
@@ -377,9 +377,9 @@ class SyncDataPutOrGetUtils {
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
                         SharedPreferencesUtils.saveCurrentUseRegion(it.id)
                         application.setupMesh(mesh)
-                        LogUtils.v("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.lastUser+"------------------"+mesh)
+                        LogUtils.v("zcl", "zcl下拉数据更新******mesh信息" + DBUtils.lastUser + "------------------" + mesh)
                         DBUtils.saveUser(DBUtils.lastUser!!)
-                        LogUtils.v("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.getAllUser().size+"------------------"+DBUtils.getAllUser())
+                        LogUtils.v("zcl", "zcl下拉数据更新******mesh信息" + DBUtils.getAllUser().size + "------------------" + DBUtils.getAllUser())
                         NetworkFactory.getApi()
                                 .getLightList(token)
                                 .compose(NetworkTransformer())
@@ -465,12 +465,11 @@ class SyncDataPutOrGetUtils {
                         GlobalScope.launch(Dispatchers.Main) {
                             syncCallBack.complete()
                         }
-                    }, {throwable ->
+                    }, {
                 GlobalScope.launch(Dispatchers.Main) {
-                        syncCallBack.error(throwable.message ?: "no message")
-                    throwable.message?.let {
-                            ToastUtils.showLong(throwable.message)
-                        }
+                    it ?: return@launch
+                    syncCallBack.error(it.message)
+                    ToastUtils.showLong(it.message)
                 }
             }
             )

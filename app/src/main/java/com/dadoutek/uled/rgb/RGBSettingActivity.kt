@@ -85,7 +85,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
     private var clickPostion: Int = 100

@@ -96,7 +96,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
  * <p>
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${
  */
 public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
@@ -425,7 +425,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         groupingCompleted.setOnClickListener(v -> {
             //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
             if (isAllLightsGrouped()) {//所有灯都有分组可以跳转
-                showToast(getString(R.string.group_completed));
+                showToast(getString(R.string.grouping_completed));
                 //页面跳转前进行分组数据保存
 
                 TelinkLightService instance = TelinkLightService.Instance();

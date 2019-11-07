@@ -90,10 +90,12 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                                 if (allocDeviceGroupCount - 1 == 0) {
                                     hideLoadingDialog()
                                     finish()
+                                    ToastUtils.showShort(getString(R.string.grouping_success_tip))
                                 }else{
                                     allocDeviceGroupCount--
                                 }
                             }
+
                         }, {
                             runOnUiThread {
                                 hideLoadingDialog()

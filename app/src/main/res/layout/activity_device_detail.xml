@@ -28,6 +28,7 @@
                 android:id="@+id/device_detail_direct_text"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:paddingTop="@dimen/dp_5"
                 android:textSize="13sp"
                 android:textColor="@color/black_three"
                 android:text="@string/direck_light"/>
@@ -114,12 +115,12 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/topView"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <include
         android:id="@+id/topView"
         layout="@layout/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </RelativeLayout>

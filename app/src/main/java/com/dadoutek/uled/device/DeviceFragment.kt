@@ -246,33 +246,17 @@ class DeviceFragment : BaseFragment() {
      */
     private fun initAdapterData() {
         deviceTypeList.clear()
-        deviceTypeList.add(DeviceItem(getString(R.string.normal_light),
-                DBUtils.getAllNormalLight().size,
-                DeviceType.LIGHT_NORMAL))
+        deviceTypeList.add(DeviceItem(getString(R.string.normal_light), DBUtils.getAllNormalLight().size, DeviceType.LIGHT_NORMAL))
 
-        deviceTypeList.add(DeviceItem(getString(R.string.rgb_light),
-                DBUtils.getAllRGBLight().size,
-                DeviceType.LIGHT_RGB))
+        deviceTypeList.add(DeviceItem(getString(R.string.rgb_light), DBUtils.getAllRGBLight().size, DeviceType.LIGHT_RGB))
 
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_name), DBUtils.getAllSwitch().size, DeviceType.NORMAL_SWITCH))
 
-        deviceTypeList.add(DeviceItem(getString(R.string.switch_name),
-                DBUtils.getAllSwitch().size,
-                DeviceType.NORMAL_SWITCH))
+        deviceTypeList.add(DeviceItem(getString(R.string.sensor), DBUtils.getAllSensor().size, DeviceType.SENSOR))
 
+        deviceTypeList.add(DeviceItem(getString(R.string.curtain), DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN))
 
-        deviceTypeList.add(DeviceItem(getString(R.string.sensor),
-                DBUtils.getAllSensor().size,
-                DeviceType.SENSOR))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.curtain),
-                DBUtils.getAllCurtains().size,
-                DeviceType.SMART_CURTAIN))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.relay),
-                DBUtils.getAllRelay().size,
-                DeviceType.SMART_RELAY))
-
-
+        deviceTypeList.add(DeviceItem(getString(R.string.relay), DBUtils.getAllRelay().size, DeviceType.SMART_RELAY))
     }
 
 

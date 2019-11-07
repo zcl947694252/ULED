@@ -7,7 +7,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DeviceType
 
 
 /**
@@ -35,19 +34,13 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
             groupName.visibility = View.VISIBLE
             groupName.text = item?.groupName
 
-            if (item?.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_rgblight)
-            } else {
-                icon.setImageResource(R.drawable.icon_device_open)
-            }
+                icon.setImageResource(R.drawable.icon_controller_open)
+
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            if (item.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_device_down)
-            } else {
-                icon.setImageResource(R.drawable.icon_rgblight_down)
-            }
+
+            icon.setImageResource(R.drawable.icon_controller)
         }
     }
 }

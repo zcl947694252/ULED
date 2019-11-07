@@ -132,7 +132,6 @@
     <string name="grouping_wait_tip">There are currently %1$s lights grouping, please wait!</string>
     <string name="rescan">Rescan</string>
     <string name="start_group_bt">Start grouping</string>
-    <string name="group_completed">Grouping is complete!</string>
     <string name="have_lamp_no_group_tip">There are no lights grouping, please complete the grouping operation</string>
     <string name="sure_group">Confirm Grouping</string>
     <string name="selected_lamp_tip">Please Select at Least ONE Light to Group</string>
@@ -907,5 +906,6 @@
     <string name="compatible_mode">compatible_mode</string>
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
+    <string name="grouping_success_tip">Grouping succeeded, please save the scene related to the grouping device again</string>
 
 </resources>

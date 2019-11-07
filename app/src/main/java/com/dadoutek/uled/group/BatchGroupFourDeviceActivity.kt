@@ -696,7 +696,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         val successCallback: () -> Unit = {
-            ToastUtils.showShort(getString(R.string.group_completed))
+            ToastUtils.showShort(getString(R.string.grouping_success_tip))
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     dbLight?.belongGroupId = dbGroup.id
@@ -766,11 +766,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
         Commander.addGroup(deviceMeshAddr, dbGroup.meshAddr, successCallback, failedCallback)
-        Commander.addGroup(deviceMeshAddr, dbGroup.meshAddr, {
-            successCallback.invoke()
-        }, {
-            failedCallback.invoke()
-        })
     }
 
     private fun stopBlink(meshAddr: Int) {
@@ -892,6 +887,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_RELAY -> {
                 changeGroupingCompleteState(selectRelays.size)
             }
+
         }
     }
 
@@ -1059,13 +1055,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 hideLoadingDialog()
                 autoConnect()
             }
-            LightAdapter.STATUS_CONNECTING -> {
-            }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
         disposable?.dispose()
         this.mApplication?.removeEventListener(this)
         isAddGroupEmptyView = false

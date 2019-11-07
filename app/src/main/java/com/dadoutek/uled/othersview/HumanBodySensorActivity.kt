@@ -155,8 +155,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         showCheckListData!!.clear()
 
         for (i in lightGroup.indices) {
-            if (lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN) {
-                showCheckListData!!.add(lightGroup[i])
+            when (lightGroup[i].deviceType) {
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
+                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constant.DEVICE_TYPE_NO)
+                        showCheckListData!!.add(lightGroup[i])
+                }
             }
         }
 

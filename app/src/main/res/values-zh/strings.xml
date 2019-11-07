@@ -125,7 +125,6 @@
     <string name="grouping_wait_tip">当前有%1$s个灯正在分组，请稍候！</string>
     <string name="rescan">重新扫描</string>
     <string name="start_group_bt">开始分组</string>
-    <string name="group_completed">分组完成！</string>
     <string name="have_lamp_no_group_tip">还有灯没有分组，请完成分组操作</string>
     <string name="sure_group">确定分组</string>
     <string name="selected_lamp_tip">至少选择一个设备进行分组</string>
@@ -831,5 +830,6 @@
     <string name="compatible_mode">兼容模式</string>
     <string name="direck_light">直连灯:</string>
     <string name="get_data_please_wait">加载数据中,请稍后</string>
+    <string name="grouping_success_tip">分组成功,请重新保存与该分组设备相关的场景</string>
 
 </resources>
