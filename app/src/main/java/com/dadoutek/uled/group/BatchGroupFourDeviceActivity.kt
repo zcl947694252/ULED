@@ -460,7 +460,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun initListener() {
         //先取消，这样可以确保不会重复添加监听
-        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
@@ -1060,8 +1060,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     override fun onDestroy() {
         super.onDestroy()
-        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
         disposable?.dispose()
+        this.mApplication?.removeEventListener(this)
         isAddGroupEmptyView = false
     }
 

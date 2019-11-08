@@ -30,7 +30,7 @@ public class Constant implements Serializable {
     public static final int MAX_VALUE = 99;
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadousmart" : "dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadoutek" : "dadoutek";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
