@@ -607,7 +607,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.isSelected = item.isSelected
 
                 DBUtils.saveLight(dbItem, false)
+
+
             }
+
+
             DeviceType.SENSOR -> {
                 val dbItem = DbSensor()
                 dbItem.name = getString(R.string.unnamed)

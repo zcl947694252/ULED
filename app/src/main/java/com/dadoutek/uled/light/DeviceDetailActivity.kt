@@ -52,7 +52,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 /**
  * 创建者     zcl
@@ -70,7 +69,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private var directLight: DbLight? = null
     private var mConnectDisposable: Disposable? = null
     private var type: Int? = null
-    private lateinit var lightsData: MutableList<DbLight>
+    private lateinit var lightsData: ArrayList<DbLight>
     private var inflater: LayoutInflater? = null
     private var adaper: DeviceDetailListAdapter? = null
     private val SCENE_MAX_COUNT = 16
@@ -103,7 +102,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         inflater = this.layoutInflater
         this.mApplication = this.application as TelinkLightApplication
 
-        lightsData = mutableListOf()
+        lightsData = arrayListOf()
     }
 
     override fun onResume() {
@@ -576,11 +575,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 val groupName = StringUtils.getLightGroupName(allLightData[i])
                                 if (groupName != getString(R.string.not_grouped))
                                     allLightData[i].groupName = groupName
+                                else
+                                    allLightData[i].groupName = ""
                                 lightsData.add(allLightData[i])
-
-                                lightsData.sortWith(Comparator { o1, o2 -> o1.groupName.hashCode() - o2.groupName.hashCode()})
                             }
                         }
+                        //排序 todo 代做
+                        lightsData = OtherUtils.sortList(lightsData)
+
 
                         var batchGroup = changeHaveDeviceView()
                         batchGroup?.setOnClickListener {
@@ -618,9 +620,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 val groupName = StringUtils.getLightGroupName(allLightDatas[i])
                                 if (groupName != getString(R.string.not_grouped))
                                     allLightDatas[i].groupName = groupName
+                                else
+                                    allLightDatas[i].groupName = ""
                                 lightsData.add(allLightDatas[i])
 
-                                lightsData.sortWith(Comparator { o1, o2 -> o1.groupName.hashCode() - o2.groupName.hashCode()})
+                                lightsData = OtherUtils.sortList(lightsData)
                             }
                         }
 
@@ -742,6 +746,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+
     private fun changeHaveDeviceView(): TextView? {
         toolbar!!.tv_function1.visibility = View.VISIBLE
         device_detail_have_ly.visibility = View.VISIBLE
@@ -798,7 +803,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     fun notifyData() {
         if (lightsData.size > 0) {
             val mOldDatas: MutableList<DbLight>? = lightsData
-            val mNewDatas: MutableList<DbLight>? = getNewData()
+            val mNewDatas: ArrayList<DbLight>? = getNewData()
 
             val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -837,7 +842,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun getNewData(): MutableList<DbLight> {
+    private fun getNewData(): ArrayList<DbLight> {
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> lightsData = DBUtils.getAllNormalLight()
             Constant.INSTALL_RGB_LIGHT -> lightsData = DBUtils.getAllRGBLight()

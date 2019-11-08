@@ -10,6 +10,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.InstallDeviceModel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,4 +145,25 @@ public class OtherUtils {
         list.add(installDeviceModel6);
         return list;
     }
+
+
+    public static ArrayList<DbLight> sortList(@NotNull ArrayList<DbLight> arr) {
+        int min;
+        DbLight temp;
+        for (int i = 0; i < arr.size(); i++) {
+            min = i;
+            for (int j = i + 1; j < arr.size(); j++) {
+                if (arr.get(j).getBelongGroupId() < arr.get(min).getBelongGroupId()) {
+                    min = j;
+                }
+            }
+            if (arr.get(i).getBelongGroupId() > arr.get(min).getBelongGroupId()) {
+                temp = arr.get(i);
+                arr.set(i, arr.get(min));
+                arr.set(min, temp);
+            }
+        }
+        return arr;
+    }
+
 }
