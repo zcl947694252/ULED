@@ -1,7 +1,5 @@
 package com.dadoutek.uled.model;
 
-import com.dadoutek.uled.BuildConfig;
-
 import java.io.Serializable;
 
 /**
@@ -31,6 +29,7 @@ public class Constant implements Serializable {
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
 
     public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadoutek" : "dadoutek";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
@@ -50,7 +49,7 @@ public class Constant implements Serializable {
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
     public static final String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
-    //public static final String PIR_SWITCH_MESH_NAME = "dadoutek";
+    //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
     public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";

@@ -13,7 +13,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.app.hubert.guide.util.ScreenUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -61,7 +60,8 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String> {
-    private var deviceCount: Int? = null
+    private var isCompatible: Boolean = true
+    private var isChange: Boolean = false
     private var lpShort: LinearLayout.LayoutParams? = null
     private var lplong: LinearLayout.LayoutParams? = null
     private var disposable: Disposable? = null
@@ -123,6 +123,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
+            ToastUtils.showShort(getString(R.string.grouping_success_tip))
             finish()
         }
 
@@ -151,6 +152,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun initData() {
+        batch_four_compatible_mode.isChecked = true
+        isCompatible = true
+
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
         scanDeviceData = intent.getParcelableArrayExtra("data")
         setDevicesData(deviceType)
@@ -205,6 +209,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             changeGroupSelectView(position)
         }
 
+        changeGroupingCompleteState(selectRelays.size)
     }
 
     private fun clearSelectors() {
@@ -270,7 +275,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      */
     private fun setLightAdatpter() {
         lightAdapter = BatchFourLightAdapter(R.layout.batch_device_item, deviceData!!)
-        setDeviceListHeightAndEmpty(deviceData?.size)
+        setDeviceListAndEmpty(deviceData?.size)
         lightAdapter?.bindToRecyclerView(batch_four_device_recycle)
         btnAddGroups?.setOnClickListener { addNewGroup() }
         lightAdapter?.setOnItemChildClickListener { _, _, position ->
@@ -279,7 +284,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 startBlink(deviceData?.get(position)!!.belongGroupId, deviceData?.get(position)!!.meshAddr)
                 selectLights.add(deviceData!![position])
             } else {
-                stopBlink(deviceData?.get(position)!!.meshAddr)
+                stopBlink(deviceData?.get(position)!!.meshAddr,deviceData?.get(position)!!.belongGroupId)
                 selectLights.remove(deviceData!![position])
             }
             changeGroupingCompleteState(selectLights.size)
@@ -289,7 +294,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun setCurtainAdatpter() {
         curtainAdapter = BatchFourCurtainAdapter(R.layout.batch_device_item, deviceDataCurtain!!)
-        setDeviceListHeightAndEmpty(deviceDataCurtain?.size)
+        setDeviceListAndEmpty(deviceDataCurtain?.size)
         curtainAdapter?.bindToRecyclerView(batch_four_device_recycle)
         curtainAdapter?.setOnItemChildClickListener { _, _, position ->
             deviceDataCurtain?.get(position)!!.selected = !deviceDataCurtain?.get(position)!!.selected
@@ -297,7 +302,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 startBlink(deviceDataCurtain?.get(position)!!.belongGroupId, deviceDataCurtain?.get(position)!!.meshAddr)
                 selectCurtains.add(deviceDataCurtain!![position])
             } else {
-                stopBlink(deviceDataCurtain?.get(position)!!.meshAddr)
+                stopBlink(deviceDataCurtain?.get(position)!!.meshAddr, deviceData?.get(position)!!.belongGroupId)
                 selectCurtains.remove(deviceDataCurtain!![position])
             }
             changeGroupingCompleteState(selectCurtains.size)
@@ -307,7 +312,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun setRelayAdatpter() {
         relayAdapter = BatchFourRelayAdapter(R.layout.batch_device_item, deviceDataRelay!!)
-        setDeviceListHeightAndEmpty(deviceDataRelay?.size)
+        setDeviceListAndEmpty(deviceDataRelay?.size)
         relayAdapter?.bindToRecyclerView(batch_four_device_recycle)
         relayAdapter?.setOnItemChildClickListener { _, _, position ->
             deviceDataRelay?.get(position)!!.selected = !deviceDataRelay?.get(position)!!.selected
@@ -315,7 +320,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 startBlink(deviceDataRelay?.get(position)!!.belongGroupId, deviceDataRelay?.get(position)!!.meshAddr)
                 selectRelays.add(deviceDataRelay!![position])
             } else {
-                stopBlink(deviceDataRelay?.get(position)!!.meshAddr)
+                stopBlink(deviceDataRelay?.get(position)!!.meshAddr, deviceData?.get(position)!!.belongGroupId)
                 selectRelays.remove(deviceDataRelay!![position])
             }
             changeGroupingCompleteState(selectRelays.size)
@@ -323,7 +328,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
     }
 
-    private fun setDeviceListHeightAndEmpty(size: Int?) {
+    private fun setDeviceListAndEmpty(size: Int?) {
         if (size == 0) {
             batch_four_device_recycle.visibility = View.INVISIBLE
             image_no_device.visibility = View.VISIBLE
@@ -331,7 +336,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             batch_four_device_recycle.visibility = View.VISIBLE
             image_no_device.visibility = View.INVISIBLE
         }
-        setRecycleViewH(size)
     }
 
     @SuppressLint("CheckResult")
@@ -462,6 +466,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         //先取消，这样可以确保不会重复添加监听
 //        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
+            isCompatible = isChecked
+            LogUtils.v("zcl是否选中$isChecked")
+        }
 
         batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
             checkedNoGrouped = checkedId == batch_four_no_group.id
@@ -533,7 +541,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 showLoadingDialog(resources.getString(R.string.grouping_wait_tip, selectLights.size.toString()))
                 for (i in selectLights.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectLights[i].meshAddr)
+                    stopBlink(selectLights[i].meshAddr, selectLights[i]!!.belongGroupId)
                 }
             }
             DeviceType.SMART_CURTAIN -> {
@@ -541,14 +549,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 for (i in selectCurtains.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectCurtains[i].meshAddr)
+                    stopBlink(selectCurtains[i].meshAddr, selectLights[i]!!.belongGroupId)
                 }
             }
             DeviceType.SMART_RELAY -> {
                 showLoadingDialog(resources.getString(R.string.grouping_wait_tip, selectRelays.size.toString()))
                 for (i in selectRelays.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectRelays[i].meshAddr)
+                    stopBlink(selectRelays[i].meshAddr, selectLights[i]!!.belongGroupId)
                 }
             }
         }
@@ -602,7 +610,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 LogUtils.v("zcl更新错误")
             }
         })
-            //grouping_completed.setText(R.string.complete)
+        //grouping_completed.setText(R.string.complete)
     }
 
     private fun setGroupForLights(deviceType: Int) {
@@ -610,19 +618,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 for (i in selectLights.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectLights[i].meshAddr)
+                    stopBlink(selectLights[i].meshAddr,selectLights[i].belongGroupId)
                 }
             }
             DeviceType.SMART_CURTAIN -> {
                 for (i in selectCurtains.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectCurtains[i].meshAddr)
+                    stopBlink(selectCurtains[i].meshAddr, selectLights[i].belongGroupId)
                 }
             }
             DeviceType.SMART_RELAY -> {
                 for (i in selectRelays.indices) {
                     //让选中的灯停下来别再发闪的命令了。
-                    stopBlink(selectRelays[i].meshAddr)
+                    stopBlink(selectRelays[i].meshAddr, selectLights[i].belongGroupId)
                 }
             }
         }
@@ -696,7 +704,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         val successCallback: () -> Unit = {
-            ToastUtils.showShort(getString(R.string.grouping_success_tip))
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     dbLight?.belongGroupId = dbGroup.id
@@ -765,10 +772,21 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
             }
         }
+        isChange = true
         Commander.addGroup(deviceMeshAddr, dbGroup.meshAddr, successCallback, failedCallback)
     }
 
-    private fun stopBlink(meshAddr: Int) {
+    private fun stopBlink(meshAddr: Int, belongGroupId: Long) {
+        val group: DbGroup
+        val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
+        group = when (groupOfTheLight) {
+            null -> currentGroup!!
+            else -> groupOfTheLight
+        }
+        val groupAddress = group.meshAddr
+        Log.d("zcl", "startBlink groupAddresss = $groupAddress")
+        newStartBlinkOpcode(groupAddress,meshAddr,false)
+
         val disposable = mBlinkDisposables.get(meshAddr)
         disposable?.dispose()
     }
@@ -844,15 +862,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_grouped.text = getString(R.string.grouped_num, haveSize ?: 0)
     }
 
-    /**
-     * 设置list高度
-     */
-    private fun setRecycleViewH(size: Int?) {
-        if (size ?: 0 > 8)
-            batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 220)
-        else
-            batch_four_device_recycle.layoutParams.height = ScreenUtils.dp2px(this, 100)
-    }
 
     private fun changeDeviceAll() {
         val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
@@ -1005,19 +1014,37 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             val groupAddress = group.meshAddr
             Log.d("zcl", "startBlink groupAddresss = $groupAddress")
-            val opcode = Opcode.SET_GROUP
-            val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
-            params[0] = 0x01
 
-            if (mBlinkDisposables.get(meshAddr) != null) {
-                mBlinkDisposables.get(meshAddr).dispose()
+            if (isCompatible) {
+                val opcode = Opcode.SET_GROUP
+                val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+                params[0] = 0x01
+
+                if (mBlinkDisposables.get(meshAddr) != null) {
+                    mBlinkDisposables.get(meshAddr).dispose()
+                }
+                //每隔1s发一次，就是为了让灯一直闪.
+                mBlinkDisposables.put(meshAddr, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params) })
+            } else {
+                newStartBlinkOpcode(groupAddress, meshAddr, true)
             }
-            //每隔1s发一次，就是为了让灯一直闪.
-            mBlinkDisposables.put(meshAddr, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params) })
         }
+    }
+
+    private fun newStartBlinkOpcode(groupAddress: Int, meshAddr: Int, isStart: Boolean) {
+        val opcode = Opcode.LIGHT_BLINK_ON_OFF
+        val params: ByteArray
+        if (isStart) {
+            params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+            params[0] = 0x01
+        } else {
+            params = byteArrayOf(0x00, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+            params[0] = 0x00
+        }
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
     }
 
     override fun onResume() {

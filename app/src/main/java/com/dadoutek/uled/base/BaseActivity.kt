@@ -29,7 +29,6 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -230,8 +229,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
         override fun complete() {
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
-            TelinkLightService.Instance()?.disconnect()
             TelinkLightService.Instance()?.idleMode(true)
             if (!this@BaseActivity.isFinishing&&!singleLogin?.isShowing!!)
                 singleLogin!!.show()
@@ -244,7 +241,6 @@ abstract class BaseActivity : AppCompatActivity() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().releseStomp()
-        SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

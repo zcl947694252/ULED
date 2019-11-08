@@ -1,9 +1,8 @@
 package com.dadoutek.uled.model
 
-import android.transition.Scene
-
 object Opcode {
     const val LIGHT_ON_OFF: Byte = 0xD0.toByte()
+    const val LIGHT_BLINK_ON_OFF: Byte = 0xF5.toByte()
     const val CURTAIN_ON_OFF: Byte = 0xF2.toByte()
     const val SET_GROUP: Byte = 0xD7.toByte()
     const val GET_GROUP: Byte = 0xDD.toByte()

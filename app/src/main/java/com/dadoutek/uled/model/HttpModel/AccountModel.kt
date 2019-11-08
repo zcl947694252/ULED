@@ -160,10 +160,6 @@ object AccountModel {
         }
     }
 
-    private fun setIsLogin(isLogin: Boolean) {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, isLogin)
-    }
-
 /*
     private fun setupMesh(account: String) {
 

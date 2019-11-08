@@ -76,9 +76,9 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
+    private val MAX_RETRY_COUNT = 8   //update mesh failed的重试次数设置为4次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 15
+    private val SCAN_TIMEOUT_SECOND = 20
     private val TIME_OUT_CONNECT = 15
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
@@ -86,7 +86,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAutoConnectDisposable: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
-    private var connectInfo: DeviceInfo? = null
     private var testId: DbGroup? = null
     private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private var mApplication: TelinkLightApplication? = null
@@ -361,7 +360,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val elements = mAddedDevicesAdapter.data
         nowDeviceList.addAll(elements)
 
-        showLoadingDialog(resources.getString(R.string.connecting_tip))
+        //showLoadingDialog(resources.getString(R.string.connecting_tip))
 
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
