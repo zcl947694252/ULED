@@ -601,7 +601,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     companion object {
-        private const val SCENE_MAX_COUNT = 16
+        private const val SCENE_MAX_COUNT = 100
     }
 
 }

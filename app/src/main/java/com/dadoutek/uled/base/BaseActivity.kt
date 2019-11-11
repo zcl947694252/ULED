@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -239,6 +240,7 @@ abstract class BaseActivity : AppCompatActivity() {
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         ActivityUtils.finishAllActivities(true)
+        SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().releseStomp()
         Log.e("zcl", "zcl******重启app并杀死原进程")

@@ -62,7 +62,7 @@ import java.util.*
  * 开关列表
  */
 class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
     private var isclickOTA: Boolean = false
     private var isOta: Boolean = false
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME

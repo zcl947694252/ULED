@@ -331,6 +331,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(light!!.meshAddr)

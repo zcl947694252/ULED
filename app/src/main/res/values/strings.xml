@@ -154,7 +154,6 @@
     <string name="btn_sure">OK</string>
     <string name="group_name_setting">Group name setting</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
-    <string name="repeat_tip_name">Already have this group name, please modify!</string>
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
     <string name="title_scanned_device_num">Added %1$d devices</string>
@@ -300,7 +299,7 @@
     <string name="tip_reset_sure">Are you sure to restore all devices (except switches and sensors)?</string>
     <string name="delete_lamp_tip">There is a light reset failed, please retry after connecting</string>
     <string name="error_disconnect_tip">Factory Settings are being restored, please wait</string>
-    <string name="scene_16_tip">Up to 16 Scenes!</string>
+    <string name="scene_16_tip">Up to 100 Scenes!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Start to download data…</string>
     <string name="download_data_success">Download data success</string>

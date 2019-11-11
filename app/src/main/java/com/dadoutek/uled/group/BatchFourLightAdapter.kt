@@ -27,8 +27,8 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
 
         helper.setText(R.id.batch_tv_device_name, item?.name)
                 .setChecked(R.id.batch_selected, item?.selected ?: false)
-                .addOnClickListener(R.id.batch_selected)
-                .addOnLongClickListener(R.id.batch_device_item)
+                //.addOnClickListener(R.id.batch_selected)
+                .addOnLongClickListener(R.id.batch_img_icon)
 
         if (item?.groupName != "") {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))

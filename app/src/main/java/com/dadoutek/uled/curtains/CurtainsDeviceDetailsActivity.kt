@@ -75,7 +75,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -645,7 +645,7 @@ object Commander : EventListener<String> {
      *
      * 连接并且自动登录
      */
-    fun connect(macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+    fun connect(meshAddr: Int = 0, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
                 retryTimes: Long = 1, deviceTypes: List<Int>? = null, fastestMode: Boolean = false): Observable<DeviceInfo>? {
 
@@ -657,6 +657,9 @@ object Commander : EventListener<String> {
                 connectParams.setMeshName(meshName)
                 if (macAddress != null)
                     connectParams.setConnectMac(macAddress)
+                else if (meshAddr != 0)
+                    connectParams.setConnectMeshAddress(meshAddr)
+
                 if (deviceTypes != null)
                     connectParams.setConnectDeviceType(deviceTypes)
                 connectParams.setPassword(meshPwd)
@@ -668,10 +671,10 @@ object Commander : EventListener<String> {
                 LogUtils.d("Commander auto connect meshName = $meshName, mConnectEmitter = ${mConnectEmitter}, mac = $macAddress")
 
                 TelinkLightService.Instance()?.autoConnect(connectParams)
+            }.
+                    timeout(15, TimeUnit.SECONDS) {
+                it.onError(Throwable("connect timeout"))
             }
-                    .timeout(15, TimeUnit.SECONDS) {
-                        it.onError(Throwable("connect timeout"))
-                    }
                     .doFinally {
                         LogUtils.d("connect doFinally")
                         mConnectObservable = null
@@ -707,9 +710,9 @@ object Commander : EventListener<String> {
                 .retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .timeout(5, TimeUnit.SECONDS, {
+                .timeout(5, TimeUnit.SECONDS) {
                     it.onError(Throwable("get version failed"))
-                })
+                }
                 .doOnSubscribe {
                     TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
                 }

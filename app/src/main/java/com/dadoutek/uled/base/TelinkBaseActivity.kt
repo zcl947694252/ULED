@@ -186,6 +186,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LightAdapter.STATUS_LOGIN -> {
                 LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
+                    if (!isScanning)
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                 }
@@ -204,7 +205,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }
 
             LightAdapter.STATUS_CONNECTING -> {
-                ToastUtils.showLong(R.string.connecting_please_wait)
+                if (!isScanning)
+                    ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
     }
@@ -213,6 +215,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     open fun afterLoginOut() {
 
     }
+
     open fun afterLogin() {
 
     }
@@ -356,6 +359,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         TelinkApplication.getInstance().removeEventListeners()
         ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkLightApplication.getApp().doDestroy()
+        SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 
@@ -557,13 +561,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
 
-    fun connect(macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+    fun connect(meshAddress: Int = 0, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
                 retryTimes: Long = 1, deviceTypes: List<Int>? = null, fastestMode: Boolean = false): Observable<DeviceInfo>? {
         //mConnectDisposable == null 代表这是第一次执行
         //!TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-            Commander.connect(macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
+            Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
@@ -575,7 +579,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
 
         } else {
-            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance().isLogin}")
+            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
             Observable.create {
                 it.onNext(TelinkLightApplication.getApp().connectDevice)
             }
@@ -633,7 +637,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LogUtils.e("zcl获取通知$deviceInfo")
             when (deviceInfo.status) {
                 LightAdapter.STATUS_LOGIN -> {
-                    ToastUtils.showLong(getString(R.string.connect_success))
+                    if (!isScanning)
+                        ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
 
                 }

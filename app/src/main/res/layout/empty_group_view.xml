@@ -2,20 +2,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/no_device_relativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="center"
     tools:showIn="@layout/activity_connector_device_detail">
+
+    <Button
+        android:id="@+id/add_groups_btn"
+        android:layout_width="140dp"
+        android:layout_height="38dp"
+        android:layout_below="@id/image_no_group"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="27dp"
+        android:background="@drawable/device_list"
+        android:text="@string/add_groups"
+        android:textColor="@color/blue_background"
+        android:textSize="18sp" />
 
     <ImageView
         android:id="@+id/image_no_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/no_device"
-        android:layout_centerHorizontal="true"/>
-
-    <Button
-        android:id="@+id/add_groups_btn"
-        style="@style/ButtonStyle"
-        android:text="@string/add_groups"
-        android:layout_below="@id/image_no_group"/>
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/no_device" />
 </RelativeLayout>

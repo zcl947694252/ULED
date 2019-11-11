@@ -77,7 +77,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

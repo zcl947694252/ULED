@@ -90,7 +90,6 @@ import io.reactivex.schedulers.Schedulers;
  * <p>
  * 校验通过后，会开始动作
  * <p>
- * todo 人体感应器在线升级速度过快可能有bug
  * Action Start by choose correct bin file!
  * <p>
  * Created by Administrator on 2017/4/20.

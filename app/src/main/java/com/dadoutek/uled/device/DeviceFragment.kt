@@ -60,7 +60,7 @@ class DeviceFragment : BaseFragment() {
     private var isRgbClick = false
     var firstShowGuide = true
     private var guideShowCurrentPage = false
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return initLayout(inflater)

@@ -677,7 +677,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                         DBUtils.INSTANCE.updateGroup(groups.get(position));
                         groupsRecyclerViewAdapter.notifyItemChanged(position);
                         adapter.notifyDataSetChanged();
-//                                DBUtils.INSTANCE.getLightByGroupMesh(groups.get(position).getMeshAddr());
                     }
                 })
                 .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {

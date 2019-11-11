@@ -33,7 +33,7 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     private var stompLifecycleDisposable: Disposable? = null
-    private lateinit var mStompManager: StompManager
+    private  var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null
     private var  MIN_CLICK_DELAY_TIME = 10000
     private var  lastClickTime:Long= 0
@@ -105,7 +105,7 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     fun releseStomp() {
-        mStompManager.mStompClient?.disconnect()
+        mStompManager?.mStompClient?.disconnect()
     }
 
     @SuppressLint("CheckResult")
@@ -113,12 +113,12 @@ class TelinkLightApplication : TelinkApplication() {
         GlobalScope.launch {
             if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()
-                mStompManager.initStompClient()
+                mStompManager?.initStompClient()
 
-                if (mStompManager.mStompClient ==null)
+                if (mStompManager?.mStompClient ==null)
                     return@launch
 
-                singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
+                singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
                     if (it != key&&"no_have_key"!=it) {
                         val intent = Intent()
@@ -131,7 +131,7 @@ class TelinkLightApplication : TelinkApplication() {
                     ToastUtils.showShort(it.localizedMessage)
                 })
 
-                paserCodedisposable = mStompManager.parseQRCodeTopic().subscribe({
+                paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
                     LogUtils.e("It's time to parse $it")
                     val intent = Intent()
                     intent.action = Constant.PARSE_CODE
@@ -141,7 +141,7 @@ class TelinkLightApplication : TelinkApplication() {
                     ToastUtils.showShort(it.localizedMessage)
                 })
 
-                mCancelAuthorTopicDisposable = mStompManager.cancelAuthorization().subscribe({
+                mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
                     LogUtils.e("It's time to cancel $it")
                     val intent = Intent()
                     intent.action = Constant.CANCEL_CODE
@@ -152,7 +152,7 @@ class TelinkLightApplication : TelinkApplication() {
                 /**
                  * stomp断联监听
                  */
-                stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
+                stompLifecycleDisposable = mStompManager?.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
 //                        LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
 //                        LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)

@@ -81,6 +81,11 @@ public final class LeAutoConnectParameters extends Parameters {
         return this;
     }
 
+    public  LeAutoConnectParameters setConnectMeshAddress(int meshAddress) {
+        this.set(PARAM_AUTO_CONNECT_MESH_ADDR, meshAddress);
+        return this;
+    }
+
     public LeAutoConnectParameters setFastestMode(Boolean isFastestMode){
         this.set(PARAM_FATEST_MODE, isFastestMode);
         return this;

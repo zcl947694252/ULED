@@ -23,13 +23,13 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SpeedDialog
 import com.dadoutek.uled.widget.ActionSheetDialog
 import io.reactivex.Observable
@@ -560,8 +560,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     rgbDiyGradientAdapter!!.notifyDataSetChanged()
                     setDate()
                 } else {
-                    ActivityUtils.finishToActivity(MainActivity::class.java, false,
-                            true)
+                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 }
             }
         }

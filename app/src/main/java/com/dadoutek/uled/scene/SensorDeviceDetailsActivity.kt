@@ -128,7 +128,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
     private var popupWindow: PopupWindow? = null
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
     private var compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {

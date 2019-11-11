@@ -186,7 +186,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/batch_four_device_recycle"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="224dp"
         />
         <TextView
             android:id="@+id/image_no_device"

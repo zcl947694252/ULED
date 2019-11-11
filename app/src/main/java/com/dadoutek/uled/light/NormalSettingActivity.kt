@@ -47,8 +47,6 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.*
-import com.telink.util.Event
-import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -1025,7 +1023,7 @@ class NormalSettingActivity : TelinkBaseActivity(),  TextView.OnEditorActionList
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light.macAddr)
+                        connect(light.meshAddr)
                     }
                     ?.subscribe(
                             {
@@ -1152,9 +1150,6 @@ class NormalSettingActivity : TelinkBaseActivity(),  TextView.OnEditorActionList
         this.mApplication = this.application as TelinkLightApplication
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
 
     private fun initType() {
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
@@ -1882,30 +1877,7 @@ class NormalSettingActivity : TelinkBaseActivity(),  TextView.OnEditorActionList
                         }
                     }
                 }
-                //                progress += 5;
-                //                Log.d(TAG, "onValueChange: "+progress);
             }
-//            else {
-//
-//                opcode = Opcode.SET_TEMPERATURE
-//                params = byteArrayOf(0x05, progress.toByte())
-//
-//                if (currentShowPageGroup) {
-//                    group?.colorTemperature = progress
-//                } else {
-//                    light?.colorTemperature = progress
-//                }
-//
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
-//                if (isStopTracking) {
-//                    if (currentShowPageGroup) {
-//                        DBUtils.updateGroup(group!!)
-//                        updateLights(progress, "colorTemperature", group!!)
-//                    } else {
-//                        DBUtils.updateLight(light!!)
-//                    }
-//                }
-//            }
         }
     }
 
@@ -1914,7 +1886,6 @@ class NormalSettingActivity : TelinkBaseActivity(),  TextView.OnEditorActionList
             var lightList: MutableList<DbLight> = ArrayList()
 
             if (group.meshAddr == 0xffff) {
-                //            lightList = DBUtils.getAllLight();
                 val list = DBUtils.groupList
                 for (j in list.indices) {
                     lightList.addAll(DBUtils.getLightByGroupID(list[j].id))

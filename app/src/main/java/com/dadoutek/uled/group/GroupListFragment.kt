@@ -68,7 +68,7 @@ class GroupListFragment : BaseFragment() {
     private var toolbar: Toolbar? = null
     internal var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
     private var viewPager: ViewPager? = null
     internal var deviceName: ArrayList<DbDeviceName>? = null
     private lateinit var cwLightFragment: CWLightFragmentList

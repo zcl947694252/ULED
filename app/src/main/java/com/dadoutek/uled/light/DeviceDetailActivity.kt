@@ -72,7 +72,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var lightsData: ArrayList<DbLight>
     private var inflater: LayoutInflater? = null
     private var adaper: DeviceDetailListAdapter? = null
-    private val SCENE_MAX_COUNT = 16
+    private val SCENE_MAX_COUNT = 100
     private var currentLight: DbLight? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
@@ -112,6 +112,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         initView()
         initToolbar()
         scrollToPosition()
+        if (TelinkLightService.Instance()?.isLogin != true) {
+            autoConnect(true)
+            ToastUtils.showShort(getString(R.string.connecting_tip))
+        }
     }
 
 
@@ -139,20 +143,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             else
                 device_detail_direct_group_name.visibility = View.VISIBLE
 
-            when (type) {
-                Constant.INSTALL_NORMAL_LIGHT, Constant.INSTALL_LIGHT_OF_CW -> {
-                    if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
-                        device_detail_direct_icon.setImageResource(R.drawable.icon_device_down)
-                    else if (directLight?.status == ConnectionStatus.ON.value)
-                        device_detail_direct_icon.setImageResource(R.drawable.icon_device_open)
-                }
-                Constant.INSTALL_RGB_LIGHT, Constant.INSTALL_LIGHT_OF_RGB -> {
-                    if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
-                        device_detail_direct_icon.setImageResource(R.drawable.icon_rgblight_down)
-                    else if (directLight?.status == ConnectionStatus.ON.value)
-                        device_detail_direct_icon.setImageResource(R.drawable.icon_rgblight)
-                }
-            }
+            setTopLightState()
 
             device_detail_direct_icon.setOnClickListener { openOrClose(directLight!!) }
             device_detail_direct_name_ly.setOnClickListener {
@@ -260,6 +251,23 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         add_device_btn.setOnClickListener(this)
     }
 
+    private fun setTopLightState() {
+        when (type) {
+            Constant.INSTALL_NORMAL_LIGHT, Constant.INSTALL_LIGHT_OF_CW -> {
+                if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
+                    device_detail_direct_icon.setImageResource(R.drawable.icon_device_down)
+                else if (directLight?.status == ConnectionStatus.ON.value)
+                    device_detail_direct_icon.setImageResource(R.drawable.icon_device_open)
+            }
+            Constant.INSTALL_RGB_LIGHT, Constant.INSTALL_LIGHT_OF_RGB -> {
+                if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
+                    device_detail_direct_icon.setImageResource(R.drawable.icon_rgblight_down)
+                else if (directLight?.status == ConnectionStatus.ON.value)
+                    device_detail_direct_icon.setImageResource(R.drawable.icon_rgblight)
+            }
+        }
+    }
+
     private fun goSetting() {
         var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
         if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
@@ -280,6 +288,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
             }
+
             this.currentLight!!.connectionStatus = ConnectionStatus.ON.value
         } else {
             if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
@@ -289,6 +298,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
             this.currentLight!!.connectionStatus = ConnectionStatus.OFF.value
         }
+        setTopLightState()
+
     }
 
     private val onClick = View.OnClickListener {
@@ -580,8 +591,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 lightsData.add(allLightData[i])
                             }
                         }
-                        //排序 todo 代做
-                        lightsData = OtherUtils.sortList(lightsData)
+                        lightsData =sortList(lightsData)
 
 
                         var batchGroup = changeHaveDeviceView()
@@ -624,7 +634,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                     allLightDatas[i].groupName = ""
                                 lightsData.add(allLightDatas[i])
 
-                                lightsData = OtherUtils.sortList(lightsData)
+                                lightsData = sortList(lightsData)
                             }
                         }
 
@@ -942,6 +952,25 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         super.afterLoginOut()
         initData()
         initView()
+    }
+
+    private fun sortList(arr: java.util.ArrayList<DbLight>): java.util.ArrayList<DbLight> {
+        var min: Int
+        var temp: DbLight
+        for (i in arr.indices) {//包括结束区间
+            min = i
+            for (j in i + 1 until arr.size) {//until不 不包括结束区间
+                if (arr[j].belongGroupId < arr[min].belongGroupId) {
+                    min = j
+                }
+            }
+            if (arr[i].belongGroupId > arr[min].belongGroupId) {
+                temp = arr[i]
+                arr[i] = arr[min]
+                arr[min] = temp
+            }
+        }
+        return arr
     }
 
 }

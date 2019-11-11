@@ -30,6 +30,7 @@ public class Parameters {
 
     public static final String PARAM_AUTO_ENABLE_NOTIFICATION = "com.telink.bluetooth.light.PARAM_AUTO_ENABLE_NOTIFICATION";
     public static final String PARAM_AUTO_CONNECT_MAC = "com.telink.bluetooth.light.PARAM_AUTO_CONNECT_MAC";
+    public static final String PARAM_AUTO_CONNECT_MESH_ADDR = "com.telink.bluetooth.light.PARAM_AUTO_CONNECT_MESH_ADDR";
     public static final String PARAM_SCAN_MAC = "com.telink.bluetooth.light.PARAM_SCAN_MAC";
     public static final String PARAM_FATEST_MODE = "com.telink.bluetooth.light.PARAM_FATEST_MODE";
     public static final String PARAM_SCAN_FILTER = "com.telink.bluetooth.light.SCAN_FILTER";

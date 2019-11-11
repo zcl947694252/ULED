@@ -468,8 +468,8 @@ class SyncDataPutOrGetUtils {
                     }, {
                 GlobalScope.launch(Dispatchers.Main) {
                     it ?: return@launch
-                    syncCallBack.error(it.message)
-                    ToastUtils.showLong(it.message)
+                    syncCallBack.error(it.message?:"")
+                    ToastUtils.showLong(it.message?:"")
                 }
             }
             )

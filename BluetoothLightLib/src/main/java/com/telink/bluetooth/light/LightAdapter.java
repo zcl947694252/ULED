@@ -6,7 +6,6 @@ package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.os.Build;
@@ -75,7 +74,7 @@ public class LightAdapter {
     public static final int AUTO_REFRESH_NOTIFICATION_DELAY = 2 * 1000;
     public static final int CHECK_OFFLINE_TIME = 10 * 1000;
 
-    public static final int MIN_SCAN_PERIOD = 6 * 1000;
+    public static final int MIN_SCAN_PERIOD = 7 * 1000;
 
     private static final int STATE_PENDING = 1;
     private static final int STATE_RUNNING = 2;
@@ -784,7 +783,13 @@ public class LightAdapter {
             if (!Arrays.equals(meshName, meshName1))
                 return false;
             String mac = params.getString(Parameters.PARAM_AUTO_CONNECT_MAC);
-            return TextUtils.isEmpty(mac) || mac.equals(light.getMacAddress());
+            if (!TextUtils.isEmpty(mac)){//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
+                // 没有就连接扫到的第一个设备
+                return  mac.equals(light.getMacAddress());
+            } else {
+                int meshAddress = params.getInt(Parameters.PARAM_AUTO_CONNECT_MESH_ADDR);
+                return meshAddress == 0 || meshAddress == light.getMeshAddress();
+            }
         }
 
         return true;
