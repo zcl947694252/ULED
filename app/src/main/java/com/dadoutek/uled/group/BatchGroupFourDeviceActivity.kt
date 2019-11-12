@@ -160,27 +160,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         lpShort = batch_four_no_group_line_ly.layoutParams as LinearLayout.LayoutParams
         lpShort?.weight = 2f
 
-
-        when (deviceType) {
-            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                lightAdapter.bindToRecyclerView(batch_four_device_recycle)
-            }
-            DeviceType.SMART_CURTAIN -> {
-                curtainAdapter.bindToRecyclerView(batch_four_device_recycle)
-            }
-            DeviceType.SMART_RELAY -> {
-                relayAdapter.notifyItemRangeChanged(0, deviceDataRelay.size)
-            }
-        }
-        autoConnect()
-    }
-
-    private fun initData() {
         batch_four_compatible_mode.isChecked = true
         isCompatible = true
 
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
         scanDeviceData = intent.getParcelableArrayExtra("data")
+
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                setDeviceListAndEmpty(deviceData.size)
+                lightAdapter.bindToRecyclerView(batch_four_device_recycle)
+            }
+            DeviceType.SMART_CURTAIN -> {
+                setDeviceListAndEmpty(deviceDataCurtain.size)
+                curtainAdapter.bindToRecyclerView(batch_four_device_recycle)
+            }
+            DeviceType.SMART_RELAY -> {
+                setDeviceListAndEmpty(deviceDataRelay.size)
+                relayAdapter.notifyItemRangeChanged(0, deviceDataRelay.size)
+            }
+        }
+        groupAdapter.bindToRecyclerView(batch_four_group_recycle)
+        autoConnect()
+    }
+
+    private fun initData() {
         setDevicesData(deviceType)
         setGroupData(deviceType)
     }
@@ -201,7 +205,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             groupAdapter.emptyView = emptyGroupView
 
         isAddGroupEmptyView = true
-        groupAdapter.bindToRecyclerView(batch_four_group_recycle)
+        groupAdapter.notifyItemRangeChanged(0,groupsByDeviceType.size)
         if (groupsByDeviceType.size > 0) {
             for (index in groupsByDeviceType.indices) {
                 val isSelect = index == 0
@@ -944,7 +948,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+               // val size = deviceData.size  Inconsistency detected. Invalid item position 8(offset:40).state:32 android.support.v7.widget.RecyclerView
                 deviceData.clear()
+                //lightAdapter.notifyItemRangeInserted(0,size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceData.addAll(noGroup)
@@ -955,10 +961,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 setTitleTexts(noGroup.size, listGroup.size)
                 setDeviceListAndEmpty(deviceData.size)
-                lightAdapter.notifyItemRangeChanged(0, deviceData.size)
+               // lightAdapter.notifyItemRangeInserted(0, deviceData.size)
+                lightAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_CURTAIN -> {
+               // val size = deviceDataCurtain.size
                 deviceDataCurtain.clear()
+               // curtainAdapter.notifyItemRangeInserted(0,size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceDataCurtain.addAll(noGroupCutain)
@@ -966,13 +975,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     batch_four_grouped.isChecked = true
                     deviceDataCurtain.addAll(listGroupCutain)
                 }
-                setTitleTexts(noGroupCutain.size, listGroupCutain.size)
-                setDeviceListAndEmpty(deviceDataCurtain.size)
 
-                curtainAdapter.notifyItemRangeChanged(0, deviceDataCurtain.size)
+                setTitleTexts(noGroup.size, listGroup.size)
+                setDeviceListAndEmpty(deviceDataCurtain.size)
+                //curtainAdapter.notifyItemRangeInserted(0, deviceDataCurtain.size)
+                curtainAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
+                val size = deviceDataRelay.size
                 deviceDataRelay.clear()
+                relayAdapter.notifyItemRangeInserted(0,size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceDataRelay.addAll(noGroupRelay)
@@ -980,9 +992,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     batch_four_grouped.isChecked = true
                     deviceDataRelay.addAll(listGroupRelay)
                 }
-                setTitleTexts(noGroupRelay.size, listGroupRelay.size)
-                setDeviceListAndEmpty(deviceDataRelay.size)
-                relayAdapter.notifyItemRangeChanged(0, deviceDataRelay.size)
+
+                setTitleTexts(noGroup.size, listGroup.size)
+                setDeviceListAndEmpty(deviceData.size)
+               // relayAdapter.notifyItemRangeInserted(0, deviceData.size)
+                relayAdapter.notifyDataSetChanged()
             }
         }
         changeTitleChecked()//改变title
