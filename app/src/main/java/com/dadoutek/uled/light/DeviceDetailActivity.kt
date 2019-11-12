@@ -113,7 +113,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         initToolbar()
         scrollToPosition()
         if (TelinkLightService.Instance()?.isLogin != true) {
-            autoConnect(true)
+            autoConnect()
             ToastUtils.showShort(getString(R.string.connecting_tip))
         }
     }
@@ -183,7 +183,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 if (!TelinkLightService.Instance().isLogin) {
                     GlobalScope.launch(Dispatchers.Main) {
                         retryConnectCount = 0
-                        autoConnect(false)
+                        autoConnect()
                     }
                 } else
                     when (view.id) {
@@ -610,7 +610,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                     }
                                 }
                             } else {
-                                autoConnect(true)
+                                autoConnect()
                                 ToastUtils.showShort(getString(R.string.connecting_tip))
                             }
                         }
@@ -701,7 +701,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                     }
                                 }
                             } else {
-                                autoConnect(true)
+                                autoConnect()
                             }
                         }
 
@@ -806,7 +806,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             delay(2000)
             val b = this@DeviceDetailAct == null || this@DeviceDetailAct.isDestroyed || this@DeviceDetailAct.isFinishing || !acitivityIsAlive
             if (!b)
-                autoConnect(true)
+                autoConnect()
         }
     }
 
@@ -868,11 +868,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            autoConnect(false)
+            autoConnect()
         } else {
             TelinkLightService.Instance()?.idleMode(true)
             retryConnectCount = 0
-            autoConnect(false)
+            autoConnect()
         }
     }
 
@@ -924,7 +924,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     /**
      * 自动重连
      */
-    fun autoConnect(b: Boolean) {
+    fun autoConnect() {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                 DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
         mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 10)
