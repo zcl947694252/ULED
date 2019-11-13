@@ -94,7 +94,7 @@ class SyncDataPutOrGetUtils {
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             if (changeId != null) {
-                Log.e("zcl", "zcl**tableName****$tableName")
+                //Log.e("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {

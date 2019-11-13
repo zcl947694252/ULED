@@ -830,5 +830,6 @@
     <string name="direck_light">直连灯:</string>
     <string name="get_data_please_wait">加载数据中,请稍后</string>
     <string name="grouping_success_tip">分组成功,请重新保存与该分组设备相关的场景</string>
+    <string name="no_scaned_device">未扫描到指定设备</string>
 
 </resources>

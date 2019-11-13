@@ -16,8 +16,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.light.DeviceInfo
-import com.tencent.bugly.proguard.t
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -113,6 +111,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun startScan() {
+        TelinkLightService.Instance()?.idleMode(true)
         if (connectDisposable?.isDisposed == false) {
             LogUtils.d("already started")
         } else {
@@ -123,13 +122,11 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                     retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
                     ?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())
-                    ?.subscribe(
-                            {
+                    ?.subscribe({
                                 bestRSSIDevice = it
                                 LogUtils.d("onLogin")
                                 onLogin()
-                            },
-                            {
+                            }, {
                                 scanFail()
                                 LogUtils.d(it)
                             })

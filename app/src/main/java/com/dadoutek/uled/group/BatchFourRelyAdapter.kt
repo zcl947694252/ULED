@@ -24,9 +24,13 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
         val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)
 
         helper.setText(R.id.batch_tv_device_name, item?.name)
-                .setChecked(R.id.batch_selected, item?.selected ?: false)
-                .addOnClickListener(R.id.batch_selected)
                 .addOnLongClickListener(R.id.batch_device_item)
+
+        if (item?.isSelected == true) {
+            helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_selected)
+        } else {
+            helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_unselected)
+        }
 
         if (item?.groupName != "") {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))

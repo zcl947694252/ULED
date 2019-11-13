@@ -301,6 +301,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         GlobalScope.launch(Dispatchers.Main) {
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
+            ToastUtils.showShort(R.string.not_find_pir)
             doFinish()
         }
     }
@@ -361,30 +362,32 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         getVersion()
     }
 
+    @SuppressLint("CheckResult")
     private fun getVersion() {
-        var dstAdress = 0
+        var dstAdress: Int
         if (TelinkApplication.getInstance().connectDevice != null&&mDeviceInfo?.meshAddress!=null) {
             dstAdress = mDeviceInfo?.meshAddress!!
-           val disposable = Commander.getDeviceVersion(dstAdress)
-                    .subscribe(
-                            {
-                                closeAnimal()
-                                finish()
-                                if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
-                                    startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
-                                } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-                                    startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                                }
-                            },
-                            {
-                                getVersionRetryCount++
-                                if (getVersionRetryCount <= getVersionRetryMaxCount) {
-                                    getVersion()
-                                }
-                            }
-                    )
+            Commander.getDeviceVersion(dstAdress)
+                     .subscribe(
+                             {
+                                 closeAnimal()
+                                 finish()
+                                 when {
+                                     mDeviceInfo?.productUUID == DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
+                                     mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
+                                     else -> ToastUtils.showShort(getString(R.string.no_scaned_device))
+                                 }
+                             },
+                             {
+                                 getVersionRetryCount++
+                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {
+                                     getVersion()
+                                 }
+                             }
+                     )
 
         } else {
+            ToastUtils.showShort(getString(R.string.get_version_fail))
             doFinish()
         }
     }
@@ -394,6 +397,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         hideLoadingDialog()
         LogUtils.e("zcl  showConnectFailed")
+        ToastUtils.showShort(getString(R.string.connect_fail))
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_fail)
         isSearchedDevice = false
@@ -436,6 +440,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
             LogUtils.d("MainActivity doesn't exist in stack")
+            ToastUtils.showShort("MainActivity doesn't exist in stack")
             finish()
         }
     }

@@ -214,9 +214,11 @@ public class StringUtils {
         }
     }
     public static String getSwitchName(DbSwitch dbSwitch) {
-        if (DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()) == null) {
-            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
-        }
+        Long belongGroupId = dbSwitch.getBelongGroupId();
+        if (belongGroupId==null||DBUtils.INSTANCE.getGroupByID(belongGroupId) == null) {
+                return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+            }
+
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()).getMeshAddr() == 0xffff) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);

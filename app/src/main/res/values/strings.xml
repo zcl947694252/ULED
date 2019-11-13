@@ -906,5 +906,6 @@
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
     <string name="grouping_success_tip">Grouping succeeded, please save the scene related to the grouping device again</string>
+    <string name="no_scaned_device">The specified device was not scanned</string>
 
 </resources>

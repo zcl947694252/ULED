@@ -1359,25 +1359,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-
                 retryScan()
             }
 
-
             LightAdapter.STATUS_LOGIN -> {
-//                onLogin()
             }
-//            LightAdapter.STATUS_LOGOUT -> {
-//                if (mConnectTimer != null && mConnectTimer?.isDisposed == false) {
-//                    mConnectTimer?.dispose()
-//                    GlobalScope.launch(Dispatchers.Main) {
-//                        retryConnect()
-//                    }
-//                }
-//            }
-//            LightAdapter.STATUS_CONNECTED -> {
-//                connectInfo?.meshName?.let { login(it) }
-//            }
+
         }
     }
 

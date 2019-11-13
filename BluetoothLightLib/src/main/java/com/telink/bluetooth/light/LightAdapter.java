@@ -749,9 +749,7 @@ public class LightAdapter {
 
         Parameters params = this.getParameters();
 
-        List<Integer> targetDevices = mParams
-                .getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
-
+        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
         //如果有要连接的目标设备
         if (targetDevices.size() > 0)
             if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
@@ -970,7 +968,7 @@ public class LightAdapter {
                 return;
 
 //            synchronized (LightAdapter.this) {
-            if (mScannedLights.contains(device.getAddress()))
+                if (mScannedLights.contains(device.getAddress()))
                 return;
 //            }
 

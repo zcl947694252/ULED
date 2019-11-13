@@ -566,8 +566,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 retryTimes: Long = 1, deviceTypes: List<Int>? = null, fastestMode: Boolean = false): Observable<DeviceInfo>? {
         //mConnectDisposable == null 代表这是第一次执行
         //!TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-            Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
+        //return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
+         return   Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
@@ -578,12 +578,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         TelinkLightService.Instance().idleMode(false)
                     }
 
-        } else {
-            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
-            Observable.create {
-                it.onNext(TelinkLightApplication.getApp().connectDevice)
-            }
-        }
+//        } else {
+//            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
+//            Observable.create {
+//                it.onNext(TelinkLightApplication.getApp().connectDevice)
+//            }
+//        }
 
     }
 

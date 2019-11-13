@@ -19,6 +19,7 @@ class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQu
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
         helper.setText(R.id.batch_four_group_name,item.name)
                 .setText(R.id.batch_four_group_num,mContext.getString(R.string.number)+":${item.deviceCount}")
+
         if (item.isChecked) {
             helper.setImageResource(R.id.batch_four_select,R.drawable.icon_checkbox_selected)
         } else {
