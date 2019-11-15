@@ -503,7 +503,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void beginToOta() {
-        if (TelinkLightService.Instance().isLogin()) {
+        if (TelinkLightApplication.getInstance().getConnectDevice() != null) {
             startOTA();
         } else {
             connectOld(lightMacAddr);

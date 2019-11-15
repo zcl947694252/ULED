@@ -37,6 +37,7 @@ class StompManager private constructor() {
     companion object {
         private var instance: StompManager? = null
             get() {
+
                 if (field == null) {
                     field = StompManager()
                 }

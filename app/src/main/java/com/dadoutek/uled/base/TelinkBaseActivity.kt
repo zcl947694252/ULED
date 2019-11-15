@@ -228,7 +228,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             LeBluetooth.getInstance().enable(applicationContext)
 
         if (LeBluetooth.getInstance().isEnabled) {
-            if (lightService?.isLogin == true) {
+            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
                 changeDisplayImgOnToolbar(true)
             } else {
                 changeDisplayImgOnToolbar(false)
@@ -608,7 +608,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        if (!TelinkLightService.Instance().isLogin) {
+                        if (TelinkLightApplication.getApp().connectDevice == null/*!TelinkLightService.Instance().isLogin*/) {
                             showLoadingDialog(getString(R.string.please_wait))
 
                             val meshName = DBUtils.lastUser!!.controlMeshName

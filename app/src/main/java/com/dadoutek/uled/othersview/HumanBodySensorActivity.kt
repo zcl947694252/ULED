@@ -810,28 +810,28 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var time = editText.text.toString()
 
         if (time == "") {
-            ToastUtil.showToast(this, "超时时间为空")
+            ToastUtil.showToast(this, getString(R.string.timeout_period_is_empty))
             return
         }
 
         if (time_type_text.text.toString() == getString(R.string.second)) {
             if (time.toInt() < 10) {
-                ToastUtil.showToast(this, "超时时间不能小于10秒钟")
+                ToastUtil.showToast(this, getString(R.string.timeout_time_less_ten))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, "超时时间不能大于255秒钟")
+                ToastUtil.showToast(this, getString(R.string.timeout_255))
                 return
             }
         } else if (time_type_text.text.toString() == getString(R.string.minute)) {
             if (time.toInt() < 1) {
-                ToastUtil.showToast(this, "超时时间不能小于1分钟")
+                ToastUtil.showToast(this, getString(R.string.timeout_1m))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, "超时时间不能大于255分钟")
+                ToastUtil.showToast(this, getString(R.string.timeout_255_big))
                 return
             }
         }

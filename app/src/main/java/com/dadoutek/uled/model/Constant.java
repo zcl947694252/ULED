@@ -19,18 +19,16 @@ public class Constant implements Serializable {
     //网络请求服务器测试地址
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
 
-
     public static final String USER_CHANNEL = "dadou";
     //单点登录key
     public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
 
     public static final int MAX_GROUP_COUNT = 250;
-    public static final int MAX_VALUE = 99;
+    public static final int MAX_VALUE = 100;
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
-
     public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadoutek" : "dadoutek";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -42,7 +40,6 @@ public class Constant implements Serializable {
     public static final String GRADIENT_KEY = "GRADIENT_KEY";
     public static final String LIGHTS_KEY = "LastLights";
     public static final String DEFAULT_GROUP_ID = "DEFAULT_GROUP_ID";
-
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 

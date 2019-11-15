@@ -62,7 +62,8 @@ import java.util.concurrent.TimeUnit
  * 更新者     zcl$
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  *
- * 更新描述 todo grideView 五个以后无法选中 刷新
+ * 24khome  威廉威定制 bosie agender 三家衬衫
+ * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String> {
     private var compositeDisposable: CompositeDisposable? = null
@@ -126,8 +127,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         initView()
         initData()
         initListener()
-
-
     }
 
     private fun initView() {
@@ -422,7 +421,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                if (!TelinkLightService.Instance().isLogin) {
+                                if (TelinkLightApplication.getApp().connectDevice == null) {
                                     ToastUtils.showShort(getString(R.string.connecting_tip))
                                     retryConnectCount = 0
                                     val meshName = DBUtils.lastUser!!.controlMeshName
@@ -462,9 +461,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     deviceDataLightAll.clear()
                     deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
 
-                } else if (deviceType == DeviceType.LIGHT_RGB)
+                } else if (deviceType == DeviceType.LIGHT_RGB){
                     deviceDataLightAll.clear()
                 deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
+                }
 
                 for (i in deviceDataLightAll.indices) {//获取组名 将分组与未分组的拆分
                     if (StringUtils.getLightGroupName(deviceDataLightAll[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
@@ -551,7 +551,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_group_add_group.setOnClickListener { addNewGroup() }
 
         grouping_completed.setOnClickListener {
-            if (TelinkLightService.Instance()?.isLogin == true)
+            if (TelinkLightApplication.getApp().connectDevice != null)
                 sureGroups()
             else
                 autoConnect()
@@ -723,8 +723,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
 
-        hideLoadingDialog()
-        clearSelectors()
+
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {
                 LogUtils.v("zcl更新start")
@@ -732,16 +731,23 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
             override fun complete() {
                 LogUtils.v("zcl更新结束")
+                hideLoadingDialog()
+                clearSelectors()
                 refreshData()
                 initData()
-                initListener()
-                LogUtils.v("")
+
             }
 
             override fun error(msg: String?) {
                 LogUtils.v("zcl更新错误")
+                hideLoadingDialog()
+                clearSelectors()
+                refreshData()
+                initData()
             }
         })
+
+
         //grouping_completed.setText(R.string.complete)
     }
 
@@ -906,6 +912,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     }
                 }
             }
+
         }
         isChange = true
         Commander.addGroup(deviceMeshAddr, dbGroup.meshAddr, successCallback, failedCallback)
@@ -1253,4 +1260,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         isAddGroupEmptyView = false
     }
 
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
 }

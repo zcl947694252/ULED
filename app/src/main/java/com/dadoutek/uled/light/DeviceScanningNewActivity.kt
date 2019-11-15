@@ -78,7 +78,7 @@ import java.util.concurrent.TimeUnit
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
     private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 30
+    private val SCAN_TIMEOUT_SECOND = 25
     private val TIME_OUT_CONNECT = 20
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
@@ -288,7 +288,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             mBlinkDisposables.put(dstAddress, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params) })
+                    .subscribe { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params) })
         }
     }
 
@@ -309,7 +309,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (mTimer != null && !mTimer!!.isDisposed)
             mTimer!!.dispose()
         LogUtils.d("startTimer")
-        mTimer = Observable.timer((SCAN_TIMEOUT_SECOND).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+         mTimer = Observable.timer((SCAN_TIMEOUT_SECOND).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe {
                     LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
@@ -406,7 +406,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         this.mApplication?.removeEventListener(this)
         showLoadingDialog(getString(R.string.please_wait))
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -823,7 +823,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     fun connectDevice(mac: String) {
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT)
+        TelinkLightService.Instance()?.connect(mac, TIME_OUT_CONNECT)
     }
 
 
@@ -1126,7 +1126,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        TelinkLightService.Instance().idleMode(false)
+        TelinkLightService.Instance()?.idleMode(false)
         list_devices.visibility = View.VISIBLE
         if (mAddedDevices.size > 0)//表示目前已经搜到了至少有一个设备
             scanSuccess()
@@ -1315,7 +1315,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         params.setNewMeshName(user?.controlMeshName)
         params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16))
         params.setUpdateDeviceList(deviceInfo)
-        TelinkLightService.Instance().updateMesh(params)
+        TelinkLightService.Instance()?.updateMesh(params)
 
         stopScanTimer()
 

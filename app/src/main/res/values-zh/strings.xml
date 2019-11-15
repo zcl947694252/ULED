@@ -477,7 +477,7 @@
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
     <string name="device_disconnected">设备已断开</string>
     <string name="reconnect">重连</string>
-    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关。</string>
+    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关,如果开关没有usb接口则不必执行拔出USB线操作。</string>
     <string name="install_success">安装成功</string>
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
@@ -831,5 +831,10 @@
     <string name="get_data_please_wait">加载数据中,请稍后</string>
     <string name="grouping_success_tip">分组成功,请重新保存与该分组设备相关的场景</string>
     <string name="no_scaned_device">未扫描到指定设备</string>
+    <string name="timeout_period_is_empty">超时时间为空</string>
+    <string name="timeout_time_less_ten">超时时间不能小于10秒钟</string>
+    <string name="timeout_255">超时时间不能大于255秒钟</string>
+    <string name="timeout_1m">超时时间不能小于1分钟</string>
+    <string name="timeout_255_big">超时时间不能大于255分钟</string>
 
 </resources>

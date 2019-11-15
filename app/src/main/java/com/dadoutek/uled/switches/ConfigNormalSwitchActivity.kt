@@ -178,7 +178,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (TelinkLightService.Instance() != null && TelinkLightService.Instance().isLogin) {
+                    if (TelinkLightApplication.getApp().connectDevice != null) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()

@@ -247,7 +247,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         acitivityIsAlive = false
         mScanDisposal?.dispose()
         if (TelinkLightApplication.getApp().connectDevice == null) {
-            TelinkLightService.Instance()?.idleMode(true)
+            //TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
     }
@@ -778,7 +778,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             }
             LightAdapter.STATUS_CONNECTED -> {
                 TelinkLightService.Instance()?:return
-                if (!TelinkLightService.Instance()!!.isLogin)
+                if (TelinkLightApplication.getApp().connectDevice == null)
                     login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)

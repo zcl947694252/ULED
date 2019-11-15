@@ -364,7 +364,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
 
     private fun syncComplet() {
-            TelinkLightApplication.getApp().initStompClient()
         hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 

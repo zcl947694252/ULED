@@ -32,7 +32,6 @@ import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
@@ -384,7 +383,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         Opcode.LIGHT_ON_OFF
         when {
             view.id == R.id.img_light -> {
-                if (TelinkLightService.Instance()?.isLogin == false) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnect()
                 } else {
                     canBeRefresh = true
@@ -419,7 +418,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showShort(getString(R.string.author_region_warm))
                     else {
-                        if (TelinkLightService.Instance()?.isLogin == false) {
+                        if (TelinkLightApplication.getApp().connectDevice == null) {
                             autoConnect()
                         } else {
                             var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)

@@ -146,7 +146,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // detectUpdate()
-
+        TelinkLightApplication.getApp().initStompClient()
         LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
@@ -623,7 +623,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            if (!TelinkLightService.Instance().isLogin) {
+                            if (TelinkLightApplication.getApp().connectDevice == null) {
                                 ToastUtils.showLong(R.string.connecting_please_wait)
 
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,

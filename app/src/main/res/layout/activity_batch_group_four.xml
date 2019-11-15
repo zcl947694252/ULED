@@ -1,39 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/grouping_completed"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/btn_rec_black_bt"
-        android:text="@string/set_group"
-        android:textColor="@android:color/white"
-        android:visibility="visible"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:popupTheme="@style/ToolBarTheme">
+
+        <TextView
+            android:id="@+id/toolbarTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:visibility="visible" />
+
+
+        <ImageView
+            android:id="@+id/img_function1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingEnd="14dp"
+            android:padding="5dp"
+            android:src="@drawable/add"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_function1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:padding="5dp"
+            android:text="@string/install_device"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/image_bluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/dp_10"
+            android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingBottom="@dimen/dp_10"
+            android:paddingEnd="@dimen/dp_10"
+            android:src="@drawable/bluetooth_no" />
+
+        <CheckBox
+            android:id="@+id/batch_four_compatible_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:padding="@dimen/dp_5"
+            android:textColor="@color/white"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:button="@null"
+            android:background="@drawable/select_compatiable_bg"
+            android:text="@string/compatible_mode"/>
+
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:id="@+id/batch_four_device_ly"
         android:layout_width="match_parent"
         android:layout_height="78dp"
         android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="33dp"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="wrap_content"
@@ -58,11 +111,11 @@
                 android:textColor="@color/black_three"
                 android:textSize="15sp" />
         </LinearLayout>
-        
+
         <RadioGroup
             android:id="@+id/batch_four_group_rg"
             android:layout_width="match_parent"
-            android:layout_height="32dp"
+            android:layout_height="30dp"
             android:paddingTop="2dp"
             android:orientation="horizontal">
                 <RadioButton
@@ -97,7 +150,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
             <LinearLayout
@@ -143,6 +196,29 @@
             android:background="@color/gray_e" />
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/batch_four_device_empety_ly"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/batch_four_device_recycle"
+            android:layout_width="match_parent"
+            android:layout_height="224dp" />
+        <TextView
+            android:id="@+id/image_no_device"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableTop="@drawable/no_device"
+            android:text="@string/no_device"
+            android:drawablePadding="10dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/batch_four_group_ly"
         android:layout_width="match_parent"
         android:layout_height="35dp"
@@ -152,14 +228,14 @@
     <TextView
         android:id="@+id/batch_four_group_title"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
+        android:layout_height="33dp"
         android:background="@color/gray_e"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
         android:paddingEnd="@dimen/dp_10"
         android:text="@string/choose_group_change"
         android:textColor="@color/gray_6"
-        android:textSize="13sp" />
+        android:textSize="13sp"/>
     <TextView
         android:id="@+id/batch_four_group_add_group"
         android:layout_width="0dp"
@@ -173,114 +249,27 @@
         android:text="@string/add_groups"
         android:textColor="@color/black_three"
         android:textSize="15sp" />
-
     </LinearLayout>
-    <RelativeLayout
-        android:id="@+id/batch_four_device_empety_ly"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/batch_four_group_ly"
-        app:layout_constraintTop_toBottomOf="@+id/batch_four_device_ly"
-        tools:layout_editor_absoluteX="0dp">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/batch_four_device_recycle"
-        android:layout_width="match_parent"
-        android:layout_height="224dp"
-        />
-        <TextView
-            android:id="@+id/image_no_device"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@drawable/no_device"
-            android:text="@string/no_device"
-            android:drawablePadding="10dp"
-            android:layout_marginBottom="20dp"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:textSize="18sp"
-            android:layout_centerHorizontal="true" />
-    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/batch_four_group_recycle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:minHeight="150dp"
-        app:layout_constraintBottom_toTopOf="@+id/grouping_completed"
-        app:layout_constraintTop_toBottomOf="@+id/batch_four_group_ly"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_weight="1"
+        android:minHeight="150dp"/>
 
+    <Button
+        android:id="@+id/grouping_completed"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_rec_black_bt"
+        android:clickable="false"
+        android:text="@string/set_group"
+        android:textColor="@android:color/white"
+        android:visibility="visible" />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/primary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:titleTextAppearance="@style/Toolbar.TitleText"
-            app:popupTheme="@style/ToolBarTheme">
-
-            <TextView
-                android:id="@+id/toolbarTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:visibility="visible" />
-
-
-            <ImageView
-                android:id="@+id/img_function1"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingEnd="14dp"
-                android:padding="5dp"
-                android:src="@drawable/add"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/tv_function1"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp"
-                android:padding="5dp"
-                android:text="@string/install_device"
-                android:textColor="@color/white"
-                android:visibility="gone"/>
-
-            <ImageView
-                android:id="@+id/image_bluetooth"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/dp_10"
-                android:layout_gravity="end"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingBottom="@dimen/dp_10"
-                android:paddingEnd="@dimen/dp_10"
-                android:src="@drawable/bluetooth_no" />
-
-            <CheckBox
-                android:id="@+id/batch_four_compatible_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:padding="@dimen/dp_5"
-                android:textColor="@color/white"
-                android:layout_marginEnd="@dimen/dp_10"
-                android:button="@null"
-                android:background="@drawable/select_compatiable_bg"
-                android:text="@string/compatible_mode"/>
-
-        </android.support.v7.widget.Toolbar>
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

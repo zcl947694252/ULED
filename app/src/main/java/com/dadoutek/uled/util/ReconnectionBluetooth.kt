@@ -98,7 +98,7 @@ class ReconnectionBluetooth : EventListener<String> {
 //                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_CONNECTED -> {
-                if (TelinkLightService.Instance()!=null&&!TelinkLightService.Instance()!!.isLogin)
+                if (TelinkLightService.Instance()!=null/*&&!TelinkLightService.Instance()!!.isLogin*/)
                     login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)

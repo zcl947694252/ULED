@@ -112,7 +112,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         initView()
         initToolbar()
         scrollToPosition()
-        if (TelinkLightService.Instance()?.isLogin != true) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             autoConnect()
             ToastUtils.showShort(getString(R.string.connecting_tip))
         }
@@ -133,7 +133,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-        if (directLight != null && TelinkLightService.Instance().isLogin) {
+        if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {
             device_detail_direct_item.visibility = View.VISIBLE
             device_detail_direct_name.text = directLight?.name
             directLight?.groupName = StringUtils.getLightGroupName(directLight)
@@ -145,18 +145,18 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
             setTopLightState()
 
-            device_detail_direct_icon.setOnClickListener { openOrClose(directLight!!) }
-            device_detail_direct_name_ly.setOnClickListener {
+            device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }
+            device_detail_direct_name_ly?.setOnClickListener {
                 currentLight = directLight
                 goSetting()
             }
-            device_detail_direct_go_arr.setOnClickListener {
+            device_detail_direct_go_arr?.setOnClickListener {
                 currentLight = directLight
                 goSetting()
             }
 
         } else {
-            device_detail_direct_item.visibility = View.GONE
+            device_detail_direct_item?.visibility = View.GONE
         }
 
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
@@ -180,7 +180,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 currentLight = lightsData[position]
                 positionCurrent = position
 
-                if (!TelinkLightService.Instance().isLogin) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     GlobalScope.launch(Dispatchers.Main) {
                         retryConnectCount = 0
                         autoConnect()
@@ -213,18 +213,22 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         adaper!!.bindToRecyclerView(recycleView)
+        val size = if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
+            lightsData.size + 1
+        else
+            lightsData.size
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
-                for (i in lightsData?.indices) {
+                toolbar.title = getString(R.string.normal_light_title) + " (" + size + ")"
+                for (i in lightsData.indices) {
                     lightsData[i].updateIcon()
                 }
             }
 
             Constant.INSTALL_RGB_LIGHT -> {
-                toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
-                for (i in lightsData?.indices) {
+                toolbar.title = getString(R.string.rgb_light) + " (" + size + ")"
+                for (i in lightsData.indices) {
                     lightsData[i].updateRgbIcon()
                 }
             }
@@ -591,12 +595,12 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 lightsData.add(allLightData[i])
                             }
                         }
-                        lightsData =sortList(lightsData)
+                        lightsData = sortList(lightsData)
 
 
                         var batchGroup = changeHaveDeviceView()
                         batchGroup?.setOnClickListener {
-                            if (TelinkLightService.Instance()?.isLogin == true) {
+                            if (TelinkLightApplication.getApp().connectDevice != null) {
                                 val lastUser = DBUtils.lastUser
                                 lastUser?.let {
                                     if (it.id.toString() != it.last_authorizer_user_id)
@@ -685,7 +689,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         var cwLightGroup = this.intent.getStringExtra("cw_light_name")
                         var batchGroup = changeHaveDeviceView()
                         batchGroup?.setOnClickListener {
-                            if (TelinkLightService.Instance()?.isLogin == true) {
+                            if (TelinkLightApplication.getApp().connectDevice != null) {
                                 val lastUser = DBUtils.lastUser
                                 lastUser?.let {
                                     if (it.id.toString() != it.last_authorizer_user_id)

@@ -12,14 +12,10 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
-import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -141,7 +137,7 @@ open class BaseFragment : Fragment() {
         super.onResume()
         enableConnectionStatusListener()
 
-        if (TelinkLightService.Instance()?.isLogin == true) {
+        if (TelinkLightApplication.getApp().connectDevice != null) {
             changeDisplayImgOnToolbar(true)
         } else {
             changeDisplayImgOnToolbar(false)

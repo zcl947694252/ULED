@@ -66,7 +66,7 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
-    internal var showList: List<ItemTypeGroup>? = null
+    private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 100
     private var viewPager: ViewPager? = null
@@ -471,14 +471,14 @@ class GroupListFragment : BaseFragment() {
                         updateLights(true, this.allGroup!!)
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "on")
-                        LocalBroadcastManager.getInstance(this!!.mContext!!)
-                                .sendBroadcast(intent)
+                        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
                     }
                 }
             }
 
             R.id.btn_off, R.id.tv_off -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
+                    //TelinkLightService.Instance()?.isLogin 有时候会出现连接状态下返回false的情况所以不用
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {

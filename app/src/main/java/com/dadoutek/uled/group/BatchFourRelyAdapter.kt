@@ -27,9 +27,9 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
                 .addOnLongClickListener(R.id.batch_device_item)
 
         if (item?.isSelected == true) {
-            helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
         if (item?.groupName != "") {
@@ -38,8 +38,7 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
             groupName.visibility = View.VISIBLE
             groupName.text = item?.groupName
 
-                icon.setImageResource(R.drawable.icon_controller_open)
-
+            icon.setImageResource(R.drawable.icon_controller_open)
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE

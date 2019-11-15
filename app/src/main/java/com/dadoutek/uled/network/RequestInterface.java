@@ -109,7 +109,7 @@ public interface RequestInterface {
     @GET("region/list")
     Observable<Response<List<DbRegion>>> getOldRegionList(@Header("token") String token);
 
-    //8、获取单个区域(又有改动)
+    //8、获取单个区域(又有改动) region/get/300975/1
     @GET("region/get/{uid}/{rid}")
     Observable<Response<DbRegion>> getRegionInfo(@Path("uid") String uid,@Path("rid") String rid);
 

@@ -49,9 +49,9 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
             if (item.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_device_down)
-            } else {
                 icon.setImageResource(R.drawable.icon_rgblight_down)
+            } else {
+                icon.setImageResource(R.drawable.icon_device_down)
             }
         }
     }

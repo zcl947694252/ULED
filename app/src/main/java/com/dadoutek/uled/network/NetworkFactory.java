@@ -48,7 +48,7 @@ public class NetworkFactory {
         if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-//                    .baseUrl(Constant.BASE_URL)
+                    //.baseUrl(Constant.BASE_URL_JAVA)
                     //.baseUrl(Constant.BASE_URL_JAVA)
                     .baseUrl(Constant.BASE_DEBUG_URL)
                     .addConverterFactory(gsonConverterFactory)
@@ -63,7 +63,7 @@ public class NetworkFactory {
         if (TextUtils.isEmpty(string)) {
             return "";
         }
-        MessageDigest md5 = null;
+        MessageDigest md5;
         try {
             md5 = MessageDigest.getInstance("MD5");
             byte[] bytes = md5.digest(string.getBytes());

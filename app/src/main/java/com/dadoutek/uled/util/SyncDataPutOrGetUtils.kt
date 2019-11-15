@@ -53,8 +53,8 @@ class SyncDataPutOrGetUtils {
 
                 for (data in dbDataChangeList) {
                     data.changeId ?: break
-                    var observable: Observable<String>? = this.sendDataToServer(data?.tableName,
-                            data?.changeId, data?.changeType, dbUser!!.token, data?.id!!)
+                    var observable: Observable<String>? = this.sendDataToServer(data.tableName,
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!)
                     observable?.let { observableList.add(it) }
                 }
 
@@ -144,8 +144,7 @@ class SyncDataPutOrGetUtils {
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getConnectorByID(changeId)
                                 light?.let {
-                                    return ConnectorModel.update(token, light,
-                                            id, changeId.toInt())
+                                    return ConnectorModel.update(token, light, id, changeId.toInt())
                                 }
                             }
                         }
@@ -177,8 +176,7 @@ class SyncDataPutOrGetUtils {
                                 return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return SensorMdodel.delete(token,
-                                        id, changeId.toInt())
+                                return SensorMdodel.delete(token, id, changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
@@ -476,7 +474,7 @@ class SyncDataPutOrGetUtils {
         }
 
 
-        internal var syncCallbackSY: SyncCallback = object : SyncCallback {
+        private var syncCallbackSY: SyncCallback = object : SyncCallback {
 
             override fun start() {
 

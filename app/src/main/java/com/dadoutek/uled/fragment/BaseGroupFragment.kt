@@ -154,6 +154,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         localBroadcastManager.registerReceiver(br, intentFilter)
     }
 
+
+
     private fun sendDeleteBrocastRecevicer(delayTime: Long) {
         Thread.sleep(delayTime)
         val intent = Intent("delete_true")
@@ -183,6 +185,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
+        refreshData()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

@@ -227,7 +227,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         confirm?.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (TelinkLightService.Instance()?.isLogin == true)
+            if (TelinkLightApplication.getApp().connectDevice != null)
                 resetAllLight()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)
@@ -521,7 +521,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
 
     fun refreshView() {
-        if (LeBluetooth.getInstance().isEnabled&&TelinkLightService.Instance()?.isLogin == true) {
+        if (LeBluetooth.getInstance().isEnabled&&TelinkLightApplication.getApp().connectDevice != null) {
                 setLoginChange()
             } else {
                 setLoginOutChange()

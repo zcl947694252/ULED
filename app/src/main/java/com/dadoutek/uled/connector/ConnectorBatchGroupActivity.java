@@ -72,7 +72,6 @@ import com.telink.bluetooth.light.Parameters;
 import com.telink.util.EventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -355,7 +354,6 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-//        TelinkLightService.Instance()?.).idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
