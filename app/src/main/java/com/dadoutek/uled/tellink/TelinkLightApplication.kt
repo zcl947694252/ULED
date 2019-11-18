@@ -101,7 +101,6 @@ class TelinkLightApplication : TelinkApplication() {
       override fun doDestroy() {
         TelinkLog.onDestroy()
         super.doDestroy()
-        releseStomp()
     }
 
     fun releseStomp() {

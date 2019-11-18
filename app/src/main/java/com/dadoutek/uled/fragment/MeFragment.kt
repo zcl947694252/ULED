@@ -502,11 +502,10 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
     //重启app并杀死原进程
     private fun restartApplication() {
-        TelinkLightApplication.getApp().releseStomp()
-        ActivityUtils.finishAllActivities(true)
-        ActivityUtils.startActivity(SplashActivity::class.java)
         TelinkApplication.getInstance().removeEventListeners()
-       // TelinkLightApplication.getApp().doDestroy()
+        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        TelinkLightApplication.getApp().releseStomp()
+        com.blankj.utilcode.util.AppUtils.relaunchApp()
 }
 
     override fun setLoginChange() {

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import android.widget.RadioButton
 import android.widget.SeekBar
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -64,7 +65,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
 
-
         sbBrightnessRGB = helper.getView(R.id.sbBrightness)
         sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
         addBrightnessRGB = helper.getView(R.id.sbBrightness_add)
@@ -87,7 +87,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         })
 
         helper.setText(R.id.name_gp, item.gpName)
-
 
         if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setProgress(R.id.sbBrightness, item.brightness)
@@ -199,6 +198,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setChecked(R.id.rg_yy, true)
                 helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
             }
+
         } else if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
@@ -236,6 +236,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         helper.addOnClickListener(R.id.sbBrightness_add)
         helper.addOnClickListener(R.id.rg_xx)
         helper.addOnClickListener(R.id.rg_yy)
+
 
         addTemperatureCW!!.setOnTouchListener { v, event ->
             addTemperature(event, position)

@@ -630,7 +630,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     fun autoConnect() {
-        mConnectDisposal = connect(macAddress = currentLight!!.macAddr)
+        mConnectDisposal = connect()
                 ?.subscribe(
                         {
                             LogUtils.d(it)
@@ -642,10 +642,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         }
                 )
     }
-
-
-
-
 
 
 }

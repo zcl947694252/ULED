@@ -319,8 +319,10 @@ public class LightAdapter {
 
         LightPeripheral currentLight = this.mLightCtrl.getCurrentLight();
 
-        if (currentLight != null && currentLight.isConnected())
+        if (currentLight != null && currentLight.isConnected()) {
+            TelinkLog.d("already connected, disconnect it");
             this.mLightCtrl.disconnect();
+        }
 
         this.mLightCtrl.setTimeoutSeconds(timeoutSeconds);
         this.mLightCtrl.connect(this.mContext, light);

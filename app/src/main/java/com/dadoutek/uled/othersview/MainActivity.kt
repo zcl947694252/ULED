@@ -156,8 +156,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
-
     }
+
+
 
 
     private fun startToRecoverDevices() {
@@ -634,7 +635,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                     onLogin()
                                                 },
                                                 {
-                                                    LogUtils.d("connect failed")
+                                                    LogUtils.d("connect failed, reason = $it")
                                                 }
                                         )
                             }

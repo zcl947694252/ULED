@@ -25,6 +25,7 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -354,13 +355,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     //重启app并杀死原进程
     open fun restartApplication() {
-        TelinkLightApplication.getApp().releseStomp()
-        ActivityUtils.finishAllActivities(true)
         TelinkApplication.getInstance().removeEventListeners()
-        ActivityUtils.startActivity(SplashActivity::class.java)
-        TelinkLightApplication.getApp().doDestroy()
-        SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
-        Log.e("zcl", "zcl******重启app并杀死原进程")
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        TelinkLightApplication.getApp().releseStomp()
+        AppUtils.relaunchApp()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -564,9 +562,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun connect(meshAddress: Int = 0, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
                 retryTimes: Long = 1, deviceTypes: List<Int>? = null, fastestMode: Boolean = false): Observable<DeviceInfo>? {
-        //mConnectDisposable == null 代表这是第一次执行
-        //!TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
-        //return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
+        mConnectDisposable == null //代表这是第一次执行
+        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
          return   Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
@@ -578,12 +576,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         TelinkLightService.Instance().idleMode(false)
                     }
 
-//        } else {
-//            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
-//            Observable.create {
-//                it.onNext(TelinkLightApplication.getApp().connectDevice)
-//            }
-//        }
+        } else {
+            LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
+            Observable.create {
+                it.onNext(TelinkLightApplication.getApp().connectDevice)
+            }
+        }
 
     }
 

@@ -16,7 +16,7 @@ class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAda
         if (item.isChecked) {
             helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_selected)
         } else {
-            if(item.enableCheck){
+            if(item.isCheckedInGroup){
                 helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)
             }else{
                 helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)

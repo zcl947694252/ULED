@@ -605,9 +605,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.meshUUID = item.deviceInfo.meshUUID
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.isSelected = item.isSelected
-
                 DBUtils.saveLight(dbItem, false)
-
 
             }
 

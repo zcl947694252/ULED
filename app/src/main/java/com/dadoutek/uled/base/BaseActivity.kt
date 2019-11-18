@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
@@ -239,11 +240,9 @@ abstract class BaseActivity : AppCompatActivity() {
     //重启app并杀死原进程
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        ActivityUtils.finishAllActivities(true)
-        SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
-        ActivityUtils.startActivity(SplashActivity::class.java)
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
-        Log.e("zcl", "zcl******重启app并杀死原进程")
+        AppUtils.relaunchApp()
     }
 
     fun showLoadingDialog(content: String) {

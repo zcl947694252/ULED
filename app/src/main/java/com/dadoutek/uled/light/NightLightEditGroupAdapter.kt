@@ -13,7 +13,7 @@ class NightLightEditGroupAdapter (layoutResId: Int, data: List<DbGroup>) : BaseQ
             helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_selected)
         } else {
                 helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)
-           //if(item.enableCheck){
+           //if(item.isCheckedInGroup){
            //    helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)
            //}else{
            //    helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)

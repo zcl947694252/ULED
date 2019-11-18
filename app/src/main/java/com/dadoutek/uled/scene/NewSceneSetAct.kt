@@ -18,6 +18,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -49,9 +50,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var isResult = false
     private var isToolbar = false
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
-    private var showGroupList: ArrayList<ItemGroup>? = null
+    private val showGroupList: ArrayList<ItemGroup> = arrayListOf()
     private var showCheckListData: MutableList<DbGroup>? = null
-    private var sceneGroupAdapter: SceneGroupAdapter? = null
+    private val sceneGroupAdapter: SceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
@@ -142,11 +143,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
         if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {
             isResult = true
-            showGroupList = savedInstanceState.getSerializable(DATA_LIST_KEY) as? ArrayList<ItemGroup>
+            val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
+            showGroupList.addAll(list)
             scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
         } else {
             isResult = false
-            showGroupList = ArrayList()
+//            showGroupList = ArrayList()
         }
         if (isChangeScene && !isResult) {
             scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
@@ -207,7 +209,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             changeCheckedViewData()
         } else {
             for (i in showCheckListData!!.indices) {
-                showCheckListData!![i].enableCheck = true
+                showCheckListData!![i].isCheckedInGroup = true
                 showCheckListData!![i].checked = false
             }
         }
@@ -278,18 +280,21 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun close(position: Int) {
-        this!!.showGroupList!![position].isNo = false
-        sceneGroupAdapter?.notifyItemChanged(position)
+        this.showGroupList[position].isNo = false
+        sceneGroupAdapter.notifyItemChanged(position)
+        Commander.openOrCloseLights(showGroupList[position].groupAddress, false)
     }
 
     private fun open(position: Int) {
-        this!!.showGroupList!![position].isNo = true
-        sceneGroupAdapter?.notifyItemChanged(position)
+        this.showGroupList[position].isNo = true
+        sceneGroupAdapter.notifyItemChanged(position)
+        Commander.openOrCloseLights(showGroupList[position].groupAddress, true)
+
     }
 
     private fun changeToColorSelect(position: Int) {
         val intent = Intent(this, SelectColorAct::class.java)
-        intent.putExtra(Constant.GROUPS_KEY, showGroupList!![position])
+        intent.putExtra(Constant.GROUPS_KEY, showGroupList[position])
         startActivityForResult(intent, position)
     }
 
@@ -313,7 +318,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun changeCheck(position: Int) {
         val item = showCheckListData!![position]
-        if (item.enableCheck) {
+        if (item.isCheckedInGroup) {
             showCheckListData!![position].checked = !item.checked
             changeCheckedViewData()
             sceneEditListAdapter?.notifyDataSetChanged()
@@ -340,12 +345,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_group_list_view.layoutManager = layoutmanager
-        this.sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList!!)
         recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
         recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
-        sceneGroupAdapter?.bindToRecyclerView(recyclerView_group_list_view)
+        sceneGroupAdapter.bindToRecyclerView(recyclerView_group_list_view)
 
-        sceneGroupAdapter?.onItemChildClickListener = onItemChildClickListener
+        sceneGroupAdapter.onItemChildClickListener = onItemChildClickListener
     }
 
     //显示配置数据页面
@@ -395,14 +399,14 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         var isAllCanCheck = true
         for (i in showCheckListData!!.indices) {
             if (showCheckListData!![0].meshAddr == 0xffff && showCheckListData!![0].checked) {
-                showCheckListData!![0].enableCheck = true
+                showCheckListData!![0].isCheckedInGroup = true
                 if (showCheckListData!!.size > 1 && i > 0) {
-                    showCheckListData!![i].enableCheck = false
+                    showCheckListData!![i].isCheckedInGroup = false
                 }
             } else {
-                showCheckListData!![0].enableCheck = false
+                showCheckListData!![0].isCheckedInGroup = false
                 if (showCheckListData!!.size > 1 && i > 0) {
-                    showCheckListData!![i].enableCheck = true
+                    showCheckListData!![i].isCheckedInGroup = true
                 }
 
                 if (i > 0 && showCheckListData!![i].checked) {
@@ -411,7 +415,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         if (isAllCanCheck) {
-            showCheckListData!![0].enableCheck = true
+            showCheckListData!![0].isCheckedInGroup = true
         }
     }
 

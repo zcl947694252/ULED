@@ -140,7 +140,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-
         val intent = Intent(this,
                 ConnectorBatchGroupActivity::class.java)
         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)

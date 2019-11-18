@@ -33,10 +33,11 @@ public class DbGroup implements Serializable{
 
     @Expose(serialize = false, deserialize = false)
     @Transient
+    @Deprecated
     public boolean checked=false;
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public boolean enableCheck=false;
+    public boolean isCheckedInGroup =false;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;
@@ -220,7 +221,7 @@ public class DbGroup implements Serializable{
                 ", index=" + index +
                 ", color=" + color +
                 ", checked=" + checked +
-                ", enableCheck=" + enableCheck +
+                ", isCheckedInGroup=" + isCheckedInGroup +
                 ", selected=" + selected +
                 ", textColor=" + textColor +
                 ", status=" + status +

@@ -14,20 +14,17 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbGroup
+
 class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        helper.setText(R.id.batch_four_group_name,item.name)
-                .setText(R.id.batch_four_group_num,mContext.getString(R.string.number)+":${item.deviceCount}")
+        helper.setText(R.id.batch_four_group_name, item.name)
+                .setText(R.id.batch_four_group_num, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
-        if (item.isChecked) {
-            helper.setImageResource(R.id.batch_four_select,R.drawable.icon_checkbox_selected)
+        if (item.isCheckedInGroup) {
+            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_selected)
         } else {
-            if(item.enableCheck){
-                helper.setImageResource(R.id.batch_four_select,R.drawable.icon_checkbox_unselected)
-            }else{
-                helper.setImageResource(R.id.batch_four_select,R.drawable.icon_checkbox_unselected)
-            }
+            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_unselected)
         }
     }
 }

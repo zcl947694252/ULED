@@ -177,7 +177,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.SMART_RELAY -> {
                 setDeviceListAndEmpty(deviceDataRelay.size)
-                relayAdapter.notifyItemRangeChanged(0, deviceDataRelay.size)
+                relayAdapter.bindToRecyclerView(batch_four_device_recycle)
             }
         }
         groupAdapter.bindToRecyclerView(batch_four_group_recycle)
@@ -196,24 +196,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setGroupData(deviceType: Int) {
         groupsByDeviceType.clear()
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(deviceType))
-        if (groupsByDeviceType.size > 0) {
-            for (index in groupsByDeviceType.indices)
-                groupsByDeviceType[index].isChecked = index == 0
-        }
 
         if (!isAddGroupEmptyView)
             groupAdapter.emptyView = emptyGroupView
-
-        if (groupsByDeviceType.size > 0) {
-            for (index in groupsByDeviceType.indices) {
-                val isSelect = index == 0
-                groupsByDeviceType[index].isChecked = isSelect
-                if (isSelect) {
-                    lastCheckedGroupPostion = 0
-                    currentGroup = groupsByDeviceType[index]
-                }
-            }
-        }
 
         isAddGroupEmptyView = true
         groupAdapter.notifyItemRangeChanged(0,groupsByDeviceType.size)
@@ -1028,12 +1013,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun changeGroupSelectView(position: Int) {
         if (lastCheckedGroupPostion != position) {
-            groupsByDeviceType[lastCheckedGroupPostion].checked = false
+            groupsByDeviceType[lastCheckedGroupPostion].isCheckedInGroup = false
             groupAdapter.notifyItemRangeChanged(lastCheckedGroupPostion, 1)
         }
 
         lastCheckedGroupPostion = position
-        groupsByDeviceType[position].checked = !groupsByDeviceType[position].checked
+        groupsByDeviceType[position].isCheckedInGroup = !groupsByDeviceType[position].isCheckedInGroup
         currentGroup = if (groupsByDeviceType[position].isChecked)
             groupsByDeviceType[position]
         else
@@ -1060,7 +1045,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)

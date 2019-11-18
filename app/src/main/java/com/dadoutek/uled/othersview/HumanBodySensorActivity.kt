@@ -668,7 +668,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         changeCheckedViewData()
                     } else {
                         for (i in it.indices) {
-                            it[i].enableCheck = true
+                            it[i].isCheckedInGroup = true
                             it[i].checked = i == 0
                         }
                     }
@@ -1043,16 +1043,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var isAllCanCheck = true
         for (i in showCheckListData!!.indices) {
             if (showCheckListData!![0].meshAddr == 0xffff && showCheckListData!![0].checked) {//选中全部分组
-                showCheckListData!![0].enableCheck = true
+                showCheckListData!![0].isCheckedInGroup = true
 
                 if (showCheckListData!!.size > 1 && i > 0) {
-                    showCheckListData!![i].enableCheck = false
+                    showCheckListData!![i].isCheckedInGroup = false
                 }
 
             } else {
-                showCheckListData!![0].enableCheck = false
+                showCheckListData!![0].isCheckedInGroup = false
                 if (showCheckListData!!.size > 1 && i > 0) {
-                    showCheckListData!![i].enableCheck = true
+                    showCheckListData!![i].isCheckedInGroup = true
                 }
 
                 if (i > 0 && showCheckListData!![i].checked) {
@@ -1061,7 +1061,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
         }
         if (isAllCanCheck) {
-            showCheckListData!![0].enableCheck = true
+            showCheckListData!![0].isCheckedInGroup = true
         }
     }
 

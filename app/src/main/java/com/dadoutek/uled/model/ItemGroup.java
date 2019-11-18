@@ -25,7 +25,7 @@ public class ItemGroup implements Serializable {
                 ", temperature=" + temperature +
                 ", color=" + color +
                 ", gpName='" + gpName + '\'' +
-                ", enableCheck=" + enableCheck +
+                ", isCheckedInGroup=" + enableCheck +
                 ", checked=" + checked +
                 ", deviceType=" + deviceType +
                 ", isNo=" + isNo +
