@@ -85,6 +85,11 @@ class DeviceFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        initAdapterData()
+    }
+
     private fun initOnLayoutListener() {
         val view = activity?.window?.decorView
         val viewTreeObserver = view?.viewTreeObserver

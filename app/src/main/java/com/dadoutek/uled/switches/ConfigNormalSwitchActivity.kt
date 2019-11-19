@@ -137,13 +137,14 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             } else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
-                if(this != null && !this.isFinishing)
+                if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }
         }
         renameCancel?.setOnClickListener {
-            if(this != null && !this.isFinishing)
-            renameDialog?.dismiss()}
+            if (this != null && !this.isFinishing)
+                renameDialog?.dismiss()
+        }
 
         renameDialog = Dialog(this)
         renameDialog!!.setContentView(popReNameView)
@@ -162,17 +163,20 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
-        if (switchDate != null&&switchDate?.name!="")
+        if (switchDate != null && switchDate?.name != "")
             renameEditText?.setText(switchDate?.name)
         else {
-            val tv = (StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-" + DBUtils.getAllSwitch().size)
-            renameEditText?.setText(tv)
+            if (switchDate != null) {
+                val tv = (StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-" + DBUtils.getAllSwitch().size)
+                renameEditText?.setText(tv)
+            }
         }
         renameEditText?.setSelection(renameEditText?.text.toString().length)
-        if(this != null && !this.isFinishing){
-        renameDialog?.dismiss()
-        renameDialog?.show()
-    }}
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+    }
 
     private fun showCancelDialog() {
         AlertDialog.Builder(this)
@@ -245,7 +249,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                                     disconnect()
                                     if (switchDate == null)
                                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                                        showRenameDialog()
+                                    showRenameDialog()
                                 },
                                 failedCallback = {
                                     mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))

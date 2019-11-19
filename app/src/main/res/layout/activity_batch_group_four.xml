@@ -9,7 +9,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/dp_50"
         android:background="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,9 +66,8 @@
         <CheckBox
             android:id="@+id/batch_four_compatible_mode"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_gravity="end"
-            android:padding="@dimen/dp_5"
             android:textColor="@color/white"
             android:layout_marginEnd="@dimen/dp_10"
             android:button="@null"
@@ -205,7 +204,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/batch_four_device_recycle"
             android:layout_width="match_parent"
-            android:layout_height="224dp" />
+            android:layout_height="match_parent" />
         <TextView
             android:id="@+id/image_no_device"
             android:layout_width="match_parent"
@@ -256,6 +255,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/white"
         android:minHeight="150dp"/>
 
     <Button

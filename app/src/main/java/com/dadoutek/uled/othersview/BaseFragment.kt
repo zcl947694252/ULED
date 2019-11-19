@@ -74,18 +74,18 @@ open class BaseFragment : Fragment() {
     }
 
     //打开基类的连接状态变化监听
-    fun enableConnectionStatusListener() {
+    private fun enableConnectionStatusListener() {
         //先取消，这样可以确保不会重复添加监听
         TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
         TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
     //关闭基类的连接状态变化监听
-    fun disableConnectionStatusListener() {
+    private fun disableConnectionStatusListener() {
         TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
-    val StatusChangedListener = EventListener<String?> { event ->
+    private val StatusChangedListener = EventListener<String?> { event ->
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
                 onDeviceStatusChanged(event as DeviceEvent)

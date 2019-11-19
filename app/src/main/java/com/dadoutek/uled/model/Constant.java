@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 public class Constant implements Serializable {
 
+
+
     //正式服务器
     //#define HTTPSERVER @"https://dev.dadoutek.com/smartlight_java"
     //#define SOCKETSERVER @"ws://dev.dadoutek.com/smartlight_java/websocket-endpoint"
@@ -26,6 +28,8 @@ public class Constant implements Serializable {
     public static final int MAX_GROUP_COUNT = 250;
     public static final int MAX_VALUE = 100;
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
+    public static  boolean isTeck = false;
+    //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
     public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";

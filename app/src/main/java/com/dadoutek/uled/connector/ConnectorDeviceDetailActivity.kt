@@ -637,7 +637,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         }
                         ,
                         {
-
                             LogUtils.d(it)
                         }
                 )

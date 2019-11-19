@@ -1379,14 +1379,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }
 
-        } else{
+        } else if (mAddDeviceType == DeviceType.SMART_CURTAIN){
+            startGrouping()
+        }else{
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
             intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
             LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
             //intent.putParcelableArrayListExtra("data",mAddedDevices as ArrayList<ScannedDeviceItem>)
             startActivity(intent)
             finish()
-         //   startGrouping()
         }
     }
 

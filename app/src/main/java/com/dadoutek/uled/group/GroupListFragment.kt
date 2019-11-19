@@ -194,7 +194,7 @@ class GroupListFragment : BaseFragment() {
         toolbar!!.setTitle(R.string.group_title)
 
         allLightText = view.findViewById(R.id.textView6)
-        val btn_delete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
+        val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
@@ -235,7 +235,7 @@ class GroupListFragment : BaseFragment() {
         btnSet?.setOnClickListener(onClick)
         onText?.setOnClickListener(onClick)
         offText?.setOnClickListener(onClick)
-        btn_delete.setOnClickListener(onClick)
+        btnDelete.setOnClickListener(onClick)
         allLightText?.setOnClickListener(onClick)
 
         return view
@@ -412,7 +412,6 @@ class GroupListFragment : BaseFragment() {
                 device.name = stringName[i]
                 deviceName!!.add(device)
             }
-
 
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.navigationIcon = null

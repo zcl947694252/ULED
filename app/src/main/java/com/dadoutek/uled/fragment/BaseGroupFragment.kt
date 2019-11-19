@@ -79,6 +79,8 @@ abstract class BaseGroupFragment : BaseFragment() {
     private lateinit var deleteList: ArrayList<DbGroup>
     private var addNewGroup: Button? = null
     private var compositeDisposable = CompositeDisposable()
+    private var isDeleteSucess = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,19 +119,23 @@ abstract class BaseGroupFragment : BaseFragment() {
                         if (groupList[i].isSelected)
                             deleteList.add(groupList[i])
                     }
-
+                    isDeleteSucess = false
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
                         Thread.sleep(300)
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j],
                                 successCallback = {
-                                    hideLoadingDialog()
-                                    isDelete = false
-                                    sendDeleteBrocastRecevicer(300)
-                                    refreshData()
+                                    isDeleteSucess = true
+                                    if (j == deleteList.size - 1 && isDeleteSucess) {
+                                        hideLoadingDialog()
+                                        isDelete = false
+                                        sendDeleteBrocastRecevicer(300)
+                                        refreshData()
+                                    }
                                 },
                                 failedCallback = {
-                                    hideLoadingDialog()
+                                    if (j == deleteList.size - 1)
+                                        hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
@@ -153,7 +159,6 @@ abstract class BaseGroupFragment : BaseFragment() {
         }
         localBroadcastManager.registerReceiver(br, intentFilter)
     }
-
 
 
     private fun sendDeleteBrocastRecevicer(delayTime: Long) {

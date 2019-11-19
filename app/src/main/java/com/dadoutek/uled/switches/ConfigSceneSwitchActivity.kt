@@ -119,8 +119,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 progressBar.visibility = View.VISIBLE
                 GlobalScope.launch {
                     setSceneForSwitch()
-                     newMeshAddr = MeshAddressGenerator().meshAddress
-                    Commander.updateMeshName(newMeshAddr = newMeshAddr,successCallback = {
+                    newMeshAddr = MeshAddressGenerator().meshAddress
+                    Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mIsConfiguring = true
                         disconnect()
                     },
@@ -142,16 +142,16 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
-        if (switchDate != null&&switchDate?.name!="")
+        if (switchDate != null && switchDate?.name != "")
             renameEditText?.setText(switchDate?.name)
-        else
+        else if (switchDate != null)
             renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
                     + DBUtils.getAllSwitch().size)
         renameEditText?.setSelection(renameEditText?.text.toString().length)
 
-        if(this != null && !this.isFinishing) {
+        if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
-        renameDialog?.show()
+            renameDialog?.show()
         }
     }
 
@@ -495,17 +495,20 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showShort(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-                DBUtils.updateSwicth(switchDate!!)
-                if(this != null && !this.isFinishing)
+                if (switchDate != null)
+                    DBUtils.updateSwicth(switchDate!!)
+                else
+                    ToastUtils.showShort(getString(R.string.rename_faile))
+                if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }
         }
 
 
         renameCancel?.setOnClickListener {
-            if(this != null && !this.isFinishing)
+            if (this != null && !this.isFinishing)
                 renameDialog?.dismiss()
-            }
+        }
 
         renameDialog = Dialog(this)
         renameDialog!!.setContentView(popReNameView)

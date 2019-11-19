@@ -829,12 +829,14 @@
     <string name="compatible_mode">兼容模式</string>
     <string name="direck_light">直连灯:</string>
     <string name="get_data_please_wait">加载数据中,请稍后</string>
-    <string name="grouping_success_tip">分组成功,请重新保存与该分组设备相关的场景</string>
+    <string name="grouping_success_tip">设备重新分组成功后,请重新保存与该分组设备相关的场景</string>
     <string name="no_scaned_device">未扫描到指定设备</string>
     <string name="timeout_period_is_empty">超时时间为空</string>
     <string name="timeout_time_less_ten">超时时间不能小于10秒钟</string>
     <string name="timeout_255">超时时间不能大于255秒钟</string>
     <string name="timeout_1m">超时时间不能小于1分钟</string>
     <string name="timeout_255_big">超时时间不能大于255分钟</string>
+    <string name="compatibility_mode">如果勾选设备后，灯没有闪烁，请再次开启兼容模式</string>
+    <string name="rename_faile">重命名失败</string>
 
 </resources>

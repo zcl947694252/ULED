@@ -150,6 +150,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initListener() {
+        login_isTeck.setOnCheckedChangeListener { _, isChecked ->
+            Constant.isTeck = isChecked
+        }
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)

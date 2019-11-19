@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -26,7 +25,6 @@ import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -130,13 +128,15 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun initView() {
-        toolbarTv.text = getString(R.string.batch_group)
+        toolbar.setTitleTextColor(getColor(R.color.white))
+        toolbar.title = getString(R.string.batch_group)
         image_bluetooth.visibility = View.VISIBLE
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
             ToastUtils.showShort(getString(R.string.grouping_success_tip))
-            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+            setDeviceTypeDataStopBlink(deviceType)
+            finish()
         }
 
         if (TelinkApplication.getInstance().connectDevice == null)
@@ -194,11 +194,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      */
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setGroupData(deviceType: Int) {
+        currentGroup = null
         groupsByDeviceType.clear()
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(deviceType))
+        groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(0))
 
         if (!isAddGroupEmptyView)
             groupAdapter.emptyView = emptyGroupView
+
+        for (i in groupsByDeviceType.indices)
+            groupsByDeviceType[i].isCheckedInGroup = false
 
         isAddGroupEmptyView = true
         groupAdapter.notifyItemRangeChanged(0,groupsByDeviceType.size)
@@ -214,17 +219,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 changeGroupingCompleteState(selectRelays.size)
             }
         }
-
-        groupAdapter.setOnItemClickListener { _, _, position ->
-            //如果点中的不是上次选中的组则恢复未选中状态
-            changeGroupSelectView(position)
-        }
-
-        groupAdapter?.setOnItemLongClickListener { _, _, position ->
-            showGroupForUpdateNameDialog(position)
-            false
-        }
-
     }
 
     private fun showGroupForUpdateNameDialog(position: Int) {
@@ -452,6 +446,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
 
                 for (i in deviceDataLightAll.indices) {//获取组名 将分组与未分组的拆分
+                    deviceDataLightAll[i].selected = false
                     if (StringUtils.getLightGroupName(deviceDataLightAll[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                         deviceDataLightAll[i].groupName = ""
                         noGroup.add(deviceDataLightAll[i])
@@ -466,6 +461,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
 
                 for (i in deviceDataCurtainAll.indices) {//获取组名 将分组与未分组的拆分
+                    deviceDataCurtainAll[i].selected = false
                     if (StringUtils.getCurtainName(deviceDataCurtainAll[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                         deviceDataCurtainAll[i].groupName = ""
                         noGroupCutain.add(deviceDataCurtainAll[i])
@@ -480,6 +476,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 deviceDataRelayAll.addAll(DBUtils.getAllRelay())
 
                 for (i in deviceDataRelayAll.indices) {//获取组名 将分组与未分组的拆分
+                    deviceDataRelayAll[i].selected = false
                     if (StringUtils.getConnectorName(deviceDataRelayAll[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                         deviceDataRelayAll[i].groupName = ""
                         noGroupRelay.add(deviceDataRelayAll[i])
@@ -523,6 +520,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
             isCompatible = isChecked
+            if (!isCompatible){
+                ToastUtils.showShort(getString(R.string.compatibility_mode))
+            }
             LogUtils.v("zcl是否选中$isChecked")
         }
 
@@ -542,7 +542,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 autoConnect()
         }
 
+        groupAdapter.setOnItemClickListener { _, _, position ->
+            //如果点中的不是上次选中的组则恢复未选中状态
+            changeGroupSelectView(position)
+        }
+
+        groupAdapter?.setOnItemLongClickListener { _, _, position ->
+            showGroupForUpdateNameDialog(position)
+            false
+        }
+
         btnAddGroups?.setOnClickListener { addNewGroup() }
+
+        //如果adapter内部使用了addLongclicklistener 那么外部必须使用longchildren否则addLongClick无效
         lightAdapter.setOnItemClickListener { _, _, position ->
             deviceData[position].selected = !deviceData[position].selected
             if (deviceData[position].isSelected) {
@@ -558,9 +570,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
         lightAdapter.setOnItemLongClickListener { _, _, position ->
             renameLight(deviceData[position])
-
             false
         }
+
 
         relayAdapter.setOnItemClickListener { _, _, position ->
             deviceDataRelay[position].selected = !deviceDataRelay[position].selected
@@ -646,6 +658,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("CheckResult")
     private fun setGroup(deviceType: Int) {
+        setDeviceTypeDataStopBlink(deviceType)
+        disposableGroupTimer?.dispose()
+        disposableGroupTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.group_fail_tip))
+                }
+        setGroupOneByOne(currentGroup!!, deviceType, 0)
+    }
+
+    private fun setDeviceTypeDataStopBlink(deviceType: Int) {
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 showLoadingDialog(resources.getString(R.string.grouping_wait_tip, selectLights.size.toString()))
@@ -656,7 +681,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.SMART_CURTAIN -> {
                 showLoadingDialog(resources.getString(R.string.grouping_wait_tip, selectCurtains.size.toString()))
-                for (curtain in   selectCurtains) {//使用选中一个indices 出现java.lang.IndexOutOfBoundsException: Invalid index 0, size is 0
+                for (curtain in selectCurtains) {//使用选中一个indices 出现java.lang.IndexOutOfBoundsException: Invalid index 0, size is 0
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(curtain.meshAddr, curtain.belongGroupId)
                 }
@@ -669,18 +694,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
             }
         }
-        disposableGroupTimer?.dispose()
-        disposableGroupTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.group_fail_tip))
-                }
-        setGroupOneByOne(currentGroup!!, deviceType, 0)
     }
 
     private fun completeGroup(deviceType: Int) {
+        hideLoadingDialog()
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 //取消分组成功的勾选的灯
@@ -858,7 +875,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val failedCallback: () -> Unit = {
             disposableGroupTimer?.dispose()
             ToastUtils.showLong(R.string.group_fail_tip)
-            hideLoadingDialog()
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     dbLight?.belongGroupId = allLightId
@@ -907,14 +923,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val group: DbGroup
         val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
         group = when (groupOfTheLight) {
-            null -> currentGroup!!
+            null -> currentGroup?:DbGroup()
             else -> groupOfTheLight
         }
         val groupAddress = group.meshAddr
         Log.d("zcl", "startBlink groupAddresss = $groupAddress")
         newStartBlinkOpcode(groupAddress, meshAddr, false)
 
-        val disposable = mBlinkDisposables.get(meshAddr)
+        val disposable = mBlinkDisposables?.get(meshAddr)
         disposable?.dispose()
     }
 
@@ -1012,14 +1028,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun changeGroupSelectView(position: Int) {
-        if (lastCheckedGroupPostion != position) {
+        if (lastCheckedGroupPostion != position&&lastCheckedGroupPostion!=1000) {
             groupsByDeviceType[lastCheckedGroupPostion].isCheckedInGroup = false
             groupAdapter.notifyItemRangeChanged(lastCheckedGroupPostion, 1)
         }
 
         lastCheckedGroupPostion = position
         groupsByDeviceType[position].isCheckedInGroup = !groupsByDeviceType[position].isCheckedInGroup
-        currentGroup = if (groupsByDeviceType[position].isChecked)
+        currentGroup = if (groupsByDeviceType[position].isCheckedInGroup)
             groupsByDeviceType[position]
         else
             null
@@ -1158,10 +1174,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      */
     private fun startBlink(belongGroupId: Long, meshAddr: Int) {
         val group: DbGroup
-        if (currentGroup != null) {
             val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
             group = when (groupOfTheLight) {
-                null -> currentGroup!!
+                null -> currentGroup?:DbGroup()
                 else -> groupOfTheLight
             }
             val groupAddress = group.meshAddr
@@ -1183,7 +1198,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             } else {
                 newStartBlinkOpcode(groupAddress, meshAddr, true)
             }
-        }
+
     }
 
     private fun newStartBlinkOpcode(groupAddress: Int, meshAddr: Int, isStart: Boolean) {
@@ -1248,6 +1263,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     override fun onBackPressed() {
         super.onBackPressed()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        setDeviceTypeDataStopBlink(deviceType)
+        checkNetworkAndSync(this)
+        ToastUtils.showShort(getString(R.string.grouping_success_tip))
+        finish()
     }
 }

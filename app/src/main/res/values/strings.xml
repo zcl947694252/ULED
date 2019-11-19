@@ -906,12 +906,14 @@
     <string name="compatible_mode">compatible_mode</string>
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
-    <string name="grouping_success_tip">Grouping succeeded, please save the scene related to the grouping device again</string>
+    <string name="grouping_success_tip">After successful regrouping of devices, please save the scene related to the grouping device again</string>
     <string name="no_scaned_device">The specified device was not scanned</string>
     <string name="timeout_period_is_empty">The timeout period is empty</string>
     <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
     <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
     <string name="timeout_1m">The timeout cannot be less than 1 minute</string>
     <string name="timeout_255_big">The timeout cannot be greater than 255 minutes</string>
+    <string name="compatibility_mode">if the light does not flash, please turn on the compatibility mode.</string>
+    <string name="rename_faile">Rename failed</string>
 
 </resources>

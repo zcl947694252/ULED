@@ -48,7 +48,7 @@
     <ImageView
         android:id="@+id/device_detail_item_arr"
         android:layout_width="8dp"
-        android:layout_height="15dp"
+        android:layout_height="match_parent"
         android:src="@drawable/icon_arrow"/>
 
 

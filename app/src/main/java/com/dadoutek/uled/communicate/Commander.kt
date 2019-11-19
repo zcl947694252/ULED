@@ -274,6 +274,7 @@ object Commander : EventListener<String> {
         val params = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte()) //0x00 代表删除组
 
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
+
         Observable.interval(0, 500, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

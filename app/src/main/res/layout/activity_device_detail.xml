@@ -81,16 +81,15 @@
             </LinearLayout>
 
         </RelativeLayout>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycleView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:paddingBottom="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:paddingBottom="10dp" />
     </LinearLayout>
-
-
     <RelativeLayout
         android:id="@+id/no_device_relativeLayout"
         android:layout_width="match_parent"
@@ -110,6 +109,7 @@
             android:layout_marginTop="170dp"
             android:src="@drawable/no_device" />
     </RelativeLayout>
+
 
     <include
         android:id="@+id/dialog_device"
