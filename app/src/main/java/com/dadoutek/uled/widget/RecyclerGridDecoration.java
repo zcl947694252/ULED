@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.app.hubert.guide.util.LogUtil;
 import com.app.hubert.guide.util.ScreenUtils;
 import com.dadoutek.uled.R;
 
@@ -30,7 +31,7 @@ public class RecyclerGridDecoration extends RecyclerView.ItemDecoration {
     private int mColumn;
     private Context mContext;
     private int mTotalCount;
-    private boolean isAllScreen;
+    private boolean isAllScreen = true;
 
     public RecyclerGridDecoration(Context context, int column) {
         super();
@@ -96,14 +97,18 @@ public class RecyclerGridDecoration extends RecyclerView.ItemDecoration {
                     //bottom
                     c.drawLine(x, y + height, ScreenUtils.getScreenWidth(mContext), y + height, paint);
                     //right
-                    c.drawLine(x + width, y, x + width, y + height + divider.getIntrinsicHeight() / 2, paint);
+//                    c.drawLine(x + width, y, x + width, y + height + divider.getIntrinsicHeight() / 2, paint);
+                    LogUtil.d("isAllScreen = true draw line x = " + (x + width));
                 }
             } else {//不满足list.size()%column==0，bottomLine不全屏
                 if ((temp <= remainder) || (temp <= mColumn && remainder == 0)) {
                     //bottom
                     c.drawLine(x, y + height, x + width, y + height, paint);
+
                     //right
-                    c.drawLine(x + width, y, x + width, y + height + divider.getIntrinsicHeight() / 2, paint);
+//                    c.drawLine(x + width, y, x + width, y + height + divider.getIntrinsicHeight() / 2, paint);
+
+                    LogUtil.d("draw line x = " + (x + width));
                 }
             }
         }
@@ -121,10 +126,10 @@ public class RecyclerGridDecoration extends RecyclerView.ItemDecoration {
         int temp = mTotalCount - position;
         //这里判断，是为了list.size()%column==0且是最后一列
         //或者最后一列有余数，在这两种情况下，才需要去画bottomLine
-        if ((temp <= remainder) || (temp <= mColumn && remainder == 0)) {
-            //设置bottom留的边框值，这样画的bottomLine才能看见
-            bottom = divider.getIntrinsicHeight();
-        }
+//        if ((temp <= remainder) || (temp <= mColumn && remainder == 0)) {
+//            //设置bottom留的边框值，这样画的bottomLine才能看见
+//            bottom = divider.getIntrinsicHeight();
+//        }
         outRect.set(left, top, right, bottom);
     }
 }
