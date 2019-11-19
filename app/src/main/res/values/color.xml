@@ -43,4 +43,5 @@
     <color name="blue_dark">#0083B3</color>
     <color name="gray_c">#ccc</color>
     <color name="gray_d">#ddd</color>
+    <color name="device_list_divider">#F8F8F8</color>
 </resources>
