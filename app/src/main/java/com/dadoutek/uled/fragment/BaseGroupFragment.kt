@@ -347,9 +347,9 @@ abstract class BaseGroupFragment : BaseFragment() {
             R.id.btn_set, R.id.curtain_setting -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
+                  /*  if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showShort(getString(R.string.author_region_warm))
-                    else {
+                    else {*/
                         if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
                             var num = 0
                             when (groupType) {
@@ -390,7 +390,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                         }
                     }
-                }
+                //}
             }
 
             R.id.selected_group -> {

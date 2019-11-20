@@ -43,7 +43,6 @@ object DBUtils {
         get() = DaoSessionInstance.getInstance().dbConnectorDao.loadAll()
 
     val sceneList: MutableList<DbScene>
-        //人体感应器
         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()

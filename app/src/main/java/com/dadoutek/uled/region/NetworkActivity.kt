@@ -246,7 +246,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         list = if (!isMeRegionAll) subMeList else listAll
 
-//        Log.e(TAG, "zcl******me**${list!!.size}")
         region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
         Log.e("zcl_NetworkActivity", "zcl***设置adapter***$lastUser")
@@ -321,6 +320,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 //不是使用中的
                 if (lastUser.last_authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString() || regionBeanAuthorize!!.id.toString() != lastUser.last_region_id)
                     setChangeDialog()
+
             }
             R.id.item_area_more -> setPopDataAuthorize(position, list)
         }
@@ -391,8 +391,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         when (view.id) {
             R.id.item_area_state -> {
                 //不是使用中的
-                if (lastUser!!.last_authorizer_user_id != lastUser!!.id.toString() || regionBean!!.id.toString() != lastUser!!.last_region_id)
+                if (lastUser!!.last_authorizer_user_id != lastUser!!.id.toString() || regionBean!!.id.toString() != lastUser!!.last_region_id) {
                     setChangeDialog()
+                }
             }
             R.id.item_area_more -> setPopData(position, list)
         }
@@ -425,6 +426,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_delete_net -> {
                 // if (regionBean!!.count_all <= 0) {
+                if (isShowType == 1)
+                    ToastUtils.showShort(getString(R.string.delete_region_tip))
                 RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
                     LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
                     PopUtil.dismiss(pop)
@@ -512,10 +515,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun changeRegion() {
         when (isShowType) {
-            1 -> if (lastUser!!.last_authorizer_user_id != lastUser!!.id.toString() || regionBean!!.id.toString() != lastUser!!.last_region_id) {
+            1 -> if (lastUser!!.last_authorizer_user_id != lastUser!!.id.toString() || regionBean!!.id.toString() != lastUser!!.last_region_id) {//切换的不是正在使用的区域
                 checkNetworkAndSyncRegion(this)
             }
-            2 -> if (lastUser!!.last_authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString() || regionBeanAuthorize!!.id.toString() != lastUser!!.last_region_id) {
+            2 -> if (lastUser!!.last_authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString() || regionBeanAuthorize!!.id.toString() != lastUser!!.last_region_id) {//不是自己的区域
                 checkNetworkAndSyncRegion(this)
             }
         }
@@ -623,7 +626,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         viewAdd?.let {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
-                if (name.text.toString() == "") {
+                if (com.blankj.utilcode.util.StringUtils.isTrimEmpty(name.text.toString())) {
                     ToastUtils.showShort(getString(R.string.please_input_region_name))
                     return@setOnClickListener
                 }
@@ -666,7 +669,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 val isFristRegionBean = regionBean!!.id.toInt() == 1
 
 
-                itView.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + regionBean?.authorizer_id
+                itView.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser!!.phone
 
                 LogUtils.e("zcl", "zcl***tankuang***$isUseingRegionId-----------$isLastUserID")
 
@@ -800,9 +803,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //下拉数据
             SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGets)
 
-            view?.findViewById<LinearLayout>(R.id.pop_unbind_net_ly)?.isClickable = false
-            view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.drawable.icon_untied)
-
+            //view?.findViewById<LinearLayout>(R.id.pop_unbind_net_ly)?.isClickable = false
+            //view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.drawable.icon_untied)
             isShowType = 3
         }
     }

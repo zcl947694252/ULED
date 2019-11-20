@@ -226,7 +226,7 @@ class DeviceFragment : BaseFragment() {
             }
             Constant.INSTALL_SWITCH -> {
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
             }
             Constant.INSTALL_SENSOR -> {
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)

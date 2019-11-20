@@ -1079,6 +1079,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun initType() {
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
             initDataGroup()

@@ -89,6 +89,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun initData() {
+        //startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         tvLightVersionText?.text = intent.getStringExtra("version")
 
@@ -122,6 +123,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     newMeshAddr = MeshAddressGenerator().meshAddress
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mIsConfiguring = true
+                        if (switchDate == null)
+                            switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                         disconnect()
                     },
                             failedCallback = {
@@ -379,10 +382,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
-            pwd = mesh.factoryPassword.toString()
+        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+            mesh.factoryPassword.toString()
         } else {
-            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
+            NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
                     .substring(0, 16)
         }
         connectParams.setPassword(pwd)
@@ -409,22 +412,24 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 
             LightAdapter.STATUS_LOGOUT -> {
-                if (mIsDisconnecting) {
-                    this.mApplication.removeEventListener(this)
+                when {
+                    mIsDisconnecting -> {
+                        this.mApplication.removeEventListener(this)
 
-                    GlobalScope.launch(Dispatchers.Main) {
-                        delay(200)
-                        progressBar.visibility = View.GONE
-                        finish()
+                        GlobalScope.launch(Dispatchers.Main) {
+                            delay(200)
+                            progressBar.visibility = View.GONE
+                            finish()
+                        }
                     }
-                } else if (mIsConfiguring) {
-                    this.mApplication.removeEventListener(this)
-                    GlobalScope.launch(Dispatchers.Main) {
-                        progressBar.visibility = View.GONE
-                        showConfigSuccessDialog()
+                    mIsConfiguring -> {
+                        this.mApplication.removeEventListener(this)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            progressBar.visibility = View.GONE
+                            showConfigSuccessDialog()
+                        }
                     }
-                } else {
-                    showDisconnectSnackBar()
+                    else -> showDisconnectSnackBar()
                 }
             }
         }
@@ -516,6 +521,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            if (switchDate!=null)
             DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }

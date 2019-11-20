@@ -138,6 +138,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //设置屏幕常亮
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_device_scanning)
+        TelinkLightService.Instance()?.idleMode(true)
         initData()
         initView()
         initClick()
@@ -489,7 +490,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun sureGroups() {
-        if (isSelectLight) {
+        if (isSelectLight&&TelinkLightApplication.getApp().connectDevice!=null) {
             //进行分组操作
             //获取当前选择的分组
             val group = currentGroup

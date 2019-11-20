@@ -142,7 +142,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 device_detail_direct_group_name.visibility = View.GONE
             else
                 device_detail_direct_group_name.visibility = View.VISIBLE
-
+            getString(R.string.rename)
             setTopLightState()
 
             device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }

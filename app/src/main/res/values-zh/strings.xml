@@ -838,5 +838,6 @@
     <string name="timeout_255_big">超时时间不能大于255分钟</string>
     <string name="compatibility_mode">如果勾选设备后，灯没有闪烁，请再次开启兼容模式</string>
     <string name="rename_faile">重命名失败</string>
+    <string name="delete_region_tip">删除该区域先把该区域已有的设备恢复出厂…</string>
 
 </resources>

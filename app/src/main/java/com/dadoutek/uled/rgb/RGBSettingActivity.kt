@@ -331,7 +331,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }
     }
 
-    @SuppressLint("CheckResult")
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(light!!.meshAddr)
@@ -733,17 +732,16 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     @SuppressLint("HandlerLeak")
     private val handler_less = object : Handler() {
-        @SuppressLint("SetTextI18n")
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             sb_w_bright.progress--
             when {
-                sb_w_bright.progress < 1 -> {
+                sb_w_bright.progress < 0 -> {
                     sb_w_bright_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 1 -> {
+                sb_w_bright.progress == 0 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
                     stopTracking = false
@@ -921,8 +919,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     buildInModeList!![i].select = false
                 }
                 rgbGradientAdapter!!.notifyDataSetChanged()
-                if (postionAndNum?.position == position)
-                    stopGradient()
+                stopGradient()
 
                 for (i in diyGradientList!!.indices) {
                     diyGradientList!![i].select = false
@@ -936,10 +933,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
                     GlobalScope.launch {
                         speed = it
-                        //stopGradient()
+                        stopGradient()
                         delay(200)
                         postionAndNum?.speed = speed
-                       // Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                     }
                 })
                 dialog.show()
@@ -1052,18 +1049,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
 
             R.id.diy_mode_off -> {
-                if (diyPosition == position) {
-                    Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
-                    diyPosition = 100
-                    diyGradientList!![position].select = false
-                    rgbDiyGradientAdapter!!.notifyItemChanged(position)
-                    DBUtils.updateGradient(diyGradientList!![position])
+                diyPosition = 100
+                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
+                diyGradientList!![position].select = false
+                rgbDiyGradientAdapter!!.notifyItemChanged(position)
+                DBUtils.updateGradient(diyGradientList!![position])
 
-                    for (i in buildInModeList!!.indices) {
-                        buildInModeList!![i].select = false
-                    }
-                    rgbGradientAdapter!!.notifyDataSetChanged()
+                for (i in buildInModeList!!.indices) {
+                    buildInModeList!![i].select = false
                 }
+                rgbGradientAdapter!!.notifyDataSetChanged()
+
             }
 
             R.id.diy_mode_set -> {
@@ -1266,7 +1262,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 if (ws > Constant.MAX_VALUE)
                     ws = Constant.MAX_VALUE
 
-                if (ws <1) {
+                if (ws == -1) {
                     ws = 1
                     showW = 1
                 }
@@ -1546,7 +1542,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
             LightAdapter.STATUS_CONNECTED -> {
 
-                if (TelinkLightApplication.getApp().connectDevice == null)
+                if (!TelinkLightService.Instance()!!.isLogin)
                     login()
                 hideLoadingDialog()
             }
@@ -1880,7 +1876,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 if (w > Constant.MAX_VALUE) {
                     w = Constant.MAX_VALUE
                 }
-                if (w <1) {
+                if (w == -1) {
                     w = 1
                     showW = 1
                 }
@@ -2102,7 +2098,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 brightness = if (progress > Constant.MAX_VALUE) {
                     Constant.MAX_VALUE
                 } else {
-                    if (progress>0) progress else 1
+                    /*if (progress>0) */progress /*else 1*/
                 }
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(brightness.toByte())
@@ -2155,7 +2151,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 w = if (progress > Constant.MAX_VALUE) {
                     Constant.MAX_VALUE
                 } else {
-                     if (progress>0) progress else 1
+                    /* if (progress>0) */progress /*else 1*/
                 }
                 params = byteArrayOf(w.toByte())
                 var color = 0

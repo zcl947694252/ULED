@@ -59,8 +59,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var guideShowCurrentPage = false
     private val DATA_LIST_KEY = "DATA_LIST_KEY"
     private val SCENE_KEY = "SCENE_KEY"
-    private var isFrist = true
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,6 +148,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
         } else {
             isResult = false
+//            showGroupList = ArrayList()
         }
         if (isChangeScene && !isResult) {
             scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
@@ -447,7 +446,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         if (!currentPageIsEdit) {
             saveScene()
         } else {
-            sceneGroupAdapter.notifyDataSetChanged()
+            showDataListView()
             stepEndGuide()
         }
     }

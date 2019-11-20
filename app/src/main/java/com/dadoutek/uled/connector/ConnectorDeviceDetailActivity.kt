@@ -19,6 +19,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
@@ -115,7 +116,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         toolbar.setNavigationOnClickListener {
             finish()
         }
-
         toolbar.title = getString(R.string.relay) + " (" + lightsData.size + ")"
 
     }
@@ -474,14 +474,29 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
+                    batchGroup.visibility = View.VISIBLE
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this,
+                    /*    val intent = Intent(this,
                                 ConnectorBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("relayType", "all_relay")
-                        startActivity(intent)
+                        startActivity(intent)*/
+                        if (TelinkLightApplication.getApp().connectDevice != null) {
+                            val lastUser = DBUtils.lastUser
+                            lastUser?.let {
+                                if (it.id.toString() != it.last_authorizer_user_id)
+                                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                                else {
+                                        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                                        startActivity(intent)
+                                }
+                            }
+                        } else {
+                            autoConnect()
+                            ToastUtils.showShort(getString(R.string.connecting_tip))
+                        }
                     }
                 } else {
                     recycleView.visibility = View.GONE

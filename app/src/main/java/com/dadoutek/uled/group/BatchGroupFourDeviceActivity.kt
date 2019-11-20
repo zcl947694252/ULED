@@ -240,6 +240,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         if (group != null)
                             DBUtils.updateGroup(group)
                         groupAdapter?.notifyItemRangeChanged(position, 1)
+                        setDevicesData(deviceType)
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
@@ -523,6 +524,20 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             if (!isCompatible){
                 ToastUtils.showShort(getString(R.string.compatibility_mode))
             }
+
+            when (deviceType) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                    for (db in selectLights) {//获取组名 将分组与未分组的拆分
+                        startBlink(db.belongGroupId, db.meshAddr)
+                    }
+                }
+
+                DeviceType.SMART_RELAY -> {
+                    for (db in selectRelays) {//获取组名 将分组与未分组的拆分
+                        startBlink(db.belongGroupId, db.meshAddr)
+                    }
+                }
+            }
             LogUtils.v("zcl是否选中$isChecked")
         }
 
@@ -725,6 +740,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
 
+        if (currentGroup!=null)
+        DBUtils.updateGroup(currentGroup!!)//更新组类型
 
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {
@@ -832,14 +849,17 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 dbLight = selectLights[index]
                 deviceMeshAddr = dbLight.meshAddr
+                currentGroup?.deviceType = dbLight.productUUID.toLong()
             }
             DeviceType.SMART_CURTAIN -> {
                 dbCurtain = selectCurtains[index]
                 deviceMeshAddr = dbCurtain.meshAddr
+                currentGroup?.deviceType = dbCurtain.productUUID.toLong()
             }
             DeviceType.SMART_RELAY -> {
                 dbRelay = selectRelays[index]
                 deviceMeshAddr = dbRelay.meshAddr
+                currentGroup?.deviceType = dbRelay.productUUID.toLong()
             }
         }
 
@@ -1035,6 +1055,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         lastCheckedGroupPostion = position
         groupsByDeviceType[position].isCheckedInGroup = !groupsByDeviceType[position].isCheckedInGroup
+
         currentGroup = if (groupsByDeviceType[position].isCheckedInGroup)
             groupsByDeviceType[position]
         else
@@ -1176,7 +1197,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val group: DbGroup
             val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
             group = when (groupOfTheLight) {
-                null -> currentGroup?:DbGroup()
+                null -> currentGroup?: DbGroup()
                 else -> groupOfTheLight
             }
             val groupAddress = group.meshAddr

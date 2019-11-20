@@ -48,8 +48,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-    private var getVersionRetryMaxCount = 2
-    private var getVersionRetryCount = 0
 
     private var modeStartUpMode = 0
     private var modeDelayUnit = 0
@@ -75,8 +73,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             autoConnectSensor()
         val version = intent.getStringExtra("version")
         getVersion(version)
-       /* else
-            getVersion()*/
     }
 
     private fun initListener() {
@@ -112,12 +108,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             DeviceEvent.CURRENT_CONNECT_CHANGED -> Log.e("zcl", "zcl******CURRENT_CONNECT_CHANGED")
 
             DeviceEvent.STATUS_CHANGED -> {
+                hideLoadingDialog()
                 progressBar_sensor.visibility = View.GONE
                 var status = (event as DeviceEvent).args.status
                 Log.e("zcl", "zcl******STATUS_CHANGED$status")
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {
-                        hideLoadingDialog()
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         Log.e("zcl", "zcl***STATUS_LOGIN***")
                     }
@@ -197,7 +193,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             when (item.deviceType) {
                 Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
                 Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
-                    if (item.deviceCount>0)
+                    if (item.deviceCount>0||item.deviceType==Constant.DEVICE_TYPE_NO)
                         mGroupsName!!.add(item.name)
                 }
             }

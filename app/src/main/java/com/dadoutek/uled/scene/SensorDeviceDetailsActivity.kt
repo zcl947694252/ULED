@@ -160,6 +160,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         acitivityIsAlive = false
         if (popupWindow != null && popupWindow!!.isShowing)
             popupWindow!!.dismiss()
+        compositeDisposable.dispose()
         this.mApplication?.removeEventListener(this)
     }
 
@@ -648,6 +649,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         .subscribe {
                                             relocationSensor()
                                         }
+                                disposableTimer?.dispose()
                             }
                             OTA_SENSOR -> {//人体感应器ota
                                 getVersion(true)
