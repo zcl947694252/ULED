@@ -312,6 +312,7 @@ object Commander : EventListener<String> {
     fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
         mDstAddr = dstAddr
+
         mTargetGroupAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令

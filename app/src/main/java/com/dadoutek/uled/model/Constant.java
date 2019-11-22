@@ -1,7 +1,5 @@
 package com.dadoutek.uled.model;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
 
 /**
@@ -308,6 +306,5 @@ public class Constant implements Serializable {
     //是否是重新配置
     public static final String ISCONFIRM ="isConfirm";
     public static  boolean isCreat = false;
-    @NotNull
     public static final String DEVICE_NUM = "DEVICE_NUM";
 }

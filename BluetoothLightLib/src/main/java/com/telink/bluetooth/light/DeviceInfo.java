@@ -12,6 +12,7 @@ import java.util.Arrays;
 /**
  * 设备信息类
  */
+
 public class DeviceInfo implements Parcelable {
 
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {

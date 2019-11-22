@@ -1389,13 +1389,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             for (item in mAddedDevices) {
                 mAddedDevicesInfos.add(item.deviceInfo)
-                intent.putParcelableArrayListExtra(Constant.DEVICE_NUM, mAddedDevicesInfos)
-
-                LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
-                //intent.putParcelableArrayListExtra("data",mAddedDevices as ArrayList<ScannedDeviceItem>)
-                startActivity(intent)
-                finish()
             }
+
+            LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
+            intent.putParcelableArrayListExtra(Constant.DEVICE_NUM,mAddedDevicesInfos)
+            startActivity(intent)
+            finish()
         }
 
         fun onDestroy() {
