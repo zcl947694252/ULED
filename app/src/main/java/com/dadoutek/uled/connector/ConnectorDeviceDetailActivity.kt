@@ -57,7 +57,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  */
 class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private var type: Int? = null
-    private lateinit var lightsData: MutableList<DbConnector>
+    private val lightsData: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var adaper: DeviceDetailConnectorAdapter? = null
     private var currentLight: DbConnector? = null
@@ -84,14 +84,14 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         setContentView(R.layout.activity_connector_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-        initDate()
+        initData()
         initView()
     }
 
     override fun onResume() {
         super.onResume()
         inflater = this.layoutInflater
-        initDate()
+        initData()
         initView()
     }
 
@@ -439,132 +439,74 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
-    private fun initDate() {
+    private fun initData() {
         setScanningMode(true)
-        lightsData = ArrayList()
-        when (type) {
--            Constant.INSTALL_CONNECTOR -> {
-                var all_light_data = DBUtils.getAllRelay()
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbConnector> = ArrayList()
-                    var no_group: ArrayList<DbConnector> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getConnectorName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
-                        } else {
-                            list_group.add(all_light_data[i])
-                        }
-                    }
-
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
-                        }
-                    }
-
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
-                        }
-                    }
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.VISIBLE
-                    batchGroup.setOnClickListener {
-                    /*    val intent = Intent(this,
-                                ConnectorBatchGroupActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("relayType", "all_relay")
-                        startActivity(intent)*/
-                        if (TelinkLightApplication.getApp().connectDevice != null) {
-                            val lastUser = DBUtils.lastUser
-                            lastUser?.let {
-                                if (it.id.toString() != it.last_authorizer_user_id)
-                                    ToastUtils.showShort(getString(R.string.author_region_warm))
-                                else {
-                                        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                                        startActivity(intent)
-                                }
-                            }
-                        } else {
-                            autoConnect()
-                            ToastUtils.showShort(getString(R.string.connecting_tip))
-                        }
-                    }
+        lightsData.clear()
+        val all_light_data = DBUtils.getAllRelay()
+        if (all_light_data.size > 0) {
+            var list_group: ArrayList<DbConnector> = ArrayList()
+            var no_group: ArrayList<DbConnector> = ArrayList()
+            for (i in all_light_data.indices) {
+                if (StringUtils.getConnectorName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                    no_group.add(all_light_data[i])
                 } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                        val lastUser = DBUtils.lastUser
-                        lastUser?.let {
-                            if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
-                            else {
-                                if (dialog_relay?.visibility == View.GONE) {
-                                    showPopupMenu()
-                                }
-                            }
-                        }
-                    }
+                    list_group.add(all_light_data[i])
                 }
             }
 
-            Constant.INSTALL_RELAY_OF -> {
-                var all_light_data = DBUtils.getAllRelay()
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbConnector> = ArrayList()
-                    var no_group: ArrayList<DbConnector> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getConnectorName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
-                        } else {
-                            list_group.add(all_light_data[i])
-                        }
-                    }
+            if (no_group.size > 0) {
+                for (i in no_group.indices) {
+                    lightsData.add(no_group[i])
+                }
+            }
 
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            lightsData.add(no_group[i])
+            if (list_group.size > 0) {
+                for (i in list_group.indices) {
+                    lightsData.add(list_group[i])
+                }
+            }
+            toolbar!!.tv_function1.visibility = View.VISIBLE
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.visibility = View.VISIBLE
+            batchGroup.setOnClickListener {
+                /*    val intent = Intent(this,
+                            ConnectorBatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("relayType", "all_relay")
+                    startActivity(intent)*/
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+                    val lastUser = DBUtils.lastUser
+                    lastUser?.let {
+                        if (it.id.toString() != it.last_authorizer_user_id)
+                            ToastUtils.showShort(getString(R.string.author_region_warm))
+                        else {
+                            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            startActivity(intent)
                         }
-                    }
-
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            lightsData.add(list_group[i])
-                        }
-                    }
-                    toolbar!!.tv_function1.visibility = View.VISIBLE
-                    recycleView.visibility = View.VISIBLE
-                    no_device_relativeLayout.visibility = View.GONE
-                    var relayGroup = this.intent.getStringExtra("relay_name")
-                    var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    batchGroup.setText(R.string.batch_group)
-                    batchGroup.visibility = View.GONE
-                    batchGroup.setOnClickListener {
-                        val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        intent.putExtra("relayType", "group_relay")
-                        intent.putExtra("relay_group_name", relayGroup)
-                        startActivity(intent)
                     }
                 } else {
-                    recycleView.visibility = View.GONE
-                    no_device_relativeLayout.visibility = View.VISIBLE
-                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                    autoConnect()
+                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                }
+            }
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
                         if (dialog_relay?.visibility == View.GONE) {
                             showPopupMenu()
                         }
@@ -607,40 +549,45 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbConnector>? = lightsData
-        val mNewDatas: MutableList<DbConnector>? = getNewData()
+        val mOldDatas: MutableList<DbConnector> = lightsData
+        val mNewDatas: MutableList<DbConnector> = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false
+                return mOldDatas.get(oldItemPosition).id?.equals(mNewDatas.get
+                (newItemPosition).id) ?: false
             }
 
             override fun getOldListSize(): Int {
-                return mOldDatas?.size ?: 0
+                return mOldDatas.size ?: 0
             }
 
             override fun getNewListSize(): Int {
-                return mNewDatas?.size ?: 0
+                return mNewDatas.size ?: 0
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas?.get(oldItemPosition)
-                val beanNew = mNewDatas?.get(newItemPosition)
-                return if (!beanOld?.name.equals(beanNew?.name)) {
+                val beanOld = mOldDatas.get(oldItemPosition)
+                val beanNew = mNewDatas.get(newItemPosition)
+                return if (!beanOld.name.equals(beanNew.name)) {
                     return false//如果有内容不同，就返回false
                 } else true
 
             }
         }, true)
         adaper?.let { diffResult.dispatchUpdatesTo(it) }
-        lightsData = mNewDatas!!
+
+        lightsData.clear()
+        lightsData.addAll(mNewDatas)
+
         toolbar.title = getString(R.string.relay) + " (" + lightsData.size + ")"
-        adaper!!.setNewData(lightsData)
+//        adaper!!.setNewData(lightsData)
+        adaper?.notifyDataSetChanged()
 
     }
 
     private fun getNewData(): MutableList<DbConnector> {
-        lightsData = DBUtils.getAllRelay()
+        lightsData.clear()
+        lightsData.addAll(DBUtils.getAllRelay())
         return lightsData
     }
 
