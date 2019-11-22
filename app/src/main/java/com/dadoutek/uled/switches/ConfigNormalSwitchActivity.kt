@@ -435,7 +435,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 Log.e("zcl", "zcl*****设置新的开关使用插入替换$dbSwitch")
                 DBUtils.saveSwitch(dbSwitch, false)
-                switchDate = dbSwitch
 
                 LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
@@ -443,6 +442,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
             }
+
+            switchDate = dbSwitch
         } else {
             switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
