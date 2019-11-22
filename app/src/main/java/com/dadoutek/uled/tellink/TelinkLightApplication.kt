@@ -129,7 +129,7 @@ class TelinkLightApplication : TelinkApplication() {
                 }, {
                     ToastUtils.showShort(it.localizedMessage)
                 })
-
+                if (DBUtils.lastUser?.id!=null)
                 paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
                     LogUtils.e("It's time to parse $it")
                     val intent = Intent()
@@ -139,7 +139,7 @@ class TelinkLightApplication : TelinkApplication() {
                 }, {
                     ToastUtils.showShort(it.localizedMessage)
                 })
-
+                if (DBUtils.lastUser?.id!=null)
                 mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
                     LogUtils.e("It's time to cancel $it")
                     val intent = Intent()

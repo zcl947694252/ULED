@@ -30,8 +30,8 @@ public class Constant implements Serializable {
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
     public static  boolean isTeck = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
-    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 

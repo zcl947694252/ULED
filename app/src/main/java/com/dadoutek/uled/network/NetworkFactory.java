@@ -49,8 +49,8 @@ public class NetworkFactory {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     //.baseUrl(Constant.BASE_URL_JAVA)
-                    //.baseUrl(Constant.BASE_URL_JAVA)
-                    .baseUrl(Constant.BASE_DEBUG_URL)
+                    .baseUrl(Constant.BASE_URL_JAVA)
+                    //.baseUrl(Constant.BASE_DEBUG_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();

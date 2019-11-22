@@ -21,7 +21,7 @@ MobSDK {
     SMSSDK { version "3.3.2" }
 }
 
-    android {
+android {
     signingConfigs {
         release {
             //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
@@ -38,17 +38,14 @@ MobSDK {
             keyPassword 'dadoutek2018'
         }
     }
-        compileSdkVersion 28
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 262
-        versionName  "3.3.2.1"
-        /*   versionCode 253
-        versionName  "3.3.0"*/
-
+        versionCode 253
+        versionName "3.3.0"
 
 
         multiDexEnabled true
@@ -125,7 +122,8 @@ dependencies {
 //    implementation 'com.tencent.bugly:crashreport:2.8.6'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
 
-    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
+    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'
+//其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
     implementation 'com.tencent.bugly:nativecrashreport:3.6.0'
 
 
@@ -171,7 +169,7 @@ dependencies {
      * 长连接websocket
      */
     //implementation "org.java-websocket:Java-WebSocket:1.4.0"
-   // implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
+    // implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
     implementation project(':stomplib')
     implementation "com.polidea.rxandroidble2:rxandroidble:1.10.1"
     testImplementation 'junit:junit:4.12'

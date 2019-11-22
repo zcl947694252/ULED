@@ -35,14 +35,12 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
@@ -64,9 +62,6 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String> {
-    private  var mesAddressSuccessList: MutableList<Int> = mutableListOf()
-    private var scanDeviceDataScanning: ArrayList<DeviceInfo>? = null
-    private var compositeDisposable: CompositeDisposable? = null
     private var disposableGroupTimer: Disposable? = null
     private var isCompatible: Boolean = true
     private var isChange: Boolean = false
@@ -118,7 +113,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isAddGroupEmptyView: Boolean = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_batch_group_four)
@@ -166,7 +160,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         isCompatible = true
 
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
-        scanDeviceDataScanning = intent.getParcelableArrayListExtra(Constant.DEVICE_NUM)
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -260,22 +253,27 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     @SuppressLint("StringFormatInvalid")
     private fun setDevicesData(deviceType: Int) {
         clearSelectors()
+
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 noGroup.clear()
                 listGroup.clear()
+                deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
             }
             DeviceType.LIGHT_RGB -> {
                 noGroup.clear()
                 listGroup.clear()
+                deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
             }
             DeviceType.SMART_CURTAIN -> {
                 noGroupCutain.clear()
                 listGroupCutain.clear()
+                deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
             }
             DeviceType.SMART_RELAY -> {
                 noGroupRelay.clear()
                 listGroupRelay.clear()
+                deviceDataRelayAll.addAll(DBUtils.getAllRelay())
             }
         }
 
@@ -423,8 +421,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
         val deviceInfo = this.mApplication?.connectDevice
         if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
-                    ?: 0x00) and 0xFF
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
         }
     }
 
@@ -437,52 +434,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 if (deviceType == DeviceType.LIGHT_NORMAL) {
                     deviceDataLightAll.clear()
-
-                    val sanningLights = mutableListOf<DbLight>()
-                    if (scanDeviceDataScanning != null)
-                        for (i in scanDeviceDataScanning!!) {
-                            val light = DbLight()
-                            light.selected = false
-                            light.meshAddr = i.meshAddress
-                            light.productUUID = i.productUUID
-                            light.meshUUID = i.meshUUID
-                            light.belongGroupId = allLightId
-                            sanningLights.add(light)
-                        }
-                    if (sanningLights.size > 0) {
-                        deviceDataLightAll.addAll(sanningLights)
-                    } else
-                        deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
-
+                    deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
 
                 } else if (deviceType == DeviceType.LIGHT_RGB) {
                     deviceDataLightAll.clear()
-
-                    val sanningLights = mutableListOf<DbLight>()
-                    if (scanDeviceDataScanning != null)
-                        for (i in scanDeviceDataScanning!!) {
-                            val light = DbLight()
-                            light.selected = false
-                            light.meshAddr = i.meshAddress
-                            light.productUUID = i.productUUID
-                            light.meshUUID = i.meshUUID
-                            sanningLights.add(light)
-                        }
-                    if (sanningLights.size > 0) {
-                        deviceDataLightAll.addAll(sanningLights)
-                    } else
-                        deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
-
+                    deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
                 }
 
-                /**
-                for (j in mesAddressSuccessList){
-                if (j == light.meshAddr){
-                noGroup.remove(light)
-                listGroup.add(light)
-                }
-                }
-                 */
                 for (i in deviceDataLightAll.indices) {//获取组名 将分组与未分组的拆分
                     deviceDataLightAll[i].selected = false
                     if (StringUtils.getLightGroupName(deviceDataLightAll[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
@@ -496,22 +454,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtainAll.clear()
-
-
-                val sanningCurtain = mutableListOf<DbCurtain>()
-                if (scanDeviceDataScanning != null)
-                    for (i in scanDeviceDataScanning!!) {
-                        val light = DbCurtain()
-                        light.selected = false
-                        light.meshAddr = i.meshAddress
-                        light.productUUID = i.productUUID
-                        sanningCurtain.add(light)
-                    }
-                if (sanningCurtain.size > 0) {
-                    deviceDataCurtainAll.addAll(sanningCurtain)
-                } else
-                    deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
-
+                deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
 
                 for (i in deviceDataCurtainAll.indices) {//获取组名 将分组与未分组的拆分
                     deviceDataCurtainAll[i].selected = false
@@ -526,21 +469,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelayAll.clear()
-
-
-                val sanningDbConnector = mutableListOf<DbConnector>()
-                if (scanDeviceDataScanning != null)
-                    for (i in scanDeviceDataScanning!!) {
-                        val light = DbConnector()
-                        light.selected = false
-                        light.meshAddr = i.meshAddress
-                        light.productUUID = i.productUUID
-                        sanningDbConnector.add(light)
-                    }
-                if (sanningDbConnector.size > 0) {
-                    deviceDataRelayAll.addAll(sanningDbConnector)
-                } else
-                    deviceDataRelayAll.addAll(DBUtils.getAllRelay())
+                deviceDataRelayAll.addAll(DBUtils.getAllRelay())
 
                 for (i in deviceDataRelayAll.indices) {//获取组名 将分组与未分组的拆分
                     deviceDataRelayAll[i].selected = false
@@ -748,7 +677,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.group_fail_tip))
                 }
-         mesAddressSuccessList.clear()
         setGroupOneByOne(currentGroup!!, deviceType, 0)
     }
 
@@ -931,7 +859,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         val successCallback: () -> Unit = {
-            mesAddressSuccessList.add(deviceMeshAddr)
             disposableGroupTimer?.dispose()
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {

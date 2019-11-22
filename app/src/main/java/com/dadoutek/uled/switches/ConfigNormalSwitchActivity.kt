@@ -30,7 +30,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -132,9 +131,13 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showShort(getString(R.string.rename_tip_check))
-            } else {
+            }  else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-                DBUtils.updateSwicth(switchDate!!)
+                if (switchDate != null)
+                    DBUtils.updateSwicth(switchDate!!)
+                else
+                    ToastUtils.showShort(getString(R.string.rename_faile))
+
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }
@@ -149,8 +152,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameDialog?.setOnDismissListener {
+
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            DBUtils.updateSwicth(switchDate!!)
+            if (switchDate!=null)
+                DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }
     }
@@ -245,8 +250,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                                     mIsConfiguring = true
                                     updateSwitch()
                                     disconnect()
-//                                    if (switchDate == null)
-//                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                                    if (switchDate == null)
+                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                                     showRenameDialog()
                                 },
                                 failedCallback = {

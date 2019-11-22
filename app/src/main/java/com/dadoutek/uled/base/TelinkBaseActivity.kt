@@ -32,12 +32,9 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -395,39 +392,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 initOnLayoutListener()
 
-                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing)//isTelBase为false所以不显示 明天看为什么
+            LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing }--------------${!pop!!.isShowing}")
+                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing&& window.decorView!=null)//isTelBase为false所以不显示 明天看为什么
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
-            }
-            LogUtils.v("zcl")
-        }
-        when (type) {
-            0 -> { //修改密码
-                val user = SharedPreferencesUtils.getLastUser()
-                DBUtils.deleteAllData()
-                user?.let {
-                    val split = user.split("-")
-                    if (split.size < 3)
-                        return@let
-                    Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
-
-                    NetworkFactory.getApi()
-                            .putPassword(account.toString(), NetworkFactory.md5(split[1]))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(object : NetworkObserver<Response<DbUser>?>() {
-                                override fun onNext(t: Response<DbUser>) {
-                                    Log.e("zcl", "zcl修改密码******${t.message}")
-                                    SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
-                                    codeStompClient?.dispose()
-                                    singleLoginTopicDisposable?.isDisposed
-                                    stompLifecycleDisposable?.dispose()
-                                    AppUtils.relaunchApp()
-                                    TelinkLightService.Instance()?.disconnect()
-                                    TelinkLightService.Instance()?.idleMode(true)
-                                    SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
-                                }
-                            })
-                }
             }
         }
     }

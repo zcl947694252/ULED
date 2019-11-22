@@ -35,7 +35,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import kotlinx.coroutines.Dispatchers
@@ -141,38 +140,11 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && !Constant.isTelBase&&window.decorView!=null)
+                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView!=null)
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
         }
 
-
-
-        when (type) {
-            0 -> { //修改密码
-                val user = SharedPreferencesUtils.getLastUser()
-                DBUtils.deleteAllData()
-                user?.let {
-                    val split = user.split("-")
-                    if (split.size < 3)
-                        return@let
-                    Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
-/*
-                    NetworkFactory.getApi()
-                            .putPassword(account.toString(), NetworkFactory.md5("1"))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                Log.e("zcl", "zcl修改密码******${it.message}")
-                                SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
-                                TelinkLightService.Instance()?.disconnect()
-                                TelinkLightService.Instance()?.idleMode(true)
-                                SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
-                            }*/
-                                restartApplication()
-                }
-            }
-        }
     }
 
     fun initOnLayoutListener() {//lan加载监听
@@ -221,7 +193,9 @@ abstract class BaseActivity : AppCompatActivity() {
      * 上传回调
      */
     private var syncCallback: SyncCallback = object : SyncCallback {
-        override fun error(msg: String?) {}
+        override fun error(msg: String?) {
+            restartApplication()
+        }
 
         override fun start() {
             showLoadingDialog(this@BaseActivity.getString(R.string.tip_start_sync))
@@ -232,6 +206,7 @@ abstract class BaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.idleMode(true)
             if (!this@BaseActivity.isFinishing&&!singleLogin?.isShowing!!)
                 singleLogin!!.show()
+            restartApplication()
         }
     }
 
@@ -259,7 +234,7 @@ abstract class BaseActivity : AppCompatActivity() {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
-            if (!this.isDestroyed)
+            if (!this.isFinishing)
                 GlobalScope.launch(Dispatchers.Main) { loadDialog!!.show() }
         }
     }
@@ -324,9 +299,8 @@ abstract class BaseActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 Constant.LOGIN_OUT -> {
-                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
                     checkNetworkAndSync(this@BaseActivity)
-                    restartApplication()
+                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
                 }
                 Constant.CANCEL_CODE -> {
                     val cancelBean = intent.getSerializableExtra(Constant.CANCEL_CODE) as CancelAuthorMsg

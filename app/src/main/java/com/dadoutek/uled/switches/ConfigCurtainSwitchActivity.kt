@@ -152,6 +152,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            if (switchDate!=null)
             DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }

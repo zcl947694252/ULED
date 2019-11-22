@@ -147,11 +147,11 @@ class SettingActivity : BaseActivity() {
         hinitTwo.text = getString(resetFactoryAllDevice)
         hinitThree.text = getString(haveQuestionLookNotice)
         disposableInterval?.dispose()
-        disposableInterval = Observable.intervalRange(0, 2, 0, 1, TimeUnit.SECONDS)
+        disposableInterval = Observable.intervalRange(0, 11, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = 1 - it as Long
+                    var num = 10 - it as Long
                     if (num == 0L) {
                         setTimerZero()
                     } else {

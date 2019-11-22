@@ -80,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:gravity="center"
-            android:text="@string/smssdk_confirm"
+            android:text="@string/btn_ok"
             android:background="@color/blue_background"
             android:textColor="@color/white"
             android:textSize="13sp" />

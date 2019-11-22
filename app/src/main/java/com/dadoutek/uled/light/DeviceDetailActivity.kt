@@ -964,7 +964,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         for (i in arr.indices) {//包括结束区间
             min = i
             for (j in i + 1 until arr.size) {//until不 不包括结束区间
-                if (arr[j].belongGroupId < arr[min].belongGroupId) {
+                val jLight = arr[j]
+                val mLight = arr[min]
+                if (jLight!=null&&mLight!=null)
+                if (jLight.belongGroupId < mLight.belongGroupId) {
                     min = j
                 }
             }

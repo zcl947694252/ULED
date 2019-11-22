@@ -33,7 +33,9 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.region.adapter.RegionAuthorizeDialogAdapter
@@ -44,6 +46,7 @@ import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.dadoutek.uled.util.ToastUtil
+import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +59,8 @@ import org.jetbrains.anko.toast
  * 登录界面 输入密码
  */
 class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
+    private var itemAdapter: RegionDialogAdapter? = null
+    private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
     private var popConfirm: TextView? = null
     private var mAuthorList: MutableList<RegionAuthorizeBean>? = null
     private var mList: MutableList<RegionBean>? = null
@@ -114,10 +119,12 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             it.isOutsideTouchable = false
         }
     }
+
     private fun initViewType() {
         dbUser = DbUser()
         when (type) {
-            Constant.TYPE_FORGET_PASSWORD -> { }
+            Constant.TYPE_FORGET_PASSWORD -> {
+            }
 
             Constant.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
 
@@ -219,7 +226,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             SharedPreferencesHelper.putString(this@EnterPasswordActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                           SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
 
                         }
@@ -273,7 +280,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initMe() {
         RegionModel.get()?.subscribe({
             setMeRegion(it)
-        }) {ToastUtils.showShort(it.message)}
+        }) { ToastUtils.showShort(it.message) }
     }
 
     @SuppressLint("StringFormatMatches")
@@ -281,19 +288,21 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         poptitleAuthorize?.text = getString(R.string.received_net_num, authorList.size)
         mAuthorList = authorList
         if (authorList.isNotEmpty()) {
-            val itemAdapter = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
-            popRecycle?.adapter = itemAdapter
-            itemAdapter.setOnItemClickListener { _, _, position ->
+            itemAdapterAuthor = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
+            popRecycleAuthorize?.adapter = itemAdapterAuthor
+            itemAdapterAuthor?.setOnItemClickListener { _, _, position ->
                 regionBeanAuthorize = authorList[position]
                 when (whoClick) {
-                    NONE -> itemAdapter.data[position].is_selected = true
+                    NONE -> itemAdapterAuthor?.data?.get(position)?.is_selected = true
                     //上次点击的自己不用便利其他人
-                    AUTHOR -> for (i in itemAdapter.data.indices)
-                        itemAdapter.data[i].is_selected = i == position
+                    AUTHOR ->
+                        if (itemAdapterAuthor != null)
+                            for (i in itemAdapterAuthor!!.data.indices)
+                                itemAdapterAuthor!!.data[i].is_selected = i == position
                     //上次点击个人区域 这次自己 个人全是false
                     ME -> initMe()
                 }
-                itemAdapter.notifyDataSetChanged()
+                itemAdapterAuthor?.notifyDataSetChanged()
                 whoClick = AUTHOR
             }
         }
@@ -304,21 +313,22 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         poptitle?.text = getString(R.string.me_net_num, list.size)
         mList = list
         if (list.isNotEmpty()) {
-            var itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
+            itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
             popRecycle?.adapter = itemAdapter
-            itemAdapter.setOnItemClickListener { adapter, view, position ->
+            itemAdapter?.setOnItemClickListener { _, _, position ->
                 regionBean = list[position]
-                when (whoClick) {
-                    NONE -> itemAdapter.data[position].is_selected = true
+                if (itemAdapter != null)
+                    when (whoClick) {//更新UI
+                        NONE -> itemAdapter!!.data[position].is_selected = true
 
-                    //上次点击的自己不用便利其他人
-                    ME -> for (i in itemAdapter.data.indices)
-                        itemAdapter.data[i].is_selected = i == position
+                        //上次点击的自己不用便利其他人 更改状态
+                        ME -> for (i in itemAdapter!!.data.indices)
+                            itemAdapter!!.data[i].is_selected = i == position
 
-                    //上次点击收授权区域 这次自己 授权全是false
-                    AUTHOR -> initAuthor()
-                }
-                itemAdapter.notifyDataSetChanged()
+                        //上次点击收授权区域 这次自己 授权全是false
+                        AUTHOR -> initAuthor()
+                    }
+                itemAdapter?.notifyDataSetChanged()
                 whoClick = ME
             }
         }
@@ -327,9 +337,9 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun downLoadDataAndChangeDbUser() {
         if (regionBean == null && regionBeanAuthorize == null) {
             ToastUtils.showShort(getString(R.string.please_select_area))
+            hideLoadingDialog()
             return
         }
-
 
         var lastUser = DBUtils.lastUser
 
@@ -345,22 +355,63 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                     it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
                 }
             }
-            DBUtils.saveUser(lastUser)
-            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+
             PopUtil.dismiss(pop)
 
+            //更新last—region-id
+            DBUtils.saveUser(it)
 
-            DBUtils.deleteLocalData()
-            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-            SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
-            SharedPreferencesUtils.setUserLogin(true)
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-
-            hideLoadingDialog()
-            ActivityUtils.finishAllActivities(true)
-            ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
+            getRegioninfo()
         }
     }
+
+
+    @SuppressLint("CheckResult")
+    private fun getRegioninfo(){//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
+        NetworkFactory.getApi()
+                .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
+                .compose(NetworkTransformer())
+                .subscribe({
+                    //保存最后的区域信息到application
+                    val application = DeviceHelper.getApplication() as TelinkLightApplication
+                    val mesh = application.mesh
+                    mesh.name = it.controlMesh
+                    mesh.password = it.controlMeshPwd
+                    mesh.factoryName = it.installMesh
+                    mesh.factoryPassword = it.installMeshPwd
+
+                    DBUtils.lastUser?.controlMeshName = it.controlMesh
+                    DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+
+
+                    SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                    application.setupMesh(mesh)
+                    val lastUser = DBUtils.lastUser!!
+                    DBUtils.saveUser(lastUser)
+
+                    DBUtils.deleteLocalData()
+                    DBUtils.deleteAllData()
+                    //创建数据库
+                    AccountModel.initDatBase(lastUser)
+
+                    //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+
+                    Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+
+                    SharedPreferencesUtils.setUserLogin(true)
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+
+                    hideLoadingDialog()
+                    ActivityUtils.finishAllActivities(true)
+                    ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
+                },{
+                    LogUtils.v("zcl-------$it")
+                    hideLoadingDialog()
+                    ToastUtils.showShort(it.localizedMessage)
+                })
+    }
+
 
 
     private fun syncComplet() {
@@ -427,7 +478,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     fun hideLoadingDialog() {
         GlobalScope.launch(Dispatchers.Main) {
-            if (loadDialog != null && this.isActive&&isRunning) {
+            if (loadDialog != null && this.isActive && isRunning) {
                 loadDialog!!.dismiss()
             }
         }

@@ -23,11 +23,11 @@ class StompManager private constructor() {
     //虚拟主机号
     val WS_HOST = "/smartlight"
 
-    //二维码频道
-    val WS_TOPIC_CODE = "/user/topic/code.parse"/* + DBUtils.lastUser?.id*/
-
+/*    //二维码频道
+    val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
+        废弃 因为使用这个是再登录成功之前赋值 是上一个账号
     //取消收授权频道
-    var WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id
+    var WS_AUTHOR_CODE = "/topic/authorization.cancel."+ DBUtils.lastUser?.id*/
 
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
@@ -37,7 +37,6 @@ class StompManager private constructor() {
     companion object {
         private var instance: StompManager? = null
             get() {
-
                 if (field == null) {
                     field = StompManager()
                 }
@@ -100,8 +99,7 @@ class StompManager private constructor() {
          */
         headersLogin.add(StompHeader("ack", "auto"))
         headersLogin.add(StompHeader("id", "code-parse"))
-        headersLogin.add(StompHeader("exclusive", "true"))
-       //headersLogin.add(StompHeader("x-queue-name", "sl-code-parse-"+DBUtils.lastUser?.id))
+
         return headersLogin
     }
 
@@ -116,9 +114,7 @@ class StompManager private constructor() {
         */
         headersLogin.add(StompHeader("ack", "client-individual"))
         headersLogin.add(StompHeader("id", "authorization-cancel"))
-        headersLogin.add(StompHeader("durable", "true"))
-        headersLogin.add(StompHeader("auto-delete", "false"))
-        headersLogin.add(StompHeader("x-queue-name", "sl-authorization-cancel-"+DBUtils.lastUser?.id))
+
         return headersLogin
     }
 
@@ -128,6 +124,9 @@ class StompManager private constructor() {
      */
     fun parseQRCodeTopic(): Flowable<QrCodeTopicMsg> {
         val headersLogin = getQRHeaders()
+
+        val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
+        LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
         return mStompClient!!.topic(WS_TOPIC_CODE, headersLogin)
                 .map { topicMessage ->
                     val payloadCode = topicMessage.payload
