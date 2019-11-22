@@ -392,7 +392,10 @@ object Commander : EventListener<String> {
         }
     }
 
-    fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.account, newMeshAddr: Int =
+    /**
+     * 更新controlMeshName 区分区域类别 不同的区域使用不同的controlMeshName
+     */
+    fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.controlMeshName, newMeshAddr: Int =
             Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mUpdateMeshSuccess = false
         TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -564,6 +567,7 @@ object Commander : EventListener<String> {
                 mGotGroupAddr = mGotGroupAddr or 0x8000
             }
 
+            LogUtils.v("zcl------分组关键-------$mTargetGroupAddr == $mGotGroupAddr---------------${mTargetGroupAddr == mGotGroupAddr}")
             if (mTargetGroupAddr == mGotGroupAddr) {
                 LogUtils.d("mGroupSuccess = true")
                 mGroupSuccess = true

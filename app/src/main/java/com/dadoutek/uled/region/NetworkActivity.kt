@@ -211,15 +211,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
                     ToastUtils.showShort(it.message)
+                    hideLoadingDialog()
                 })
                 2 -> RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
                     ToastUtils.showShort(it.message)
+                    hideLoadingDialog()
                 })
                 3 -> {
                     RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
                         ToastUtils.showShort(it.message)
+                    hideLoadingDialog()
                     })
                     RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
+                    hideLoadingDialog()
                         ToastUtils.showShort(it.message)
                     })
                 }
@@ -426,8 +430,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_delete_net -> {
                 // if (regionBean!!.count_all <= 0) {
-                if (isShowType == 1)
-                    ToastUtils.showShort(getString(R.string.delete_region_tip))
+                if (isShowType == 1&&regionBean?.count_all?:0>0)
+                    ToastUtils.showLong(getString(R.string.delete_region_tip))
+                else
                 RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
                     LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
                     PopUtil.dismiss(pop)
@@ -803,8 +808,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //下拉数据
             SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGets)
 
-            //view?.findViewById<LinearLayout>(R.id.pop_unbind_net_ly)?.isClickable = false
-            //view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.drawable.icon_untied)
+            view?.findViewById<ImageView>(R.id.pop_delete_net)?.isClickable = false
+            view?.findViewById<ImageView>(R.id.pop_delete_net)?.setImageResource(R.drawable.icon_delete)
             isShowType = 3
         }
     }

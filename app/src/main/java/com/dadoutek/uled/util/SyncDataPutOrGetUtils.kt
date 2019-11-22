@@ -37,7 +37,7 @@ class SyncDataPutOrGetUtils {
             Thread {
                 val dbDataChangeList = DBUtils.dataChangeAll
                 val dbUser = DBUtils.lastUser
-                if (dbDataChangeList.size == 0) {
+                if (dbDataChangeList.isEmpty()) {
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
                     }
@@ -118,15 +118,13 @@ class SyncDataPutOrGetUtils {
                                 return light?.let { LightModel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return LightModel.delete(token,
-                                        id, changeId.toInt())
+                                return LightModel.delete(token, id, changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getLightByID(changeId)
 
                                 light?.let {
-                                    return LightModel.update(token, light,
-                                            id, changeId.toInt())
+                                    return LightModel.update(token, light, id, changeId.toInt())
                                 }
                             }
                         }
@@ -138,8 +136,7 @@ class SyncDataPutOrGetUtils {
                                 return light?.let { ConnectorModel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return ConnectorModel.delete(token,
-                                        id, changeId.toInt())
+                                return ConnectorModel.delete(token, id, changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getConnectorByID(changeId)
@@ -156,14 +153,12 @@ class SyncDataPutOrGetUtils {
                                 return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return SwitchMdodel.delete(token,
-                                        id, changeId.toInt())
+                                return SwitchMdodel.delete(token, id, changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
                                 switch?.let {
-                                    return SwitchMdodel.update(token,
-                                            switch, changeId.toInt(), id)
+                                    return SwitchMdodel.update(token, switch, changeId.toInt(), id)
                                 }
                             }
                         }
@@ -191,14 +186,12 @@ class SyncDataPutOrGetUtils {
                                 return curtain?.let { CurtainMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return CurtainMdodel.delete(token,
-                                        id, changeId.toInt())
+                                return CurtainMdodel.delete(token, id, changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 val curtain = DBUtils.getCurtainByID(changeId)
                                 if (curtain != null) {
-                                    return CurtainMdodel.update(token,
-                                            curtain, changeId.toInt(), id)
+                                    return CurtainMdodel.update(token, curtain, changeId.toInt(), id)
                                 }
                             }
                         }
@@ -361,7 +354,6 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
                                 .compose(NetworkTransformer())
-
                     }
                     .flatMap {
                         //保存最后的区域信息到application
@@ -371,8 +363,11 @@ class SyncDataPutOrGetUtils {
                         mesh.password = it.controlMeshPwd
                         mesh.factoryName = it.installMesh
                         mesh.factoryPassword = it.installMeshPwd
+
                         DBUtils.lastUser?.controlMeshName = it.controlMesh
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+
+
                         SharedPreferencesUtils.saveCurrentUseRegion(it.id)
                         application.setupMesh(mesh)
                         LogUtils.v("zcl", "zcl下拉数据更新******mesh信息" + DBUtils.lastUser + "------------------" + mesh)
@@ -494,18 +489,18 @@ class SyncDataPutOrGetUtils {
             val regionList = DBUtils.regionAll
             SharedPreferencesUtils.getLastUser()
             //数据库有区域数据直接加载
-            if (regionList.size != 0) {
+            if (regionList.isNotEmpty()) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
                 val dbRegion = DBUtils.lastRegion
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
-                mesh.name = dbRegion.controlMesh
+                mesh.name = dbRegion?.controlMesh
                 //mesh.password = dbRegion.controlMeshPwd
-                mesh.password = dbRegion.belongAccount
-                mesh.factoryName = dbRegion.installMesh
-                mesh.factoryPassword = dbRegion.installMeshPwd
+                mesh.password = dbRegion?.belongAccount
+                mesh.factoryName = dbRegion?.installMesh
+                mesh.factoryPassword = dbRegion?.installMeshPwd
                 application.setupMesh(mesh)
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion?.id!!)
                 return
             } else {
                 setupMeshCreat(this!!.acc!!)

@@ -115,7 +115,7 @@ class TelinkLightApplication : TelinkApplication() {
                 mStompManager?.initStompClient()
 
                 if (mStompManager?.mStompClient ==null)
-                    return@launch
+                  initStompClient()
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
@@ -153,8 +153,6 @@ class TelinkLightApplication : TelinkApplication() {
                  */
                 stompLifecycleDisposable = mStompManager?.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
-//                        LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
-//                        LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
                         LifecycleEvent.Type.CLOSED -> {
 //                            LogUtils.d("zcl_Stomp******Stomp connection closed")
                                 var currentTime = Calendar.getInstance().timeInMillis

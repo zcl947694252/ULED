@@ -377,9 +377,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     Constant.DEVICE_TYPE_LIGHT_RGB -> {
                                         intent = Intent(mContext, RGBSettingActivity::class.java)
                                     }
-                                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                                    Constant.DEVICE_TYPE_CONNECTOR -> {//蓝牙接收器
                                         intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                                    }//蓝牙接收器
+                                    }
                                     Constant.DEVICE_TYPE_CURTAIN -> {
                                         intent = Intent(mContext, WindowCurtainsActivity::class.java)
                                     }
@@ -397,7 +397,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 groupList[position].isSelected = !groupList[position].isSelected
             }
 
-            //不能使用group_name否则会造成长按监听无效
+            //不能使用group_name否则会造成长按监听无效 跳转组详情
             R.id.item_layout -> {
                 var intent = Intent()
                 when (groupType) {

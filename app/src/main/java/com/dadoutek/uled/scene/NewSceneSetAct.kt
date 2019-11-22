@@ -43,6 +43,7 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
+    private var isFirst: Boolean = true
     private var currentPageIsEdit = false
     private var scene: DbScene? = null
     private var isChangeScene = false
@@ -63,7 +64,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
-        init(savedInstanceState)
+        if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {
+            isResult = true
+            val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
+            showGroupList.addAll(list)
+            scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
+        } else {
+            isResult = false
+        }
+        initChangeState()
+        initScene()
         if (!isChangeScene) {
             edit_name.setText(DBUtils.getDefaultNewSceneName())
             edit_name.setSelection(DBUtils.getDefaultNewSceneName().length)
@@ -138,44 +148,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun init(savedInstanceState: Bundle?) {
-        val intent = intent
-        isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
-        if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {
-            isResult = true
-            val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
-            showGroupList.addAll(list)
-            scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
-        } else {
-            isResult = false
-//            showGroupList = ArrayList()
-        }
-        if (isChangeScene && !isResult) {
-            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
-            edit_name.setText(scene?.name)
-            //获取场景具体信息
-            val actions = DBUtils.getActionsBySceneId(scene!!.id)
-            for (i in actions.indices) {
-                val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
-                val itemGroup = ItemGroup()
-                if (item != null) {
-                    itemGroup.gpName = item.name
-                    itemGroup.enableCheck = false
-                    itemGroup.groupAddress = actions[i].groupAddr
-                    itemGroup.brightness = actions[i].brightness
-                    itemGroup.temperature = actions[i].colorTemperature
-                    itemGroup.color = actions[i].color
-                    itemGroup.isNo = actions[i].isOn
-                    item.checked = true
-                    showGroupList!!.add(itemGroup)
-                    groupMeshAddrArrayList.add(item.meshAddr)
-                }
-            }
-        }
-
-        initChangeState()
-        initScene()
-    }
 
     private fun initChangeState() {
         if (showCheckListData == null)
@@ -187,9 +159,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val gp = allGroups[index]
             //if (gp.deviceCount > 0 || index == 0) {//不含有设备的组也要显示不然加入组1有一个等分到场景
             //再次移除以后重新配置场景则场景改组不在了没法配置
-                if (index == 0)
-                    gp.name = getString(R.string.allLight)
-                showCheckListData?.add(gp)
+            if (index == 0)
+                gp.name = getString(R.string.allLight)
+            showCheckListData?.add(gp)
             //}
         }
 
@@ -216,6 +188,31 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initScene() {
+        val intent = intent
+        isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
+        if (isChangeScene && !isResult) {
+            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
+            edit_name.setText(scene?.name)
+            //获取场景具体信息
+            val actions = DBUtils.getActionsBySceneId(scene!!.id)
+            for (i in actions.indices) {
+                val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
+                val itemGroup = ItemGroup()
+                if (item != null) {
+                    itemGroup.gpName = item.name
+                    itemGroup.enableCheck = false
+                    itemGroup.groupAddress = actions[i].groupAddr
+                    itemGroup.brightness = actions[i].brightness
+                    itemGroup.temperature = actions[i].colorTemperature
+                    itemGroup.color = actions[i].color
+                    itemGroup.isNo = actions[i].isOn
+                    item.checked = true
+                    showGroupList!!.add(itemGroup)
+                    groupMeshAddrArrayList.add(item.meshAddr)
+                }
+            }
+        }
+
         if (isResult) {
             if (isChangeScene)
                 initChangeView()
@@ -347,8 +344,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         recyclerView_group_list_view.layoutManager = layoutmanager
         recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
         recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
-        sceneGroupAdapter.bindToRecyclerView(recyclerView_group_list_view)
-
+        if (isFirst) {
+            isFirst = false
+            sceneGroupAdapter.bindToRecyclerView(recyclerView_group_list_view)
+        } else
+            sceneGroupAdapter.notifyDataSetChanged()
         sceneGroupAdapter.onItemChildClickListener = onItemChildClickListener
     }
 

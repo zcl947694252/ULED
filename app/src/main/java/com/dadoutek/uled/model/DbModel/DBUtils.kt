@@ -635,11 +635,25 @@ object DBUtils {
     }
 
 
-    fun saveSensor(sensor: DbSensor?, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
-        } else {
-            DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
+    fun saveSensor(sensor: DbSensor, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(sensor.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改
+            sensor.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
+
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            if (existList.size > 0) {
+                recordingChange(sensor.id,
+                        DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(sensor.id,
+                        DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
     }
 
@@ -1230,7 +1244,7 @@ object DBUtils {
                 }//如果数据表没有该数据直接添加
             }
         }
-        //LogUtils.v("zcl-------添加变化表" + DaoSessionInstance.getInstance().dbDataChangeDao.loadAll())
+        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

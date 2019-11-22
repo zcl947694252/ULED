@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.util.SparseArray
@@ -36,6 +35,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
@@ -64,6 +64,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String> {
+    private var scanDeviceDataScanning: ArrayList<DeviceInfo>? = null
     private var compositeDisposable: CompositeDisposable? = null
     private var disposableGroupTimer: Disposable? = null
     private var isCompatible: Boolean = true
@@ -104,7 +105,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var curtainAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.batch_device_item, deviceDataCurtain)
 
 
-    private var scanDeviceData: Array<Parcelable>? = null
     private var deviceType: Int = 100
     private var lastCheckedGroupPostion: Int = 1000
     private var allLightId: Long = 0//有设备等于0说明没有分组成功
@@ -164,7 +164,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         isCompatible = true
 
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
-        scanDeviceData = intent.getParcelableArrayExtra("data")
+        scanDeviceDataScanning = intent.getParcelableArrayExtra(Constant.DEVICE_NUM) as ArrayList<DeviceInfo>
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -206,7 +206,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             groupsByDeviceType[i].isCheckedInGroup = false
 
         isAddGroupEmptyView = true
-        groupAdapter.notifyItemRangeChanged(0,groupsByDeviceType.size)
+        groupAdapter.notifyItemRangeChanged(0, groupsByDeviceType.size)
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -258,11 +258,22 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     @SuppressLint("StringFormatInvalid")
     private fun setDevicesData(deviceType: Int) {
         clearSelectors()
+        val sanningNum = scanDeviceDataScanning?.size ?: 0
+
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 noGroup.clear()
                 listGroup.clear()
-                deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
+/*                mutableListOf<DbLight>()
+                if (scanDeviceDataScanning!=null)
+                    for(i in scanDeviceDataScanning!!){
+                        val light = DbLight()
+                        light.id = i.id.toLong()
+                    }
+                if (sanningNum > 0) {
+                    deviceDataLightAll.add()
+                } else*/
+                    deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
             }
             DeviceType.LIGHT_RGB -> {
                 noGroup.clear()
@@ -441,9 +452,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     deviceDataLightAll.clear()
                     deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
 
-                } else if (deviceType == DeviceType.LIGHT_RGB){
+                } else if (deviceType == DeviceType.LIGHT_RGB) {
                     deviceDataLightAll.clear()
-                deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
+                    deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
                 }
 
                 for (i in deviceDataLightAll.indices) {//获取组名 将分组与未分组的拆分
@@ -521,7 +532,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
             isCompatible = isChecked
-            if (!isCompatible){
+            if (!isCompatible) {
                 ToastUtils.showShort(getString(R.string.compatibility_mode))
             }
 
@@ -740,8 +751,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
 
-        if (currentGroup!=null)
-        DBUtils.updateGroup(currentGroup!!)//更新组类型
+        if (currentGroup != null)
+            DBUtils.updateGroup(currentGroup!!)//更新组类型
 
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {
@@ -943,7 +954,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val group: DbGroup
         val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
         group = when (groupOfTheLight) {
-            null -> currentGroup?:DbGroup()
+            null -> currentGroup ?: DbGroup()
             else -> groupOfTheLight
         }
         val groupAddress = group.meshAddr
@@ -981,7 +992,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 val size = deviceData.size
                 // Inconsistency detected. Invalid item position 8(offset:40).state:32 android.support.v7.widget.RecyclerView
                 deviceData.clear()
-                lightAdapter.notifyItemRangeRemoved(0,size)
+                lightAdapter.notifyItemRangeRemoved(0, size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceData.addAll(noGroup)
@@ -992,12 +1003,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 setTitleTexts(noGroup.size, listGroup.size)
                 setDeviceListAndEmpty(deviceData.size)
-               lightAdapter.notifyItemRangeInserted(0, deviceData.size)
+                lightAdapter.notifyItemRangeInserted(0, deviceData.size)
             }
             DeviceType.SMART_CURTAIN -> {
                 val size = deviceDataCurtain.size
                 deviceDataCurtain.clear()
-                lightAdapter.notifyItemRangeRemoved(0,size)
+                lightAdapter.notifyItemRangeRemoved(0, size)
 
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
@@ -1014,7 +1025,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_RELAY -> {
                 val size = deviceDataRelay.size
                 deviceDataRelay.clear()
-                relayAdapter.notifyItemRangeRemoved(0,size)
+                relayAdapter.notifyItemRangeRemoved(0, size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceDataRelay.addAll(noGroupRelay)
@@ -1048,7 +1059,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun changeGroupSelectView(position: Int) {
-        if (lastCheckedGroupPostion != position&&lastCheckedGroupPostion!=1000) {
+        if (lastCheckedGroupPostion != position && lastCheckedGroupPostion != 1000) {
             groupsByDeviceType[lastCheckedGroupPostion].isCheckedInGroup = false
             groupAdapter.notifyItemRangeChanged(lastCheckedGroupPostion, 1)
         }
@@ -1195,30 +1206,30 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      */
     private fun startBlink(belongGroupId: Long, meshAddr: Int) {
         val group: DbGroup
-            val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
-            group = when (groupOfTheLight) {
-                null -> currentGroup?: DbGroup()
-                else -> groupOfTheLight
-            }
-            val groupAddress = group.meshAddr
-            Log.d("zcl", "startBlink groupAddresss = $groupAddress")
+        val groupOfTheLight = DBUtils.getGroupByID(belongGroupId)
+        group = when (groupOfTheLight) {
+            null -> currentGroup ?: DbGroup()
+            else -> groupOfTheLight
+        }
+        val groupAddress = group.meshAddr
+        Log.d("zcl", "startBlink groupAddresss = $groupAddress")
 
-            if (isCompatible) {
-                val opcode = Opcode.SET_GROUP
-                val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
-                params[0] = 0x01
+        if (isCompatible) {
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+            params[0] = 0x01
 
-                if (mBlinkDisposables.get(meshAddr) != null) {
-                    mBlinkDisposables.get(meshAddr).dispose()
-                }
-                //每隔1s发一次，就是为了让灯一直闪.
-                mBlinkDisposables.put(meshAddr, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params) })
-            } else {
-                newStartBlinkOpcode(groupAddress, meshAddr, true)
+            if (mBlinkDisposables.get(meshAddr) != null) {
+                mBlinkDisposables.get(meshAddr).dispose()
             }
+            //每隔1s发一次，就是为了让灯一直闪.
+            mBlinkDisposables.put(meshAddr, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params) })
+        } else {
+            newStartBlinkOpcode(groupAddress, meshAddr, true)
+        }
 
     }
 

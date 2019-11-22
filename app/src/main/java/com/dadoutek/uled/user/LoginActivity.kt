@@ -174,7 +174,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
-        val havePhone = info != null && !info.isEmpty()
+        val havePhone = info != null && info.isNotEmpty()
         if (havePhone) {
             val messge = info.split("-")
             if (messge.size>1)
@@ -203,6 +203,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
             R.id.btn_register -> {
+               returnView()
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
                 startActivityForResult(intent, 0)
@@ -232,9 +233,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun verificationCode() {
+        returnView()
         var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
+        returnView()
         startActivityForResult(intent, 0)
+    }
+
+    private fun returnView() {
+        isPhone = false
+        phoneList()
     }
 
     private fun eyePassword() {
@@ -312,7 +320,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(currentUser!!.password)
             edit_user_password!!.visibility = View.GONE
-            list_phone.visibility = View.GONE
+            list_phone?.visibility = View.GONE
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
             login()
         }
@@ -330,7 +338,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun newPhoneList() {
         var message: List<String>? = null
         val info = SharedPreferencesUtils.getLastUser()
-        if (info != null && !info.isEmpty()) {
+        if (info != null && info.isNotEmpty()) {
             message = info.split("-")
             edit_user_phone_or_email.setText(message[0])
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
@@ -408,6 +416,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun forgetPassword() {
         var intent = Intent(this@LoginActivity, ForgetPassWordActivity::class.java)
         intent.putExtra("fromLogin", "forgetPassword")
+        returnView()
         startActivityForResult(intent, 0)
     }
 
@@ -434,9 +443,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         val intent = Intent(this, EnterPasswordActivity::class.java)
                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
                         intent.putExtra("phone", phone)
+                        returnView()
                         startActivityForResult(intent, 0)
                     },{
                         ToastUtils.showShort(it.localizedMessage)
+                        returnView()
                         if (getString(R.string.account_not_exist)==it.localizedMessage)
                             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
                     })

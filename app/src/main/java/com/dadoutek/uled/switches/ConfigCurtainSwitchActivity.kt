@@ -398,11 +398,11 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
+                          /*  if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
                                 updateSwitch()
                             } else {
                                 saveSwitch()
-                            }
+                            }*/
                             TelinkLightService.Instance()?.idleMode(true)
                             TelinkLightService.Instance()?.disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -418,17 +418,17 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
-                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-                dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 DBUtils.updateSwicth(dbSwitch)
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-                dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
-                dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
 
@@ -438,8 +438,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                         Constant.DB_ADD)
             }
         } else {
-            switchDate!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
-            switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+            switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
             switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
             DBUtils.updateSwicth(switchDate!!)
         }
@@ -460,9 +460,9 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
-            var dbSwitch: DbSwitch = DbSwitch()
+            var dbSwitch = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID

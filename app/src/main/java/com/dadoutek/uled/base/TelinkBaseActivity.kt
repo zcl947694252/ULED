@@ -24,7 +24,6 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import cn.smssdk.SMSSDK
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -39,7 +38,6 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -397,9 +395,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 initOnLayoutListener()
 
-                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && Constant.isTelBase)
+                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing)//isTelBase为false所以不显示 明天看为什么
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
+            LogUtils.v("zcl")
         }
         when (type) {
             0 -> { //修改密码
@@ -422,6 +421,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                                     codeStompClient?.dispose()
                                     singleLoginTopicDisposable?.isDisposed
                                     stompLifecycleDisposable?.dispose()
+                                    AppUtils.relaunchApp()
                                     TelinkLightService.Instance()?.disconnect()
                                     TelinkLightService.Instance()?.idleMode(true)
                                     SharedPreferencesHelper.putBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)
@@ -651,6 +651,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.isScanning = isScanning
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        hideLoadingDialog()
+    }
 }
 
 

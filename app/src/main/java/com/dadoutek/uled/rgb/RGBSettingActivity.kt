@@ -797,8 +797,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             R.id.tvOta -> checkPermission()
             R.id.update_group -> updateGroup()
             R.id.btn_remove -> remove()
-            R.id.dynamic_rgb -> toRGBGradientView()
-            R.id.normal_rgb -> toNormalView()
+            R.id.dynamic_rgb ->{
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        toRGBGradientView()
+                    }
+                }
+            }
+                    R.id.normal_rgb -> toNormalView()
             R.id.tvRename -> renameLight()
             R.id.ll_r -> {
                 var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->

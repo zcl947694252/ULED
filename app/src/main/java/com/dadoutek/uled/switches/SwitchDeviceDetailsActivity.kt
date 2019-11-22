@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -367,14 +366,14 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         DBUtils.deleteSwitch(deleteSwitch)
                         notifyData()
-                        Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
 
+
+
+                        Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
                         if (mConnectDevice != null) {
-                            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
                             if (deleteSwitch.meshAddr == mConnectDevice?.meshAddress) {
                                 GlobalScope.launch {
                                     delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态

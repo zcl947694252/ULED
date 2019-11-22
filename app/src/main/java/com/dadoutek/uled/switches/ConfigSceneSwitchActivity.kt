@@ -122,10 +122,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     setSceneForSwitch()
                     newMeshAddr = MeshAddressGenerator().meshAddress
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
+                        mDeviceInfo.meshAddress = newMeshAddr
                         mIsConfiguring = true
+                        updateSwitch()
+                        disconnect()
                         if (switchDate == null)
                             switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                        disconnect()
+                        showRenameDialog()
+
                     },
                             failedCallback = {
                                 mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
@@ -180,9 +184,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             this.mApplication.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
-                if (switchDate == null)
-                    switchDate = DBUtils.getSwitchByMeshAddr(newMeshAddr)
-                showRenameDialog()
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -197,16 +198,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
+                     /*   if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
                             updateSwitch()
                         } else {
                             saveSwitch()
-                        }
+                        }*/
                         TelinkLightService.Instance()?.idleMode(true)
-                        TelinkLightService.Instance()?.disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                    }
-                    .show()
+                    }.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -219,7 +218,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
                 dbSwitch.controlSceneId = getControlScene()
                 dbSwitch.macAddr = mDeviceInfo.macAddress
-                dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
             } else {
@@ -227,7 +226,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.controlSceneId = getControlScene()
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress
-                dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch!!.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch!!.productUUID = mDeviceInfo.productUUID
                 dbSwitch!!.index = dbSwitch.id.toInt()
                 DBUtils.saveSwitch(dbSwitch, false)
@@ -504,6 +503,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     DBUtils.updateSwicth(switchDate!!)
                 else
                     ToastUtils.showShort(getString(R.string.rename_faile))
+
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }

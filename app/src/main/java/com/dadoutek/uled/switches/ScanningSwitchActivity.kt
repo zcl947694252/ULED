@@ -174,6 +174,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                             {
                                 showToast(getString(R.string.get_version_fail))
                                 closeAnimation()
+                                finish()
                             })
 
         }

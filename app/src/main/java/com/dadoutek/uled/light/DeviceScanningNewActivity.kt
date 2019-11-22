@@ -122,6 +122,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
+    private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
     private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.device_item, mAddedDevices)
 
     /**
@@ -1380,22 +1381,27 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }
 
-        } else if (mAddDeviceType == DeviceType.SMART_CURTAIN){
+        } else if (mAddDeviceType == DeviceType.SMART_CURTAIN) {
             startGrouping()
-        }else{
+        } else {
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
             intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
-            LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
-            //intent.putParcelableArrayListExtra("data",mAddedDevices as ArrayList<ScannedDeviceItem>)
-            startActivity(intent)
-            finish()
+
+            for (item in mAddedDevices) {
+                mAddedDevicesInfos.add(item.deviceInfo)
+                intent.putParcelableArrayListExtra(Constant.DEVICE_NUM, mAddedDevicesInfos)
+
+                LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
+                //intent.putParcelableArrayListExtra("data",mAddedDevices as ArrayList<ScannedDeviceItem>)
+                startActivity(intent)
+                finish()
+            }
         }
-    }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //移除事件
-        this.mApplication?.removeEventListener(this)
+        fun onDestroy() {
+            super.onDestroy()
+            //移除事件
+            this.mApplication?.removeEventListener(this)
+        }
     }
 }

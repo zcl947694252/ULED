@@ -25,6 +25,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -35,7 +36,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -149,12 +149,18 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.light_add_device_btn -> {
-                if(DBUtils.getAllCurtains().size ==0){
-                    intent = Intent(this, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                    startActivityForResult(intent, 0)
-                }else{
-                    addDevice()
+                 DBUtils.lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                    else {
+                        if(DBUtils.getAllCurtains().size ==0){
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        }else{
+                            addDevice()
+                        }
+                    }
                 }
             }
         }

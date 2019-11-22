@@ -16,7 +16,6 @@ import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
@@ -27,7 +26,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -479,23 +477,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun setGroupForSwitch() {
-        val mesh = this.mApplication.mesh
-        val params = Parameters.createUpdateParameters()
-        if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-        } else {
-            params.setOldMeshName(mesh.factoryName)
-        }
-        params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
-
-        params.setUpdateDeviceList(mDeviceInfo)
         val groupAddress = mGroupArrayList[mAdapter.selectedPos].meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddress shr 8 and 0xFF).toByte())

@@ -194,38 +194,43 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        when (item?.itemId) {
-            R.id.toolbar_delete_group -> {
-                removeGroup()
-            }
-            R.id.toolbar_rename_group -> {
-                renameGp()
-            }
-            R.id.toolbar_rename_light -> {
-                renameLight()
-            }
-            R.id.toolbar_reset -> {
-                onceReset()
-            }
-            R.id.toolbar_update_group -> {
-                updateGroup()
-            }
-            R.id.toolbar_commutation -> {
-                electricCommutation()
-            }
-            R.id.toolbar_hand_recovery -> {
-                handRecovery()
-            }
-            R.id.toolbar_software_restart -> {
-                sofwareRestart()
-            }
-            R.id.toolbar_slow_up -> {
-                slowUp()
-            }
-            R.id.toolbar_ota -> {
-                updateOTA()
-            }
-        }
+         DBUtils.lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id) {
+                ToastUtils.showShort(getString(R.string.author_region_warm))
+            }else {
+                when (item?.itemId) {
+                    R.id.toolbar_delete_group -> {
+                        removeGroup()
+                    }
+                    R.id.toolbar_rename_group -> {
+                        renameGp()
+                    }
+                    R.id.toolbar_rename_light -> {
+                        renameLight()
+                    }
+                    R.id.toolbar_reset -> {
+                        onceReset()
+                    }
+                    R.id.toolbar_update_group -> {
+                        updateGroup()
+                    }
+                    R.id.toolbar_commutation -> {
+                        electricCommutation()
+                    }
+                    R.id.toolbar_hand_recovery -> {
+                        handRecovery()
+                    }
+                    R.id.toolbar_software_restart -> {
+                        sofwareRestart()
+                    }
+                    R.id.toolbar_slow_up -> {
+                        slowUp()
+                    }
+                    R.id.toolbar_ota -> {
+                        updateOTA()
+                    }
+                }
+            }}
         true
     }
 
@@ -332,6 +337,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
+
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {

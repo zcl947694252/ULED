@@ -10,8 +10,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 
 object ServerResultException {
     fun handleException(response: Response<*>) {
-        val code = response.errorCode
-        when (code) {
+        when (response.errorCode) {
             NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
                 //token 过期
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.login_timeout))

@@ -45,7 +45,7 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var curtain: MutableList<DbCurtain>
     private var adapter: CurtainDeviceDetailsAdapter? = null
-    internal var showList: List<ItemTypeGroup>? = null
+    private var showList: List<ItemTypeGroup>? = null
     private var gpList: List<ItemTypeGroup>? = null
     private var type: Int? = null
     private var inflater: LayoutInflater? = null
@@ -499,17 +499,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
         currentLight = curtain?.get(position)
         positionCurrent = position
-        val lastUser = DBUtils.lastUser
-        lastUser?.let {
-            if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
-            else {
                 if (TelinkLightApplication.getApp().connectDevice == null)
                     ToastUtils.showShort(getString(R.string.connecting_tip))
                 else
                     skipSetting()
-            }
-        }
+
     }
 
     override fun onDestroy() {

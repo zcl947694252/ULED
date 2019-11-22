@@ -214,7 +214,7 @@ public class StringUtils {
         }
     }
     public static String getSwitchName(DbSwitch dbSwitch) {
-        Long belongGroupId = dbSwitch.getBelongGroupId();
+         Long belongGroupId = dbSwitch.getBelongGroupId();
         if (belongGroupId==null||DBUtils.INSTANCE.getGroupByID(belongGroupId) == null) {
                 return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
             }

@@ -443,7 +443,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         setScanningMode(true)
         lightsData = ArrayList()
         when (type) {
-            Constant.INSTALL_CONNECTOR -> {
+-            Constant.INSTALL_CONNECTOR -> {
                 var all_light_data = DBUtils.getAllRelay()
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbConnector> = ArrayList()
