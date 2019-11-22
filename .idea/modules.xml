@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" filepath="$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/ULED.iml" filepath="$PROJECT_DIR$/ULED.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/ULED-app.iml" filepath="$PROJECT_DIR$/app/ULED-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/guide/guide.iml" filepath="$PROJECT_DIR$/guide/guide.iml" />
       <module fileurl="file://$PROJECT_DIR$/stomplib/stomplib.iml" filepath="$PROJECT_DIR$/stomplib/stomplib.iml" />

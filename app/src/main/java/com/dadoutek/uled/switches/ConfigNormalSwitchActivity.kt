@@ -238,15 +238,15 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     Thread(Runnable {
                         setGroupForSwitch()
                         Thread.sleep(800)
-                        val newMeshAddr = MeshAddressGenerator().meshAddress
+                        val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
                         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                                 successCallback = {
                                     mDeviceInfo.meshAddress = newMeshAddr
                                     mIsConfiguring = true
                                     updateSwitch()
                                     disconnect()
-                                    if (switchDate == null)
-                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+//                                    if (switchDate == null)
+//                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                                     showRenameDialog()
                                 },
                                 failedCallback = {
@@ -435,6 +435,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                 Log.e("zcl", "zcl*****设置新的开关使用插入替换$dbSwitch")
                 DBUtils.saveSwitch(dbSwitch, false)
+                switchDate = dbSwitch
 
                 LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
