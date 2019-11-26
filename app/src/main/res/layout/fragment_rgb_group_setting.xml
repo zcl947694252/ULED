@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -96,8 +97,34 @@
             app:layout_constraintBottom_toTopOf="@+id/brightness"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
 
+        </top.defaults.colorpicker.ColorPickerView>
+
+        <CheckBox
+            android:id="@+id/switch_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:background="@drawable/select_check"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:button="@null"
+            app:layout_constraintEnd_toEndOf="@+id/brightness"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/switch_bt_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/switch_btn"
+            android:textColor="@color/blue_text"
+            android:textSize="13sp"
+            android:layout_marginEnd="@dimen/dp_30"
+            android:layout_marginTop="@dimen/dp_40"
+            app:layout_constraintEnd_toEndOf="@+id/brightness"
+            app:layout_constraintStart_toStartOf="@+id/switch_btn"
+            app:layout_constraintTop_toTopOf="parent" />
         <LinearLayout
             android:id="@+id/ll_r"
             android:layout_width="wrap_content"
@@ -337,6 +364,7 @@
                 android:layout_gravity="center" />
 
         </LinearLayout>
+
 
         <TextView
             android:id="@+id/lightVersion"

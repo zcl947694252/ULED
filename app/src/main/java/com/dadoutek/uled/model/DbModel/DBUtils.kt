@@ -637,8 +637,8 @@ object DBUtils {
 
     fun saveSensor(sensor: DbSensor, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(sensor.meshAddr)).list()
-        if (existList.size > 0) {
-            //如果该mesh地址的数据已经存在，就直接修改
+        if (existList.size > 0&&existList[0].macAddr ==sensor.macAddr) {
+            //如果该mesh地址的数据已经存在，就直接修改 mes一致则判断mac
             sensor.id = existList[0].id
         }
         DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
@@ -660,7 +660,7 @@ object DBUtils {
 
     fun saveSwitch(db: DbSwitch, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
-        if (existList.size > 0) {
+        if (existList.size > 0&&existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }

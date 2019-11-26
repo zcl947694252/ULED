@@ -839,5 +839,6 @@
     <string name="compatibility_mode">如果勾选设备后，灯没有闪烁，请再次开启兼容模式</string>
     <string name="rename_faile">重命名失败</string>
     <string name="delete_region_tip">删除该区域请先把该区域设备恢复出厂设置…</string>
+    <string name="switch_btn">开关</string>
 
 </resources>

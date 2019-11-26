@@ -36,6 +36,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -46,10 +47,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
-import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.ErrorReportInfo
-import com.telink.bluetooth.light.LeScanParameters
-import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -68,6 +66,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
 import top.defaults.colorpicker.ColorObserver
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -87,7 +86,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 更新时间   $Date$
  * 更新描述   ${
  */
-class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
+class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener/*, View.OnTouchListener */ {
     private var clickPostion: Int = 100
     private var postionAndNum: ItemRgbGradient? = null
     private var mApplication: TelinkLightApplication? = null
@@ -371,6 +370,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         tvRename.visibility = View.GONE
         toolbar.title = light?.name
 
+        switch_btn.onCheckedChange { _, _ ->
+            if (light != null)
+                openOrClose(light!!)
+        }
+        if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
+            light!!.connectionStatus = ConnectionStatus.ON.value
+            switch_btn.isChecked = true
+        } else {
+            light!!.connectionStatus = ConnectionStatus.OFF.value
+            switch_btn.isChecked = false
+        }
+
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
         dynamic_rgb!!.setOnClickListener(this.clickListener)
@@ -467,8 +478,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
 
 
-        sbBrightness!!.progress = light!!.brightness
-        sbBrightness_num!!.text = light!!.brightness.toString() + "%"
+        val brightness = if (light!!.brightness >= 1) light!!.brightness else 1
+        sbBrightness!!.progress = brightness
+        sbBrightness_num!!.text = "$brightness%"
 
         when {
             sbBrightness!!.progress >= 100 -> {
@@ -485,12 +497,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
         }
 
-        var w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var w = ((light?.color ?: 1) and 0xff000000.toInt()) shr 24
         var r = Color.red(light?.color ?: 0)
         var g = Color.green(light?.color ?: 0)
         var b = Color.blue(light?.color ?: 0)
-        if (w == -1) {
-            w = 0
+        if (w == -1 || w < 1) {
+            w = 1
         }
 
         color_r.text = r.toString()
@@ -515,9 +527,19 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
         }
 
-        color_picker.setInitialColor((light?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
+        color_picker.setInitialColor((light?.color ?: 1 and 0xffffff) or 0xff000000.toInt())
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+    }
+
+    private fun openOrClose(currentLight: DbLight) {
+        if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+            Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
+            currentLight.connectionStatus = ConnectionStatus.ON.value
+        } else {
+            Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
+            currentLight.connectionStatus = ConnectionStatus.OFF.value
+        }
     }
 
     private fun lessBrightness(event: MotionEvent?) {
@@ -736,12 +758,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             super.handleMessage(msg)
             sb_w_bright.progress--
             when {
-                sb_w_bright.progress < 0 -> {
+                sb_w_bright.progress < 1 -> {
                     sb_w_bright_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 0 -> {
+                sb_w_bright.progress == 1 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
                     stopTracking = false
@@ -797,7 +819,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             R.id.tvOta -> checkPermission()
             R.id.update_group -> updateGroup()
             R.id.btn_remove -> remove()
-            R.id.dynamic_rgb ->{
+            R.id.dynamic_rgb -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
@@ -807,7 +829,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     }
                 }
             }
-                    R.id.normal_rgb -> toNormalView()
+            R.id.normal_rgb -> toNormalView()
             R.id.tvRename -> renameLight()
             R.id.ll_r -> {
                 var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
@@ -1243,8 +1265,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
 
         var color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-        /*  if (color==0)
-              color =1*/
 
         var ws = (color and 0xff000000.toInt()) shr 24
 
@@ -1305,16 +1325,16 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 e.printStackTrace()
             }
         }
-        showBrightness = if (showBrightness <= 0) 1 else showBrightness
+        showBrightness = if (showBrightness <= 1) 1 else showBrightness
         //亮度
         sbBrightness?.progress = showBrightness
         sbBrightness_num.text = "$showBrightness%"
-        if (w != -1) {//白光
+        if (w != -1 && w >= 1) {//白光
             sb_w_bright_num.text = "$showW%"
             sb_w_bright.progress = showW
         } else {
-            sb_w_bright_num.text = "0%"
-            sb_w_bright.progress = 0
+            sb_w_bright_num.text = "1%"
+            sb_w_bright.progress = 1
         }
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -1827,12 +1847,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
         }
 
-        var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var w = ((group?.color ?: 1) and 0xff000000.toInt()) shr 24
         var r = Color.red(group?.color ?: 0)
         var g = Color.green(group?.color ?: 0)
         var b = Color.blue(group?.color ?: 0)
-        if (w == -1) {
-            w = 0
+        if (w == -1 || w < 1) {
+            w = 1
         }
         sb_w_bright_num.text = "$w%"
         sb_w_bright.progress = w
@@ -1874,8 +1894,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-        var showBrightness = brightness
-        var showW = w
+        var showBrightness = if (brightness ?: 1 >= 1) brightness else 1
+        var showW = if (w ?: 1 >= 1) w else 1
 
         GlobalScope.launch {
             try {
@@ -1885,13 +1905,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 if (w > Constant.MAX_VALUE) {
                     w = Constant.MAX_VALUE
                 }
-                if (w == -1) {
+                if (w == -1 || w < 1) {
                     w = 1
                     showW = 1
                 }
 
-                var addr = 0
-                addr = if (currentShowGroupSetPage) {
+                var addr: Int = if (currentShowGroupSetPage) {
                     group?.meshAddr!!
                 } else {
                     light?.meshAddr!!
@@ -1899,8 +1918,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
                 val opcode: Byte = Opcode.SET_LUM
                 val opcodeW: Byte = Opcode.SET_W_LUM
-                w = if (w == 0) 1 else w
-                brightness = if (brightness == 0) 1 else brightness
+                w = if (w <= 1) 1 else w
+                brightness = if (brightness!! < 1) 1 else brightness
 
                 val paramsW: ByteArray = byteArrayOf(w.toByte())
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
@@ -1924,23 +1943,22 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
         }
 
-        showBrightness = if (showBrightness == 0) 1 else showBrightness
-        showW = if (showW == 0) 1 else showW
+        showBrightness = if (showBrightness!! < 1) 1 else showBrightness
+        showW = if (showW < 1) 1 else showW
 
         sbBrightness?.progress = showBrightness!!
         sb_w_bright_num.text = "$showBrightness%"
-        if (w != -1) {
+        if (w != -1 && w >= 1) {
             sb_w_bright_num.text = "$showW%"
             sb_w_bright.progress = showW
         } else {
-            sb_w_bright_num.text = "0%"
-            sb_w_bright.progress = 0
+            sb_w_bright_num.text = "1%"
+            sb_w_bright.progress = 1
         }
         color_r?.text = red.toString()
         color_g?.text = green.toString()
         color_b?.text = blue.toString()
     }
-
 
     @SuppressLint("SetTextI18n")
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
@@ -2059,7 +2077,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                                        fromUser: Boolean) {
             val currentTime = System.currentTimeMillis()
 
-            onValueChangeView(seekBar, progress, true)
+            onValueChangeView(seekBar, progress)
             if (currentTime - this.preTime > this.delayTime) {
                 this.onValueChange(seekBar, progress, true)
                 this.preTime = currentTime
@@ -2070,7 +2088,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
          * 此处判断是白光还是亮度 使用view判断
          */
         @SuppressLint("SetTextI18n")
-        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean) {
+        private fun onValueChangeView(view: View, progress: Int) {
             var progressNoZero = if (progress <= 0) 1 else progress
             if (view === sbBrightness) {
                 sbBrightness_num.text = "$progressNoZero%"
@@ -2092,8 +2110,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
          * 亮度白光监听
          */
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
-            var addr = 0
-            addr = if (currentShowGroupSetPage) {
+            var addr: Int = if (currentShowGroupSetPage) {
                 group!!.meshAddr
             } else {
                 light!!.meshAddr
@@ -2163,7 +2180,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     /* if (progress>0) */progress /*else 1*/
                 }
                 params = byteArrayOf(w.toByte())
-                var color = 0
+                var color: Int
                 if (currentShowGroupSetPage) {
                     color = group?.color!!
                     when {
@@ -2245,6 +2262,28 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }.start()
     }
 
+    private fun reSetWhiteAndBrightness() {
+        var opcode = Opcode.SET_LUM
+        var opcodeW = Opcode.SET_W_LUM
+
+        var addr: Int = if (currentShowGroupSetPage) {
+            group!!.meshAddr
+        } else {
+            light!!.meshAddr
+        }
+
+        var brightness = sbBrightness.progress
+        var params = byteArrayOf(brightness.toByte())
+        GlobalScope.launch {
+            delay(500)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+            val w = sb_w_bright.progress
+            var paramsW = byteArrayOf(w.toByte())
+            delay(500)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
+        }
+    }
+
     private val colorObserver = ColorObserver { color, fromUser ->
         val r = Color.red(color)
         val g = Color.green(color)
@@ -2277,8 +2316,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         var green = G
         var blue = B
 
-        var addr = 0
-        addr = if (!currentShowGroupSetPage) {
+        var addr: Int = if (!currentShowGroupSetPage) {
             light?.meshAddr!!
         } else {
             group?.meshAddr!!
@@ -2299,12 +2337,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         } else {
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
         }
+
+        reSetWhiteAndBrightness()
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr == 0xFFFF) {
-
         }
     }
 

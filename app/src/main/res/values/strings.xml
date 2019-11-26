@@ -916,5 +916,6 @@
     <string name="compatibility_mode">if the light does not flash, please turn on the compatibility mode.</string>
     <string name="rename_faile">Rename failed</string>
     <string name="delete_region_tip">Delete the area first restore the existing equipment in the area to factory.</string>
+    <string name="switch_btn">Switch Button</string>
 
 </resources>
