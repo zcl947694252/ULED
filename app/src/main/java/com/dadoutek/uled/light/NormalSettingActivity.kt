@@ -932,6 +932,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
         intent.putExtra(Constant.OTA_VERSION, light?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.LIGHT_NORMAL)
 
         startActivity(intent)
         finish()

@@ -24,6 +24,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -605,6 +606,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         intent.putExtra(Constant.OTA_MAC, curtain?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, curtain?.meshAddr)
         intent.putExtra(Constant.OTA_VERSION, curtain?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SMART_CURTAIN)
         startActivity(intent)
         finish()
     }

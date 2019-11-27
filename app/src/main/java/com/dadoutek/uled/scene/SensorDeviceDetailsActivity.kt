@@ -782,6 +782,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
         intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }

@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.FileSelectActivity;
@@ -211,6 +212,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             }
         }
     };
+    private int lightType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +237,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         lightMeshAddr = getIntent().getIntExtra(Constant.OTA_MES_Add, 0);
         lightMacAddr = getIntent().getStringExtra(Constant.OTA_MAC);
         lightVersion = getIntent().getStringExtra(Constant.OTA_VERSION);
+        lightType = getIntent().getIntExtra(Constant.OTA_TYPE,100);
+
         boolean b = "".equals(lightVersion) || lightVersion == null;
         btn_start_update.setClickable(!b);
         if (b) {
@@ -385,6 +389,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             this.msgHandler.removeCallbacksAndMessages(null);
         if (this.handler != null)
             this.handler.removeCallbacksAndMessages(null);
+
+        switch (lightType){
+            case DeviceType.SENSOR:
+            case DeviceType.NORMAL_SWITCH:
+                TelinkLightService.Instance().idleMode(true);
+        }
 
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }

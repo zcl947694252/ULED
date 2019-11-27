@@ -472,6 +472,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
         intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.NORMAL_SWITCH)
         val timeMillis = System.currentTimeMillis()
         if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
             startActivity(intent)

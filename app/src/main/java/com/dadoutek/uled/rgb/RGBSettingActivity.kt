@@ -293,6 +293,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         intent.putExtra(Constant.OTA_MAC, light?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
         intent.putExtra(Constant.OTA_VERSION, light?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.LIGHT_RGB)
         startActivity(intent)
         finish()
     }
