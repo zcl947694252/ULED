@@ -79,6 +79,8 @@ object ServerResultException {
             }
             NetworkStatusCode.ERROR_REGION_NOT_EXIST -> {//30000  该区域不存在  需要弹框
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.region_not_exist))
+            }  NetworkStatusCode.ERROR_BIN_NOT_EXIST -> {//30000  该区域不存在  需要弹框
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.no_have_bin))
             }
             else -> {
                 //throw RuntimeException(response.message)

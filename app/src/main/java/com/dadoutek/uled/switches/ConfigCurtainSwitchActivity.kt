@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -153,8 +154,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            if (switchDate!=null)
-            DBUtils.updateSwicth(switchDate!!)
+            if (switchDate != null)
+                DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }
     }
@@ -206,11 +207,11 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
     private fun showRenameDialog() {
         hideLoadingDialog()
         StringUtils.initEditTextFilter(renameEditText)
-            if (switchDate != null&&switchDate?.name!="")
-                renameEditText?.setText(switchDate?.name)
-            else
-                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
-                        + DBUtils.getAllSwitch().size)
+        if (switchDate != null && switchDate?.name != "")
+            renameEditText?.setText(switchDate?.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
+                    + DBUtils.getAllSwitch().size)
         renameEditText?.setSelection(renameEditText?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
@@ -400,11 +401,11 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                          /*  if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
-                                updateSwitch()
-                            } else {
-                                saveSwitch()
-                            }*/
+                            /*  if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
+                                  updateSwitch()
+                              } else {
+                                  saveSwitch()
+                              }*/
                             TelinkLightService.Instance()?.idleMode(true)
                             TelinkLightService.Instance()?.disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -531,5 +532,12 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         super.onDestroy()
         TelinkApplication.getInstance().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            finish()
+        }
+            return super.onKeyDown(keyCode, event)
     }
 }

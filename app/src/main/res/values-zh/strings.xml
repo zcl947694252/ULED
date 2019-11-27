@@ -840,5 +840,6 @@
     <string name="rename_faile">重命名失败</string>
     <string name="delete_region_tip">删除该区域请先把该区域设备恢复出厂设置…</string>
     <string name="switch_btn">开关</string>
+    <string name="no_have_bin">不存在该类型的bin文件</string>
 
 </resources>

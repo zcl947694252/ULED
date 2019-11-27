@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -491,6 +492,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
 
-
-
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
 }

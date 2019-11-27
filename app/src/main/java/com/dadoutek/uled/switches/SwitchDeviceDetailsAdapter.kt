@@ -17,6 +17,7 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
             }
 
             helper.setText(R.id.name, StringUtils.getSwitchName(scene))
+                    .setVisible(R.id.name,false)
 
             helper.setImageResource(R.id.img_light, R.drawable.icon_switch)
             helper.addOnClickListener(R.id.tv_setting)

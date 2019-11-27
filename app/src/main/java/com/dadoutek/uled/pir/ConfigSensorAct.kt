@@ -2,6 +2,7 @@ package com.dadoutek.uled.pir
 
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -339,5 +340,18 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
         LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightApplication.getApp().removeEventListener(this)
+        TelinkLightService.Instance()?.idleMode(true)
     }
 }

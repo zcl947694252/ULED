@@ -15,10 +15,7 @@ import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -183,7 +180,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     if (!isScanning)
-                    ToastUtils.showLong(getString(R.string.connect_success))
+                        ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                 }
                 afterLogin()
@@ -392,8 +389,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 initOnLayoutListener()
 
-            LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing }--------------${!pop!!.isShowing}")
-                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing&& window.decorView!=null)//isTelBase为false所以不显示 明天看为什么
+                LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing}--------------${!pop!!.isShowing}")
+                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null)//isTelBase为false所以不显示 明天看为什么
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
         }
@@ -531,7 +528,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable == null //代表这是第一次执行
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-         return   Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
+            return Commander.connect(meshAddress, macAddress, meshName, meshPwd, retryTimes, deviceTypes, fastestMode)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
@@ -620,8 +617,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        hideLoadingDialog()
+        if (loadDialog != null && loadDialog!!.isShowing)
+            hideLoadingDialog()
+        else
+            finish()
     }
-}
 
+}
 

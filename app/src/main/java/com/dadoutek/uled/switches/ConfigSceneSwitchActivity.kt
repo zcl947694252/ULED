@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -318,6 +319,13 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance()?.idleMode(true)
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun onErrorReport(info: ErrorReportInfo) {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
@@ -560,4 +568,5 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             }
             return id
         }
+
 }

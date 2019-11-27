@@ -11,10 +11,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
@@ -121,6 +118,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     override fun onDestroy() {
         super.onDestroy()
         TelinkLightApplication.getApp().removeEventListener(this)
+        TelinkLightService.Instance()?.idleMode(true)
     }
 
     override fun performed(event: Event<String>?) {
@@ -1091,5 +1089,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             progressBar_sensor?.visibility = View.GONE
             ToastUtils.showShort(getString(R.string.connect_fail))
         }, {})
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }

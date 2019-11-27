@@ -183,6 +183,8 @@ object NetworkStatusCode {
     const val ERROR_PERMISSION_DENFINED = 20028
     // 权限不足,无法操作: 20028
     const val ERROR_REGION_NOT_EXIST = 30000
+    //不存在改bin文件
+    const val ERROR_BIN_NOT_EXIST = 50000
     //20025  该区域不存在
 
 
