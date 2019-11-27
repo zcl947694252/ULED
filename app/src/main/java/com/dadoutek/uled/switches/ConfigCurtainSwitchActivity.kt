@@ -31,6 +31,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -525,4 +526,10 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 paramBytes)
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkApplication.getInstance().removeEventListener(this)
+        TelinkLightService.Instance()?.idleMode(true)
+    }
 }

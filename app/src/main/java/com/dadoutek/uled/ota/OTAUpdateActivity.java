@@ -393,7 +393,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         switch (lightType){
             case DeviceType.SENSOR:
             case DeviceType.NORMAL_SWITCH:
-                TelinkLightService.Instance().idleMode(true);
+
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance!=null)
+                instance.idleMode(true);
         }
 
         TelinkLightApplication.Companion.getApp().removeEventListener(this);

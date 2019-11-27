@@ -315,6 +315,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         TelinkApplication.getInstance().removeEventListener(this)
+        TelinkLightService.Instance()?.idleMode(true)
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {

@@ -293,6 +293,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         this.mApplication?.removeEventListener(this)
+        TelinkLightService.Instance()?.idleMode(true)
     }
 
 
@@ -489,5 +490,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 (groupAddress shr 8 and 0xFF).toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
+
+
 
 }
