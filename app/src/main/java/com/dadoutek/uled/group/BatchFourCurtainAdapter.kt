@@ -30,11 +30,11 @@ class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : 
             helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
-        if (item?.groupName != "") {
+        if (item?.hasGroup == true) {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.batch_tv_group_name, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item?.groupName
+            groupName.text = item.groupName
 
             icon.setImageResource(R.drawable.icon_curtain)
 

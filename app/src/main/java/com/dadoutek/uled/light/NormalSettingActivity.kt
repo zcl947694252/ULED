@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
@@ -37,16 +36,15 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.light.*
+import com.telink.bluetooth.light.ConnectionStatus
+import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.LightAdapter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -74,7 +72,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
     private var mConnectTimer: Disposable? = null
-    private var isLoginSuccess = false
     private var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
@@ -999,75 +996,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    private fun onErrorReport(info: ErrorReportInfo) {
-//       //("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
-        when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        //"蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        //"无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        //"未扫到目标设备")
-                    }
-                }
-
-            }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        //"未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        //"未建立物理连接")
-                    }
-                }
-
-                autoConnect()
-
-            }
-            ErrorReportEvent.STATE_LOGIN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        //"value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        //"read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        //"write login data 没有收到response")
-                    }
-                }
-
-                autoConnect()
-
-            }
-        }
-    }
-
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
-
-        val deviceInfo = event.args
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                hideLoadingDialog()
-                isLoginSuccess = true
-                mConnectTimer?.dispose()
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                autoConnect()
-                mConnectTimer?.dispose()
-                mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe {
-                            ToastUtil.showToast(this, getString(R.string.connecting))
-                        }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)//requestFeature() must be called before adding content必须放在者否则八错
@@ -1761,26 +1689,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    private fun sendInitCmd(brightness: Int, colorTemperature: Int) {
-        val addr = light?.meshAddr
-        var opcode: Byte
-        var params: ByteArray
-        opcode = Opcode.SET_LUM
-        params = byteArrayOf(brightness.toByte())
-        light?.brightness = brightness
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
-
-        try {
-            Thread.sleep(200)
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        } finally {
-            opcode = Opcode.SET_TEMPERATURE
-            params = byteArrayOf(0x05, colorTemperature.toByte())
-            light?.colorTemperature = colorTemperature
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
-        }
-    }
 
     fun remove() {
         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
@@ -1821,42 +1729,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    /**
-     * 自动重连
-     */
-    private fun autoConnect() {
-
-        if (TelinkLightService.Instance() != null) {
-            ToastUtils.showLong(getString(R.string.connecting))
-
-            if (this.mApp?.isEmptyMesh != false)
-                return
-
-            val mesh = this.mApp?.mesh
-
-            if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                TelinkLightService.Instance()?.idleMode(true)
-                return
-            }
-
-            //自动重连参数
-            val connectParams = Parameters.createAutoConnectParameters()
-            connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
-            connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
-
-            connectParams.autoEnableNotification(true)
-
-            //自动重连
-            TelinkLightService.Instance()?.autoConnect(connectParams)
-
-            //刷新Notify参数
-            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-            refreshNotifyParams.setRefreshRepeatCount(2)
-            refreshNotifyParams.setRefreshInterval(2000)
-            //开启自动刷新Notify
-            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
-        }
-    }
 
     override fun onBackPressed() {
         super.onBackPressed()

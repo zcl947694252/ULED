@@ -82,9 +82,6 @@ class RxDeviceList<T> : ArrayList<T>() {
     fun getObservable(index: Int = observableListHm.size, predicate: (T) -> Boolean): Observable<List<T>> {
         return Observable.create<List<T>> {
             observableListHm[index] = ObservableListHmValue(it, predicate)
-//            Observable.create { emitter: ObservableEmitter<List<T>> ->
-//                observableListHm[index] = ObservableListHmValue(emitter,predicate)
-//            }
         }
                 .doOnDispose {
                     observableListHm.remove(index)      //如果取消订阅了，直接把对应的index从HashMap中移除

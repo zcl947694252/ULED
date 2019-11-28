@@ -566,9 +566,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas.get(oldItemPosition)
-                val beanNew = mNewDatas.get(newItemPosition)
-                return if (!beanOld.name.equals(beanNew.name)) {
+                val beanOld = mOldDatas[oldItemPosition]
+                val beanNew = mNewDatas[newItemPosition]
+                return if (beanOld.name != beanNew.name) {
                     return false//如果有内容不同，就返回false
                 } else true
 

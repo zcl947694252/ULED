@@ -176,7 +176,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+
                         DBUtils.deleteConnector(light!!)
+
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }

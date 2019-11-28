@@ -121,7 +121,7 @@
                     android:id="@+id/batch_four_no_group"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
+                    android:layout_weight="3"
                     android:button="@null"
                     android:gravity="center"
                     android:checked="true"
@@ -134,16 +134,16 @@
                 android:layout_height="match_parent"
                 android:background="@color/gray_e" />
 
-                <RadioButton
-                    android:id="@+id/batch_four_grouped"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:text="@string/grouped_num"
-                    android:textColor="@color/selector_batch_group_color"
-                    android:textSize="18sp" />
+            <RadioButton
+                android:id="@+id/batch_four_grouped"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:button="@null"
+                android:gravity="center"
+                android:text="@string/grouped_num"
+                android:textColor="@color/selector_batch_group_color"
+                android:textSize="15sp" />
 
         </RadioGroup>
 
@@ -204,11 +204,15 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/batch_four_device_recycle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/batch_four_device_recycle_grouped"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
         <TextView
             android:id="@+id/image_no_device"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:drawableTop="@drawable/no_device"
             android:text="@string/no_device"
             android:drawablePadding="10dp"

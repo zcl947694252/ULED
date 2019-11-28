@@ -20,6 +20,7 @@ import com.dadoutek.uled.model.DeviceType
  * 更新描述
  */
 class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+    private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.batch_img_icon)
@@ -33,7 +34,7 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
             helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_unselected)
         }
 
-        if (item?.groupName != "") {
+        if (item?.belongGroupId !=allLightId) {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.batch_tv_group_name, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
@@ -47,7 +48,7 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            if (item.productUUID == DeviceType.LIGHT_RGB) {
+            if (item?.productUUID == DeviceType.LIGHT_RGB) {
                 icon.setImageResource(R.drawable.icon_rgblight_down)
             } else {
                 icon.setImageResource(R.drawable.icon_device_down)

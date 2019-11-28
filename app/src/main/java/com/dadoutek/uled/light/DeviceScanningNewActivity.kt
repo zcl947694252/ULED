@@ -1385,16 +1385,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             startGrouping()
         } else {
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-            intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
 
             for (item in mAddedDevices) {
                 mAddedDevicesInfos.add(item.deviceInfo)
             }
-
-            LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
             intent.putParcelableArrayListExtra(Constant.DEVICE_NUM,mAddedDevicesInfos)
+            intent.putExtra(Constant.DEVICE_TYPE,mAddDeviceType)
             startActivity(intent)
             finish()
+            LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
         }
 
         fun onDestroy() {
