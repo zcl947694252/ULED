@@ -276,7 +276,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun initData() {
         refreshData()
-        setDevicesData(deviceType)
+        setDevicesData()
         setGroupData()
     }
 
@@ -330,7 +330,29 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         if (group != null)
                             DBUtils.updateGroup(group)
                         groupAdapter?.notifyItemRangeChanged(position, 1)
-                        setDevicesData(deviceType)
+                        when (deviceType) {
+                            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                                for (device in listGroup) {
+                                    if (device.belongGroupId == group.id)
+                                        device.groupName = group.name
+                                }
+                                lightGroupedAdapter.notifyDataSetChanged()
+                            }
+                            DeviceType.SMART_CURTAIN -> {
+                                for (device in listGroupCutain) {
+                                    if (device.belongGroupId == group.id)
+                                        device.groupName = group.name
+                                }
+                                curtainGroupedAdapter.notifyDataSetChanged()
+                            }
+                            DeviceType.SMART_RELAY -> {
+                                for (device in listGroupRelay) {
+                                    if (device.belongGroupId == group.id)
+                                        device.groupName = group.name
+                                }
+                                relayGroupedAdapter.notifyDataSetChanged()
+                            }
+                        }
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
@@ -340,7 +362,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 设置设备数据
      */
     @SuppressLint("StringFormatInvalid")
-    private fun setDevicesData(deviceType: Int) {
+    private fun setDevicesData() {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 deviceDataLightAll.clear()

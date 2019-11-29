@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 蓝牙发送数据相关类
  * 蓝牙操作类
+ * todo 更改mac地址4位
  */
 public class Peripheral extends BluetoothGattCallback {
 
@@ -80,14 +81,28 @@ public class Peripheral extends BluetoothGattCallback {
     //    private int mConnState = CONN_STATE_IDLE;
     private AtomicInteger mConnState = new AtomicInteger(CONN_STATE_IDLE);
 
-    public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
+    private String get4ByteMac(byte[] scanRecord) {
+            long mac4Byte = 0;
+        if (scanRecord.length > 22){
+            mac4Byte = (long) ((scanRecord[19] << 24) & 0xFF000000 | (scanRecord[20] << 16) & 0x00FF0000 | (scanRecord[21] << 8) & 0x0000FF00 | scanRecord[22] & 0xFF) & 0xFFFFFFFFL;
+        }
+        String i1 = Integer.toHexString(scanRecord[19] & 0xff);
+        String  i2 = Integer.toHexString(scanRecord[20] & 0xff);
+        String  i3 = Integer.toHexString(scanRecord[21] & 0xff);
+        String  i4 = Integer.toHexString(scanRecord[22] & 0xff);
 
+        Log.v("zcl","-------"+i1+i2+i3+i4+"-----------------"+mac4Byte);
+        return String.valueOf(mac4Byte);
+    }
+
+    public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
         this.device = device;
         this.scanRecord = scanRecord;
         this.rssi = rssi;
-
+        String byteMac = get4ByteMac(scanRecord);
+        Log.v("","zcl"+device.getAddress()+" 新地址"+byteMac);
         this.name = device.getName();
-        this.mac = device.getAddress();
+        this.mac = byteMac;
         this.type = device.getType();
     }
 
