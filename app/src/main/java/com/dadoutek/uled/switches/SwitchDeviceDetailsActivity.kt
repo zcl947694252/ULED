@@ -41,13 +41,12 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -56,11 +55,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 开关列表
  */
-class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
+class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var downloadDispoable: Disposable? = null
+    private var mConnectDeviceDisposable: Disposable? = null
     private val SCENE_MAX_COUNT = 100
     private var isclickOTA: Boolean = false
     private var isOta: Boolean = false
@@ -154,7 +156,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun onLogin(bestRSSIDevice: DeviceInfo) {
         mScanTimeoutDisposal?.dispose()
-        this.mApplication?.removeEventListener(this)
         hideLoadingDialog()
         if (TelinkApplication.getInstance().connectDevice != null)
             Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
@@ -181,33 +182,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 showToast(getString(R.string.get_version_fail))
                             }
                     )
-    }
-
-    private fun onLeScan(leScanEvent: LeScanEvent) {
-        val meshAddress = Constant.SWITCH_PIR_ADDRESS
-        val deviceInfo: DeviceInfo = leScanEvent.args
-
-        if (meshAddress == -1) {
-            return
-        }
-
-        when (leScanEvent.args.productUUID) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
-                val MAX_RSSI = 81
-                if (leScanEvent.args.rssi < MAX_RSSI) {
-                    if (bestRSSIDevice != null) {
-                        //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
-                        if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                            bestRSSIDevice = deviceInfo
-                        }
-                    } else {
-                        bestRSSIDevice = deviceInfo
-                    }
-                } else {
-                    ToastUtils.showLong(getString(R.string.rssi_low))
-                }
-            }
-        }
     }
 
     private fun addDevice() {
@@ -391,23 +365,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         }
     }
 
-    override fun performed(event: Event<String>?) {
-        when (event?.type) {
-            LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_COMPLETED -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> {
-                ToastUtils.showShort(getString(R.string.scanning_timeout))
-                hideLoadingDialog()
-            }
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-
-            ErrorReportEvent.ERROR_REPORT -> {
-                val info = (event as ErrorReportEvent).args
-                onErrorReportNormal(info)
-                hideLoadingDialog()
-            }
-        }
-    }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
@@ -440,17 +397,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     @SuppressLint("CheckResult")
     private fun getDeviceVersion(deviceInfo: DeviceInfo) {
         if (TelinkApplication.getInstance().connectDevice != null) {
-             Commander.getDeviceVersion(deviceInfo.meshAddress)
+             downloadDispoable = Commander.getDeviceVersion(deviceInfo.meshAddress)
                     .subscribe(
                             { s ->
                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                     currentLight!!.version = s
-                                    var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                                    if (isBoolean) {
-                                        transformView()
-                                    } else {
-                                        OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, s, otaPrepareListner)
-                                    }
+                                    isDirectConnectDevice()
                                 } else {
                                     ToastUtils.showShort(getString(R.string.version_disabled))
                                 }
@@ -467,7 +419,45 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         isclickOTA = false
     }
 
+    private fun isDirectConnectDevice() {
+                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentLight?.macAddr) {
+            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
+                if (isBoolean) {
+                    transformView()
+                } else {
+                    OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, currentLight?.version, otaPrepareListner)
+                }
+        } else {
+            showLoadingDialog(getString(R.string.please_wait))
+            TelinkLightService.Instance()?.idleMode(true)
+            mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMap {
+                        connect(currentLight!!.meshAddr,macAddress = currentLight!!.macAddr)
+                    }
+                    ?.subscribe(
+                            {
+                                onLogin(it)
+                                hideLoadingDialog()
+                                if (isBoolean) {
+                                    transformView()
+                                } else {
+                                    OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, currentLight!!.version, otaPrepareListner)
+                                }
+                            }
+                            ,
+                            {
+                                hideLoadingDialog()
+                                ToastUtils.showLong(R.string.connect_fail2)
+                                LogUtils.d(it)
+                            })
+        }
+    }
+
     private fun transformView() {
+        mConnectDeviceDisposable?.dispose()
         val intent = Intent(this@SwitchDeviceDetailsActivity, OTAUpdateActivity::class.java)
         intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
@@ -545,9 +535,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     override fun onDestroy() {
         super.onDestroy()
+        downloadDispoable?.dispose()
+        mConnectDeviceDisposable?.toString()
         acitivityIsAlive = false
         //移除事件
-        this.mApplication?.removeEventListener(this)
     }
 
     private val onClick = View.OnClickListener {

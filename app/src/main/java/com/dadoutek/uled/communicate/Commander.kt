@@ -661,7 +661,7 @@ object Commander : EventListener<String> {
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
-                if (macAddress != null)
+                if (macAddress != null&&macAddress!="0")
                     connectParams.setConnectMac(macAddress)
                 else if (meshAddr != 0)
                     connectParams.setConnectMeshAddress(meshAddr)

@@ -33,25 +33,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 蓝牙发送数据相关类
  * 蓝牙操作类
  * todo 更改mac地址4位
+ *
  */
 public class Peripheral extends BluetoothGattCallback {
-
-    public static final int CONNECTION_PRIORITY_BALANCED = 0;
     public static final int CONNECTION_PRIORITY_HIGH = 1;
-    public static final int CONNECTION_PRIORITY_LOW_POWER = 2;
-
     private static final int CONN_STATE_IDLE = 1;
     private static final int CONN_STATE_CONNECTING = 2;
     private static final int CONN_STATE_CONNECTED = 4;
-    private static final int CONN_STATE_DISCONNECTING = 8;
     private static final int CONN_STATE_CLOSED = 16;
-
     private static final int RSSI_UPDATE_TIME_INTERVAL = 2000;
-
     protected final Queue<CommandContext> mInputCommandQueue = new ConcurrentLinkedQueue<>();
     protected final Queue<CommandContext> mOutputCommandQueue = new ConcurrentLinkedQueue<>();
     protected final Map<String, CommandContext> mNotificationCallbacks = new ConcurrentHashMap<>();
-
     protected final Handler mTimeoutHandler = new Handler(Looper.getMainLooper());
     protected final Handler mRssiUpdateHandler = new Handler(Looper.getMainLooper());
     protected final Handler mDelayHandler = new Handler(Looper.getMainLooper());
@@ -60,8 +53,6 @@ public class Peripheral extends BluetoothGattCallback {
     protected final Runnable mCommandDelayRunnable = new CommandDelayRunnable();
 
     private final Object mStateLock = new Object();
-//    private final Object mProcessLock = new Object();
-
     protected BluetoothDevice device;
     protected BluetoothGatt gatt;
     protected int rssi;
@@ -71,14 +62,11 @@ public class Peripheral extends BluetoothGattCallback {
     protected byte[] macBytes;
     protected int type;
     protected List<BluetoothGattService> mServices;
-
     protected AtomicBoolean processing = new AtomicBoolean(false);
-
     protected boolean monitorRssi;
     protected int updateIntervalMill = 5 * 1000;
     protected int commandTimeoutMill = 10 * 1000;
     protected long lastTime;
-    //    private int mConnState = CONN_STATE_IDLE;
     private AtomicInteger mConnState = new AtomicInteger(CONN_STATE_IDLE);
 
     private String get4ByteMac(byte[] scanRecord) {
@@ -91,7 +79,7 @@ public class Peripheral extends BluetoothGattCallback {
         String  i3 = Integer.toHexString(scanRecord[21] & 0xff);
         String  i4 = Integer.toHexString(scanRecord[22] & 0xff);
 
-        Log.v("zcl","-------"+i1+i2+i3+i4+"-----------------"+mac4Byte);
+        Log.v("zcl","---解析新mac----"+i1+i2+i3+i4+"-----------------"+mac4Byte);
         return String.valueOf(mac4Byte);
     }
 
@@ -129,6 +117,13 @@ public class Peripheral extends BluetoothGattCallback {
     public byte[] getMacBytes() {
 
         if (this.macBytes == null) {
+       /*    long mac = Long.parseLong(getMacAddress());
+            long macL1= (mac & 0xFF000000)>>24;
+            long macL2= (mac & 0x00FF0000)>>16;
+            long macL3= (mac & 0x0000FF00)>>8;
+            long macL4= mac & 0x000000FF;
+            Log.v("zcl","---解析新mac后----"+macL1+"---"+macL1+"---"+macL1+"----"+macL1);
+        */
             String[] strArray = this.getMacAddress().split(":");
             int length = strArray.length;
             this.macBytes = new byte[length];
@@ -736,12 +731,7 @@ public class Peripheral extends BluetoothGattCallback {
                 + newState);
 
         if (newState == BluetoothGatt.STATE_CONNECTED) {
-//            setMTU(103);
-
             this.mConnState.set(CONN_STATE_CONNECTED);
-
-//            Log.d("dadouhjj", "onConnectionStateChange: "+a);
-
             if (this.gatt == null || !this.gatt.discoverServices()) {
                 TelinkLog.d("remote service discovery has been stopped status = " + newState);
                 this.disconnect();
@@ -850,7 +840,6 @@ public class Peripheral extends BluetoothGattCallback {
     public void sendData(byte[] data, BluetoothGattCharacteristic characteristicData, int writeType) {
         int chunksize = 20; //20 byte chunk
         packetSize = (int) Math.ceil(data.length / (double) chunksize); //make this variable public so we can access it on the other function
-
         //this is use as header, so peripheral device know ho much packet will be received.
         characteristicData.setValue(data);
         characteristicData.setWriteType(writeType);
@@ -1025,6 +1014,7 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     private final class CommandDelayRunnable implements Runnable {
+
         @Override
         public void run() {
             synchronized (mOutputCommandQueue) {
@@ -1033,4 +1023,5 @@ public class Peripheral extends BluetoothGattCallback {
             }
         }
     }
+
 }

@@ -1,10 +1,6 @@
 package com.dadoutek.uled.model.HttpModel
 
-import android.content.Context
-import android.os.Environment
-import android.util.Log
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -29,6 +25,7 @@ object DownLoadFileModel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
+                    LogUtils.v("zcl请求升级版本$localVersion")
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }

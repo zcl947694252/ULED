@@ -60,6 +60,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var downloadDispoable: Disposable? = null
     private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
     private lateinit var light: DbLight
@@ -851,6 +852,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onDestroy() {
         super.onDestroy()
+        downloadDispoable?.dispose()
         mConnectTimer?.dispose()
         mDisposable.dispose()
     }
@@ -913,7 +915,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     if (it!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
-                            transformView()
+                            downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
+                                    .subscribe(
+                                            { s ->
+                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                    light!!.version = s
+                                                    transformView()
+                                                } else {
+                                                    ToastUtils.showShort(getString(R.string.version_disabled))
+                                                }
+                                                hideLoadingDialog()
+                                            },
+                                            {
+                                                hideLoadingDialog()
+                                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                                            }
+                                    )
+
                         } else {
                             OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
                         }
