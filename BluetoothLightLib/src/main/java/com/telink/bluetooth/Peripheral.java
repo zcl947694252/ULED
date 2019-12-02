@@ -81,17 +81,15 @@ public class Peripheral extends BluetoothGattCallback {
     //    private int mConnState = CONN_STATE_IDLE;
     private AtomicInteger mConnState = new AtomicInteger(CONN_STATE_IDLE);
 
-    private String get4ByteMac(byte[] scanRecord) {
-            long mac4Byte = 0;
-        if (scanRecord.length > 22){
-            mac4Byte = (long) ((scanRecord[19] << 24) & 0xFF000000 | (scanRecord[20] << 16) & 0x00FF0000 | (scanRecord[21] << 8) & 0x0000FF00 | scanRecord[22] & 0xFF) & 0xFFFFFFFFL;
-        }
-        String i1 = Integer.toHexString(scanRecord[19] & 0xff);
-        String  i2 = Integer.toHexString(scanRecord[20] & 0xff);
-        String  i3 = Integer.toHexString(scanRecord[21] & 0xff);
-        String  i4 = Integer.toHexString(scanRecord[22] & 0xff);
+    private String get4ByteMac(String macString) {
+        String[] strArray = macString.split(":");
+        this.macBytes = new byte[4];
+        this.macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);
+        this.macBytes[1] = (byte) (Integer.parseInt(strArray[4], 16) & 0xFF);
+        this.macBytes[2] = (byte) (Integer.parseInt(strArray[3], 16) & 0xFF);
+        this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
 
-        Log.v("zcl","-------"+i1+i2+i3+i4+"-----------------"+mac4Byte);
+        long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
         return String.valueOf(mac4Byte);
     }
 
@@ -99,10 +97,8 @@ public class Peripheral extends BluetoothGattCallback {
         this.device = device;
         this.scanRecord = scanRecord;
         this.rssi = rssi;
-        String byteMac = get4ByteMac(scanRecord);
-        Log.v("","zcl"+device.getAddress()+" 新地址"+byteMac);
         this.name = device.getName();
-        this.mac = device.getAddress();
+        this.mac = get4ByteMac(device.getAddress());
         this.type = device.getType();
     }
 
@@ -127,17 +123,14 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public byte[] getMacBytes() {
-
         if (this.macBytes == null) {
-            String[] strArray = this.getMacAddress().split(":");
-            int length = strArray.length;
-            this.macBytes = new byte[length];
 
-            for (int i = 0; i < length; i++) {
-                this.macBytes[i] = (byte) (Integer.parseInt(strArray[i], 16) & 0xFF);
-            }
-
-            Arrays.reverse(this.macBytes, 0, length - 1);
+            long macLong = Long.valueOf(mac);
+            macBytes = new byte[4];
+            macBytes[0] = (byte) (macLong >> 24 & 0xFF);
+            macBytes[1] = (byte) (macLong >> 16 & 0xFF);
+            macBytes[2] = (byte) (macLong >> 8 & 0xFF);
+            macBytes[3] = (byte) (macLong & 0xFF);
         }
 
         return this.macBytes;

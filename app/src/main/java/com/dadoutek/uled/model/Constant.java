@@ -9,9 +9,9 @@ import java.io.Serializable;
 public class Constant implements Serializable {
 
     public static final Boolean isDebug = true;
-    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
+//    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+//    public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
 
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转
     // 换
