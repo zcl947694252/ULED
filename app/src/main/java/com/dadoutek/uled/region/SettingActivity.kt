@@ -29,6 +29,7 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -147,11 +148,11 @@ class SettingActivity : BaseActivity() {
         hinitTwo.text = getString(resetFactoryAllDevice)
         hinitThree.text = getString(haveQuestionLookNotice)
         disposableInterval?.dispose()
-        disposableInterval = Observable.intervalRange(0, 11, 0, 1, TimeUnit.SECONDS)
+        disposableInterval = Observable.intervalRange(0, downTime, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = 10 - it as Long
+                    var num = downTime -1 - it
                     if (num == 0L) {
                         setTimerZero()
                     } else {

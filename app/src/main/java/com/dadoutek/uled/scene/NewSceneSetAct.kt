@@ -647,7 +647,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         var id = 0
-        for (i in 1..16) {
+        for (i in 1..100) {
             if (idList.contains(i)) {
                 Log.d("sceneID", "getSceneId: " + "aaaaa")
                 continue

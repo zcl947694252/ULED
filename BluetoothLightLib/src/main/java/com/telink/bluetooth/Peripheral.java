@@ -102,7 +102,7 @@ public class Peripheral extends BluetoothGattCallback {
         String byteMac = get4ByteMac(scanRecord);
         Log.v("","zcl"+device.getAddress()+" 新地址"+byteMac);
         this.name = device.getName();
-        this.mac = byteMac;
+        this.mac = device.getAddress();
         this.type = device.getType();
     }
 
@@ -1025,7 +1025,6 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     private final class CommandDelayRunnable implements Runnable {
-
         @Override
         public void run() {
             synchronized (mOutputCommandQueue) {
@@ -1034,5 +1033,4 @@ public class Peripheral extends BluetoothGattCallback {
             }
         }
     }
-
 }

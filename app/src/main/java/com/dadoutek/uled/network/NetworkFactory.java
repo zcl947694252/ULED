@@ -45,12 +45,13 @@ public class NetworkFactory {
         if (okHttpClient == null) {
             okHttpClient = initHttpClient();
         }
+        /**
+         * 记得修改stomp的前缀地址 StompManager不能是测试的  还有dadousmart
+         */
         if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-                    //.baseUrl(Constant.BASE_URL_JAVA)
-                    .baseUrl(Constant.BASE_URL_JAVA)
-                    //.baseUrl(Constant.BASE_DEBUG_URL)
+                    .baseUrl(Constant.BASE_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();

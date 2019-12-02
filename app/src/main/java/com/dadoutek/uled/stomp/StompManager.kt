@@ -2,6 +2,7 @@ package com.dadoutek.uled.stomp
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.base.CancelAuthorMsg
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.google.gson.Gson
@@ -14,15 +15,6 @@ import java.util.*
 
 
 class StompManager private constructor() {
-    //长连接请求服务器域名地址
-    val WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint"
-    //长连接测试请求服务器域名地址
-    val WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint"
-    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
-    val WS_DEBUG_HOST = "/smartlight/test"
-    //虚拟主机号
-    val WS_HOST = "/smartlight"
-
 /*    //二维码频道
     val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
         废弃 因为使用这个是再登录成功之前赋值 是上一个账号
@@ -52,11 +44,11 @@ class StompManager private constructor() {
     fun initStompClient() {
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
-        headers.add(StompHeader("host", WS_DEBUG_HOST))
+       headers.add(StompHeader("host", Constant.WS_HOST))
 
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
-            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_BASE_URL_DEBUG)
+            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_STOMP_URL)
 
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)

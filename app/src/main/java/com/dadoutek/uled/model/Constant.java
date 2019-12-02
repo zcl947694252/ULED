@@ -8,32 +8,41 @@ import java.io.Serializable;
 
 public class Constant implements Serializable {
 
+    public static final Boolean isDebug = true;
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
 
+    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转
+    // 换
+    // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
+    public static String WS_HOST = "/smartlight";
 
-    //正式服务器
-    //#define HTTPSERVER @"https://dev.dadoutek.com/smartlight_java"
-    //#define SOCKETSERVER @"ws://dev.dadoutek.com/smartlight_java/websocket-endpoint"
-
-    //网络请求服务器域名地址
-    public static final String BASE_URL = "https://dev.dadoutek.com/smartlight/";
     //网络请求服务器java域名地址
     public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
     //网络请求服务器测试地址
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
+    //长连接请求服务器域名地址
+    public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
+    //长连接测试请求服务器域名地址
+    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
 
-    public static final String USER_CHANNEL = "dadou";
+    /**
+     * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
+     */
+    public static final long downTime = isDebug ? 2 : 11;
+    public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
+    public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
+
+    public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
     public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
 
     public static final int MAX_GROUP_COUNT = 250;
     public static final int MAX_VALUE = 100;
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
-    public static  boolean isTeck = false;
+    public static boolean isTeck = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
-    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
-    public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
     public static final String COLOR_NODE_KEY = "COLOR_NODE_KEY";
@@ -248,7 +257,6 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_NO = 1L;
 
 
-
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
     //RGB分组
@@ -276,18 +284,18 @@ public class Constant implements Serializable {
     //是否显示区域弹框
     public static final String IS_SHOW_REGION_DIALOG = "IS_SHOW_REGION_DIALOG";
     //区域列表key
-    public static final String REGION_LIST="REGION_LIST";
+    public static final String REGION_LIST = "REGION_LIST";
     //区域授权列表key
-    public static final String REGION_AUTHORIZE_LIST="REGION_AUTHORIZE_LIST";
+    public static final String REGION_AUTHORIZE_LIST = "REGION_AUTHORIZE_LIST";
 
     //区域列别
-    public static final int REGION_TYPE=1;
+    public static final int REGION_TYPE = 1;
     //授权区域列别
-    public static final int REGION_AUTHORIZE_TYPE=2;
+    public static final int REGION_AUTHORIZE_TYPE = 2;
     //判断是否是telbase类
-    public static boolean isTelBase =true;
+    public static boolean isTelBase = true;
     //进行OTA的设备类型
-    public static final String OTA_TYPE ="OTA_TYPE";
+    public static final String OTA_TYPE = "OTA_TYPE";
 
     //进行OTA的设备类型为开关
     public static final int SWITCH_TYPE = 3;
@@ -302,9 +310,9 @@ public class Constant implements Serializable {
     public static final String CANCEL_CODE = "CANCEL_CODE";
 
     //OTA 升级版本
-    public static final String OTA_VERSION="OTA_VERSION";
+    public static final String OTA_VERSION = "OTA_VERSION";
     //是否是重新配置
-    public static final String ISCONFIRM ="isConfirm";
-    public static  boolean isCreat = false;
+    public static final String ISCONFIRM = "isConfirm";
+    public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
 }
