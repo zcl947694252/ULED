@@ -534,12 +534,6 @@ object Commander : EventListener<String> {
                     LogUtils.d("mConnectEmitter == $mConnectEmitter")
                 }
             }
-//            LightAdapter.STATUS_LOGOUT -> {
-//                if (mConnectEmitter?.isDisposed == false) {
-//                    mConnectEmitter?.onError(Throwable("Connect Failed"))
-//                    TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, this)
-//                }
-//            }
         }
     }
 
@@ -637,8 +631,7 @@ object Commander : EventListener<String> {
      * 双色温渐变模式：[16]: 色温
      */
     fun addGradient(dstAddr: Int, id: Int, node: Int, mode: Int, brightness: Int,
-                    r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff, successCallback: (version: String?) -> Unit1,
-                    failedCallback: () -> Unit1) {
+                    r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType = 0x00
         val params: ByteArray
@@ -680,12 +673,10 @@ object Commander : EventListener<String> {
             }.
                     timeout(15, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
-            }
-                    .doFinally {
+            }.doFinally {
                         LogUtils.d("connect doFinally")
                         mConnectObservable = null
-                    }
-                    .retry(retryTimes)
+                    }.retry(retryTimes)
 
             return mConnectObservable
         } else {
@@ -758,6 +749,4 @@ object Commander : EventListener<String> {
         }
         mResetSuccess = true
     }
-
-
 }

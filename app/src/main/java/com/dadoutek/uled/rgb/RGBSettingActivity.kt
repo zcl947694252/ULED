@@ -1973,7 +1973,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                         DBUtils.updateLight(light!!)
                     }
                 }
-
             }
         }
     }
