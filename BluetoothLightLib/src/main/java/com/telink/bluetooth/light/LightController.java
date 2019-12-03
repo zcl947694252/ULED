@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;
@@ -960,10 +959,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
 //        for(int i=0;i<data.length;i++){
 //            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
 //        }
-
         System.arraycopy(data, 0, nonce, 3, 5);
-        byte[] result = AES.decrypt(this.sessionKey, nonce, data);
-
+            byte[] result;
+        if (nonce!=null&&sessionKey!=null&&sessionKey.length>0&&nonce.length>0&&data.length>0) {
+            result = AES.decrypt(this.sessionKey, nonce, data);
+        } else {
+            result = new byte[0];
+        }
         TelinkLog.d("Notify Data --> " + Arrays.bytesToHexString(result, ","));
 
         this.onDeviceAddressNotify(data, tag);

@@ -170,12 +170,7 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                         sv_log.setVisibility(View.VISIBLE);
                         String time = mTimeFormat.format(Calendar.getInstance().getTimeInMillis());
                         tv_log.append("\n" + time + ":" + msg.obj.toString());
-//
-////                    int scroll_amount = tv_log.getBottom();
-////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
-////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                       //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
@@ -211,6 +206,7 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
             }
         }
     };
+    private boolean developerModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,13 +255,16 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         TelinkLightService.Instance().enableNotification();
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         initToolbar();
-        otaProgress = (TextView) findViewById(R.id.progress_ota);
-        meshOtaProgress = (TextView) findViewById(R.id.progress_mesh_ota);
-        tv_log = (TextView) findViewById(R.id.tv_log);
-        sv_log = (ScrollView) findViewById(R.id.sv_log);
-        tv_version = (TextView) findViewById(R.id.tv_version);
+        otaProgress = findViewById(R.id.progress_ota);
+        meshOtaProgress = findViewById(R.id.progress_mesh_ota);
+        tv_log = findViewById(R.id.tv_log);
+        sv_log = findViewById(R.id.sv_log);
+        tv_version = findViewById(R.id.tv_version);
+
+         developerModel = SharedPreferencesUtils.isDeveloperModel();
+        select.setVisibility(developerModel?View.VISIBLE:View.GONE);
 
         if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
             mPath = SharedPreferencesUtils.getUpdateFilePath();
@@ -575,9 +574,6 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
             this.sendStopMeshOTACommand();
         }
         this.mode = MODE_COMPLETE;
-        TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }

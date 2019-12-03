@@ -214,7 +214,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
-                var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
             LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             if (granted!!) {
@@ -233,7 +233,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light!!.meshAddr,macAddress = light!!.macAddr)
+                        connect(light!!.meshAddr, macAddress = light!!.macAddr)
                     }
                     ?.subscribe(
                             {
@@ -1447,10 +1447,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
 
-
-
-
-
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
@@ -2043,14 +2039,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         if (fromUser) {
             if (r == 0 && g == 0 && b == 0) {
             } else {
-                GlobalScope.launch {
-                    if (currentShowGroupSetPage) {
-                        group?.color = color
-                    } else {
-                        light?.color = color
-                    }
-                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+                if (currentShowGroupSetPage) {
+                    group?.color = color
+                } else {
+                    light?.color = color
                 }
+                changeColor(r.toByte(), g.toByte(), b.toByte(), false)
             }
         }
     }
@@ -2065,24 +2059,22 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         } else {
             group?.meshAddr!!
         }
+        GlobalScope.launch {
+            val opcode = Opcode.SET_TEMPERATURE
 
-        val opcode = Opcode.SET_TEMPERATURE
+            val params = byteArrayOf(0x04, red, green, blue)
 
-        val params = byteArrayOf(0x04, red, green, blue)
+            val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
+            Log.d("RGBCOLOR", logStr)
 
-        val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("RGBCOLOR", logStr)
-
-        if (isOnceSet) {
-            GlobalScope.launch {
+            if (isOnceSet) {
                 delay(50)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+            } else {
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
             }
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
-        } else {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+            reSetWhiteAndBrightness()
         }
-
-        reSetWhiteAndBrightness()
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理

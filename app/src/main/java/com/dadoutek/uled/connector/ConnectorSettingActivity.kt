@@ -291,7 +291,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (!currentShowPageGroup) {
             checkAndSaveName()
             isRenameState = false
-//            tvOta.setText(R.string.ota)
         } else {
             checkAndSaveNameGp()
         }
@@ -301,11 +300,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-//            editTitle.visibility=View.GONE
             relayName.visibility = View.VISIBLE
             relayName.text = light?.name
         } else {
-//            editTitle.visibility=View.GONE
             relayName.visibility = View.VISIBLE
             relayName.text = name
             light?.name = name
@@ -525,11 +522,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
-//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
