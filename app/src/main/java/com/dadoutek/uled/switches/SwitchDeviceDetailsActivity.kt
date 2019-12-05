@@ -365,35 +365,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-
-    private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
-        val deviceInfo = deviceEvent.args
-        mDeviceMeshName = deviceInfo.meshName ?: getString(R.string.unnamed)
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-//                bestRSSIDevice = deviceInfo
-//                hideLoadingDialog()
-//                if (isOta) {
-//                    getDeviceVersion()
-//                } else {
-//                    onLogin()//判断进入那个开关设置界面
-//                    stopConnectTimer()
-//                    LogUtils.d("connected22")
-//                }
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                if (isclickOTA)
-                    connect()
-                isclickOTA = false
-            }
-
-            LightAdapter.STATUS_CONNECTED -> {
-                LogUtils.d("connected11")
-                hideLoadingDialog()
-            }
-        }
-    }
-
     @SuppressLint("CheckResult")
     private fun getDeviceVersion(deviceInfo: DeviceInfo) {
         if (TelinkApplication.getInstance().connectDevice != null) {

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 20
+const val SCAN_TIMEOUT_SECOND: Int = 20
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class ReconnectionBluetooth : EventListener<String> {

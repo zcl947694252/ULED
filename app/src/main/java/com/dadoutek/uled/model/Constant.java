@@ -4,18 +4,17 @@ import java.io.Serializable;
 
 /**
  * Created by hejiajun on 2018/3/22.
- *
- * 12-2号版本再次上传时候记得改成dadousmart
  */
 
 public class Constant implements Serializable {
 
-    public static final Boolean isDebug = false;
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
-    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+    public static final Boolean isDebug = true;
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
 
-    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
+    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转
+    // 换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
     public static String WS_HOST = "/smartlight";
 

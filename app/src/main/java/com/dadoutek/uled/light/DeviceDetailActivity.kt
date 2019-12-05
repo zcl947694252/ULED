@@ -11,6 +11,9 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -46,6 +49,7 @@ import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.util.MeshUtils
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_detail.*
+import kotlinx.android.synthetic.main.template_search_tool.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +70,7 @@ import kotlinx.coroutines.launch
 private const val MAX_RETRY_CONNECT_TIME = 5
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
+    private lateinit var allLightData: ArrayList<DbLight>
     private var directLight: DbLight? = null
     private var mConnectDisposable: Disposable? = null
     private var type: Int? = null
@@ -133,7 +138,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-        if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {
+       /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {
             device_detail_direct_item.visibility = View.VISIBLE
             device_detail_direct_name.text = directLight?.name
             directLight?.groupName = StringUtils.getLightGroupName(directLight)
@@ -155,9 +160,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 goSetting()
             }
 
-        } else {
+        } else {*/
             device_detail_direct_item?.visibility = View.GONE
-        }
+       // }
 
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.addItemDecoration(RecyclerGridDecoration(this, 2))
@@ -213,9 +218,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         adaper!!.bindToRecyclerView(recycleView)
-        val size = if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
+        val size =/* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
             lightsData.size + 1
-        else
+        else*/
             lightsData.size
 
         when (type) {
@@ -225,20 +230,17 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     lightsData[i].updateIcon()
                 }
             }
-
             Constant.INSTALL_RGB_LIGHT -> {
                 toolbar.title = getString(R.string.rgb_light) + " (" + size + ")"
                 for (i in lightsData.indices) {
                     lightsData[i].updateRgbIcon()
                 }
             }
-
             Constant.INSTALL_LIGHT_OF_CW -> {
                 for (i in lightsData?.indices) {
                     lightsData[i].updateIcon()
                 }
             }
-
             Constant.INSTALL_LIGHT_OF_RGB -> {
                 for (i in lightsData?.indices) {
                     lightsData[i].updateRgbIcon()
@@ -253,7 +255,49 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
+        search_clear.setOnClickListener{
+            clearSearch()
+        }
+        search_btn.setOnClickListener {
+            clearSearch()
+        }
+        search_no_result.visibility = View.GONE
+        search_view.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (TextUtils.isEmpty(s)) {
+                    // 清除ListView的过滤
+                    lightsData.clear()
+                    lightsData.addAll(allLightData)
+                    search_clear.visibility = View.GONE
+                    search_btn.setTextColor(getColor(R.color.gray_6))
+                    search_no_result.visibility = View.GONE
+                } else {
+                    // 使用用户输入的内容对ListView的列表项进行过滤
+                    lightsData.clear()
+                    search_btn.text = getString(R.string.cancel)
+                    search_btn.setTextColor(getColor(R.color.gray_6))
+                    search_clear.visibility = View.VISIBLE
+                    val list = allLightData.filter { dbLight -> dbLight.name.contains(s.toString()) }
+                    if (list.isEmpty()){
+                        search_no_result.visibility = View.VISIBLE
+                    }else{
+                        search_no_result.visibility = View.GONE
+                    lightsData.addAll(list)
+                    adaper?.notifyDataSetChanged()
+                    }
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
+
+    private fun clearSearch() {
+        search_btn.text = getString(R.string.search)
+        search_btn.setTextColor(getColor(R.color.gray_6))
+        search_view.setText("")
+    }
+
 
     private fun setTopLightState() {
         when (type) {
@@ -580,20 +624,20 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             directLight = null
             when (type) {
                 Constant.INSTALL_NORMAL_LIGHT -> {//普通灯列表
-                    var allLightData = DBUtils.getAllNormalLight()
+                    allLightData = DBUtils.getAllNormalLight()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
-                            if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
+                          /*  if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
                                     == TelinkLightApplication.getApp().connectDevice?.meshAddress)
                                 directLight = allLightData[i]
-                            else {
+                            else {*/
                                 val groupName = StringUtils.getLightGroupName(allLightData[i])
                                 if (groupName != getString(R.string.not_grouped))
                                     allLightData[i].groupName = groupName
                                 else
                                     allLightData[i].groupName = ""
                                 lightsData.add(allLightData[i])
-                            }
+                            //}
                         }
                         lightsData = sortList(lightsData)
 
@@ -623,23 +667,23 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
                 Constant.INSTALL_RGB_LIGHT -> {//全彩灯
-                    var allLightDatas = DBUtils.getAllRGBLight()
+                    allLightData = DBUtils.getAllRGBLight()
                     lightsData.clear()
-                    if (allLightDatas.size > 0) {
-                        for (i in allLightDatas.indices) {
-                            if (TelinkLightApplication.getApp().connectDevice != null && allLightDatas[i].meshAddr
+                    if (allLightData.size > 0) {
+                        for (i in allLightData.indices) {
+                           /* if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
                                     == TelinkLightApplication.getApp().connectDevice?.meshAddress)
-                                directLight = allLightDatas[i]
-                            else {
-                                val groupName = StringUtils.getLightGroupName(allLightDatas[i])
+                                directLight = allLightData[i]
+                            else {*/
+                                val groupName = StringUtils.getLightGroupName(allLightData[i])
                                 if (groupName != getString(R.string.not_grouped))
-                                    allLightDatas[i].groupName = groupName
+                                    allLightData[i].groupName = groupName
                                 else
-                                    allLightDatas[i].groupName = ""
-                                lightsData.add(allLightDatas[i])
+                                    allLightData[i].groupName = ""
+                                lightsData.add(allLightData[i])
 
                                 lightsData = sortList(lightsData)
-                            }
+                           // }
                         }
 
                         var batchGroup = changeHaveDeviceView()
@@ -966,10 +1010,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             for (j in i + 1 until arr.size) {//until不 不包括结束区间
                 val jLight = arr[j]
                 val mLight = arr[min]
-                if (jLight!=null&&mLight!=null)
-                if (jLight.belongGroupId < mLight.belongGroupId) {
-                    min = j
-                }
+                if (jLight != null && mLight != null)
+                    if (jLight.belongGroupId < mLight.belongGroupId) {
+                        min = j
+                    }
             }
             if (arr[i].belongGroupId > arr[min].belongGroupId) {
                 temp = arr[i]

@@ -1291,7 +1291,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
 
         if (light == null) {
             light = new DbLight();
-            light.setName(getString(R.string.unnamed));
+            light.setName(getString(R.string.device_name)+light.getMeshAddr());
             light.setMeshAddr(meshAddress);
             light.textColor = this.getResources().getColor(
                     R.color.black);

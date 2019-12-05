@@ -36,6 +36,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property GroupName = new Property(9, String.class, "groupName", false, "GROUP_NAME");
         public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
         public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
+        public final static Property Rssi = new Property(12, int.class, "rssi", false, "RSSI");
     }
 
 
@@ -62,7 +63,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"INDEX\" INTEGER NOT NULL ," + // 8: index
                 "\"GROUP_NAME\" TEXT," + // 9: groupName
                 "\"COLOR\" INTEGER NOT NULL ," + // 10: color
-                "\"STATUS\" INTEGER NOT NULL );"); // 11: status
+                "\"STATUS\" INTEGER NOT NULL ," + // 11: status
+                "\"RSSI\" INTEGER NOT NULL );"); // 12: rssi
     }
 
     /** Drops the underlying database table. */
@@ -106,6 +108,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         }
         stmt.bindLong(11, entity.getColor());
         stmt.bindLong(12, entity.getStatus());
+        stmt.bindLong(13, entity.getRssi());
     }
 
     @Override
@@ -143,6 +146,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         }
         stmt.bindLong(11, entity.getColor());
         stmt.bindLong(12, entity.getStatus());
+        stmt.bindLong(13, entity.getRssi());
     }
 
     @Override
@@ -164,7 +168,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.getInt(offset + 8), // index
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // groupName
             cursor.getInt(offset + 10), // color
-            cursor.getInt(offset + 11) // status
+            cursor.getInt(offset + 11), // status
+            cursor.getInt(offset + 12) // rssi
         );
         return entity;
     }
@@ -183,6 +188,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setGroupName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setColor(cursor.getInt(offset + 10));
         entity.setStatus(cursor.getInt(offset + 11));
+        entity.setRssi(cursor.getInt(offset + 12));
      }
     
     @Override

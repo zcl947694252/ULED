@@ -148,13 +148,13 @@ android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <include layout="@layout/template_bottom_btn" />
+          <include layout="@layout/template_bottom_btn" />
             <TextView
                 android:id="@+id/read_timer"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:background="@color/white"
+                android:background="@drawable/rect_r15_w"
                 android:gravity="center"
                 android:text="@string/please_read_carefully"
                 android:textColor="@color/text_red"

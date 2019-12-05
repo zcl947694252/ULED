@@ -453,7 +453,6 @@
     <string name="stop">停止</string>
     <string name="stopping">停止中…</string>
     <string name="rename">重命名</string>
-    <string name="no_name">未命名</string>
     <string name="firmware_version">固件版本：%1$s</string>
     <string name="ota">在线升级</string>
     <string name="my_scene">场景一</string>
@@ -479,7 +478,6 @@
     <string name="reconnect">重连</string>
     <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关,如果开关没有usb接口则不必执行拔出USB线操作。</string>
     <string name="install_success">安装成功</string>
-    <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
     <string name="scene_name_show">场景:%1$s</string>
     <string name="name_can_not_null">名字不能为空</string>
@@ -841,5 +839,8 @@
     <string name="delete_region_tip">删除该区域请先把该区域设备恢复出厂设置…</string>
     <string name="switch_btn">开关</string>
     <string name="no_have_bin">不存在该类型的bin文件</string>
+    <string name="device_name">设备:</string>
+    <string name="no_search_result">抱歉,没有发现相关内容</string>
+    <string name="change_match_type">换个关键词试试吧</string>
 
 </resources>

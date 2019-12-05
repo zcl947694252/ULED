@@ -33,6 +33,7 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property ControlSceneId = new Property(6, String.class, "controlSceneId", false, "CONTROL_SCENE_ID");
         public final static Property Index = new Property(7, int.class, "index", false, "INDEX");
         public final static Property BelongGroupId = new Property(8, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
+        public final static Property Rssi = new Property(9, int.class, "rssi", false, "RSSI");
     }
 
 
@@ -56,7 +57,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 5: productUUID
                 "\"CONTROL_SCENE_ID\" TEXT," + // 6: controlSceneId
                 "\"INDEX\" INTEGER NOT NULL ," + // 7: index
-                "\"BELONG_GROUP_ID\" INTEGER);"); // 8: belongGroupId
+                "\"BELONG_GROUP_ID\" INTEGER," + // 8: belongGroupId
+                "\"RSSI\" INTEGER NOT NULL );"); // 9: rssi
     }
 
     /** Drops the underlying database table. */
@@ -97,6 +99,7 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
+        stmt.bindLong(10, entity.getRssi());
     }
 
     @Override
@@ -131,6 +134,7 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
+        stmt.bindLong(10, entity.getRssi());
     }
 
     @Override
@@ -149,7 +153,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.getInt(offset + 5), // productUUID
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // controlSceneId
             cursor.getInt(offset + 7), // index
-            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8) // belongGroupId
+            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // belongGroupId
+            cursor.getInt(offset + 9) // rssi
         );
         return entity;
     }
@@ -165,6 +170,7 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setControlSceneId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setIndex(cursor.getInt(offset + 7));
         entity.setBelongGroupId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
+        entity.setRssi(cursor.getInt(offset + 9));
      }
     
     @Override

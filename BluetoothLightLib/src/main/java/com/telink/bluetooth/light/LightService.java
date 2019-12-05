@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.TelinkLog;
@@ -448,6 +447,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.macAddress = light.getMacAddress();
             deviceInfo.progress = controller.getOtaProgress();
             deviceInfo.status = newStatus;
+            deviceInfo.rssi = light.getRssi();
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
@@ -461,6 +461,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.meshUUID = light.getMeshUUID();
             deviceInfo.productUUID = light.getProductUUID();
             deviceInfo.status = newStatus;
+            deviceInfo.rssi = light.getRssi();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);

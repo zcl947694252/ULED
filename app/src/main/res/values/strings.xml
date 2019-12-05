@@ -485,7 +485,6 @@
         
     <string name="rename">Rename </string>
         
-    <string name="no_name">Unnamed </string>
         
     <string name="firmware_version">Firmware version: %1$s</string>
         
@@ -533,7 +532,6 @@
         Please unplug the USB cable on the switch before using the switch. If the switch does not have a USB interface,
         it is not necessary to perform the operation of unplugging the USB cable.</string>
     <string name="install_success">Successful installation</string>
-    <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
     <string name="sure_delete">Confirm deleting this scene？</string>
     <string name="w_bright">White Brightness:</string>
@@ -918,5 +916,9 @@
     <string name="delete_region_tip">Delete the area first restore the existing equipment in the area to factory.</string>
     <string name="switch_btn">Switch Button</string>
     <string name="no_have_bin">There is no bin file of this type</string>
+    <string name="device_name">Device:</string>
+    <string name="search_icon">&#xe63c;</string>
+    <string name="no_search_result">抱歉,没有发现相关内容</string>
+    <string name="change_match_type">换个关键词试试吧</string>
 
 </resources>

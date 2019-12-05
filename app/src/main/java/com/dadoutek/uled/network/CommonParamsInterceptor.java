@@ -2,6 +2,7 @@ package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbUser;
 
@@ -64,7 +65,7 @@ public class CommonParamsInterceptor implements Interceptor {
         String oldToken = tokenNow;
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";
         builder.addHeader("region-id", last_region_id);
-        //LogUtils.e("zcl","zcl******region-id=="+last_region_id);
+        LogUtils.e("zcl","zcl******region-id=="+last_region_id+"----------Token"+oldToken);
 
         //authorizer-user-id：80
         //在请求头加上键值对authorizer-user-id:80即可获取id为80用户的数据，如果请求头中缺少这对键值对，后台默认authorizer-user-id：自己用户的id。

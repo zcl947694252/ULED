@@ -79,6 +79,7 @@ public class DeviceInfo implements Parcelable {
         this.productUUID = in.readInt();
         this.status = in.readInt();
         this.isConfirm = in.readInt();
+        this.rssi = in.readInt();
         in.readByteArray(this.longTermKey);
     }
 
@@ -99,6 +100,7 @@ public class DeviceInfo implements Parcelable {
         dest.writeInt(this.productUUID);
         dest.writeInt(this.status);
         dest.writeInt(this.isConfirm);
+        dest.writeInt(this.rssi);
         dest.writeByteArray(this.longTermKey);
     }
 
