@@ -1715,7 +1715,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                             val opcode = Opcode.KICK_OUT
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+                            Commander.resetDevice(light!!.meshAddr)
+                                    .subscribe(
+                                            {
+                                                LogUtils.v("zcl-----恢复出厂成功")
+                                            }, {
+                                        LogUtils.v("zcl-----恢复出厂失败")
+                                    })
+
                             DBUtils.deleteLight(light!!)
                             if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                                 TelinkLightApplication.getApp().mesh.saveOrUpdate(this)

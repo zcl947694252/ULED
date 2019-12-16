@@ -3,7 +3,6 @@ package com.dadoutek.uled.communicate
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -37,6 +36,7 @@ import kotlin.experimental.and
 import kotlin.Unit as Unit1
 
 object Commander : EventListener<String> {
+    private lateinit var isSucess: ObservableEmitter<Boolean>
     private var mConnectObservable: Observable<DeviceInfo>? = null
     private var mConnectEmitter: ObservableEmitter<DeviceInfo>? = null
     private var mGetVersionObservable: ObservableEmitter<String>? = null
@@ -47,6 +47,9 @@ object Commander : EventListener<String> {
     private var mResetSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
     private var version: String? = null
+    //软件恢复出厂设置0xE3，指令后的参数必须是dadou，才有效果。
+    //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
+    private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
 
     init {
         //监听事件
@@ -123,7 +126,7 @@ object Commander : EventListener<String> {
                 for (light in lightList) {
                     for (k in 0..resendCmdTime) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, paramsKickOut)
                         Thread.sleep(sleepTime)
                     }
                     DBUtils.deleteAll()//删除人体感应器和开关
@@ -155,9 +158,9 @@ object Commander : EventListener<String> {
         } else {
             //就算数据里没设备，设备也有可能存在，这是就发指令让它恢复出厂设置
             GlobalScope.launch {
-                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null) //直连灯不响应此条命令0xFFFF的目标地址
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, paramsKickOut) //直连灯不响应此条命令0xFFFF的目标地址
                 delay(500)
-                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, null) //延时后再给直连灯发恢复出厂设置指令
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, paramsKickOut) //延时后再给直连灯发恢复出厂设置指令
             }
             failedCallback.invoke()
         }
@@ -165,12 +168,10 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
-                    failedCallback: () -> Unit1) {
+    fun resetAllDevices(lightList: List<Int>, successCallback: () -> Unit1,
+                        failedCallback: () -> Unit1) {
         val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
                 ?: 0x00
-
-
         var isSupportFastResetFactory: Boolean = false
         val disposable = getDeviceVersion(connectDeviceMeshAddr)
                 .subscribe(
@@ -178,9 +179,9 @@ object Commander : EventListener<String> {
                             isSupportFastResetFactory = AppUtils.isSupportFastResetFactory(it)
                             if (isSupportFastResetFactory) {
                                 GlobalScope.launch {
-                                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null) //直连灯不响应此条命令0xFFFF的目标地址
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, paramsKickOut) //直连灯不响应此条命令0xFFFF的目标地址
                                     delay(500)
-                                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, null) //延时后再给直连灯发恢复出厂设置指令
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, paramsKickOut) //延时后再给直连灯发恢复出厂设置指令
                                     DBUtils.deleteAllNormalLight()
                                     DBUtils.deleteAllRGBLight()
                                     DBUtils.deleteAllConnector()
@@ -202,43 +203,23 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetCurtain(lightList: List<DbCurtain>, successCallback: () -> Unit1,
-                     failedCallback: () -> Unit1) {
-        val sleepTime: Long = 200
-        val resendCmdTime: Int = 3
-        var connectDeviceIndex: Int = 0
-        val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp()?.connectDevice?.meshAddress
-                ?: 0x00
-
-        if (lightList.isNotEmpty()) {
-            Thread {
-                //找到当前连接的灯的mesh地址
-                for (k in lightList.indices) {
-                    if (lightList[k].meshAddr == connectDeviceMeshAddr) {
-                        connectDeviceIndex = k
-                        break
-                    }
-                }
-                //把当前连接的灯放到list的最后一个
-                Collections.swap(lightList, lastIndex, connectDeviceIndex)
-                for (light in lightList) {
-                    for (k in 0..resendCmdTime) {
-                        val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light.meshAddr, null)
-                        Thread.sleep(sleepTime)
-                    }
-                    Thread.sleep(sleepTime)
-                    DBUtils.deleteCurtain(light)
-                }
-                GlobalScope.launch(Dispatchers.Main) {
-                    successCallback.invoke()
-                }
-            }.start()
-        } else {
-            failedCallback.invoke()
+    fun resetDevice(deviceMeshAddr: Int): Observable<Boolean> {
+        val deviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+        val observable = Observable.create<Boolean> { emitter ->
+            var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, paramsKickOut) //延时后再给直连灯发恢复
+            if (sendCommandNoResponse == null)
+                sendCommandNoResponse = false
+            emitter.onNext(sendCommandNoResponse!!)// 出厂设置指令
         }
+
+        val ret = getDeviceVersion(deviceMeshAddr)
+                .flatMap {
+                    observable
+                }//如果获取没成功就走到外部的error
+
+        return ret
     }
+
 
     fun addScene(sceneId: Long, meshAddr: Int, color: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
@@ -654,7 +635,7 @@ object Commander : EventListener<String> {
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
-                if (macAddress != null&&macAddress!="0")
+                if (macAddress != null && macAddress != "0")
                     connectParams.setConnectMac(macAddress)
                 else if (meshAddr != 0)
                     connectParams.setConnectMeshAddress(meshAddr)
@@ -670,13 +651,12 @@ object Commander : EventListener<String> {
                 LogUtils.d("Commander auto connect meshName = $meshName, mConnectEmitter = ${mConnectEmitter}, mac = $macAddress")
 
                 TelinkLightService.Instance()?.autoConnect(connectParams)
-            }.
-                    timeout(15, TimeUnit.SECONDS) {
+            }.timeout(15, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
-                        LogUtils.d("connect doFinally")
-                        mConnectObservable = null
-                    }.retry(retryTimes)
+                LogUtils.d("connect doFinally")
+                mConnectObservable = null
+            }.retry(retryTimes)
 
             return mConnectObservable
         } else {

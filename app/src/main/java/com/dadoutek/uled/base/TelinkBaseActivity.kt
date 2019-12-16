@@ -79,7 +79,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var loadDialog: Dialog? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
-    var disposableTimer: Disposable? = null
+    public var disposableConnectTimer: Disposable? = null
     var isScanning = false
 
 

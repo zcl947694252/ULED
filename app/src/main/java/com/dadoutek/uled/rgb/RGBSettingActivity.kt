@@ -156,7 +156,15 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+
+                        Commander.resetDevice(light!!.meshAddr)
+                                .subscribe(
+                                        {
+                                            LogUtils.v("zcl-----恢复出厂成功")
+                                        }, {
+                                    LogUtils.v("zcl-----恢复出厂失败")
+                                })
+
                         DBUtils.deleteLight(light!!)
                         isReset = true
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {

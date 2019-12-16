@@ -9,9 +9,9 @@ import java.io.Serializable;
 public class Constant implements Serializable {
 
     public static final Boolean isDebug = true;
-    public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
+    public static  String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
 
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转
     // 换
@@ -41,7 +41,7 @@ public class Constant implements Serializable {
     public static final int MAX_GROUP_COUNT = 250;
     public static final int MAX_VALUE = 100;
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
-    public static boolean isTeck = false;
+
     //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -315,4 +315,5 @@ public class Constant implements Serializable {
     public static final String ISCONFIRM = "isConfirm";
     public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
+    public static final String IS_TECK="IS_TECK";
 }

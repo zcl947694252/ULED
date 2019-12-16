@@ -152,6 +152,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         if (bestRSSIDevice != null) {
             val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
@@ -167,14 +168,14 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     ToastUtils.showShort(getString(R.string.get_version_fail))
                                     finish()
                                 }
-
                                 closeAnimation()
                             }
                             ,
                             {
                                 showToast(getString(R.string.get_version_fail))
                                 closeAnimation()
-                                finish()
+                                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to "")
+                                //finish()
                             })
 
         }

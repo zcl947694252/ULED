@@ -150,6 +150,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
+
+        val isTeck = SharedPreferencesHelper.getBoolean(this, Constant.IS_TECK, false)
+        if (isTeck)
+            Constant.DEFAULT_MESH_FACTORY_NAME = "dadoutek"
+        else
+            Constant.DEFAULT_MESH_FACTORY_NAME = "dadourd"
+
         initBottomNavigation()
 
         checkVersionAvailable()
@@ -236,15 +243,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev?.action == MotionEvent.ACTION_DOWN) {
-            when {
-                bnve.currentItem == 0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
-                bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
-                bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+        try {
+            if (ev?.action == MotionEvent.ACTION_DOWN) {
+                when {
+                    bnve.currentItem == 0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
+                    bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
+                    bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+                }
             }
-            return super.dispatchTouchEvent(ev)
+        }catch (ex:IllegalArgumentException){
+            ex.printStackTrace()
         }
         return super.dispatchTouchEvent(ev)
+
     }
 
     var installDialog: AlertDialog? = null
@@ -707,6 +718,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         mDisposable.dispose()
         disposableCamera?.dispose()
+        mCompositeDisposable.dispose()
 
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }

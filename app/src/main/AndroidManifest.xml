@@ -150,6 +150,10 @@
             android:name=".group.BatchGroupFourDeviceActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".light.PhysicalRecoveryActivity"
+            android:screenOrientation="portrait" />
+
 
         <activity
             android:name=".othersview.SplashActivity"
@@ -181,9 +185,6 @@
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name=".group.AddGroupActivity"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".ota.OtaActivity"
             android:screenOrientation="portrait" />

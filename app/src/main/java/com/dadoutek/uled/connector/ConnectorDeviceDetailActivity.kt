@@ -518,7 +518,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onPause() {
         super.onPause()
-        disposableTimer?.dispose()
+        disposableConnectTimer?.dispose()
     }
 
     private fun showPopupMenu() {

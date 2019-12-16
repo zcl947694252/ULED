@@ -848,7 +848,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun showPop(pop: PopupWindow, gravity: Int) {
-        if (!pop.isShowing)
+        if (!pop.isShowing&&!this.isFinishing)
             pop.showAtLocation(window.decorView, gravity, 0, 0)
     }
 
@@ -859,6 +859,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         disposableEnsure?.dispose()
         disposableRequest?.dispose()
         mCompositeDisposable.dispose()
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

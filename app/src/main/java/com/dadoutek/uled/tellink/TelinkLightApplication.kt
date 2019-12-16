@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uledtest.ble.RxBleManager
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -64,7 +65,7 @@ class TelinkLightApplication : TelinkApplication() {
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
-
+        RxBleManager.init(this)
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)

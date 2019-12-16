@@ -1032,6 +1032,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mDisposable.dispose();
         TelinkApplication.getInstance().removeEventListener(this);
     }
 

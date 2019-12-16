@@ -533,13 +533,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         isClick = OTA_SENSOR
                         val instance = TelinkLightService.Instance()
                         instance?.idleMode(true)
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
+                        disposableConnectTimer?.dispose()
+                        disposableConnectTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     autoConnectSensor(true)
                                 }
-                        compositeDisposable.add(disposableTimer!!)
+                        compositeDisposable.add(disposableConnectTimer!!)
 
                         popupWindow!!.dismiss()
                     }
@@ -618,7 +618,16 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         isClick = SENSOR_FINISH
         val opcode = Opcode.KICK_OUT//发送恢复出厂命令
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0, null)
+        val list = arrayListOf<Int>()
+        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress)
+                .subscribe(
+                        {
+                            LogUtils.v("zcl-----恢复出厂成功")
+                        }, {
+                            LogUtils.v("zcl-----恢复出厂失败")
+                }
+                )
+
         LogUtils.e("zcl", "zcl******重启人体")
         connectSensorTimeoutDisposable?.dispose()
     }
@@ -651,7 +660,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         .subscribe {
                                             relocationSensor()
                                         }
-                                disposableTimer?.dispose()
+                                disposableConnectTimer?.dispose()
                             }
                             OTA_SENSOR -> {//人体感应器ota
                                 getVersion(true)

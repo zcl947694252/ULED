@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -33,7 +32,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
-import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -189,6 +187,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
+        compositeDisposable.dispose()
     }
 
     private fun initClick() {
@@ -353,7 +352,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
 
         if (meshAdre.size > 0) {
-            Commander.resetLights(meshAdre, {
+            Commander.resetAllDevices(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
                 activity?.bnve?.currentItem = 0

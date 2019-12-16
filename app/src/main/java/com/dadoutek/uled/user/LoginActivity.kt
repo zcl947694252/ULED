@@ -104,6 +104,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 var s = list[0]
                 edit_user_phone_or_email.setText(s)
                 edit_user_phone_or_email.post {
+                    if (!TextUtils.isEmpty(s))
                     edit_user_phone_or_email.setSelection(s.length)
                 }
                 SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
@@ -151,7 +152,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun initListener() {
         login_isTeck.setOnCheckedChangeListener { _, isChecked ->
-            Constant.isTeck = isChecked
+            SharedPreferencesHelper.putBoolean(this,Constant.IS_TECK,isChecked)
+            LogUtils.v("zcl切换恢复出厂名-----$isChecked-----------${Constant.DEFAULT_MESH_FACTORY_NAME}")
         }
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
@@ -169,6 +171,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
         }
+
+        val b = SharedPreferencesHelper.getBoolean(this, Constant.IS_TECK, false)
+        login_isTeck.isChecked = b
 
         linearLayout_1.setOnClickListener(this)
 

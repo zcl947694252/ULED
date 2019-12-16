@@ -175,7 +175,14 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+
+                        val disposable = Commander.resetDevice(light!!.meshAddr)
+                                .subscribe(
+                                        {
+                                            LogUtils.v("zcl-----恢复出厂成功")
+                                        }, {
+                                    LogUtils.v("zcl-----恢复出厂失败")
+                                })
 
                         DBUtils.deleteConnector(light!!)
 

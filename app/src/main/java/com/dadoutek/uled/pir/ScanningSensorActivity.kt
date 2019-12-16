@@ -375,7 +375,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                  when {
                                      mDeviceInfo?.productUUID == DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
                                      mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                                     else -> ToastUtils.showShort(getString(R.string.no_scaned_device))
+                                     else -> ToastUtils.showShort(getString(R.string.scan_end))
                                  }
                              },
                              {

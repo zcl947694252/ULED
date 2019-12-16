@@ -76,17 +76,16 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为4次
+    private val MAX_RETRY_COUNT = 1   //update mesh failed的重试次数设置为6次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 25
-    private val TIME_OUT_CONNECT = 20
+    private val SCAN_TIMEOUT_SECOND = 12//25
+    private val TIME_OUT_CONNECT = 5//20
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
 
     private var mAutoConnectDisposable: Disposable? = null
     private var rxBleDispose: Disposable? = null
     private var disposable: Disposable? = null
-    private var connectInfo: DeviceInfo? = null
     private var testId: DbGroup? = null
     private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private var mApplication: TelinkLightApplication? = null
@@ -107,7 +106,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     //当前所选组index
     private var currentGroupIndex = -1
     private var updateList: MutableList<ScannedDeviceItem> = ArrayList()
-    private val indexList = ArrayList<Int>()
     //对一个灯重复分组时记录上一次分组
     private val mGroupingDisposable: Disposable? = null
     //灯的mesh地址
@@ -192,8 +190,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
-    private var startConnect = false
-
     private val onClick = View.OnClickListener {
         stopScanTimer()
         closeAnimation()
@@ -205,7 +201,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess()
         } else {
-            scanFail()
+            closeAnimation()
+            btn_stop_scan.visibility = View.GONE
+            ToastUtils.showShort(getString(R.string.scan_end))
+            finish()
         }
     }
 
@@ -300,10 +299,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     //扫描失败处理方法
-    private fun scanFail() {
-        showToast(getString(R.string.scan_end))
+    private fun scanFail() {                                                                                                                                                                                                                                                         
         closeAnimation()
-        doFinish()
+        btn_stop_scan.visibility = View.GONE
+        scanning_no_device.visibility = View.VISIBLE
     }
 
     private fun startTimer() {
@@ -339,14 +338,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
 
-    private fun createConnectTimeout(): Disposable {
-        return Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe {
-                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
-                    hideLoadingDialog()
-                    mConnectTimer = null
-                }
-    }
 
     //处理扫描成功后
     @SuppressLint("CheckResult")
@@ -365,8 +356,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         showLoadingDialog(resources.getString(R.string.connecting_tip))
 
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
+        disposableConnectTimer?.dispose()
+        disposableConnectTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     autoConnect()
@@ -409,8 +400,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.mApplication?.removeEventListener(this)
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance()?.idleMode(true)
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableConnectTimer?.dispose()
+        disposableConnectTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -450,6 +441,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         for (meshAddr in mAddedDevices) {
                             stopBlink(meshAddr)
+                            doFinish()
                         }
                         doFinish()
                     }
@@ -884,11 +876,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun initClick() {
+        scanning_no_factory_btn.setOnClickListener {
+            ActivityUtils.startActivity(Intent(this,PhysicalRecoveryActivity::class.java))
+            finish()
+        }
+
+        btn_start_scan.setOnClickListener {
+            initVisiable()
+            startScan()
+        }
         add_group_layout.setOnClickListener {
             //全彩灯以及普通等扫描完毕添加组
             isGuide = false
             addNewGroup()
         }
+        btn_stop_scan?.setOnClickListener(onClick)
+
+        add_group_relativeLayout?.setOnClickListener { v -> addNewGroup() }
 
         mAddedDevicesAdapter.setOnItemClickListener { _, _, position ->
             val item = this.mAddedDevicesAdapter.getItem(position)
@@ -920,15 +924,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun initView() {
         initToolbar()
-        //监听事件
-        this.mApplication?.removeEventListener(this)
-        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-        this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-
-        LogUtils.d("addEventListener(DeviceEvent.STATUS_CHANGED, this)")
+        addListerner()
 
         this.inflater = this.layoutInflater
 
@@ -939,16 +935,31 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         this.updateList.clear()
 
+        initVisiable()
+    }
+
+    private fun initVisiable() {
         image_bluetooth?.visibility = View.GONE
         btn_add_groups?.visibility = View.GONE
         grouping_completed?.visibility = View.GONE
         toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
+        scanning_no_device.visibility = View.GONE
 
         scanning_num.text = getString(R.string.title_scanned_device_num, 0)
         btn_stop_scan?.setText(R.string.stop_scan)
-        btn_stop_scan?.setOnClickListener(onClick)
+        btn_stop_scan?.visibility = View.VISIBLE
+    }
 
-        add_group_relativeLayout?.setOnClickListener { v -> addNewGroup() }
+    private fun addListerner() {
+        //监听事件
+        this.mApplication?.removeEventListener(this)
+        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
+        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+        this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+
+        LogUtils.d("addEventListener(DeviceEvent.STATUS_CHANGED, this)")
     }
 
     @SuppressLint("ResourceType")
@@ -1170,9 +1181,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         handleIfSupportBle()
 
         //断连后延时一段时间再开始扫描
-        disposableTimer?.dispose()
+        disposableConnectTimer?.dispose()
         val delay = if (RomUtils.isHuawei()) HUAWEI_DELAY else SCAN_DELAY
-        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+        disposableConnectTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1398,11 +1409,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             finish()
             LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
         }
+    }
 
-        fun onDestroy() {
-            super.onDestroy()
-            //移除事件
-            this.mApplication?.removeEventListener(this)
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        disposeAllSubscribe()
+        this.mApplication?.removeEventListener(this)
     }
 }

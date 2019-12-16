@@ -567,6 +567,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        compositeDisposable.dispose()
         localBroadcastManager.unregisterReceiver(br)
     }
 

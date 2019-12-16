@@ -207,7 +207,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         byte[] plaintext = new byte[16];
-
+        if (meshName!=null&&password!=null)
         for (int i = 0; i < 16; i++) {
             plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
         }
@@ -1537,7 +1537,6 @@ public final class LightController extends EventBus<Integer> implements LightPer
             }
 
             System.arraycopy(this.data, index * size, packet, 2, packetSize - 4);
-
 
             this.fillIndex(packet, index);
             int crc = this.crc16(packet);

@@ -59,7 +59,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var curtainGroup: DbGroup? = null
     private var currentShowGroupSetPage = true
     private var mConnectDevice: DeviceInfo? = null
-    private var compositeDisposable = CompositeDisposable()
     private var commutationBoolean: Boolean = true
     private var slowBoolean: Boolean = true
     private var handBoolean: Boolean = true
@@ -168,7 +167,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtain!!.meshAddr, null)
+
+                        Commander.resetDevice(curtain!!.meshAddr)
+                                .subscribe(
+                                        {
+                                            LogUtils.v("zcl-----恢复出厂成功")
+                                        }, {
+                                    LogUtils.v("zcl-----恢复出厂失败")
+                                })
+
                         DBUtils.deleteCurtain(curtain!!)
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
@@ -740,13 +747,29 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun onceReset() {
         if (type == Constant.TYPE_GROUP) {
             val opcode = Opcode.KICK_OUT
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, null)
+
+            Commander.resetDevice(curtain!!.meshAddr)
+                    .subscribe(
+                            {
+                                LogUtils.v("zcl-----恢复出厂成功")
+                            }, {
+                        LogUtils.v("zcl-----恢复出厂失败")
+                    })
+
             DBUtils.deleteGroupOnly(curtainGroup!!)
             Toast.makeText(this, R.string.successful_resumption, Toast.LENGTH_LONG).show()
             finish()
         } else {
             val opcode = Opcode.KICK_OUT
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, null)
+
+            Commander.resetDevice(curtain!!.meshAddr)
+                    .subscribe(
+                            {
+                                LogUtils.v("zcl-----恢复出厂成功")
+                            }, {
+                        LogUtils.v("zcl-----恢复出厂失败")
+                    })
+
             DBUtils.deleteCurtain(curtain!!)
             Toast.makeText(this, R.string.successful_resumption, Toast.LENGTH_LONG).show()
             finish()

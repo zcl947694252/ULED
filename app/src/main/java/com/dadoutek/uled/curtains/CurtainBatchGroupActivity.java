@@ -1466,4 +1466,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mDisposable.dispose();
+    }
 }

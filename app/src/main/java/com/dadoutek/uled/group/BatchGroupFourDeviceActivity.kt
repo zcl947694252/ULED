@@ -1644,6 +1644,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     if (it != null)
                         refreshRssi(it)
                 }, {})
+        compositeDisposable.add(disposableScan!!)
 
     }
 
@@ -1708,10 +1709,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun oldStartScan() {
         LogUtils.d("####信号 start scan idleMode true ####")
         //断连后延时一段时间再开始扫描
-        disposableTimer?.dispose()
+        disposableConnectTimer?.dispose()
         LeBluetooth.getInstance().stopScan()
         val delay = if (RomUtils.isHuawei()) HUAWEI_DELAY else SCAN_DELAY
-        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+        disposableConnectTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
