@@ -104,7 +104,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 } else {
                     String phoneNum = editPhoneNumber.getEditText().getText().toString().trim();
                     if (StringUtils.isEmpty(phoneNum)) {
-                        ToastUtils.showShort(R.string.phone_cannot_be_empty);
+                        ToastUtils.showLong(R.string.phone_cannot_be_empty);
                     } else {
                         sendCode(countryCode, phoneNum);
                     }

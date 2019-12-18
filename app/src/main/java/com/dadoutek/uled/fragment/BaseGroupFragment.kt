@@ -136,7 +136,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 failedCallback = {
                                     if (j == deleteList.size - 1)
                                         hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -255,7 +255,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id) {
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             } else {
                 if (!isDelete) {
                     isDelete = true
@@ -348,7 +348,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                   /*  if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {*/
                         if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
                             var num = 0
@@ -460,7 +460,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
@@ -485,7 +485,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, setGroupType())
@@ -599,7 +599,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
                 override fun error(msg: String) {
                     hideLoadingDialog()
-                    ToastUtils.showShort(R.string.backup_failed)
+                    ToastUtils.showLong(R.string.backup_failed)
                 }
 
                 override fun start() {}

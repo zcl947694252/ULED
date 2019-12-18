@@ -110,4 +110,17 @@ public class SharedPreferencesUtils {
     }
 
 
+    public static void saveRegionNameList( List<String> list) {
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
+                Constant.REGION_LIST, list);
+    }
+
+    public static List<String> getRegionNameList() {
+        List list = (List<String>)SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
+                Constant.REGION_LIST);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
 }

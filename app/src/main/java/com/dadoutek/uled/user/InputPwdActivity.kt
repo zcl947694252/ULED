@@ -201,7 +201,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun error(msg: String) {
             hideLoadingDialog()
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
     }
 

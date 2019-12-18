@@ -472,7 +472,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 } else {
-                    ToastUtils.showShort(R.string.reconnecting)
+                    ToastUtils.showLong(R.string.reconnecting)
                 }
             }
     }

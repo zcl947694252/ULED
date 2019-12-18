@@ -203,7 +203,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         val lastUser = DBUtils.lastUser
                         lastUser?.let {
                             if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                                ToastUtils.showLong(getString(R.string.author_region_warm))
                             else {
                                 if (dialog_curtain?.visibility == View.GONE) {
                                     showPopupMenu()
@@ -296,7 +296,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -481,7 +481,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         addCurtainDevice()
                     }
@@ -500,7 +500,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         currentLight = curtain?.get(position)
         positionCurrent = position
                 if (TelinkLightApplication.getApp().connectDevice == null)
-                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                    ToastUtils.showLong(getString(R.string.connecting_tip))
                 else
                     skipSetting()
 

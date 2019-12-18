@@ -89,7 +89,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         return
                     }
                     if (com.blankj.utilcode.util.StringUtils.isEmpty(userName)) {
-                        ToastUtils.showShort(R.string.phone_cannot_be_empty)
+                        ToastUtils.showLong(R.string.phone_cannot_be_empty)
                         return
                     }
 
@@ -99,7 +99,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                                 SMSSDK.getVerificationCode(countryCode, userName)
 
                             }else{
-                                ToastUtils.showShort(getString(R.string.account_exist))
+                                ToastUtils.showLong(getString(R.string.account_exist))
                             }
                     },{})
 
@@ -206,7 +206,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     private fun send_verification() {
         val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
-            ToastUtils.showShort(R.string.phone_cannot_be_empty)
+            ToastUtils.showLong(R.string.phone_cannot_be_empty)
         } else {
             SMSSDK.getVerificationCode(countryCode, phoneNum)
         }
@@ -225,7 +225,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun error(msg: String) {
             hideLoadingDialog()
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
     }
 

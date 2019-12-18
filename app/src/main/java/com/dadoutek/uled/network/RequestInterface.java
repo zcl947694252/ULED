@@ -17,6 +17,7 @@ import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
+import com.dadoutek.uled.region.bean.RegionListBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferData;
 
@@ -480,6 +481,15 @@ public interface RequestInterface {
      */
     @GET("auth/transfer/code/info")
     Observable<Response<TransferData>> mlookTransferCode();
+
+    /**
+     * 60、获取区域controlMesh列表
+     * https://dev.dadoutek.com/smartlight_java/region/list/controlMesh
+     * GET
+     * controlMesh字符串数组
+     */
+    @GET("region/list/controlMesh")
+    Observable<RegionListBean> regionNameList();
 
 
     /**

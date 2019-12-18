@@ -130,7 +130,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             R.id.light_add_device_btns -> {
                 DBUtils.lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (DBUtils.getAllRelay().size == 0) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
@@ -409,7 +409,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (scanPb.visibility != View.VISIBLE) {
                             //判断是否为rgb灯
@@ -423,7 +423,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         } else {
-                            ToastUtils.showShort(R.string.reconnecting)
+                            ToastUtils.showLong(R.string.reconnecting)
                         }
                     }
                 }

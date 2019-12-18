@@ -273,14 +273,13 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initAuthor() {
         RegionModel.getAuthorizerList()?.subscribe({
             setAuthorizeRegion(it)
-        }) { ToastUtils.showShort(it.message) }
+        }) { ToastUtils.showLong(it.message) }
     }
 
-    @SuppressLint("CheckResult")
     private fun initMe() {
-        RegionModel.get()?.subscribe({
+        val disposable = RegionModel.get()?.subscribe({
             setMeRegion(it)
-        }) { ToastUtils.showShort(it.message) }
+        }) { ToastUtils.showLong(it.message) }
     }
 
     @SuppressLint("StringFormatMatches")
@@ -336,7 +335,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     private fun downLoadDataAndChangeDbUser() {
         if (regionBean == null && regionBeanAuthorize == null) {
-            ToastUtils.showShort(getString(R.string.please_select_area))
+            ToastUtils.showLong(getString(R.string.please_select_area))
             hideLoadingDialog()
             return
         }
@@ -408,7 +407,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                 },{
                     LogUtils.v("zcl-------$it")
                     hideLoadingDialog()
-                    ToastUtils.showShort(it.localizedMessage)
+                    ToastUtils.showLong(it.localizedMessage)
                 })
     }
 

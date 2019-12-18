@@ -195,7 +195,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     startActivity(Intent(this, ScanningSensorActivity::class.java))
                     doFinish()
@@ -254,7 +254,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -443,7 +443,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (dialog_pir?.visibility == View.GONE) {
                             dialog_pir?.visibility = View.VISIBLE//showPopupMenu
@@ -461,7 +461,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
 
                 if (view.id == R.id.tv_setting) {
@@ -603,7 +603,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
             progressBar_sensor.visibility = View.GONE
-            ToastUtils.showShort(getString(R.string.connect_fail))
+            ToastUtils.showLong(getString(R.string.connect_fail))
         }, {
             LogUtils.e(it)
         })
@@ -733,7 +733,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                                 OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
                                             } else {
-                                                ToastUtils.showShort(getString(R.string.version_disabled))
+                                                ToastUtils.showLong(getString(R.string.version_disabled))
                                                 hideLoadingDialog()
                                             }
                                         }

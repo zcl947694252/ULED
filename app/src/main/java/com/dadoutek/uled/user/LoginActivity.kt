@@ -451,7 +451,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         returnView()
                         startActivityForResult(intent, 0)
                     },{
-                        ToastUtils.showShort(it.localizedMessage)
+                        ToastUtils.showLong(it.localizedMessage)
                         returnView()
                         if (getString(R.string.account_not_exist)==it.localizedMessage)
                             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))

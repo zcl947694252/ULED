@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class Constant implements Serializable {
 
-    public static final Boolean isDebug = true;
+    public static  Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     public static  String DEFAULT_MESH_FACTORY_NAME = "dadoutek";

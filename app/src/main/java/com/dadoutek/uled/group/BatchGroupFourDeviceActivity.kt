@@ -147,7 +147,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
-            ToastUtils.showShort(getString(R.string.grouping_success_tip))
+            ToastUtils.showLong(getString(R.string.grouping_success_tip))
             setDeviceTypeDataStopBlink(deviceType)
             finish()
         }
@@ -367,7 +367,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         groupsByDeviceType?.get(position)?.name = textGp.text.toString().trim { it <= ' ' }
                         val group = groupsByDeviceType?.get(position)
@@ -489,7 +489,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                         // 获取输入框的内容
                         if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showShort(getString(R.string.rename_tip_check))
+                            ToastUtils.showLong(getString(R.string.rename_tip_check))
                         } else {
                             curtain.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateCurtain(curtain)
@@ -514,7 +514,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                         // 获取输入框的内容
                         if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showShort(getString(R.string.rename_tip_check))
+                            ToastUtils.showLong(getString(R.string.rename_tip_check))
                         } else {
                             connector.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateConnector(connector)
@@ -537,7 +537,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         if (light != null) {
@@ -626,7 +626,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 if (TelinkLightApplication.getApp().connectDevice == null) {
-                                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                                    ToastUtils.showLong(getString(R.string.connecting_tip))
                                     retryConnectCount = 0
                                     val meshName = DBUtils.lastUser!!.controlMeshName
 
@@ -803,7 +803,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
             isCompatible = isChecked
             if (!isCompatible)
-                ToastUtils.showShort(getString(R.string.compatibility_mode))
+                ToastUtils.showLong(getString(R.string.compatibility_mode))
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     for (db in deviceDataLightAll.filter { it.isSelected })//获取组名 将分组与未分组的拆分
@@ -949,7 +949,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.group_fail_tip))
+                    ToastUtils.showLong(getString(R.string.group_fail_tip))
                 }
         setGroupOneByOne(currentGroup!!, deviceType, 0)
     }
@@ -1374,7 +1374,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
@@ -1618,7 +1618,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         super.onBackPressed()
         setDeviceTypeDataStopBlink(deviceType)
         checkNetworkAndSync(this)
-        ToastUtils.showShort(getString(R.string.grouping_success_tip))
+        ToastUtils.showLong(getString(R.string.grouping_success_tip))
         finish()
     }
 

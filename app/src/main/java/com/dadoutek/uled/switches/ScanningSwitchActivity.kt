@@ -86,7 +86,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             if (!isSeachedDevice)
                 scanFail()
             else
-                ToastUtils.showShort(getString(R.string.connecting_tip))
+                ToastUtils.showLong(getString(R.string.connecting_tip))
         }
 
     }
@@ -165,7 +165,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     }
                                     finish()
                                 } else {
-                                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                     finish()
                                 }
                                 closeAnimation()

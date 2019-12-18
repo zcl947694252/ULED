@@ -63,8 +63,8 @@ class UnbindMeNetActivity : BaseActivity() {
                         adapter?.remove(position)
                         adapter!!.notifyDataSetChanged()
                         recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
-                        ToastUtils.showShort(getString(R.string.unbundling_success))
-                    }, { ToastUtils.showShort(it.message) })
+                        ToastUtils.showLong(getString(R.string.unbundling_success))
+                    }, { ToastUtils.showLong(it.message) })
                 }
             }
             dialog.dismiss()

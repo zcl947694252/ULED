@@ -82,7 +82,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     val lastUser = DBUtils.lastUser
                     lastUser?.let {
                         if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showShort(getString(R.string.author_region_warm))
+                            ToastUtils.showLong(getString(R.string.author_region_warm))
                         else {
                             Log.e("zcl场景", "zcl场景******scene_edit")
                             val scene = scenesListData!![position]
@@ -176,7 +176,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -298,7 +298,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
                 isDelete = true
                 adaper!!.changeState(isDelete)
@@ -499,7 +499,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
 
                 when (v.id) {
@@ -508,7 +508,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     }
                     R.id.img_function1 -> {
                         if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showShort(getString(R.string.author_region_warm))
+                            ToastUtils.showLong(getString(R.string.author_region_warm))
                         else {
                             isGuide = false
                             if (dialog_pop?.visibility == View.GONE) {

@@ -116,7 +116,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 },
                                 failedCallback = {
                                     (this).hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -145,7 +145,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -217,7 +217,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         val intent = Intent(this,
                 ConnectorGroupingActivity::class.java)
         if (light == null) {
-            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -418,7 +418,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateConnector(light!!)

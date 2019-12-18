@@ -106,7 +106,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         this.mApplication = this.application as TelinkLightApplication
-
         lightsData = arrayListOf()
     }
 
@@ -119,7 +118,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         scrollToPosition()
         if (TelinkLightApplication.getApp().connectDevice == null) {
             autoConnect()
-            ToastUtils.showShort(getString(R.string.connecting_tip))
+            ToastUtils.showLong(getString(R.string.connecting_tip))
         }
     }
 
@@ -138,7 +137,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-       /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {
+       /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
             device_detail_direct_item.visibility = View.VISIBLE
             device_detail_direct_name.text = directLight?.name
             directLight?.groupName = StringUtils.getLightGroupName(directLight)
@@ -329,6 +328,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun openOrClose(currentLight: DbLight) {
+        LogUtils.v("zcl点击后的灯$currentLight")
         this.currentLight = currentLight
         if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
             if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {//开窗
@@ -336,7 +336,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
             }
-
             this.currentLight!!.connectionStatus = ConnectionStatus.ON.value
         } else {
             if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
@@ -347,7 +346,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             this.currentLight!!.connectionStatus = ConnectionStatus.OFF.value
         }
         setTopLightState()
-
     }
 
     private val onClick = View.OnClickListener {
@@ -573,7 +571,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -591,7 +589,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         addDeviceLight()
                     }
@@ -648,7 +646,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 val lastUser = DBUtils.lastUser
                                 lastUser?.let {
                                     if (it.id.toString() != it.last_authorizer_user_id)
-                                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                                        ToastUtils.showLong(getString(R.string.author_region_warm))
                                     else {
                                         if (dialog_device?.visibility == View.GONE) {
                                             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
@@ -659,7 +657,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 }
                             } else {
                                 autoConnect()
-                                ToastUtils.showShort(getString(R.string.connecting_tip))
+                                ToastUtils.showLong(getString(R.string.connecting_tip))
                             }
                         }
                     } else {
@@ -692,7 +690,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             val lastUser = DBUtils.lastUser
                             lastUser?.let {
                                 if (it.id.toString() != it.last_authorizer_user_id)
-                                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                                    ToastUtils.showLong(getString(R.string.author_region_warm))
                                 else {
                                     if (dialog_device?.visibility == View.GONE) {
                                         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
@@ -737,7 +735,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 val lastUser = DBUtils.lastUser
                                 lastUser?.let {
                                     if (it.id.toString() != it.last_authorizer_user_id)
-                                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                                        ToastUtils.showLong(getString(R.string.author_region_warm))
                                     else {
                                         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
                                         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
@@ -825,7 +823,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     if (dialog_device?.visibility == View.GONE) {
                         showPopupMenu()

@@ -133,7 +133,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
-                ToastUtils.showShort(getString(R.string.rename_tip_check))
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)

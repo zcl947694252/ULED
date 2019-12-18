@@ -161,7 +161,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                 startActivity(intent)
                         },{
                             hideLoadingDialog()
-                            ToastUtils.showShort(it.localizedMessage)
+                            ToastUtils.showLong(it.localizedMessage)
                         })
             }
         } else {
@@ -224,7 +224,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         override fun error(msg: String) {
             hideLoadingDialog()
             //("GetDataError:$msg")
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
 
     }
@@ -246,7 +246,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
             val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
             //("zcl**********************$phoneNum")
             if (StringUtils.isEmpty(phoneNum)) {
-                ToastUtils.showShort(R.string.phone_cannot_be_empty)
+                ToastUtils.showLong(R.string.phone_cannot_be_empty)
             } else {
                 showLoadingDialog(getString(R.string.get_code_ing))
                 SMSSDK.getVerificationCode(countryCode, phoneNum)

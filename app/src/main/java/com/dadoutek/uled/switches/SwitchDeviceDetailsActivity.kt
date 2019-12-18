@@ -132,7 +132,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (dialog?.visibility == View.GONE) {
                             showPopupMenu()
@@ -174,7 +174,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                                         finish()
                                     }
                                 } else {
-                                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                     initData()
                                 }
                             },
@@ -188,7 +188,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
                 goSearchSwitch()
             }
@@ -236,7 +236,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     showPopupWindow(view, position)
                 }
@@ -273,7 +273,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                         // 获取输入框的内容
                         if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showShort(getString(R.string.rename_tip_check))
+                            ToastUtils.showLong(getString(R.string.rename_tip_check))
                         } else {
                             currentSwitch?.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateSwicth(currentSwitch!!)
@@ -375,13 +375,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                                     currentLight!!.version = s
                                     isDirectConnectDevice()
                                 } else {
-                                    ToastUtils.showShort(getString(R.string.version_disabled))
+                                    ToastUtils.showLong(getString(R.string.version_disabled))
                                 }
                                 hideLoadingDialog()
                             },
                             {
                                 hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                                ToastUtils.showLong(getString(R.string.get_version_fail))
                             }
                     )
 
@@ -727,7 +727,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)

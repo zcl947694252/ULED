@@ -117,7 +117,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         RegionModel.lookTransferCodeState().subscribe({
             val isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
             transfer_account_tv.text = if (isNewQr) getString(R.string.transfer_accounts) else getString(R.string.to_receive)
-        }, { ToastUtils.showShort(it.message) })
+        }, { ToastUtils.showLong(it.message) })
     }
 
     private fun initToolBar() {
@@ -152,10 +152,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             if (t)
                                 openScan()
                             else
-                                ToastUtils.showShort(getString(R.string.permission_denfied))
-                        }, { t -> ToastUtils.showShort(t.localizedMessage) })
+                                ToastUtils.showLong(getString(R.string.permission_denfied))
+                        }, { t -> ToastUtils.showLong(t.localizedMessage) })
                     }
-                }, { t -> ToastUtils.showShort(t.localizedMessage) })
+                }, { t -> ToastUtils.showLong(t.localizedMessage) })
 
         transfer_account.setOnClickListener {
             lookAndMaketransferCode()
@@ -169,13 +169,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
             view?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.VISIBLE
             setQR(it.code)
+
             downTimer(it.expire.toLong())
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
             view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.GONE
             showPop(pop!!, Gravity.BOTTOM)
             transfer_account_tv.text = getString(R.string.to_receive)
         }, {
-            ToastUtils.showShort(it.message)
+            ToastUtils.showLong(it.message)
         })
     }
 
@@ -198,7 +199,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         RegionModel.addRegions(lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe(
                 { initData() },
-                { ToastUtils.showShort(it.message) })
+                { ToastUtils.showLong(it.message) })
     }
 
     @SuppressLint("CheckResult", "SetTextI18n")
@@ -210,21 +211,21 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             Log.e(TAG, "zcl******isShowType****$isShowType" + "user${lastUser.toString()}")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
-                    ToastUtils.showShort(it.message)
+                    ToastUtils.showLong(it.message)
                     hideLoadingDialog()
                 })
                 2 -> RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
-                    ToastUtils.showShort(it.message)
+                    ToastUtils.showLong(it.message)
                     hideLoadingDialog()
                 })
                 3 -> {
                     RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
-                        ToastUtils.showShort(it.message)
+                        ToastUtils.showLong(it.message)
                     hideLoadingDialog()
                     })
                     RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
                     hideLoadingDialog()
-                        ToastUtils.showShort(it.message)
+                        ToastUtils.showLong(it.message)
                     })
                 }
             }
@@ -421,7 +422,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_qr_cancel -> {//取消弹框
                 if (isTransferCode)
-                    RegionModel.removeTransferCode()!!.subscribe({ setCancel() }, { ToastUtils.showShort(it.message) })
+                    RegionModel.removeTransferCode()!!.subscribe({ setCancel() }, { ToastUtils.showLong(it.message) })
                 PopUtil.dismiss(pop)
             }
             R.id.pop_user_net -> {
@@ -438,7 +439,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     PopUtil.dismiss(pop)
                     initData()
                 }, {
-                    ToastUtils.showShort(it.message)
+                    ToastUtils.showLong(it.message)
                 })
             }
             R.id.pop_share_net -> {
@@ -472,7 +473,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             LogUtils.e("zcl取消网络授权成功id" + regionBean!!.id + "=======type" + regionBean!!.code_info!!.type)
                             setCancel()
                             setCreatShareCodeState()
-                        }, { ToastUtils.showShort(it.message) })
+                        }, { ToastUtils.showLong(it.message) })
                     }
                 }
             }
@@ -494,7 +495,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             downTimer(expire)
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
         }, {
-            ToastUtils.showShort(it.message)
+            ToastUtils.showLong(it.message)
         })
     }
 
@@ -632,7 +633,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
                 if (com.blankj.utilcode.util.StringUtils.isTrimEmpty(name.text.toString())) {
-                    ToastUtils.showShort(getString(R.string.please_input_region_name))
+                    ToastUtils.showLong(getString(R.string.please_input_region_name))
                     return@setOnClickListener
                 }
                 isShowType = 1
@@ -724,7 +725,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     }
                     showPop(pop!!, Gravity.BOTTOM)
                 }, {
-                    ToastUtils.showShort(it.message)
+                    ToastUtils.showLong(it.message)
                     showPop(pop!!, Gravity.BOTTOM)
                 })
             }
@@ -824,10 +825,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     ?.subscribe({
                         isShowType = 2
                         initData()
-                        ToastUtils.showShort(getString(R.string.unbundling_success))
+                        ToastUtils.showLong(getString(R.string.unbundling_success))
                         PopUtil.dismiss(pop)
                     }, {
-                        ToastUtils.showShort(it.message)
+                        ToastUtils.showLong(it.message)
                     })
             dialog.dismiss()
         }
@@ -886,7 +887,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 override fun onNext(t: String) {
                     isShowType = 3
                     initData()
-                    ToastUtils.showShort(getString(R.string.scan_success))
+                    ToastUtils.showLong(getString(R.string.scan_success))
                 }
 
             })
@@ -900,7 +901,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
                 startActivityForResult(intent, REQUEST_CODE)
             } else {
-                ToastUtils.showShort(getString(R.string.fail_parse_qr))
+                ToastUtils.showLong(getString(R.string.fail_parse_qr))
             }
         }
     }

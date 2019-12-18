@@ -165,7 +165,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -362,7 +362,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         addDevice()
                     }
@@ -416,7 +416,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             autoConnect()
@@ -435,7 +435,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 }
 
             }
-            else -> ToastUtils.showShort(R.string.reconnecting)
+            else -> ToastUtils.showLong(R.string.reconnecting)
         }
     }
 
@@ -484,7 +484,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     val lastUser = DBUtils.lastUser
                     lastUser?.let {
                         if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showShort(getString(R.string.author_region_warm))
+                            ToastUtils.showLong(getString(R.string.author_region_warm))
                         else {
                             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
@@ -493,7 +493,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 } else {
                     autoConnect()
-                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                    ToastUtils.showLong(getString(R.string.connecting_tip))
                 }
             }
         } else {
@@ -505,7 +505,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (dialog_relay?.visibility == View.GONE) {
                             showPopupMenu()

@@ -107,7 +107,7 @@ class SettingActivity : BaseActivity() {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     when (position) {
                         0 -> emptyTheCache()
@@ -290,7 +290,7 @@ class SettingActivity : BaseActivity() {
                 CleanUtils.cleanExternalCache()
                 CleanUtils.cleanInternalFiles()
                 CleanUtils.cleanInternalCache()
-                ToastUtils.showShort(R.string.clean_tip)
+                ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
                 try {
@@ -359,7 +359,7 @@ class SettingActivity : BaseActivity() {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
                     resetAllLights()
                 } else {
-                    ToastUtils.showShort(R.string.device_not_connected)
+                    ToastUtils.showLong(R.string.device_not_connected)
                 }
             } else {
                 clearData()
@@ -431,7 +431,7 @@ class SettingActivity : BaseActivity() {
 
             override fun error(msg: String) {
                 hideLoadingDialog()
-                ToastUtils.showShort(R.string.backup_failed)
+                ToastUtils.showLong(R.string.backup_failed)
             }
 
             override fun start() {}

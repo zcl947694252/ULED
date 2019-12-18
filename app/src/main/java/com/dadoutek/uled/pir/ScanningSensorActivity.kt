@@ -99,7 +99,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             if (!isSearchedDevice)
                 scanFail()
             else
-                ToastUtils.showShort(getString(R.string.connecting_tip))
+                ToastUtils.showLong(getString(R.string.connecting_tip))
         }
         progressBtn.onClick {
             setNewScan()
@@ -301,7 +301,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         GlobalScope.launch(Dispatchers.Main) {
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
-            ToastUtils.showShort(R.string.not_find_pir)
+            ToastUtils.showLong(R.string.not_find_pir)
             doFinish()
         }
     }
@@ -375,7 +375,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                  when {
                                      mDeviceInfo?.productUUID == DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
                                      mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                                     else -> ToastUtils.showShort(getString(R.string.scan_end))
+                                     else -> ToastUtils.showLong(getString(R.string.scan_end))
                                  }
                              },
                              {
@@ -387,7 +387,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                      )
 
         } else {
-            ToastUtils.showShort(getString(R.string.get_version_fail))
+            ToastUtils.showLong(getString(R.string.get_version_fail))
             doFinish()
         }
     }
@@ -397,7 +397,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         hideLoadingDialog()
         LogUtils.e("zcl  showConnectFailed")
-        ToastUtils.showShort(getString(R.string.connect_fail))
+        ToastUtils.showLong(getString(R.string.connect_fail))
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_fail)
         isSearchedDevice = false
@@ -440,7 +440,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
             LogUtils.d("MainActivity doesn't exist in stack")
-            ToastUtils.showShort("MainActivity doesn't exist in stack")
+            ToastUtils.showLong("MainActivity doesn't exist in stack")
             finish()
         }
     }

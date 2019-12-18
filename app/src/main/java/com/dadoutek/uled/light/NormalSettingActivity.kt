@@ -118,7 +118,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 },
                                 failedCallback = {
                                     this.hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -755,7 +755,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -862,7 +862,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
 
         if (light == null) {
-            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -922,13 +922,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                                     light!!.version = s
                                                     transformView()
                                                 } else {
-                                                    ToastUtils.showShort(getString(R.string.version_disabled))
+                                                    ToastUtils.showLong(getString(R.string.version_disabled))
                                                 }
                                                 hideLoadingDialog()
                                             },
                                             {
                                                 hideLoadingDialog()
-                                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                                                ToastUtils.showLong(getString(R.string.get_version_fail))
                                             }
                                     )
 
@@ -965,15 +965,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light.meshAddr)
-                    }
-                    ?.subscribe(
-                            {
+                        connect(light.meshAddr,true)
+                    }?.subscribe({
                                 hideLoadingDialog()
-                                startOtaAct()
-                            }
-                            ,
-                            {
+                                startOtaAct() }
+                            , {
                                 hideLoadingDialog()
                                 ToastUtils.showLong(R.string.connect_fail2)
                                 LogUtils.d(it)
@@ -1245,7 +1241,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     },
                                     failedCallback = {
                                         this.hideLoadingDialog()
-                                        ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                        ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                     })
                         }
                         .setNegativeButton(R.string.btn_cancel, null)
@@ -1423,7 +1419,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateLight(light!!)

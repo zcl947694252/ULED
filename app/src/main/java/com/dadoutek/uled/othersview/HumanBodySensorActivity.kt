@@ -1087,7 +1087,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
             progressBar_sensor?.visibility = View.GONE
-            ToastUtils.showShort(getString(R.string.connect_fail))
+            ToastUtils.showLong(getString(R.string.connect_fail))
         }, {})
     }
 

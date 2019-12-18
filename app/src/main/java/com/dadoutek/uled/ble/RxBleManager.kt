@@ -1,7 +1,12 @@
 package com.dadoutek.uledtest.ble
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -21,6 +26,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object RxBleManager {
+    private var regionList: MutableList<String>? = null
     private var isNeedRetry: Boolean = true
     private val serviceUUID: String = "19200d0c-0b0a-0908-0706-050403020100"
     private val charUUID: String = "19210d0c-0b0a-0908-0706-050403020100"
@@ -41,6 +47,32 @@ object RxBleManager {
         rxBleClient = RxBleClient.create(context)
     }
 
+    fun initData() {
+        //regionList = SharedPreferencesUtils.getRegionNameList()
+        regionList = getRegionList()  //不能使用包i装的response
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getRegionList(): MutableList<String> {
+        var list = mutableListOf<String>()
+        RegionModel.getRegionName()?.subscribe({
+
+            if (it.errorCode==0){
+                  for (i in it.data) {
+                      LogUtils.v("zcl获取区域contromes名$i")
+                      list.add(i)
+                  }
+            LogUtils.v("zcl获取区域contromes名列表$list-------------$it")
+                  SharedPreferencesUtils.saveRegionNameList(list)
+            }else{
+                ToastUtils.showLong(it.message)
+            }
+        }, {
+            LogUtils.v("zclzcl获取区域contromes--------$it")
+        })
+
+        return list
+    }
 
     /**
      * getVersion
@@ -89,9 +121,7 @@ object RxBleManager {
     fun scan(deviceName: String? = null): Observable<ScanResult> {
         mHmScannedDevice.clear()
         val scanFilter: ScanFilter = ScanFilter.Builder()
-//                .setServiceUuid(ParcelUuid(UUID.fromString(serviceUUID)))
                 .setManufacturerData(0x0211, byteArrayOf())
-                // .setDeviceName()
                 .build()
 
         val scanSettings: ScanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -99,12 +129,13 @@ object RxBleManager {
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .filter {
                     val version = getVersion(it)
-                    // LogUtils.v("zcl设备物理恢复信息版本号:$version")
                     val b = isSupportHybridFactoryReset(version)
-                    val dadoutek = it.bleDevice.name == /*Constant.DEFAULT_MESH_FACTORY_NAME*/"e8e54634354663b2"
-                    if (dadoutek && b)
-                        LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}")
-                    dadoutek && b
+                    var isNotMyDevice = isNotMyDevice(it.bleDevice.name)
+
+                    val dadoutek = it.bleDevice.name == Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
+                    LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
+
+                    b&&isNotMyDevice
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -116,7 +147,18 @@ object RxBleManager {
                     mIsScanning = false
                 }.doOnError {
                     mIsScanning = false
-                }.retry(1)
+                }.retry()
+    }
+
+    private fun isNotMyDevice(name: String?): Boolean {
+        var b = true
+        if (regionList == null) {
+            b = true
+        } else
+            for (rgName in regionList!!)
+                if (name == rgName)
+                    b = false
+        return b
     }
 
 
@@ -193,7 +235,7 @@ object RxBleManager {
 //            val ret = gatt?.writeCharacteristic(writeChar)
 ////            LogUtils.d("write ret = $ret")
 //        } else {
-//            ToastUtils.showShort("命令发送过快，请稍候再试。")
+//            ToastUtils.showLong("命令发送过快，请稍候再试。")
 //        }
 
     }

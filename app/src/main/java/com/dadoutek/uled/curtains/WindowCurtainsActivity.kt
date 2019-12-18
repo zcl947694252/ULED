@@ -209,7 +209,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
          DBUtils.lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id) {
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             }else {
                 when (item?.itemId) {
                     R.id.toolbar_delete_group -> {
@@ -259,7 +259,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -297,7 +297,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                             },
                             failedCallback = {
                                 this.hideLoadingDialog()
-                                ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                             })
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
@@ -307,7 +307,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun updateGroup() {
         val intent = Intent(this, CurtainGroupingActivity::class.java)
         if (curtain==null){
-            ToastUtils.showShort(getString(R.string.please_connect_curtain))
+            ToastUtils.showLong(getString(R.string.please_connect_curtain))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -332,7 +332,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         curtain?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateCurtain(curtain!!)
@@ -578,7 +578,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                                 curtain!!.version = s
                                                 isDirectConnectDevice()
                                             } else
-                                                ToastUtils.showShort(getString(R.string.version_disabled))
+                                                ToastUtils.showLong(getString(R.string.version_disabled))
                                         }, { hideLoadingDialog() }
                                 )
                     } else {

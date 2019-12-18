@@ -128,7 +128,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     private fun send_verification() {
         val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
-            ToastUtils.showShort(R.string.phone_cannot_be_empty)
+            ToastUtils.showLong(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
             SMSSDK.getVerificationCode(countryCode, phoneNum)

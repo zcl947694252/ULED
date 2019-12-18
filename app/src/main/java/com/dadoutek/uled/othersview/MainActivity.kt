@@ -45,6 +45,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
@@ -97,7 +98,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var receiver: HomeKeyEventBroadCastReceiver
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
-    private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
 
     private lateinit var deviceFragment: DeviceFragment
     private lateinit var groupFragment: GroupListFragment
@@ -153,9 +153,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         val isTeck = SharedPreferencesHelper.getBoolean(this, Constant.IS_TECK, false)
         if (isTeck)
-            Constant.DEFAULT_MESH_FACTORY_NAME = "dadoutek"
-        else
             Constant.DEFAULT_MESH_FACTORY_NAME = "dadourd"
+        else
+            Constant.DEFAULT_MESH_FACTORY_NAME = "dadousmart"
 
         initBottomNavigation()
 
@@ -163,9 +163,20 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+
+        getRegionList()
     }
 
-
+    @SuppressLint("CheckResult")
+    private fun getRegionList() {
+        val list = mutableListOf<String>()
+        RegionModel.get()?.subscribe({
+            for (i in it) {
+                i.controlMesh?.let { it1 -> list.add(it1) }
+            }
+            SharedPreferencesUtils.saveRegionNameList(list)
+        }) {}
+    }
 
 
     private fun startToRecoverDevices() {
@@ -251,7 +262,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
                 }
             }
-        }catch (ex:IllegalArgumentException){
+        } catch (ex: IllegalArgumentException) {
             ex.printStackTrace()
         }
         return super.dispatchTouchEvent(ev)
@@ -641,7 +652,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-                               mConnectDisposal = connect(deviceTypes = deviceTypes, retryTimes = 10)
+                                mConnectDisposal = connect(deviceTypes = deviceTypes, retryTimes = 10)
                                         ?.subscribe(
                                                 {
                                                     onLogin()
@@ -687,7 +698,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             TelinkLightService.Instance().idleMode(true)
-            ToastUtils.showShort(getString(R.string.reconnecting))
+            ToastUtils.showLong(getString(R.string.reconnecting))
             retryDisposable?.dispose()
             retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
                     .subscribe {

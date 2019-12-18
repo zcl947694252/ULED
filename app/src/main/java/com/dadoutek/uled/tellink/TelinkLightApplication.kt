@@ -128,7 +128,7 @@ class TelinkLightApplication : TelinkApplication() {
                     }
 
                 }, {
-                    ToastUtils.showShort(it.localizedMessage)
+                    ToastUtils.showLong(it.localizedMessage)
                 })
                 if (DBUtils.lastUser?.id!=null)
                 paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
@@ -138,7 +138,7 @@ class TelinkLightApplication : TelinkApplication() {
                     intent.putExtra(Constant.PARSE_CODE, it)
                     sendBroadcast(intent)
                 }, {
-                    ToastUtils.showShort(it.localizedMessage)
+                    ToastUtils.showLong(it.localizedMessage)
                 })
                 if (DBUtils.lastUser?.id!=null)
                 mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
@@ -147,7 +147,7 @@ class TelinkLightApplication : TelinkApplication() {
                     intent.action = Constant.CANCEL_CODE
                     intent.putExtra(Constant.CANCEL_CODE, it)
                     sendBroadcast(intent)
-                }, { ToastUtils.showShort(it.localizedMessage)})
+                }, { ToastUtils.showLong(it.localizedMessage)})
 
                 /**
                  * stomp断联监听
@@ -163,7 +163,7 @@ class TelinkLightApplication : TelinkApplication() {
                                 }
                         }
                     }
-                }, { ToastUtils.showShort(it.localizedMessage)})
+                }, { ToastUtils.showLong(it.localizedMessage)})
             }
         }
     }

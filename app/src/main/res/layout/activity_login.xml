@@ -254,7 +254,7 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginStart="144dp"
-        android:text="isTeck"
+        android:text="不用smart"
         app:layout_constraintBottom_toBottomOf="@+id/clThirdPartyLogin"
         app:layout_constraintStart_toStartOf="@+id/btn_login"
         app:layout_constraintTop_toTopOf="@+id/sms_password_login"

@@ -76,10 +76,10 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private val MAX_RETRY_COUNT = 1   //update mesh failed的重试次数设置为6次
+    private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为6次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 12//25
-    private val TIME_OUT_CONNECT = 5//20
+    private val SCAN_TIMEOUT_SECOND = 25//25
+    private val TIME_OUT_CONNECT = 20//20
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
 
@@ -203,7 +203,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else {
             closeAnimation()
             btn_stop_scan.visibility = View.GONE
-            ToastUtils.showShort(getString(R.string.scan_end))
+            ToastUtils.showLong(getString(R.string.scan_end))
             finish()
         }
     }
@@ -525,7 +525,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             ToastUtils.showLong(R.string.group_fail_tip)
             updateGroupResult(dbLight, dbGroup)
             if (TelinkLightApplication.getApp().connectDevice == null) {
-                ToastUtils.showLong("断开连接")
+                ToastUtils.showLong(getString(R.string.device_disconnected))
                 stopScanTimer()
                 onLeScanTimeout()
             } else {
@@ -702,7 +702,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         groups!![position].name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateGroup(groups!![position])
@@ -745,7 +745,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         builder.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
             // 获取输入框的内容
             if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                ToastUtils.showShort(getString(R.string.rename_tip_check))
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 //往DB里添加组数据
                 val newGroup: DbGroup? = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, mAddDeviceType.toLong())
@@ -1130,7 +1130,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
     private fun onMeshEvent() {
-        ToastUtils.showShort(R.string.restart_bluetooth)
+        ToastUtils.showLong(R.string.restart_bluetooth)
     }
 
 

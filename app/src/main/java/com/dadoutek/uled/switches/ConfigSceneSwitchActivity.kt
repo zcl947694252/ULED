@@ -505,13 +505,13 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
-                ToastUtils.showShort(getString(R.string.rename_tip_check))
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 if (switchDate != null)
                     DBUtils.updateSwicth(switchDate!!)
                 else
-                    ToastUtils.showShort(getString(R.string.rename_faile))
+                    ToastUtils.showLong(getString(R.string.rename_faile))
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()

@@ -716,7 +716,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
                     if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check));
+                        ToastUtils.showLong(getString(R.string.rename_tip_check));
                     } else {
                         groups.get(position).setName(textGp.getText().toString().trim());
                         DBUtils.INSTANCE.updateGroup(groups.get(position));
@@ -771,7 +771,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
             // 获取输入框的内容
             if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                ToastUtils.showShort(getString(R.string.rename_tip_check));
+                ToastUtils.showLong(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
                 DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_NORMAL);
@@ -1234,12 +1234,12 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         @Override
         public void start() {
 //            showLoadingDialog(getString(R.string.tip_start_sync));
-//            ToastUtils.showShort(R.string.uploading_data);
+//            ToastUtils.showLong(R.string.uploading_data);
         }
 
         @Override
         public void complete() {
-//            ToastUtils.showShort(R.string.upload_data_success);
+//            ToastUtils.showLong(R.string.upload_data_success);
 //            hideLoadingDialog();
         }
 
