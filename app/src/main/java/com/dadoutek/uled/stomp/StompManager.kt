@@ -118,7 +118,7 @@ class StompManager private constructor() {
         val headersLogin = getQRHeaders()
 
         val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
-        LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
+       // LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
         return mStompClient!!.topic(WS_TOPIC_CODE, headersLogin)
                 .map { topicMessage ->
                     val payloadCode = topicMessage.payload

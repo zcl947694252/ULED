@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 object RxBleManager {
     private var regionList: MutableList<String>? = null
-    private var isNeedRetry: Boolean = true
+    public var isNeedRetry: Boolean = true
     private val serviceUUID: String = "19200d0c-0b0a-0908-0706-050403020100"
     private val charUUID: String = "19210d0c-0b0a-0908-0706-050403020100"
     private val manuDataSize = 18
@@ -132,10 +132,11 @@ object RxBleManager {
                     val b = isSupportHybridFactoryReset(version)
                     var isNotMyDevice = isNotMyDevice(it.bleDevice.name)
 
-                    val dadoutek = it.bleDevice.name == Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
+                    val filter = it.bleDevice.name == Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
                     LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
                     b&&isNotMyDevice
+                    //b&&filter
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -192,10 +193,7 @@ object RxBleManager {
                     .doOnNext {
                         isNeedRetry = false
                     }
-                    .retry(1) {
-                        /*  if (isFirst)
-                              true
-                          else */
+                    .retry(2) {
                         isNeedRetry
                     }
 

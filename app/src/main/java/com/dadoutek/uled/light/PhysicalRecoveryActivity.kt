@@ -36,7 +36,8 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
  * 更新描述
  */
 
-    class PhysicalRecoveryActivity : AppCompatActivity() {
+class PhysicalRecoveryActivity : AppCompatActivity() {
+    private var disposableConnectWaitTimer: Disposable? = null
     private val scanMinTime: Long = 5000
     private val scanMaxTime: Long = 25000
     private var disposableWrite: Disposable? = null
@@ -53,7 +54,6 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
     private var isConnection = false
     private var countConnection = 0
     private var disposableConnect: Disposable? = null
-    private var physicalSuccessTag: Boolean = false
     private var allStateTag: Int = 0   // 1代表扫描连接中  2连接成功 3失败 4
 
     private var tenTag: Int = 5   // 1代表连接中  2连接成功 3失败 4 五秒倒计时完成    5-10秒断联
@@ -70,6 +70,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
         RxBleManager.initData()
         initView()
         initData()
+
         initListener()
     }
 
@@ -84,7 +85,6 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
             disposableScan = RxBleManager.scan()
                     .subscribe({
                         LogUtils.v("zcl------------物理恢添加信息$it")
-                        physicalSuccessTag = false
                         list.add(it)
                         if (macAddress != null && it.bleDevice.macAddress == macAddress)
                             connectBestRssi(list)
@@ -108,6 +108,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun connectBestRssi(list: ArrayList<ScanResult>) {
         disposableScan?.dispose()
         disposableScanTimer?.dispose()
@@ -117,7 +118,13 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
             changeVisiable(View.VISIBLE, View.GONE, View.GONE)
             if (macAddress == null)
                 setConnectText()
-            connectAndWriteBle(scanResult.bleDevice)
+            disposableConnectWaitTimer?.dispose()
+             disposableConnectWaitTimer = Observable.timer(700, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        connectAndWriteBle(scanResult.bleDevice)
+                    }
         } else {
             changeVisiable(View.GONE, View.GONE, View.VISIBLE)
         }
@@ -162,7 +169,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
                     writeDataAndShowView(bleDevice)
                 }, {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-                    if (!isConnection && countConnection != maxCount && !physicalSuccessTag) {// 不是连接成功后主动断开
+                    if (!isConnection && countConnection < maxCount) {// 不是恢复出厂成功后的断开
                         physical_recovery_state_progress.visibility = View.GONE
                         changeVisiable(View.GONE, View.GONE, View.VISIBLE)
                     }
@@ -179,34 +186,38 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    disposableConnectTimer?.dispose()
                     countConnection++
                     isConnection = true
+
                     LogUtils.e("zcl物理写入次数$countConnection")
                     if (countConnection < maxCount) {
                         changeVisiable(View.VISIBLE, View.GONE, View.GONE)
                         startOffTimer()
                     } else {
-                        LogUtils.v("zcl物理流程恢复成功$countConnection")
+                        LogUtils.v("zcl物理写入流程恢复成功$countConnection")
                         disposableShowResultDelay?.dispose()
                         disposableShowResultDelay = Observable.timer(3000, TimeUnit.MILLISECONDS)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
+                                    disposableConnectTimer?.dispose()//取消30秒倒计时
                                     changeVisiable(View.GONE, View.VISIBLE, View.GONE)
                                 }, {})
-                        compositeDisposable.add(disposableShowResultDelay!!)
+
                     }
                 }, {
                     LogUtils.v("zcl物理写入数据错误$it")
+                    RxBleManager.disconnectAllDevice()
+                    setAllDispose()
                 })
     }
 
     /**
-     * 断电倒计时10秒
+     * 断电倒计时30秒
      */
     @SuppressLint("StringFormatMatches")
     private fun startOffTimer() {//连接状态下断电倒计时
+        disposableConnectTimer?.dispose()
         disposableConnectOffTimer?.dispose()
 
         disposableConnectOffTimer = Observable.intervalRange(0, powerOffTimer, 0, 1, TimeUnit.SECONDS)
@@ -219,7 +230,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
                     if (powerOffTimer == it)
                         allStateTag = tenTag//代表10秒已经结束
 
-                    LogUtils.e("zcl------------------------------------------------------$it")
+                    LogUtils.e("zcl-----------------------------isConnectio====$isConnection-------isNeedRetry===${RxBleManager.isNeedRetry}------------------$it")
 
                     if (!isConnection) {//如果已经断联是正常的走流程 false
                         LogUtils.e("zcl物理流程状态断联了嘛__________还在连接?________$isConnection")
@@ -249,21 +260,12 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
                     physical_recovery_state_warm.textColor = getColor(R.color.gray_3)
                     if (it == 1L)//等于5秒时候开始连接并通电 重新扫描时为了让连接的那个设备发广播提高连接成功率
                         startScanBestRssi(scanMaxTime)
-                    changePowerOnColor(num)
-                    if (isConnection) {//通电倒计时完毕为连接状态则走正常流程提醒断电
-                        disposableConnectTimer?.dispose()
-                        when (countConnection) {
-                            1, 2 -> startOffTimer()
 
-                            3 -> {//第三次连接成功
-                                physicalSuccessTag = true
-                            }
-                        }
-                    } else {//通电倒计时内没有连接上 恢复失败
-                        if (0L == num) {
-                            changeVisiable(View.GONE, View.GONE, View.VISIBLE)
-                            disposableConnectTimer?.dispose()
-                        }
+                    changePowerOnColor(num)
+
+                    if (!isConnection && 0L == num) {//通电倒计时内没有连接上 恢复失败
+                        changeVisiable(View.GONE, View.GONE, View.VISIBLE)
+                        disposableConnectTimer?.dispose()
                     }
                 }
     }
@@ -338,7 +340,6 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
             setSearcher()
             changeVisiable(View.VISIBLE, View.GONE, View.GONE)
             startScanBestRssi()
-            physicalSuccessTag = false
         }
         physical_recovery_success.setOnClickListener {
             finish()
@@ -374,11 +375,9 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
     }
 
     private fun changeVisiable(state: Int, success: Int, fail: Int) {
-        if (!physicalSuccessTag) {
-            physical_recovery_rly.visibility = state
-            physical_recovery_success_ly.visibility = success
-            physical_recovery_fail_ly.visibility = fail
-        }
+        physical_recovery_rly.visibility = state
+        physical_recovery_success_ly.visibility = success
+        physical_recovery_fail_ly.visibility = fail
         if (fail == View.VISIBLE)
             setAllDispose()
     }
@@ -394,6 +393,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
         disposableScanTimer?.dispose()
         disposableConnect?.dispose()
 
+        disposableConnectWaitTimer?.dispose()
         disposableShowResultDelay?.dispose()
         compositeDisposable.dispose()
     }

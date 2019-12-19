@@ -803,7 +803,7 @@
     <string name="please_connect_normal_light">请连接冷暖灯</string>
     <string name="please_connect_curtain">请连接窗帘</string>
     <string name="scanning_timeout">扫描超时</string>
-    <string name="reset_factory_success">恢复出厂设置成功,3秒内设备灯光将闪烁,如未闪烁请重试</string>
+    <string name="reset_factory_success">恢复出厂成功,3秒内设备灯光闪烁,未闪烁请重试</string>
     <string name="reset_factory_fail">恢复出厂设置失败,请重新上电重试</string>
     <string name="please_read_carefully">请仔细阅读 %1$s</string>
     <string name="please_sure_all_device_power_on">请确保所有设备已通电(传感器,开关除外)</string>

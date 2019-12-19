@@ -974,11 +974,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                 DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
         mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 10)
-                ?.subscribe(
-                        {
+                ?.subscribe({
                             onLogin()
-                        },
-                        {
+                        }, {
                             LogUtils.d("connect failed")
                         }
                 )

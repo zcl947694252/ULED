@@ -880,7 +880,7 @@
     <string name="please_connect_normal_light">Please connect the  lights</string>
     <string name="please_connect_curtain">Please connect the curtain</string>
     <string name="scanning_timeout">Scan timeout</string>
-    <string name="reset_factory_success">If factory Settings are restored successfully, the device lights will flash within 3 seconds. If not, please try again</string>
+    <string name="reset_factory_success">The factory has been restored successfully. The equipment light flashes within 3 seconds. Please try again if not</string>
     <string name="reset_factory_fail">Factory Settings restored fail,please power-on to try again</string>
     <string name="please_read_carefully">Please read %1$s S carefully</string>
     <string name="please_sure_all_device_power_on">Please ensure all devices are  powered on (except sensor, switch)</string>
