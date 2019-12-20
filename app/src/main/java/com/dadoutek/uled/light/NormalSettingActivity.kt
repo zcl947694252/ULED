@@ -751,7 +751,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         android.app.AlertDialog.Builder(this@NormalSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {

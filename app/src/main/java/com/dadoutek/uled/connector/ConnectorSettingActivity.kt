@@ -68,7 +68,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
 
     private var localVersion: String? = null
-    private var light: DbConnector? = null
+    private var light: DbConnector? =null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
@@ -590,7 +590,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbConnector
+        val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
+        if (get!=null)
+        this.light = get as DbConnector
+
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         // intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
@@ -601,7 +604,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 //        editTitle!!.setText(light?.name)
 //        editTitle!!.visibility=View.GONE
         relayName.visibility = View.VISIBLE
-        relayName.setText(light?.name)
+        relayName.text = light?.name ?: ""
 
 //        tvOta!!.setOnClickListener(this.clickListener)
         updateGroup.setOnClickListener(this.clickListener)

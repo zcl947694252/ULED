@@ -36,7 +36,7 @@ object RxBleManager {
     private val versionCodeLength = 5       //-之后的版本号长度，2.1.8 为5个byte
     private val supportVersion = "15"           //支持新恢复出厂设置的版本，XX-15
     private val supportVersionWithDot = "3.5.0"     //支持新恢复出厂设置的版本，XX-3.5.1  正式版记得改回来
-    private lateinit var rxBleClient: RxBleClient
+    private  var rxBleClient: RxBleClient? = null
     private val mHmScannedDevice = hashMapOf<String, RxBleDevice>()
     private var mIsScanning = false
     private val mHmConnectObservable = hashMapOf<RxBleDevice, Observable<RxBleConnection>>()
@@ -118,7 +118,7 @@ object RxBleManager {
     }
 
 
-    fun scan(deviceName: String? = null): Observable<ScanResult> {
+    fun scan(deviceName: String? = null): Observable<ScanResult>? {
         mHmScannedDevice.clear()
         val scanFilter: ScanFilter = ScanFilter.Builder()
                 .setManufacturerData(0x0211, byteArrayOf())
@@ -126,8 +126,8 @@ object RxBleManager {
 
         val scanSettings: ScanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .build()
-        return rxBleClient.scanBleDevices(scanSettings, scanFilter)
-                .filter {
+        return rxBleClient?.scanBleDevices(scanSettings, scanFilter)
+                ?.filter {
                     val version = getVersion(it)
                     val b = isSupportHybridFactoryReset(version)
                     var isNotMyDevice = isNotMyDevice(it.bleDevice.name)
@@ -138,17 +138,17 @@ object RxBleManager {
                     b&&isNotMyDevice
                     //b&&filter
                 }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.doOnSubscribe {
                     mIsScanning = true
                 }
-                .doOnDispose {
+                ?.doOnDispose {
                     //   LogUtils.d("doOnDispose mIsScanning = $mIsScanning")
                     mIsScanning = false
-                }.doOnError {
+                }?.doOnError {
                     mIsScanning = false
-                }.retry()
+                }?.retry()
     }
 
     private fun isNotMyDevice(name: String?): Boolean {

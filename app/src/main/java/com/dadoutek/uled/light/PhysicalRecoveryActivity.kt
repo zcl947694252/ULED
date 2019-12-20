@@ -83,13 +83,12 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
             disposableScan?.dispose()
             disposableScan = RxBleManager.scan()
-                    .subscribe({
+                    ?.subscribe({
                         LogUtils.v("zcl------------物理恢添加信息$it")
                         list.add(it)
                         if (macAddress != null && it.bleDevice.macAddress == macAddress)
                             connectBestRssi(list)
                         LogUtils.e("zcl物理恢复----------------------${it.bleDevice.macAddress == macAddress}---------${it.bleDevice.macAddress}---------$macAddress")
-
                     }, {
                         LogUtils.v("zcl------------物理恢复扫描错误信息$it-------------------连接状态$allStateTag")
                         disposableScan?.dispose()

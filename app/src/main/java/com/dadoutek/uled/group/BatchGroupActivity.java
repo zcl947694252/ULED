@@ -1118,11 +1118,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
-        if (lightType.equals("cw_light")) {
+        if ("cw_light".equals(lightType)) {
             groupLight = intent.getStringExtra("cw_light_group_name");
-        } else if (lightType.equals("cw_light_group")) {
+        } else if ("cw_light_group".equals(lightType)) {
             selectGroupId = intent.getIntExtra("group", 0);
-        } else if (lightType.equals("rgb_light_group")) {
+        } else if ("rgb_light_group".equals(lightType)) {
             selectGroupId = intent.getIntExtra("group", 0);
         }
 

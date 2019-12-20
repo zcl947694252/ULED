@@ -1020,7 +1020,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         val pos = seekBar.tag as Int
-        val address = data[pos].groupAddress
+
+        val address = if (pos<data.size)
+            data[pos].groupAddress
+        else
+            0
+
         val opcode: Byte
         val itemGroup = data[pos]
         if (seekBar.id == R.id.cw_sbBrightness) {
