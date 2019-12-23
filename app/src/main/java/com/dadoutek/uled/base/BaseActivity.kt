@@ -303,11 +303,14 @@ abstract class BaseActivity : AppCompatActivity() {
                     LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
                 }
                 Constant.CANCEL_CODE -> {
-                    val cancelBean = intent.getSerializableExtra(Constant.CANCEL_CODE) as CancelAuthorMsg
+                    val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
+                    var cancelBean: CancelAuthorMsg? = null
+                    if (cancelBean!=null)
+                    cancelBean = extra as CancelAuthorMsg
                     val user = DBUtils.lastUser
                     user?.let {
-                        if (user.last_authorizer_user_id == cancelBean.authorizer_user_id.toString()
-                                && user.last_region_id == cancelBean.rid.toString()) {
+                        if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
+                                && user.last_region_id == cancelBean?.rid.toString()) {
                             user.last_region_id = 1.toString()
                             user.last_authorizer_user_id = user.id.toString()
                             DBUtils.deleteAllData()
@@ -318,7 +321,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                         }
                     }
-                    makeCodeDialog(2, cancelBean.authorizer_user_phone, "", cancelBean.region_name)//2代表解除授权信息type
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, "", cancelBean?.region_name) }//2代表解除授权信息type
                     LogUtils.e("zcl_baseMe_______取消授权")
 
                 }

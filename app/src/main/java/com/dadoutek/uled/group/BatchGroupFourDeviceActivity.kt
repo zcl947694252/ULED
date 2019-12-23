@@ -640,7 +640,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                                 mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN))
                                         //连接，如断开会自动重连
-                                        TelinkLightService.Instance().autoConnect(connectParams)
+
+                                        TelinkLightService.Instance()?.autoConnect(connectParams)
                                     }
                                 }
                             }, { LogUtils.d(it) })
@@ -1632,7 +1633,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         LogUtils.d("findMeshDevice name = $deviceName")
         disposableScan?.dispose()
-         disposableScan = RecoverMeshDeviceUtil.rxBleClient.scanBleDevices(scanSettings, scanFilter)
+        disposableScan = RecoverMeshDeviceUtil.rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
                 .map { RecoverMeshDeviceUtil.parseData(it) }          //解析数据
                 .timeout(RecoverMeshDeviceUtil.SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {

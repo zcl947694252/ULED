@@ -269,11 +269,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
+        if (!loadDialog!!.isShowing && !this.isFinishing) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
-            if (this.isRuning && !this.isDestroyed) {
+            if ( !this.isDestroyed) {
                 loadDialog!!.show()
             }
         }
@@ -545,7 +545,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         mConnectDisposable = null
                     }
                     ?.doOnError {
-                        TelinkLightService.Instance().idleMode(false)
+                        TelinkLightService.Instance()?.idleMode(false)
                     }
 
         } else {
@@ -572,7 +572,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             showOpenLocationServiceDialog()
         } else {
             hideLocationServiceDialog()
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             Thread.sleep(200)
             RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                     .subscribeOn(Schedulers.io())
@@ -593,7 +593,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                                 LogUtils.v("autoconnect  meshName = $meshName   meshPwd = ${NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)}   macAddress = ${macAddr}")
 
                                 //连接，如断开会自动重连
-                                TelinkLightService.Instance().autoConnect(connectParams)
+                                TelinkLightService.Instance()?.autoConnect(connectParams)
                             }
                         }
                     }, { LogUtils.d(it) })

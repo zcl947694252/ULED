@@ -296,8 +296,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))
                                     hideLoadingDialog()
-                                    TelinkLightService.Instance().idleMode(true)
-                                    TelinkLightService.Instance().disconnect()
+                                    TelinkLightService.Instance()?.idleMode(true)
+                                    TelinkLightService.Instance()?.disconnect()
                                 })
                     }.start()
 

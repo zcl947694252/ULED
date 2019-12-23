@@ -191,6 +191,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private val onClick = View.OnClickListener {
+        Log.e("zcl","zcl******扫描设备开始分组");
         stopScanTimer()
         closeAnimation()
 
@@ -806,6 +807,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         },
                         {
                             hideLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.connect_fail))
                             LogUtils.d(it)
                         }
                 )
@@ -890,7 +892,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             isGuide = false
             addNewGroup()
         }
-        btn_stop_scan?.setOnClickListener(onClick)
+        btn_stop_scan?.setOnClickListener(onClick)//停止扫描
 
         add_group_relativeLayout?.setOnClickListener { v -> addNewGroup() }
 
