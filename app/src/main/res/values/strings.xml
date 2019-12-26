@@ -929,5 +929,13 @@
     <string name="frist_power_on">Please power on after %1$s</string>
     <string name="second_power_on">Please power on within %1$s seconds,waiting for the connection</string>
     <string name="scan_retry">Re-Scan </string>
+    <string name="transfer_region">Transfer accounts</string>
+    <string name="region_transfer_code_invalid">Area handover qr code is invalid</string>
+    <string name="transfer_region_code">Scan the qr code below to hand over your account</string>
+    <string name="see_region_qr">Transfer Code</string>
+    <string name="transfer_network_region">Transfer Area</string>
+    <string name="transfer_region_success">The area you handed over has been accepted</string>
+    <string name="have_old_device">是否存在旧版本未恢复</string>
+    <string name="make_code_fail">Failed to create qr code</string>
 
 </resources>

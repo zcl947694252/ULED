@@ -43,12 +43,8 @@ public class CommonParamsInterceptor implements Interceptor {
         Request request = chain.request(); // 112.124.22.238:8081/course_api/cniaoplay/featured?p={'page':0}
         //请求方式
         String method = request.method();
-
         Request.Builder builder = request.newBuilder();
-
         DbUser user = DBUtils.INSTANCE.getLastUser();
-        //LogUtils.e("zcl", "zcl*******method---" + method);
-
         //添加请求头
         builder.addHeader("Content-Type", TEXT);
 
@@ -66,7 +62,6 @@ public class CommonParamsInterceptor implements Interceptor {
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";
         builder.addHeader("region-id", last_region_id);
         LogUtils.v("zcl","zcl******region-id=="+last_region_id+"----------Token"+oldToken);
-
         //authorizer-user-id：80
         //在请求头加上键值对authorizer-user-id:80即可获取id为80用户的数据，如果请求头中缺少这对键值对，后台默认authorizer-user-id：自己用户的id。
         //如何用回自己的数据？
@@ -75,18 +70,11 @@ public class CommonParamsInterceptor implements Interceptor {
         //在请求头加上键值对region-id:2即可获取区域2的数据，如果请求头中缺少这对键值对，后台默认region-id:1
         //以下情况使用的是区域一的数据
         //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
-        if (user != null && user.getLast_authorizer_user_id() != null && !user.getLast_authorizer_user_id().equals("")) {
+        if (user != null && user.getLast_authorizer_user_id() != null && !user.getLast_authorizer_user_id().equals(""))
             builder.addHeader("authorizer-user-id", user.getLast_authorizer_user_id());
-            //LogUtils.e("zcl","zcl****是空的没有authorizer-user-id**Last_authorizer_user_id=="+user.getLast_authorizer_user_id());
-        }
 
-
-            if (token == null || "".equals(token)) {
+            if (token == null || "".equals(token))
                 builder.addHeader("token", oldToken);
-                //LogUtils.e("zcltoken设置user的token-----" + oldToken));
-            }
-               // LogUtils.e("zcltoken设置user的token-----"+builder.build().header("token"));
-
 
         RequestBody body = request.body();
         //LogUtils.e("zcl","zcl**method.equals(GET)****"+method.equals("GET")+"00000000"+(method.equals("POST") || method.equals("DELETE"))+"----"+(body != null));
@@ -104,17 +92,17 @@ public class CommonParamsInterceptor implements Interceptor {
                     if (body instanceof FormBody) { // form 表单
                         for (int i = 0; i < ((FormBody) body).size(); i++)
                             rootMap.put(((FormBody) body).encodedName(i), ((FormBody) body).encodedValue(i));
-                        //LogUtils.e("zcl", "zcl******rootMap" + rootMap.toString());
                         requestBody = RequestBody.create(MJSON, new JSONObject(rootMap).toString());
-                    } else {
+                        builder.post(requestBody);
+                    } else if (method.equals("POST")){
                         Buffer buffer = new Buffer();
                         body.writeTo(buffer);
                         String oldJsonParams = buffer.readUtf8();
                         requestBody = RequestBody.create(MJSON, oldJsonParams);
                         requestBody.writeTo(buffer);
                         //LogUtils.e("zcl", "zcl******buffer" + buffer.readUtf8());
+                        builder.post(requestBody);
                     }
-                    builder.post(requestBody);
                 }
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();

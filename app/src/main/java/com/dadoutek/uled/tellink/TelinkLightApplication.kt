@@ -120,6 +120,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
+//                    LogUtils.e("zcl单点登录 It's time to cancel $it")
                     if (it != key&&"no_have_key"!=it) {
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
@@ -132,7 +133,7 @@ class TelinkLightApplication : TelinkApplication() {
                 })
                 if (DBUtils.lastUser?.id!=null)
                 paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
-                    LogUtils.e("It's time to parse $it")
+                    LogUtils.e("zcl解析 It's time to parse $it")
                     val intent = Intent()
                     intent.action = Constant.PARSE_CODE
                     intent.putExtra(Constant.PARSE_CODE, it)
@@ -142,7 +143,7 @@ class TelinkLightApplication : TelinkApplication() {
                 })
                 if (DBUtils.lastUser?.id!=null)
                 mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
-                    LogUtils.e("It's time to cancel $it")
+                    LogUtils.e("zcl取消授权 It's time to cancel $it")
                     val intent = Intent()
                     intent.action = Constant.CANCEL_CODE
                     intent.putExtra(Constant.CANCEL_CODE, it)

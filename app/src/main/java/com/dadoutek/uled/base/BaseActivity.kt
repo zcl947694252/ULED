@@ -103,16 +103,20 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
     abstract fun initData()
     abstract fun initListener()
-    open fun notifyWSData() {}
+    open fun notifyWSData(type: Int, rid: Any) {}
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
-    private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
+    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
 
         when (type) {
+            -1 -> {
+                title = getString(R.string.transfer_region_success)
+                recever = getString(R.string.recevicer)
+            }
             0 -> {
                 title = getString(R.string.author_account_receviced)
                 recever = getString(R.string.recevicer)
@@ -139,9 +143,13 @@ abstract class BaseActivity : AppCompatActivity() {
                         restartApplication()
                     }
                 }
-                notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView!=null)
-                    pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                notifyWSData(type, rid)
+                try {
+                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&!Constant.isTelBase)
+                        pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                } catch (e: Exception) {
+                    LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
+                }
             }
         }
 
@@ -151,7 +159,7 @@ abstract class BaseActivity : AppCompatActivity() {
         var view = window.decorView
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
-            view.viewTreeObserver.removeOnGlobalLayoutListener{}
+            view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
     }
 
@@ -204,7 +212,7 @@ abstract class BaseActivity : AppCompatActivity() {
         override fun complete() {
             hideLoadingDialog()
             TelinkLightService.Instance()?.idleMode(true)
-            if (!this@BaseActivity.isFinishing&&!singleLogin?.isShowing!!)
+            if (!this@BaseActivity.isFinishing && !singleLogin?.isShowing!!)
                 singleLogin!!.show()
             restartApplication()
         }
@@ -305,8 +313,8 @@ abstract class BaseActivity : AppCompatActivity() {
                 Constant.CANCEL_CODE -> {
                     val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
                     var cancelBean: CancelAuthorMsg? = null
-                    if (cancelBean!=null)
-                    cancelBean = extra as CancelAuthorMsg
+                    if (cancelBean != null)
+                        cancelBean = extra as CancelAuthorMsg
                     val user = DBUtils.lastUser
                     user?.let {
                         if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
@@ -321,14 +329,15 @@ abstract class BaseActivity : AppCompatActivity() {
                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                         }
                     }
+
                     cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, "", cancelBean?.region_name) }//2代表解除授权信息type
                     LogUtils.e("zcl_baseMe_______取消授权")
 
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    LogUtils.e("zcl_baseMe___________解析二维码")
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
+//                    LogUtils.e("zcl_baseMe___________解析二维码")
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid, codeBean.region_name)
                 }
             }
         }

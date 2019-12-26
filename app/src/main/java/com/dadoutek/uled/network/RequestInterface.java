@@ -13,13 +13,16 @@ import com.dadoutek.uled.model.DbModel.DbSensorChild;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.HttpModel.RemoveCodeBody;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
+import com.dadoutek.uled.network.bean.TransferRegionBean;
+import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.RegionListBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
-import com.dadoutek.uled.region.bean.TransferData;
+import com.dadoutek.uled.region.bean.TransferBean;
 
 import java.util.List;
 
@@ -112,7 +115,7 @@ public interface RequestInterface {
 
     //8、获取单个区域(又有改动) region/get/300975/1
     @GET("region/get/{uid}/{rid}")
-    Observable<Response<DbRegion>> getRegionInfo(@Path("uid") String uid,@Path("rid") String rid);
+    Observable<Response<DbRegion>> getRegionInfo(@Path("uid") String uid, @Path("rid") String rid);
 
     //47.获取区域列表 区域activity内使用
     // http://dev.dadoutek.com/smartlight/auth/region/list
@@ -140,7 +143,6 @@ public interface RequestInterface {
     //57、授权码过期
     //使一个授权码过期
     //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
-    //DELETE
     //区域id和码种类type，在url中
     //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
@@ -404,7 +406,7 @@ public interface RequestInterface {
                                                @Path("lid") int lid);
 
     /**
-     *  <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
+     * <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
      * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
      * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
      * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
@@ -416,6 +418,7 @@ public interface RequestInterface {
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)   todo 此处报错  用户不存在
     Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
                                                                @Query("currentVersion") String version);
+
     //用于检测是都注册
     @GET("auth/isRegister")
     Observable<Response<Boolean>> isRegister(@Query("phone") String phoneNumber);
@@ -431,7 +434,7 @@ public interface RequestInterface {
 
     @FormUrlEncoded
     @POST("auth/code/parse")
-    Observable<Response<String>> parseQRCode(@Field("code") String code,@Field("password") String password);
+    Observable<Response<ParseCodeBean>> parseQRCode(@Field("code") String code, @Field("password") String password);
 
     /**
      * 62、取消授权(主动方:授权者)
@@ -463,7 +466,7 @@ public interface RequestInterface {
      * GET
      */
     @GET("auth/transfer/code/generate")
-    Observable<Response<TransferData>> makeTransferCode();
+    Observable<Response<TransferBean>> makeTransferCode();
 
     /**
      * 59、获取区域授权码信息(新增)
@@ -480,7 +483,46 @@ public interface RequestInterface {
      * GET
      */
     @GET("auth/transfer/code/info")
-    Observable<Response<TransferData>> mlookTransferCode();
+    Observable<Response<TransferBean>> mGetTransferCode();
+
+    /**
+     * 1、生成区域移交码（new）
+     * https://dev.dadoutek.com/smartlight_java/auth/transfer/code/generate/{rid}
+     * GET
+     */
+    @GET("auth/transfer/code/generate/{rid}")
+    Observable<Response<TransferRegionBean>> mGetTransferRegionQR(@Path("rid") Long rid);
+
+    /**
+     * 2 获取区域移交码信息
+     * https://dev.dadoutek.com/smartlight_java/auth/transfer/code/info/{rid}
+     * GET
+     */
+    @GET("auth/transfer/code/info/{rid}")
+    Observable<Response<TransferRegionBean>> mlookRegionTransferCodeBean(@Path("rid") Long regionId);
+
+
+    /**
+     * 删除一个区域的移交码
+     * https://dev.dadoutek.com/smartlight_java/auth/transfer/code/remove/{rid}
+     * DELETE
+     * content-type : application/json
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * https://dev.dadoutek.com/smartlight_java/auth/transfer/code/remove/1
+     */
+    @DELETE("auth/transfer/code/remove/{rid}")
+    Observable<Response<TransferRegionBean>> removeTransferRegionCode(@Path("rid") Long rid);
+
+    /**
+     * 三码删除统一接口，可以通过code删除
+     * * https://dev.dadoutek.com/smartlight_java/auth/code/remove
+     * * DELETE
+     * * code string
+     */
+    @HTTP(method = "DELETE", path = "auth/code/remove", hasBody = true)
+    //@DELETE("auth/code/remove")
+//添加数据进body 少量参数可以使用field
+    Observable<Response> allCodeRemove(@Body() RemoveCodeBody body);
 
     /**
      * 60、获取区域controlMesh列表
@@ -502,6 +544,6 @@ public interface RequestInterface {
      */
     @GET("app/getNewVersion")
     Observable<Response<VersionBean>> haveNewVerison(@Query("currentVersion") String currentVersion
-            ,@Query("platform") int AndroidZero ,@Query("lang") int zhOrEnglish);
+            , @Query("platform") int AndroidZero, @Query("lang") int zhOrEnglish);
 
 }

@@ -24,7 +24,7 @@ class StompManager private constructor() {
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
 
-     var mStompClient: StompClient? = null
+    var mStompClient: StompClient? = null
 
     companion object {
         private var instance: StompManager? = null
@@ -44,7 +44,7 @@ class StompManager private constructor() {
     fun initStompClient() {
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
-       headers.add(StompHeader("host", Constant.WS_HOST))
+        headers.add(StompHeader("host", Constant.WS_HOST))
 
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
@@ -103,7 +103,7 @@ class StompManager private constructor() {
         durable	boolean	是	固定: true
         auto-delete	boolean	是	固定: false
         x-queue-name	boolean	是	固定: sl-authorization-cancel-用户id
-        */
+         */
         headersLogin.add(StompHeader("ack", "client-individual"))
         headersLogin.add(StompHeader("id", "authorization-cancel"))
 
@@ -118,7 +118,7 @@ class StompManager private constructor() {
         val headersLogin = getQRHeaders()
 
         val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
-       // LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
+        // LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
         return mStompClient!!.topic(WS_TOPIC_CODE, headersLogin)
                 .map { topicMessage ->
                     val payloadCode = topicMessage.payload
@@ -147,12 +147,13 @@ class StompManager private constructor() {
     fun cancelAuthorization(): Flowable<CancelAuthorMsg> {
         val headersLogin = getAuthorHeaders()
 //        LogUtils.e("解除授权的订阅id  ----${DBUtils.lastUser}")
-        var WSAUTHOR_CODE_NOW="/topic/authorization.cancel."+ DBUtils.lastUser?.id
+        var WSAUTHOR_CODE_NOW = "/topic/authorization.cancel." + DBUtils.lastUser?.id
 
         return mStompClient!!.topic(WSAUTHOR_CODE_NOW, headersLogin)
                 .map { topicMessage ->
                     val payload = topicMessage.payload
                     val msg = Gson().fromJson(payload, CancelAuthorMsg::class.java)
+                    LogUtils.v("zcl解除授权得到信息$msg")
                     msg
                 }
     }

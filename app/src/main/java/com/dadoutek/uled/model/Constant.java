@@ -275,10 +275,6 @@ public class Constant implements Serializable {
     public static final String OTA_MAC = "OTA_MAC";
     public static final String OTA_MES_Add = "OTA_MES_Add";
 
-    //是否是新生成的移交码
-    public static final String IS_NEW_TRANSFER_CODE = "IS_NEW_TRANSFER_CODE";
-    //是否是新生成的授权码
-    public static final String IS_NEW_AUTHOR_CODE = "IS_NEW_AUTHOR_CODE";
 
 
     //是否显示区域弹框

@@ -56,7 +56,6 @@ object RxBleManager {
     private fun getRegionList(): MutableList<String> {
         var list = mutableListOf<String>()
         RegionModel.getRegionName()?.subscribe({
-
             if (it.errorCode==0){
                   for (i in it.data) {
                       LogUtils.v("zcl获取区域contromes名$i")
@@ -77,7 +76,7 @@ object RxBleManager {
     /**
      * getVersion
      */
-    private fun getVersion(result: ScanResult): String {
+     fun getVersion(result: ScanResult): String {
         val rssi: Int = result.rssi
         val mac: String = result.bleDevice?.macAddress ?: ""
         val manuData = result.scanRecord?.manufacturerSpecificData
@@ -105,7 +104,7 @@ object RxBleManager {
     /**
      * 是否支持新的物理恢复出厂设置方法
      */
-    private fun isSupportHybridFactoryReset(version: String): Boolean {
+     fun isSupportHybridFactoryReset(version: String): Boolean {
         var isSupport = false
         if (version.isNotEmpty()) {
             isSupport = if (version.contains('.')) {
@@ -130,13 +129,11 @@ object RxBleManager {
                 ?.filter {
                     val version = getVersion(it)
                     val b = isSupportHybridFactoryReset(version)
-                    var isNotMyDevice = isNotMyDevice(it.bleDevice.name)
 
-                    val filter = it.bleDevice.name == Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
+                    val filter = it.bleDevice.name != Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
                     LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
-                    b&&isNotMyDevice
-                    //b&&filter
+                    version!=""&&filter
                 }
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
@@ -151,7 +148,7 @@ object RxBleManager {
                 }?.retry()
     }
 
-    private fun isNotMyDevice(name: String?): Boolean {
+    private fun isNotFactoryDevice(name: String?): Boolean {
         var b = true
         if (regionList == null) {
             b = true

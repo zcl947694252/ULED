@@ -69,13 +69,10 @@ class SyncDataPutOrGetUtils {
                                         syncCallback.complete()
                                     }
                                 }
-
                                 override fun onSubscribe(d: Disposable) {
                                 }
-
                                 override fun onNext(t: String) {
                                 }
-
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {

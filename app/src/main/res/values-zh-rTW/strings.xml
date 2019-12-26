@@ -852,4 +852,12 @@
     <string name="frist_power_on">请在%1$s秒后通电</string>
     <string name="second_power_on">请在%1$s秒内通电,等待连接</string>
     <string name="scan_retry">重新扫描</string>
+    <string name="transfer_region">移交区域</string>
+    <string name="region_transfer_code_invalid">区域移交二维码失效</string>
+    <string name="transfer_region_code">扫描下方二维码移交区域</string>
+    <string name="see_region_qr">查看移交码</string>
+    <string name="transfer_network_region">移交单个区域</string>
+    <string name="transfer_region_success">您移交的区域已被接收</string>
+    <string name="have_old_device">是否存在旧版本设备未恢复</string>
+    <string name="make_code_fail">创建二维码失败</string>
 </resources>

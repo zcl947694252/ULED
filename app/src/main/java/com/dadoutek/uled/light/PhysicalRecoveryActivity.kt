@@ -60,6 +60,9 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     private var seachering: Int = 7   // 扫描中
     private var maxCount: Int = 3   // 成功次数
 
+    private var isHaveNew: Boolean = false
+    private var isHaveOld: Boolean = false
+
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
 
@@ -86,7 +89,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                     ?.subscribe({
                         LogUtils.v("zcl------------物理恢添加信息$it")
                         list.add(it)
-                        if (macAddress != null && it.bleDevice.macAddress == macAddress)
+                        if (macAddress != null && it.bleDevice.macAddress == macAddress)//如果搜索到已连接的设备则停止扫描马上链接 否则走下面定时
                             connectBestRssi(list)
                         LogUtils.e("zcl物理恢复----------------------${it.bleDevice.macAddress == macAddress}---------${it.bleDevice.macAddress}---------$macAddress")
                     }, {
@@ -95,6 +98,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         disposableFiveTimer?.dispose()
                         disposableConnectTimer?.dispose()
                     })
+
             disposableScanTimer?.dispose()
             disposableScanTimer = Observable.timer(time, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
@@ -112,39 +116,72 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         disposableScan?.dispose()
         disposableScanTimer?.dispose()
         var scanResult: ScanResult? = getBestRssi(list)
-
-        if (scanResult != null && scanResult.bleDevice != null) {
-            changeVisiable(View.VISIBLE, View.GONE, View.GONE)
-            if (macAddress == null)
-                setConnectText()
-            disposableConnectWaitTimer?.dispose()
-             disposableConnectWaitTimer = Observable.timer(700, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        connectAndWriteBle(scanResult.bleDevice)
-                    }
-        } else {
-            changeVisiable(View.GONE, View.GONE, View.VISIBLE)
+        if (isHaveNew&&scanResult != null) {
+            if (scanResult.bleDevice != null) {
+                changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                if (macAddress == null)
+                    setConnectText()
+                disposableConnectWaitTimer?.dispose()
+                disposableConnectWaitTimer = Observable.timer(700, TimeUnit.MILLISECONDS)//
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            connectAndWriteBle(scanResult.bleDevice)
+                        }
+            } else {
+                changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+            }
+        } else if (isHaveOld) {//是我们的旧设备并且是没有恢复出厂的
+            //显示旧设备恢复出厂的提示语
+            changeVisiable(View.GONE, View.GONE, View.GONE, View.VISIBLE)
         }
+
     }
 
     private fun getBestRssi(list: ArrayList<ScanResult>): ScanResult? {
         var scanResult: ScanResult? = null
+        val listNew = mutableListOf<ScanResult>()
+        val listOld = mutableListOf<ScanResult>()
+
         for (it in list) {
+            val version = RxBleManager.getVersion(it)
+            val supportHybridFactoryReset = RxBleManager.isSupportHybridFactoryReset(version)
+            if (supportHybridFactoryReset) {
+                listNew.add(it)
+                LogUtils.v("zcl添加新设备$it")
+            } else {
+                listOld.add(it)
+                LogUtils.v("zcl添加旧设备$it")
+            }
+        }
+
+        isHaveNew = listNew.size > 0
+        isHaveOld = listOld.size > 0
+
+        if (listNew.size > 0) {
+            scanResult = filterRssi(listNew, scanResult)
+        } else  {
+            scanResult = null
+        }
+        return scanResult
+    }
+
+    private fun filterRssi(listNew: MutableList<ScanResult>, scanResult: ScanResult?): ScanResult? {
+        var scanResult1 = scanResult
+        for (it in listNew) {
             if (macAddress == null) {
-                if (scanResult == null)
-                    scanResult = it
+                if (scanResult1 == null)
+                    scanResult1 = it
                 else {
-                    if (it.rssi > scanResult.rssi)
-                        scanResult = it
+                    if (it.rssi > scanResult1.rssi)
+                        scanResult1 = it
                 }
             } else {
                 if (macAddress == it.bleDevice.macAddress)
-                    scanResult = it
+                    scanResult1 = it
             }
         }
-        return scanResult
+        return scanResult1
     }
 
     private fun setConnectText() {
@@ -170,7 +207,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     if (!isConnection && countConnection < maxCount) {// 不是恢复出厂成功后的断开
                         physical_recovery_state_progress.visibility = View.GONE
-                        changeVisiable(View.GONE, View.GONE, View.VISIBLE)
+                        changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     }
                     disposableConnect?.dispose()
 
@@ -190,7 +227,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
                     LogUtils.e("zcl物理写入次数$countConnection")
                     if (countConnection < maxCount) {
-                        changeVisiable(View.VISIBLE, View.GONE, View.GONE)
+                        changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
                         startOffTimer()
                     } else {
                         LogUtils.v("zcl物理写入流程恢复成功$countConnection")
@@ -200,7 +237,9 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
                                     disposableConnectTimer?.dispose()//取消30秒倒计时
-                                    changeVisiable(View.GONE, View.VISIBLE, View.GONE)
+                                     changeVisiable(View.GONE, View.VISIBLE, View.GONE, View.GONE)
+                                    //if (isHaveOld)
+                                        //ToastUtils.showLong(getString(R.string.have_old_device))
                                 }, {})
 
                     }
@@ -240,7 +279,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         }
                     } else {//断联倒计时到了还没断联 升级失败
                         if (0L == num)
-                            changeVisiable(View.GONE, View.GONE, View.VISIBLE)
+                            changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     }
                 }
     }
@@ -263,7 +302,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                     changePowerOnColor(num)
 
                     if (!isConnection && 0L == num) {//通电倒计时内没有连接上 恢复失败
-                        changeVisiable(View.GONE, View.GONE, View.VISIBLE)
+                        changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
                         disposableConnectTimer?.dispose()
                     }
                 }
@@ -337,7 +376,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
             countConnection = 0
             physical_recovery_state_progress.visibility = View.VISIBLE
             setSearcher()
-            changeVisiable(View.VISIBLE, View.GONE, View.GONE)
+            changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
             startScanBestRssi()
         }
         physical_recovery_success.setOnClickListener {
@@ -373,10 +412,11 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         physical_recovery_text_fail.text = style
     }
 
-    private fun changeVisiable(state: Int, success: Int, fail: Int) {
+    private fun changeVisiable(state: Int, success: Int, fail: Int, old: Int) {
         physical_recovery_rly.visibility = state
         physical_recovery_success_ly.visibility = success
         physical_recovery_fail_ly.visibility = fail
+        physical_recovery_old_ly.visibility = old
         if (fail == View.VISIBLE)
             setAllDispose()
     }

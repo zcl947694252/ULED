@@ -92,6 +92,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialogAndPop()
         initStompReceiver()
         initChangeRecevicer()
+        Constant.isTelBase = true
     }
 
     private fun initChangeRecevicer() {
@@ -236,6 +237,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Constant.isTelBase = false
         disableConnectionStatusListener()
         mConnectDisposable?.dispose()
         isRuning = false
@@ -273,7 +275,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
-            if ( !this.isDestroyed) {
+            if (!this.isDestroyed) {
                 loadDialog!!.show()
             }
         }
@@ -359,12 +361,16 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n", "StringFormatInvalid")
-    private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
+    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
 
         when (type) {
+            -1 -> {
+                title = getString(R.string.transfer_region_success)
+                recever = getString(R.string.recevicer)
+            }
             0 -> {
                 title = getString(R.string.author_account_receviced)
                 recever = getString(R.string.recevicer)
@@ -390,18 +396,23 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     if (type == 0)
                         restartApplication()
                 }
-                notifyWSData()
+                notifyWSData(type, rid)
 
                 initOnLayoutListener()
 
-                LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing}--------------${!pop!!.isShowing}")
-                if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null)//isTelBase为false所以不显示 明天看为什么
-                    pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+//                LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing}--------------${!pop!!.isShowing}")
+                try {
+
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && Constant.isTelBase)
+                        pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                } catch (e: Exception) {
+                    LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
+                }
             }
         }
     }
 
-    open fun notifyWSData() {
+    open fun notifyWSData(type: Int, rid: Any) {
 
     }
 
@@ -448,8 +459,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
+//                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
                 }
             }
         }

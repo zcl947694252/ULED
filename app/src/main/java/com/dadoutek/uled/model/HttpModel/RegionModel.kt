@@ -1,17 +1,13 @@
 package com.dadoutek.uled.model.HttpModel
 
-import android.content.Context
-import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
-import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
-import com.dadoutek.uled.region.bean.RegionBean
-import com.dadoutek.uled.region.bean.RegionListBean
-import com.dadoutek.uled.region.bean.ShareCodeBean
-import com.dadoutek.uled.region.bean.TransferData
+import com.dadoutek.uled.network.bean.TransferRegionBean
+import com.dadoutek.uled.region.bean.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -136,9 +132,9 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun parseQRCode(code: String,password: String): Observable<String>? {
+    fun parseQRCode(code: String, password: String): Observable<ParseCodeBean>? {
         return NetworkFactory.getApi()
-                .parseQRCode(code,password)
+                .parseQRCode(code, password)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
@@ -171,7 +167,7 @@ object RegionModel {
     /**
      * 生成移交吗
      */
-    fun transferCode(): Observable<TransferData> {
+    fun transferCode(): Observable<TransferBean> {
         return NetworkFactory.getApi()
                 .makeTransferCode()
                 .compose(NetworkTransformer())
@@ -192,30 +188,29 @@ object RegionModel {
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
- /**
+
+    /**
      * 查看移交吗
      */
-    fun lookTransferCodeState(): Observable<TransferData> {
+    fun lookTransferCodeState(): Observable<TransferBean> {
         //数据转换
         return NetworkFactory.getApi()
-                .mlookTransferCode()
+                .mGetTransferCode()
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-
     /**
      * 查看生成授权码
      */
-    fun lookAuthorizeCode(rid: Long, context: Context): Observable<ShareCodeBean> {
+    fun lookAuthorizeCode(rid: Long): Observable<ShareCodeBean> {
         return NetworkFactory.getApi()
                 .mlookAuthroizeCode(rid)
                 .compose(NetworkTransformer())
-                .flatMap{
-                    var isNewQr = it.code == null || it.code.trim() == ""||it.expire<=0
-                    SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_AUTHOR_CODE,isNewQr)
+                .flatMap {
+                    var isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
                     if (isNewQr)
                         NetworkFactory.getApi().regionAuthorizationCode(rid).compose(NetworkTransformer())
                     else
@@ -231,14 +226,13 @@ object RegionModel {
     /**
      * 查看生成移交吗
      */
-    fun lookTransferCode(context: Context): Observable<TransferData> {
+    fun lookTransferCode(): Observable<TransferBean> {
         //数据转换
         return NetworkFactory.getApi()
-                .mlookTransferCode()
+                .mGetTransferCode()
                 .compose(NetworkTransformer())
                 .flatMap {
-                    var isNewQr = it.code == null || it.code.trim() == ""||it.expire<=0
-                    SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_TRANSFER_CODE,isNewQr)
+                    var isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
                     if (isNewQr)
                         NetworkFactory.getApi().makeTransferCode().compose(NetworkTransformer())
                     else {
@@ -249,6 +243,63 @@ object RegionModel {
                 }
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 查看生成单个区域移交码
+     */
+    fun lookAndMakeRegionQR(id: Long): Observable<TransferRegionBean>? {
+        return NetworkFactory.getApi()
+                .mlookRegionTransferCodeBean(id)
+                .compose(NetworkTransformer())
+                .flatMap {
+                    var isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
+                    if (isNewQr)
+                        NetworkFactory.getApi().mGetTransferRegionQR(id).compose(NetworkTransformer())
+                    else {
+                        Observable.create { emitter ->
+                            emitter.onNext(it)
+                        }
+                    }
+                }
+                .doOnNext {}
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+
+    }
+
+    /**
+     * 查看单个区域移交码
+     */
+    fun lookTransforRegionCode(id: Long): Observable<Response<TransferRegionBean>>? {
+        return NetworkFactory.getApi()
+                .mlookRegionTransferCodeBean(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    /**
+     * 取消区域移交码
+     */
+
+    fun removeTransferRegionCode(rid: Long): Observable<Response<TransferRegionBean>>? {
+        return NetworkFactory.getApi()
+                .removeTransferRegionCode(rid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 取消二维码 三码合一  有问题
+     */
+    fun removeQrCode(code: String): Observable<Response<Any>>? {
+        val body = RemoveCodeBody()
+        body.code = code
+        return NetworkFactory.getApi()
+                .allCodeRemove(body)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

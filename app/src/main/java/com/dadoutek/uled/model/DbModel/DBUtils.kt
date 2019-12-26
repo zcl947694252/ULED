@@ -1241,7 +1241,7 @@ object DBUtils {
                 }//如果数据表没有该数据直接添加
             }
         }
-        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
+//        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

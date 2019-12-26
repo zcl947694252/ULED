@@ -113,6 +113,31 @@
                     android:textColor="@color/black_three"
                     android:textSize="13sp" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="25dp"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/pop_transfer_region"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/icon_single"/>
+
+                <TextView
+                    android:id="@+id/pop_transfer_region_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="@string/transfer_region"
+                    android:textColor="@color/black_three"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
 
             <LinearLayout
@@ -141,17 +166,26 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="27dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
             <LinearLayout
                 android:id="@+id/pop_unbind_net_ly"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
-
 
                 <ImageView
                     android:id="@+id/pop_unbind_net"
@@ -172,18 +206,6 @@
                     app:layout_constraintStart_toStartOf="@+id/pop_share_net"
                     app:layout_constraintTop_toBottomOf="@+id/pop_share_net" />
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="27dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -234,13 +256,7 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="25dp"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical" />
+
         </LinearLayout>
 
         <TextView
@@ -266,7 +282,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/pop_qr_area_user"
