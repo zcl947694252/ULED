@@ -483,8 +483,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 })
             }
             R.id.pop_share_net -> {
-                //生成区域授权码
-                lookAndMakeAuthorCode()
+                SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                    override fun start() {}
+
+                    override fun complete() {
+                        //生成区域授权码
+                        lookAndMakeAuthorCode()
+                    }
+
+                    override fun error(msg: String?) {
+                        ToastUtils.showLong(getString(R.string.make_code_fail))
+                    }
+                })
+
             }
             R.id.pop_update_net -> {
                 viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
@@ -509,7 +520,18 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                 ToastUtils.showLong(getString(R.string.make_code_fail))
                             }
                         })
-                        2 -> lookAndMakeAuthorCode()
+                        2 -> SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                            override fun start() {}
+
+                            override fun complete() {
+                                //生成区域授权码
+                                lookAndMakeAuthorCode()
+                            }
+
+                            override fun error(msg: String?) {
+                                ToastUtils.showLong(getString(R.string.make_code_fail))
+                            }
+                        })
                         3 -> PopUtil.dismiss(pop)
                     }
                 } else {
