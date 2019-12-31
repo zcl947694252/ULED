@@ -105,7 +105,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 edit_user_phone_or_email.setText(s)
                 edit_user_phone_or_email.post {
                     if (!TextUtils.isEmpty(s))
-                    edit_user_phone_or_email.setSelection(s.length)
+                        edit_user_phone_or_email.setSelection(s.length)
                 }
                 SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
             }
@@ -147,13 +147,23 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
         }, {})
-
     }
 
     private fun initListener() {
-        login_isTeck.setOnCheckedChangeListener { _, isChecked ->
-            SharedPreferencesHelper.putBoolean(this,Constant.IS_TECK,isChecked)
-            LogUtils.v("zcl切换恢复出厂名-----$isChecked-----------${Constant.DEFAULT_MESH_FACTORY_NAME}")
+        login_isTeck.setOnCheckedChangeListener { _, checkedId ->
+            if (Constant.isDebug) {//如果是debug则可以切换
+                when (checkedId) {
+                    R.id.login_smart -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 0)
+                    }
+                    R.id.login_Teck -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 1)
+                    }
+                    R.id.login_rd -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 2)
+                    }
+                }
+            }
         }
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
@@ -167,13 +177,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initView() {
+        if (Constant.isDebug){
+            login_isTeck.visibility = View.VISIBLE
+        }else{
+            login_isTeck.visibility = View.GONE
+        }
         initToolbar()
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
         }
-
-        val b = SharedPreferencesHelper.getBoolean(this, Constant.IS_TECK, false)
-        login_isTeck.isChecked = b
 
         linearLayout_1.setOnClickListener(this)
 
@@ -182,12 +194,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         val havePhone = info != null && info.isNotEmpty()
         if (havePhone) {
             val messge = info.split("-")
-            if (messge.size>1)
-            edit_user_phone_or_email!!.setText(messge[0])
+            if (messge.size > 1)
+                edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
-        } else{
+        } else {
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
         }
@@ -208,7 +220,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
             R.id.btn_register -> {
-               returnView()
+                returnView()
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
                 startActivityForResult(intent, 0)
@@ -450,10 +462,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         intent.putExtra("phone", phone)
                         returnView()
                         startActivityForResult(intent, 0)
-                    },{
+                    }, {
                         ToastUtils.showLong(it.localizedMessage)
                         returnView()
-                        if (getString(R.string.account_not_exist)==it.localizedMessage)
+                        if (getString(R.string.account_not_exist) == it.localizedMessage)
                             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
                     })
         } else {
@@ -486,7 +498,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun transformView() {
-            startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
+        startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

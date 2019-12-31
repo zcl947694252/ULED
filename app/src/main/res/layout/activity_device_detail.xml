@@ -85,7 +85,9 @@
                 android:textSize="15sp" />
 
         </RelativeLayout>
+
         <include layout="@layout/template_search_tool" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">

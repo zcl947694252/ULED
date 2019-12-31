@@ -219,7 +219,6 @@ public abstract class LightService extends Service implements LightAdapter.Callb
     }
 
     public void autoRefreshNotify(boolean enable, Parameters params) {
-
         if (this.mAdapter == null)
             return;
 

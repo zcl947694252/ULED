@@ -1013,14 +1013,14 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
     }
 
-    fun deleteAll() {
+    fun deleteAllSensorAndSwitch() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
 
 
     fun deleteLocalData() {
-        //        DaoSessionInstance.getApp().getDbUserDao().deleteAll();
+        //        DaoSessionInstance.getApp().getDbUserDao().deleteAllSensorAndSwitch();
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteAll()
         DaoSessionInstance.getInstance().dbRegionDao.deleteAll()

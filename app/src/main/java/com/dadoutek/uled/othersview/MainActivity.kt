@@ -23,6 +23,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,6 +45,7 @@ import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
@@ -150,12 +152,18 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
-
-        val isTeck = SharedPreferencesHelper.getBoolean(this, Constant.IS_TECK, false)
-        if (isTeck)
-            Constant.DEFAULT_MESH_FACTORY_NAME = "dadourd"
-        else
-            Constant.DEFAULT_MESH_FACTORY_NAME = "dadousmart"
+        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
+            when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
+                0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
+                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
+                2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
+            }
+            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
+            main_toast.visibility = VISIBLE
+        }else{
+            main_toast.visibility = GONE
+        }
+        main_toast.text = DEFAULT_MESH_FACTORY_NAME
 
         initBottomNavigation()
 
@@ -177,6 +185,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             SharedPreferencesUtils.saveRegionNameList(list)
         }) {}
     }
+
 
 
     private fun startToRecoverDevices() {
@@ -479,7 +488,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            if (isRuning)
                                 ToastUtils.showLong(R.string.get_server_version_fail)
                         }
                     })
@@ -572,7 +580,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
         progressBar.visibility = GONE
-
         try {
             this.unregisterReceiver(mReceiver)
         } catch (e: Exception) {
@@ -584,7 +591,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -655,6 +661,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                 mConnectDisposal = connect(deviceTypes = deviceTypes, retryTimes = 10)
                                         ?.subscribe(
                                                 {
+                                                    RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                     onLogin()
                                                 },
                                                 {
@@ -855,6 +862,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onBackPressed() {
         super.onBackPressed()
     }
+
+
 }
 
 

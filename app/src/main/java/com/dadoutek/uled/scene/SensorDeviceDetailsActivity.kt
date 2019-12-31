@@ -619,7 +619,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val opcode = Opcode.KICK_OUT//发送恢复出厂命令
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
         val list = arrayListOf<Int>()
-        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress)
+        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress,true)
                 .subscribe(
                         {
                             LogUtils.v("zcl-----恢复出厂成功")

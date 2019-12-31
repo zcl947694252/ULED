@@ -399,7 +399,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         lastUser?.let {
             if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
                 if (isClickExlogin) {
-                    SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                     TelinkLightService.Instance()?.disconnect()
                     TelinkLightService.Instance()?.idleMode(true)
                     restartApplication()

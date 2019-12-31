@@ -320,36 +320,39 @@ abstract class BaseGroupFragment : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         val groupType = setGroupType()
-        when (view!!.id) {
-            R.id.btn_on, R.id.tv_on -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                    Commander.openOrCloseLights(dstAddr, true)
-                    currentLight.connectionStatus = ConnectionStatus.ON.value
-                    groupAdapter!!.notifyItemChanged(position)
-                    GlobalScope.launch {
-                        DBUtils.updateGroup(currentLight)
-                        updateLights(true, currentLight)
+        if (TelinkLightApplication.getApp().connectDevice == null) {
+            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+        } else {
+            when (view!!.id) {
+                R.id.btn_on, R.id.tv_on -> {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, true)
+                        currentLight.connectionStatus = ConnectionStatus.ON.value
+                        groupAdapter!!.notifyItemChanged(position)
+                        GlobalScope.launch {
+                            DBUtils.updateGroup(currentLight)
+                            updateLights(true, currentLight)
+                        }
                     }
                 }
-            }
-            R.id.btn_off, R.id.tv_off -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                    Commander.openOrCloseLights(dstAddr, false)
-                    currentLight.connectionStatus = ConnectionStatus.OFF.value
-                    groupAdapter!!.notifyItemChanged(position)
-                    GlobalScope.launch {
-                        DBUtils.updateGroup(currentLight)
-                        updateLights(true, currentLight)
+                R.id.btn_off, R.id.tv_off -> {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, false)
+                        currentLight.connectionStatus = ConnectionStatus.OFF.value
+                        groupAdapter!!.notifyItemChanged(position)
+                        GlobalScope.launch {
+                            DBUtils.updateGroup(currentLight)
+                            updateLights(true, currentLight)
+                        }
                     }
                 }
-            }
 
-            R.id.btn_set, R.id.curtain_setting -> {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                  /*  if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {*/
+                R.id.btn_set, R.id.curtain_setting -> {
+                    val lastUser = DBUtils.lastUser
+                    lastUser?.let {
+                        /*  if (it.id.toString() != it.last_authorizer_user_id)
+                              ToastUtils.showLong(getString(R.string.author_region_warm))
+                          else {*/
                         if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
                             var num = 0
                             when (groupType) {
@@ -390,34 +393,35 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                         }
                     }
-                //}
-            }
-
-            R.id.selected_group -> {
-                groupList[position].isSelected = !groupList[position].isSelected
-            }
-
-            //不能使用group_name否则会造成长按监听无效 跳转组详情
-            R.id.item_layout -> {
-                var intent = Intent()
-                when (groupType) {
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "cw_light")
-                    }
-                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "rgb_light")
-                    }//蓝牙接收器
-                    Constant.DEVICE_TYPE_CONNECTOR -> {
-                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                    }
-                    Constant.DEVICE_TYPE_CURTAIN -> {
-                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                    }
+                    //}
                 }
-                intent.putExtra("group", currentLight)
-                startActivityForResult(intent, 2)
+
+                R.id.selected_group -> {
+                    groupList[position].isSelected = !groupList[position].isSelected
+                }
+
+                //不能使用group_name否则会造成长按监听无效 跳转组详情
+                R.id.item_layout -> {
+                    var intent = Intent()
+                    when (groupType) {
+                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "cw_light")
+                        }
+                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "rgb_light")
+                        }//蓝牙接收器
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                            intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                        }
+                        Constant.DEVICE_TYPE_CURTAIN -> {
+                            intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                        }
+                    }
+                    intent.putExtra("group", currentLight)
+                    startActivityForResult(intent, 2)
+                }
             }
         }
     }

@@ -160,6 +160,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
+
                     if (BuildConfig.DEBUG) {
                         params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
                     } else {
@@ -173,6 +174,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                         params.setMeshName(mesh.name)
                         params.setOutOfMeshName(mesh.name)
                     }
+
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
 

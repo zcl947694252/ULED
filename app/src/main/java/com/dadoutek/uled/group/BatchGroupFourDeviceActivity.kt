@@ -1183,7 +1183,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     //dbLight?.belongGroupId = allLightId  因为有些本身已经分组所以再次分失败不能
                     // 更改他的belongGroupId
-                    updateGroupResultLight(dbLight!!, dbGroup)
+                    //updateGroupResultLight(dbLight!!, dbGroup)
                     if (TelinkLightApplication.getApp().connectDevice == null) {
                         ToastUtils.showLong(getString(R.string.connect_fail))
                     } else {

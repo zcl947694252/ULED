@@ -39,7 +39,6 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -48,7 +47,6 @@ import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -58,7 +56,6 @@ import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.bluetooth.LeBluetooth;
-import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.ErrorReportEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -130,7 +127,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     @BindView(R.id.add_group)
     RelativeLayout add_group;
 
-    private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private TelinkLightApplication mApplication;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
@@ -139,7 +135,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private LayoutInflater inflater;
     private boolean grouping;
     private DeviceListAdapter adapter;
-    boolean isFirtst = true;
     //标记登录状态
     private boolean isLoginSuccess = false;
     private GridView deviceListView;
@@ -149,35 +144,18 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private int selectGroupId;
 
-    private Disposable mTimer;
-    private int mRetryCount = 0;
-
     //当前所选组index
     private int currentGroupIndex = -1;
-
     private List<DbLight> updateList;
-
     private ArrayList<Integer> indexList = new ArrayList<>();
-
-    //对一个灯重复分组时记录上一次分组
-    private int originalGroupID = -1;
-
-    private Disposable mGroupingDisposable;
-
-    private TextView tvStopScan;
-
     private String lightType;
 
     private String groupLight;
-
-    //灯的mesh地址
-    private int dstAddress;
     private Disposable mConnectTimer;
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
     private boolean isSelectAll = false;
     private boolean scanCURTAIN = false;
 
-    private boolean initHasGroup = false;
     private boolean guideShowCurrentPage = false;
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
@@ -283,7 +261,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(aLong -> {
                         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
+                        if (instance != null)
                             instance.sendCommandNoResponse(opcode, dstAddress, params);
                     }));
         }
@@ -302,12 +280,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
 
-    private void stopTimer() {
-        if (mTimer != null && !mTimer.isDisposed()) {
-            mTimer.dispose();
-        }
-    }
-
 
     private Disposable createConnectTimeout() {
         return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
@@ -319,8 +291,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     //处理扫描成功后
     private void scanSuccess() {
-        //更新Title
-        tvStopScan.setVisibility(View.GONE);
         toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
 
         //存储当前添加的灯。
@@ -337,7 +307,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         autoConnect();
         //倒计时10s，出问题了就超时。
         mConnectTimer = createConnectTimeout();
-
 
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
@@ -362,16 +331,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-        TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
-        if (mTimer != null)
-            mTimer.dispose();
-        if (mGroupingDisposable != null)
-            mGroupingDisposable.dispose();
         if (mConnectTimer != null)
             mConnectTimer.dispose();
 
@@ -386,7 +349,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 nowLightList.get(i).selected = false;
             }
         }
-
         finish();
     }
 
@@ -432,8 +394,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 //页面跳转前进行分组数据保存
 
                 TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+                if (instance != null)
+                    instance.idleMode(true);
                 //目前测试调到主页
                 doFinish();
             } else {
@@ -449,7 +411,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
      */
     private boolean isSelectLight() {
         return getCurrentSelectLights().size() > 0;
-
     }
 
     private void sureGroups() {
@@ -489,9 +450,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 setGroupOneByOne(dbGroup, selectLights, index + 1);
             return null;
         }, () -> {
-            dbLight.setBelongGroupId(allLightId);
+//            dbLight.setBelongGroupId(allLightId);
+//            updateGroupResult(dbLight, dbGroup);
             ToastUtils.showLong(R.string.group_fail_tip);
-            updateGroupResult(dbLight, dbGroup);
             if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
                 ToastUtils.showLong("断开连接");
                 hideLoadingDialog();
@@ -582,7 +543,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             } else if (nowLightList.get(i).selected && nowLightList.get(i).hasGroup) {
-                originalGroupID = Integer.parseInt(String.valueOf(nowLightList.get(i).getBelongGroupId()));
                 //如果所选灯已有分组，清空后再继续添加到新的分组
 //                nowLightList.get(i).belongGroups.clear();
                 arrayList.add(nowLightList.get(i));
@@ -658,8 +618,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
             DbLight dbLight = nowLightList.get(j);
-            if (dbLight!=null&&dbLight.getBelongGroupId() == allLightId)
-                    return false;
+            if (dbLight != null && dbLight.getBelongGroupId() == allLightId)
+                return false;
         }
         return true;
     }
@@ -854,16 +814,16 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 //                LeBluetooth.getApp().stopScan();
-               TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance != null)
+                    instance.idleMode(true);
 
                 startConnect = true;
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 DbUser lastUser = DBUtils.INSTANCE.getLastUser();
-                if (lastUser==null)
+                if (lastUser == null)
                     return;
                 connectParams.setMeshName(lastUser.getControlMeshName());
                 connectParams.setConnectMac(bestRssiDevice.macAddress);
@@ -876,7 +836,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 new Thread(() -> {
                     try {
                         Thread.sleep(300);
-                        if (instance!=null)
+                        if (instance != null)
                             instance.autoConnect(connectParams);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -891,7 +851,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             refreshNotifyParams.setRefreshInterval(2000);
             //开启自动刷新Notify
             TelinkLightService instance = TelinkLightService.Instance();
-            if (instance!=null)
+            if (instance != null)
                 instance.autoRefreshNotify(refreshNotifyParams);
         }
     }
@@ -900,7 +860,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     public void connectDevice(String mac) {
         TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
+        if (instance != null)
             instance.connect(mac, TIME_OUT_CONNECT);
     }
 
@@ -978,7 +938,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                     }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
                     .show();
         }
-//        sureGroups
+
     }
 
     private void initClick() {
@@ -1000,7 +960,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void initView() {
         initToolbar();
-//        tvStopScan.setVisibility(View.GONE);
         scanPb.setVisibility(View.GONE);
         //监听事件
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
@@ -1037,14 +996,14 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
         if (lightType.equals("cw_light_group")) {
             List<DbLight> cwLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
-            this.adapter = new DeviceListAdapter(cwLightGroup, this);
+            this.adapter = new DeviceListAdapter(cwLightGroup);
             nowLightList.addAll(cwLightGroup);
         } else if (lightType.equals("rgb_light_group")) {
             List<DbLight> rgbLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
-            this.adapter = new DeviceListAdapter(rgbLightGroup, this);
+            this.adapter = new DeviceListAdapter(rgbLightGroup);
             nowLightList.addAll(rgbLightGroup);
         } else {
-            this.adapter = new DeviceListAdapter(all_light, this);
+            this.adapter = new DeviceListAdapter(all_light);
             nowLightList.addAll(all_light);
         }
 
@@ -1072,7 +1031,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private View.OnClickListener onClick = v -> {
-        stopTimer();
         onLeScanTimeout();
     };
 
@@ -1157,9 +1115,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = false;
                     }
                 }
-                initHasGroup = true;
             } else {
-                initHasGroup = false;
                 currentGroupIndex = -1;
             }
         } else if (lightType.equals("rgb_light_group")) {
@@ -1183,9 +1139,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = false;
                     }
                 }
-                initHasGroup = true;
             } else {
-                initHasGroup = false;
                 currentGroupIndex = -1;
             }
         } else {
@@ -1200,9 +1154,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = false;
                     }
                 }
-                initHasGroup = true;
             } else {
-                initHasGroup = false;
                 currentGroupIndex = -1;
             }
         }
@@ -1215,11 +1167,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() == null) {
             mApplication.startLightService(TelinkLightService.class);
         }
-//
-//        if(TelinkLightApplication.Companion.getApp().getConnectDevice()==null){
-//            connect();
-//            mConnectTimer = createConnectTimeout();
-//        }
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -1248,7 +1195,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             ToastUtils.showLong(R.string.upload_data_failed);
 //            hideLoadingDialog();
         }
-
     };
 
 
@@ -1268,11 +1214,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
         private List<DbLight> lights;
 
-        private Context context;
-
-        public DeviceListAdapter(List<DbLight> connectors, Context mContext) {
+        public DeviceListAdapter(List<DbLight> connectors) {
             lights = connectors;
-            context = mContext;
         }
 
         @Override
@@ -1296,12 +1239,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
-            ImageView icon = (ImageView) convertView
-                    .findViewById(R.id.img_icon);
-            TextView txtName = (TextView) convertView
-                    .findViewById(R.id.tv_group_name);
-            CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
-            TextView lightName = (TextView) convertView.findViewById(R.id.tv_device_name);
+            ImageView icon = convertView.findViewById(R.id.img_icon);
+            TextView txtName = convertView.findViewById(R.id.tv_group_name);
+            CheckBox selected = convertView.findViewById(R.id.selected);
+            TextView lightName = convertView.findViewById(R.id.tv_device_name);
 
             holder = new DeviceItemHolder();
 
@@ -1341,7 +1282,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         }
 
         public DbLight get(int meshAddress) {
-
             if (this.lights == null)
                 return null;
 
@@ -1350,7 +1290,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                     return light;
                 }
             }
-
             return null;
         }
 
@@ -1373,28 +1312,13 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     /*********************************泰凌微后台数据部分*********************************************/
 
     /**
-     * 事件处理方法
-     *
-     * @param event
-     */
-
-    private void onNError(final DeviceEvent event) {
-        TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
-            instance.idleMode(true);
-        TelinkLog.d("DeviceScanningActivity#onNError");
-        onLeScanTimeout();
-    }
-
-    /**
      * 扫描不到任何设备了
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()
         LeBluetooth.getInstance().stopScan();
         TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
+        if (instance != null)
             instance.idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
@@ -1418,10 +1342,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
         if (light == null) {
             light = new DbLight();
-            light.setName(getString(R.string.device_name)+light.getMeshAddr());
+//            light.setName(getString(R.string.device_name)+light.getMeshAddr());
             light.setMeshAddr(meshAddress);
-            light.textColor = this.getResources().getColor(
-                    R.color.black);
+            light.textColor = this.getResources().getColor(R.color.black);
             light.setBelongGroupId(allLightId);
             light.setMacAddr(deviceInfo.macAddress);
             light.setProductUUID(deviceInfo.productUUID);
@@ -1433,84 +1356,5 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private DeviceInfo bestRssiDevice = null;
-
-    private void onDeviceStatusChanged(DeviceEvent event) {
-
-        DeviceInfo deviceInfo = event.getArgs();
-
-        switch (deviceInfo.status) {
-            case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
-                //加灯完成继续扫描,直到扫不到设备
-                DadouDeviceInfo dadouDeviceInfo1 = new DadouDeviceInfo();
-                dadouDeviceInfo1.deviceName = deviceInfo.deviceName;
-                dadouDeviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
-                dadouDeviceInfo1.longTermKey = deviceInfo.longTermKey;
-                dadouDeviceInfo1.macAddress = deviceInfo.macAddress;
-                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
-                dadouDeviceInfo1.meshAddress = deviceInfo.meshAddress;
-                dadouDeviceInfo1.meshUUID = deviceInfo.meshUUID;
-                dadouDeviceInfo1.productUUID = deviceInfo.productUUID;
-                dadouDeviceInfo1.status = deviceInfo.status;
-                dadouDeviceInfo1.meshName = deviceInfo.meshName;
-                if (bestRssiDevice == null) {
-                    bestRssiDevice = deviceInfo;
-                    if (bestRssiDevice.rssi < deviceInfo.rssi) {
-                        bestRssiDevice = deviceInfo;
-                    }
-                }
-//                Log.d(TAG, "onDeviceStatusChanged: " + dadouDeviceInfo1.macAddress + "-----" + dadouDeviceInfo1.meshAddress);
-
-                new Thread(() -> BatchGroupActivity.this.mApplication.getMesh().saveOrUpdate(BatchGroupActivity.this)).start();
-
-                if (scanCURTAIN) {
-                    if (checkIsCurtain(dadouDeviceInfo1.productUUID) && dadouDeviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
-                        addDevice(deviceInfo);
-                    }
-                } else {
-                }
-
-                //扫描出灯就设置为非首次进入
-                if (isFirtst) {
-                    isFirtst = false;
-                    SharedPreferencesHelper.putBoolean(BatchGroupActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
-                }
-                toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
-                tvStopScan.setVisibility(View.VISIBLE);
-
-                Log.d("ScanningTest", "update mesh success");
-                mRetryCount = 0;
-//                this.startScan(0);
-                break;
-            case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
-                //加灯失败继续扫描
-                if (mRetryCount < MAX_RETRY_COUNT) {
-                    mRetryCount++;
-                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
-                    stopTimer();
-//                    this.startScan(0);
-                } else {
-                    Log.d("ScanningTest", "update mesh failed , do not retry");
-                }
-                break;
-
-            case LightAdapter.STATUS_ERROR_N:
-                this.onNError(event);
-                break;
-            case LightAdapter.STATUS_LOGIN:
-                Log.d("ScanningTest", "mConnectTimer = " + mConnectTimer);
-                if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
-                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
-                    mConnectTimer.dispose();
-                    isLoginSuccess = true;
-                    //进入分组
-                    hideLoadingDialog();
-                    startGrouping();
-                }
-                break;
-            case LightAdapter.STATUS_LOGOUT:
-                isLoginSuccess = false;
-                break;
-        }
-    }
 
 }

@@ -270,6 +270,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     search_clear.visibility = View.GONE
                     search_btn.setTextColor(getColor(R.color.gray_6))
                     search_no_result.visibility = View.GONE
+                    adaper?.notifyDataSetChanged()
                 } else {
                     // 使用用户输入的内容对ListView的列表项进行过滤
                     lightsData.clear()

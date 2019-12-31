@@ -60,10 +60,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
-    protected var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
     private var pop: PopupWindow? = null
     private var popView: View? = null
@@ -79,7 +79,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var loadDialog: Dialog? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
-    public var disposableConnectTimer: Disposable? = null
+    var disposableConnectTimer: Disposable? = null
     var isScanning = false
 
 
@@ -92,7 +92,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialogAndPop()
         initStompReceiver()
         initChangeRecevicer()
-        Constant.isTelBase = true
     }
 
     private fun initChangeRecevicer() {
@@ -159,9 +158,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     //打开基类的连接状态变化监听
-    fun enableConnectionStatusListener() {
+    private fun enableConnectionStatusListener() { //todo 传感器上传下拉  外部不退出
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, statusChangedListener)
-        LogUtils.d("enableConnectionStatusListener, current listeners = ${mApplication?.mEventBus?.mEventListeners}")
+        //LogUtils.d("enableConnectionStatusListener, current listeners = ${mApplication?.mEventBus?.mEventListeners}")
     }
 
     //关闭基类的连接状态变化监听
@@ -219,7 +218,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Constant.isTelBase = true
+        isResume = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
@@ -237,10 +236,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Constant.isTelBase = false
         disableConnectionStatusListener()
         mConnectDisposable?.dispose()
-        isRuning = false
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
         SMSSDK.unregisterAllEventHandler()
@@ -250,7 +247,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var view = window.decorView
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
-            isRuning = true
             view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
     }
@@ -295,7 +291,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         mConnectDisposable?.dispose()
-        isRuning = false
+        isResume = false
     }
 
 
@@ -361,7 +357,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n", "StringFormatInvalid")
-    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any) {
+    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any, lastRegionId: Int? = DBUtils.lastUser?.last_region_id?.toInt()) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
@@ -393,24 +389,33 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
-                    if (type == 0)
-                        restartApplication()
+//                    if (type == 0)
+//                        restartApplication()
+                    PopUtil.dismiss(pop)
+                    when (type) {
+                        -1, 0, 2 -> { //移交的区域已被接收 账号已被接收 解除了区域%1$s的授权
+                            if (lastRegionId== rid || rid == 1) {//如果正在使用或者是区域一则退出
+                                //DBUtils.deleteAllData()//删除数据
+                                restartApplication()
+                                ToastUtils.showLong(getString(R.string.cancel_authorization))
+                            }
+                        }
+                    }
                 }
-                notifyWSData(type, rid)
 
                 initOnLayoutListener()
-
-//                LogUtils.v("zcl-------------是否显示${!this@TelinkBaseActivity.isFinishing}--------------${!pop!!.isShowing}")
+                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
                 try {
-
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && Constant.isTelBase)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
                 }
+                notifyWSData(type, rid)
             }
         }
     }
+
 
     open fun notifyWSData(type: Int, rid: Any) {
 
@@ -441,6 +446,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         cancelBean = extra as CancelAuthorMsg
 
                     val user = DBUtils.lastUser
+                    val lastRegionId = user?.last_region_id
                     user?.let {
                         if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
                                 && user.last_region_id == cancelBean?.rid.toString()) {
@@ -454,8 +460,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                         }
                     }
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, "", cancelBean.region_name) }//2代表解除授权信息type
-                    LogUtils.e("zcl_baseMe___________收到取消消息")
+
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid ,cancelBean.region_name,lastRegionId?.toInt()) }//2代表解除授权信息type
+                    
+                    LogUtils.e("zcl_baseMe___________取消授权${cancelBean==null}")
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg

@@ -3,6 +3,7 @@ package com.dadoutek.uled.communicate
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -63,13 +64,11 @@ object Commander : EventListener<String> {
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
         mTargetGroupAddr = groupAddr
-        val params: ByteArray
-
-        if (isOpen) {
+        val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
-            params = byteArrayOf(0x01, 0x64, 0x00)
+            byteArrayOf(0x01, 0x64, 0x00)
         } else {
-            params = byteArrayOf(0x00, 0x64, 0x00)
+            byteArrayOf(0x00, 0x64, 0x00)
         }
 
         GlobalScope.launch {
@@ -85,16 +84,14 @@ object Commander : EventListener<String> {
     fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
         val opcode = Opcode.CURTAIN_ON_OFF
         mTargetGroupAddr = groupAddr
-        val params: ByteArray
-
-        if (isPause) {
-            params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
+        val params: ByteArray = if (isPause) {
+            byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
         } else {
             if (isOpen) {
                 //0x64代表延时100ms保证开关同步
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+                byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             } else {
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+                byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             }
         }
 
@@ -129,7 +126,7 @@ object Commander : EventListener<String> {
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, paramsKickOut)
                         Thread.sleep(sleepTime)
                     }
-                    DBUtils.deleteAll()//删除人体感应器和开关
+                    DBUtils.deleteAllSensorAndSwitch()//删除人体感应器和开关
                     Thread.sleep(sleepTime)
                     for (k in lightList.indices) {
                         if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
@@ -172,7 +169,7 @@ object Commander : EventListener<String> {
                         failedCallback: () -> Unit1) {
         val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
                 ?: 0x00
-        var isSupportFastResetFactory: Boolean = false
+        var isSupportFastResetFactory = false
         val disposable = getDeviceVersion(connectDeviceMeshAddr)
                 .subscribe(
                         {
@@ -203,10 +200,11 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetDevice(deviceMeshAddr: Int): Observable<Boolean> {
-        val deviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+    fun resetDevice(deviceMeshAddr: Int, isSensor: Boolean = false): Observable<Boolean> {
+        val deviceMeshAddr = deviceMeshAddr
         val observable = Observable.create<Boolean> { emitter ->
-            var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, paramsKickOut) //延时后再给直连灯发恢复
+
+            var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, deviceMeshAddr, paramsKickOut) //延时后再给直连灯发恢复
             if (sendCommandNoResponse == null)
                 sendCommandNoResponse = false
             emitter.onNext(sendCommandNoResponse!!)// 出厂设置指令
@@ -626,9 +624,9 @@ object Commander : EventListener<String> {
      * 连接并且自动登录
      */
     @JvmStatic
-    fun connect(meshAddr: Int = 0,fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+    fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null,connectTimeOutTime:Long = 20): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
@@ -652,7 +650,7 @@ object Commander : EventListener<String> {
                 LogUtils.d("Commander auto connect meshName = $meshName, mConnectEmitter = ${mConnectEmitter}, mac = $macAddress")
 
                 TelinkLightService.Instance()?.autoConnect(connectParams)
-            }.timeout(10, TimeUnit.SECONDS) {
+            }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
                 LogUtils.d("connect doFinally")
@@ -661,6 +659,7 @@ object Commander : EventListener<String> {
 
             return mConnectObservable
         } else {
+            DeviceType.NORMAL_SWITCH
             LogUtils.d("in connecting device mode")
             return null
         }

@@ -476,7 +476,7 @@
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
     <string name="device_disconnected">设备已断开</string>
     <string name="reconnect">重连</string>
-    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关,如果开关没有usb接口则不必执行拔出USB线操作。</string>
+    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关。</string>
     <string name="install_success">安装成功</string>
     <string name="stop_scan">停止扫描</string>
     <string name="scene_name_show">场景:%1$s</string>
@@ -760,7 +760,7 @@
     <string name="QR_expired">二维码已失效,请重新生成</string>
     <string name="unbind_network">解绑区域</string>
     <string name="more">更多</string>
-    <string name="change_region">确定切换到区域</string>
+    <string name="change_region">确定切换到区域:</string>
     <string name="total_device">(共%1$s个设备)</string>
     <string name="share_person">分享人数: %1$s人</string>
     <string name="to_receive">待接收</string>
@@ -792,7 +792,7 @@
     <string name="single_login_warm">你的优乐迪账号已再其他设备登录,如果这不是你的操作,请尽快修改密码</string>
     <string name="other_device_login">其他设备登录提醒</string>
     <string name="author_region_receviced">您分享的区域已被接收</string>
-    <string name="author_account_receviced">您分享的账号已被接收</string>
+    <string name="author_account_receviced">您移交的账号已被接收</string>
     <string name="recevicer">接收者:</string>
     <string name="hint">提示</string>
     <string name="please_select_area">请选择区域</string>
@@ -857,7 +857,11 @@
     <string name="see_region_qr">查看移交码</string>
     <string name="transfer_network_region">移交单个区域</string>
     <string name="transfer_region_success">您移交的区域已被接收</string>
-    <string name="have_old_device">是否存在旧版本未恢复</string>
     <string name="make_code_fail">创建二维码失败</string>
+    <string name="please_near_light">请靠近灯</string>
+    <string name="near_light_ok">我已靠近灯</string>
+    <string name="old_light_rest">当前固件版本较低,请尝试以下步骤复位设备:</string>
+    <string name="warm_notice">温馨提示：如有其它问题，请参考APP使用说明。</string>
+    <string name="config_success">配置成功</string>
 
 </resources>

@@ -54,12 +54,12 @@ import java.util.*
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var isResume: Boolean = false
     private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
     private var popView: View? = null
     private var loadDialog: Dialog? = null
     private var singleLogin: AlertDialog? = null
-    private var isRuning: Boolean = false
     protected var foreground = false
     private var mApplication: TelinkLightApplication? = null
 
@@ -74,7 +74,6 @@ abstract class BaseActivity : AppCompatActivity() {
         initListener()
         initOnLayoutListener()
         initStompReceiver()
-        Constant.isTelBase = false
     }
 
     private fun makeDialogAndPop() {
@@ -103,11 +102,11 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
     abstract fun initData()
     abstract fun initListener()
-    open fun notifyWSData(type: Int, rid: Any) {}
+    open fun notifyWSData(type: Int, rid: Int) {}
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
-    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any) {
+    private fun makeCodeDialog(type: Int, phone: String, regionName: String,rid: Int = 0 ) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
@@ -139,17 +138,18 @@ abstract class BaseActivity : AppCompatActivity() {
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
-                    if (type == 0) {
+                    if (type == 0)
                         restartApplication()
-                    }
                 }
-                notifyWSData(type, rid)
+                LogUtils.v("zcl---------判断---${!this@BaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
                 try {
-                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&!Constant.isTelBase)
+                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
                 }
+
+                notifyWSData(type, rid)
             }
         }
 
@@ -165,7 +165,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        isRuning = false
+        isResume = true
         foreground = false
         PopUtil.dismiss(pop)
     }
@@ -313,7 +313,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 Constant.CANCEL_CODE -> {
                     val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
                     var cancelBean: CancelAuthorMsg? = null
-                    if (cancelBean != null)
+                    if (extra != null)
                         cancelBean = extra as CancelAuthorMsg
                     val user = DBUtils.lastUser
                     user?.let {
@@ -330,16 +330,22 @@ abstract class BaseActivity : AppCompatActivity() {
                         }
                     }
 
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, "", cancelBean?.region_name) }//2代表解除授权信息type
-                    LogUtils.e("zcl_baseMe_______取消授权")
+                    LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone,  cancelBean?.region_name,cancelBean.rid) }//2代表解除授权信息type
 
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
 //                    LogUtils.e("zcl_baseMe___________解析二维码")
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid, codeBean.region_name)
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
                 }
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        isResume = true
+    }
+
 }

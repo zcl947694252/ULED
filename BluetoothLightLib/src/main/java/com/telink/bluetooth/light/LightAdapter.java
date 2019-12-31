@@ -74,7 +74,7 @@ public class LightAdapter {
     public static final int AUTO_REFRESH_NOTIFICATION_DELAY = 2 * 1000;
     public static final int CHECK_OFFLINE_TIME = 10 * 1000;
 
-    public static final int MIN_SCAN_PERIOD = 7 * 1000;
+    public static final int MIN_SCAN_PERIOD = 9 * 1000;
 
     private static final int STATE_PENDING = 1;
     private static final int STATE_RUNNING = 2;
@@ -772,7 +772,7 @@ public class LightAdapter {
         if (mode == MODE_SCAN_MESH) {
 //            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
 
-            Log.v("zcl","lightAdapter 0nLeScan"+ meshName +"------------------"+ light.getMacAddress());
+            Log.v("zcl","lightAdapter 0nLeScan"+ meshName.toString() +"------------------"+ light.getMacAddress());
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
             if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
                 return false;

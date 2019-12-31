@@ -7,17 +7,9 @@ import java.io.Serializable;
  */
 
 public class Constant implements Serializable {
-
-    public static  Boolean isDebug = true;
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
-    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-    public static  String DEFAULT_MESH_FACTORY_NAME = "dadoutek";
-
-    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转
-    // 换
+    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
     public static String WS_HOST = "/smartlight";
-
     //网络请求服务器java域名地址
     public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
     //网络请求服务器测试地址
@@ -27,12 +19,16 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
 
+    public static  Boolean isDebug = false;
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
      */
     public static final long downTime = isDebug ? 2 : 11;
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
+    public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
@@ -58,7 +54,7 @@ public class Constant implements Serializable {
 
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
-    public static final String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
+    public static  String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
@@ -288,8 +284,6 @@ public class Constant implements Serializable {
     public static final int REGION_TYPE = 1;
     //授权区域列别
     public static final int REGION_AUTHORIZE_TYPE = 2;
-    //判断是否是telbase类
-    public static boolean isTelBase = true;
     //进行OTA的设备类型
     public static final String OTA_TYPE = "OTA_TYPE";
 

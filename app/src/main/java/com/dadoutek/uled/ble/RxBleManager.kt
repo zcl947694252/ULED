@@ -129,11 +129,11 @@ object RxBleManager {
                 ?.filter {
                     val version = getVersion(it)
                     val b = isSupportHybridFactoryReset(version)
-
-                    val filter = it.bleDevice.name != Constant.DEFAULT_MESH_FACTORY_NAME//不能等于我们区域的mesname
+                    //返回true  说明是自己区域下的设备或者为恢复出厂的设备
+                    var isMyDevice = isMyDevice(it.bleDevice.name)
                     LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
-                    version!=""&&filter
+                    version!=""&&!isMyDevice
                 }
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
@@ -148,14 +148,14 @@ object RxBleManager {
                 }?.retry()
     }
 
-    private fun isNotFactoryDevice(name: String?): Boolean {
-        var b = true
+    private fun isMyDevice(name: String?): Boolean {
+        var b = false
         if (regionList == null) {
-            b = true
+            b = false
         } else
             for (rgName in regionList!!)
-                if (name == rgName)
-                    b = false
+                if (name == rgName||name== Constant.DEFAULT_MESH_FACTORY_NAME)
+                    b = true
         return b
     }
 
@@ -222,17 +222,6 @@ object RxBleManager {
                     val writeCharacteristic = it.writeCharacteristic(UUID.fromString(charUUID), data)
                     writeCharacteristic
                 }
-//
-//        val gatt = mGattHM[device]
-//        val writeChar = getWriteChar(gatt)
-//        if (writeChar != null) {
-//            writeChar.value = data
-//            val ret = gatt?.writeCharacteristic(writeChar)
-////            LogUtils.d("write ret = $ret")
-//        } else {
-//            ToastUtils.showLong("命令发送过快，请稍候再试。")
-//        }
-
     }
 
 }

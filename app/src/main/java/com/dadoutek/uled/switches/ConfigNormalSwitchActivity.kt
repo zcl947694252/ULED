@@ -67,7 +67,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
-    private var localVersion: String? = null
+    private var localVersion: String = ""
     private var mRxPermission: RxPermissions? = null
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
@@ -95,7 +95,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
         tvLightVersion.text = localVersion
-        if (localVersion!!.startsWith("STS"))
+        if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS")||localVersion.contains("STS"))
             isGlassSwitch = true
 
         if (groupName != null && groupName == "true") {
@@ -170,10 +170,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (switchDate != null && switchDate?.name != "")
             renameEditText?.setText(switchDate?.name)
         else {
-            if (switchDate != null) {
-                val tv = (StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-" + DBUtils.getAllSwitch().size)
-                renameEditText?.setText(tv)
-            }
+            if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
+                renameEditText?.setText(switchDate?.name)
+            else
+                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
+                        + DBUtils.getAllSwitch().size)
         }
         renameEditText?.setSelection(renameEditText?.text.toString().length)
         if (this != null && !this.isFinishing) {
@@ -403,6 +404,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             if (isGlassSwitch) {
                 TelinkLightService.Instance()?.idleMode(true)
                 TelinkLightService.Instance()?.disconnect()
+                ToastUtils.showLong(getString(R.string.config_success))
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             } else {
                 AlertDialog.Builder(this)
@@ -425,11 +427,13 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+dbSwitch.meshAddr
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
                 Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
                 DBUtils.updateSwicth(dbSwitch)
+                switchDate = dbSwitch
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
@@ -448,6 +452,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
+                switchDate = dbSwitch
             }
 
             switchDate = dbSwitch

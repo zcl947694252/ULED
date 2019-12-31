@@ -240,6 +240,7 @@
     </LinearLayout>
 
         <TextView
+                android:id="@+id/scanning_no_factory_btn_tv1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/scanning_no_factory_btn_ly"

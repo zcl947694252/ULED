@@ -38,7 +38,7 @@ import android.text.style.ForegroundColorSpan as ForegroundColorSpan1
 
 class PhysicalRecoveryActivity : AppCompatActivity() {
     private var disposableConnectWaitTimer: Disposable? = null
-    private val scanMinTime: Long = 5000
+    private val scanMinTime: Long = 10000
     private val scanMaxTime: Long = 25000
     private var disposableWrite: Disposable? = null
     private var disposableFiveTimer: Disposable? = null
@@ -73,7 +73,6 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         RxBleManager.initData()
         initView()
         initData()
-
         initListener()
     }
 
@@ -118,7 +117,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         var scanResult: ScanResult? = getBestRssi(list)
         if (isHaveNew&&scanResult != null) {
             if (scanResult.bleDevice != null) {
-                changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                changeVisiable(View.GONE,View.VISIBLE, View.GONE, View.GONE, View.GONE)
                 if (macAddress == null)
                     setConnectText()
                 disposableConnectWaitTimer?.dispose()
@@ -129,11 +128,11 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                             connectAndWriteBle(scanResult.bleDevice)
                         }
             } else {
-                changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
             }
         } else if (isHaveOld) {//是我们的旧设备并且是没有恢复出厂的
             //显示旧设备恢复出厂的提示语
-            changeVisiable(View.GONE, View.GONE, View.GONE, View.VISIBLE)
+            changeVisiable(View.GONE,View.GONE, View.GONE, View.GONE, View.VISIBLE)
         }
 
     }
@@ -207,7 +206,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     if (!isConnection && countConnection < maxCount) {// 不是恢复出厂成功后的断开
                         physical_recovery_state_progress.visibility = View.GONE
-                        changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                        changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     }
                     disposableConnect?.dispose()
 
@@ -227,7 +226,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
                     LogUtils.e("zcl物理写入次数$countConnection")
                     if (countConnection < maxCount) {
-                        changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+                        changeVisiable(View.GONE,View.VISIBLE, View.GONE, View.GONE, View.GONE)
                         startOffTimer()
                     } else {
                         LogUtils.v("zcl物理写入流程恢复成功$countConnection")
@@ -237,15 +236,14 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
                                     disposableConnectTimer?.dispose()//取消30秒倒计时
-                                     changeVisiable(View.GONE, View.VISIBLE, View.GONE, View.GONE)
-                                    //if (isHaveOld)
-                                        //ToastUtils.showLong(getString(R.string.have_old_device))
+                                     changeVisiable(View.GONE,View.GONE, View.VISIBLE, View.GONE, View.GONE)
                                 }, {})
 
                     }
                 }, {
                     LogUtils.v("zcl物理写入数据错误$it")
                     RxBleManager.disconnectAllDevice()
+                    changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     setAllDispose()
                 })
     }
@@ -279,7 +277,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         }
                     } else {//断联倒计时到了还没断联 升级失败
                         if (0L == num)
-                            changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                            changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     }
                 }
     }
@@ -302,7 +300,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                     changePowerOnColor(num)
 
                     if (!isConnection && 0L == num) {//通电倒计时内没有连接上 恢复失败
-                        changeVisiable(View.GONE, View.GONE, View.VISIBLE, View.GONE)
+                        changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                         disposableConnectTimer?.dispose()
                     }
                 }
@@ -372,11 +370,16 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
+        physical_recovery_ready_ok.setOnClickListener {
+            changeVisiable(View.GONE,View.VISIBLE, View.GONE, View.GONE, View.GONE)
+            setSearcher()
+            startScanBestRssi()
+        }
         physical_recovery_retry.setOnClickListener {
             countConnection = 0
             physical_recovery_state_progress.visibility = View.VISIBLE
             setSearcher()
-            changeVisiable(View.VISIBLE, View.GONE, View.GONE, View.GONE)
+            changeVisiable(View.GONE,View.VISIBLE, View.GONE, View.GONE, View.GONE)
             startScanBestRssi()
         }
         physical_recovery_success.setOnClickListener {
@@ -386,8 +389,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        setSearcher()
-        startScanBestRssi()
+        changeVisiable(View.VISIBLE,View.GONE, View.GONE, View.GONE, View.GONE)
     }
 
     private fun setSearcher() {
@@ -399,8 +401,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
-            ActivityUtils.finishAllActivities()
-            ActivityUtils.startActivity(MainActivity::class.java)
+            finish()
         }
         toolbarTv.text = getString(com.dadoutek.uled.R.string.physical_recovery)
 
@@ -412,7 +413,8 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         physical_recovery_text_fail.text = style
     }
 
-    private fun changeVisiable(state: Int, success: Int, fail: Int, old: Int) {
+    private fun changeVisiable(ready: Int,state: Int, success: Int, fail: Int, old: Int) {
+        physical_recovery_ready_ly.visibility = ready
         physical_recovery_rly.visibility = state
         physical_recovery_success_ly.visibility = success
         physical_recovery_fail_ly.visibility = fail

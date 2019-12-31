@@ -54,6 +54,7 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
+    private var version: String = ""
     private var popReNameView: View? = null
     private var renameDialog: Dialog? = null
     private var renameCancel: TextView? = null
@@ -92,7 +93,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         //startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        tvLightVersionText?.text = intent.getStringExtra("version")
+         version = intent.getStringExtra("version")
+        tvLightVersionText?.text = version
 
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {
@@ -150,9 +152,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
-        if (switchDate != null && switchDate?.name != "")
+        if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
             renameEditText?.setText(switchDate?.name)
-        else if (switchDate != null)
+        else
             renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
                     + DBUtils.getAllSwitch().size)
         renameEditText?.setSelection(renameEditText?.text.toString().length)
@@ -193,35 +195,43 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun showConfigSuccessDialog() {
-        try {
-            AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setTitle(R.string.install_success)
-                    .setMessage(R.string.tip_config_switch_success)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                     /*   if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
-                            updateSwitch()
-                        } else {
-                            saveSwitch()
-                        }*/
-                        TelinkLightService.Instance()?.idleMode(true)
-                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                    }.show()
-        } catch (e: Exception) {
-            e.printStackTrace()
+        if (version.contains("BT") || version.contains("BTL") || version.contains("BTS")||version.contains("STS")){
+            TelinkLightService.Instance()?.idleMode(true)
+            ToastUtils.showLong(getString(R.string.config_success))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        }else{
+            try {
+                AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle(R.string.install_success)
+                        .setMessage(R.string.tip_config_switch_success)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            /*   if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
+                                   updateSwitch()
+                               } else {
+                                   saveSwitch()
+                               }*/
+                            TelinkLightService.Instance()?.idleMode(true)
+                            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                        }.show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+
     }
 
     private fun updateSwitch() {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+dbSwitch!!.meshAddr
                 dbSwitch.controlSceneId = getControlScene()
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
+                switchDate = dbSwitch
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
@@ -235,6 +245,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 DBUtils.recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
+                switchDate = dbSwitch
             }
         } else {
             switchDate!!.controlSceneId = getControlScene()
@@ -289,7 +300,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun showCancelDialog() {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
@@ -444,7 +455,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
-    private fun setSceneForSwitch() {
+    private fun setSceneForSwitch() {//设置开关场景
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {

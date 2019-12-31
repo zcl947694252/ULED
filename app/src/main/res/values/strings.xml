@@ -836,7 +836,7 @@
     <string name="QR_expired">The qr code is invalid, please regenerate it</string>
     <string name="unbind_network">Unbund network</string>
     <string name="more">More</string>
-    <string name="change_region">Make sure to switch to region </string>
+    <string name="change_region">Make sure to switch to region :</string>
     <string name="total_device">(%1$s devices in total)</string>
     <string name="share_person">Number of participants: %1$s per person</string>
     <string name="to_receive">To_receive</string>
@@ -929,13 +929,17 @@
     <string name="frist_power_on">Please power on after %1$s</string>
     <string name="second_power_on">Please power on within %1$s seconds,waiting for the connection</string>
     <string name="scan_retry">Re-Scan </string>
-    <string name="transfer_region">Transfer accounts</string>
+    <string name="transfer_region">Transfer Region</string>
     <string name="region_transfer_code_invalid">Area handover qr code is invalid</string>
     <string name="transfer_region_code">Scan the qr code below to hand over your account</string>
     <string name="see_region_qr">Transfer Code</string>
     <string name="transfer_network_region">Transfer Area</string>
     <string name="transfer_region_success">The area you handed over has been accepted</string>
-    <string name="have_old_device">是否存在旧版本未恢复</string>
     <string name="make_code_fail">Failed to create qr code</string>
+    <string name="please_near_light">Please close to the light</string>
+    <string name="near_light_ok">I am near the light</string>
+    <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
+    <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
+    <string name="config_success">Configuration is successful</string>
 
 </resources>

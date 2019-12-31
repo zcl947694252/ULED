@@ -99,7 +99,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         version = intent.getStringExtra("version")
 
         tvLightVersionText.text = version
-        if (version!!.startsWith("ST")) {
+        if (version!!.startsWith("ST") || (version!!.contains("BT") || version!!.contains("BTL") || version!!.contains("BTS"))) {
             isGlassSwitch = true
         }
         groupName = intent.getStringExtra("group")
@@ -207,7 +207,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
     private fun showRenameDialog() {
         hideLoadingDialog()
         StringUtils.initEditTextFilter(renameEditText)
-        if (switchDate != null && switchDate?.name != "")
+        if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
             renameEditText?.setText(switchDate?.name)
         else
             renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
@@ -394,6 +394,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             if (isGlassSwitch) {
                 TelinkLightService.Instance()?.idleMode(true)
                 TelinkLightService.Instance()?.disconnect()
+                ToastUtils.showLong(getString(R.string.config_success))
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             } else {
                 AlertDialog.Builder(this)
@@ -421,14 +422,16 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
+            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+dbSwitch.meshAddr
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 DBUtils.updateSwicth(dbSwitch)
+                switchDate = dbSwitch
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID) + switchDate!!.meshAddr
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
@@ -439,6 +442,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
+                switchDate = dbSwitch
             }
         } else {
             switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
@@ -447,15 +451,13 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             DBUtils.updateSwicth(switchDate!!)
         }
     }
-
     private fun saveSwitch() {
-
         var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
 
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
-            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-            dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+mDeviceInfo.meshAddress
+            dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
@@ -538,6 +540,6 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         if (KeyEvent.KEYCODE_BACK == keyCode) {
             finish()
         }
-            return super.onKeyDown(keyCode, event)
+        return super.onKeyDown(keyCode, event)
     }
 }

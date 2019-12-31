@@ -54,14 +54,18 @@ object RecoverMeshDeviceUtil {
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder()
-                .setScanMode(SCAN_MODE_LOW_LATENCY)
+               // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
 
 
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
-                .map { parseData(it) }          //解析数据
+                .map {
+                    val data = parseData(it)
+                    LogUtils.v("zcl=====$data")
+                    data
+                }          //解析数据
                 .filter {
                     addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
                 }
@@ -75,7 +79,6 @@ object RecoverMeshDeviceUtil {
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-
     }
 
 
@@ -102,17 +105,17 @@ object RecoverMeshDeviceUtil {
                 }
                 .filter {
                     var isFilter: Boolean
-                    if (it.hasConflict) {   //有冲突不过滤掉
-                        isFilter = true
+                    isFilter = if (it.hasConflict) {   //有冲突不过滤掉
+                        true
                     } else {  //无冲突就保存数据
-                        isFilter = addDevicesToDb(it.deviceInfo)       //addDevicesToDb返回False代表已有此数据，把isFilter设成false，过滤掉
+                        addDevicesToDb(it.deviceInfo)       //addDevicesToDb返回False代表已有此数据，把isFilter设成false，过滤掉
                     }
                     //如果之前已经发送过的结果，就不发送了。
                     if (scannedDeviceHm.containsKey(it.deviceInfo.macAddress)) {
                         isFilter = false
 //                        LogUtils.d("sent result , filtered it. ")
                     } else {
-                        scannedDeviceHm.put(it.deviceInfo.macAddress, it.deviceInfo)
+                        scannedDeviceHm[it.deviceInfo.macAddress] = it.deviceInfo
                     }
 
                     //false是过滤，true是不过滤

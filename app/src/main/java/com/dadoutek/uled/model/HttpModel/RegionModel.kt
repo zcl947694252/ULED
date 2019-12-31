@@ -272,9 +272,10 @@ object RegionModel {
     /**
      * 查看单个区域移交码
      */
-    fun lookTransforRegionCode(id: Long): Observable<Response<TransferRegionBean>>? {
+    fun lookTransforRegionCode(id: Long): Observable<TransferRegionBean>? {
         return NetworkFactory.getApi()
                 .mlookRegionTransferCodeBean(id)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -292,7 +293,7 @@ object RegionModel {
     }
 
     /**
-     * 取消二维码 三码合一  有问题
+     * 取消二维码 三码合一
      */
     fun removeQrCode(code: String): Observable<Response<Any>>? {
         val body = RemoveCodeBody()

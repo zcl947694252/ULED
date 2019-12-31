@@ -78,30 +78,36 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 R.id.scene_delete -> scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.scene_edit -> {
-
-                    val lastUser = DBUtils.lastUser
-                    lastUser?.let {
-                        if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showLong(getString(R.string.author_region_warm))
-                        else {
-                            Log.e("zcl场景", "zcl场景******scene_edit")
-                            val scene = scenesListData!![position]
-                            val intent = Intent(activity, NewSceneSetAct::class.java)
-                            intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
-                            intent.putExtra(Constant.IS_CHANGE_SCENE, true)
-                            startActivityForResult(intent, 3)
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
+                        ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    } else {
+                        val lastUser = DBUtils.lastUser
+                        lastUser?.let {
+                            if (it.id.toString() != it.last_authorizer_user_id)
+                                ToastUtils.showLong(getString(R.string.author_region_warm))
+                            else {
+                                Log.e("zcl场景", "zcl场景******scene_edit")
+                                val scene = scenesListData!![position]
+                                val intent = Intent(activity, NewSceneSetAct::class.java)
+                                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, true)
+                                startActivityForResult(intent, 3)
+                            }
                         }
                     }
                 }
-
                 R.id.scene_apply -> {
                     Log.e("zcl场景", "zcl场景******scene_apply")
-                    try {
-                        if (position < adapter.data.size) {
-                            setScene(scenesListData!![position].id!!)
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
+                        ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    } else {
+                        try {
+                            if (position < adapter.data.size) {
+                                setScene(scenesListData!![position].id!!)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
                 }
             }
