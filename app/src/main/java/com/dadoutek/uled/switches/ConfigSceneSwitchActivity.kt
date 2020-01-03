@@ -15,6 +15,7 @@ import android.widget.EditText
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -551,6 +552,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         if (resultCode == Activity.RESULT_OK&&requestCode == requestCodes){
             val scene = intent.getSerializableExtra("select")  as DbScene
             map[configTag] = scene
+            LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
             when(configTag){
                 0-> scene_one.text = scene.name
                 1-> scene_two.text = scene.name

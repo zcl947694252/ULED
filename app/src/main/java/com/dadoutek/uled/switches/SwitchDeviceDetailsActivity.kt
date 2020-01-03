@@ -198,7 +198,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData)
+        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData,this)
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
