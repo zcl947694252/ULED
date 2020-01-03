@@ -234,19 +234,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -256,16 +256,16 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
         }
     }
 
-    private fun showInstallDeviceDetail(describe: String) {
+    private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
@@ -275,11 +275,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
         switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
         swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
+        val title = view.findViewById<TextView>(R.id.textView5)
         val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar = view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+        if (position==INSTALL_NORMAL_LIGHT){
+            title.visibility =  View.GONE
+            install_tip_question.visibility =  View.GONE
+        }else{
+            title.visibility =  View.VISIBLE
+            install_tip_question.visibility =  View.VISIBLE
+        }
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)

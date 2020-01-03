@@ -25,8 +25,7 @@ public class NetworkFactory {
     private static OkHttpClient okHttpClient;
 
     private static OkHttpClient initHttpClient() {
-       // HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(/*!Constant.isDebug?HttpLoggingInterceptor.Level.NONE:*/HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)

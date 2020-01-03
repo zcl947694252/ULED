@@ -23,21 +23,17 @@ import java.util.Map;
 
 public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements AdapterView.OnItemSelectedListener {
 
-    private List<String> btList;
     private List<DbScene> sceneList;
     private List<String> sceneNameList;
     private Spinner spinner;
     private ArrayAdapter<String> arrayAdapter;
-    private Context context;
     private Map<Integer, DbScene> map;
 
     public SwitchSceneGroupAdapter(int layoutResId, List<String> btList, List<DbScene> sceneList, Context context) {
         super(layoutResId, btList);
-        this.btList = btList;
         this.sceneList = sceneList;
         sceneNameList = new ArrayList<>();
         map = new HashMap<>();
-        this.context = context;
         init();
         this.arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, sceneNameList);
     }

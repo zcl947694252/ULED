@@ -923,7 +923,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

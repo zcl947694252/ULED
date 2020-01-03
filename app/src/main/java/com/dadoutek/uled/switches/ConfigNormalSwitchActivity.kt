@@ -173,7 +173,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
                 renameEditText?.setText(switchDate?.name)
             else
-                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
+                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
                         + DBUtils.getAllSwitch().size)
         }
         renameEditText?.setSelection(renameEditText?.text.toString().length)
@@ -427,7 +427,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+dbSwitch.meshAddr
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+dbSwitch.meshAddr
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 

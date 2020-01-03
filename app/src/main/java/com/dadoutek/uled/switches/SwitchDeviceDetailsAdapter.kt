@@ -13,7 +13,7 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
             if(scene.name!=null&&scene.name!=""){
                 helper.setText(R.id.tv_device_name, scene.name)
             }else{
-               helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID)+"-"+helper.position)
+               helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID, this)+"-"+helper.position)
             }
 
             helper.setText(R.id.name, StringUtils.getSwitchName(scene))

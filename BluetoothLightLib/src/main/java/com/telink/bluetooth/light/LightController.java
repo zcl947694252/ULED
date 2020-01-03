@@ -800,9 +800,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         int maxNum = 0xFFFFFF;
 
-        if (this.sequenceNumber > maxNum)
-            this.sequenceNumber = Math.round((float) Math.random()
-                    * (maxNum - 1)) + 1;
+        if (this.sequenceNumber > maxNum)//生成指定范围内的随机数
+            this.sequenceNumber = Math.round((float) Math.random() * (maxNum - 1)) + 1;
 
         this.sequenceNumber++;
 

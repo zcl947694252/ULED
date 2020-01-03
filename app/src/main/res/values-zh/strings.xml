@@ -863,5 +863,11 @@
     <string name="old_light_rest">当前固件版本较低,请尝试以下步骤复位设备:</string>
     <string name="warm_notice">温馨提示：如有其它问题，请参考APP使用说明。</string>
     <string name="config_success">配置成功</string>
+    <string name="normal_swith">普通开关</string>
+    <string name="scene_switch">场景开关</string>
+    <string name="curtain_switch">窗帘开关</string>
+    <string name="night_light">小夜灯</string>
+    <string name="click_config">点击配置</string>
+    <string name="select_scene">选择场景</string>
 
 </resources>

@@ -941,5 +941,11 @@
     <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
     <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
     <string name="config_success">Configuration is successful</string>
+    <string name="normal_swith">Ordinary switch</string>
+    <string name="scene_switch">Scene switch</string>
+    <string name="curtain_switch">Curtain switch</string>
+    <string name="night_light">Night light</string>
+    <string name="click_config">Click Config</string>
+    <string name="select_scene">选择场景</string>
 
 </resources>

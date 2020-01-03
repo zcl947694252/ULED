@@ -65,7 +65,6 @@ import java.util.concurrent.TimeUnit
  * 更新者     zcl$
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  *
- * 24khome  威廉威定制 bosie agender 三家衬衫
  * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
@@ -129,6 +128,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isAddGroupEmptyView: Boolean = false
+    private var isComplete: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -344,13 +344,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
             }
             DeviceType.SMART_CURTAIN -> {
-                changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
             }
             DeviceType.SMART_RELAY -> {
-                changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
             }
         }
     }
@@ -694,7 +694,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(noGroup[position].meshAddr, noGroup[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
                     lightAdapter.notifyItemRangeChanged(0, noGroup.size)
                     LogUtils.v("zcl更新后状态${noGroup[position].selected}")
                 }
@@ -706,7 +706,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(noGroupCutain[position].meshAddr, noGroupCutain[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainAdapter.notifyItemRangeChanged(0, noGroupCutain.size)
                     LogUtils.v("zcl更新后状态${noGroupCutain[position].selected}")
                 }
@@ -717,7 +717,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(noGroupRelay[position].meshAddr, noGroupRelay[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
                     relayAdapter.notifyItemRangeChanged(0, noGroupRelay.size)
                     LogUtils.v("zcl更新后状态${noGroupRelay[position].selected}")
                 }
@@ -731,7 +731,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(listGroup[position].meshAddr, listGroup[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
                     lightGroupedAdapter.notifyItemRangeChanged(0, listGroup.size)
                     LogUtils.v("zcl更新后状态${listGroup[position].selected}")
                 }
@@ -743,7 +743,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(listGroupCutain[position].meshAddr, listGroupCutain[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainGroupedAdapter.notifyItemRangeChanged(0, listGroupCutain.size)
                     LogUtils.v("zcl更新后状态${listGroupCutain[position].selected}")
                 }
@@ -754,7 +754,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         stopBlink(listGroupRelay[position].meshAddr, listGroupRelay[position].belongGroupId)
                     }
-                    changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyItemRangeChanged(0, listGroupRelay.size)
                     LogUtils.v("zcl更新后状态${listGroupRelay[position].selected}")
                 }
@@ -832,10 +832,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_device_all.setOnClickListener { changeDeviceAll() }
         batch_four_group_add_group.setOnClickListener { addNewGroup() }
         grouping_completed.setOnClickListener {
+            if (!isComplete){
             if (TelinkLightApplication.getApp().connectDevice != null)
                 sureGroups()
             else
                 autoConnect()
+            }else{
+                finish()
+            }
         }
         groupAdapter.setOnItemClickListener { _, _, position ->
             //如果点中的不是上次选中的组则恢复未选中状态
@@ -894,13 +898,26 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
     }
 
-    private fun changeGroupingCompleteState(size: Int) {
-        if (size > 0 && currentGroup != null) {
+    private fun changeGroupingCompleteState(selectSize: Int, noGroupSize: Int) {
+
+        if (selectSize > 0 && currentGroup != null) {//选中分组并且有选中设备的情况下
             grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
+            isComplete = false
             grouping_completed.isClickable = true
-        } else {
-            grouping_completed.isClickable = false
-            grouping_completed.setBackgroundResource(R.drawable.btn_rec_black_bt)
+            grouping_completed.text = getString(R.string.set_group)
+        } else {//没有选中设备或者未选中分组的情况下
+            if (noGroupSize > 0 || selectSize > 0 || currentGroup != null) {
+                //有未分组的设备或者有选中设备或者选中组但是未达到分组条件的情况下
+                isComplete = false
+                grouping_completed.text = getString(R.string.set_group)
+                grouping_completed.isClickable = false
+                grouping_completed.setBackgroundResource(R.drawable.btn_rec_black_bt)
+            } else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
+                isComplete = true
+                grouping_completed.isClickable = true
+                grouping_completed.setBackgroundResource(R.drawable.btn_rec_black_bt)
+                grouping_completed.text = getString(R.string.complete)
+            }
         }
     }
 
@@ -1350,13 +1367,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
             }
             DeviceType.SMART_CURTAIN -> {
-                changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
             }
             DeviceType.SMART_RELAY -> {
-                changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size)
+                changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
             }
 
         }
@@ -1433,7 +1450,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(noGroup.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(noGroup.filter { it.isSelected }.size, noGroup.size)
                     lightAdapter.notifyDataSetChanged()
                 } else {
                     for (device in listGroup) {
@@ -1448,7 +1465,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(listGroup.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(listGroup.filter { it.isSelected }.size, noGroup.size)
                     lightGroupedAdapter.notifyDataSetChanged()
                 }
             }
@@ -1466,7 +1483,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainAdapter.notifyDataSetChanged()
                 } else {
                     for (device in listGroupCutain) {
@@ -1481,7 +1498,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainAdapter.notifyDataSetChanged()
                 }
             }
@@ -1499,7 +1516,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyDataSetChanged()
                 } else {
                     for (device in listGroup) {
@@ -1514,7 +1531,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size)
+                    changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyDataSetChanged()
                 }
 
