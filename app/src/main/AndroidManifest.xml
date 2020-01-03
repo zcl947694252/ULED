@@ -325,6 +325,9 @@
         <activity
             android:name=".region.UnbindMeNetActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".switches.SelectSceneListActivity"
+            android:screenOrientation="portrait" />
 <!--        <activity
             android:name=".light.MeshAddDeviceActivity"
             android:screenOrientation="portrait" />-->

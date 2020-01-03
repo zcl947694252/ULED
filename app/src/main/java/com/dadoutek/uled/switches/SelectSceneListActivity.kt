@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述
  */
 class SelectSceneListActivity : TelinkBaseActivity() {
-    private val resultCode: Int = 1001
     private val mSceneList = DBUtils.sceneAll
     private val adpter = SceneListAdapter(R.layout.item_group, mSceneList)
 
@@ -34,14 +33,6 @@ class SelectSceneListActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
-        adpter.setOnItemClickListener { _, _, position ->
-            val dbScene = mSceneList[position]
-            val intent = Intent(this@SelectSceneListActivity, ConfigSceneSwitchActivity::class.java)
-            intent.putExtra("select", dbScene)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
-        }
-
     }
 
     private fun initData() {
@@ -57,6 +48,14 @@ class SelectSceneListActivity : TelinkBaseActivity() {
 
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adpter
+        adpter.bindToRecyclerView(template_recycleView)
+        adpter.setOnItemClickListener { _, _, position ->
+            val dbScene = mSceneList[position]
+            val intent = Intent(this@SelectSceneListActivity, ConfigSceneSwitchActivity::class.java)
+            intent.putExtra("select", dbScene)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+        }
     }
 }
 
