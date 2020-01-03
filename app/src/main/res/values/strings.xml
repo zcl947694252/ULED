@@ -945,7 +945,7 @@
     <string name="scene_switch">Scene switch</string>
     <string name="curtain_switch">Curtain switch</string>
     <string name="night_light">Night light</string>
-    <string name="click_config">Click Config</string>
+    <string name="click_config">Config</string>
     <string name="select_scene">选择场景</string>
 
 </resources>

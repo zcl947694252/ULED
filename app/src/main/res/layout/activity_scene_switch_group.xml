@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/configGroupRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="@drawable/gradient_gay">
 
     <include layout="@layout/toolbar" />
 
-    <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="280dp"
+    <LinearLayout
+            android:layout_width="319dp"
+            android:layout_height="268dp"
             android:layout_marginStart="38dp"
             android:layout_marginTop="161dp"
             android:layout_marginEnd="38dp"
             android:background="@drawable/icon_scenes"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="parent">
+            android:gravity="center">
 
-        <android.support.constraint.ConstraintLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="131dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="@dimen/dp_15"
                 android:layout_marginBottom="9dp"
+                android:layout_marginTop="75dp"
                 android:paddingStart="13dp"
                 android:paddingTop="7dp"
                 android:paddingEnd="@dimen/dp_8"
                 android:paddingBottom="6dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:layout_editor_absoluteX="13dp">
+                >
 
             <TextView
                     android:id="@+id/scene_one"
@@ -39,9 +38,18 @@
                     android:background="@drawable/icon_small"
                     android:gravity="center"
                     android:paddingBottom="@dimen/dp_4"
-                    android:text="@string/click_config"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:text="@string/click_config" />
+
+            <TextView
+                    android:id="@+id/scene_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/icon_small"
+                    android:gravity="center"
+                    android:layout_alignParentEnd="true"
+                    android:paddingBottom="@dimen/dp_4"
+                    android:text="@string/click_config"/>
+
 
             <TextView
                     android:id="@+id/scene_three"
@@ -50,20 +58,9 @@
                     android:background="@drawable/icon_small"
                     android:gravity="center"
                     android:paddingBottom="@dimen/dp_4"
-                    android:text="@string/click_config"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_alignParentBottom="true"
+                    android:text="@string/click_config" />
 
-            <TextView
-                    android:id="@+id/scene_two"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/icon_small"
-                    android:gravity="center"
-                    android:paddingBottom="@dimen/dp_4"
-                    android:text="@string/click_config"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                     android:id="@+id/scene_four"
@@ -73,19 +70,15 @@
                     android:gravity="center"
                     android:paddingBottom="@dimen/dp_4"
                     android:text="@string/click_config"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"/>
 
             <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="29dp"
-                    android:layout_marginEnd="88dp"
-                    android:layout_marginBottom="15dp"
                     android:background="@drawable/icon_big"
                     android:gravity="center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:layout_centerInParent="true">
 
                 <ImageView
                         android:layout_width="wrap_content"
@@ -93,11 +86,8 @@
                         android:src="@drawable/icon_switch_scene" />
             </RelativeLayout>
 
-
-        </android.support.constraint.ConstraintLayout>
-
-    </android.support.constraint.ConstraintLayout>
-
+        </RelativeLayout>
+    </LinearLayout>
     <TextView
             android:id="@+id/scene_switch_text"
             android:layout_width="match_parent"
@@ -122,7 +112,7 @@
             android:text="@string/use"
             android:textColor="@android:color/white"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            />
 
     <LinearLayout
             android:id="@+id/scene_versionLayout"
@@ -132,10 +122,7 @@
             android:background="@color/primary"
             android:gravity="center"
             android:orientation="horizontal"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="36dp"
-            tools:layout_editor_absoluteY="384dp">
+            android:visibility="visible">
 
         <TextView
                 android:id="@+id/scene_tvLightVersionText"
@@ -155,5 +142,5 @@
     </LinearLayout>
 
 
-</android.support.constraint.ConstraintLayout>
+</>
 

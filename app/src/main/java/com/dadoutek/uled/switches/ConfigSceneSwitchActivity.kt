@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
@@ -504,8 +503,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-        mAdapter.bindToRecyclerView(recyclerView)
+//        recyclerView.layoutManager = GridLayoutManager(this, 2)
+//        mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun makePop() {
