@@ -869,5 +869,6 @@
     <string name="night_light">小夜灯</string>
     <string name="click_config">点击配置</string>
     <string name="select_scene">选择场景</string>
+    <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
 
 </resources>

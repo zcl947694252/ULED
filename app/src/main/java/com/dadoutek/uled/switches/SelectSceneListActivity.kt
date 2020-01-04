@@ -51,8 +51,8 @@ class SelectSceneListActivity : TelinkBaseActivity() {
         adpter.bindToRecyclerView(template_recycleView)
         adpter.setOnItemClickListener { _, _, position ->
             val dbScene = mSceneList[position]
-            val intent = Intent(this@SelectSceneListActivity, ConfigSceneSwitchActivity::class.java)
-            intent.putExtra("select", dbScene)
+            val intent = Intent()
+            intent.putExtra("data", dbScene)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }

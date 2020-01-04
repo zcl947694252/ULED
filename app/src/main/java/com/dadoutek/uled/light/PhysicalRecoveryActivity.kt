@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uledtest.ble.RxBleManager
@@ -96,6 +97,8 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         disposableScan?.dispose()
                         disposableFiveTimer?.dispose()
                         disposableConnectTimer?.dispose()
+                        disposableScanTimer?.dispose()
+                        changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     })
 
             disposableScanTimer?.dispose()
@@ -133,6 +136,10 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         } else if (isHaveOld) {//是我们的旧设备并且是没有恢复出厂的
             //显示旧设备恢复出厂的提示语
             changeVisiable(View.GONE,View.GONE, View.GONE, View.GONE, View.VISIBLE)
+        }else {
+            //scanResult==null
+            ToastUtils.showLong(getString(R.string.no_found_recovery_device))
+            finish()
         }
 
     }

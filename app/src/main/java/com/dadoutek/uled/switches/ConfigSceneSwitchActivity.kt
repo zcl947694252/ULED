@@ -44,8 +44,6 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
-import kotlinx.android.synthetic.main.activity_switch_group.configGroupRoot
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -96,10 +94,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
 
 
     private fun initData() {
-        //startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        tvLightVersionText?.text = version
+        scene_tvLightVersion?.text = version
         map.clear()
 
         groupName = intent.getStringExtra("group")
@@ -126,7 +123,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                     showDisconnectSnackBar()
                 }
             } else {
-                progressBar.visibility = View.VISIBLE
+                pb_ly.visibility = View.VISIBLE
                 GlobalScope.launch {
                     setSceneForSwitch()
                     newMeshAddr = MeshAddressGenerator().meshAddress
@@ -140,12 +137,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                         showRenameDialog()
 
                     }, failedCallback = {
-                                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    progressBar.visibility = View.GONE
-                                    mIsConfiguring = false
-                                }
-                            })
+                        mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
+                        GlobalScope.launch(Dispatchers.Main) {
+                            pb_ly.visibility = View.GONE
+                            mIsConfiguring = false
+                        }
+                    })
                 }
             }
         }
@@ -166,10 +163,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 configTag = 2
             }
             R.id.scene_four -> {
-                configTag =3
+                configTag = 3
             }
         }
-        startActivityForResult(Intent(this,SelectSceneListActivity::class.java),requestCodes)
+        startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
     }
 
     @SuppressLint("SetTextI18n")
@@ -212,7 +209,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         if (mIsConfiguring) {
             this.mApplication.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
+               // pb_ly.visibility = View.GONE
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -301,7 +298,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
-                        progressBar.visibility = View.VISIBLE
+                        pb_ly.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
                     } else {
@@ -385,9 +382,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         }
     }
 
-    private fun showDisconnectSnackBar() {
+    private fun showDisconnectSnackBar() {//java.lang.ClassCastException: android.widget.LinearLayout cannot be cast to android.support.design.widget.CoordinatorLayout
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+        mDisconnectSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
                 .string.device_disconnected), getString(R.string.reconnect)) {
             reconnect()
         }
@@ -425,7 +422,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
                 mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
-                progressBar.visibility = View.GONE
+                pb_ly.visibility = View.GONE
             }
 
 
@@ -436,14 +433,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
 
                         GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
-                            progressBar.visibility = View.GONE
+                            pb_ly.visibility = View.GONE
                             finish()
                         }
                     }
                     mIsConfiguring -> {
                         this.mApplication.removeEventListener(this)
                         GlobalScope.launch(Dispatchers.Main) {
-                            progressBar.visibility = View.GONE
+                            pb_ly.visibility = View.GONE
                             showConfigSuccessDialog()
                         }
                     }
@@ -548,17 +545,18 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK&&requestCode == requestCodes){
-            val scene = intent.getSerializableExtra("select")  as DbScene
-            map[configTag] = scene
-            LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
-            when(configTag){
-                0-> scene_one.text = scene.name
-                1-> scene_two.text = scene.name
-                2-> scene_three.text = scene.name
-                3-> scene_four.text = scene.name
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
+            val scene = data?.getParcelableExtra<DbScene>("data")
+            scene.let {
+                map[configTag] = scene!!
+                LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
+                when (configTag) {
+                    0 -> scene_one.text = scene.name
+                    1 -> scene_two.text = scene.name
+                    2 -> scene_three.text = scene.name
+                    3 -> scene_four.text = scene.name
+                }
             }
         }
     }
-
 }
