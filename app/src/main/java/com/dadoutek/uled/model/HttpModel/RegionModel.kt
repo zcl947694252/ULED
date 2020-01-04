@@ -122,11 +122,8 @@ object RegionModel {
 
     fun removeRegion(id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .clearRegion(id.toInt())
+                .removeRegion(id.toInt())
                 .compose(NetworkTransformer())
-                .flatMap {
-                    NetworkFactory.getApi().removeRegion(id.toInt()).compose(NetworkTransformer())
-                }
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())

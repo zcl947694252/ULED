@@ -7,11 +7,11 @@
     <include layout="@layout/toolbar"/>
 
     <GridView
-        android:id="@+id/list_groups"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="none"
-        android:numColumns="1"
-        android:scrollbars="none" />
+            android:id="@+id/list_groups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadingEdge="none"
+            android:numColumns="1"
+            android:scrollbars="none" />
 
 </LinearLayout>

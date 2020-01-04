@@ -228,7 +228,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-
                         }
 
                         override fun onError(e: Throwable) {

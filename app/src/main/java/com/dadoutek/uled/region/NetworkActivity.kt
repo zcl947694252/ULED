@@ -463,6 +463,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
                         LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
                         PopUtil.dismiss(pop)
+                        regionBean?.let {itr->
+                            val dbRegion = DbRegion()
+                            dbRegion.installMeshPwd = itr.installMeshPwd
+                            dbRegion.controlMeshPwd = itr.controlMeshPwd
+                            dbRegion.belongAccount = itr.belongAccount
+                            dbRegion.controlMesh = itr.controlMesh
+                            dbRegion.installMesh = itr.installMesh
+                            dbRegion.name = itr.name
+                            dbRegion.id = itr.id
+                            DBUtils.deleteRegion(dbRegion)
+                        }
                         initData()
                     }, {
                         ToastUtils.showLong(it.message)
@@ -1081,7 +1092,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         isShowType = 3
-        initData()
+                //initData()
     }
 
     override fun onPause() {

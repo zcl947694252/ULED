@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
@@ -29,6 +28,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.coroutines.GlobalScope
 import java.util.*
 
 
@@ -59,41 +59,52 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showLong(R.string.group_fail)
             } else {
                 showLoadingDialog(getString(R.string.grouping))
-                var allocDeviceGroupCount = 2
-                object : Thread({
-                    //发两次，确保成功
-                    for (i in 0..1) {
+
+                GlobalScope.let {
+                    allocDeviceGroup(group, {
+                        mLight.belongGroupId = group.id
+                        group.deviceType = mLight.productUUID.toLong()
+                        updateGroupResult(mLight, group)
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            finish()
+                            ToastUtils.showLong(getString(R.string.grouping_success_tip))
+                        }
+                    }, {
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            ToastUtils.showLong(R.string.group_failed)
+                        }
+                    })
+                }
+               /* object : Thread({
                         //如果修改分组成功,才改数据库之类的操作
                         allocDeviceGroup(group, {
-                            val sceneIds = getRelatedSceneIds(group.meshAddr)
-                            for (i in 0..1) {
+                            mLight.belongGroupId = group.id
+                            group.deviceType = mLight.productUUID.toLong()
+                            updateGroupResult(mLight, group)
+                           *//* val sceneIds = getRelatedSceneIds(group.meshAddr)
                                 deleteAllSceneByLightAddr(mLight.meshAddr)
-                                sleep(100)
-                            }
-                            for (sceneId in sceneIds) {
+                                sleep(100)*//*
+
+                         *//*   for (sceneId in sceneIds) {
                                 val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
                                 if (action != null) {
-                                    for (i in 0..1) {
                                         Commander.addScene(sceneId, mLight.meshAddr, action.color)
                                         sleep(100)
-                                    }
-                                }
-                            }
 
-                            group.deviceType = mLight.productUUID.toLong()
-                            Log.d("message", "deviceType=" + group.deviceType.toString() + ",address=" + mLight.meshAddr + ",productUUID=" + mLight.productUUID)
+                                }
+                            }*//*
+
+                           *//* Log.d("message", "deviceType=" + group.deviceType.toString() + ",address=" + mLight.meshAddr + ",productUUID=" + mLight.productUUID)
                             Log.d("message", mLight.toString())
 
                             DBUtils.updateGroup(group)
-                            DBUtils.updateLight(mLight)
+                            DBUtils.updateLight(mLight)*//*
                             runOnUiThread {
-                                if (allocDeviceGroupCount - 1 == 0) {
                                     hideLoadingDialog()
                                     finish()
                                     ToastUtils.showLong(getString(R.string.grouping_success_tip))
-                                }else{
-                                    allocDeviceGroupCount--
-                                }
                             }
 
                         }, {
@@ -102,11 +113,17 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                                 ToastUtils.showLong(R.string.group_failed)
                             }
                         })
-                    }
-                }) {
-                }.start()
+
+                }) {}.start()*/
             }
         }
+    }
+
+    private fun updateGroupResult(light: DbLight, group: DbGroup) {
+        light.hasGroup = true
+        light.belongGroupId = group.id
+        light.name = light.name
+        DBUtils.updateLight(light)
     }
 
     private val mHandler = @SuppressLint("HandlerLeak")
