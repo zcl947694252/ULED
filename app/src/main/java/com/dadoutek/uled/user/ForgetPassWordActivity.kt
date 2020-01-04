@@ -58,7 +58,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         edit_user_phone.addTextChangedListener(this)
         if (isChangePwd) {
             dbUser = DbUser()
-            register_completed.setText(R.string.btn_ok)
+            register_completed.setText(R.string.btn_sure)
         }
     }
 

@@ -400,7 +400,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         mBuild?.let {
             it.setMessage(message)
-            it.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
+            it.setNegativeButton(getString(R.string.btn_sure)) { dialog, _ ->
                 changeRegion()
                 dialog.dismiss()
             }
@@ -988,7 +988,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun showUnbindDialog() {
         val builder = android.support.v7.app.AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.warm_unbind_authorize_config, regionBeanAuthorize!!.name))
-        builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.btn_sure)) { dialog, _ ->
             //解除授权
             //authorizer_id授权用户id  rid区域id
             RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)

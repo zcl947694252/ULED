@@ -30,6 +30,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@drawable/bottom_right"
-        android:text="@string/btn_ok"
+        android:text="@string/btn_sure"
         android:textColor="@color/blue_background"/>
 </LinearLayout>

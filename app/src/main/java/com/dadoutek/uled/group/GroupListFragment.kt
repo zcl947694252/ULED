@@ -3,6 +3,7 @@ package com.dadoutek.uled.group
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -58,6 +59,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
+    private lateinit var dialogMake: Dialog
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -166,7 +168,13 @@ class GroupListFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
+        makeDialog()
         return view
+    }
+
+    private fun makeDialog() {
+         dialogMake = Dialog(context)
+        dialogMake.setContentView(R.layout.dialog_add_group)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -218,7 +218,7 @@ class SettingActivity : BaseActivity() {
         hinitThree.visibility = View.GONE
 
         cancel.text = getString(R.string.cancel)
-        confirm.text = getString(R.string.btn_ok)
+        confirm.text = getString(R.string.btn_sure)
         cancel.isClickable = true
         confirm.isClickable = true
     }

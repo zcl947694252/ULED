@@ -107,7 +107,6 @@
     <string name="progress_mesh_ota">MeshOTA 进度: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
-    <string name="btn_ok">确定</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
     <string name="add_group">添加群组</string>
@@ -870,5 +869,7 @@
     <string name="click_config">点击配置</string>
     <string name="select_scene">选择场景</string>
     <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
+    <string name="select_type">请选择类型</string>
+    <string name="no_type">无类型</string>
 
 </resources>

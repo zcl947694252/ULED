@@ -115,7 +115,6 @@
     <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">Scanning lights need related permissions, otherwise it can not proceed to the next step</string>
-    <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add Group</string>
     <string name="set_group">CONFIRM GROUPING</string>
@@ -948,5 +947,7 @@
     <string name="click_config">Config</string>
     <string name="select_scene">Select the scene</string>
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
+    <string name="select_type">Please select type</string>
+    <string name="no_type">No type</string>
 
 </resources>

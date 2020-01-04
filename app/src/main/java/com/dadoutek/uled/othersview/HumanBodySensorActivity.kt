@@ -217,7 +217,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initView() {
-        tv_function1.text = getString(R.string.btn_ok)
+        tv_function1.text = getString(R.string.btn_sure)
         tv_function1.setOnClickListener(this)
         triggering_conditions.setOnClickListener(this)
         trigger_time.setOnClickListener(this)
