@@ -227,10 +227,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 }
             }
             R.id.spSwitchMode -> {
-                if (position == 0) {
-                    modeSwitchMode = MODE_SWITCH_MODE_MOMENT
+                modeSwitchMode = if (position == 0) {
+                    MODE_SWITCH_MODE_MOMENT
                 } else {
-                    modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
+                    MODE_SWITCH_MODE_GRADIENT
                 }
             }
             R.id.spDelayUnit -> {

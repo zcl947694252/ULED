@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -41,16 +43,16 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.switches.SceneListAdapter
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.dialog_add_group.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
+import kotlinx.android.synthetic.main.pop_recycleview.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -77,6 +79,8 @@ class GroupListFragment : BaseFragment() {
     private lateinit var rgbLightFragment: RGBLightFragmentList
     private lateinit var curtianFragment: CurtainFragmentList
     private lateinit var relayFragment: RelayFragmentList
+    val list = mutableListOf(getString(R.string.normal_light),getString(R.string.rgb_light),getString(R.string.curtain),getString(R.string.relay))
+    //private val adpter = TypeListAdapter(R.layout.item_group,list)
     //19-2-20 界面调整
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -107,6 +111,7 @@ class GroupListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
+
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
         val intentFilter = IntentFilter()
@@ -174,7 +179,15 @@ class GroupListFragment : BaseFragment() {
 
     private fun makeDialog() {
          dialogMake = Dialog(context)
+        val pop = PopUtil.makeMWf(context!!, R.layout.pop_recycleview)
+        pop_recycle.layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
+        pop_recycle.adapter = C
         dialogMake.setContentView(R.layout.dialog_add_group)
+        dialog_group_type_arrow.setOnClickListener {
+
+        }
+        dialog_group_cancel.setOnClickListener { dialogMake.dismiss() }
+        dialog_group_ok.setOnClickListener { dialogMake.dismiss() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

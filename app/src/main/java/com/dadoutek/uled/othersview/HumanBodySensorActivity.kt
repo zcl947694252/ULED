@@ -995,7 +995,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         if (canSendGroup) {
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    mDeviceInfo.meshAddress, paramBytesGroup)
+                    mDeviceInfo?.meshAddress, paramBytesGroup)
         }
 
         Thread.sleep(300)
