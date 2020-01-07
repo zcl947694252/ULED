@@ -136,6 +136,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         this.mApplication = this.application as TelinkLightApplication
         setContentView(R.layout.activity_sensor_device_details)
         addScanListeners()
+        LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
     }
 
     override fun onResume() {
@@ -519,14 +520,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                         Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
                                         if (deleteSensor.meshAddr == mConnectDevice?.meshAddress) {
-                                            GlobalScope.launch {
-                                                delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                                if (this@SensorDeviceDetailsActivity == null ||
-                                                        this@SensorDeviceDetailsActivity.isDestroyed ||
-                                                        this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                                } else
-                                                    autoConnectSensor(true)
-                                            }
+                                            TelinkLightService.Instance()?.idleMode(true)
+                                            TelinkLightService.Instance()?.disconnect()
                                         }
                                     }
 

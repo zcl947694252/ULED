@@ -506,7 +506,6 @@ public class Peripheral extends BluetoothGattCallback {
                     isOutOfSize = false;
                     characteristic.setValue(data);
                     characteristic.setWriteType(writeType);
-
                     if (!this.gatt.writeCharacteristic(characteristic)) {
                         success = false;
                         errorMsg = "write characteristic error";

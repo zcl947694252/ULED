@@ -72,6 +72,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
         TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         initView()
         initListener()
     }
@@ -346,7 +347,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
-        LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
+        LogUtils.e("zcl配置传感器**********************pwd$pwd-------------$mDeviceMeshName------$pwd")
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
@@ -384,7 +385,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                  getVersionRetryCount++
                                  if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                      getVersion()
+                                 }else{
+ToastUtils.showLong(getString(R.string.get_version_fail))
+                                     finish()
                                  }
+                                 LogUtils.e("zcl配置传感器前失败----$it")
                              }
                      )
 

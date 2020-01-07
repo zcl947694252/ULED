@@ -99,7 +99,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
@@ -119,6 +119,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         super.onDestroy()
         TelinkLightApplication.getApp().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
     }
 
     override fun performed(event: Event<String>?) {
@@ -845,7 +846,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
 
             configNewlight()
-            delay(300)
+            delay(3000)
 
             Commander.updateMeshName(
                     successCallback = {
@@ -957,13 +958,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     editText.text.toString().toInt().toByte(),
                     0x00,
                     modeTriggerCondition.toByte(),
-                    mode.toByte()
+                    mode.toByte(),0x00, 0x00,0x00
             )
             trigger_time_text.text.toString() == getString(R.string.light_off) -> paramBytes = byteArrayOf(
                     switchMode.toByte(), 0x00, 0x00,
                     editText.text.toString().toInt().toByte(), 0x00,
                     modeTriggerCondition.toByte(),
-                    mode.toByte()
+                    mode.toByte(),0x00, 0x00,0x00
             )
             else -> {
                 var str = trigger_time_text.text.toString()
@@ -973,7 +974,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         editText.text.toString().toInt().toByte(),
                         st.toInt().toByte(),
                         modeTriggerCondition.toByte(),
-                        mode.toByte()
+                        mode.toByte(),0x00, 0x00,0x00
                 )
             }
         }
@@ -990,20 +991,38 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAddress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
+
             }
         }
+        val address = TelinkLightApplication.getApp().connectDevice.meshAddress
+        //val address = mDeviceInfo.meshAddress
+        //此处不能使用mes地址 应当使用0x00代表直连灯 所以用mes的时候断联后可以成功因为灯可能变为了直连灯
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                address, paramBytes)
 
+        LogUtils.v("zcl配置传感器-------------${editText.text}-----------${byteToHex(paramBytes)}------------${byteToHex(paramBytesGroup)}")
+
+        Thread.sleep(500)
         if (canSendGroup) {
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    mDeviceInfo.meshAddress, paramBytesGroup)
+                    address, paramBytesGroup)
         }
+        Thread.sleep(500)
+    }
 
-        Thread.sleep(300)
-
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                mDeviceInfo.meshAddress, paramBytes)
-
-        Thread.sleep(300)
+    /**
+     * byte数组转hex
+     * @param bytes
+     * @return
+     */
+    fun byteToHex(bytes: ByteArray): String {
+        var strHex = ""
+        val sb = StringBuilder("")
+        for (n in bytes.indices) {
+            strHex = Integer.toHexString(bytes[n].toInt() and 0xFF)
+            sb.append(if (strHex.length == 1) "0$strHex" else strHex) // 每个字节由两个字符表示，位数不够，高位补0
+        }
+        return sb.toString().trim { it <= ' ' }
     }
 
     /**

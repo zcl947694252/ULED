@@ -680,14 +680,13 @@ object Commander : EventListener<String> {
                 val meshAddr = TelinkApplication.getInstance().connectDevice.meshAddress
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
-
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
 
         }
                 .retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .timeout(5, TimeUnit.SECONDS) {
+                .timeout(10, TimeUnit.SECONDS) {
                     it.onError(Throwable("get version failed"))
                 }
                 .doOnSubscribe {
