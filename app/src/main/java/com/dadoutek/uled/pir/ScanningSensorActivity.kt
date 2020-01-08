@@ -242,6 +242,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
+                showToast(getString(R.string.scan_end))
                 doFinish()
             }
         }
@@ -347,7 +348,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
-        LogUtils.e("zcl配置传感器**********************pwd$pwd-------------$mDeviceMeshName------$pwd")
+        LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}-----------$pwd---------${DBUtils.lastUser?.controlMeshName}")
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
@@ -424,9 +425,9 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
 
         Thread {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-
-            LogUtils.e("zcl开始连接")
         }.start()
+            LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
+
             connectDisposable?.dispose()    //取消掉上一个超时计时器
             connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
