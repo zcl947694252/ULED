@@ -23,7 +23,6 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -177,9 +176,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initView() {
-        if (Constant.isDebug){
+        if (Constant.isDebug) {
             login_isTeck.visibility = View.VISIBLE
-        }else{
+        } else {
             login_isTeck.visibility = View.GONE
         }
         initToolbar()
@@ -456,18 +455,26 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     .compose(NetworkTransformer())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        val intent = Intent(this, EnterPasswordActivity::class.java)
-                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-                        intent.putExtra("phone", phone)
-                        returnView()
-                        startActivityForResult(intent, 0)
-                    }, {
-                        ToastUtils.showLong(it.localizedMessage)
-                        returnView()
-                        if (getString(R.string.account_not_exist) == it.localizedMessage)
-                            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-                    })
+                    .subscribe(
+                            object : NetworkObserver<String>() {
+                                override fun onNext(t: String) {
+                                    if (TextUtils.isEmpty(t))
+                                        startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+                                    else {
+                                        val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
+                                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
+                                        intent.putExtra("phone", phone)
+                                        returnView()
+                                        startActivityForResult(intent, 0)
+                                    }
+                                }
+
+                                override fun onError(e: Throwable) {
+                                    super.onError(e)
+                                    returnView()
+
+                                }
+                            })
         } else {
             ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
         }

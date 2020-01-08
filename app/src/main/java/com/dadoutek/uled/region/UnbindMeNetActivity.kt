@@ -9,6 +9,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.region.adapter.UnbindNetWorkAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import kotlinx.android.synthetic.main.template_recycleview_with_title.*
@@ -59,12 +60,19 @@ class UnbindMeNetActivity : BaseActivity() {
         builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
             unbindBean?.id?.let {
                 regionbBean?.id?.let { it1 ->
-                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe({
-                        adapter?.remove(position)
-                        adapter!!.notifyDataSetChanged()
-                        recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
-                        ToastUtils.showLong(getString(R.string.unbundling_success))
-                    }, { ToastUtils.showLong(it.message) })
+                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe(object : NetworkObserver<String?>() {
+                        override fun onNext(t: String) {
+                            adapter?.remove(position)
+                            adapter!!.notifyDataSetChanged()
+                            recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
+                            ToastUtils.showLong(getString(R.string.unbundling_success))
+                        }
+
+                        override fun onError(e: Throwable) {
+                            super.onError(e)
+                            ToastUtils.showLong(e.localizedMessage)
+                        }
+                    })
                 }
             }
             dialog.dismiss()

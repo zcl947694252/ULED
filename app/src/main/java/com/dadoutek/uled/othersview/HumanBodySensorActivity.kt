@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -73,7 +74,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private lateinit var mDeviceInfo: DeviceInfo
     private var nightLightGroupRecycleViewAdapter: NightLightGroupRecycleViewAdapter? = null
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter? = null
-    private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private val CMD_OPEN_LIGHT = 0X01
     private val CMD_CLOSE_LIGHT = 0X00
     private val CMD_CONTROL_GROUP = 0X02
@@ -96,17 +96,15 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val MODE_SWITCH_MODE_GRADIENT = 4
     private var retryConnectCount = 0
     private var isFinish: Boolean = false
-
+    val handler = Handler()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-
         initToolbar()
         initData()
         initView()
-
         initListener()
     }
 
@@ -841,22 +839,25 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         }
 
         GlobalScope.launch {
-            GlobalScope.launch(Dispatchers.Main) {
-                showLoadingDialog(getString(R.string.configuring_switch))
-            }
 
             configNewlight()
             delay(3000)
 
             Commander.updateMeshName(
                     successCallback = {
-                        hideLoadingDialog()
+                        this@HumanBodySensorActivity.runOnUiThread {
+                            hideLoadingDialog()
+                        }
                         configureComplete()
                         TelinkLightService.Instance()?.idleMode(true)
                     },
                     failedCallback = {
-                        snackbar(sensor_root, getString(R.string.pace_fail))
-                        hideLoadingDialog()
+
+                       this@HumanBodySensorActivity.runOnUiThread {
+                           snackbar(sensor_root, getString(R.string.pace_fail))
+                           hideLoadingDialog()
+                       }
+
                         TelinkLightService.Instance()?.idleMode(true)
                     })
         }
@@ -958,13 +959,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     editText.text.toString().toInt().toByte(),
                     0x00,
                     modeTriggerCondition.toByte(),
-                    mode.toByte(),0x00, 0x00,0x00
+                    mode.toByte(), 0x00, 0x00, 0x00
             )
             trigger_time_text.text.toString() == getString(R.string.light_off) -> paramBytes = byteArrayOf(
                     switchMode.toByte(), 0x00, 0x00,
                     editText.text.toString().toInt().toByte(), 0x00,
                     modeTriggerCondition.toByte(),
-                    mode.toByte(),0x00, 0x00,0x00
+                    mode.toByte(), 0x00, 0x00, 0x00
             )
             else -> {
                 var str = trigger_time_text.text.toString()
@@ -974,7 +975,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         editText.text.toString().toInt().toByte(),
                         st.toInt().toByte(),
                         modeTriggerCondition.toByte(),
-                        mode.toByte(),0x00, 0x00,0x00
+                        mode.toByte(), 0x00, 0x00, 0x00
                 )
             }
         }
@@ -991,24 +992,32 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAddress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-
             }
         }
-        val address = TelinkLightApplication.getApp().connectDevice.meshAddress
-        //val address = mDeviceInfo.meshAddress
-        //此处不能使用mes地址 应当使用0x00代表直连灯 所以用mes的时候断联后可以成功因为灯可能变为了直连灯
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                address, paramBytes)
-
-        LogUtils.v("zcl配置传感器-------------${editText.text}-----------${byteToHex(paramBytes)}------------${byteToHex(paramBytesGroup)}")
-
-        Thread.sleep(500)
-        if (canSendGroup) {
+        val device = TelinkLightApplication.getApp().connectDevice
+        if (device != null) {
+            GlobalScope.launch(Dispatchers.Main) {
+                showLoadingDialog(getString(R.string.configuring_switch))
+            }
+            val address = device.meshAddress
+            //val address = mDeviceInfo.meshAddress
+            //此处不能使用mes地址 应当使用0x00代表直连灯 所以用mes的时候断联后可以成功因为灯可能变为了直连灯
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    address, paramBytesGroup)
+                    address, paramBytes)
+
+            LogUtils.v("zcl配置传感器-------------${editText.text}-----------${byteToHex(paramBytes)}------------${byteToHex(paramBytesGroup)}")
+
+            Thread.sleep(500)
+            if (canSendGroup) {
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                        address, paramBytesGroup)
+            }
+            Thread.sleep(500)
+        } else {
+            ToastUtils.showLong(getString(R.string.connect_fail))
+            autoConnectSensor()
         }
-        Thread.sleep(500)
-    }
+}
 
     /**
      * byte数组转hex

@@ -186,12 +186,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     GlobalScope.launch(Dispatchers.Main) {
+                        ToastUtils.showLong(getString(R.string.connecting_tip))
                         retryConnectCount = 0
                         autoConnect()
                     }
                 } else
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
+
                             canBeRefresh = true
                             openOrClose(currentLight!!)
 

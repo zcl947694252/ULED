@@ -72,8 +72,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private var disposableScan: Disposable? = null
     private var disposableTimerResfresh: Disposable? = null
-    private var disposableTimerExit: Disposable? = null
-    private val mRxPermission: RxPermissions? = null
     private var scanningList: ArrayList<DeviceInfo>? = null
     private val deviceData: MutableList<DbLight> = mutableListOf()
     private var disposableGroupTimer: Disposable? = null
@@ -148,7 +146,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
             ToastUtils.showLong(getString(R.string.grouping_success_tip))
-            setDeviceTypeDataStopBlink(deviceType)
+            setDeviceTypeDataStopBlink(deviceType,false)
             finish()
         }
 
@@ -165,7 +163,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 2)
         batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
-
 
         batch_four_group_recycle.layoutManager = GridLayoutManager(this, 2)
         batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
@@ -190,7 +187,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         swipe_refresh_ly.setColorSchemeColors(Color.BLACK, Color.GREEN, Color.RED, Color.YELLOW, Color.BLUE)
         //设置触发刷新的距离
         swipe_refresh_ly.setDistanceToTriggerSync(200)
-
 
         setAdapterAndSubscribleData()
         autoConnect()
@@ -943,7 +939,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("CheckResult")
     private fun setGroup(deviceType: Int) {
-        setDeviceTypeDataStopBlink(deviceType)
+        setDeviceTypeDataStopBlink(deviceType, false)
         disposableGroupTimer?.dispose()
         disposableGroupTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -955,24 +951,36 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         setGroupOneByOne(currentGroup!!, deviceType, 0)
     }
 
-    private fun setDeviceTypeDataStopBlink(deviceType: Int) {
+    private fun setDeviceTypeDataStopBlink(deviceType: Int, b: Boolean = true) {
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
+                if (b)
                 showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataLightAll.filter { it.isSelected }.size.toString()))
+                else
+                  showLoadingDialog(getString(R.string.please_wait))
                 for (light in deviceDataLightAll.filter { it.isSelected }) {
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(light.meshAddr, light.belongGroupId)
                 }
             }
             DeviceType.SMART_CURTAIN -> {
-                showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataCurtainAll.filter { it.isSelected }.size.toString()))
+                if (b)
+                    showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataCurtainAll.filter { it.isSelected }.size.toString()))
+                else
+                    showLoadingDialog(getString(R.string.please_wait))
+
                 for (curtain in deviceDataCurtainAll.filter { it.isSelected }) {//使用选中一个indices 出现java.lang.IndexOutOfBoundsException: Invalid index 0, size is 0
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(curtain.meshAddr, curtain.belongGroupId)
                 }
             }
             DeviceType.SMART_RELAY -> {
-                showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataRelayAll.filter { it.isSelected }.size.toString()))
+                if (b)
+                    showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataRelayAll.filter { it.isSelected }.size.toString()))
+                else
+                    showLoadingDialog(getString(R.string.please_wait))
+
+
                 for (relay in deviceDataRelayAll.filter { it.isSelected }) {
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(relay.meshAddr, relay.belongGroupId)
@@ -1617,7 +1625,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     override fun onBackPressed() {
         super.onBackPressed()
-        setDeviceTypeDataStopBlink(deviceType)
+        setDeviceTypeDataStopBlink(deviceType, false)
         checkNetworkAndSync(this)
         ToastUtils.showLong(getString(R.string.grouping_success_tip))
         finish()

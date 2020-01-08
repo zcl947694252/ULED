@@ -3,9 +3,10 @@ package com.dadoutek.uledtest.ble
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
@@ -55,19 +56,12 @@ object RxBleManager {
     @SuppressLint("CheckResult")
     private fun getRegionList(): MutableList<String> {
         var list = mutableListOf<String>()
-        RegionModel.getRegionName()?.subscribe({
-            if (it.errorCode==0){
-                  for (i in it.data) {
-                      LogUtils.v("zcl获取区域contromes名$i")
-                      list.add(i)
-                  }
-            LogUtils.v("zcl获取区域contromes名列表$list-------------$it")
-                  SharedPreferencesUtils.saveRegionNameList(list)
-            }else{
-                ToastUtils.showLong(it.message)
+        RegionModel.getRegionName().subscribe(object : NetworkObserver<Response<MutableList<String>>?>() {
+            override fun onNext(t: Response<MutableList<String>>) {
+                list = t.t
+                LogUtils.v("zcl获取区域contromes名列表-------------$t")
+                SharedPreferencesUtils.saveRegionNameList(list)
             }
-        }, {
-            LogUtils.v("zclzcl获取区域contromes--------$it")
         })
 
         return list

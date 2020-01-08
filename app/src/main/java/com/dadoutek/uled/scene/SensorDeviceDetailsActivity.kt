@@ -33,6 +33,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.HumanBodySensorActivity
@@ -508,10 +509,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             .compose(NetworkTransformer())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({
-                                                LogUtils.v("zcl-----删除服务器内传感器$it")
-                                                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                                            }, {})
+                                            .subscribe(object : NetworkObserver<String?>() {
+                                                override fun onNext(t: String) {
+                                                    LogUtils.v("zcl-----删除服务器内传感器$it")
+                                                    Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                                                }
+
+                                                override fun onError(e: Throwable) {
+                                                    super.onError(e)
+
+                                                }
+                                            })
 
                                     if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSensor.meshAddr)) {
                                         TelinkLightApplication.getApp().mesh.saveOrUpdate(this)

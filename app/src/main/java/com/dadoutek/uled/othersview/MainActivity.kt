@@ -53,6 +53,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -178,12 +179,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getRegionList() {
         val list = mutableListOf<String>()
-        RegionModel.get()?.subscribe({
-            for (i in it) {
-                i.controlMesh?.let { it1 -> list.add(it1) }
+        RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
+            override fun onNext(t: MutableList<RegionBean>) {
+                    for (i in t) {
+                        i.controlMesh?.let { it -> list.add(it) }
+                    }
+                    SharedPreferencesUtils.saveRegionNameList(list)
+
             }
-            SharedPreferencesUtils.saveRegionNameList(list)
-        }) {}
+        })
     }
 
 

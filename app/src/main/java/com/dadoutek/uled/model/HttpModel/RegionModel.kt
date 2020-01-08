@@ -7,7 +7,10 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.network.bean.TransferRegionBean
-import com.dadoutek.uled.region.bean.*
+import com.dadoutek.uled.region.bean.ParseCodeBean
+import com.dadoutek.uled.region.bean.RegionBean
+import com.dadoutek.uled.region.bean.ShareCodeBean
+import com.dadoutek.uled.region.bean.TransferBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -304,7 +307,7 @@ object RegionModel {
     /**
      * 查看各个区域controlmesname
      */
-    fun getRegionName(): Observable<RegionListBean>? {
+    fun getRegionName(): Observable<Response<MutableList<String>>> {
         //数据转换
         return NetworkFactory.getApi()
                 .regionNameList()
