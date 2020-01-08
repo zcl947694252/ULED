@@ -25,7 +25,7 @@ object PopUtil {
             return pop
         }
 
-        fun makeMWf(context: Context, res: Int): PopupWindow? {
+        fun makeMWf(context: Context, res: Int): PopupWindow {
             var popView = LayoutInflater.from(context).inflate(res, null)
             var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             pop.isFocusable = true // 设置PopupWindow可获得焦点
