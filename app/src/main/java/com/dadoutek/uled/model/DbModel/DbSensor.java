@@ -23,12 +23,12 @@ public class DbSensor implements Serializable {
     private int index;
     private Long belongGroupId;
     private String version;
+    public int rssi =1000;
 
-
-    @Generated(hash = 250565031)
+    @Generated(hash = 2029813700)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
-            String version) {
+            String version, int rssi) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -38,6 +38,7 @@ public class DbSensor implements Serializable {
         this.index = index;
         this.belongGroupId = belongGroupId;
         this.version = version;
+        this.rssi = rssi;
     }
     @Generated(hash = 295132781)
     public DbSensor() {
@@ -116,5 +117,11 @@ public class DbSensor implements Serializable {
                 ", belongGroupId=" + belongGroupId +
                 ", version='" + version + '\'' +
                 '}';
+    }
+    public int getRssi() {
+        return this.rssi;
+    }
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

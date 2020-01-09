@@ -100,7 +100,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             LeScanEvent.LE_SCAN_TIMEOUT -> {
                 progressBar_sensor.visibility = View.GONE
                 hideLoadingDialog()
-
             }
             LeScanEvent.LE_SCAN_COMPLETED -> {
                 progressBar_sensor.visibility = View.GONE
@@ -227,10 +226,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 }
             }
             R.id.spSwitchMode -> {
-                if (position == 0) {
-                    modeSwitchMode = MODE_SWITCH_MODE_MOMENT
+                modeSwitchMode = if (position == 0) {
+                    MODE_SWITCH_MODE_MOMENT
                 } else {
-                    modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
+                    MODE_SWITCH_MODE_GRADIENT
                 }
             }
             R.id.spDelayUnit -> {
@@ -276,7 +275,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else {
                     showLoadingDialog(getString(R.string.configuring_switch))
                     Thread {
-
                         val mode = getModeValue()
 
                         configPir(mSelectGroupAddr,
@@ -296,8 +294,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))
                                     hideLoadingDialog()
-                                    TelinkLightService.Instance().idleMode(true)
-                                    TelinkLightService.Instance().disconnect()
+                                    TelinkLightService.Instance()?.idleMode(true)
+                                    TelinkLightService.Instance()?.disconnect()
                                 })
                     }.start()
 
@@ -324,7 +322,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+mDeviceInfo!!.meshAddress
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

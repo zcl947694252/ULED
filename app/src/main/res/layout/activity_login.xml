@@ -195,6 +195,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 
 
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clThirdPartyLogin"
         android:layout_width="0dp"
@@ -249,16 +250,34 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <CheckBox
+    <RadioGroup
         android:id="@+id/login_isTeck"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginStart="144dp"
-        android:text="isTeck"
         app:layout_constraintBottom_toBottomOf="@+id/clThirdPartyLogin"
         app:layout_constraintStart_toStartOf="@+id/btn_login"
         app:layout_constraintTop_toTopOf="@+id/sms_password_login"
-        android:visibility="gone"
-        app:layout_constraintVertical_bias="0.465" />
+        android:visibility="visible"
+            android:orientation="horizontal"
+        app:layout_constraintVertical_bias="0.465" >
+        <RadioButton
+                android:id="@+id/login_Teck"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="dadoutek"/>
+        <RadioButton
+                android:id="@+id/login_rd"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="dadourd"/>
+        <RadioButton
+                android:id="@+id/login_smart"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="dadousmart"/>
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>

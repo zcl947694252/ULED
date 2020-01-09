@@ -9,7 +9,7 @@ package com.dadoutek.uled.region.bean;
  * 更新时间   $Date$
  * 更新描述   ${TODO}
  */
-public class TransferData {
+public class TransferBean {
         /**
          * expire : 86400
          * code : dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjowLCJsZXZlbCI6MH0.IqcdLPRgBj3BMy_piagIybESLTiqIe0-r531q8pOcSUsmartlight

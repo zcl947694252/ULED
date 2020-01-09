@@ -20,6 +20,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.NetWorkUtils
@@ -150,18 +151,25 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         .subscribeOn(Schedulers.io())
                         .compose(NetworkTransformer())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            hideLoadingDialog()
-                                dbUser.account =it
+                        .subscribe(object : NetworkObserver<String?>() {
+                            override fun onNext(t: String) {
+                                hideLoadingDialog()
+                                dbUser.account =t
+
                                 val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
                                 intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
                                 intent.putExtra("country_code",countryCode)
                                 intent.putExtra("phone", userName)
                                 intent.putExtra("account", dbUser.account)
                                 startActivity(intent)
-                        },{
-                            hideLoadingDialog()
-                            ToastUtils.showShort(it.localizedMessage)
+
+                            }
+
+                            override fun onError(e: Throwable) {
+                                super.onError(e)
+                                    hideLoadingDialog()
+                                    ToastUtils.showLong(e.localizedMessage)
+                            }
                         })
             }
         } else {
@@ -224,7 +232,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         override fun error(msg: String) {
             hideLoadingDialog()
             //("GetDataError:$msg")
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
 
     }
@@ -246,7 +254,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
             val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
             //("zcl**********************$phoneNum")
             if (StringUtils.isEmpty(phoneNum)) {
-                ToastUtils.showShort(R.string.phone_cannot_be_empty)
+                ToastUtils.showLong(R.string.phone_cannot_be_empty)
             } else {
                 showLoadingDialog(getString(R.string.get_code_ing))
                 SMSSDK.getVerificationCode(countryCode, phoneNum)

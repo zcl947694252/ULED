@@ -74,7 +74,7 @@ public class LightAdapter {
     public static final int AUTO_REFRESH_NOTIFICATION_DELAY = 2 * 1000;
     public static final int CHECK_OFFLINE_TIME = 10 * 1000;
 
-    public static final int MIN_SCAN_PERIOD = 7 * 1000;
+    public static final int MIN_SCAN_PERIOD = 9 * 1000;
 
     private static final int STATE_PENDING = 1;
     private static final int STATE_RUNNING = 2;
@@ -772,7 +772,7 @@ public class LightAdapter {
         if (mode == MODE_SCAN_MESH) {
 //            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
 
-            Log.v("zcl","lightAdapter 0nLeScan"+ meshName +"------------------"+ light.getMacAddress());
+            Log.v("zcl", "lightAdapter 0nLeScan" + meshName.toString() + "------------------" + light.getMacAddress());
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
             if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
                 return false;
@@ -784,9 +784,9 @@ public class LightAdapter {
             if (!Arrays.equals(meshName, meshName1))
                 return false;
             String mac = params.getString(Parameters.PARAM_AUTO_CONNECT_MAC);
-            if (!TextUtils.isEmpty(mac)){//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
+            if (!TextUtils.isEmpty(mac)) {//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
                 // 没有就连接扫到的第一个设备
-                return  mac.equals(light.getMacAddress());
+                return mac.equals(light.getMacAddress());
             } else {
                 int meshAddress = params.getInt(Parameters.PARAM_AUTO_CONNECT_MESH_ADDR);
                 return meshAddress == 0 || meshAddress == light.getMeshAddress();
@@ -971,7 +971,7 @@ public class LightAdapter {
                 return;
 
 //            synchronized (LightAdapter.this) {
-                if (mScannedLights.contains(device.getAddress()))
+            if (mScannedLights.contains(device.getAddress()))
                 return;
 //            }
 
@@ -1455,12 +1455,11 @@ public class LightAdapter {
             //只有当没有指定mac时，需要这样做。
             boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
 //            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
-            if ((!fastestMode) ) {
+            if ((!fastestMode)) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
                 }
             }
-
 
 
             int count = mScannedLights.size();

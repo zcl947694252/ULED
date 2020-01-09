@@ -485,7 +485,6 @@
         
     <string name="rename">Rename </string>
         
-    <string name="no_name">Unnamed </string>
         
     <string name="firmware_version">Firmware version: %1$s</string>
         
@@ -533,7 +532,6 @@
         Please unplug the USB cable on the switch before using the switch. If the switch does not have a USB interface,
         it is not necessary to perform the operation of unplugging the USB cable.</string>
     <string name="install_success">Successful installation</string>
-    <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
     <string name="sure_delete">Confirm deleting this scene？</string>
     <string name="w_bright">White Brightness:</string>
@@ -838,7 +836,7 @@
     <string name="QR_expired">The qr code is invalid, please regenerate it</string>
     <string name="unbind_network">Unbund network</string>
     <string name="more">More</string>
-    <string name="change_region">Make sure to switch to region </string>
+    <string name="change_region">Make sure to switch to region :</string>
     <string name="total_device">(%1$s devices in total)</string>
     <string name="share_person">Number of participants: %1$s per person</string>
     <string name="to_receive">To_receive</string>
@@ -882,7 +880,8 @@
     <string name="please_connect_normal_light">Please connect the  lights</string>
     <string name="please_connect_curtain">Please connect the curtain</string>
     <string name="scanning_timeout">Scan timeout</string>
-    <string name="reset_factory_success">Factory Settings restored successfully</string>
+    <string name="reset_factory_success">The factory has been restored successfully. The equipment light flashes within 3 seconds. Please try again if not</string>
+    <string name="reset_factory_fail">Factory Settings restored fail,please power-on to try again</string>
     <string name="please_read_carefully">Please read %1$s S carefully</string>
     <string name="please_sure_all_device_power_on">Please ensure all devices are  powered on (except sensor, switch)</string>
     <string name="reset_factory_all_device">This will restore factory Settings(except sensor, switch) to all powered on devices.</string>
@@ -907,7 +906,6 @@
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
     <string name="grouping_success_tip">After successful regrouping of devices, please save the scene related to the grouping device again</string>
-    <string name="no_scaned_device">The specified device was not scanned</string>
     <string name="timeout_period_is_empty">The timeout period is empty</string>
     <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
     <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
@@ -918,5 +916,31 @@
     <string name="delete_region_tip">Delete the area first restore the existing equipment in the area to factory.</string>
     <string name="switch_btn">Switch Button</string>
     <string name="no_have_bin">There is no bin file of this type</string>
+    <string name="device_name">Device:</string>
+    <string name="search_icon">&#xe63c;</string>
+    <string name="no_search_result">Sorry, there is no relevant content</string>
+    <string name="change_match_type">Try a different keyword</string>
+    <string name="physical_recovery">The physical recovery</string>
+    <string name="no_found_device">No additional devices were found nearby</string>
+    <string name="please">Whether to try</string>
+    <string name="begin_scan">Start scanning</string>
+    <string name="click_retry">Click retry</string>
+    <string name="frist_out_age">Connection successful, power off within %1$sS</string>
+    <string name="frist_power_on">Please power on after %1$s</string>
+    <string name="second_power_on">Please power on within %1$s seconds,waiting for the connection</string>
+    <string name="scan_retry">Re-Scan </string>
+    <string name="transfer_region">Transfer Region</string>
+    <string name="region_transfer_code_invalid">Area handover qr code is invalid</string>
+    <string name="transfer_region_code">Scan the qr code below to hand over your account</string>
+    <string name="see_region_qr">Transfer Code</string>
+    <string name="transfer_network_region">Transfer Area</string>
+    <string name="transfer_region_success">The area you handed over has been accepted</string>
+    <string name="make_code_fail">Failed to create qr code</string>
+    <string name="please_near_light">Please close to the light</string>
+    <string name="near_light_ok">I am near the light</string>
+    <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
+    <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
+    <string name="config_success">Configuration is successful</string>
+    <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
 
 </resources>

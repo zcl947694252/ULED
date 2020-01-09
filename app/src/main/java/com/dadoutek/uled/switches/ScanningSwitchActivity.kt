@@ -86,7 +86,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             if (!isSeachedDevice)
                 scanFail()
             else
-                ToastUtils.showShort(getString(R.string.connecting_tip))
+                ToastUtils.showLong(getString(R.string.connecting_tip))
         }
 
     }
@@ -116,7 +116,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             LogUtils.d("already started")
         } else {
             startAnimation()
-            val deviceTypes = mutableListOf<Int>(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+            val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
                     DeviceType.SCENE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH)
             mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
                     retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
@@ -152,6 +152,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         if (bestRSSIDevice != null) {
             val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
@@ -164,17 +165,17 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     }
                                     finish()
                                 } else {
-                                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                     finish()
                                 }
-
                                 closeAnimation()
                             }
                             ,
                             {
                                 showToast(getString(R.string.get_version_fail))
                                 closeAnimation()
-                                finish()
+                                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to "")
+                                //finish()
                             })
 
         }

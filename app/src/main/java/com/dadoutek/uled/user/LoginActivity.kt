@@ -23,7 +23,6 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -104,7 +103,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 var s = list[0]
                 edit_user_phone_or_email.setText(s)
                 edit_user_phone_or_email.post {
-                    edit_user_phone_or_email.setSelection(s.length)
+                    if (!TextUtils.isEmpty(s))
+                        edit_user_phone_or_email.setSelection(s.length)
                 }
                 SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
             }
@@ -146,12 +146,23 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
         }, {})
-
     }
 
     private fun initListener() {
-        login_isTeck.setOnCheckedChangeListener { _, isChecked ->
-            Constant.isTeck = isChecked
+        login_isTeck.setOnCheckedChangeListener { _, checkedId ->
+            if (Constant.isDebug) {//如果是debug则可以切换
+                when (checkedId) {
+                    R.id.login_smart -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 0)
+                    }
+                    R.id.login_Teck -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 1)
+                    }
+                    R.id.login_rd -> {
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 2)
+                    }
+                }
+            }
         }
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
@@ -165,6 +176,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initView() {
+        if (Constant.isDebug) {
+            login_isTeck.visibility = View.VISIBLE
+        } else {
+            login_isTeck.visibility = View.GONE
+        }
         initToolbar()
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
@@ -177,12 +193,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         val havePhone = info != null && info.isNotEmpty()
         if (havePhone) {
             val messge = info.split("-")
-            if (messge.size>1)
-            edit_user_phone_or_email!!.setText(messge[0])
+            if (messge.size > 1)
+                edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
-        } else{
+        } else {
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
         }
@@ -203,7 +219,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
             R.id.btn_register -> {
-               returnView()
+                returnView()
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
                 startActivityForResult(intent, 0)
@@ -439,18 +455,26 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     .compose(NetworkTransformer())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        val intent = Intent(this, EnterPasswordActivity::class.java)
-                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-                        intent.putExtra("phone", phone)
-                        returnView()
-                        startActivityForResult(intent, 0)
-                    },{
-                        ToastUtils.showShort(it.localizedMessage)
-                        returnView()
-                        if (getString(R.string.account_not_exist)==it.localizedMessage)
-                            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-                    })
+                    .subscribe(
+                            object : NetworkObserver<String>() {
+                                override fun onNext(t: String) {
+                                    if (TextUtils.isEmpty(t))
+                                        startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+                                    else {
+                                        val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
+                                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
+                                        intent.putExtra("phone", phone)
+                                        returnView()
+                                        startActivityForResult(intent, 0)
+                                    }
+                                }
+
+                                override fun onError(e: Throwable) {
+                                    super.onError(e)
+                                    returnView()
+
+                                }
+                            })
         } else {
             ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
         }
@@ -481,7 +505,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun transformView() {
-            startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
+        startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

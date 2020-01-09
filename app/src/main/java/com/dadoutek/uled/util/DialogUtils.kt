@@ -22,8 +22,8 @@ object DialogUtils {
     fun showNoBlePermissionDialog(context: Context, positiveCallback: () -> Unit, negativeCallback: () -> Unit) {
         AlertDialog.Builder(context)
                 .setMessage(R.string.require_permission_reason)
-                .setPositiveButton(android.R.string.ok, { _, _ -> positiveCallback.invoke() })
-                .setNegativeButton(R.string.exit, { _, _ -> negativeCallback.invoke() })
+                .setPositiveButton(android.R.string.ok) { _, _ -> positiveCallback.invoke() }
+                .setNegativeButton(R.string.exit) { _, _ -> negativeCallback.invoke() }
                 .show()
     }
 

@@ -18,10 +18,19 @@ import com.dadoutek.uled.model.DbModel.DbConnector
  * 更新描述
  */
 class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
+    private val bestRssi: Long = -70
+    private val normalRssi: Long = -80
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.batch_img_icon)
         val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)
+
+        val rssiIcon = helper.getView<ImageView>(R.id.batch_img_rssi)
+        when {
+            item?.rssi?:-1000>=bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_blue)
+            item?.rssi?:-1000 in normalRssi..bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_yellow)
+            else -> rssiIcon.setBackgroundResource(R.drawable.btn_rectangle_circle_red)
+        }
 
         helper.setText(R.id.batch_tv_device_name, item?.name)
 
@@ -41,7 +50,7 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-
+           // groupName.text ="==="+item?.rssi
             icon.setImageResource(R.drawable.icon_controller)
         }
     }

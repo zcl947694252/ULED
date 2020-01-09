@@ -68,7 +68,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
 
     private var localVersion: String? = null
-    private var light: DbConnector? = null
+    private var light: DbConnector? =null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
@@ -116,7 +116,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 },
                                 failedCallback = {
                                     (this).hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -145,7 +145,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -175,7 +175,14 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+
+                        val disposable = Commander.resetDevice(light!!.meshAddr)
+                                .subscribe(
+                                        {
+                                            LogUtils.v("zcl-----恢复出厂成功")
+                                        }, {
+                                    LogUtils.v("zcl-----恢复出厂失败")
+                                })
 
                         DBUtils.deleteConnector(light!!)
 
@@ -210,7 +217,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         val intent = Intent(this,
                 ConnectorGroupingActivity::class.java)
         if (light == null) {
-            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -291,7 +298,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (!currentShowPageGroup) {
             checkAndSaveName()
             isRenameState = false
-//            tvOta.setText(R.string.ota)
         } else {
             checkAndSaveNameGp()
         }
@@ -301,11 +307,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-//            editTitle.visibility=View.GONE
             relayName.visibility = View.VISIBLE
             relayName.text = light?.name
         } else {
-//            editTitle.visibility=View.GONE
             relayName.visibility = View.VISIBLE
             relayName.text = name
             light?.name = name
@@ -414,7 +418,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateConnector(light!!)
@@ -525,11 +529,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
-//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
@@ -591,7 +590,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbConnector
+        val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
+        if (get!=null)
+        this.light = get as DbConnector
+
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         // intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
@@ -602,7 +604,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 //        editTitle!!.setText(light?.name)
 //        editTitle!!.visibility=View.GONE
         relayName.visibility = View.VISIBLE
-        relayName.setText(light?.name)
+        relayName.text = light?.name ?: ""
 
 //        tvOta!!.setOnClickListener(this.clickListener)
         updateGroup.setOnClickListener(this.clickListener)

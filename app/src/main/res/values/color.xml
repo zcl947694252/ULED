@@ -36,7 +36,7 @@
     <color name="transparent">#00000000</color>
     <color name="app_bg_color">#3c3c52</color>
     <color name="blue_light">#6FD8FF</color>
-    <color name="gray_e">#f8f8f8</color>
+    <color name="gray_e">#ededed</color>
     <color name="gray_nine">#999999</color>
     <color name="gray_f8">#F8F8F8</color>
     <color name="blue_text">#18B4ED</color>

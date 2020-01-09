@@ -55,16 +55,18 @@ public class DbLight implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int rssi =1000;
 
 
     @Generated(hash = 2075223479)
     public DbLight() {
     }
 
-    @Generated(hash = 1395507821)
+    @Generated(hash = 1172693351)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
-            int productUUID, Long belongGroupId, int index, int color, int status) {
+            int productUUID, Long belongGroupId, int index, int color, int status,
+            int rssi) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -78,6 +80,7 @@ public class DbLight implements Serializable {
         this.index = index;
         this.color = color;
         this.status = status;
+        this.rssi = rssi;
     }
 
     public static long getSerialVersionUID() {
@@ -289,5 +292,13 @@ public class DbLight implements Serializable {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public int getRssi() {
+        return this.rssi;
+    }
+
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

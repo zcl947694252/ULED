@@ -36,25 +36,29 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.util.Event
-import com.telink.util.EventListener
+import com.telink.bluetooth.light.LightAdapter
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_window_curtains.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-    override fun performed(event: Event<String>?) {}
+class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var disposable: Disposable? = null
+    private var mConnectDeviceDisposable: Disposable? = null
     private var localVersion: String? = null
     private var curtain: DbCurtain? = null
     private var ctAdress: Int? = null
     private var curtainGroup: DbGroup? = null
     private var currentShowGroupSetPage = true
     private var mConnectDevice: DeviceInfo? = null
-    private var compositeDisposable = CompositeDisposable()
     private var commutationBoolean: Boolean = true
     private var slowBoolean: Boolean = true
     private var handBoolean: Boolean = true
@@ -163,7 +167,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtain!!.meshAddr, null)
+
+                        Commander.resetDevice(curtain!!.meshAddr)
+                                .subscribe(
+                                        {
+                                            LogUtils.v("zcl-----恢复出厂成功")
+                                        }, {
+                                    LogUtils.v("zcl-----恢复出厂失败")
+                                })
+
                         DBUtils.deleteCurtain(curtain!!)
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
@@ -197,7 +209,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
          DBUtils.lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id) {
-                ToastUtils.showShort(getString(R.string.author_region_warm))
+                ToastUtils.showLong(getString(R.string.author_region_warm))
             }else {
                 when (item?.itemId) {
                     R.id.toolbar_delete_group -> {
@@ -247,7 +259,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -285,7 +297,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                             },
                             failedCallback = {
                                 this.hideLoadingDialog()
-                                ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                             })
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
@@ -295,7 +307,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun updateGroup() {
         val intent = Intent(this, CurtainGroupingActivity::class.java)
         if (curtain==null){
-            ToastUtils.showShort(getString(R.string.please_connect_curtain))
+            ToastUtils.showLong(getString(R.string.please_connect_curtain))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -320,7 +332,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         curtain?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateCurtain(curtain!!)
@@ -558,16 +570,57 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                        if (isBoolean) {
-                            transformView()
-                        } else {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
-                        }
+                         disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
+                                .subscribe(
+                                        { s ->
+                                            hideLoadingDialog()
+                                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                curtain!!.version = s
+                                                isDirectConnectDevice()
+                                            } else
+                                                ToastUtils.showLong(getString(R.string.version_disabled))
+                                        }, { hideLoadingDialog() }
+                                )
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
                 })
+    }
+
+    private fun isDirectConnectDevice() {
+            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
+            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
+            if (isBoolean) {
+                transformView()
+            } else {
+                OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
+            }
+        } else {
+            showLoadingDialog(getString(R.string.please_wait))
+            TelinkLightService.Instance()?.idleMode(true)
+            mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMap {
+                        connect(curtain!!.meshAddr,macAddress = curtain!!.macAddr)
+                    }
+                    ?.subscribe(
+                            {
+                                hideLoadingDialog()
+                                if (isBoolean) {
+                                    transformView()
+                                } else {
+                                    OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
+                                }
+                            }
+                            ,
+                            {
+                                hideLoadingDialog()
+                                ToastUtils.showLong(R.string.connect_fail2)
+                                LogUtils.d(it)
+                            })
+        }
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -602,6 +655,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun transformView() {
+        mConnectDeviceDisposable?.dispose()
+        disposable?.dispose()
         val intent = Intent(this@WindowCurtainsActivity, OTAUpdateActivity::class.java)
         intent.putExtra(Constant.OTA_MAC, curtain?.macAddr)
         intent.putExtra(Constant.OTA_MES_Add, curtain?.meshAddr)
@@ -692,13 +747,29 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun onceReset() {
         if (type == Constant.TYPE_GROUP) {
             val opcode = Opcode.KICK_OUT
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, null)
+
+            Commander.resetDevice(curtain!!.meshAddr)
+                    .subscribe(
+                            {
+                                LogUtils.v("zcl-----恢复出厂成功")
+                            }, {
+                        LogUtils.v("zcl-----恢复出厂失败")
+                    })
+
             DBUtils.deleteGroupOnly(curtainGroup!!)
             Toast.makeText(this, R.string.successful_resumption, Toast.LENGTH_LONG).show()
             finish()
         } else {
             val opcode = Opcode.KICK_OUT
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, null)
+
+            Commander.resetDevice(curtain!!.meshAddr)
+                    .subscribe(
+                            {
+                                LogUtils.v("zcl-----恢复出厂成功")
+                            }, {
+                        LogUtils.v("zcl-----恢复出厂失败")
+                    })
+
             DBUtils.deleteCurtain(curtain!!)
             Toast.makeText(this, R.string.successful_resumption, Toast.LENGTH_LONG).show()
             finish()
@@ -878,6 +949,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
     override fun onDestroy() {
         super.onDestroy()
+        disposable?.dispose()
+        mConnectDeviceDisposable?.dispose()
         mDisposable.dispose()
     }
 }

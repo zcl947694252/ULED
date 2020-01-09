@@ -16,7 +16,7 @@ lottie_scale代表lottie所显示的视图缩放，屏幕密度为3的，那么l
         android:id="@+id/device_lottieAnimationView"
         android:layout_width="246dp"
         android:layout_height="246dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="110dp"
         android:layout_marginBottom="48dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/tv_tip"

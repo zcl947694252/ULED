@@ -94,6 +94,7 @@ class SettingActivity : BaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
         list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
+       // list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)
@@ -102,15 +103,17 @@ class SettingActivity : BaseActivity() {
         settingAdapter.bindToRecyclerView(recycleView_setting)
 
         settingAdapter.setOnItemClickListener { _, _, position ->
+
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     when (position) {
                         0 -> emptyTheCache()
                         1 -> checkNetworkAndSyncs(this)
                         2 -> showSureResetDialogByApp()
+                        3 -> showSureResetDialogByApp()
                     }
                 }
             }
@@ -262,7 +265,6 @@ class SettingActivity : BaseActivity() {
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun emptyTheCache() {
-
         isResetFactory = false
         setFirstePopAndShow(R.string.clear_one, R.string.clear_two, R.string.clear_one, isResetFactory)
     }
@@ -288,7 +290,7 @@ class SettingActivity : BaseActivity() {
                 CleanUtils.cleanExternalCache()
                 CleanUtils.cleanInternalFiles()
                 CleanUtils.cleanInternalCache()
-                ToastUtils.showShort(R.string.clean_tip)
+                ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
                 try {
@@ -357,7 +359,7 @@ class SettingActivity : BaseActivity() {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
                     resetAllLights()
                 } else {
-                    ToastUtils.showShort(R.string.device_not_connected)
+                    ToastUtils.showLong(R.string.device_not_connected)
                 }
             } else {
                 clearData()
@@ -400,7 +402,7 @@ class SettingActivity : BaseActivity() {
             }
         }
 
-        Commander.resetLights(meshAdre, {
+        Commander.resetAllDevices(meshAdre, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
             syncData()
             this@SettingActivity?.bnve?.currentItem = 0
@@ -429,13 +431,17 @@ class SettingActivity : BaseActivity() {
 
             override fun error(msg: String) {
                 hideLoadingDialog()
-                ToastUtils.showShort(R.string.backup_failed)
+                ToastUtils.showLong(R.string.backup_failed)
             }
 
             override fun start() {}
         })
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
+    }
 }
 
 

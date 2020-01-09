@@ -218,7 +218,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun send_verification() {
         if (StringUtils.isEmpty(phone)) {
-            ToastUtils.showShort(R.string.phone_cannot_be_empty)
+            ToastUtils.showLong(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
             SMSSDK.getVerificationCode(countryCode, phone)
@@ -262,7 +262,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         }
         override fun error(msg: String) {
             hideLoadingDialog()
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
     }
 

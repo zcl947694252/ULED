@@ -52,13 +52,13 @@ public class DbCurtain implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int connectionStatus = 1;//链接状态
+    public int rssi =1000;
 
-
-    @Generated(hash = 333790539)
+    @Generated(hash = 1892218322)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr,
             String macAddr, int productUUID, int status, boolean inverse,
             boolean closePull, int speed, boolean closeSlowStart, int index,
-            Long belongGroupId, String groupName) {
+            Long belongGroupId, String groupName, int rssi) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -73,6 +73,7 @@ public class DbCurtain implements Serializable {
         this.index = index;
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
+        this.rssi = rssi;
     }
     @Generated(hash = 303143706)
     public DbCurtain() {
@@ -261,5 +262,11 @@ public class DbCurtain implements Serializable {
                 ", icon=" + icon +
                 ", connectionStatus=" + connectionStatus +
                 '}';
+    }
+    public int getRssi() {
+        return this.rssi;
+    }
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

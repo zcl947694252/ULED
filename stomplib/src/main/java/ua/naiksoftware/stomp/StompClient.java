@@ -122,7 +122,7 @@ public class StompClient {
                                     .subscribe(() -> {
 //                                        Log.d(TAG, "Publish open");
                                         lifecyclePublishSubject.onNext(lifecycleEvent);
-                                    });
+                                    },throwable -> {});
                             break;
 
                         case CLOSED:
@@ -146,7 +146,7 @@ public class StompClient {
                 .subscribe(stompMessage -> {
                     getConnectionStream().onNext(true);
                 }, throwable -> {
-                    Log.e("zcl","zcl******"+throwable.getLocalizedMessage()+"================"+throwable.getStackTrace());
+                   // Log.e("zcl","zcl** stomp****"+throwable.getLocalizedMessage()+"================"+throwable.getStackTrace());
                 });
 
     }

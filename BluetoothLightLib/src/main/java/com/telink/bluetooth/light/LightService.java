@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.TelinkLog;
@@ -189,6 +188,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      * service.sendCommandNoResponse((byte) 0xD0, 0xFFFF, new byte[]{0x01, 0x00, 0x00});
      * }
      * </pre>
+     *
      * @param opcode  操作码
      * @param address 设备的地址
      * @param params  参数
@@ -220,7 +220,6 @@ public abstract class LightService extends Service implements LightAdapter.Callb
     }
 
     public void autoRefreshNotify(boolean enable, Parameters params) {
-
         if (this.mAdapter == null)
             return;
 
@@ -423,7 +422,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);
 
-        TelinkLog.d("onLeScanResult"+deviceInfo.macAddress+"----"+deviceInfo.rssi);
+        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----" + deviceInfo.rssi);
         return true;
     }
 
@@ -448,6 +447,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.macAddress = light.getMacAddress();
             deviceInfo.progress = controller.getOtaProgress();
             deviceInfo.status = newStatus;
+            deviceInfo.rssi = light.getRssi();
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
@@ -461,6 +461,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.meshUUID = light.getMeshUUID();
             deviceInfo.productUUID = light.getProductUUID();
             deviceInfo.status = newStatus;
+            deviceInfo.rssi = light.getRssi();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);

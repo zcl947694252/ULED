@@ -36,7 +36,7 @@
         android:id="@+id/tv_device_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_name"
+        android:text="@string/device_name"
         android:textColor="@color/black_three"
         android:textSize="17sp"
         android:layout_marginTop="4dp"

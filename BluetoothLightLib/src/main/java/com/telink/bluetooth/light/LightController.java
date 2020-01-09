@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;
@@ -208,10 +207,10 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         byte[] plaintext = new byte[16];
-
-        for (int i = 0; i < 16; i++) {
-            plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
-        }
+        if (meshName != null && password != null)
+            for (int i = 0; i < 16; i++) {
+                plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
+            }
 
         byte[] randm = this.generateRandom(this.loginRandm);
         byte[] sk = new byte[16];
@@ -701,7 +700,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.COMMAND);
 
         Command command = Command.newInstance();
-        if (command!=null){
+        if (command != null) {
             command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE : Command.CommandType.WRITE;
             command.data = data;
             command.serviceUUID = serviceUUID;
@@ -960,10 +959,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
 //        for(int i=0;i<data.length;i++){
 //            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
 //        }
-
         System.arraycopy(data, 0, nonce, 3, 5);
-        byte[] result = AES.decrypt(this.sessionKey, nonce, data);
-
+        byte[] result;
+        if (nonce != null && sessionKey != null && sessionKey.length > 0 && nonce.length > 0 && data.length > 0) {
+            result = AES.decrypt(this.sessionKey, nonce, data);
+        } else {
+            result = new byte[0];
+        }
         TelinkLog.d("Notify Data --> " + Arrays.bytesToHexString(result, ","));
 
         this.onDeviceAddressNotify(data, tag);
@@ -1468,7 +1470,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         private int progress;
 
         public void set(byte[] data) {
-            if(data!=null){
+            if (data != null) {
                 this.clear();
 
                 this.data = data;
@@ -1535,7 +1537,6 @@ public final class LightController extends EventBus<Integer> implements LightPer
             }
 
             System.arraycopy(this.data, index * size, packet, 2, packetSize - 4);
-
 
             this.fillIndex(packet, index);
             int crc = this.crc16(packet);

@@ -1,13 +1,8 @@
 package com.dadoutek.uled.util;
 
-import android.content.Context;
-
-import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.DbModel.DbUser;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +68,7 @@ public class SharedPreferencesUtils {
 
     //true表示处于开发者模式，false标书用户模式
     public static void setDeveloperModel(boolean model) {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.Companion.getApp(),
-                Constant.IS_DEVELOPER_MODE, model);
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.Companion.getApp(), Constant.IS_DEVELOPER_MODE, model);
     }
 
     //开关状态是否是所有组
@@ -116,4 +110,17 @@ public class SharedPreferencesUtils {
     }
 
 
+    public static void saveRegionNameList( List<String> list) {
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
+                Constant.REGION_LIST, list);
+    }
+
+    public static List<String> getRegionNameList() {
+        List list = (List<String>)SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
+                Constant.REGION_LIST);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
 }

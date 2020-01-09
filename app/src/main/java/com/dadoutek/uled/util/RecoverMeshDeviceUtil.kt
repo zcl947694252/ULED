@@ -54,14 +54,18 @@ object RecoverMeshDeviceUtil {
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder()
-                .setScanMode(SCAN_MODE_LOW_LATENCY)
+               // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
 
 
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
-                .map { parseData(it) }          //解析数据
+                .map {
+                    val data = parseData(it)
+                    LogUtils.v("zcl=====$data")
+                    data
+                }          //解析数据
                 .filter {
                     addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
                 }
@@ -75,7 +79,6 @@ object RecoverMeshDeviceUtil {
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-
     }
 
 
@@ -102,17 +105,17 @@ object RecoverMeshDeviceUtil {
                 }
                 .filter {
                     var isFilter: Boolean
-                    if (it.hasConflict) {   //有冲突不过滤掉
-                        isFilter = true
+                    isFilter = if (it.hasConflict) {   //有冲突不过滤掉
+                        true
                     } else {  //无冲突就保存数据
-                        isFilter = addDevicesToDb(it.deviceInfo)       //addDevicesToDb返回False代表已有此数据，把isFilter设成false，过滤掉
+                        addDevicesToDb(it.deviceInfo)       //addDevicesToDb返回False代表已有此数据，把isFilter设成false，过滤掉
                     }
                     //如果之前已经发送过的结果，就不发送了。
                     if (scannedDeviceHm.containsKey(it.deviceInfo.macAddress)) {
                         isFilter = false
 //                        LogUtils.d("sent result , filtered it. ")
                     } else {
-                        scannedDeviceHm.put(it.deviceInfo.macAddress, it.deviceInfo)
+                        scannedDeviceHm[it.deviceInfo.macAddress] = it.deviceInfo
                     }
 
                     //false是过滤，true是不过滤
@@ -177,21 +180,20 @@ object RecoverMeshDeviceUtil {
                     dbLightNew.color = 0
                     dbLightNew.colorTemperature = 0
                     dbLightNew.meshAddr = deviceInfo.meshAddress
-                    dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.device_name)+dbLightNew.meshAddr
                     dbLightNew.macAddr = deviceInfo.macAddress
                     DBUtils.saveLight(dbLightNew, false)
                     LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
                 }
                 DeviceType.SMART_RELAY -> {
                     val relay = DbConnector()
-//                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
                     relay.productUUID = productUUID
                     relay.connectionStatus = 0
                     relay.updateIcon()
                     relay.belongGroupId = DBUtils.groupNull?.id
                     relay.color = 0
                     relay.meshAddr = deviceInfo.meshAddress
-                    relay.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    relay.name = TelinkLightApplication.getApp().getString(R.string.device_name)+relay.meshAddr
                     relay.macAddr = deviceInfo.macAddress
                     DBUtils.saveConnector(relay, false)
                     LogUtils.d("create = $relay  " + relay.meshAddr)
@@ -199,21 +201,18 @@ object RecoverMeshDeviceUtil {
 
                 DeviceType.SMART_CURTAIN -> {
                     val curtain = DbCurtain()
-//                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
                     curtain.productUUID = productUUID
                     curtain.connectionStatus = 0
                     curtain.updateIcon()
                     curtain.belongGroupId = DBUtils.groupNull?.id
                     curtain.meshAddr = deviceInfo.meshAddress
-                    curtain.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    curtain.name = TelinkLightApplication.getApp().getString(R.string.device_name)+curtain.meshAddr
                     curtain.macAddr = deviceInfo.macAddress
                     DBUtils.saveCurtain(curtain, false)
                     LogUtils.d("create = $curtain  " + curtain.meshAddr)
                 }
-
             /*    DeviceType.NIGHT_LIGHT -> {
                     val sensor = DbSensor()
-//                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
                     sensor.productUUID = productUUID
                     sensor.belongGroupId = DBUtils.groupNull?.id
                     sensor.meshAddr = deviceInfo.meshAddress
@@ -242,13 +241,10 @@ object RecoverMeshDeviceUtil {
         var position: Int
         var type: Int
         var meshName: ByteArray? = null
-
         var rspData = 0
 
         while (packetPosition < length) {
-
             packetSize = scanRecord[packetPosition].toInt()
-
             if (packetSize == 0)
                 break
 
@@ -257,18 +253,13 @@ object RecoverMeshDeviceUtil {
             position++
 
             if (type == 0x09) {
-
                 packetContentLength = packetSize - 1
-
-//                if (packetContentLength > 16 || packetContentLength <= 0)
-//                    return null
-
                 meshName = ByteArray(16)
+                //scanRecord要复制的源数据 postion要复制的源数据的开始位置 meshanme 代表要被复制进去的数组
+                //destPos代表被复制数据开始的位置 packetContentLength代表要复制的长度
                 System.arraycopy(scanRecord, position, meshName, 0, packetContentLength)
             } else if (type == 0xFF) {
-
                 rspData++
-
                 if (rspData == 2) {
 
                     val vendorId = ((scanRecord[position++].toInt() and 0xFF) shl 8) + (scanRecord[position++].toInt() and 0xFF)
@@ -281,21 +272,12 @@ object RecoverMeshDeviceUtil {
                     val status = scanRecord[position++].toInt() and 0xFF
                     val meshAddress = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position].toInt() and 0xFF shl 8)
 
-
                     val deviceInfo = DeviceInfo()
                     deviceInfo.rssi =scanResult.rssi
-//                    deviceInfo.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
                     deviceInfo.meshAddress = meshAddress
-//                    light.textColor = TelinkLightApplication.getApp().getColor(
-//                            R.color.black)
-//                    deviceInfo.belongGroupId = allLightId
                     deviceInfo.macAddress = scanResult.bleDevice.macAddress
                     deviceInfo.meshUUID = meshUUID
                     deviceInfo.productUUID = productUUID
-//                    LogUtils.e("zcl---------productUUID----$productUUID")
-
-//                    light.isSelected = false
-//                    LogUtils.d("deviceInfo = $deviceInfo")
                     return deviceInfo
                 }
             }

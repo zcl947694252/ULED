@@ -6,6 +6,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.tellink.TelinkLightApplication
 
 /**
  * 创建者     zcl
@@ -31,6 +32,14 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
             deviceName.visibility = View.GONE
         else
             deviceName.visibility = View.VISIBLE
+
+        if (TelinkLightApplication.getApp().connectDevice!=null&&TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+            deviceName.setTextColor(mContext.resources.getColor(R.color.primary))
+            groupName.setTextColor(mContext.resources.getColor(R.color.primary))
+        } else {
+            deviceName.setTextColor(mContext.resources.getColor(R.color.black_three))
+            groupName.setTextColor(mContext.resources.getColor(R.color.black))
+        }
 
 
         helper.setText(R.id.device_detail_item_device_name,dbLight.name)

@@ -28,7 +28,7 @@ public class DbSwitch implements Serializable {
     private String controlSceneId;
     private int index;
     private Long belongGroupId;
-
+    public int rssi =1000;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -49,10 +49,9 @@ public class DbSwitch implements Serializable {
     @Transient
     public int connectionStatus = 1;//链接状态
 
-    @Generated(hash = 811812800)
-    public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
-                    String macAddr, int productUUID, String controlSceneId, int index,
-                    Long belongGroupId) {
+    @Generated(hash = 1494781249)
+    public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr, String macAddr,
+            int productUUID, String controlSceneId, int index, Long belongGroupId, int rssi) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -62,6 +61,7 @@ public class DbSwitch implements Serializable {
         this.controlSceneId = controlSceneId;
         this.index = index;
         this.belongGroupId = belongGroupId;
+        this.rssi = rssi;
     }
     @Generated(hash = 1179115222)
     public DbSwitch() {
@@ -198,5 +198,11 @@ public class DbSwitch implements Serializable {
                 ", icon=" + icon +
                 ", connectionStatus=" + connectionStatus +
                 '}';
+    }
+    public int getRssi() {
+        return this.rssi;
+    }
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

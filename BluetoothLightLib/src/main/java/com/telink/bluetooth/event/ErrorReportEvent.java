@@ -8,7 +8,6 @@ import com.telink.bluetooth.light.ErrorReportInfo;
 
 /**
  * Error report
- *
  */
 public class ErrorReportEvent extends DataEvent<ErrorReportInfo> {
 
@@ -48,7 +47,6 @@ public class ErrorReportEvent extends DataEvent<ErrorReportInfo> {
     public static final int ERROR_SCAN_NO_TARGET = 3;
 
 
-
     // state_connect
 
     /**
@@ -60,7 +58,6 @@ public class ErrorReportEvent extends DataEvent<ErrorReportInfo> {
      * 未读到att表
      */
     public static final int ERROR_CONNECT_ATT = 2;
-
 
 
     // state_login
@@ -80,8 +77,6 @@ public class ErrorReportEvent extends DataEvent<ErrorReportInfo> {
      * value check失败： 密码错误
      */
     public static final int ERROR_LOGIN_VALUE_CHECK = 3;
-
-
 
 
     public ErrorReportEvent(Object sender, String type, ErrorReportInfo args) {
