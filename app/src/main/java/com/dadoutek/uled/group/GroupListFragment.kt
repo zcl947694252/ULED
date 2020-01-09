@@ -3,7 +3,6 @@ package com.dadoutek.uled.group
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,6 +15,7 @@ import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,6 +55,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
+    private lateinit var viewContent: View
     private lateinit var popMain: PopupWindow
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
@@ -174,16 +175,17 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun makeDialog() {
-        val view = View.inflate(context, R.layout.pop_recycleview, null)
-        val pop = PopUtil.makeMWf(context!!, R.layout.pop_recycleview)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapterType
-        adapterType?.bindToRecyclerView(recyclerView)
+//        val view = View.inflate(context, R.layout.pop_recycleview, null)
+//        val pop = PopUtil.makeMWf(context!!, R.layout.pop_recycleview)
 
          popMain = PopUtil.makeMWf(context!!, R.layout.dialog_add_group)
 
         val dialogView = View.inflate(context, R.layout.dialog_add_group, null)
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = adapterType
+        adapterType?.bindToRecyclerView(recyclerView)
+
         val dialogGroupTypeArrow = dialogView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
         val dialogGroupCancel = dialogView.findViewById<TextView>(R.id.dialog_group_cancel)
         val dialogGroupOk = dialogView.findViewById<TextView>(R.id.dialog_group_ok)
@@ -220,14 +222,14 @@ class GroupListFragment : BaseFragment() {
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
 
-        val view = inflater.inflate(R.layout.fragment_group_list, null)
+         viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
-        viewPager = view.findViewById(R.id.list_groups)
+        viewPager = viewContent.findViewById(R.id.list_groups)
 
-        toolbar = view.findViewById(R.id.toolbar)
+        toolbar = viewContent.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
 
-        allLightText = view.findViewById(R.id.textView6)
+        allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
@@ -249,18 +251,18 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
-        btnOn = view.findViewById(R.id.btn_on)
-        btnOff = view.findViewById(R.id.btn_off)
-        btnSet = view.findViewById(R.id.btn_set)
-        onText = view.findViewById(R.id.tv_on)
-        offText = view.findViewById(R.id.tv_off)
+        btnOn = viewContent.findViewById(R.id.btn_on)
+        btnOff = viewContent.findViewById(R.id.btn_off)
+        btnSet = viewContent.findViewById(R.id.btn_set)
+        onText = viewContent.findViewById(R.id.tv_on)
+        offText = viewContent.findViewById(R.id.tv_off)
 
 
-        totalNum = view.findViewById(R.id.total_num)
+        totalNum = viewContent.findViewById(R.id.total_num)
 
-        install_device = view.findViewById(R.id.install_device)
-        create_group = view.findViewById(R.id.create_group)
-        create_scene = view.findViewById(R.id.create_scene)
+        install_device = viewContent.findViewById(R.id.install_device)
+        create_group = viewContent.findViewById(R.id.create_group)
+        create_scene = viewContent.findViewById(R.id.create_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
@@ -272,7 +274,7 @@ class GroupListFragment : BaseFragment() {
         btnDelete.setOnClickListener(onClick)
         allLightText?.setOnClickListener(onClick)
 
-        return view
+        return viewContent
     }
 
     /**
@@ -472,7 +474,7 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     //addNewGroup()
-                    popMain.showAtLocation(context)
+                    popMain.showAtLocation(viewContent,Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
