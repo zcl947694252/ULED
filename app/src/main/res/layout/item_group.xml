@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tv_group_name"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@color/white"
-    android:gravity="center"
-    android:text="kkkk"
-    android:textColor="@color/gray_3"
-    android:textSize="14sp" />
+        android:orientation="vertical"
+    android:gravity="center">
+    <TextView
+            android:id="@+id/tv_group_name"
+            android:layout_width="match_parent"
+            android:layout_height="49dp"
+            android:background="@color/gray_e"
+            android:gravity="center"
+            android:text="kkkk"
+            android:textColor="@color/gray_3"
+            android:textSize="14sp"/>
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray_d"/>
+</LinearLayout>

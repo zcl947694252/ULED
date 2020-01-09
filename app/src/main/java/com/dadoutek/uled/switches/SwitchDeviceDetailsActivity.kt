@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -522,7 +523,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
@@ -631,11 +633,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun goSearchSwitch() {
         installId = INSTALL_SWITCH
-<<<<<<< HEAD
-        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), INSTALL_SWITCH)
-=======
         showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId)
->>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
+
         stepOneText.visibility = View.GONE
         stepTwoText.visibility = View.GONE
         stepThreeText.visibility = View.GONE

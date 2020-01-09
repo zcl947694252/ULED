@@ -44,6 +44,7 @@ import java.util.*
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+    private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
     private var adaper: SceneRecycleListAdapter? = null
     private var toolbar: Toolbar? = null
@@ -116,15 +117,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
-        val view = inflater.inflate(R.layout.fragment_scene, null)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        no_scene = view.findViewById(R.id.no_scene)
-        add_scenes = view.findViewById(R.id.add_scenes)
+         viewContent = inflater.inflate(R.layout.fragment_scene, null)
+        recyclerView = viewContent.findViewById(R.id.recyclerView)
+        no_scene = viewContent.findViewById(R.id.no_scene)
+        add_scenes = viewContent.findViewById(R.id.add_scenes)
 
-        install_device = view.findViewById(R.id.install_device)
-        create_group = view.findViewById(R.id.create_group)
-        create_scene = view.findViewById(R.id.create_scene)
-        addNewScene = view.findViewById(R.id.add_new_scene)
+        install_device = viewContent.findViewById(R.id.install_device)
+        create_group = viewContent.findViewById(R.id.create_group)
+        create_scene = viewContent.findViewById(R.id.create_scene)
+        addNewScene = viewContent.findViewById(R.id.add_new_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
@@ -132,10 +133,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         add_scenes!!.setOnClickListener(this)
         addNewScene!!.setOnClickListener(this)
 
-        initToolBar(view)
+        initToolBar(viewContent)
         initData()
         initView()
-        return view
+        return viewContent
     }
 
     private val onClick = View.OnClickListener {
@@ -148,7 +149,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {

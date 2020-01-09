@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#dddd"
-
+        android:background="#7f7F7F7F"
         android:gravity="center">
 
     <LinearLayout
+            android:id="@+id/dialog_group_ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginStart="38dp"
             android:layout_marginEnd="38dp"
-            android:layout_marginBottom="135dp"
+            android:background="@drawable/rect_white"
             android:orientation="vertical"
-            android:background="@drawable/rect_r15_w"
             android:paddingStart="@dimen/dp_10"
             android:paddingEnd="@dimen/dp_10">
 
         <TextView
+                android:id="@+id/dialog_group_name_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="9dp"
@@ -32,6 +33,8 @@
                 android:id="@+id/dialog_group_name"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_45"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
                 android:background="@drawable/icon_long_rect"
                 android:hint="@string/input_groupAdress" />
 
@@ -49,8 +52,8 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
                 android:background="@drawable/icon_long_rect"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
             <TextView
@@ -59,7 +62,7 @@
                     android:layout_height="@dimen/dp_45"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="@string/no_type" />
+                    android:text="@string/not_type" />
 
             <ImageView
                     android:id="@+id/dialog_group_type_arrow"
@@ -87,7 +90,7 @@
             <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_e" />
+                    android:background="@color/gray_d" />
 
             <TextView
                     android:id="@+id/dialog_group_ok"
@@ -105,9 +108,12 @@
             android:id="@+id/pop_recycle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/dialog_group_ly"
             android:layout_marginStart="48dp"
+            android:layout_marginTop="-89dp"
             android:layout_marginEnd="48dp"
-            android:layout_marginBottom="100dp">
+            android:background="#8e8e8e8e"
+            android:visibility="gone">
 
     </android.support.v7.widget.RecyclerView>
 

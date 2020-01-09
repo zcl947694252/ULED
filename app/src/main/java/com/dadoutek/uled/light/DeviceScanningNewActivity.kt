@@ -901,7 +901,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         add_group_layout.setOnClickListener {
             //全彩灯以及普通等扫描完毕添加组
             isGuide = false
-            addNewGroup()
+           // addNewGroup()
+            popMain.showAtLocation(window.decorView,Gravity.CENTER,0,0)
         }
         btn_stop_scan?.setOnClickListener(onClick)//停止扫描
 

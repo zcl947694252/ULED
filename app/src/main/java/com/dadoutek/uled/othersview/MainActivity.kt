@@ -336,18 +336,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
-<<<<<<< HEAD
 
-        val title = view.findViewById<TextView>(R.id.textView5)
-        if (position==INSTALL_NORMAL_LIGHT){
-            title.visibility =  View.GONE
-            install_tip_question.visibility =  View.GONE
-        }else{
-            title.visibility =  View.VISIBLE
-            install_tip_question.visibility =  View.VISIBLE
-        }
-
-=======
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  GONE
@@ -356,7 +345,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             title.visibility =  VISIBLE
             install_tip_question.visibility =  VISIBLE
         }
->>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
+
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = AlertDialog.Builder(this).setView(view).create()
@@ -450,7 +439,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-<<<<<<< HEAD
+
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
@@ -460,17 +449,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-=======
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
-            }
-            INSTALL_CURTAIN -> {
-                installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
-            }
-            INSTALL_SWITCH -> {
-                installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
->>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
                 stepOneText.visibility = GONE
                 stepTwoText.visibility = GONE
                 stepThreeText.visibility = GONE
@@ -480,19 +458,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-=======
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
-            }
-            INSTALL_CONNECTOR -> {
-                installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
->>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
             }
         }
     }

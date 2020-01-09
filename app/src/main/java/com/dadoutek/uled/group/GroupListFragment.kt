@@ -12,15 +12,16 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -41,7 +42,10 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.GuideUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -56,7 +60,6 @@ import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
     private lateinit var viewContent: View
-    private lateinit var popMain: PopupWindow
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -100,14 +103,19 @@ class GroupListFragment : BaseFragment() {
     private var fragmentPosition = 0
     private var delete: String? = null
     private var deleteComplete: String? = null
-    var adapterType: TypeListAdapter? = null
-    var list: MutableList<String>? = null
+
+/*    private lateinit var dialog: Dialog
+    private var adapterType: TypeListAdapter? = null
+    private var list: MutableList<String>? = null
+    private var groupType: Long = 0L
+    private var dialogGroupName: TextView? = null
+    private var dialogGroupType: TextView? = null
+    private lateinit var popMain: PopupWindow*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
 
-        list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
-        adapterType = TypeListAdapter(R.layout.item_group, list!!)
 
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
@@ -170,41 +178,85 @@ class GroupListFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
-        makeDialog()
+        // makeDialog()
         return view
     }
 
-    private fun makeDialog() {
-//        val view = View.inflate(context, R.layout.pop_recycleview, null)
-//        val pop = PopUtil.makeMWf(context!!, R.layout.pop_recycleview)
-
-         popMain = PopUtil.makeMWf(context!!, R.layout.dialog_add_group)
-
-        val dialogView = View.inflate(context, R.layout.dialog_add_group, null)
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapterType
-        adapterType?.bindToRecyclerView(recyclerView)
-
-        val dialogGroupTypeArrow = dialogView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
-        val dialogGroupCancel = dialogView.findViewById<TextView>(R.id.dialog_group_cancel)
-        val dialogGroupOk = dialogView.findViewById<TextView>(R.id.dialog_group_ok)
-        val dialogGroupType = dialogView.findViewById<TextView>(R.id.dialog_group_type)
-
-
-        adapterType?.setOnItemClickListener { _, _, position ->
-            dialogGroupType.text = list!![position]
-        }
-
-        dialogGroupTypeArrow.setOnClickListener {
-            pop?.showAsDropDown(dialogGroupType, 0, 0)
-        }
-        dialogGroupCancel.setOnClickListener { popMain?.dismiss() }
-        dialogGroupOk.setOnClickListener {
-            addNewGroup()
-            popMain?.dismiss() }
+    override fun refreshGroupData() {
+        refreshView()
     }
 
+    /*    private fun makeDialog() {
+            val popView = View.inflate(context, R.layout.dialog_add_group, null)
+            popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            popMain.isFocusable = true // 设置PopupWindow可获得焦点
+            popMain.isTouchable = true // 设置PopupWindow可触摸补充：
+            popMain.isOutsideTouchable = false
+
+            val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
+            recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            recyclerView.adapter = adapterType
+
+            adapterType?.bindToRecyclerView(recyclerView)
+
+            val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
+            val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
+            val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
+            dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
+            dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
+
+            dialogGroupTypeArrow.setOnClickListener {
+                if (recyclerView.visibility == View.GONE)
+                    recyclerView.visibility = View.VISIBLE
+                else
+                    recyclerView.visibility = View.GONE
+
+            }
+            dialogGroupType?.setOnClickListener {
+                if (recyclerView.visibility == View.GONE)
+                    recyclerView.visibility = View.VISIBLE
+                else
+                    recyclerView.visibility = View.GONE
+
+            }
+            dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
+            dialogGroupOk.setOnClickListener {
+                addNewTypeGroup()
+            }
+
+            adapterType?.setOnItemClickListener { _, _, position ->
+                dialogGroupType?.text = list!![position]
+                recyclerView.visibility = View.GONE
+                when(position){
+                    0-> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                    1-> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                    2-> groupType = Constant.DEVICE_TYPE_CURTAIN
+                    3-> groupType = Constant.DEVICE_TYPE_CONNECTOR
+                }
+            }
+            popMain.setOnDismissListener {
+                recyclerView.visibility = View.GONE
+                dialogGroupType?.text = getString(R.string.not_type)
+                dialogGroupName?.text = ""
+                groupType = 0
+            }
+        }
+
+        private fun addNewTypeGroup() {
+            // 获取输入框的内容
+            if (StringUtils.compileExChar(dialogGroupName?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                if (groupType == 0L) {
+                    ToastUtils.showLong(getString(R.string.select_type))
+                } else {
+                    //往DB里添加组数据
+                    DBUtils.addNewGroupWithType(dialogGroupName?.text.toString().trim { it <= ' ' }, groupType)
+                    refreshView()
+                    PopUtil.dismiss(popMain)
+                }
+            }
+        }*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initDeviceTypeNavigation()
@@ -222,7 +274,7 @@ class GroupListFragment : BaseFragment() {
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
 
-         viewContent = inflater.inflate(R.layout.fragment_group_list, null)
+        viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
         viewPager = viewContent.findViewById(R.id.list_groups)
 
@@ -474,7 +526,7 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     //addNewGroup()
-                    popMain.showAtLocation(viewContent,Gravity.CENTER,0,0)
+                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {

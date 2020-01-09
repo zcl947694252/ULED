@@ -127,7 +127,7 @@ object RxBleManager {
                     var isMyDevice = isMyDevice(it.bleDevice.name)
                     LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
-                    version!=""&&!isMyDevice&&false
+                    version!=""&&!isMyDevice
                 }
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())

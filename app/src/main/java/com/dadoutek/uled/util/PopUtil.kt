@@ -15,7 +15,7 @@ fun filesToMultipartBodyParts(files: List<File>): List<MultipartBody.Part>? {
 一部分是静态方法的情况 : 将方法用 companion object { } 包裹即可
  */
 object PopUtil {
-        fun makeMW(context: Context, res: Int,isClick:Boolean): PopupWindow? {
+        fun makeMW(context: Context, res: Int,isClick:Boolean): PopupWindow {
             var popView = LayoutInflater.from(context).inflate(res, null)
             var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             pop!!.isOutsideTouchable = isClick

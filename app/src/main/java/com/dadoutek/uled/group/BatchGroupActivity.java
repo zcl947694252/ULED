@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -574,7 +575,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         builder.setPositiveButton(R.string.create_now, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                addNewGroup();
+//                addNewGroup();
+                popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
             }
         });
         builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
@@ -716,7 +718,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     @OnClick(R.id.add_group_layout)
     public void onViewClicked() {
         isGuide = false;
-        addNewGroup();
+        //addNewGroup();
+        popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
     }
 
     private void addNewGroup() {
@@ -891,7 +894,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP3_GUIDE_CREATE_GROUP())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
                         isGuide = true;
-                        addNewGroup();
+                        //addNewGroup();
+                        popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
                     }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
                     .show();
         }
@@ -1024,7 +1028,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         this.updateList = new ArrayList<>();
 
         add_relativeLayout.setOnClickListener(v -> {
-            addNewGroup();
+            //addNewGroup();
+            popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
         });
 
         startGrouping();

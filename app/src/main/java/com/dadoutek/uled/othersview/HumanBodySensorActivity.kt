@@ -1050,13 +1050,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             val address = device.meshAddress
             //val address = mDeviceInfo.meshAddress
             //此处不能使用mes地址 应当使用0x00代表直连灯 所以用mes的时候断联后可以成功因为灯可能变为了直连灯
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-<<<<<<< HEAD
-                    mDeviceInfo?.meshAddress, paramBytesGroup)
-        }
-=======
-                    0x00, paramBytes)
->>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, 0x00, paramBytes)
+
 
             LogUtils.v("zcl配置传感器-------------${editText.text}-----------${byteToHex(paramBytes)}------------${byteToHex(paramBytesGroup)}")
 

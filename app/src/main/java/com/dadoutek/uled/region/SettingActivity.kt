@@ -279,6 +279,12 @@ class SettingActivity : BaseActivity() {
             ToastUtils.showLong(R.string.data_empty)
             return
         }
+/*
+        val disposable = RegionModel.clearRegion()?.subscribe({
+
+        }, {
+
+        })*/
 
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {

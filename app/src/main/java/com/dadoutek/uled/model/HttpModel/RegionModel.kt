@@ -73,6 +73,14 @@ object RegionModel {
     }
 
 
+    fun clearRegion(): Observable<String>? {
+        return NetworkFactory.getApi()
+                .clearRegion(DBUtils.lastUser?.last_region_id!!.toInt())
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
     fun getAuthorizerList(): Observable<MutableList<RegionAuthorizeBean>>? {
         return NetworkFactory.getApi()
                 .gotAuthorizerList()

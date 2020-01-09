@@ -21,6 +21,7 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#c9c9c9</color>
+    <color name="divider2">#999</color>
     <color name="background_color">#f6f6f6</color>
     <color name="mode_check_color">#80858C91</color>
     <color name="color_gray">#00000000</color>

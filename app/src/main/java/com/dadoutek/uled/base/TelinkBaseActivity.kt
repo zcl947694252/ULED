@@ -14,6 +14,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -29,6 +31,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -82,6 +85,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var disposableConnectTimer: Disposable? = null
     var isScanning = false
 
+    private lateinit var dialog: Dialog
+    private var adapterType: TypeListAdapter? = null
+    private var list: MutableList<String>? = null
+    private var groupType: Long = 0L
+    private var dialogGroupName: TextView? = null
+    private var dialogGroupType: TextView? = null
+    open lateinit var popMain: PopupWindow
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +100,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         enableConnectionStatusListener()    //尽早注册监听
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
+        makeDialog()
         initStompReceiver()
         initChangeRecevicer()
     }
@@ -123,6 +134,86 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    private fun makeDialog() {
+        dialog = Dialog(this@TelinkBaseActivity)
+        list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
+        adapterType = TypeListAdapter(R.layout.item_group, list!!)
+
+        val popView = View.inflate(this@TelinkBaseActivity, R.layout.dialog_add_group, null)
+        popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        popMain.isFocusable = true // 设置PopupWindow可获得焦点
+        popMain.isTouchable = true // 设置PopupWindow可触摸补充：
+        popMain.isOutsideTouchable = false
+
+        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(this@TelinkBaseActivity, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = adapterType
+
+        adapterType?.bindToRecyclerView(recyclerView)
+
+        val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
+        val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
+        val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
+        dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
+        dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
+
+        dialogGroupTypeArrow.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupType?.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
+        dialogGroupOk.setOnClickListener {
+            addNewTypeGroup()
+        }
+
+        adapterType?.setOnItemClickListener { _, _, position ->
+            dialogGroupType?.text = list!![position]
+            recyclerView.visibility = View.GONE
+            when(position){
+                0-> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1-> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2-> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3-> groupType = Constant.DEVICE_TYPE_CONNECTOR
+            }
+        }
+        popMain.setOnDismissListener {
+            recyclerView.visibility = View.GONE
+            dialogGroupType?.text = getString(R.string.not_type)
+            dialogGroupName?.text = ""
+            groupType = 0
+        }
+    }
+
+    private fun addNewTypeGroup() {
+        // 获取输入框的内容
+        if (StringUtils.compileExChar(dialogGroupName?.text.toString().trim { it <= ' ' })) {
+            ToastUtils.showLong(getString(R.string.rename_tip_check))
+        } else {
+            if (groupType == 0L) {
+                ToastUtils.showLong(getString(R.string.select_type))
+            } else {
+                //往DB里添加组数据
+                DBUtils.addNewGroupWithType(dialogGroupName?.text.toString().trim { it <= ' ' }, groupType)
+                refreshGroupData()
+                PopUtil.dismiss(popMain)
+            }
+        }
+    }
+
+   open  fun refreshGroupData() {
+
+
+    }
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {
