@@ -72,6 +72,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
         TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         initView()
         initListener()
     }
@@ -241,6 +242,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
+                showToast(getString(R.string.scan_end))
                 doFinish()
             }
         }
@@ -346,7 +348,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
-        LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
+        LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}-----------$pwd---------${DBUtils.lastUser?.controlMeshName}")
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
@@ -384,7 +386,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                  getVersionRetryCount++
                                  if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                      getVersion()
+                                 }else{
+ToastUtils.showLong(getString(R.string.get_version_fail))
+                                     finish()
                                  }
+                                 LogUtils.e("zcl配置传感器前失败----$it")
                              }
                      )
 
@@ -419,9 +425,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         Thread {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-
-            LogUtils.e("zcl开始连接")
         }.start()
+            LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
+
             connectDisposable?.dispose()    //取消掉上一个超时计时器
             connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())

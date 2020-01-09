@@ -278,7 +278,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (loadDialog != null && !this@TelinkBaseActivity.isFinishing) {
+        if (loadDialog != null &&loadDialog!!.isShowing&& !this@TelinkBaseActivity.isFinishing) {
             loadDialog!!.dismiss()
         }
     }

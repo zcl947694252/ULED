@@ -20,7 +20,6 @@ import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
 import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
-import com.dadoutek.uled.region.bean.RegionListBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 
@@ -531,7 +530,7 @@ public interface RequestInterface {
      * controlMesh字符串数组
      */
     @GET("region/list/controlMesh")
-    Observable<RegionListBean> regionNameList();
+    Observable<Response<List<String>>> regionNameList();
 
 
     /**

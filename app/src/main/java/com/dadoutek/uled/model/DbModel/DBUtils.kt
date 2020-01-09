@@ -596,6 +596,13 @@ object DBUtils {
         }
     }
 
+    fun deleteRegion(dbRegion: DbRegion) {
+        DaoSessionInstance.getInstance().dbRegionDao.delete(dbRegion)
+        recordingChange(dbRegion.id,
+                DaoSessionInstance.getInstance().dbRegionDao.tablename,
+                Constant.DB_DELETE)
+    }
+
 
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {

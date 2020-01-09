@@ -53,6 +53,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -178,12 +179,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getRegionList() {
         val list = mutableListOf<String>()
-        RegionModel.get()?.subscribe({
-            for (i in it) {
-                i.controlMesh?.let { it1 -> list.add(it1) }
+        RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
+            override fun onNext(t: MutableList<RegionBean>) {
+                    for (i in t) {
+                        i.controlMesh?.let { it -> list.add(it) }
+                    }
+                    SharedPreferencesUtils.saveRegionNameList(list)
+
             }
-            SharedPreferencesUtils.saveRegionNameList(list)
-        }) {}
+        })
     }
 
 
@@ -332,6 +336,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+<<<<<<< HEAD
 
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
@@ -342,6 +347,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             install_tip_question.visibility =  View.VISIBLE
         }
 
+=======
+        val title = view.findViewById<TextView>(R.id.textView5)
+        if (position==INSTALL_NORMAL_LIGHT){
+            title.visibility =  GONE
+            install_tip_question.visibility =  GONE
+        }else{
+            title.visibility =  VISIBLE
+            install_tip_question.visibility =  VISIBLE
+        }
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = AlertDialog.Builder(this).setView(view).create()
@@ -435,6 +450,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
@@ -444,20 +460,39 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CURTAIN -> {
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_SWITCH -> {
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
                 stepOneText.visibility = GONE
                 stepTwoText.visibility = GONE
                 stepThreeText.visibility = GONE
-                switchStepOne.visibility = View.VISIBLE
-                switchStepTwo.visibility = View.VISIBLE
-                swicthStepThree.visibility = View.VISIBLE
+                switchStepOne.visibility = VISIBLE
+                switchStepTwo.visibility = VISIBLE
+                swicthStepThree.visibility = VISIBLE
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
             }
         }
     }

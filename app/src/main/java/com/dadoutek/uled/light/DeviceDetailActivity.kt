@@ -186,12 +186,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     GlobalScope.launch(Dispatchers.Main) {
+                        ToastUtils.showLong(getString(R.string.connecting_tip))
                         retryConnectCount = 0
                         autoConnect()
                     }
                 } else
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
+
                             canBeRefresh = true
                             openOrClose(currentLight!!)
 
@@ -437,6 +439,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
@@ -446,6 +449,17 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CURTAIN -> {
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_SWITCH -> {
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -455,11 +469,19 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
             }
         }
     }
@@ -479,7 +501,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
@@ -488,7 +513,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             title.visibility =  View.VISIBLE
             install_tip_question.visibility =  View.VISIBLE
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)

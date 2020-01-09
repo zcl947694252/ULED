@@ -29,6 +29,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
@@ -228,7 +229,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-
                         }
 
                         override fun onError(e: Throwable) {
@@ -271,15 +271,29 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     @SuppressLint("CheckResult")
     private fun initAuthor() {
-        RegionModel.getAuthorizerList()?.subscribe({
-            setAuthorizeRegion(it)
-        }) { ToastUtils.showLong(it.message) }
+        RegionModel.getAuthorizerList()?.subscribe(object : NetworkObserver<MutableList<RegionAuthorizeBean>?>() {
+            override fun onNext(it: MutableList<RegionAuthorizeBean>) {
+                setAuthorizeRegion(it)
+            }
+
+            override fun onError(it: Throwable) {
+                super.onError(it)
+                ToastUtils.showLong(it.message)
+            }
+        })
     }
 
     private fun initMe() {
-        val disposable = RegionModel.get()?.subscribe({
-            setMeRegion(it)
-        }) { ToastUtils.showLong(it.message) }
+        val disposable = RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
+            override fun onNext(t: MutableList<RegionBean>) {
+                    setMeRegion(t)
+            }
+
+            override fun onError(it: Throwable) {
+                super.onError(it)
+                ToastUtils.showLong(it.message)
+            }
+        })
     }
 
     @SuppressLint("StringFormatMatches")
@@ -370,44 +384,49 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         NetworkFactory.getApi()
                 .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
                 .compose(NetworkTransformer())
-                .subscribe({
-                    //保存最后的区域信息到application
-                    val application = DeviceHelper.getApplication() as TelinkLightApplication
-                    val mesh = application.mesh
-                    mesh.name = it.controlMesh
-                    mesh.password = it.controlMeshPwd
-                    mesh.factoryName = it.installMesh
-                    mesh.factoryPassword = it.installMeshPwd
+                .subscribe(object : NetworkObserver<DbRegion?>() {
+                    override fun onNext(it: DbRegion) {
+                            //保存最后的区域信息到application
+                            val application = DeviceHelper.getApplication() as TelinkLightApplication
+                            val mesh = application.mesh
+                            mesh.name = it.controlMesh
+                            mesh.password = it.controlMeshPwd
+                            mesh.factoryName = it.installMesh
+                            mesh.factoryPassword = it.installMeshPwd
 
-                    DBUtils.lastUser?.controlMeshName = it.controlMesh
-                    DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+                            DBUtils.lastUser?.controlMeshName = it.controlMesh
+                            DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
 
-                    SharedPreferencesUtils.saveCurrentUseRegion(it.id)
-                    application.setupMesh(mesh)
-                    val lastUser = DBUtils.lastUser!!
-                    DBUtils.saveUser(lastUser)
+                            SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                            application.setupMesh(mesh)
+                            val lastUser = DBUtils.lastUser!!
+                            DBUtils.saveUser(lastUser)
 
-                    DBUtils.deleteLocalData()
-                    DBUtils.deleteAllData()
-                    //创建数据库
-                    AccountModel.initDatBase(lastUser)
+                            DBUtils.deleteLocalData()
+                            DBUtils.deleteAllData()
+                            //创建数据库
+                            AccountModel.initDatBase(lastUser)
 
-                    //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                            SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
 
-                    Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+                            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
 
-                    SharedPreferencesUtils.setUserLogin(true)
-                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+                            SharedPreferencesUtils.setUserLogin(true)
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
-                    hideLoadingDialog()
-                    ActivityUtils.finishAllActivities(true)
-                    ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
-                },{
-                    LogUtils.v("zcl-------$it")
-                    hideLoadingDialog()
-                    ToastUtils.showLong(it.localizedMessage)
+                            hideLoadingDialog()
+                            ActivityUtils.finishAllActivities(true)
+                            ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
+                    }
+
+                    override fun onError(it: Throwable) {
+                        super.onError(it)
+                        LogUtils.v("zcl-------$it")
+                        hideLoadingDialog()
+                        ToastUtils.showLong(it.localizedMessage)
+                    }
                 })
     }
 

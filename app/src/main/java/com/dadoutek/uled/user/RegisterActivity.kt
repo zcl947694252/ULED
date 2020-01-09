@@ -22,6 +22,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
@@ -93,15 +94,17 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         return
                     }
 
-                    UpdateModel.isRegister(userName!!)?.subscribe({
-                            if (!it) {
+                    UpdateModel.isRegister(userName!!)?.subscribe(object : NetworkObserver<Boolean?>() {
+                        override fun onNext(t: Boolean) {
+                            if (!t) {
                                 regist_frist_progress.visibility = View.GONE
                                 SMSSDK.getVerificationCode(countryCode, userName)
 
                             }else{
                                 ToastUtils.showLong(getString(R.string.account_exist))
                             }
-                    },{})
+                        }
+                    })
 
                 } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))

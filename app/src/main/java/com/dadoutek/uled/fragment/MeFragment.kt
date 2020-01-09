@@ -102,8 +102,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                             TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
-                        }
-                        .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which ->
+                        }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                             dialog.dismiss()
                             isClickExlogin = false
                             hideLoadingDialog()
@@ -390,7 +389,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         })
     }
 
-
     private fun exitLogin() {
         isClickExlogin = true
         val b1 = (DBUtils.allLight.isEmpty() && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.isEmpty()
@@ -409,7 +407,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 checkNetworkAndSync(activity)
             }
         }
-
     }
 
 

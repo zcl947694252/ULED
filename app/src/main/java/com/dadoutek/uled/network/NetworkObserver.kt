@@ -10,7 +10,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-abstract class NetworkObserver<t> : Observer<t> {
+abstract class NetworkObserver<T> : Observer<T> {
 
     override fun onSubscribe(d: Disposable) {
     }

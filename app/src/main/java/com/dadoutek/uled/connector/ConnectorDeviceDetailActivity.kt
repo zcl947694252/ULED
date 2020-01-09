@@ -238,6 +238,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
@@ -247,6 +248,17 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CURTAIN -> {
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_SWITCH -> {
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -256,11 +268,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
             }
         }
     }
@@ -281,6 +301,10 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+<<<<<<< HEAD
+=======
+        val title = view.findViewById<TextView>(R.id.textView5)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
             install_tip_question.visibility =  View.GONE

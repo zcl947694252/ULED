@@ -863,6 +863,7 @@
     <string name="old_light_rest">当前固件版本较低,请尝试以下步骤复位设备:</string>
     <string name="warm_notice">温馨提示：如有其它问题，请参考APP使用说明。</string>
     <string name="config_success">配置成功</string>
+<<<<<<< HEAD
     <string name="normal_swith">普通开关</string>
     <string name="scene_switch">场景开关</string>
     <string name="curtain_switch">窗帘开关</string>
@@ -872,4 +873,7 @@
     <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
     <string name="select_type">请选择类型</string>
     <string name="no_type">无类型</string>
+=======
+    <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
 </resources>

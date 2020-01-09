@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
@@ -20,16 +19,14 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import java.util.*
+import kotlinx.coroutines.GlobalScope
 
 
 /**
@@ -59,54 +56,35 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showLong(R.string.group_fail)
             } else {
                 showLoadingDialog(getString(R.string.grouping))
-                var allocDeviceGroupCount = 2
-                object : Thread({
-                    //发两次，确保成功
-                    for (i in 0..1) {
-                        //如果修改分组成功,才改数据库之类的操作
-                        allocDeviceGroup(group, {
-                            val sceneIds = getRelatedSceneIds(group.meshAddr)
-                            for (i in 0..1) {
-                                deleteAllSceneByLightAddr(mLight.meshAddr)
-                                sleep(100)
-                            }
-                            for (sceneId in sceneIds) {
-                                val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
-                                if (action != null) {
-                                    for (i in 0..1) {
-                                        Commander.addScene(sceneId, mLight.meshAddr, action.color)
-                                        sleep(100)
-                                    }
-                                }
-                            }
 
-                            group.deviceType = mLight.productUUID.toLong()
-                            Log.d("message", "deviceType=" + group.deviceType.toString() + ",address=" + mLight.meshAddr + ",productUUID=" + mLight.productUUID)
-                            Log.d("message", mLight.toString())
-
-                            DBUtils.updateGroup(group)
-                            DBUtils.updateLight(mLight)
-                            runOnUiThread {
-                                if (allocDeviceGroupCount - 1 == 0) {
-                                    hideLoadingDialog()
-                                    finish()
-                                    ToastUtils.showLong(getString(R.string.grouping_success_tip))
-                                }else{
-                                    allocDeviceGroupCount--
-                                }
-                            }
-
-                        }, {
-                            runOnUiThread {
-                                hideLoadingDialog()
-                                ToastUtils.showLong(R.string.group_failed)
-                            }
-                        })
-                    }
-                }) {
-                }.start()
+                GlobalScope.let {
+                    allocDeviceGroup(group, {
+                        mLight.belongGroupId = group.id
+                        group.deviceType = mLight.productUUID.toLong()
+                        updateGroupResult(mLight, group)
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            finish()
+                            ToastUtils.showLong(getString(R.string.grouping_success_tip))
+                        }
+                    }, {
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            ToastUtils.showLong(R.string.group_failed)
+                        }
+                    })
+                }
             }
         }
+    }
+
+    private fun updateGroupResult(light: DbLight, group: DbGroup) {
+        light.hasGroup = true
+        light.belongGroupId = group.id
+        light.name = light.name
+        DBUtils.updateLight(light)
+        if (group != null)
+            DBUtils.updateGroup(group!!)//更新组类型
     }
 
     private val mHandler = @SuppressLint("HandlerLeak")
@@ -121,33 +99,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
 
     private var mApplication: TelinkLightApplication? = null
 
-
-    private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
-        val sceneIds = ArrayList<Long>()
-        val dbSceneList = DBUtils.sceneList
-        sceneLoop@ for (dbScene in dbSceneList) {
-            val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
-            for (action in dbActions) {
-                if (groupAddress == action.groupAddr || 0xffff == action.groupAddr) {
-                    sceneIds.add(dbScene.id)
-                    continue@sceneLoop
-                }
-            }
-        }
-        return sceneIds
-    }
-
-
-    /**
-     * 删除指定灯里的所有场景
-     *
-     * @param lightMeshAddr 灯的mesh地址
-     */
-    private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
-        val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -211,8 +162,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private fun setGroupChecked() {
         for (group in mGroupList) {
             group.checked = group.id == mLight.belongGroupId
-            /* if (group.checked)
-                 break*/
         }
     }
 
@@ -229,7 +178,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         })
         mLight.belongGroupId = group.id
     }
-
 
     override fun performed(event: Event<String>) {
         val e = event as NotificationEvent
@@ -270,11 +218,8 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                 group.checked = true
             }
         }
-
         mHandler.obtainMessage(UPDATE).sendToTarget()
-
     }
-
 
     /**
      * 添加新的分组进列表
@@ -284,7 +229,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this@ChooseGroupForDevice)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -301,7 +246,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     /**
@@ -316,12 +261,11 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         adapter!!.notifyDataSetChanged()
     }
 
-
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this@ChooseGroupForDevice)
         builder.setTitle(R.string.group_not_change_tip)
-        builder.setPositiveButton(android.R.string.ok) { dialog, which -> finish() }
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
+        builder.setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+        builder.setNegativeButton(R.string.btn_cancel) { _, _ -> }
         val dialog = builder.create()
         dialog.show()
     }

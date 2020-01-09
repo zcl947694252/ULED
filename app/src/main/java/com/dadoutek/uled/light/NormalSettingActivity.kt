@@ -871,6 +871,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra("uuid", light!!.productUUID)
         Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
+        this?.setResult(Constant.RESULT_OK)
         this.finish()
 
     }
@@ -1709,8 +1710,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setPositiveButton(android.R.string.ok) { _, _ ->
 
                         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
-                            val opcode = Opcode.KICK_OUT
-                            Commander.resetDevice(light!!.meshAddr)
+                            val disposable = Commander.resetDevice(light!!.meshAddr)
                                     .subscribe(
                                             {
                                                 LogUtils.v("zcl-----恢复出厂成功")

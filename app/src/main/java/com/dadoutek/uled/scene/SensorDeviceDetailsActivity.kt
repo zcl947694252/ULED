@@ -33,6 +33,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.HumanBodySensorActivity
@@ -136,6 +137,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         this.mApplication = this.application as TelinkLightApplication
         setContentView(R.layout.activity_sensor_device_details)
         addScanListeners()
+        LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
     }
 
     override fun onResume() {
@@ -310,6 +312,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
@@ -319,6 +322,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CURTAIN -> {
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_SWITCH -> {
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -328,11 +342,19 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
+<<<<<<< HEAD
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+=======
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+            }
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
             }
         }
     }
@@ -352,7 +374,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
@@ -361,7 +386,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             title.visibility =  View.VISIBLE
             install_tip_question.visibility =  View.VISIBLE
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
@@ -509,10 +537,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             .compose(NetworkTransformer())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({
-                                                LogUtils.v("zcl-----删除服务器内传感器$it")
-                                                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                                            }, {})
+                                            .subscribe(object : NetworkObserver<String?>() {
+                                                override fun onNext(t: String) {
+                                                    LogUtils.v("zcl-----删除服务器内传感器$it")
+                                                    Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                                                }
+
+                                                override fun onError(e: Throwable) {
+                                                    super.onError(e)
+
+                                                }
+                                            })
 
                                     if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSensor.meshAddr)) {
                                         TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -521,14 +556,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                         Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
                                         if (deleteSensor.meshAddr == mConnectDevice?.meshAddress) {
-                                            GlobalScope.launch {
-                                                delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                                if (this@SensorDeviceDetailsActivity == null ||
-                                                        this@SensorDeviceDetailsActivity.isDestroyed ||
-                                                        this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                                } else
-                                                    autoConnectSensor(true)
-                                            }
+                                            TelinkLightService.Instance()?.idleMode(true)
+                                            TelinkLightService.Instance()?.disconnect()
                                         }
                                     }
 

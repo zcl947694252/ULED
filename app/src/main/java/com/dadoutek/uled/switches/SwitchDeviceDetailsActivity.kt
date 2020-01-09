@@ -631,7 +631,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun goSearchSwitch() {
         installId = INSTALL_SWITCH
+<<<<<<< HEAD
         showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), INSTALL_SWITCH)
+=======
+        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId)
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
         stepOneText.visibility = View.GONE
         stepTwoText.visibility = View.GONE
         stepThreeText.visibility = View.GONE

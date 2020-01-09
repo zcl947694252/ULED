@@ -940,6 +940,7 @@
     <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
     <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
     <string name="config_success">Configuration is successful</string>
+<<<<<<< HEAD
     <string name="normal_swith">Ordinary switch</string>
     <string name="scene_switch">Scene switch</string>
     <string name="curtain_switch">Curtain switch</string>
@@ -949,5 +950,8 @@
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
     <string name="select_type">Please select type</string>
     <string name="no_type">No type</string>
+=======
+    <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
+>>>>>>> 99efa66076ef5e0336475a25184c80f580adf87e
 
 </resources>
