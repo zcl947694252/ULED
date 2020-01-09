@@ -151,7 +151,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             R.id.light_add_device_btn -> {
                  DBUtils.lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if(DBUtils.getAllCurtains().size ==0){
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
@@ -408,7 +408,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
-                ToastUtils.showShort(R.string.reconnecting)
+                ToastUtils.showLong(R.string.reconnecting)
             }
         }
     }

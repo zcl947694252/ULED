@@ -193,19 +193,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 switch (state) {
                     case BluetoothAdapter.STATE_ON: {
                         log("蓝牙打开");
-//                        TelinkLightService instance = TelinkLightService.Instance();
-//                        if (instance != null)
-//                            instance.idleMode(true);
-//                        TelinkLightService.Instance().disconnect();
-//                        LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF: {
                         log("蓝牙关闭");
-//                        ToastUtils.showLong(R.string.tip_phone_ble_off);
-//                        TelinkLightService instance = TelinkLightService.Instance();
-//                        if (instance != null)
-//                            instance.idleMode(true);
-//                        TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
                     }
                 }

@@ -203,7 +203,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         val lastUser = DBUtils.lastUser
                         lastUser?.let {
                             if (it.id.toString() != it.last_authorizer_user_id)
-                                ToastUtils.showShort(getString(R.string.author_region_warm))
+                                ToastUtils.showLong(getString(R.string.author_region_warm))
                             else {
                                 if (dialog_curtain?.visibility == View.GONE) {
                                     showPopupMenu()
@@ -296,7 +296,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -355,19 +355,19 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -377,16 +377,16 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
         }
     }
 
-    private fun showInstallDeviceDetail(describe: String) {
+    private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
@@ -401,6 +401,14 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+        val title = view.findViewById<TextView>(R.id.textView5)
+        if (position==INSTALL_NORMAL_LIGHT){
+            title.visibility =  View.GONE
+            install_tip_question.visibility =  View.GONE
+        }else{
+            title.visibility =  View.VISIBLE
+            install_tip_question.visibility =  View.VISIBLE
+        }
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
@@ -481,7 +489,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         addCurtainDevice()
                     }
@@ -500,7 +508,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         currentLight = curtain?.get(position)
         positionCurrent = position
                 if (TelinkLightApplication.getApp().connectDevice == null)
-                    ToastUtils.showShort(getString(R.string.connecting_tip))
+                    ToastUtils.showLong(getString(R.string.connecting_tip))
                 else
                     skipSetting()
 

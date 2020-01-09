@@ -2,4 +2,9 @@ package com.dadoutek.uled.stomp.model
 
 import java.io.Serializable
 
-data class QrCodeTopicMsg(val ref_user_phone: String, val type: Int, val account: String) :Serializable
+data class QrCodeTopicMsg(var code: String,
+                          var ref_user_phone: String,
+                          var region_name: String,
+                          var rid: Int,
+                          var type: Int) :Serializable
+

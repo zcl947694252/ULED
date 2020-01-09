@@ -72,6 +72,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
         TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         initView()
         initListener()
     }
@@ -99,7 +100,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             if (!isSearchedDevice)
                 scanFail()
             else
-                ToastUtils.showShort(getString(R.string.connecting_tip))
+                ToastUtils.showLong(getString(R.string.connecting_tip))
         }
         progressBtn.onClick {
             setNewScan()
@@ -160,6 +161,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
+
                     if (BuildConfig.DEBUG) {
                         params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
                     } else {
@@ -173,6 +175,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                         params.setMeshName(mesh.name)
                         params.setOutOfMeshName(mesh.name)
                     }
+
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
 
@@ -239,6 +242,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
+                showToast(getString(R.string.scan_end))
                 doFinish()
             }
         }
@@ -301,7 +305,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         GlobalScope.launch(Dispatchers.Main) {
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
-            ToastUtils.showShort(R.string.not_find_pir)
+            ToastUtils.showLong(R.string.not_find_pir)
             doFinish()
         }
     }
@@ -344,7 +348,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
-        LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
+        LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}-----------$pwd---------${DBUtils.lastUser?.controlMeshName}")
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
@@ -375,19 +379,23 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                  when {
                                      mDeviceInfo?.productUUID == DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
                                      mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                                     else -> ToastUtils.showShort(getString(R.string.no_scaned_device))
+                                     else -> ToastUtils.showLong(getString(R.string.scan_end))
                                  }
                              },
                              {
                                  getVersionRetryCount++
                                  if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                      getVersion()
+                                 }else{
+ToastUtils.showLong(getString(R.string.get_version_fail))
+                                     finish()
                                  }
+                                 LogUtils.e("zcl配置传感器前失败----$it")
                              }
                      )
 
         } else {
-            ToastUtils.showShort(getString(R.string.get_version_fail))
+            ToastUtils.showLong(getString(R.string.get_version_fail))
             doFinish()
         }
     }
@@ -397,7 +405,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         hideLoadingDialog()
         LogUtils.e("zcl  showConnectFailed")
-        ToastUtils.showShort(getString(R.string.connect_fail))
+        ToastUtils.showLong(getString(R.string.connect_fail))
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_fail)
         isSearchedDevice = false
@@ -417,9 +425,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         Thread {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-
-            LogUtils.e("zcl开始连接")
         }.start()
+            LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
+
             connectDisposable?.dispose()    //取消掉上一个超时计时器
             connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
@@ -440,7 +448,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
             LogUtils.d("MainActivity doesn't exist in stack")
-            ToastUtils.showShort("MainActivity doesn't exist in stack")
+            ToastUtils.showLong("MainActivity doesn't exist in stack")
             finish()
         }
     }

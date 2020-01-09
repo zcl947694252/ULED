@@ -2,9 +2,6 @@ package com.dadoutek.uled.model;
 
 import android.content.Context;
 
-import android.database.sqlite.SQLiteDatabase;
-
-
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
@@ -100,8 +97,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                             int uuid = entry.getValue();
 
                             DbGroup group = DBUtils.INSTANCE.getGroupByID(id);
-
-                            if (group.getMeshAddr() != 0xffff) {
+                            if (group!=null&&group.getMeshAddr() != 0xffff) {
                                 group.setDeviceType((long) uuid);
                                 DBUtils.INSTANCE.updateGroup(group);
                             }

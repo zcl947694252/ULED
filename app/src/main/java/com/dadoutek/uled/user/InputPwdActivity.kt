@@ -24,9 +24,7 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_input_pwd.*
 import org.jetbrains.anko.toast
@@ -120,27 +118,25 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 .putPassword(phone, NetworkFactory.md5(password))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Response<DbUser>> {
-                    override fun onComplete() {}
+                .subscribe(object : NetworkObserver<Response<DbUser>?>() {
+                    override fun onNext(t: Response<DbUser>) {
 
-                    override fun onSubscribe(d: Disposable) {}
-
-                    override fun onNext(stringResponse: Response<DbUser>) {
-                        hideLoadingDialog()
-                        if (stringResponse.errorCode == 0) {
-                           //("logging" + stringResponse.errorCode + "更改成功")
-                            ToastUtils.showLong(R.string.tip_update_password_success)
-                            startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            //ToastUtils.showLong(R.string.tip_update_password_fail)
-                            ToastUtils.showLong(stringResponse.message)
-                        }
+                            hideLoadingDialog()
+                            if (t.errorCode == 0) {
+                                //("logging" + stringResponse.errorCode + "更改成功")
+                                ToastUtils.showLong(R.string.tip_update_password_success)
+                                startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
+                                finish()
+                            } else {
+                                //ToastUtils.showLong(R.string.tip_update_password_fail)
+                                ToastUtils.showLong(t.message)
+                            }
                     }
 
-                    override fun onError(e: Throwable) {
+                    override fun onError(it: Throwable) {
+                        super.onError(it)
                         hideLoadingDialog()
-                        Toast.makeText(this@InputPwdActivity, "onError:${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@InputPwdActivity, "onError:${it.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
     }
@@ -201,7 +197,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun error(msg: String) {
             hideLoadingDialog()
-            ToastUtils.showShort(msg)
+            ToastUtils.showLong(msg)
         }
     }
 

@@ -23,6 +23,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,12 +45,15 @@ import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -97,7 +101,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var receiver: HomeKeyEventBroadCastReceiver
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
-    private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
 
     private lateinit var deviceFragment: DeviceFragment
     private lateinit var groupFragment: GroupListFragment
@@ -150,14 +153,42 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
+        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
+            when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
+                0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
+                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
+                2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
+            }
+            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
+            main_toast.visibility = VISIBLE
+        }else{
+            main_toast.visibility = GONE
+        }
+        main_toast.text = DEFAULT_MESH_FACTORY_NAME
+
         initBottomNavigation()
 
         checkVersionAvailable()
 
         receiver = HomeKeyEventBroadCastReceiver()
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+
+        getRegionList()
     }
 
+    @SuppressLint("CheckResult")
+    private fun getRegionList() {
+        val list = mutableListOf<String>()
+        RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
+            override fun onNext(t: MutableList<RegionBean>) {
+                    for (i in t) {
+                        i.controlMesh?.let { it -> list.add(it) }
+                    }
+                    SharedPreferencesUtils.saveRegionNameList(list)
+
+            }
+        })
+    }
 
 
 
@@ -236,15 +267,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev?.action == MotionEvent.ACTION_DOWN) {
-            when {
-                bnve.currentItem == 0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
-                bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
-                bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+        try {
+            if (ev?.action == MotionEvent.ACTION_DOWN) {
+                when {
+                    bnve.currentItem == 0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
+                    bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
+                    bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+                }
             }
-            return super.dispatchTouchEvent(ev)
+        } catch (ex: IllegalArgumentException) {
+            ex.printStackTrace()
         }
         return super.dispatchTouchEvent(ev)
+
     }
 
     var installDialog: AlertDialog? = null
@@ -286,7 +321,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    private fun showInstallDeviceDetail(describe: String) {
+    private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
@@ -301,6 +336,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+        val title = view.findViewById<TextView>(R.id.textView5)
+        if (position==INSTALL_NORMAL_LIGHT){
+            title.visibility =  GONE
+            install_tip_question.visibility =  GONE
+        }else{
+            title.visibility =  VISIBLE
+            install_tip_question.visibility =  VISIBLE
+        }
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = AlertDialog.Builder(this).setView(view).create()
@@ -390,33 +433,33 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
                 stepOneText.visibility = GONE
                 stepTwoText.visibility = GONE
                 stepThreeText.visibility = GONE
-                switchStepOne.visibility = View.VISIBLE
-                switchStepTwo.visibility = View.VISIBLE
-                swicthStepThree.visibility = View.VISIBLE
+                switchStepOne.visibility = VISIBLE
+                switchStepTwo.visibility = VISIBLE
+                swicthStepThree.visibility = VISIBLE
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
         }
     }
@@ -457,7 +500,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            if (isRuning)
                                 ToastUtils.showLong(R.string.get_server_version_fail)
                         }
                     })
@@ -550,7 +592,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
         progressBar.visibility = GONE
-
         try {
             this.unregisterReceiver(mReceiver)
         } catch (e: Exception) {
@@ -562,7 +603,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -630,9 +670,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-                               mConnectDisposal = connect(deviceTypes = deviceTypes, retryTimes = 10)
+                                mConnectDisposal = connect(deviceTypes = deviceTypes, retryTimes = 10)
                                         ?.subscribe(
                                                 {
+                                                    RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                     onLogin()
                                                 },
                                                 {
@@ -676,7 +717,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             TelinkLightService.Instance().idleMode(true)
-            ToastUtils.showShort(getString(R.string.reconnecting))
+            ToastUtils.showLong(getString(R.string.reconnecting))
             retryDisposable?.dispose()
             retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
                     .subscribe {
@@ -707,6 +748,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         mDisposable.dispose()
         disposableCamera?.dispose()
+        mCompositeDisposable.dispose()
 
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
@@ -832,6 +874,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onBackPressed() {
         super.onBackPressed()
     }
+
+
 }
 
 

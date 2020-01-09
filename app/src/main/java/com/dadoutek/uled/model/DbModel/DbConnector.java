@@ -8,7 +8,6 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -46,12 +45,12 @@ public class DbConnector implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int rssi =1000;
 
-
-    @Generated(hash = 1193846907)
+    @Generated(hash = 615264722)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, String groupName, int color, int status) {
+            int index, String groupName, int color, int status, int rssi) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -64,6 +63,7 @@ public class DbConnector implements Serializable {
         this.groupName = groupName;
         this.color = color;
         this.status = status;
+        this.rssi = rssi;
     }
     @Generated(hash = 1212725637)
     public DbConnector() {
@@ -203,5 +203,11 @@ public class DbConnector implements Serializable {
     }
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+    public int getRssi() {
+        return this.rssi;
+    }
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

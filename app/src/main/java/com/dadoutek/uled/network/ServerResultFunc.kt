@@ -1,7 +1,6 @@
 package com.dadoutek.uled.network
 
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
@@ -23,15 +22,19 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
         } else {
             var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
-            if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
-                    &&response.errorCode==NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT){
-                            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
-                ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
-                LogUtils.e("zcl--------------------错误执行")
-                            AppUtils.relaunchApp()
-                LogUtils.e("zcl--------------------错误执行后")
 
-            }else ServerResultException.handleException(response)
+            if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
+                    && response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT) {
+                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
+                ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
+                AppUtils.relaunchApp()
+            } else if ( response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT) {
+                response.t = "" as T
+            }
+            else
+             {
+                ServerResultException.handleException(response)
+            }
         }
         return response.t
     }

@@ -356,9 +356,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-      TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -671,7 +668,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
                     if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check));
+                        ToastUtils.showLong(getString(R.string.rename_tip_check));
                     } else {
                         groups.get(position).setName(textGp.getText().toString().trim());
                         DBUtils.INSTANCE.updateGroup(groups.get(position));
@@ -724,7 +721,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
             // 获取输入框的内容
             if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                ToastUtils.showShort(getString(R.string.rename_tip_check));
+                ToastUtils.showLong(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
                 DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_CURTAIN);
@@ -1186,12 +1183,12 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         @Override
         public void start() {
 //            showLoadingDialog(getString(R.string.tip_start_sync));
-//            ToastUtils.showShort(R.string.uploading_data);
+//            ToastUtils.showLong(R.string.uploading_data);
         }
 
         @Override
         public void complete() {
-//            ToastUtils.showShort(R.string.upload_data_success);
+//            ToastUtils.showLong(R.string.upload_data_success);
 //            hideLoadingDialog();
         }
 
@@ -1370,7 +1367,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
         if (light == null) {
             light = new DbCurtain();
-            light.setName(getString(R.string.unnamed));
+            light.setName(getString(R.string.device_name)+light.getMeshAddr());
             light.setMeshAddr(meshAddress);
             light.textColor = this.getResources().getColor(
                     R.color.black);
@@ -1466,4 +1463,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mDisposable.dispose();
+    }
 }

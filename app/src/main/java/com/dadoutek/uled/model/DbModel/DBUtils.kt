@@ -405,9 +405,6 @@ object DBUtils {
         val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
-            //            for(int i=0;i<dbLightList.size();i++){
-            ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
-            //            }
             dbLightList[0]
         } else null
     }
@@ -597,6 +594,13 @@ object DBUtils {
                         Constant.DB_UPDATE)
             }
         }
+    }
+
+    fun deleteRegion(dbRegion: DbRegion) {
+        DaoSessionInstance.getInstance().dbRegionDao.delete(dbRegion)
+        recordingChange(dbRegion.id,
+                DaoSessionInstance.getInstance().dbRegionDao.tablename,
+                Constant.DB_DELETE)
     }
 
 
@@ -1016,14 +1020,14 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
     }
 
-    fun deleteAll() {
+    fun deleteAllSensorAndSwitch() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
 
 
     fun deleteLocalData() {
-        //        DaoSessionInstance.getApp().getDbUserDao().deleteAll();
+        //        DaoSessionInstance.getApp().getDbUserDao().deleteAllSensorAndSwitch();
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteAll()
         DaoSessionInstance.getInstance().dbRegionDao.deleteAll()
@@ -1244,7 +1248,7 @@ object DBUtils {
                 }//如果数据表没有该数据直接添加
             }
         }
-        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
+//        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
     }
 
     private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {

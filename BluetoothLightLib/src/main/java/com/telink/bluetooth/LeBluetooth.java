@@ -219,8 +219,8 @@ public final class LeBluetooth {
             ScanSettings scanSettings = scanSettingsBuilder.build();
 //                mScanner.startScan(mScanCallback);
             mScanner.startScan(scanFilters, scanSettings, mScanCallback);
-            for (int i = 0; i < scanFilters.size(); i++){
-                
+            for (int i = 0; i < scanFilters.size(); i++) {
+
             }
             Log.d("Saw", "mScanner.startScan  scanFilters = " + scanFilters + ", mScanCallback = " + mScanCallback);
             synchronized (this) {

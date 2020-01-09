@@ -54,12 +54,12 @@ import java.util.*
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var isResume: Boolean = false
     private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
     private var popView: View? = null
     private var loadDialog: Dialog? = null
     private var singleLogin: AlertDialog? = null
-    private var isRuning: Boolean = false
     protected var foreground = false
     private var mApplication: TelinkLightApplication? = null
 
@@ -74,7 +74,6 @@ abstract class BaseActivity : AppCompatActivity() {
         initListener()
         initOnLayoutListener()
         initStompReceiver()
-        Constant.isTelBase = false
     }
 
     private fun makeDialogAndPop() {
@@ -103,16 +102,20 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
     abstract fun initData()
     abstract fun initListener()
-    open fun notifyWSData() {}
+    open fun notifyWSData(type: Int, rid: Int) {}
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
-    private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
+    private fun makeCodeDialog(type: Int, phone: String, regionName: String,rid: Int = 0 ) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
 
         when (type) {
+            -1 -> {
+                title = getString(R.string.transfer_region_success)
+                recever = getString(R.string.recevicer)
+            }
             0 -> {
                 title = getString(R.string.author_account_receviced)
                 recever = getString(R.string.recevicer)
@@ -135,13 +138,18 @@ abstract class BaseActivity : AppCompatActivity() {
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
-                    if (type == 0) {
+                    if (type == 0)
                         restartApplication()
-                    }
                 }
-                notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView!=null)
-                    pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                LogUtils.v("zcl---------判断---${!this@BaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
+                try {
+                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
+                        pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                } catch (e: Exception) {
+                    LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
+                }
+
+                notifyWSData(type, rid)
             }
         }
 
@@ -151,13 +159,13 @@ abstract class BaseActivity : AppCompatActivity() {
         var view = window.decorView
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
-            view.viewTreeObserver.removeOnGlobalLayoutListener{}
+            view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
     }
 
     override fun onPause() {
         super.onPause()
-        isRuning = false
+        isResume = true
         foreground = false
         PopUtil.dismiss(pop)
     }
@@ -204,7 +212,7 @@ abstract class BaseActivity : AppCompatActivity() {
         override fun complete() {
             hideLoadingDialog()
             TelinkLightService.Instance()?.idleMode(true)
-            if (!this@BaseActivity.isFinishing&&!singleLogin?.isShowing!!)
+            if (!this@BaseActivity.isFinishing && !singleLogin?.isShowing!!)
                 singleLogin!!.show()
             restartApplication()
         }
@@ -303,11 +311,14 @@ abstract class BaseActivity : AppCompatActivity() {
                     LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
                 }
                 Constant.CANCEL_CODE -> {
-                    val cancelBean = intent.getSerializableExtra(Constant.CANCEL_CODE) as CancelAuthorMsg
+                    val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
+                    var cancelBean: CancelAuthorMsg? = null
+                    if (extra != null)
+                        cancelBean = extra as CancelAuthorMsg
                     val user = DBUtils.lastUser
                     user?.let {
-                        if (user.last_authorizer_user_id == cancelBean.authorizer_user_id.toString()
-                                && user.last_region_id == cancelBean.rid.toString()) {
+                        if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
+                                && user.last_region_id == cancelBean?.rid.toString()) {
                             user.last_region_id = 1.toString()
                             user.last_authorizer_user_id = user.id.toString()
                             DBUtils.deleteAllData()
@@ -318,16 +329,23 @@ abstract class BaseActivity : AppCompatActivity() {
                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                         }
                     }
-                    makeCodeDialog(2, cancelBean.authorizer_user_phone, "", cancelBean.region_name)//2代表解除授权信息type
-                    LogUtils.e("zcl_baseMe_______取消授权")
+
+                    LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone,  cancelBean?.region_name,cancelBean.rid) }//2代表解除授权信息type
 
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-                    LogUtils.e("zcl_baseMe___________解析二维码")
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
+//                    LogUtils.e("zcl_baseMe___________解析二维码")
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
                 }
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        isResume = true
+    }
+
 }

@@ -184,7 +184,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         params.setTimeoutSeconds(20);
         /*params.set(Parameters.PARAM_MESH_NAME, this.selectedDevice.meshName);
         params.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 10);*/
-        TelinkLightService.Instance().startScan(params);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.startScan(params);
     }
 
     /**
@@ -207,7 +209,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         deviceInfo.macAddress = this.selectedDevice.macAddress;
         deviceInfo.firmware = this.firmware;
         params.setDeviceInfo(deviceInfo);
-        TelinkLightService.Instance().startOta(params);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.startOta(params);
     }
 
     /**
@@ -253,9 +257,11 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                     this.flag = true;
                     this.append("connecting");
                     TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
+                        if (instance!=null){
+
                             instance.idleMode(true);
-                    TelinkLightService.Instance().connect(deviceInfo.macAddress, 10);
+                    instance.connect(deviceInfo.macAddress, 10);
+                        }
                 }
 
                 break;
@@ -284,7 +290,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                     //连接成功后获取firmware信息
                     this.append("connected");
                     this.append("get firmware");
-                    TelinkLightService.Instance().getFirmwareVersion();
+                    TelinkLightService instance = TelinkLightService.Instance();
+                    if (instance!=null)
+                    instance.getFirmwareVersion();
                 } else if (status == LightAdapter.STATUS_LOGOUT) {
                     if (otaCompleted) {
                         this.append("ota success");

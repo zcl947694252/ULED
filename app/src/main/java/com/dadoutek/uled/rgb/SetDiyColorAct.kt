@@ -439,7 +439,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         if (w > 99) {
                             w = 99
                         }
-                        Commander.addGradient(address, id, nodeId, nodeMode, brightness, r, g, b, c, w, {}, {})
+                        Commander.addGradient(address, id, nodeId, nodeMode, brightness, r, g, b, c, w)
                     }
                 }
             } else {
@@ -451,7 +451,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     temperature = item.colorTemperature
 
                     Thread.sleep(200)
-                    Commander.addGradient(address, id, nodeId, nodeMode, brightness, temperature, 0, 0, 0, 0, {}, {})
+                    Commander.addGradient(address, id, nodeId, nodeMode, brightness, temperature, 0, 0, 0, 0)
                 }
             }
 //        val red = (color!! and 0xff0000) shr 16

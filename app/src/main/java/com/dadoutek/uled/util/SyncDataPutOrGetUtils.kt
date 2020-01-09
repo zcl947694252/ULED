@@ -69,16 +69,14 @@ class SyncDataPutOrGetUtils {
                                         syncCallback.complete()
                                     }
                                 }
-
                                 override fun onSubscribe(d: Disposable) {
                                 }
-
                                 override fun onNext(t: String) {
                                 }
-
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {
+                                        if (e.message!="")
                                         syncCallback.error(e.cause.toString())
                                     }
                                 }
@@ -202,9 +200,7 @@ class SyncDataPutOrGetUtils {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
-
-                            Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
-                                    id)
+                           // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.update(token,

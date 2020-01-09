@@ -60,7 +60,7 @@ public class ScanRecordUtil {
         return mBytes;
     }
 
-    private ScanRecordUtil( List<String> mUuids16S,  int advertiseFlags, int txPowerLevel, String localName, byte[] bytes) {
+    private ScanRecordUtil(List<String> mUuids16S, int advertiseFlags, int txPowerLevel, String localName, byte[] bytes) {
         mDeviceName = localName;
         mAdvertiseFlags = advertiseFlags;
         mTxPowerLevel = txPowerLevel;
@@ -70,6 +70,7 @@ public class ScanRecordUtil {
 
     /**
      * 获取16位UUID
+     *
      * @return
      */
     public List<String> getUuids16S() {
@@ -79,8 +80,7 @@ public class ScanRecordUtil {
     /**
      * 字节数组转换为十六进制字符串
      *
-     * @param b
-     *            byte[] 需要转换的字节数组
+     * @param b byte[] 需要转换的字节数组
      * @return String 十六进制字符串
      */
     public static final String byte2hex(byte b[]) {
@@ -103,6 +103,7 @@ public class ScanRecordUtil {
 
     /**
      * 得到ScanRecordUtil 对象，主要逻辑
+     *
      * @param scanRecord
      * @return
      */
@@ -142,18 +143,19 @@ public class ScanRecordUtil {
           /*  if (uuids_16.isEmpty()){
                 uuids_16 = null;
             }*/
-            return new ScanRecordUtil(uuids16,  advertiseFlag, txPowerLevel, localName, scanRecord);
+            return new ScanRecordUtil(uuids16, advertiseFlag, txPowerLevel, localName, scanRecord);
         } catch (Exception e) {
             Log.e(TAG, "unable to parse scan record: " + Arrays.bytesToString(scanRecord));
             // As the record is invalid, ignore all the parsed results for this packet
             // and return an empty record with raw scanRecord bytes in results
-            return new ScanRecordUtil( null, -1, Integer.MIN_VALUE, null, scanRecord);
+            return new ScanRecordUtil(null, -1, Integer.MIN_VALUE, null, scanRecord);
         }
     }
 
 
     /**
      * byte数组转16进制
+     *
      * @param bytes
      * @return
      */

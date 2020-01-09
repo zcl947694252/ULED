@@ -103,7 +103,7 @@ class CurtainFragmentList : BaseGroupFragment() {
                                 },
                                 failedCallback = {
                                     hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                     val intent = Intent("delete_true")
                                     intent.putExtra("delete_true", "true")
                                     LocalBroadcastManager.getInstance(context)
@@ -330,7 +330,7 @@ class CurtainFragmentList : BaseGroupFragment() {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_CURTAIN)

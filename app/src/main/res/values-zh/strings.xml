@@ -114,7 +114,7 @@
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">未扫描到设备！</string>
-    <string name="connecting_tip">正在连接……,请稍后</string>
+    <string name="connecting_tip">正在连接,请稍后</string>
     <string name="grouping_completed">分组完成</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
     <string name="quite">退出</string>
@@ -453,7 +453,6 @@
     <string name="stop">停止</string>
     <string name="stopping">停止中…</string>
     <string name="rename">重命名</string>
-    <string name="no_name">未命名</string>
     <string name="firmware_version">固件版本：%1$s</string>
     <string name="ota">在线升级</string>
     <string name="my_scene">场景一</string>
@@ -477,9 +476,8 @@
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
     <string name="device_disconnected">设备已断开</string>
     <string name="reconnect">重连</string>
-    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关,如果开关没有usb接口则不必执行拔出USB线操作。</string>
+    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关。</string>
     <string name="install_success">安装成功</string>
-    <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
     <string name="scene_name_show">场景:%1$s</string>
     <string name="name_can_not_null">名字不能为空</string>
@@ -762,7 +760,7 @@
     <string name="QR_expired">二维码已失效,请重新生成</string>
     <string name="unbind_network">解绑区域</string>
     <string name="more">更多</string>
-    <string name="change_region">确定切换到区域</string>
+    <string name="change_region">确定切换到区域:</string>
     <string name="total_device">(共%1$s个设备)</string>
     <string name="share_person">分享人数: %1$s人</string>
     <string name="to_receive">待接收</string>
@@ -794,7 +792,7 @@
     <string name="single_login_warm">你的优乐迪账号已再其他设备登录,如果这不是你的操作,请尽快修改密码</string>
     <string name="other_device_login">其他设备登录提醒</string>
     <string name="author_region_receviced">您分享的区域已被接收</string>
-    <string name="author_account_receviced">您分享的账号已被接收</string>
+    <string name="author_account_receviced">您移交的账号已被接收</string>
     <string name="recevicer">接收者:</string>
     <string name="hint">提示</string>
     <string name="please_select_area">请选择区域</string>
@@ -805,7 +803,8 @@
     <string name="please_connect_normal_light">请连接冷暖灯</string>
     <string name="please_connect_curtain">请连接窗帘</string>
     <string name="scanning_timeout">扫描超时</string>
-    <string name="reset_factory_success">恢复出厂设置成功</string>
+    <string name="reset_factory_success">恢复出厂成功,3秒内设备灯光闪烁,未闪烁请重试</string>
+    <string name="reset_factory_fail">恢复出厂设置失败,请重新上电重试</string>
     <string name="please_read_carefully">请仔细阅读 %1$s</string>
     <string name="please_sure_all_device_power_on">请确保所有设备已通电(传感器,开关除外)</string>
     <string name="reset_factory_all_device">此操作会让所有通电设备恢复出厂设置(传感器,开关除外)</string>
@@ -830,7 +829,6 @@
     <string name="direck_light">直连灯:</string>
     <string name="get_data_please_wait">加载数据中,请稍后</string>
     <string name="grouping_success_tip">设备重新分组成功后,请重新保存与该分组设备相关的场景</string>
-    <string name="no_scaned_device">未扫描到指定设备</string>
     <string name="timeout_period_is_empty">超时时间为空</string>
     <string name="timeout_time_less_ten">超时时间不能小于10秒钟</string>
     <string name="timeout_255">超时时间不能大于255秒钟</string>
@@ -841,5 +839,30 @@
     <string name="delete_region_tip">删除该区域请先把该区域设备恢复出厂设置…</string>
     <string name="switch_btn">开关</string>
     <string name="no_have_bin">不存在该类型的bin文件</string>
+    <string name="device_name">设备:</string>
+    <string name="no_search_result">抱歉,没有发现相关内容</string>
+    <string name="change_match_type">换个关键词试试吧</string>
+    <string name="physical_recovery">物理恢复</string>
+    <string name="no_found_device">未发现附近有可添加设备</string>
+    <string name="please">是否尝试</string>
+    <string name="begin_scan">开始扫描</string>
+    <string name="click_retry">点击重试</string>
+    <string name="frist_out_age">连接成功,请在%1$sS内断电</string>
+    <string name="frist_power_on">请在%1$s秒后通电</string>
+    <string name="second_power_on">请在%1$s秒内通电,等待连接</string>
+    <string name="scan_retry">重新扫描</string>
+    <string name="transfer_region">移交区域</string>
+    <string name="region_transfer_code_invalid">区域移交二维码失效</string>
+    <string name="transfer_region_code">扫描下方二维码移交区域</string>
+    <string name="see_region_qr">查看移交码</string>
+    <string name="transfer_network_region">移交单个区域</string>
+    <string name="transfer_region_success">您移交的区域已被接收</string>
+    <string name="make_code_fail">创建二维码失败</string>
+    <string name="please_near_light">请靠近灯</string>
+    <string name="near_light_ok">我已靠近灯</string>
+    <string name="old_light_rest">当前固件版本较低,请尝试以下步骤复位设备:</string>
+    <string name="warm_notice">温馨提示：如有其它问题，请参考APP使用说明。</string>
+    <string name="config_success">配置成功</string>
+    <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
 
 </resources>

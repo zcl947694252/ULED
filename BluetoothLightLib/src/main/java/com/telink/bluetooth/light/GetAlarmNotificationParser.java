@@ -91,7 +91,8 @@ public final class GetAlarmNotificationParser extends NotificationParser<GetAlar
     }
 
     public enum AlarmType {
-        DAY(0), WEEK(1),;
+        DAY(0), WEEK(1),
+        ;
 
         private final int value;
 
@@ -117,7 +118,8 @@ public final class GetAlarmNotificationParser extends NotificationParser<GetAlar
     }
 
     public enum AlarmStatus {
-        ENABLE(1), DISABLE(0),;
+        ENABLE(1), DISABLE(0),
+        ;
 
         private final int value;
 

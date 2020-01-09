@@ -170,12 +170,7 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                         sv_log.setVisibility(View.VISIBLE);
                         String time = mTimeFormat.format(Calendar.getInstance().getTimeInMillis());
                         tv_log.append("\n" + time + ":" + msg.obj.toString());
-//
-////                    int scroll_amount = tv_log.getBottom();
-////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
-////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                       //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
@@ -195,7 +190,6 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                         TelinkLightService instance = TelinkLightService.Instance();
                         if (instance!=null)
                             instance.idleMode(true);
-                        TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF:{
@@ -204,13 +198,13 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                         TelinkLightService instance = TelinkLightService.Instance();
                         if (instance!=null)
                             instance.idleMode(true);
-                        TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
                     }
                 }
             }
         }
     };
+    private boolean developerModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,16 +250,21 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         assert powerManager != null;
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         addEventListener();
-        TelinkLightService.Instance().enableNotification();
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.enableNotification();
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         initToolbar();
-        otaProgress = (TextView) findViewById(R.id.progress_ota);
-        meshOtaProgress = (TextView) findViewById(R.id.progress_mesh_ota);
-        tv_log = (TextView) findViewById(R.id.tv_log);
-        sv_log = (ScrollView) findViewById(R.id.sv_log);
-        tv_version = (TextView) findViewById(R.id.tv_version);
+        otaProgress = findViewById(R.id.progress_ota);
+        meshOtaProgress = findViewById(R.id.progress_mesh_ota);
+        tv_log = findViewById(R.id.tv_log);
+        sv_log = findViewById(R.id.sv_log);
+        tv_version = findViewById(R.id.tv_version);
+
+         developerModel = SharedPreferencesUtils.isDeveloperModel();
+        select.setVisibility(developerModel?View.VISIBLE:View.GONE);
 
         if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
             mPath = SharedPreferencesUtils.getUpdateFilePath();
@@ -417,7 +416,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                 byte opcode = (byte) 0xC7;
                 int address = 0x0000;
                 byte[] params = new byte[]{0x20, 0x05};
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance!=null)
+                instance.sendCommandNoResponse(opcode, address,
                         params);
                 log("SendCommand 0xC7 getDeviceOtaState");
                 otaStateTimeout++;
@@ -446,7 +447,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         byte opcode = (byte) 0xC7;
         int address = dbLight.getMeshAddr();
         byte[] params = new byte[]{0x20, 0x00};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.sendCommandNoResponse(opcode, address,
                 params);
         log("SendCommand 0xC7 getVersion");
         // 转发次数 * () * interval + 500
@@ -495,14 +498,18 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
     public void connectDevice(String mac) {
         log("connectDevice :" + mac);
         btn_start_update.setText(R.string.start_connect);
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.connect(mac, TIME_OUT_CONNECT);
     }
 
     private void login() {
         log("login");
         String account = DBUtils.INSTANCE.getLastUser().getAccount();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16);
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 
     private boolean isConnectting = false;
@@ -575,9 +582,6 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
             this.sendStopMeshOTACommand();
         }
         this.mode = MODE_COMPLETE;
-        TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
         TelinkLightApplication.Companion.getApp().removeEventListener(this);
     }
@@ -844,7 +848,8 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         if(dbLight.getMacAddr().length()>16){
             params.setScanMac(dbLight.getMacAddr());
         }
-        TelinkLightService.Instance().startScan(params);
+        if (instance!=null)
+        instance.startScan(params);
         startScanTimer();
         log("startScan ");
     }
@@ -879,7 +884,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
 
         if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null) {
             OTA_IS_HAVEN_START=true;
-            TelinkLightService.Instance().startOta(mFirmwareData);
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance!=null)
+            instance.startOta(mFirmwareData);
         } else {
             startScan();
         }
@@ -1097,7 +1104,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                 stopConnectTimer();
                 connectRetryCount = 0;
                 if (this.mode == MODE_COMPLETE) return;
-                TelinkLightService.Instance().enableNotification();
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance!=null)
+                instance.enableNotification();
 //                if (this.mode == MODE_OTA) {
 //                    sendGetDeviceOtaStateCommand();
 //                } else if (this.mode == MODE_IDLE) {
@@ -1173,8 +1182,9 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         byte opcode = (byte) 0xC6;
         int address = 0x0000;
         byte[] params = new byte[]{(byte) 0xFF, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.sendCommandNoResponse(opcode, address, params);
         log("SendCommand 0xC6 startMeshOTA");
     }
 
@@ -1183,7 +1193,8 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
         byte opcode = (byte) 0xC6;
         int address = 0xFFFF;
         byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance!=null)
+        instance.sendCommandNoResponse(opcode, address, params);
     }
 }

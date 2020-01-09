@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uledtest.ble.RxBleManager
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -64,7 +65,7 @@ class TelinkLightApplication : TelinkApplication() {
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
-
+        RxBleManager.init(this)
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)
@@ -119,6 +120,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
+//                    LogUtils.e("zcl单点登录 It's time to cancel $it")
                     if (it != key&&"no_have_key"!=it) {
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
@@ -127,26 +129,26 @@ class TelinkLightApplication : TelinkApplication() {
                     }
 
                 }, {
-                    ToastUtils.showShort(it.localizedMessage)
+                    ToastUtils.showLong(it.localizedMessage)
                 })
                 if (DBUtils.lastUser?.id!=null)
                 paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
-                    LogUtils.e("It's time to parse $it")
+                    LogUtils.e("zcl解析 It's time to parse $it")
                     val intent = Intent()
                     intent.action = Constant.PARSE_CODE
                     intent.putExtra(Constant.PARSE_CODE, it)
                     sendBroadcast(intent)
                 }, {
-                    ToastUtils.showShort(it.localizedMessage)
+                    ToastUtils.showLong(it.localizedMessage)
                 })
                 if (DBUtils.lastUser?.id!=null)
                 mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
-                    LogUtils.e("It's time to cancel $it")
+                    LogUtils.e("zcl取消授权 It's time to cancel $it")
                     val intent = Intent()
                     intent.action = Constant.CANCEL_CODE
                     intent.putExtra(Constant.CANCEL_CODE, it)
                     sendBroadcast(intent)
-                }, { ToastUtils.showShort(it.localizedMessage)})
+                }, { ToastUtils.showLong(it.localizedMessage)})
 
                 /**
                  * stomp断联监听
@@ -162,7 +164,7 @@ class TelinkLightApplication : TelinkApplication() {
                                 }
                         }
                     }
-                }, { ToastUtils.showShort(it.localizedMessage)})
+                }, { ToastUtils.showLong(it.localizedMessage)})
             }
         }
     }

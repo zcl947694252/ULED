@@ -36,7 +36,7 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
         webSettings.domStorageEnabled = true
         webView!!.clearCache(true)
         if(isZh(this)){
-            webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html")
+            webView!!.loadUrl("https://dev.dadoutek.com/static/README/index.html?lang=0")
         }else{
             webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
         }

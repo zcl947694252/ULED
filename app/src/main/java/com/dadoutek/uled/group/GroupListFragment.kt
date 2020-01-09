@@ -201,7 +201,7 @@ class GroupListFragment : BaseFragment() {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showShort(getString(R.string.author_region_warm))
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     isGuide = false
                     if (dialog_pop?.visibility == View.GONE) {
@@ -356,7 +356,7 @@ class GroupListFragment : BaseFragment() {
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -501,7 +501,7 @@ class GroupListFragment : BaseFragment() {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showShort(getString(R.string.author_region_warm))
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))

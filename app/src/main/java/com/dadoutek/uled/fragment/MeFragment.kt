@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -33,7 +32,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
-import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -104,8 +102,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                             TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
-                        }
-                        .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which ->
+                        }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
                             dialog.dismiss()
                             isClickExlogin = false
                             hideLoadingDialog()
@@ -189,6 +186,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
+        compositeDisposable.dispose()
     }
 
     private fun initClick() {
@@ -230,7 +228,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
             if (TelinkLightApplication.getApp().connectDevice != null)
                 resetAllLight()
             else {
-                ToastUtils.showShort(R.string.device_not_connected)
+                ToastUtils.showLong(R.string.device_not_connected)
             }
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -353,7 +351,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
 
         if (meshAdre.size > 0) {
-            Commander.resetLights(meshAdre, {
+            Commander.resetAllDevices(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
                 activity?.bnve?.currentItem = 0
@@ -384,13 +382,12 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
             override fun error(msg: String) {
                 hideLoadingDialog()
-                ToastUtils.showShort(R.string.backup_failed)
+                ToastUtils.showLong(R.string.backup_failed)
             }
 
             override fun start() {}
         })
     }
-
 
     private fun exitLogin() {
         isClickExlogin = true
@@ -400,7 +397,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         lastUser?.let {
             if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
                 if (isClickExlogin) {
-                    SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                     TelinkLightService.Instance()?.disconnect()
                     TelinkLightService.Instance()?.idleMode(true)
                     restartApplication()
@@ -411,7 +407,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 checkNetworkAndSync(activity)
             }
         }
-
     }
 
 
@@ -479,7 +474,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 CleanUtils.cleanExternalCache()
                 CleanUtils.cleanInternalFiles()
                 CleanUtils.cleanInternalCache()
-                ToastUtils.showShort(R.string.clean_tip)
+                ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(activity!!)
                 hideLoadingDialog()
 

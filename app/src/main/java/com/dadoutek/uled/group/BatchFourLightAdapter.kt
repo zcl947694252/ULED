@@ -3,6 +3,7 @@ package com.dadoutek.uled.group
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -20,11 +21,23 @@ import com.dadoutek.uled.model.DeviceType
  * 更新描述
  */
 class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+    // -70 至 -80一般  >=-65 很好
     private val allLightId: Long = 1
+    private val bestRssi: Long = -70
+    private val normalRssi: Long = -80
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.batch_img_icon)
         val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)
+        val rssiIcon = helper.getView<ImageView>(R.id.batch_img_rssi)
+
+        LogUtils.e("zcl更新信号${item?.rssi}---------${item?.rssi?:-1000>=bestRssi}----------------${ item?.rssi?:-1000 in bestRssi..normalRssi}")
+
+        when {
+            item?.rssi?:-1000>=bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_blue)
+            item?.rssi?:-1000 in normalRssi..bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_yellow)
+            else -> rssiIcon.setBackgroundResource(R.drawable.btn_rectangle_circle_red)
+        }
 
         helper.setText(R.id.batch_tv_device_name, item?.name)
 
@@ -33,6 +46,7 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
         } else {
             helper.setImageResource(R.id.batch_selected,R.drawable.icon_checkbox_unselected)
         }
+
 
         if (item?.belongGroupId !=allLightId) {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))
@@ -48,6 +62,7 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
         } else {
             helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
+            //groupName.text ="=="+item?.rssi
             if (item?.productUUID == DeviceType.LIGHT_RGB) {
                 icon.setImageResource(R.drawable.icon_rgblight_down)
             } else {

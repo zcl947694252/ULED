@@ -60,6 +60,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var downloadDispoable: Disposable? = null
     private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
     private lateinit var light: DbLight
@@ -117,7 +118,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 },
                                 failedCallback = {
                                     this.hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -750,11 +751,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         android.app.AlertDialog.Builder(this@NormalSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
                         var canSave = true
@@ -851,6 +851,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onDestroy() {
         super.onDestroy()
+        downloadDispoable?.dispose()
         mConnectTimer?.dispose()
         mDisposable.dispose()
     }
@@ -860,7 +861,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
 
         if (light == null) {
-            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
             return
@@ -870,6 +871,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra("uuid", light!!.productUUID)
         Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
+        this?.setResult(Constant.RESULT_OK)
         this.finish()
 
     }
@@ -913,7 +915,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     if (it!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
-                            transformView()
+                            downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
+                                    .subscribe(
+                                            { s ->
+                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                    light!!.version = s
+                                                    transformView()
+                                                } else {
+                                                    ToastUtils.showLong(getString(R.string.version_disabled))
+                                                }
+                                                hideLoadingDialog()
+                                            },
+                                            {
+                                                hideLoadingDialog()
+                                                ToastUtils.showLong(getString(R.string.get_version_fail))
+                                            }
+                                    )
+
                         } else {
                             OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
                         }
@@ -947,15 +965,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light.meshAddr)
-                    }
-                    ?.subscribe(
-                            {
+                        connect(light.meshAddr,true)
+                    }?.subscribe({
                                 hideLoadingDialog()
-                                startOtaAct()
-                            }
-                            ,
-                            {
+                                startOtaAct() }
+                            , {
                                 hideLoadingDialog()
                                 ToastUtils.showLong(R.string.connect_fail2)
                                 LogUtils.d(it)
@@ -1227,7 +1241,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     },
                                     failedCallback = {
                                         this.hideLoadingDialog()
-                                        ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                        ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
                                     })
                         }
                         .setNegativeButton(R.string.btn_cancel, null)
@@ -1405,7 +1419,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateLight(light!!)
@@ -1696,8 +1710,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setPositiveButton(android.R.string.ok) { _, _ ->
 
                         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
-                            val opcode = Opcode.KICK_OUT
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
+                            val disposable = Commander.resetDevice(light!!.meshAddr)
+                                    .subscribe(
+                                            {
+                                                LogUtils.v("zcl-----恢复出厂成功")
+                                            }, {
+                                        LogUtils.v("zcl-----恢复出厂失败")
+                                    })
+
                             DBUtils.deleteLight(light!!)
                             if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                                 TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
