@@ -838,7 +838,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         if (device != null&&device.macAddress==mDeviceInfo.macAddress){
         Thread {
             GlobalScope.launch(Dispatchers.Main) {
-                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_switch))
+                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
             }
             LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
             configLightlight()
@@ -1045,7 +1045,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val device = TelinkLightApplication.getApp().connectDevice
         if (device != null&&device.macAddress==mDeviceInfo.macAddress) {
             GlobalScope.launch(Dispatchers.Main) {
-                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_switch))
+                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
             }
             val address = device.meshAddress
             //val address = mDeviceInfo.meshAddress

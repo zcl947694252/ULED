@@ -1745,9 +1745,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     val mesh = mApplication!!.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
-                    // if (!AppUtils.isExynosSoc) {
                     params.setScanFilters(getFilters())
-                    //}
                     params.setMeshName(DBUtils.lastUser?.controlMeshName)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)

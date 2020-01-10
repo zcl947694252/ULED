@@ -273,7 +273,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else if (tietDelay.text.toString().toInt() > 255) {
                     ToastUtils.showLong(getString(R.string.time_max_tip))
                 } else {
-                    showLoadingDialog(getString(R.string.configuring_switch))
+                    showLoadingDialog(getString(R.string.configuring_sensor))
                     Thread {
                         val mode = getModeValue()
 

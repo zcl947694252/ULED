@@ -132,6 +132,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                         mIsConfiguring = true
                         updateSwitch()
                         disconnect()
+                        ToastUtils.showShort(getString(R.string.config_success))
+                        pb_ly.visibility = View.GONE
                         if (switchDate == null)
                             switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                         showRenameDialog()
@@ -298,7 +300,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
-                        pb_ly.visibility = View.VISIBLE
+                        pb_ly.visibility = View.GONE
                         mIsDisconnecting = true
                         disconnect()
                     } else {
@@ -409,7 +411,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+        mConnectingSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
                 .string.connecting))
 
         TelinkLightService.Instance()?.autoConnect(connectParams)
@@ -421,8 +423,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
-                mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
-                pb_ly.visibility = View.GONE
+                mConnectedSnackBar = snackbar(config_scene_switch, R.string.connect_success)
             }
 
 
@@ -493,7 +494,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
 
         if (mSceneList.isEmpty()) {
             fab.visibility = View.GONE
-            indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
+            indefiniteSnackbar(config_scene_switch, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 TelinkLightService.Instance()?.idleMode(true)
             }

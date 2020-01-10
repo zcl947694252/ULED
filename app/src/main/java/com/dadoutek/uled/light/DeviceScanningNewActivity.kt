@@ -1205,12 +1205,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     val mesh = mApplication!!.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
-                    if (!AppUtils.isExynosSoc) {
+                    //if (!AppUtils.isExynosSoc)
                         if (mAddDeviceType == DeviceType.NORMAL_SWITCH)
                             params.setScanFilters(getSwitchFilters())
                         else
                             params.setScanFilters(getFilters())
-                    }
+
                     params.setMeshName(mesh.factoryName)
                     params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

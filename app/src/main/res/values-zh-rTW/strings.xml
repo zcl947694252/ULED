@@ -202,7 +202,7 @@
     <string name="scene4">场景4</string>
     <string name="scene_set">场景分配</string>
     <string name="setting_switch">正在配置开关……</string>
-    <string name="configuring_switch">正在配置传感器……</string>
+    <string name="configuring_sensor">正在配置传感器……</string>
     <string name="pace_fail">配置失败</string>
     <string name="tip_switch">请先添加场景</string>
     <string name="tip_add_scene">已经添加了所有存在的组！</string>

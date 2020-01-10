@@ -209,7 +209,7 @@
     <string name="scene4">Scene 4</string>
     <string name="scene_set">Scene assignment</string>
     <string name="setting_switch">Configuring switch…</string>
-    <string name="configuring_switch">Configuring sensor…</string>
+    <string name="configuring_sensor">Configuring sensor…</string>
     <string name="pace_fail">Configuration failed</string>
     <string name="tip_switch">Please add Scene first</string>
     <string name="tip_add_scene">All existing groups have been added!</string>

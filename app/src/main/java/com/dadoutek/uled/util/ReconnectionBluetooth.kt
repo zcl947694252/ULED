@@ -155,9 +155,9 @@ class ReconnectionBluetooth : EventListener<String> {
             scanFilters.add(scanFilter)
 
             val params = LeScanParameters.create()
-            if (!AppUtils.isExynosSoc) {
+           // if (!AppUtils.isExynosSoc)
                 params.setScanFilters(scanFilters)
-            }
+
             params.setMeshName(account)
             params.setOutOfMeshName(account)
             params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
