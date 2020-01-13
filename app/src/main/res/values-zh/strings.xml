@@ -870,5 +870,11 @@
     <string name="select_scene">选择场景</string>
     <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
     <string name="select_type">请选择类型</string>
+    <string name="group_switch">群组开关</string>
+    <string name="close">关</string>
+    <string name="brightness_add">亮度+</string>
+    <string name="color_temperature_add">色温+</string>
+    <string name="brightness_minus">亮度-</string>
+    <string name="color_temperature_minus">色温-</string>
 
 </resources>

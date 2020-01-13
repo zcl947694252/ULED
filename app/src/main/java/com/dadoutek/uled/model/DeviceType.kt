@@ -6,6 +6,7 @@ object DeviceType {
     const val NORMAL_SWITCH: Int = 0x20
     const val SCENE_SWITCH: Int = 0x21
     const val NORMAL_SWITCH2: Int = 0x22
+    const val EIGHT_SWITCH: String = "B8SS"
     const val SMART_CURTAIN_SWITCH: Int = 0x25
 
     const val SENSOR: Int = 0x23//pir 版本:PS-1.1.3

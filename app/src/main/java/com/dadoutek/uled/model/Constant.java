@@ -140,16 +140,11 @@ public class Constant implements Serializable {
     public static final String DB_UPDATE = "DB_UPDATE";
     //用户类型
     public static String USER_TYPE = "USER_TYPE";
-    //    //用户类型老用户
-//    public static String USER_TYPE_OLD = "OLD_USER";
     //用户类型老用户（2018-7-23：取消新老用户的标识，全部标记为新用户数据类型）
     public static String USER_TYPE_OLD = "NEW_USER";
     //用户类型新用户
     public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户
-    public static int CTROL_PASSWORD_REGION = 1000000000;
-
-    public static String LIGHT_STATE_KEY = "LIGHT_STATE_KEY";
 
     //是否在一键恢复出厂设置
     public static String DELETEING = "DELETEING";
@@ -159,8 +154,6 @@ public class Constant implements Serializable {
 
     public static String DEVICE_TYPE = "DEVICE_TYPE";
 
-    //管理权限本地保存key
-    public static String OLD_INDEX_DATA = "oldIndexData";
 
     //管理权限本地保存key
     public static int SWITCH_PIR_ADDRESS = 0xFF;
@@ -170,40 +163,9 @@ public class Constant implements Serializable {
 
     public static String UPDATE_LIGHT = "UPDATE_LIGHT";
 
-    public static String FIRMWARE_TYPE_LIGHT = "FIRMWARE_TYPE_LIGHT";
-    public static String FIRMWARE_TYPE_CONTROLLER = "FIRMWARE_TYPE_CONTROLLER";
-
     public static String PRESET_COLOR = "PRESET_COLOR";
 
-    public static int LIGHT = 1;
-    public static int CONTROLLER = 2;
-
-    //l有频闪;ln无频闪;lns无频闪单调光;ln不带s调光调色
-
-    //🈶频闪
-    public static int LIGHT_TYPE_STROBE = 1;
-    //无频闪单调光
-    public static int LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 2;
-    //无频闪调光调色
-    public static int LIGHT_TYPE_NO_STROBO_DIMMING = 3;
-    //无频闪costdown
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN = 4;
-    //无频闪costdown双调光
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING = 5;
-    //无频闪costdown48转36V
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V = 6;
-
-    //无频闪单调光
-    public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 1;
-    //无频闪调光调色
-    public static int CONTROLLER_TYPE_NO_STROBO_DIMMING = 2;
-    //RGB控制器
-    public static int CONTROLLER_TYPE_RGB = 3;
-
     public static int OTA_SUPPORT_LOWEST_VERSION = 206;
-
-    public static int TURN_ON_THE_LIGHT_AFTER_PASSING = 0;
-    public static int TURN_OFF_THE_LIGHT_AFTER_PASSING = 1;
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT = "IS_SCAN_RGB_LIGHT";
@@ -220,15 +182,7 @@ public class Constant implements Serializable {
     public static String TYPE_LOGIN = "TYPE_LOGIN";
 
     //导航页标签
-    public static String TAG_GroupListFragment = "GroupListFragment";
     public static String TAG_SceneFragment = "SceneFragment";
-    public static String TAG_SceneFragment1 = "SceneFragment1";
-    public static String TAG_SceneFragment2 = "SceneFragment2";
-    public static String TAG_DeviceScanningNewActivity = "DeviceScanningNewActivity";
-    public static String TAG_SetSceneAct = "TAG_SetSceneAct";
-    public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
-    public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
-    //    public static String TAG_GroupListFragment = "GroupListFragment";
 
     public static final int INSTALL_NORMAL_LIGHT = 0;
     public static final int INSTALL_RGB_LIGHT = 1;
@@ -306,4 +260,5 @@ public class Constant implements Serializable {
     public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
     public static final String IS_TECK="IS_TECK";
+    public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
 }
