@@ -35,6 +35,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSensorDao.createTable(db, ifNotExists);
         DbSwitchDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
+        DbUserDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
