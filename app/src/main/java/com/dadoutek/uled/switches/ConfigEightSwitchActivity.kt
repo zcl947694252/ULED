@@ -3,21 +3,28 @@ package com.dadoutek.uled.switches
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.example.library.banner.BannerLayout
 import com.telink.bluetooth.light.DeviceInfo
+import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.eight_switch.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.design.snackbar
 
 
 /**
@@ -30,7 +37,9 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
-    private lateinit var switchDate: DbSwitch
+    private lateinit var mConfigFailSnackbar: Snackbar
+    private var newMeshAddr: Int = 0
+    private  var switchDate: DbSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
@@ -80,8 +89,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun confimCongfig() {
         //成功后clickType = 0
         if (configSwitchType == 0) {
-
-            if (groupMap.size >= 3 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7)) {
+            if (groupMap.size >= 3 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(4)) {
               sendParms()
                // TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, , )
             } else
@@ -89,7 +97,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         } else if (configSwitchType == 1) {
             if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
                     sceneMap.containsKey(3) && sceneMap.containsKey(4)&& sceneMap.containsKey(5)
-                    && sceneMap.containsKey(6) && sceneMap.containsKey(7)&& sceneMap.containsKey(8)) {
+                    && sceneMap.containsKey(6)&& sceneMap.containsKey(0)) {
             sendSceneParms()
             } else
                 ToastUtils.showLong("请点击配置按钮完成配置")
@@ -98,31 +106,31 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun sendSceneParms() {
         sceneParmList.clear()
-        val first = mutableListOf(1, 2)
-        val second = mutableListOf(3, 4)
-        val third = mutableListOf(5, 6)
+        val first = mutableListOf(0, 1)
+        val second = mutableListOf(2, 3)
+        val third = mutableListOf(4, 5)
         val four: MutableList<Int> = if (sceneParmList.size > 7)
-            mutableListOf(7, 8)
+            mutableListOf(7, 6)
         else
-            mutableListOf(7)
+            mutableListOf(6)
 
         getSceneParm(first)
         getSceneParm(second)
         getSceneParm(third)
         getSceneParm(four)
-
     }
 
     private fun sendParms() {
+        showLoadingDialog(getString(R.string.setting_switch))
         groupParmList.clear()
         var firstParm = byteArrayOf(0x01, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x02, Opcode.GROUP_CCT_ADD, 0x00, 0x00)
         var secondParm = byteArrayOf(0x03, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x04, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
 
-        val third = mutableListOf(5, 6)
+        val third = mutableListOf(4, 5)
         val four: MutableList<Int> = if (groupMap.size > 3)
-            mutableListOf(7, 8)
+            mutableListOf(7, 6)
         else
-            mutableListOf(7)
+            mutableListOf(6)
         val thirParm = getGroupParm(third)
         val fourParm = getGroupParm(four)
 
@@ -138,15 +146,80 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH,mDeviceInfo.meshAddress,p)
                delay += 300
            }
+            kotlinx.coroutines.delay(1500)
+            newMeshAddr = MeshAddressGenerator().meshAddress
+            Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
+                mDeviceInfo.meshAddress = newMeshAddr
+               // mIsConfiguring = true
+               // updateSwitch()
+               // disconnect()
+//                if (switchDate == null)
+//                    switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+               // showRenameDialog()
+                GlobalScope.launch(Dispatchers.Main){
+                ToastUtils.showShort(getString(R.string.config_success))
+                    hideLoadingDialog()
+                }
+            }, failedCallback = {
+                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
+                GlobalScope.launch(Dispatchers.Main) {
+                   // pb_ly.visibility = View.GONE
+                   // mIsConfiguring = false
+                    GlobalScope.launch(Dispatchers.Main){
+                        hideLoadingDialog()
+                    }
+                }
+            })
        }
 }
+    private fun updateSwitch() {
+        if (groupName == "false") {
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if (dbSwitch != null) {
+//                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+dbSwitch.meshAddr
+//                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+//                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+//
+//                Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
+//                DBUtils.updateSwicth(dbSwitch)
+//                switchDate = dbSwitch
+            } else {
+//                var dbSwitch = DbSwitch()
+//                DBUtils.saveSwitch(dbSwitch, false)
+//                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+//                dbSwitch.macAddr = mDeviceInfo.macAddress
+//                dbSwitch.meshAddr = mDeviceInfo.meshAddress
+//                dbSwitch.productUUID = mDeviceInfo.productUUID
+//                dbSwitch.index = dbSwitch.id.toInt()
+//                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+//
+//                Log.e("zcl", "zcl*****设置新的开关使用插入替换$dbSwitch")
+//                DBUtils.saveSwitch(dbSwitch, false)
+//
+//                LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
+//                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//                DBUtils.recordingChange(gotSwitchByMac?.id,
+//                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+//                        Constant.DB_ADD)
+//                switchDate = dbSwitch
+            }
+
+            switchDate = dbSwitch
+        } else {
+           // switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+           // switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+            DBUtils.updateSwicth(switchDate!!)
+        }
+    }
+
+
     private fun getSceneParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
         val firsDbSceneId = sceneMap[firstNum]!!.id
         return if (list.size > 1) {
             val secondNum = list[1]
-            val secondDbScene = groupMap[secondNum]
-            byteArrayOf(firstNum.toByte(), 0x00, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), Opcode.GROUP_SWITCH,  0x00,  0x00)
+            val secondDbSceneId = groupMap[secondNum]!!.id
+            byteArrayOf(firstNum.toByte(), 0x00, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), 0x00,  0x00,  secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关
             byteArrayOf(firstNum.toByte(), Opcode.GROUP_SWITCH,  0x00,  0x00, 0x08, Opcode.CLOSE, 0x00, 0x00)
         }
@@ -173,35 +246,35 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.eight_switch_b1 -> {
                 isCanClick = configSwitchType != 0
-                configButtonTag = 1
+                configButtonTag = 0
             }
             R.id.eight_switch_b2 -> {
                 isCanClick = configSwitchType != 0
-                configButtonTag = 2
+                configButtonTag = 1
             }
             R.id.eight_switch_b3 -> {
                 isCanClick = configSwitchType != 0
-                configButtonTag = 3
+                configButtonTag = 2
             }
             R.id.eight_switch_b4 -> {
                 isCanClick = configSwitchType != 0
-                configButtonTag = 4
+                configButtonTag = 3
             }
             R.id.eight_switch_b5 -> {
                 isCanClick = true
-                configButtonTag = 5
+                configButtonTag = 4
             }
             R.id.eight_switch_b6 -> {
                 isCanClick = true
-                configButtonTag = 6
+                configButtonTag = 5
             }
             R.id.eight_switch_b7 -> {
                 isCanClick = true
-                configButtonTag = 7
+                configButtonTag = 6
             }
             R.id.eight_switch_b8 -> {
                 isCanClick = true
-                configButtonTag = 8
+                configButtonTag = 7
             }
         }
         if (isCanClick) {
@@ -212,7 +285,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         eight_switch_tvLightVersion?.text = version
@@ -286,14 +358,14 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             }
 
             when (configButtonTag) {
-                1 -> eight_switch_b1.text = name
-                2 -> eight_switch_b2.text = name
-                3 -> eight_switch_b3.text = name
-                4 -> eight_switch_b4.text = name
-                5 -> eight_switch_b5.text = name
-                6 -> eight_switch_b6.text = name
-                7 -> eight_switch_b7.text = name
-                8 -> eight_switch_b8.text = name
+                0 -> eight_switch_b1.text = name
+                1 -> eight_switch_b2.text = name
+                2 -> eight_switch_b3.text = name
+                3 -> eight_switch_b4.text = name
+                4 -> eight_switch_b5.text = name
+                5 -> eight_switch_b6.text = name
+                6 -> eight_switch_b7.text = name
+                7 -> eight_switch_b8.text = name
             }
         }
     }
