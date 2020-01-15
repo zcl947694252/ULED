@@ -1,6 +1,18 @@
 package com.dadoutek.uled.model
 
 object Opcode {
+    const val GROUP_BRIGHTNESS_ADD: Byte = 0x1C.toByte()//增加组亮度 C代表组 A代表灯
+    const val GROUP_BRIGHTNESS_MINUS: Byte = 0x2C.toByte()//降低组亮度
+    const val GROUP_CCT_ADD: Byte = 0x3C.toByte()//增加组色温
+    const val GROUP_CCT_MINUS: Byte = 0x4C.toByte()//减少组色温
+    const val GROUP_SWITCH: Byte = 0x7C.toByte()//组开关
+    const val CLOSE: Byte = 0x03.toByte()//组开关
+
+    const val BRIGHTNESS_ADD: Byte = 0x1A.toByte()
+    const val BRIGHTNESS_MINUS: Byte = 0x2A.toByte()
+    const val CCT_ADD: Byte = 0x3A.toByte()
+    const val CCT_MINUS: Byte = 0x4A.toByte()
+
     const val LIGHT_ON_OFF: Byte = 0xD0.toByte()
     const val LIGHT_BLINK_ON_OFF: Byte = 0xF5.toByte()
     const val CURTAIN_ON_OFF: Byte = 0xF2.toByte()

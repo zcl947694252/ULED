@@ -647,7 +647,7 @@ object Commander : EventListener<String> {
 
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-                LogUtils.d("Commander auto connect meshName = $meshName, mConnectEmitter = ${mConnectEmitter}, mac = $macAddress")
+                LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")
 
                 TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {

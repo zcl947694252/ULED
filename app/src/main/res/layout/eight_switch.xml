@@ -56,7 +56,7 @@
                 android:id="@+id/eight_switch_config"
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/light_background">
 
@@ -67,8 +67,8 @@
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="15dp"
                     android:gravity="center"
-                    android:text="点击配置"
-                    android:textColor="@color/click_config_color"
+                    android:text="@string/brightness_add"
+                    android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
             <TextView
                     android:id="@+id/eight_switch_b2"
@@ -78,8 +78,8 @@
                     android:layout_marginTop="15dp"
                     android:layout_alignParentEnd="true"
                     android:gravity="center"
-                    android:text="点击配置"
-                    android:textColor="@color/click_config_color"
+                    android:text="@string/color_temperature_add"
+                    android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
 
             <TextView
@@ -90,8 +90,8 @@
                     android:layout_marginTop="62dp"
                     android:gravity="center"
                     android:layout_below="@id/eight_switch_b1"
-                    android:text="点击配置"
-                    android:textColor="@color/click_config_color"
+                    android:text="@string/brightness_minus"
+                    android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
 
             <TextView
@@ -103,8 +103,8 @@
                     android:layout_below="@id/eight_switch_b2"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
-                    android:text="点击配置"
-                    android:textColor="@color/click_config_color"
+                    android:text="@string/color_temperature_minus"
+                    android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
             <TextView
                     android:id="@+id/eight_switch_b5"
@@ -170,4 +170,33 @@
             android:gravity="center"
             android:text="@string/use"
             android:textSize="18sp" />
+
+    <LinearLayout
+            android:id="@+id/eight_switch_versionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp_30"
+            android:background="@color/primary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+        <TextView
+                android:id="@+id/eight_switch_tvLightVersionText"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="@string/switch_version"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+        <TextView
+                android:id="@+id/eight_switch_tvLightVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+    </LinearLayout>
+
 </LinearLayout>

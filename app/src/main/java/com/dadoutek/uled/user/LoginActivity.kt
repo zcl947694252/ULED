@@ -23,6 +23,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -39,7 +40,6 @@ import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -476,7 +476,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                                 }
                             })
         } else {
-            ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
+            ToastUtils.showShort(getString(R.string.phone_or_password_can_not_be_empty))
         }
     }
 

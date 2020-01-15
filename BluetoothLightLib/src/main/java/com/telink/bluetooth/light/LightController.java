@@ -759,7 +759,9 @@ public final class LightController extends EventBus<Integer> implements LightPer
         command[offset++] = (byte) (vendorId >> 8 & 0xFF);
         command[offset++] = (byte) (vendorId & 0xFF);
 
-        // params
+        /**
+         * params从第十一位开始
+          */
         if (params != null) {
             System.arraycopy(params, 0, command, offset, params.length);
         }

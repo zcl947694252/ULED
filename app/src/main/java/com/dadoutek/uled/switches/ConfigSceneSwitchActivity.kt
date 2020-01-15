@@ -103,6 +103,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
+
         mSwitchList = ArrayList()
         mSwitchList.add(getString(R.string.button1))
         mSwitchList.add(getString(R.string.button2))
@@ -493,7 +494,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         makePop()
 
         if (mSceneList.isEmpty()) {
-            fab.visibility = View.GONE
+            scene_use_botton.visibility = View.GONE
             indefiniteSnackbar(config_scene_switch, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 TelinkLightService.Instance()?.idleMode(true)

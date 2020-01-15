@@ -35,7 +35,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -420,11 +419,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                     brightness = "0"
                                 var brin = brightness.toInt()
                                 if (brin == 0) {
-                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot))
+                                    ToastUtils.showShort(getString(R.string.brightness_cannot))
                                     return@setPositiveButton
                                 }
                                 if (brin > 100) {
-                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot_be_greater_than))
+                                    ToastUtils.showShort( getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
                                 trigger_time_text.text = textGp.text.toString() + "%"
@@ -872,28 +871,28 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var time = editText.text.toString()
 
         if (time == "") {
-            ToastUtil.showToast(this, getString(R.string.timeout_period_is_empty))
+            ToastUtils.showShort(getString(R.string.timeout_period_is_empty))
             return
         }
 
         if (time_type_text.text.toString() == getString(R.string.second)) {
             if (time.toInt() < 10) {
-                ToastUtil.showToast(this, getString(R.string.timeout_time_less_ten))
+                ToastUtils.showShort( getString(R.string.timeout_time_less_ten))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, getString(R.string.timeout_255))
+                ToastUtils.showShort(getString(R.string.timeout_255))
                 return
             }
         } else if (time_type_text.text.toString() == getString(R.string.minute)) {
             if (time.toInt() < 1) {
-                ToastUtil.showToast(this, getString(R.string.timeout_1m))
+                ToastUtils.showShort( getString(R.string.timeout_1m))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, getString(R.string.timeout_255_big))
+                ToastUtils.showShort(getString(R.string.timeout_255_big))
                 return
             }
         }

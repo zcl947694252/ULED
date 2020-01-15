@@ -30,7 +30,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.TmtUtils
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -390,7 +389,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
         }
 
-        TmtUtils.midToastW(activity, getString(R.string.scene_apply_success))
+        //ToastUtils.showShort(activity, getString(R.string.scene_apply_success))
+
+       ToastUtils.showShort(getString(R.string.scene_apply_success))
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -403,7 +404,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         } else {
             refreshView()
         }
-
     }
 
     fun refreshView() {
