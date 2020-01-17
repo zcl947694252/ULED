@@ -161,6 +161,24 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
+                    "DB_EIGHT_SWITCH" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val switch = DBUtils.getEightSwitchByID(changeId)
+                              //  /*return*/ switch?.let { EightSwitchMdodel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                            //    /*return*/ EightSwitchMdodel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                val switch = DBUtils.getEightSwitchByID(changeId)
+                                switch?.let {
+                                //    /*return*/ EightSwitchMdodel.update(token, switch, changeId.toInt(), id)
+                                }
+                            }
+                        }
+                    }
+
                     "DB_SENSOR" -> {
                         when (type) {
                             Constant.DB_ADD -> {

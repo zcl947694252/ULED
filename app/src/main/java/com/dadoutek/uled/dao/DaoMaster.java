@@ -27,6 +27,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbDataChangeDao.createTable(db, ifNotExists);
         DbDeleteGroupDao.createTable(db, ifNotExists);
         DbDiyGradientDao.createTable(db, ifNotExists);
+        DbEightSwitchDao.createTable(db, ifNotExists);
         DbGroupDao.createTable(db, ifNotExists);
         DbLightDao.createTable(db, ifNotExists);
         DbRegionDao.createTable(db, ifNotExists);
@@ -34,7 +35,6 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSceneActionsDao.createTable(db, ifNotExists);
         DbSensorDao.createTable(db, ifNotExists);
         DbSwitchDao.createTable(db, ifNotExists);
-        DbUserDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
     }
 
@@ -46,6 +46,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbDataChangeDao.dropTable(db, ifExists);
         DbDeleteGroupDao.dropTable(db, ifExists);
         DbDiyGradientDao.dropTable(db, ifExists);
+        DbEightSwitchDao.dropTable(db, ifExists);
         DbGroupDao.dropTable(db, ifExists);
         DbLightDao.dropTable(db, ifExists);
         DbRegionDao.dropTable(db, ifExists);
@@ -78,6 +79,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbDataChangeDao.class);
         registerDaoClass(DbDeleteGroupDao.class);
         registerDaoClass(DbDiyGradientDao.class);
+        registerDaoClass(DbEightSwitchDao.class);
         registerDaoClass(DbGroupDao.class);
         registerDaoClass(DbLightDao.class);
         registerDaoClass(DbRegionDao.class);

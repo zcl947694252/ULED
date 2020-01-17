@@ -20,8 +20,7 @@ public class DbDataChange {
     private String changeType;  //数据改变操作类型  增删改查
 
     @Generated(hash = 668824277)
-    public DbDataChange(Long id, Long changeId, String tableName,
-            String changeType) {
+    public DbDataChange(Long id, Long changeId, String tableName, String changeType) {
         this.id = id;
         this.changeId = changeId;
         this.tableName = tableName;

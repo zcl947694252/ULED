@@ -513,7 +513,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun createCustomDialogOne(t: VersionBean): CustomVersionDialogListener {
         return CustomVersionDialogListener { _, _ ->
             var upDateDialog = BaseUpDateDialog(this, R.style.BaseDialog, R.layout.custom_dialog_two_layout)
-            upDateDialog.findViewById<TextView>(R.id.tv_msg).text = t.data.description
+            upDateDialog.findViewById<TextView>(R.id.tv_msg).text = t.description
             upDateDialog.setCanceledOnTouchOutside(true)
             upDateDialog
         }
@@ -528,8 +528,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun crateUIData(v: VersionBean): UIData {
         val uiData = UIData.create()
         uiData.title = getString(R.string.update_version)
-        uiData.downloadUrl = v.data.url
-        uiData.content = v.data.description
+        uiData.downloadUrl = v.url
+        uiData.content = v.description
         return uiData
     }
 

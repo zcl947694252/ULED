@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model.HttpModel
 
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DbModel.DbSwitchChild
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -8,8 +10,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object SwitchMdodel {
-
-
     fun add(token: String, switch: DbSwitch, id: Long, changeId: Long?): Observable<String>? {
         var dbChild=DbSwitchChild()
         dbChild.productUUID=switch.productUUID

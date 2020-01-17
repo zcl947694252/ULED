@@ -56,6 +56,10 @@ object DBUtils {
         //开关
         get() = DaoSessionInstance.getInstance().dbSwitchDao.loadAll()
 
+    val eightSwitchList: MutableList<DbEightSwitch>
+        get() = DaoSessionInstance.getInstance().dbEightSwitchDao.loadAll()
+
+
     val groupList: MutableList<DbGroup>
         get() {
             val allGIndex = -1
@@ -395,11 +399,9 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbUserDao.load(id)
     }
 
-
-    fun getCurrentRegion(id: Long): DbRegion? {
-        return DaoSessionInstance.getInstance().dbRegionDao.load(id)
+    fun getEightSwitchByID(id: Long): DbEightSwitch {
+        return DaoSessionInstance.getInstance().dbEightSwitchDao.load(id)
     }
-
 
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
         val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
@@ -427,6 +429,25 @@ object DBUtils {
             dbRelyList[0]
         } else null
     }
+
+
+    fun getEightSwitchByMeshAddr(meshAddr: Int): DbEightSwitch? {
+        val dbEightSwitchList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder()
+                .where(DbEightSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return if (dbEightSwitchList.size > 0) {
+            dbEightSwitchList[0]
+        } else null
+    }
+
+
+    fun getEightSwitchByMachAddr(machAddr: Int): DbEightSwitch? {
+        val dbEightSwitchList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder()
+                .where(DbEightSwitchDao.Properties.MacAddr.eq(machAddr)).list()
+        return if (dbEightSwitchList.size > 0) {
+            dbEightSwitchList[0]
+        } else null
+    }
+
 
     fun getSwitchByMacAddr(macAddr: String): DbSwitch? {
         val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
@@ -641,7 +662,7 @@ object DBUtils {
 
     fun saveSensor(sensor: DbSensor, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(sensor.meshAddr)).list()
-        if (existList.size > 0&&existList[0].macAddr ==sensor.macAddr) {
+        if (existList.size > 0 && existList[0].macAddr == sensor.macAddr) {
             //如果该mesh地址的数据已经存在，就直接修改 mes一致则判断mac
             sensor.id = existList[0].id
         }
@@ -664,7 +685,7 @@ object DBUtils {
 
     fun saveSwitch(db: DbSwitch, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
-        if (existList.size > 0&&existList[0].macAddr == db.macAddr) {//
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
@@ -679,6 +700,28 @@ object DBUtils {
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
+            }
+        }
+    }
+
+    fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
+        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
+            //如果该mesh地址的数据已经存在，就直接修改
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbEightSwitchDao.insertOrReplace(db)
+
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbEightSwitchDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbEightSwitchDao.tablename,
                         Constant.DB_ADD)
             }
         }
