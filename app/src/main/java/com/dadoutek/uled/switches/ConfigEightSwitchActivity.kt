@@ -262,8 +262,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         var isCanClick = true
         when (v?.id) {
             R.id.eight_switch_b1 -> {
-                isCanClick = configSwitchType != 0
-                configButtonTag = 0
+                isCanClick = configSwitchType != 0//是否可以點擊
+                configButtonTag = 0//用於判斷是點擊的哪一個配置按鈕方便配置對應的藍牙命令
                 EightSwitchMdodel.add()
                         ?.subscribe({
                             LogUtils.v("zcl八键添加$it")
@@ -309,6 +309,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             LogUtils.v("zcl八键批量删除错误$it")
                         })
                 isCanClick = configSwitchType != 0
+                //用於判斷是點擊的哪一個配置按鈕方便配置對應的藍牙命令
                 configButtonTag = 3
             }
             R.id.eight_switch_b5 -> {
