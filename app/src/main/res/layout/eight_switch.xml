@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/eight_switch_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/ico_background"
-        android:id="@+id/eight_switch_content"
         android:clipChildren="false"
         android:orientation="vertical">
 
@@ -21,8 +21,8 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="@dimen/dp_40"
             android:layout_weight="1"
-            android:layout_marginTop="@dimen/dp_50"
             android:gravity="center_horizontal">
 
         <LinearLayout
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.example.library.banner.BannerLayout
+            <!--<com.example.library.banner.BannerLayout
                     android:id="@+id/eight_switch_banner"
                     android:layout_width="match_parent"
                     android:layout_height="230dp"
@@ -39,13 +39,19 @@
                     app:autoPlaying="false"
                     app:centerScale="1.3"
                     app:itemSpace="0"
-                    app:showIndicator="false"/>
+                    app:showIndicator="false"/>-->
+            <android.support.v4.view.ViewPager
+                    android:id="@+id/eight_switch_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="230dp"
+                    android:clipChildren="false"
+                    android:overScrollMode="never" />
 
             <TextView
                     android:id="@+id/eight_switch_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_40"
+                    android:layout_marginTop="@dimen/dp_30"
                     android:gravity="center_horizontal"
                     android:text="@string/group_switch"
                     android:textColor="#FF333333"
@@ -57,9 +63,9 @@
                 android:id="@+id/eight_switch_config"
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
-                android:visibility="gone"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/light_background">
+                android:background="@drawable/light_background"
+                android:visibility="gone">
 
             <TextView
                     android:id="@+id/eight_switch_b1"
@@ -71,13 +77,14 @@
                     android:text="@string/brightness_add"
                     android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
+
             <TextView
                     android:id="@+id/eight_switch_b2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="40dp"
-                    android:layout_marginTop="15dp"
                     android:layout_alignParentEnd="true"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="40dp"
                     android:gravity="center"
                     android:text="@string/color_temperature_add"
                     android:textColor="@color/brightness_add_color"
@@ -87,10 +94,10 @@
                     android:id="@+id/eight_switch_b3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b1"
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="62dp"
                     android:gravity="center"
-                    android:layout_below="@id/eight_switch_b1"
                     android:text="@string/brightness_minus"
                     android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
@@ -99,34 +106,36 @@
                     android:id="@+id/eight_switch_b4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b2"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="62dp"
-                    android:layout_below="@id/eight_switch_b2"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
                     android:text="@string/color_temperature_minus"
                     android:textColor="@color/brightness_add_color"
                     android:textSize="13sp" />
+
             <TextView
                     android:id="@+id/eight_switch_b5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b3"
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="31dp"
-                    android:layout_below="@id/eight_switch_b3"
                     android:gravity="center"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
+
             <TextView
                     android:id="@+id/eight_switch_b6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b4"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="31dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
-                    android:layout_below="@id/eight_switch_b4"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
@@ -135,9 +144,9 @@
                     android:id="@+id/eight_switch_b7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b5"
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="60dp"
-                    android:layout_below="@id/eight_switch_b5"
                     android:gravity="center"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
@@ -147,11 +156,11 @@
                     android:id="@+id/eight_switch_b8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b6"
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="60dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
-                    android:layout_below="@id/eight_switch_b6"
                     android:text="@string/close"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />

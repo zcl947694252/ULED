@@ -440,7 +440,7 @@ object DBUtils {
     }
 
 
-    fun getEightSwitchByMachAddr(machAddr: Int): DbEightSwitch? {
+    fun getEightSwitchByMachAddr(machAddr: String): DbEightSwitch? {
         val dbEightSwitchList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder()
                 .where(DbEightSwitchDao.Properties.MacAddr.eq(machAddr)).list()
         return if (dbEightSwitchList.size > 0) {
@@ -895,6 +895,10 @@ object DBUtils {
     @Deprecated("Use saveSwitch()")
     fun updateSwicth(switch: DbSwitch) {
         saveSwitch(switch, false)
+    }
+    @Deprecated("Use saveEightSwitch()")
+    fun updateEightSwicth(switch: DbEightSwitch) {
+        saveEightSwitch(switch, false)
     }
 
     @Deprecated("use saveConnector()")

@@ -193,7 +193,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      * @param params  参数
      * @return
      */
-    public boolean                        sendCommandNoResponse(byte opcode, int address, byte[] params) {
+    public boolean sendCommandNoResponse(byte opcode, int address, byte[] params) {
         return this.sendCommandNoResponse(opcode, address, params, null, 0, false);
     }
 

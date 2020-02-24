@@ -34,6 +34,7 @@ class WebBannerAdapter( private val urlList: List<Int>) : RecyclerView.Adapter<W
 
         val url = urlList[position]
          holder.imageView.setImageResource(url)
+
         holder.imageView.setOnClickListener {
             if (onBannerItemClickListener != null) {
                 onBannerItemClickListener!!.onItemClick(position)
@@ -43,7 +44,7 @@ class WebBannerAdapter( private val urlList: List<Int>) : RecyclerView.Adapter<W
     }
 
     override fun getItemCount(): Int {
-        return urlList?.size ?: 0
+        return urlList.size
     }
 
 
