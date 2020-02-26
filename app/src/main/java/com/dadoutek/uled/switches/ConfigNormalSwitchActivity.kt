@@ -428,7 +428,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
-                Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
+                //Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
             } else {

@@ -276,7 +276,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         } else {
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
-            switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            // TODO 此处不知道为什么要设置成固定的 暂时注释 configsceneSwith也已被注释
+            //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
             switchDate!!.productUUID = mDeviceInfo.productUUID
 
             DBUtils.updateSwicth(switchDate!!)

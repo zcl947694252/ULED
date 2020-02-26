@@ -32,6 +32,9 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
         public final static Property ProductUUID = new Property(5, int.class, "productUUID", false, "PRODUCT_UUID");
         public final static Property Index = new Property(6, int.class, "index", false, "INDEX");
         public final static Property Keys = new Property(7, String.class, "keys", false, "KEYS");
+        public final static Property GroupIds = new Property(8, String.class, "groupIds", false, "GROUP_IDS");
+        public final static Property SceneIds = new Property(9, String.class, "sceneIds", false, "SCENE_IDS");
+        public final static Property Type = new Property(10, boolean.class, "type", false, "TYPE");
     }
 
 
@@ -54,7 +57,10 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
                 "\"MAC_ADDR\" TEXT," + // 4: macAddr
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 5: productUUID
                 "\"INDEX\" INTEGER NOT NULL ," + // 6: index
-                "\"KEYS\" TEXT);"); // 7: keys
+                "\"KEYS\" TEXT," + // 7: keys
+                "\"GROUP_IDS\" TEXT," + // 8: groupIds
+                "\"SCENE_IDS\" TEXT," + // 9: sceneIds
+                "\"TYPE\" INTEGER NOT NULL );"); // 10: type
     }
 
     /** Drops the underlying database table. */
@@ -94,6 +100,17 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
         if (keys != null) {
             stmt.bindString(8, keys);
         }
+ 
+        String groupIds = entity.getGroupIds();
+        if (groupIds != null) {
+            stmt.bindString(9, groupIds);
+        }
+ 
+        String sceneIds = entity.getSceneIds();
+        if (sceneIds != null) {
+            stmt.bindString(10, sceneIds);
+        }
+        stmt.bindLong(11, entity.getType() ? 1L: 0L);
     }
 
     @Override
@@ -127,6 +144,17 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
         if (keys != null) {
             stmt.bindString(8, keys);
         }
+ 
+        String groupIds = entity.getGroupIds();
+        if (groupIds != null) {
+            stmt.bindString(9, groupIds);
+        }
+ 
+        String sceneIds = entity.getSceneIds();
+        if (sceneIds != null) {
+            stmt.bindString(10, sceneIds);
+        }
+        stmt.bindLong(11, entity.getType() ? 1L: 0L);
     }
 
     @Override
@@ -144,7 +172,10 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // macAddr
             cursor.getInt(offset + 5), // productUUID
             cursor.getInt(offset + 6), // index
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // keys
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // keys
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // groupIds
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // sceneIds
+            cursor.getShort(offset + 10) != 0 // type
         );
         return entity;
     }
@@ -159,6 +190,9 @@ public class DbEightSwitchDao extends AbstractDao<DbEightSwitch, Long> {
         entity.setProductUUID(cursor.getInt(offset + 5));
         entity.setIndex(cursor.getInt(offset + 6));
         entity.setKeys(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setGroupIds(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setSceneIds(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setType(cursor.getShort(offset + 10) != 0);
      }
     
     @Override

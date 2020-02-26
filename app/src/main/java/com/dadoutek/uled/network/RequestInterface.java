@@ -552,7 +552,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("switch/8ks/add/{swid}")
-    Observable<Response<EightSwitchItemBean>> addSwitch8k(@Path("swid") Long swid,
+    Observable<Response<String>> addSwitch8k(@Path("swid") Long swid,
                                                     @Field("firmwareVersion") String firmwareVersion, @Field("meshAddr") int meshAddr, @Field("name") String name,
                                                     @Field("macAddr") String macAddr, @Field("productUUID") int productUUID, @Field("index") int index,
                                                     @Field("keys") String keys);
@@ -582,7 +582,7 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_java/switch/8ks/remove/1
      */
     @DELETE("switch/8ks/remove/{swid}")
-    Observable<Response<Integer>> removeSwitch8k(@Path("swid") Long swid);
+    Observable<Response<String>> removeSwitch8k(@Path("swid") Long swid);
 
     /**
      * 10、批量删除八键开关（new）
@@ -595,5 +595,5 @@ public interface RequestInterface {
      * }
      */
     @HTTP(method = "DELETE", path = "switch/8ks/remove", hasBody = true)
-    Observable<Response<Integer>> removeSwitch8kList(@Body BatchRemove8kBody body);
+    Observable<Response<String>> removeSwitch8kList(@Body BatchRemove8kBody body);
 }

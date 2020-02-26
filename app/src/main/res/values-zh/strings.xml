@@ -876,5 +876,6 @@
     <string name="color_temperature_add">色温+</string>
     <string name="brightness_minus">亮度-</string>
     <string name="color_temperature_minus">色温-</string>
+    <string name="click_config_tip">请点击配置按钮完成配置</string>
 
 </resources>

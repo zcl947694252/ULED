@@ -161,7 +161,7 @@
                     android:layout_marginTop="60dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
-                    android:text="@string/close"
+                    android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
 

@@ -954,6 +954,7 @@
     <string name="color_temperature_add">cct+</string>
     <string name="brightness_minus">brightness-</string>
     <string name="color_temperature_minus">cct-</string>
+    <string name="click_config_tip">Click the configure button to complete the configuration</string>
 
 
 </resources>

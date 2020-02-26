@@ -106,6 +106,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         switchData = DBUtils.getAllSwitch()
+
         setScanningMode(true)
         SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
             override fun start() {

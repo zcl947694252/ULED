@@ -1,8 +1,8 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -20,6 +20,12 @@ public class DbSwitchChild implements Serializable {
     private String list;
     private int index;
     private Long belongGroupId;
+    @Nullable
+    public String groupIds;
+    @Nullable
+    public String sceneIds;
+    public boolean type;
+
     @Generated(hash = 811812800)
     public DbSwitchChild(Long id, int meshAddr, String name, int controlGroupAddr,
                     String macAddr, int productUUID, String controlSceneId, int index,

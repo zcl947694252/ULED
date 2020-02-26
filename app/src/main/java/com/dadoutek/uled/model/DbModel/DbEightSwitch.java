@@ -1,8 +1,9 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 创建者     ZCL
@@ -24,9 +25,19 @@ public class DbEightSwitch {
     private int productUUID;
     private int index;
     private String keys;
-    @Generated(hash = 767865062)
+    @Nullable
+    public String groupIds;
+    @Nullable
+    public String sceneIds;
+    /**
+     * 是不是群組八鍵
+     */
+    public boolean type;
+
+    @Generated(hash = 229360566)
     public DbEightSwitch(Long id, String firmwareVersion, int meshAddr, String name,
-            String macAddr, int productUUID, int index, String keys) {
+            String macAddr, int productUUID, int index, String keys,
+            String groupIds, String sceneIds, boolean type) {
         this.id = id;
         this.firmwareVersion = firmwareVersion;
         this.meshAddr = meshAddr;
@@ -35,6 +46,9 @@ public class DbEightSwitch {
         this.productUUID = productUUID;
         this.index = index;
         this.keys = keys;
+        this.groupIds = groupIds;
+        this.sceneIds = sceneIds;
+        this.type = type;
     }
     @Generated(hash = 638875022)
     public DbEightSwitch() {
@@ -86,5 +100,23 @@ public class DbEightSwitch {
     }
     public void setKeys(String keys) {
         this.keys = keys;
+    }
+    public String getGroupIds() {
+        return this.groupIds;
+    }
+    public void setGroupIds(String groupIds) {
+        this.groupIds = groupIds;
+    }
+    public String getSceneIds() {
+        return this.sceneIds;
+    }
+    public void setSceneIds(String sceneIds) {
+        this.sceneIds = sceneIds;
+    }
+    public boolean getType() {
+        return this.type;
+    }
+    public void setType(boolean type) {
+        this.type = type;
     }
 }

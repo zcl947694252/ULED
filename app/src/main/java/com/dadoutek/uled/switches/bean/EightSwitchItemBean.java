@@ -118,6 +118,8 @@ public class EightSwitchItemBean implements Serializable {
             private int keyId;
             private int featureId;
             private List<Integer> params;
+            public int reserveValue_A;
+            public int reserveValue_B;
 
             public int getKeyId() {
                 return keyId;
@@ -142,5 +144,16 @@ public class EightSwitchItemBean implements Serializable {
             public void setParams(List<Integer> params) {
                 this.params = params;
             }
-    }
+
+            @Override
+            public String toString() {
+                return "KeysBean{" +
+                        "keyId=" + keyId +
+                        ", featureId=" + featureId +
+                        ", params=" + params +
+                        ", reserveValue_A=" + reserveValue_A +
+                        ", reserveValue_B=" + reserveValue_B +
+                        '}';
+            }
+        }
 }

@@ -399,7 +399,7 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbUserDao.load(id)
     }
 
-    fun getEightSwitchByID(id: Long): DbEightSwitch {
+    fun getEightSwitchByID(id: Long): DbEightSwitch? {
         return DaoSessionInstance.getInstance().dbEightSwitchDao.load(id)
     }
 

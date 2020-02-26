@@ -165,15 +165,15 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getEightSwitchByID(changeId)
-                              //  /*return*/ switch?.let { EightSwitchMdodel.add(token, it, id, changeId) }
+                              return switch?.let { EightSwitchMdodel.add(it, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                            //    /*return*/ EightSwitchMdodel.delete(token, id, changeId.toInt())
+                                return EightSwitchMdodel.delete( id, changeId)
                             }
                             Constant.DB_UPDATE -> {
                                 val switch = DBUtils.getEightSwitchByID(changeId)
                                 switch?.let {
-                                //    /*return*/ EightSwitchMdodel.update(token, switch, changeId.toInt(), id)
+                               return EightSwitchMdodel.update(switch, changeId)
                                 }
                             }
                         }
