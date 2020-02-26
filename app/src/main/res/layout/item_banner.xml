@@ -9,7 +9,7 @@
         android:id="@+id/eight_switch_item_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="75dp"
+        android:paddingStart="25dp"
         android:scaleType="fitCenter"
         android:src="@drawable/big" />
 <!--paddingstart調節前面距離 -->

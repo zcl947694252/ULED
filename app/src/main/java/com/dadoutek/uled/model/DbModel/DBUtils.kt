@@ -706,7 +706,8 @@ object DBUtils {
     }
 
     fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
-        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
+
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id

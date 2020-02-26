@@ -1,17 +1,23 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.ViewPager
+import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbEightSwitch
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -20,6 +26,7 @@ import com.dadoutek.uled.model.HttpModel.EightSwitchMdodel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
@@ -37,11 +44,16 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var renameDialog: Dialog? = null
+    private var renameConfirm: TextView? = null
+    private var renameCancel: TextView? = null
+    private var renameEditText: EditText? = null
+    private var popReNameView: View? = null
     private var newMeshAddr: Int = 0
     private var switchDate: DbEightSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
-    private var mDeviceInfo: DeviceInfo? = null
+    private lateinit var mDeviceInfo: DeviceInfo
     private var configSwitchType = 0
     private var configButtonTag = 0
     private val requestCodeNum = 100
@@ -60,6 +72,73 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         initListener()
     }
 
+    private fun makePop() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
+        renameConfirm?.setOnClickListener {
+            // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            }  else {
+                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                if (switchDate == null)
+                    switchDate = DBUtils.getEightSwitchByMeshAddr(mDeviceInfo?.meshAddress?:0)
+                if (switchDate != null)
+                    DBUtils.updateEightSwicth(switchDate!!)
+                else
+                    ToastUtils.showLong(getString(R.string.rename_faile))
+
+                if (this != null && !this.isFinishing)
+                    renameDialog?.dismiss()
+
+                if (clickType < 1) {
+                    eight_switch_config.visibility = View.VISIBLE
+                    eight_switch_banner_ly.visibility = View.GONE
+                    clickType = 1
+                } else {
+                    clickType = 2
+                    confimCongfig()
+                }
+            }
+        }
+        renameCancel?.setOnClickListener {
+            if (this != null && !this.isFinishing)
+                renameDialog?.dismiss()
+        }
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+
+        renameDialog?.setOnDismissListener {
+            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            if (switchDate!=null)
+                DBUtils.updateEightSwicth(switchDate!!)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showRenameDialog() {
+        StringUtils.initEditTextFilter(renameEditText)
+        if (switchDate != null && switchDate?.name != "")
+            renameEditText?.setText(switchDate?.name)
+        else {
+            if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
+                renameEditText?.setText(switchDate?.name)
+            else {
+                var text = eight_switch_title.text.toString()
+                renameEditText?.setText(text + "-" + DBUtils.eightSwitchList.size)
+            }
+        }
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+    }
+
     private fun initListener() {
         eight_switch_retutn.setOnClickListener {
             finish()
@@ -67,6 +146,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             TelinkLightService.Instance().disconnect()
         }
         eight_switch_use_button.setOnClickListener {
+            //showRenameDialog()
             if (clickType < 1) {
                 eight_switch_config.visibility = View.VISIBLE
                 eight_switch_banner_ly.visibility = View.GONE
@@ -187,6 +267,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 // mIsConfiguring = false
                 GlobalScope.launch(Dispatchers.Main) {
                     hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.pace_fail))
                 }
             }
         })
@@ -196,11 +277,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getEightSwitchByMachAddr(mDeviceInfo!!.macAddress)
             if (dbSwitch != null) {
-//                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+dbSwitch.meshAddr
-//                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
-//                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
-//
-//                Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+dbSwitch.meshAddr
+               // dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+                //dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+
+                Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
                 DBUtils.updateEightSwicth(dbSwitch)
 //                switchDate = dbSwitch
             } else {
@@ -316,6 +397,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 //用於判斷是點擊的哪一個配置按鈕方便配置對應的藍牙命令
                 configButtonTag = 3
             }
+
+            /**
+             * 1234的點擊事件是爲了測試接口 正常時應當禁掉 群組是不會有點擊反應的場景會有*/
             R.id.eight_switch_b5 -> {
                 isCanClick = true
                 configButtonTag = 4
@@ -342,13 +426,46 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-
         version = intent.getStringExtra("version")
         eight_switch_tvLightVersion?.text = version
 
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true")
             switchDate = this.intent.extras!!.get("switch") as DbEightSwitch
+        updateEightSwitch()
+    }
+
+    private fun updateEightSwitch() {
+        if (groupName == "false") {
+            var dbSwitch = DBUtils.getEightSwitchByMachAddr(mDeviceInfo.macAddress)
+            if (dbSwitch != null) {
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch!!.meshAddr
+                dbSwitch.macAddr = mDeviceInfo.macAddress
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
+                dbSwitch.productUUID = mDeviceInfo.productUUID
+                DBUtils.updateEightSwicth(dbSwitch)
+                switchDate = dbSwitch
+            } else {
+                var dbSwitch = DbEightSwitch()
+                DBUtils.saveEightSwitch(dbSwitch, false)
+                dbSwitch!!.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
+                dbSwitch!!.macAddr = mDeviceInfo.macAddress
+                dbSwitch!!.productUUID = mDeviceInfo.productUUID
+                dbSwitch!!.index = dbSwitch.id.toInt()
+                DBUtils.saveEightSwitch(dbSwitch, false)
+                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                DBUtils.recordingChange(gotSwitchByMac?.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
+                switchDate = dbSwitch
+            }
+        } else {
+            switchDate!!.macAddr = mDeviceInfo.macAddress
+            switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            switchDate!!.productUUID = mDeviceInfo.productUUID
+
+            DBUtils.updateEightSwicth(switchDate!!)
+        }
     }
 
     private fun initView() {
@@ -365,8 +482,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         eight_switch_banner.offscreenPageLimit = 2
         eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f,this))
         eight_switch_banner.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {
-            }
+            override fun onPageScrollStateChanged(p0: Int) {}
 
             override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
 
@@ -385,30 +501,12 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
         })
-        /*
-        val list = mutableListOf(R.drawable.big, R.drawable.big)
-        eight_switch_banner.setAutoPlaying(false)
-         //val bannerAdapter = BannerAdapter(R.layout.item_banner, list)
-         val bannerAdapter = WebBannerAdapter(list)
-         eight_switch_banner.setAdapter(bannerAdapter)
-         bannerAdapter.setOnBannerItemClickListener(BannerLayout.OnBannerItemClickListener {
-             configSwitchType = it
-             groupMap.clear()
-             sceneMap.clear()
-         })
-
-         eight_switch_banner.setOnBannerItemChangeListener {
-             if (it == 0) {
-                 configSwitchType = 0
-                 setTextColorsAndText(it)
-                 eight_switch_title.text = getString(R.string.group_switch)
-             } else {
-                 configSwitchType = 1
-                 setTextColorsAndText(R.color.click_config_color)
-                 eight_switch_title.text = getString(R.string.scene_switch)
-             }
-         }*/
+        makePop()
     }
+    /**
+     * 创建pop并添加按钮监听
+     */
+    @SuppressLint("SetTextI18n")
 
     private fun setTextColorsAndText(type: Int) {
         if (type == 0) {

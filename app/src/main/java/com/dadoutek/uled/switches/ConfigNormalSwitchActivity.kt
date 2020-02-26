@@ -12,7 +12,6 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -59,7 +58,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var popReNameView: View? = null
     private var renameDialog: Dialog? = null
     private var renameCancel: TextView? = null
-    private var popRename: PopupWindow? = null
     private var renameConfirm: TextView? = null
     private var renameEditText: EditText? = null
     private var alertDialog: android.app.AlertDialog? = null
@@ -164,7 +162,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     @SuppressLint("SetTextI18n")
     private fun showRenameDialog() {
         hideLoadingDialog()
-        popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
         if (switchDate != null && switchDate?.name != "")
