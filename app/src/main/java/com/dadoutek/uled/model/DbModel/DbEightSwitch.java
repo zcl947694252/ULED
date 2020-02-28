@@ -12,7 +12,9 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * 更新者     $
  * 更新时间   $
- * 更新描述 @entity @id  build make project完成
+ * 更新描述 @entity @id  添加新的参数后需要更改版本号后 build make project
+ * 如果更改参数则会提示Constructor (see DbSwitch:64) has been changed after generation.
+ * 需要更改版本后并且删除generation相关的构造方法 再build make project完成
  */
 @Entity
 public class DbEightSwitch {
@@ -29,9 +31,7 @@ public class DbEightSwitch {
     public String groupIds;
     @Nullable
     public String sceneIds;
-    /**
-     * 是不是群組八鍵
-     */
+
     public boolean type;
 
     @Generated(hash = 229360566)

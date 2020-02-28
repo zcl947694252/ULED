@@ -110,15 +110,15 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         setScanningMode(true)
         SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
             override fun start() {
-                LogUtils.e("zcl____同步开关________start")
+                LogUtils.v("zcl____同步开关________start")
             }
 
             override fun complete() {
-                LogUtils.e("zcl____同步开关________complete")
+                LogUtils.v("zcl____同步开关________complete")
             }
 
             override fun error(msg: String?) {
-                LogUtils.e("zcl____同步开关________error")
+                LogUtils.v("zcl____同步开关________error")
             }
         })
         if (switchData.size > 0) {
@@ -154,7 +154,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-
     private fun onLogin(bestRSSIDevice: DeviceInfo) {
         mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
@@ -167,10 +166,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                                             bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
                                         startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
-                                    } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                                        startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                                        if (version.contains(DeviceType.EIGHT_SWITCH))
+                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
+                                        else
+                                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
-                                    } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
                                         startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
                                     }
@@ -731,7 +733,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)

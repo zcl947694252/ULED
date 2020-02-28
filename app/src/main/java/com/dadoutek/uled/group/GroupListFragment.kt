@@ -369,7 +369,7 @@ class GroupListFragment : BaseFragment() {
         showList = ArrayList()
         showList = gpList
 
-        allGroup = DBUtils.getGroupByMesh(0xFFFF)
+        allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
 
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
@@ -505,7 +505,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            allGroup = DBUtils.getGroupByMesh(0xFFFF)
+            allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
             toolbar!!.setTitle(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 

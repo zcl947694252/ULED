@@ -1000,8 +1000,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
 
-        if (DBUtils.getGroupByMesh(0xffff) != null) {
-            allLightId = DBUtils.getGroupByMesh(0xffff)?.id?.toLong() ?: 0
+        if (DBUtils.getGroupByMeshAddr(0xffff) != null) {
+            allLightId = DBUtils.getGroupByMeshAddr(0xffff)?.id?.toLong() ?: 0
         }
 
         this.mApplication = this.application as TelinkLightApplication

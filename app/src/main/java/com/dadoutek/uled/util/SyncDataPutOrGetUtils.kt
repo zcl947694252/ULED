@@ -53,8 +53,9 @@ class SyncDataPutOrGetUtils {
 
                 for (data in dbDataChangeList) {
                     data.changeId ?: break
+                    //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
                     var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!)
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type,data.keys?:"")
                     observable?.let { observableList.add(it) }
                 }
 
@@ -69,15 +70,18 @@ class SyncDataPutOrGetUtils {
                                         syncCallback.complete()
                                     }
                                 }
+
                                 override fun onSubscribe(d: Disposable) {
                                 }
+
                                 override fun onNext(t: String) {
                                 }
+
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {
-                                        if (e.message!="")
-                                        syncCallback.error(e.cause.toString())
+                                        if (e.message != "")
+                                            syncCallback.error(e.cause.toString())
                                     }
                                 }
                             })
@@ -90,9 +94,9 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String, id: Long): Observable<String>? {
+                                     token: String, id: Long, switchType: Int, keys: String): Observable<String>? {
             if (changeId != null) {
-                //Log.e("zcl", "zcl**tableName****$tableName")
+                LogUtils.v("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
@@ -145,35 +149,53 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     "DB_SWITCH" -> {
-                        when (type) {
-                            Constant.DB_ADD -> {
-                                val switch = DBUtils.getSwitchByID(changeId)
-                                return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
-                            }
-                            Constant.DB_DELETE -> {
-                                return SwitchMdodel.delete(token, id, changeId.toInt())
-                            }
-                            Constant.DB_UPDATE -> {
-                                val switch = DBUtils.getSwitchByID(changeId)
-                                switch?.let {
-                                    return SwitchMdodel.update(token, switch, changeId.toInt(), id)
+//                            when (type) {
+//                                Constant.DB_ADD -> {
+//                                    val switch = DBUtils.getSwitchByID(changeId)
+//                                  return SwitchMdodel.add(token, switch!!, id, changeId)//判断是否是八键开关接口问题
+//                                   //return switch?.let { EightSwitchMdodel.add(it,changeId) }
+//                                }
+//                                Constant.DB_DELETE -> {
+//                                    return EightSwitchMdodel.delete(id, changeId)
+//                                }
+//                                Constant.DB_UPDATE -> {
+//                                    val switch = DBUtils.getSwitchByID(changeId)
+//                                    switch?.let {
+//                                        return EightSwitchMdodel.update(switch, changeId)
+//                                    }
+//                                }
+//                            }
+
+                            when (type) {
+                                Constant.DB_ADD -> {
+                                    val switch = DBUtils.getSwitchByID(changeId)
+                                    return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
+                                }
+                                Constant.DB_DELETE -> {
+                                    return SwitchMdodel.delete(token, id, changeId.toInt())
+                                }
+                                Constant.DB_UPDATE -> {
+                                    val switch = DBUtils.getSwitchByID(changeId)
+                                    switch?.let {
+                                        return SwitchMdodel.update(token, switch, changeId.toInt(), id)
+                                    }
                                 }
                             }
                         }
-                    }
+
                     "DB_EIGHT_SWITCH" -> {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getEightSwitchByID(changeId)
-                              return switch?.let { EightSwitchMdodel.add(it, changeId) }
+                                return switch?.let { EightSwitchMdodel.add8k(it, changeId) }
                             }
                             Constant.DB_DELETE -> {
-                                return EightSwitchMdodel.delete( id, changeId)
+                                return EightSwitchMdodel.delete(id, changeId)
                             }
                             Constant.DB_UPDATE -> {
                                 val switch = DBUtils.getEightSwitchByID(changeId)
                                 switch?.let {
-                               return EightSwitchMdodel.update(switch, changeId)
+                                    return EightSwitchMdodel.update8k(switch, changeId)
                                 }
                             }
                         }
@@ -218,7 +240,7 @@ class SyncDataPutOrGetUtils {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
-                           // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
+                            // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.update(token,
@@ -398,10 +420,9 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .getSwitchList(token)
                                 .compose(NetworkTransformer())
-                    }
-                    .flatMap {
+                    }.flatMap {
                         for (item in it) {
-                            DBUtils.saveSwitch(item, true)
+                                DBUtils.saveSwitch(item, true)
                         }
                         NetworkFactory.getApi()
                                 .getSensorList(token)
@@ -475,8 +496,8 @@ class SyncDataPutOrGetUtils {
                     }, {
                 GlobalScope.launch(Dispatchers.Main) {
                     it ?: return@launch
-                    syncCallBack.error(it.message?:"")
-                    ToastUtils.showLong(it.message?:"")
+                    syncCallBack.error(it.message ?: "")
+                    ToastUtils.showLong(it.message ?: "")
                 }
             }
             )

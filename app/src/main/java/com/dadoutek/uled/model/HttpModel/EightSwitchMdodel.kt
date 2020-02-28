@@ -2,12 +2,11 @@ package com.dadoutek.uled.model.HttpModel
 
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbEightSwitch
-import com.dadoutek.uled.model.DbModel.DbSwitchChild
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
-import com.dadoutek.uled.switches.bean.EightSwitchItemBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -24,18 +23,7 @@ import io.reactivex.schedulers.Schedulers
 
 object EightSwitchMdodel {
 
-    fun add(switch: DbEightSwitch, changeId: Long): Observable<String>? {
-        var dbChild = DbSwitchChild()
-        dbChild.productUUID = switch.productUUID
-        dbChild.meshAddr = switch.meshAddr
-        dbChild.macAddr = switch.macAddr
-        dbChild.name = switch.name
-        dbChild.id = switch.id
-        dbChild.index = switch.index
-        dbChild.groupIds = switch.groupIds
-        dbChild.sceneIds = switch.sceneIds
-        dbChild.type = switch.type
-
+    fun add(switch: DbSwitch, changeId: Long): Observable<String>? {
         /**
          * 6、添加/更新八键开关（new） POST
          * https://dev.dadoutek.com/smartlight_java/switch/8ks/add/{swid}
@@ -51,8 +39,7 @@ object EightSwitchMdodel {
          * {"featureId":28,"reserveValue_A":0,"reserveValue_B":0,"keyId":1}
          */
         return NetworkFactory.getApi()
-               // .addSwitch8k(token,dbChild,changeId!!.toInt())
-                .addSwitch8k(1, DeviceType.EIGHT_SWITCH, 1, switch.name, switch.macAddr, DeviceType.SCENE_SWITCH, 1, switch.groupIds)
+                .addSwitch8k(switch.id, switch.version, switch.meshAddr, switch.name, switch.macAddr, switch.productUUID, 0, switch.keys)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -61,7 +48,34 @@ object EightSwitchMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(switch: DbEightSwitch, changeId: Long): Observable<String>? {
+    fun add8k(switch: DbEightSwitch, changeId: Long): Observable<String>? {
+        return NetworkFactory.getApi()
+                // .addSwitch8k(token,dbChild,changeId!!.toInt())
+                .addSwitch8k(switch.id, switch.firmwareVersion, switch.meshAddr, switch.name, switch.macAddr, switch.productUUID, 0, switch.keys)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                    DBUtils.deleteDbDataChange(changeId)
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun update(switch: DbSwitch, changeId: Long): Observable<String>? {
+        val list = mutableListOf(1)
+        val body = BatchRemove8kBody()
+        body.idList = list
+
+        return NetworkFactory.getApi()
+                // .addSwitch8k(token,dbChild,changeId!!.toInt())
+                .addSwitch8k(switch.id, switch.version, switch.meshAddr, switch.name, switch.macAddr, switch.productUUID, 0, switch.keys)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                    DBUtils.deleteDbDataChange(changeId)
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun update8k(switch: DbEightSwitch, changeId: Long): Observable<String>? {
         val list = mutableListOf(1)
         val body = BatchRemove8kBody()
         body.idList = list
@@ -88,8 +102,8 @@ object EightSwitchMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun get(): Observable<Response<MutableList<EightSwitchItemBean>>>? {
-        return NetworkFactory.getApi().switch8kList(true)
+    fun get(): Observable<Response<MutableList<DbSwitch>>>? {
+        return NetworkFactory.getApi().getSwitch8kList(true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

@@ -28,6 +28,8 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
         public final static Property ChangeId = new Property(1, Long.class, "changeId", false, "CHANGE_ID");
         public final static Property TableName = new Property(2, String.class, "tableName", false, "TABLE_NAME");
         public final static Property ChangeType = new Property(3, String.class, "changeType", false, "CHANGE_TYPE");
+        public final static Property Type = new Property(4, int.class, "type", false, "TYPE");
+        public final static Property Keys = new Property(5, String.class, "keys", false, "KEYS");
     }
 
 
@@ -46,7 +48,9 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"CHANGE_ID\" INTEGER," + // 1: changeId
                 "\"TABLE_NAME\" TEXT," + // 2: tableName
-                "\"CHANGE_TYPE\" TEXT);"); // 3: changeType
+                "\"CHANGE_TYPE\" TEXT," + // 3: changeType
+                "\"TYPE\" INTEGER NOT NULL ," + // 4: type
+                "\"KEYS\" TEXT);"); // 5: keys
     }
 
     /** Drops the underlying database table. */
@@ -78,6 +82,12 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
         if (changeType != null) {
             stmt.bindString(4, changeType);
         }
+        stmt.bindLong(5, entity.getType());
+ 
+        String keys = entity.getKeys();
+        if (keys != null) {
+            stmt.bindString(6, keys);
+        }
     }
 
     @Override
@@ -103,6 +113,12 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
         if (changeType != null) {
             stmt.bindString(4, changeType);
         }
+        stmt.bindLong(5, entity.getType());
+ 
+        String keys = entity.getKeys();
+        if (keys != null) {
+            stmt.bindString(6, keys);
+        }
     }
 
     @Override
@@ -116,7 +132,9 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // changeId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // tableName
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // changeType
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // changeType
+            cursor.getInt(offset + 4), // type
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // keys
         );
         return entity;
     }
@@ -127,6 +145,8 @@ public class DbDataChangeDao extends AbstractDao<DbDataChange, Long> {
         entity.setChangeId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setTableName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setChangeType(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setType(cursor.getInt(offset + 4));
+        entity.setKeys(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

@@ -94,7 +94,7 @@ object AccountModel {
             for (item in lights.get()) {
                 var light: DbLight = DbLight()
                 if (item.belongGroups.size > 0) {
-                    light.belongGroupId = DBUtils.getGroupByMesh(item.belongGroups.get(0)).id
+                    light.belongGroupId = DBUtils.getGroupByMeshAddr(item.belongGroups.get(0)).id
                 } else {
                     light.belongGroupId = 1
                 }

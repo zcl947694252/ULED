@@ -49,13 +49,14 @@ import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.switches.ConfigEightSwitchActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -166,7 +167,17 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { startActivity(Intent(this@MainActivity, ConfigEightSwitchActivity::class.java)) }
+        main_toast.setOnClickListener {
+            //startActivity(Intent(this@MainActivity, ConfigEightSwitchActivity::class.java))
+            NetworkFactory.getApi()
+                    .addSwitch8k(1, "中文", 1, "[dddd]", "888fsdfds***", 21, 0, "{dfds}")
+                    .compose(NetworkTransformer())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+
+                    }
+        }
         initBottomNavigation()
 
         checkVersionAvailable()

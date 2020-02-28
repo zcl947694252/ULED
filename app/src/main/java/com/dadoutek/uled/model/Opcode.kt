@@ -8,7 +8,8 @@ object Opcode {
     /**
      * 單组开关
      */
-    const val GROUP_SWITCH: Byte = 0x7C.toByte()//單组开关
+    const val SCENE_SWITCH8K: Byte = 0x00.toByte()//场景8开关
+    const val GROUP_SWITCH8K: Byte = 0x7C.toByte()//單组开关
     const val CLOSE: Byte = 0x7e.toByte()//组开关
 
     const val BRIGHTNESS_ADD: Byte = 0x1A.toByte()

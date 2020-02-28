@@ -44,7 +44,6 @@ object DBUtils {
 
     val sceneList: MutableList<DbScene>
         get() {
-            val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
 
             return qb.where(
@@ -422,13 +421,6 @@ object DBUtils {
         } else null
     }
 
-    fun getRelyByMeshAddr(meshAddr: Int): DbConnector? {
-        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
-                .where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
-        return if (dbRelyList.size > 0) {
-            dbRelyList[0]
-        } else null
-    }
 
 
     fun getEightSwitchByMeshAddr(meshAddr: Int): DbEightSwitch? {
@@ -436,6 +428,15 @@ object DBUtils {
                 .where(DbEightSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbEightSwitchList.size > 0) {
             dbEightSwitchList[0]
+        } else null
+    }
+
+
+    fun getRelyByMeshAddr(meshAddr: Int): DbConnector? {
+        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
+                .where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return if (dbRelyList.size > 0) {
+            dbRelyList[0]
         } else null
     }
 
@@ -492,15 +493,15 @@ object DBUtils {
     }
 
 
-    fun getGroupByMesh(mesh: String): DbGroup {
+    fun getGroupByMeshAddr(mesh: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
-//        Log.d("datasave", "getGroupByMesh: $mesh")
+//        Log.d("datasave", "getGroupByMeshAddr: $mesh")
         return dbGroup
     }
 
     fun getGroupByName(name: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.Name.eq(name)).unique()
-//        Log.d("datasave", "getGroupByMesh: $name")
+//        Log.d("datasave", "getGroupByMeshAddr: $name")
         return dbGroup
     }
 
@@ -533,10 +534,10 @@ object DBUtils {
     /**
      * 一个mesh地址对应一个组
      */
-    fun getGroupByMesh(mesh: Int): DbGroup? {
+    fun getGroupByMeshAddr(mesh: Int): DbGroup {
         var dbGroup: DbGroup? = null
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
-//        Log.d("datasave", "getGroupByMesh: $mesh")
+//        Log.d("datasave", "getGroupByMeshAddr: $mesh")
         if (dbGroupLs.size > 0) {
             dbGroup = dbGroupLs[0]
         }
@@ -575,7 +576,7 @@ object DBUtils {
     }
 
     fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight>? {
-        val group = getGroupByMesh(mesh)
+        val group = getGroupByMeshAddr(mesh)
         if (group != null) {
             val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
             return ArrayList(query.list())
@@ -683,7 +684,7 @@ object DBUtils {
     }
 
 
-    fun saveSwitch(db: DbSwitch, isFromServer: Boolean) {
+    fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3,keys: String = "") {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
@@ -696,15 +697,14 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_UPDATE)
+                        Constant.DB_UPDATE,type,keys)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constant.DB_ADD,type,keys)
             }
         }
     }
-
     fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
         val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
 
@@ -1114,7 +1114,7 @@ object DBUtils {
             //新增数据库保存
             saveGroup(group, false)
 
-            group = DBUtils.getGroupByMesh(newMeshAdress)!!
+            group = DBUtils.getGroupByMeshAddr(newMeshAdress)!!
             if (group != null) {
                 recordingChange(group.id,
                         DaoSessionInstance.getInstance().dbGroupDao.tablename,
@@ -1144,7 +1144,7 @@ object DBUtils {
 
             group.index = group.id.toInt()
 
-//            group=DBUtils.getGroupByMesh(newMeshAdress)
+//            group=DBUtils.getGroupByMeshAddr(newMeshAdress)
 
             updateGroup(group)
 
@@ -1258,11 +1258,11 @@ object DBUtils {
      * @param operating   所执行的操作
      */
 
-    fun recordingChange(changeIndex: Long?, changeTable: String, operating: String) {
+    fun recordingChange(changeIndex: Long?, changeTable: String, operating: String,type:Int =3,keys:String = "") {
         val dataChangeList = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
         if (dataChangeList.size == 0) {
-            saveChange(changeIndex, operating, changeTable)
+            saveChange(changeIndex, operating, changeTable,type,keys)
             return
         } else {
             for (i in dataChangeList.indices) {
@@ -1291,7 +1291,7 @@ object DBUtils {
                         break
                     }
                 } else if (i == dataChangeList.size - 1) {
-                    saveChange(changeIndex, operating, changeTable)
+                    saveChange(changeIndex, operating, changeTable, type, keys)
                     break
                 }//如果数据表没有该数据直接添加
             }
@@ -1299,11 +1299,13 @@ object DBUtils {
 //        LogUtils.v("zcl-------添加变化表${dataChangeAll.size}-----------$dataChangeAll")
     }
 
-    private fun saveChange(changeIndex: Long?, operating: String, changeTable: String) {
+    private fun saveChange(changeIndex: Long?, operating: String, changeTable: String, type: Int, keys: String) {
         val dataChange = DbDataChange()
         dataChange.changeId = changeIndex
         dataChange.changeType = operating
         dataChange.tableName = changeTable
+        dataChange.type =  type
+        dataChange.keys =  keys
         DaoSessionInstance.getInstance().dbDataChangeDao.insert(dataChange)
     }
 

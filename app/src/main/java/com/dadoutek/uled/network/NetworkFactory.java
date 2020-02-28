@@ -2,7 +2,6 @@ package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
 
-import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -26,17 +25,17 @@ public class NetworkFactory {
 
     private static OkHttpClient initHttpClient() {
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(!Constant.isDebug?HttpLoggingInterceptor.Level.NONE:HttpLoggingInterceptor.Level.BODY);
-
-        //HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE);
+       // HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(Constant.isDebug?HttpLoggingInterceptor.Level.BODY:HttpLoggingInterceptor.Level.NONE);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
                 .writeTimeout(3, TimeUnit.MINUTES)
-                .addInterceptor(new CommonParamsInterceptor()).retryOnConnectionFailure(true);
+                .addInterceptor(new CommonParamsInterceptor())
+                .retryOnConnectionFailure(true);
 
-        if (BuildConfig.DEBUG)
+       // if (BuildConfig.DEBUG)
             okHttpBuilder.addInterceptor(logging);
 
         return okHttpBuilder.build();

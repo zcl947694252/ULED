@@ -25,6 +25,11 @@ object SwitchMdodel {
         dbChild.index=switch.index
         dbChild.controlGroupAddr=switch.controlGroupAddr
         dbChild.belongGroupId=switch.belongGroupId
+
+        dbChild.firmwareVersion = switch.version
+        dbChild.type = switch.type
+        dbChild.keys = switch.keys
+
         return NetworkFactory.getApi()
                 .addSwitch(token,dbChild,changeId!!.toInt())
                 .compose(NetworkTransformer())
@@ -50,6 +55,11 @@ object SwitchMdodel {
         dbChild.index=dbSwitch.index
         dbChild.controlGroupAddr=dbSwitch.controlGroupAddr
         dbChild.belongGroupId=dbSwitch.belongGroupId
+
+        dbChild.firmwareVersion = dbSwitch.version
+        dbChild.type = dbSwitch.type
+        dbChild.keys = dbSwitch.keys
+
         return NetworkFactory.getApi()
                 .updateSwitch(token,lid,dbChild)
                 .compose(NetworkTransformer())

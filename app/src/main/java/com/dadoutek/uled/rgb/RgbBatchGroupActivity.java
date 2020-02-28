@@ -1069,7 +1069,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         }
 
         //所有灯的meshId
-        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        allLightId = DBUtils.INSTANCE.getGroupByMeshAddr(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();

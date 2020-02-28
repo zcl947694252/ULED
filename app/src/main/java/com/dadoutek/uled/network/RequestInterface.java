@@ -23,7 +23,6 @@ import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
-import com.dadoutek.uled.switches.bean.EightSwitchItemBean;
 
 import java.util.List;
 
@@ -564,7 +563,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("switch/8ks/add-batch")
-    Observable<Response<String>> batchAdd8kSwitch(@Field("eightKeySwitches") List<EightSwitchItemBean> eightKeySwitches);
+    Observable<Response<String>> batchAdd8kSwitch(@Field("eightKeySwitches") List<DbSwitch> eightKeySwitches);
 
     /**
      * 8、获取八键开关列表（new） GET
@@ -573,7 +572,7 @@ public interface RequestInterface {
      * isKeySerialized	否	boolean（其实是string）	是否序列化八键开关的keys。默认true（会序列化）
      */
     @GET("switch/8ks/list")
-    Observable<Response<List<EightSwitchItemBean>>> switch8kList(@Query("isKeySerialized") boolean isKeySerialized);
+    Observable<Response<List<DbSwitch>>> getSwitch8kList(@Query("isKeySerialized") boolean isKeySerialized);
 
     /**
      * 9、删除一个八键开关（new）

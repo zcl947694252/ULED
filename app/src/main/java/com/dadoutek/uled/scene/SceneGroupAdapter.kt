@@ -89,7 +89,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         helper.setText(R.id.name_gp, item.gpName)
 
 
-        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
+        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress))) {
             helper.setProgress(R.id.sbBrightness, item.brightness)
             helper.setProgress(R.id.sb_w_bright, item.temperature)
             helper.setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
@@ -158,7 +158,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
         }
 
-        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
+        if (OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress))) {
             helper.setGone(R.id.textView7, true)
             helper.setGone(R.id.oval, true)
             helper.setGone(R.id.rgb_scene, true)
@@ -166,7 +166,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             helper.setGone(R.id.switch_scene, false)
             helper.setGone(R.id.scene_curtain, false)
             helper.setGone(R.id.scene_relay, false)
-        } else if (OtherUtils.isNormalGroup(DBUtils.getGroupByMesh(item.groupAddress))) {
+        } else if (OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
@@ -174,7 +174,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             helper.setGone(R.id.switch_scene, false)
             helper.setGone(R.id.scene_curtain, false)
             helper.setGone(R.id.scene_relay, false)
-        } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAddress))) {
+        } else if (OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
@@ -189,7 +189,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setChecked(R.id.rg_yy, true)
                 helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
             }
-        } else if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAddress))) {
+        } else if (OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)

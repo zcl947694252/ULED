@@ -1099,8 +1099,8 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             selectGroupId = intent.getIntExtra("group", 0);
         }
 
-        if (DBUtils.INSTANCE.getGroupByMesh(0xffff) != null) {
-            allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        if (DBUtils.INSTANCE.getGroupByMeshAddr(0xffff) != null) {
+            allLightId = DBUtils.INSTANCE.getGroupByMeshAddr(0xffff).getId();
         }
 
         this.mApplication = (TelinkLightApplication) this.getApplication();

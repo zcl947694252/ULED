@@ -196,7 +196,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             for (i in actions.indices) {
-                val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
+                val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
                 val itemGroup = ItemGroup()
                 if (item != null) {
                     itemGroup.gpName = item.name
@@ -531,7 +531,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
 
                 when {
-                    OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAddress)) -> {
+                    OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
 
                         sceneActions.brightness = item.brightness
@@ -543,7 +543,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAddress)) -> {
+                    OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = item.brightness
                         sceneActions.colorTemperature = item.temperature
@@ -553,7 +553,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         sceneActions.isOn = item.isNo
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAddress)) -> {
+                    OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = item.brightness
                         sceneActions.colorTemperature = item.temperature
@@ -682,7 +682,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 val sceneActions = DbSceneActions()
 
                 when {
-                    OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups[i].groupAddress)) -> {
+                    OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
@@ -695,7 +695,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAddress)) -> {
+                    OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(itemGroups.get(i).groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
@@ -707,7 +707,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         nameList.add(itemGroups[i].groupAddress)
                         DBUtils.saveSceneActions(sceneActions)
                     }
-                    OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAddress)) -> {
+                    OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)) -> {
                         sceneActions.belongSceneId = idAction
                         sceneActions.brightness = itemGroups[i].brightness
                         sceneActions.colorTemperature = itemGroups[i].temperature
