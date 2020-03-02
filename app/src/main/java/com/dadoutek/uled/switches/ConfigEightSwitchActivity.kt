@@ -378,6 +378,12 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             eight_switch_b8.text = getString(R.string.click_config)
 
         } else {
+            eight_switch_b1.setTextColor(getColor(R.color.click_config_color))
+            eight_switch_b2.setTextColor(getColor(R.color.click_config_color))
+            eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
+            eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
+            eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
+
             eight_switch_b5.text = getString(R.string.click_config)
             eight_switch_b6.text = getString(R.string.click_config)
             eight_switch_b7.text = getString(R.string.click_config)
@@ -390,7 +396,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             eight_switch_b5.text = getString(R.string.click_config)
             eight_switch_b6.text = getString(R.string.click_config)
             eight_switch_b7.text = getString(R.string.click_config)
-            eight_switch_b8.text = getString(R.string.click_config)
+            eight_switch_b8.text = getString(R.string.close)
         }
     }
 

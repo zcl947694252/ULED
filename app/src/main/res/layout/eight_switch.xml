@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/eight_switch_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="切换模式"
+                android:text="@string/change_mode_8k"
                 android:textColor="#FF654405"
                 android:textSize="18sp" />
     </LinearLayout>
@@ -49,11 +48,12 @@
             android:layout_weight="1"
             android:gravity="center_horizontal">
 
-           <LinearLayout
+        <LinearLayout
                 android:id="@+id/eight_switch_banner_ly"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
+
             <android.support.v4.view.ViewPager
                     android:id="@+id/eight_switch_banner"
                     android:layout_width="match_parent"
@@ -65,7 +65,7 @@
                     android:id="@+id/eight_switch_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
+                    android:layout_marginTop="50dp"
                     android:gravity="center_horizontal"
                     android:text="@string/group_switch"
                     android:textColor="#FF333333"
@@ -102,7 +102,7 @@
                     android:gravity="center"
                     android:text="@string/color_temperature_add"
                     android:textColor="@color/brightness_add_color"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"/>
 
             <TextView
                     android:id="@+id/eight_switch_b3"
@@ -137,6 +137,8 @@
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="31dp"
                     android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
@@ -150,6 +152,8 @@
                     android:layout_marginTop="31dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
@@ -162,6 +166,8 @@
                     android:layout_marginStart="45dp"
                     android:layout_marginTop="60dp"
                     android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
@@ -175,6 +181,8 @@
                     android:layout_marginTop="60dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
                     android:textSize="13sp" />
