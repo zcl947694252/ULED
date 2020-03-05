@@ -195,7 +195,7 @@
         <item name="android:background">@drawable/device_list</item>
         <item name="android:layout_width">140dp</item>
         <item name="android:layout_height">38dp</item>
-        <item name="android:layout_marginTop">72dp</item>
+        <item name="android:layout_marginTop">60dp</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
     </style>

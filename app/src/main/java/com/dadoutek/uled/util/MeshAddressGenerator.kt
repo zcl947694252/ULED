@@ -1,7 +1,7 @@
 package com.dadoutek.uled.util
 
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.lastRegion
 import com.telink.util.MeshUtils
 
 /**
@@ -17,6 +17,8 @@ class MeshAddressGenerator {
                     ++field
                 }
             } while (DBUtils.isDeviceExist(field) || field == 0)
+            lastRegion.lastGenMeshAddr = meshAddress
+            DBUtils.saveRegion(lastRegion,true)
             return field
         }
 

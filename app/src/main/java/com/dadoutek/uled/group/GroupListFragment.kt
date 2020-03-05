@@ -104,18 +104,9 @@ class GroupListFragment : BaseFragment() {
     private var delete: String? = null
     private var deleteComplete: String? = null
 
-/*    private lateinit var dialog: Dialog
-    private var adapterType: TypeListAdapter? = null
-    private var list: MutableList<String>? = null
-    private var groupType: Long = 0L
-    private var dialogGroupName: TextView? = null
-    private var dialogGroupType: TextView? = null
-    private lateinit var popMain: PopupWindow*/
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
-
 
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
@@ -178,7 +169,6 @@ class GroupListFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
-        // makeDialog()
         return view
     }
 
@@ -186,77 +176,6 @@ class GroupListFragment : BaseFragment() {
         refreshView()
     }
 
-    /*    private fun makeDialog() {
-            val popView = View.inflate(context, R.layout.dialog_add_group, null)
-            popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            popMain.isFocusable = true // 设置PopupWindow可获得焦点
-            popMain.isTouchable = true // 设置PopupWindow可触摸补充：
-            popMain.isOutsideTouchable = false
-
-            val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
-            recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            recyclerView.adapter = adapterType
-
-            adapterType?.bindToRecyclerView(recyclerView)
-
-            val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
-            val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
-            val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
-            dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
-            dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
-
-            dialogGroupTypeArrow.setOnClickListener {
-                if (recyclerView.visibility == View.GONE)
-                    recyclerView.visibility = View.VISIBLE
-                else
-                    recyclerView.visibility = View.GONE
-
-            }
-            dialogGroupType?.setOnClickListener {
-                if (recyclerView.visibility == View.GONE)
-                    recyclerView.visibility = View.VISIBLE
-                else
-                    recyclerView.visibility = View.GONE
-
-            }
-            dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
-            dialogGroupOk.setOnClickListener {
-                addNewTypeGroup()
-            }
-
-            adapterType?.setOnItemClickListener { _, _, position ->
-                dialogGroupType?.text = list!![position]
-                recyclerView.visibility = View.GONE
-                when(position){
-                    0-> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                    1-> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                    2-> groupType = Constant.DEVICE_TYPE_CURTAIN
-                    3-> groupType = Constant.DEVICE_TYPE_CONNECTOR
-                }
-            }
-            popMain.setOnDismissListener {
-                recyclerView.visibility = View.GONE
-                dialogGroupType?.text = getString(R.string.not_type)
-                dialogGroupName?.text = ""
-                groupType = 0
-            }
-        }
-
-        private fun addNewTypeGroup() {
-            // 获取输入框的内容
-            if (StringUtils.compileExChar(dialogGroupName?.text.toString().trim { it <= ' ' })) {
-                ToastUtils.showLong(getString(R.string.rename_tip_check))
-            } else {
-                if (groupType == 0L) {
-                    ToastUtils.showLong(getString(R.string.select_type))
-                } else {
-                    //往DB里添加组数据
-                    DBUtils.addNewGroupWithType(dialogGroupName?.text.toString().trim { it <= ' ' }, groupType)
-                    refreshView()
-                    PopUtil.dismiss(popMain)
-                }
-            }
-        }*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initDeviceTypeNavigation()
@@ -611,15 +530,6 @@ class GroupListFragment : BaseFragment() {
                 deleteList.addAll(rgbLightFragment.getGroupDeleteList())
                 deleteList.addAll(curtianFragment.getGroupDeleteList())
                 deleteList.addAll(relayFragment.getGroupDeleteList())
-
-                /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
-                    if (listLight.size > 0) {
-                        for (i in listLight.indices) {
-                            if (listLight[i].isSelected) {
-                                deleteList.add(listLight[i])
-                            }
-                        }
-                    }*/
 
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)

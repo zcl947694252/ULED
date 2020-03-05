@@ -15,7 +15,7 @@ public class DbUser {
     //头像
     private String avatar;
     //渠道id
-    private String channel="dadou";
+    private String channel="uled";
     //用户邮箱
     private String email;
     //用户名
@@ -41,15 +41,15 @@ public class DbUser {
     //切换区域后设备登录使用的密码
     private String controlMeshPwd;
     //lastGenMeshAddr设备地址唯一标识确保地址不重复
-    //private int lastGenMeshAddr;
+    private int lastGenMeshAddr;
 
 
 
-    @Generated(hash = 2027603692)
+    @Generated(hash = 298022711)
     public DbUser(Long id, String avatar, String channel, String email, String name, String account, String phone,
             String token, String password, String last_region_id, String authorizer_user_id,
-            String login_state_key, String last_authorizer_user_id, String controlMeshName,
-            String controlMeshPwd) {
+            String login_state_key, String last_authorizer_user_id, String controlMeshName, String controlMeshPwd,
+            int lastGenMeshAddr) {
         this.id = id;
         this.avatar = avatar;
         this.channel = channel;
@@ -65,6 +65,7 @@ public class DbUser {
         this.last_authorizer_user_id = last_authorizer_user_id;
         this.controlMeshName = controlMeshName;
         this.controlMeshPwd = controlMeshPwd;
+        this.lastGenMeshAddr = lastGenMeshAddr;
     }
     @Generated(hash = 762027100)
     public DbUser() {
@@ -182,5 +183,11 @@ public class DbUser {
                 ", controlMeshName='" + controlMeshName + '\'' +
                 ", controlMeshPwd='" + controlMeshPwd + '\'' +
                 '}';
+    }
+    public int getLastGenMeshAddr() {
+        return this.lastGenMeshAddr;
+    }
+    public void setLastGenMeshAddr(int lastGenMeshAddr) {
+        this.lastGenMeshAddr = lastGenMeshAddr;
     }
 }

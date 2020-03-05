@@ -47,7 +47,7 @@ object DBUtils {
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
 
             return qb.where(
-                    DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                    DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId()))
                     .list()
         }
 
@@ -63,7 +63,7 @@ object DBUtils {
         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
-            return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion())).list()
+            return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId())).list()
         }
 
 
@@ -150,7 +150,7 @@ object DBUtils {
         get() {
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
             val list = qb.where(
-                    DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                    DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId()))
                     .list()
 
             for (i in list.indices) {
@@ -599,7 +599,7 @@ object DBUtils {
             if (dbRegionOld.isEmpty()) {//直接插入
                 DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
                 //暂时用本地保存区域
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
+                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion.id)
 
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
@@ -610,7 +610,7 @@ object DBUtils {
                 dbRegion.id = dbRegionOld[0].id
                 DaoSessionInstance.getInstance().dbRegionDao.update(dbRegion)
                 //暂时用本地保存区域
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
+                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion.id)
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
                         Constant.DB_UPDATE)
@@ -1109,7 +1109,7 @@ object DBUtils {
             group.brightness = 100
             group.colorTemperature = 100
             group.color = 0xffffff
-            group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
+            group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId().toInt()//目前暂无分区 区域ID暂为0
             groups.add(group)
             //新增数据库保存
             saveGroup(group, false)
@@ -1136,7 +1136,7 @@ object DBUtils {
             group.brightness = 100
             group.colorTemperature = 100
             group.color = 0xffffff
-            group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
+            group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId().toInt()//目前暂无分区 区域ID暂为0
             group.deviceType = type
             groups.add(group)
             //新增数据库保存
@@ -1242,7 +1242,7 @@ object DBUtils {
         groupAllLights.colorTemperature = 100
         groupAllLights.deviceType = 1
         groupAllLights.color = TelinkLightApplication.getApp().resources.getColor(R.color.gray)
-        groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
+        groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId().toInt()
         groupAllLights.id = 1
         DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(groupAllLights)
         recordingChange(groupAllLights.id,

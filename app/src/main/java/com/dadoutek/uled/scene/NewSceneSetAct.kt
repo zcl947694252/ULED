@@ -518,7 +518,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val dbScene = DbScene()
             dbScene.id = getSceneId()
             dbScene.name = name
-            dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion()
+            dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
             DBUtils.saveScene(dbScene, false)
 
             val idAction = dbScene.id!!

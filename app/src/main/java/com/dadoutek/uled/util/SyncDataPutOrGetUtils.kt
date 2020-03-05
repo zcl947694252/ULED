@@ -404,7 +404,7 @@ class SyncDataPutOrGetUtils {
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
 
-                        SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                        SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
                         application.setupMesh(mesh)
                         LogUtils.v("zcl", "zcl下拉数据更新******mesh信息" + DBUtils.lastUser + "------------------" + mesh)
                         DBUtils.saveUser(DBUtils.lastUser!!)
@@ -525,7 +525,7 @@ class SyncDataPutOrGetUtils {
             SharedPreferencesUtils.getLastUser()
             //数据库有区域数据直接加载
             if (regionList.isNotEmpty()) {
-//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
+//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegionId()
                 val dbRegion = DBUtils.lastRegion
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
@@ -535,7 +535,7 @@ class SyncDataPutOrGetUtils {
                 mesh.factoryName = dbRegion?.installMesh
                 mesh.factoryPassword = dbRegion?.installMeshPwd
                 application.setupMesh(mesh)
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion?.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion?.id!!)
                 return
             } else {
                 setupMeshCreat(this!!.acc!!)

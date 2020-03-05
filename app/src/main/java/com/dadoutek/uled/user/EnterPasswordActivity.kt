@@ -46,7 +46,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.dadoutek.uled.util.TmtUtils
 import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
@@ -398,7 +397,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
 
-                            SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                            SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
                             application.setupMesh(mesh)
                             val lastUser = DBUtils.lastUser!!
                             DBUtils.saveUser(lastUser)

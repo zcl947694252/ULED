@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <RadioGroup
+            android:id="@+id/event_mode_gp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:orientation="horizontal">
+
+        <RadioButton
+                android:id="@+id/event_timer_mode"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:button="@null"
+                android:text="@string/times_mode"
+                android:textColor="@color/blue_text"
+                android:textSize="18sp" />
+
+        <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray_e" />
+
+        <RadioButton
+                android:id="@+id/event_time_pattern_mode"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:button="@null"
+                android:text="@string/time_pattern_mode"
+                android:textColor="@color/gray9"
+                android:textSize="18sp" />
+    </RadioGroup>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray_e" />
+
+   <!-- <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">-->
+
+        <include
+                layout="@layout/template_recycleview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+       <!-- <include layout="@layout/empty_view" />
+    </RelativeLayout>-->
+</LinearLayout>

@@ -15,7 +15,7 @@
             android:paddingTop="20dp"
             android:paddingEnd="@dimen/dp_10"
             android:paddingBottom="@dimen/dp_10"
-            android:src="@drawable/icon_return" />
+            android:src="@drawable/icon_return"/>
 
     <LinearLayout
             android:id="@+id/eight_switch_mode"
@@ -76,7 +76,7 @@
         <RelativeLayout
                 android:id="@+id/eight_switch_config"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
+                android:layout_height="290dp"
                 android:layout_marginBottom="30dp"
                 android:background="@drawable/light_background"
                 android:visibility="visible">
@@ -86,7 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="45dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="25dp"
                     android:gravity="center"
                     android:text="@string/brightness_add"
                     android:textColor="@color/brightness_add_color"
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="25dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
                     android:text="@string/color_temperature_add"
@@ -135,13 +135,13 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/eight_switch_b3"
                     android:layout_marginStart="45dp"
-                    android:layout_marginTop="31dp"
+                    android:layout_marginTop="41dp"
                     android:gravity="center"
                     android:minWidth="40dp"
                     android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"/>
 
             <TextView
                     android:id="@+id/eight_switch_b6"
@@ -149,14 +149,14 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/eight_switch_b4"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="31dp"
+                    android:layout_marginTop="41dp"
                     android:layout_marginEnd="40dp"
                     android:gravity="center"
                     android:minWidth="40dp"
                     android:minHeight="@dimen/dp_15"
                     android:text="@string/click_config"
                     android:textColor="@color/click_config_color"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"/>
 
             <TextView
                     android:id="@+id/eight_switch_b7"

@@ -956,6 +956,10 @@
     <string name="color_temperature_minus">cct-</string>
     <string name="click_config_tip">Click the configure button to complete the configuration</string>
     <string name="change_mode_8k">switching mode</string>
+    <string name="times_mode">Timer_Mode</string>
+    <string name="time_pattern_mode">Time_pattern</string>
+    <string name="event_list">Even List</string>
+    <string name="repetition">重复</string>
 
 
 </resources>

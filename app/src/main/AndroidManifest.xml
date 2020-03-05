@@ -71,6 +71,18 @@
         <service
                 android:name=".service.SendLightsInfo"
                 android:enabled="true" />
+        <activity
+                android:name=".gateway.GatewayConfigActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".gateway.GatewayChoseTimeActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".gateway.GatewayModeChoseActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".gateway.EventListActivity"
+                android:screenOrientation="portrait" />
 
         <activity
                 android:name=".othersview.HumanBodySensorActivity"

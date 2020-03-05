@@ -29,7 +29,6 @@ import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -45,10 +44,8 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -123,12 +120,14 @@ abstract class BaseGroupFragment : BaseFragment() {
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
                         Thread.sleep(300)
-                        deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j],
+                        val dbGroup = deleteList[j]
+                        val lights = DBUtils.getLightByGroupID(dbGroup.id)
+                        deleteGroup(lights, dbGroup,
                                 successCallback = {
                                     isDeleteSucess = true
                                     if (j == deleteList.size - 1 && isDeleteSucess) {
                                         hideLoadingDialog()
-                                        isDelete = false
+                                         isDelete = false
                                         sendDeleteBrocastRecevicer(300)
                                         refreshData()
                                     }
@@ -183,7 +182,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
-        lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+        lin = LayoutInflater.from(activity).inflate(R.layout.gp_fragment_add_view, null)
         return view
     }
 
@@ -262,15 +261,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                     SharedPreferencesUtils.setDelete(true)
                     val intent = Intent("showPro")
                     intent.putExtra("is_delete", "true")
-                    this.activity?.let {
-                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    this.activity?.let {it1->
+                        LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                     }
                 } else {//先长按  选中 在长按 就会通知外面关闭了
                     isDelete = false
                     val intent = Intent("showPro")
                     intent.putExtra("is_delete", "false")
-                    this.activity?.let {
-                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    this.activity?.let {it1->
+                        LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                     }
                 }
                 SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, isDelete)
@@ -513,7 +512,6 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
-
             if (lights.count() != 0) {
                 val maxRetryCount = 3
                 if (retryCount <= maxRetryCount) {
@@ -584,30 +582,5 @@ abstract class BaseGroupFragment : BaseFragment() {
             LogUtils.e("zcl要删除的组-----$list")
         }
         return list
-    }
-
-
-    private fun syncData() {
-        mContext?.let {
-            SyncDataPutOrGetUtils.syncPutDataStart(it, object : SyncCallback {
-                override fun complete() {
-                    hideLoadingDialog()
-                    val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe { }
-                    if (compositeDisposable.isDisposed) {
-                        compositeDisposable = CompositeDisposable()
-                    }
-                    compositeDisposable.add(disposable)
-                }
-
-                override fun error(msg: String) {
-                    hideLoadingDialog()
-                    ToastUtils.showLong(R.string.backup_failed)
-                }
-
-                override fun start() {}
-            })
-        }
     }
 }

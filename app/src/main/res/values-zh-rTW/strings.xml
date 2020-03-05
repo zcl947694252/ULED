@@ -404,7 +404,7 @@
     <string name="update_permission_tip">请同意相关权限才能升级</string>
     <string name="switch_mode">开关灯方式</string>
     <string name="delay_unit">延时时间单位</string>
-    <string name="edit">修改</string>
+    <string name="edit">编辑</string>
     <string name="long_click_select_color_tip">*长按保存,单击应用</string>
     <string name="account">账号:</string>
     <string name="rssi_low">信号太差</string>
@@ -879,5 +879,9 @@
     <string name="color_temperature_minus">色温-</string>
     <string name="click_config_tip">请点击配置按钮完成配置</string>
     <string name="change_mode_8k">切换模式</string>
+    <string name="times_mode">定时模式</string>
+    <string name="time_pattern_mode">时间段模式</string>
+    <string name="event_list">事件列表</string>
+    <string name="repetition">重复</string>
 
 </resources>

@@ -98,10 +98,10 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    abstract fun setLayoutID(): Int
-    abstract fun initView()
-    abstract fun initData()
     abstract fun initListener()
+    abstract fun initData()
+    abstract fun initView()
+    abstract fun setLayoutID(): Int
     open fun notifyWSData(type: Int, rid: Int) {}
 
 

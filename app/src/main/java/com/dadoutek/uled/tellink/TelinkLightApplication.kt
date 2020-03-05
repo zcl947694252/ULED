@@ -77,7 +77,7 @@ class TelinkLightApplication : TelinkApplication() {
     open fun initData() {
         //super.doInit()
         //AES.Security = true;
-        val currentRegionID = SharedPreferencesUtils.getCurrentUseRegion()
+        val currentRegionID = SharedPreferencesUtils.getCurrentUseRegionId()
         // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
         //切换区域记得断开连接
         if (currentRegionID != -1L) {

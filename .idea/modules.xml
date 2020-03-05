@@ -15,6 +15,7 @@
       <module fileurl="file://$PROJECT_DIR$/stomplib/stomplib.iml" filepath="$PROJECT_DIR$/stomplib/stomplib.iml" />
       <module fileurl="file://$PROJECT_DIR$/tbanner/tbanner.iml" filepath="$PROJECT_DIR$/tbanner/tbanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/tbanner/library/tbanner-library.iml" filepath="$PROJECT_DIR$/tbanner/library/tbanner-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wheelview/wheelview.iml" filepath="$PROJECT_DIR$/wheelview/wheelview.iml" />
     </modules>
   </component>
 </project>

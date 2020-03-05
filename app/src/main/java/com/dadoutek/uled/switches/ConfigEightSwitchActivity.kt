@@ -91,6 +91,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configSwitchType = type//赋值选择的模式
                 clickType = 1//代表跳过选择模式
 
+
                 setTextColorsAndText(type)
 
                 for (i in 0 until listKeysBean.length()){
@@ -239,7 +240,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun updateMeshGroup(isConfigGroup: Int) {
         newMeshAddr = MeshAddressGenerator().meshAddress
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
-            mDeviceInfo?.meshAddress = newMeshAddr
+            mDeviceInfo.meshAddress = newMeshAddr
 
             updateSwitch(isConfigGroup)
             GlobalScope.launch(Dispatchers.Main) {
@@ -320,7 +321,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun getSceneParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
         val firsDbSceneId = sceneMap[firstNum]!!.id
-
         listKeysBean.put(getKeyBean(firstNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
         return if (list.size > 1) {
             val secondNum = list[1]
@@ -338,20 +338,32 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val fiveMeshs = groupMap[firstNum]!!.meshAddr
         val fiveH = fiveMeshs.shr(8).toByte()
         val fiveL = fiveMeshs.and(0xff).toByte()
-        listKeysBean.put(getKeyBean(firstNum, Opcode.GROUP_SWITCH8K.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = fiveMeshs.shr(8), low8Mes = fiveMeshs.and(0xff)))
+        var opcodeOne = getAllGroupOpcode(fiveMeshs)
+
+        listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = fiveMeshs.shr(8), low8Mes = fiveMeshs.and(0xff)))
 
         return if (list.size > 1) {
             val secondNum = list[1]
             val sixMeshs = groupMap[secondNum]!!.meshAddr
             val sixH = sixMeshs.shr(8).toByte()
             val sixL = sixMeshs.and(0xff).toByte()
+            var opcodeTwo = getAllGroupOpcode(sixMeshs)
 
-            listKeysBean.put(getKeyBean(secondNum, Opcode.GROUP_SWITCH8K.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = sixMeshs.shr(8), low8Mes = sixMeshs.and(0xff)))
-            byteArrayOf(firstNum.toByte(), Opcode.GROUP_SWITCH8K, fiveH, fiveL, secondNum.toByte(), Opcode.GROUP_SWITCH8K, sixH, sixL)
+            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = sixMeshs.shr(8), low8Mes = sixMeshs.and(0xff)))
+
+            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, secondNum.toByte(), opcodeTwo, sixH, sixL)
         } else {
             //如果第八键没有配置默认为关
             listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt()))
-            byteArrayOf(firstNum.toByte(), Opcode.GROUP_SWITCH8K, fiveH, fiveL, 0x08, Opcode.CLOSE, 0x00, 0x00)
+            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, 0x08, Opcode.CLOSE, 0x00, 0x00)
+        }
+    }
+
+    private fun getAllGroupOpcode(fiveMeshs: Int): Byte {
+        return if (fiveMeshs != 0xffff) {
+            Opcode.GROUP_SWITCH8K
+        } else {
+            Opcode.SWITCH_ALL_GROUP
         }
     }
 
@@ -496,7 +508,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             eight_switch_config.visibility = View.GONE
             eight_switch_banner_ly.visibility = View.VISIBLE
             clickType = 0//代表没有选择模式
-
+            configSwitchType = 0//默认选中的是群组八键开关
+            eight_switch_title.text = getString(R.string.group_switch)
         }
 
         eight_switch_b1.setOnClickListener(this)

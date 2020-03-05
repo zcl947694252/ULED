@@ -47,4 +47,5 @@
     <color name="dark_glod">#FF654405</color>
     <color name="device_list_divider">#F8F8F8</color>
     <color name="brightness_add_color">#FF654405</color>
+    <color name="gray9">#FF999999</color>
 </resources>

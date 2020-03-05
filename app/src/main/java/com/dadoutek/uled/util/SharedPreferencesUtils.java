@@ -13,12 +13,12 @@ import java.util.List;
 
 public class SharedPreferencesUtils {
 
-    public static void saveCurrentUseRegion(long id) {
+    public static void saveCurrentUseRegionID(long id) {
         SharedPreferencesHelper.putLong(TelinkLightApplication.Companion.getApp(),
                 Constant.CURRENT_USE_REGION_KEY, id);
     }
 
-    public static long getCurrentUseRegion() {
+    public static long getCurrentUseRegionId() {
         return SharedPreferencesHelper.getLong(TelinkLightApplication.Companion.getApp(),
                 Constant.CURRENT_USE_REGION_KEY, -1);
     }
