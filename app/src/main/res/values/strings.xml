@@ -960,6 +960,20 @@
     <string name="time_pattern_mode">Time_pattern</string>
     <string name="event_list">Even List</string>
     <string name="repetition">重复</string>
+    <string name="chose_time">选择时间</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="lable1">Lable 1</string>
+    <string name="gate_way">Gateway</string>
+    <string name="every_day">Everyday</string>
+    <string name="only_one">Only once</string>
+    <string name="please_select_scene">Please select the scene</string>
+    <string name="timer_exists">The timing time already exists</string>
 
 
 </resources>

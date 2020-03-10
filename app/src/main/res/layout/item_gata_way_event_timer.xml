@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/timer_scene_ly"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="@dimen/dp_15">
-
+    <!--時間定時title的顔色是黑3 時間段時黑9-->
     <TextView
-            android:id="@+id/gate_way_timer_time"
+            android:id="@+id/item_gate_way_timer_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/edit"
             android:textColor="@color/black_three"
-            android:textSize="13sp" />
+            android:textSize="18sp" />
 
     <ImageView
-            android:id="@+id/gate_way_timer_arr"
+            android:id="@+id/item_gate_way_timer_arr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:src="@drawable/arrow_r" />
 
     <TextView
-            android:id="@+id/gate_way_timer_scene"
+            android:id="@+id/item_gate_way_timer_scene"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/dp_10"
-            android:layout_toStartOf="@id/gate_way_timer_arr"
+            android:layout_toStartOf="@id/item_gate_way_timer_arr"
             android:gravity="center"
             android:text="@string/edit"
-            android:textColor="@color/black_three"
-            android:textSize="13sp" />
+            android:textColor="@color/black_six"
+            android:textSize="15sp" />
 </RelativeLayout>

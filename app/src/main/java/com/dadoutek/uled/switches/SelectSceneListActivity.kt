@@ -26,7 +26,7 @@ class SelectSceneListActivity : TelinkBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_select_scene_list)
+        setContentView(R.layout.template_activity_list)
         initView()
         initData()
         initListener()

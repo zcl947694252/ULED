@@ -39,11 +39,9 @@ private const val MAX_RETRY_CONNECT_TIME = 1
 class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private var isSeachedDevice: Boolean = false
-    private var connectDisposable: Disposable? = null
     private lateinit var mApplication: TelinkLightApplication
     private var mRxPermission: RxPermissions? = null
     private var bestRSSIDevice: DeviceInfo? = null
-    private var mScanTimeoutDisposal: Disposable? = null
     private var mConnectDisposal: Disposable? = null
     private var retryConnectCount = 0
     private var isSupportInstallOldDevice = false
@@ -112,9 +110,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private fun startScan() {
         TelinkLightService.Instance()?.idleMode(true)
-        if (connectDisposable?.isDisposed == false) {
-            LogUtils.d("already started")
-        } else {
+
             startAnimation()
             val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
                     DeviceType.SCENE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH)
@@ -130,7 +126,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                         scanFail()
                         LogUtils.d(it)
                     })
-        }
     }
 
     override fun onResume() {
@@ -140,15 +135,11 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        mScanTimeoutDisposal?.dispose()
-        connectDisposable?.dispose()
         mConnectDisposal?.dispose()
         stopConnectTimer()
     }
 
     private fun onLogin() {
-        connectDisposable?.dispose()
-        mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
         if (bestRSSIDevice != null) {
             val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)

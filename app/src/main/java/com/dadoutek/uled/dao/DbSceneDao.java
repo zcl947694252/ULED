@@ -28,6 +28,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property BelongRegionId = new Property(2, Long.class, "belongRegionId", false, "BELONG_REGION_ID");
         public final static Property Index = new Property(3, int.class, "index", false, "INDEX");
+        public final static Property Times = new Property(4, String.class, "times", false, "TIMES");
     }
 
     private DaoSession daoSession;
@@ -49,7 +50,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 2: belongRegionId
-                "\"INDEX\" INTEGER NOT NULL );"); // 3: index
+                "\"INDEX\" INTEGER NOT NULL ," + // 3: index
+                "\"TIMES\" TEXT);"); // 4: times
     }
 
     /** Drops the underlying database table. */
@@ -73,6 +75,11 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         }
         stmt.bindLong(3, entity.getBelongRegionId());
         stmt.bindLong(4, entity.getIndex());
+ 
+        String times = entity.getTimes();
+        if (times != null) {
+            stmt.bindString(5, times);
+        }
     }
 
     @Override
@@ -90,6 +97,11 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         }
         stmt.bindLong(3, entity.getBelongRegionId());
         stmt.bindLong(4, entity.getIndex());
+ 
+        String times = entity.getTimes();
+        if (times != null) {
+            stmt.bindString(5, times);
+        }
     }
 
     @Override
@@ -109,7 +121,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.getLong(offset + 2), // belongRegionId
-            cursor.getInt(offset + 3) // index
+            cursor.getInt(offset + 3), // index
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // times
         );
         return entity;
     }
@@ -120,6 +133,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setBelongRegionId(cursor.getLong(offset + 2));
         entity.setIndex(cursor.getInt(offset + 3));
+        entity.setTimes(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override

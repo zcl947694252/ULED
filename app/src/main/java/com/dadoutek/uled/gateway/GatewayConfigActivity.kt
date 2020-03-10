@@ -1,13 +1,19 @@
 package com.dadoutek.uled.gateway
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.chad.library.adapter.base.BaseQuickAdapter
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.gateway.adapter.GatewayTimeItemAdapter
+import com.dadoutek.uled.gateway.bean.DbGatewayTimeBean
+import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_gate_way.*
-import kotlinx.android.synthetic.main.template_recycleview.*
+import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.toast
 
 
 /**
@@ -24,7 +30,8 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
     private val requestModeCode: Int = 1000
     private val requestTimeCode: Int = 2000
     private var isCanEdite = false
-    private val adapter = GatewayTimeItemAdapter(R.layout.event_timer_item, mutableListOf())
+    val list = mutableListOf<DbGatewayTimeBean>()
+    private val adapter = GatewayTimeItemAdapter(R.layout.item_gata_way_event_timer, list)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {
@@ -59,27 +66,89 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun initView() {
+        toolbarTv.text = getString(R.string.gate_way)
+        gate_way_repete_mode.textSize = 15F
+        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
         isCanEdite = false
         isCanEdite()
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        template_recycleView.adapter = adapter
+        swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         lin = View.inflate(this, R.layout.add_group, null)
-        adapter.addFooterView(lin)
-        adapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-            startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java), requestTimeCode)
-        }
     }
 
     override fun initData() {
-
+        swipe_recycleView.adapter = adapter
+        adapter.addFooterView(lin)
+        swipe_recycleView.isItemViewSwipeEnabled = true // 侧滑删除，默认关闭。
     }
 
     override fun initListener() {
         gate_way_edite.setOnClickListener(this)
         gate_way_repete_mode.setOnClickListener(this)
         gate_way_repete_mode_arrow.setOnClickListener(this)
+        swipe_recycleView.setOnItemMoveListener(object : OnItemMoveListener {
+            override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
+                // 从数据源移除该Item对应的数据，并刷新Adapter。
+                val position = srcHolder?.adapterPosition
+                list.removeAt(position!!)
+                adapter.notifyItemRemoved(position)
+                LogUtils.v("zcl------------$list")
+            }
+
+            override fun onItemMove(srcHolder: RecyclerView.ViewHolder?, targetHolder: RecyclerView.ViewHolder?): Boolean {
+                return false//表示数据移动不成功
+            }
+        })
+        /*adapter.onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+            val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java)
+            intent.putExtra("data", list[position])
+            startActivityForResult(intent, requestTimeCode)
+        }*/
         lin?.setOnClickListener {
             startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java), requestTimeCode)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == requestModeCode) {
+                val mode = data?.getStringExtra("data")
+                if (mode!!.contains("6")) {
+                    gate_way_repete_mode.textSize = 13F
+                    gate_way_repete_mode.text = mode.replace("6", "")
+                } else {
+                    gate_way_repete_mode.textSize = 15F
+                    gate_way_repete_mode.text = mode
+                }
+            } else if (requestCode == requestTimeCode) {
+                val bean = data?.getParcelableExtra<DbGatewayTimeBean>("data")
+                bean?.let {
+                    if (bean.new)
+                        list.add(bean)
+                    else {
+                        var targetPosition: Int
+                        for (i in 0 until list.size) {
+                            val timeBean = list[i]
+                            if (timeBean.label_id == bean.label_id) {//存在
+                                targetPosition = i
+                                list.removeAt(targetPosition)
+                                list.add(bean)
+                                break
+                            } else {//新建
+                                if (timeBean.hour == bean.hour && timeBean.minute == bean.minute) {
+                                    toast(getString(R.string.timer_exists))
+                                    break
+                                } else list.add(bean)
+                            }
+                        }
+                        list.sortBy { it.hour }
+                    }
+                    adapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 }

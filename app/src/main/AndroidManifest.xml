@@ -81,7 +81,7 @@
                 android:name=".gateway.GatewayModeChoseActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.EventListActivity"
+                android:name=".gateway.GateWayEventListActivity"
                 android:screenOrientation="portrait" />
 
         <activity

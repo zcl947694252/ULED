@@ -327,9 +327,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             val secondDbSceneId = sceneMap[secondNum]!!.id
             //位置 功能 保留 14场景id
             listKeysBean.put(getKeyBean(secondNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
-            byteArrayOf(firstNum.toByte(), 0x00, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), 0x00, 0x00, secondDbSceneId.toByte())
+            byteArrayOf(firstNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), secondNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关
-            byteArrayOf(firstNum.toByte(), 0x00, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
+            byteArrayOf(firstNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
 

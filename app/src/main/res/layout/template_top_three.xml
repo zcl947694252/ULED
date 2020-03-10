@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/blue_text"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        tools:showIn="@layout/activity_gate_way_chose_time2">
+
+    <TextView
+            android:id="@+id/toolbar_t_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/black_three"
+            android:paddingStart="@dimen/dp_15"
+            android:textSize="18sp" />
+
+    <TextView
+            android:id="@+id/toolbar_t_center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:paddingStart="@dimen/dp_15"
+            android:textSize="18sp" />
+
+    <TextView
+            android:id="@+id/toolbar_t_confim"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_alignParentEnd="true"
+            android:text="@string/complete"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:textColor="@color/black_three"
+            android:paddingStart="@dimen/dp_15"
+            android:textSize="18sp" />
+</RelativeLayout>

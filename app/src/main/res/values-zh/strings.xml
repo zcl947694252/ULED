@@ -881,6 +881,20 @@
     <string name="times_mode">定时模式</string>
     <string name="time_pattern_mode">时间段模式</string>
     <string name="event_list">事件列表</string>
+    <string name="chose_time">选择时间</string>
     <string name="repetition">重复</string>
+    <string name="monday">星期一</string>
+    <string name="tuesday">星期二</string>
+    <string name="wednesday">星期三</string>
+    <string name="thursday">星期四</string>
+    <string name="friday">星期五</string>
+    <string name="saturday">星期六</string>
+    <string name="sunday">星期日</string>
+    <string name="lable1">标签1</string>
+    <string name="gate_way">网关</string>
+    <string name="every_day">每日</string>
+    <string name="only_one">仅一次</string>
+    <string name="please_select_scene">请选择场景</string>
+    <string name="timer_exists">该定时时间已存在</string>
 
 </resources>

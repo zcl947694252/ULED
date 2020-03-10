@@ -700,11 +700,11 @@ object Commander : EventListener<String> {
 
     private fun onGetLightVersion(event: NotificationEvent) {
         val data = event.args.params
-        if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
-            version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
+        version = if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
+            Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
 
         } else {
-            version = Strings.bytesToString(data)
+            Strings.bytesToString(data)
         }
 
         if (version != null && version?.isNotEmpty() == true) {

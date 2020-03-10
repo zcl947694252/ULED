@@ -664,7 +664,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 it.onNext(TelinkLightApplication.getApp().connectDevice)
             }
         }
-
     }
 
     /**

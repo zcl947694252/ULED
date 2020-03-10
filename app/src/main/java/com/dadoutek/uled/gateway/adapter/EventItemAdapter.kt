@@ -1,4 +1,4 @@
-package com.dadoutek.uled.gateway
+package com.dadoutek.uled.gateway.adapter
 
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
