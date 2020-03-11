@@ -33,6 +33,8 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
+    internal val useIndex = mutableListOf<Int>()
+    internal val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
     private  var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null

@@ -27,6 +27,7 @@ class GatewayModeChoseActivity : BaseActivity() {
 
     private val checkedList = ArrayList<WeekBean>()
     override fun initListener() {
+
     }
 
     override fun initData() {
@@ -56,8 +57,8 @@ class GatewayModeChoseActivity : BaseActivity() {
             var intent = Intent()
             var sb = StringBuilder()
             when {
-                checkedList.size ==0 -> sb.append(getString(R.string.only_one))
-                checkedList.size ==1 -> sb.append(getString(R.string.only_one))
+                checkedList.size == 0 -> sb.append(getString(R.string.only_one))
+                checkedList.size == 1 -> sb.append(getString(R.string.only_one))
                 checkedList.size == 7 -> sb.append(getString(R.string.every_day))
                 else -> {
                     checkedList.sortBy { it.pos }
@@ -66,8 +67,8 @@ class GatewayModeChoseActivity : BaseActivity() {
                             sb.append(checkedList[i].week)
                         else
                             sb.append(checkedList[i].week).append(",")
-                          if (checkedList.size==6)
-                              sb.append("6")
+                        if (checkedList.size == 6)
+                            sb.append("6")
                     }
                 }
             }

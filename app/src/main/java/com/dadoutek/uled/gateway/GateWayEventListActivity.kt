@@ -14,6 +14,7 @@ import com.dadoutek.uled.gateway.adapter.EventItemAdapter
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.toast
 
 
 /**
@@ -26,12 +27,11 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述
  */
 class GateWayEventListActivity : BaseActivity() {
+    private var addBtn: Button? = null
     private var lin: View? = null
-    val list = mutableListOf("1","2")
+    private var modeIsTimer: Boolean = true
+    val list = mutableListOf("1", "2")
     val adapter = EventItemAdapter(R.layout.event_item, list)
-    override fun setLayoutID(): Int {
-        return R.layout.activity_event_list
-    }
 
     override fun initView() {
         toolbarTv.text = getString(R.string.event_list)
@@ -41,16 +41,13 @@ class GateWayEventListActivity : BaseActivity() {
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
 
-        lin = LayoutInflater.from(this).inflate(R.layout.add_group, null)
+        lin = LayoutInflater.from(this).inflate(R.layout.template_bottom_add_no_line, null)
         lin?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add)
         adapter.addFooterView(lin)
 
         var emptyView = View.inflate(this, R.layout.empty_view, null)
-        var  addBtn =  emptyView.findViewById<Button>(R.id.add_device_btn)
-        addBtn.text = getString(R.string.add)
-        addBtn.setOnClickListener {
-           startActivity(Intent(this, GatewayConfigActivity::class.java))
-        }
+        addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
+        addBtn?.text = getString(R.string.add)
 
         adapter.emptyView = emptyView
     }
@@ -65,16 +62,28 @@ class GateWayEventListActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        addBtn?.setOnClickListener {
+            val intent = Intent(this, GatewayConfigActivity::class.java)
+            intent.putExtra("data", modeIsTimer)
+            startActivity(intent)
+        }
+        lin?.setOnClickListener {
+            if (list.size >= 20)
+                toast(getString(R.string.gate_way_time_max))
+            else
+                startActivity(Intent(this, GatewayConfigActivity::class.java))
+        }
         event_mode_gp.setOnCheckedChangeListener { _, checkedId ->
-                list.clear()
+            list.clear()
+            modeIsTimer = checkedId == R.id.event_timer_mode
             if (checkedId == R.id.event_timer_mode) {//定時模式
                 event_timer_mode.setTextColor(getColor(R.color.blue_text))
                 event_time_pattern_mode.setTextColor(getColor(R.color.gray9))
-                list.addAll(mutableListOf("12","13"))
+                list.addAll(mutableListOf("12", "13"))
             } else {//時間段模式
                 event_timer_mode.setTextColor(getColor(R.color.gray9))
                 event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
-                list.addAll(mutableListOf("1","2"))
+                list.addAll(mutableListOf("1", "2"))
             }
             adapter.notifyDataSetChanged()
         }
@@ -91,8 +100,9 @@ class GateWayEventListActivity : BaseActivity() {
                 }
             }
         }
-
-        lin?.setOnClickListener {    startActivity(Intent(this, GatewayConfigActivity::class.java)) }
     }
 
+    override fun setLayoutID(): Int {
+        return R.layout.activity_event_list
+    }
 }

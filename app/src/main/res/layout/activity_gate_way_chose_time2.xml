@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:orientation="vertical">
 
     <include layout="@layout/template_top_three" />
@@ -11,6 +12,6 @@
     <include
             layout="@layout/item_gata_way_event_timer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="35dp" />
+            android:layout_height="46dp"
+            android:layout_marginTop="@dimen/dp_15"/>
 </LinearLayout>

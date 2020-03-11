@@ -764,7 +764,7 @@
     <string name="light_on">Turn on </string>
     <string name="light_off">Turn off </string>
 
-    <string name="minute">Min</string>
+    <string name="startMinute">Min</string>
     <string name="second">Sec</string>
 
     <string name="moment">Instant</string>
@@ -908,7 +908,7 @@
     <string name="timeout_period_is_empty">The timeout period is empty</string>
     <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
     <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
-    <string name="timeout_1m">The timeout cannot be less than 1 minute</string>
+    <string name="timeout_1m">The timeout cannot be less than 1 startMinute</string>
     <string name="timeout_255_big">The timeout cannot be greater than 255 minutes</string>
     <string name="compatibility_mode">if the light does not flash, please turn on the compatibility mode.</string>
     <string name="rename_faile">Rename failed</string>
@@ -974,6 +974,10 @@
     <string name="only_one">Only once</string>
     <string name="please_select_scene">Please select the scene</string>
     <string name="timer_exists">The timing time already exists</string>
+    <string name="invalid_data">Invalid data </string>
+    <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
+    <string name="add_time">Add Time</string>
+    <string name="add_times">Add Times</string>
 
 
 </resources>

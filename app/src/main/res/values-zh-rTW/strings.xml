@@ -694,7 +694,7 @@
     <string name="very_dark_environment">夜晚</string>
     <string name="light_on">触发时开灯</string>
     <string name="light_off">触发时关灯</string>
-    <string name="minute">分钟</string>
+    <string name="startMinute">分钟</string>
     <string name="second">秒</string>
     <string name="moment">瞬间</string>
     <string name="gradient">渐变</string>
@@ -897,5 +897,9 @@
     <string name="only_one">仅一次</string>
     <string name="please_select_scene">请选择场景</string>
     <string name="timer_exists">该定时时间已存在</string>
+    <string name="invalid_data">无效数据</string>
+    <string name="gate_way_time_max">网关定时已达最大创建数</string>
+    <string name="add_time">添加时间</string>
+    <string name="add_times">添加时间段</string>
 
 </resources>

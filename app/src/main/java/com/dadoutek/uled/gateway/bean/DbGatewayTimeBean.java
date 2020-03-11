@@ -32,11 +32,14 @@ public class DbGatewayTimeBean implements Parcelable {
     @Id(autoincrement = true)
     private  Long label_id;
     private  int label_switch;
-    private  int hour;
-    private  int minute;
+    private  int startHour;
+    private  int startMinute;
+    private  int endHour;
+    private  int endMinute;
     private  String week;
     private  int index;
     private  Boolean isNew;
+    private  Boolean isTime;
     private  Long sceneId;
     private  String  sceneName;
 
@@ -47,8 +50,8 @@ public class DbGatewayTimeBean implements Parcelable {
             label_id = in.readLong();
         }
         label_switch = in.readInt();
-        hour = in.readInt();
-        minute = in.readInt();
+        startHour = in.readInt();
+        startMinute = in.readInt();
         week = in.readString();
         index = in.readInt();
         byte tmpIsNew = in.readByte();
@@ -74,8 +77,8 @@ public class DbGatewayTimeBean implements Parcelable {
     };
 
     public DbGatewayTimeBean(int hourTime, int minuteTime, boolean b) {
-        this.hour = hourTime;
-        this.minute = minuteTime;
+        this.startHour = hourTime;
+        this.startMinute = minuteTime;
         this.isNew = b;
     }
 
@@ -84,8 +87,8 @@ public class DbGatewayTimeBean implements Parcelable {
             int index, Boolean isNew, Long sceneId, String sceneName) {
         this.label_id = label_id;
         this.label_switch = label_switch;
-        this.hour = hour;
-        this.minute = minute;
+        this.startHour = hour;
+        this.startMinute = minute;
         this.week = week;
         this.index = index;
         this.isNew = isNew;
@@ -111,8 +114,8 @@ public class DbGatewayTimeBean implements Parcelable {
             dest.writeLong(label_id);
         }
         dest.writeInt(label_switch);
-        dest.writeInt(hour);
-        dest.writeInt(minute);
+        dest.writeInt(startHour);
+        dest.writeInt(startMinute);
         dest.writeString(week);
         dest.writeInt(index);
         dest.writeByte((byte) (isNew == null ? 0 : isNew ? 1 : 2));
@@ -141,20 +144,20 @@ public class DbGatewayTimeBean implements Parcelable {
         this.label_switch = label_switch;
     }
 
-    public int getHour() {
-        return hour;
+    public int getStartHour() {
+        return startHour;
     }
 
-    public void setHour(int hour) {
-        this.hour = hour;
+    public void setStartHour(int startHour) {
+        this.startHour = startHour;
     }
 
-    public int getMinute() {
-        return minute;
+    public int getStartMinute() {
+        return startMinute;
     }
 
-    public void setMinute(int minute) {
-        this.minute = minute;
+    public void setStartMinute(int startMinute) {
+        this.startMinute = startMinute;
     }
 
     public String getWeek() {
@@ -214,8 +217,8 @@ public class DbGatewayTimeBean implements Parcelable {
         return "DbGatewayTimeBean{" +
                 "label_id=" + label_id +
                 ", label_switch=" + label_switch +
-                ", hour=" + hour +
-                ", minute=" + minute +
+                ", startHour=" + startHour +
+                ", startMinute=" + startMinute +
                 ", week='" + week + '\'' +
                 ", index=" + index +
                 ", isNew=" + isNew +

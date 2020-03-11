@@ -17,7 +17,7 @@ import com.dadoutek.uled.gateway.bean.DbGatewayTimeBean
  */
 class GatewayTimeItemAdapter(resId:Int, data: MutableList<DbGatewayTimeBean>): BaseQuickAdapter<DbGatewayTimeBean, BaseViewHolder>(resId,data){
     override fun convert(helper: BaseViewHolder?, item: DbGatewayTimeBean) {
-        val time =  "${item.hour}:${item.minute}"
+        val time =  "${item.startHour}:${item.startMinute}"
         helper?.setText(R.id.item_gate_way_timer_time, time)
                 ?.setText(R.id.item_gate_way_timer_scene,item.sceneName)
     }

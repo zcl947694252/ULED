@@ -63,8 +63,8 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
                 Intent intent = new Intent();
                 gatewayTimeBean.setSceneId(scene.getId());
                 gatewayTimeBean.setSceneName(scene.getName());
-                gatewayTimeBean.setHour(hourTime);
-                gatewayTimeBean.setMinute(minuteTime);
+                gatewayTimeBean.setStartHour(hourTime);
+                gatewayTimeBean.setStartMinute(minuteTime);
 
                 intent.putExtra("data", gatewayTimeBean);
                 setResult(Activity.RESULT_OK, intent);

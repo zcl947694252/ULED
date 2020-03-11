@@ -68,7 +68,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var currentUser: DbUser? = null
     private var isPassword = false
 
-
     private var lastClickTime: Long = 0
 
     @SuppressLint("InvalidWakeLockTag")
@@ -90,6 +89,18 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun detectUpdate() {
 //        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
 //        XiaomiUpdateAgent.update(this)
+
+        //已用index
+        val list = mutableListOf(1, 3, 5, 7)
+
+        for (i in 0..50) {
+            for (j in 0 until list.size)
+                if (i == j)
+                    TelinkLightApplication.getApp().useIndex.add(i)
+                else
+                    TelinkLightApplication.getApp().freeIndex.add(i)
+
+        }
     }
 
     private fun initData() {
@@ -107,6 +118,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         edit_user_phone_or_email.setSelection(s.length)
                 }
                 SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
+
             }
         }
     }

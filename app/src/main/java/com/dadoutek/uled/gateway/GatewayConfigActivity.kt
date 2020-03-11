@@ -2,9 +2,11 @@ package com.dadoutek.uled.gateway
 
 import android.app.Activity
 import android.content.Intent
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
@@ -26,6 +28,7 @@ import org.jetbrains.anko.toast
  * 更新描述
  */
 class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
+    private var modeIsTimer: Boolean = false
     private var lin: View? = null
     private val requestModeCode: Int = 1000
     private val requestTimeCode: Int = 2000
@@ -44,27 +47,9 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun isCanEdite() {
-        if (isCanEdite) {
-            gate_way_title.isFocusableInTouchMode = true//不可编辑
-            gate_way_title.isClickable = true//不可点击，但是这个效果我这边没体现出来，不知道怎没用
-            gate_way_title.isFocusable = true//不可编辑
-            gate_way_title.isEnabled = true
-            gate_way_title.requestFocus()
-            gate_way_title.setSelection(gate_way_title.text.length)//将光标移至文字末尾
-        } else {
-            gate_way_title.isFocusableInTouchMode = false//不可编辑
-            gate_way_title.isClickable = false//不可点击
-            gate_way_title.isFocusable = false//不可编辑
-            gate_way_title.isEnabled = false
-            gate_way_title.background = null
-        }
-    }
-
-    override fun setLayoutID(): Int {
-        return R.layout.activity_gate_way
-    }
-
+    /**
+     * 默认重复设置为仅一次
+     */
     override fun initView() {
         toolbarTv.text = getString(R.string.gate_way)
         gate_way_repete_mode.textSize = 15F
@@ -72,10 +57,18 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        gate_way_repete_mode.text = getString(R.string.only_one)
+        modeIsTimer = intent.getBooleanExtra("data", true)
+
         isCanEdite = false
         isCanEdite()
         swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        lin = View.inflate(this, R.layout.add_group, null)
+        swipe_recycleView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
+        lin = View.inflate(this, R.layout.template_bottom_add_no_line, null)
+        if (modeIsTimer)
+        lin?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
+        else
+        lin?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
     }
 
     override fun initData() {
@@ -107,7 +100,10 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
             startActivityForResult(intent, requestTimeCode)
         }*/
         lin?.setOnClickListener {
-            startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java), requestTimeCode)
+            if (list.size >= 20)
+                toast(getString(R.string.gate_way_time_max))
+            else
+                startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java), requestTimeCode)
         }
     }
 
@@ -126,9 +122,18 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
             } else if (requestCode == requestTimeCode) {
                 val bean = data?.getParcelableExtra<DbGatewayTimeBean>("data")
                 bean?.let {
-                    if (bean.new)
-                        list.add(bean)
-                    else {
+                    if (bean.new) {
+                        if (list.size == 0)
+                            list.add(bean)
+                        else
+                            for (timeBean in list) {
+                                if (timeBean.startHour == bean.startHour && timeBean.startMinute == bean.startMinute) {
+                                    toast(getString(R.string.timer_exists))
+                                    break
+                                } else
+                                    list.add(bean)
+                            }
+                    } else {
                         var targetPosition: Int
                         for (i in 0 until list.size) {
                             val timeBean = list[i]
@@ -137,18 +142,36 @@ class GatewayConfigActivity : BaseActivity(), View.OnClickListener {
                                 list.removeAt(targetPosition)
                                 list.add(bean)
                                 break
-                            } else {//新建
-                                if (timeBean.hour == bean.hour && timeBean.minute == bean.minute) {
-                                    toast(getString(R.string.timer_exists))
-                                    break
-                                } else list.add(bean)
+                            } else {
+                                toast(getString(R.string.invalid_data))
                             }
                         }
-                        list.sortBy { it.hour }
+                        list.sortBy { it.startHour }
                     }
                     adapter.notifyDataSetChanged()
                 }
             }
         }
+    }
+
+    private fun isCanEdite() {
+        if (isCanEdite) {
+            gate_way_title.isFocusableInTouchMode = true//不可编辑
+            gate_way_title.isClickable = true//不可点击，但是这个效果我这边没体现出来，不知道怎没用
+            gate_way_title.isFocusable = true//不可编辑
+            gate_way_title.isEnabled = true
+            gate_way_title.requestFocus()
+            gate_way_title.setSelection(gate_way_title.text.length)//将光标移至文字末尾
+        } else {
+            gate_way_title.isFocusableInTouchMode = false//不可编辑
+            gate_way_title.isClickable = false//不可点击
+            gate_way_title.isFocusable = false//不可编辑
+            gate_way_title.isEnabled = false
+            gate_way_title.background = null
+        }
+    }
+
+    override fun setLayoutID(): Int {
+        return R.layout.activity_gate_way
     }
 }
