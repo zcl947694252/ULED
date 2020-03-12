@@ -14,17 +14,20 @@
 
         <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
+                android:paddingTop="@dimen/dp_5"
+                android:paddingBottom="@dimen/dp_5"
                 android:paddingStart="@dimen/dp_10"
                 android:paddingEnd="@dimen/dp_10">
 
             <TextView
                     android:id="@+id/item_event_title"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:layout_marginBottom="@dimen/dp_8"
                     android:text="@string/click_config"
                     android:textSize="18sp" />
@@ -32,7 +35,8 @@
             <TextView
                     android:id="@+id/item_event_week"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:text="@string/click_config"
                     android:textSize="13sp" />
         </LinearLayout>

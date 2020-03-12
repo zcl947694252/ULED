@@ -71,11 +71,17 @@
         <service
                 android:name=".service.SendLightsInfo"
                 android:enabled="true" />
+
         <activity
                 android:name=".gateway.GatewayConfigActivity"
-                android:screenOrientation="portrait" />
+                android:screenOrientation="portrait"
+                android:launchMode="standard"/>
         <activity
                 android:name=".gateway.GatewayChoseTimeActivity"
+                android:screenOrientation="portrait"
+                android:launchMode="standard"/>
+        <activity
+                android:name=".gateway.GatewayChoseTimesActivity"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".gateway.GatewayModeChoseActivity"

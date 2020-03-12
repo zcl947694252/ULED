@@ -2,9 +2,10 @@ package com.dadoutek.uled.gateway
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.WeeksItemAdapter
 import com.dadoutek.uled.gateway.bean.WeekBean
 import kotlinx.android.synthetic.main.template_recycleview.*
@@ -20,17 +21,17 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新时间   $
  * 更新描述
  */
-class GatewayModeChoseActivity : BaseActivity() {
+class GatewayModeChoseActivity : TelinkBaseActivity() {
 
     private var list: MutableList<WeekBean>? = null
     private var adapter: WeeksItemAdapter? = null
 
     private val checkedList = ArrayList<WeekBean>()
-    override fun initListener() {
+    fun initListener() {
 
     }
 
-    override fun initData() {
+    fun initData() {
         list = mutableListOf(WeekBean(getString(R.string.monday), 1), WeekBean(getString(R.string.tuesday), 2),
                 WeekBean(getString(R.string.wednesday), 3), WeekBean(getString(R.string.thursday), 4), WeekBean(getString(R.string.friday), 5)
                 , WeekBean(getString(R.string.saturday), 6), WeekBean(getString(R.string.sunday), 7))
@@ -50,7 +51,7 @@ class GatewayModeChoseActivity : BaseActivity() {
         }
     }
 
-    override fun initView() {
+    fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbarTv.text = getString(R.string.repetition)
         toolbar.setNavigationOnClickListener {
@@ -78,8 +79,11 @@ class GatewayModeChoseActivity : BaseActivity() {
         }
     }
 
-    override fun setLayoutID(): Int {
-        return R.layout.template_activity_list
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.template_activity_list)
+        initView()
+        initData()
+        initListener()
     }
-
 }

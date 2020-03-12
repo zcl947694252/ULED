@@ -900,5 +900,9 @@
     <string name="gate_way_time_max">网关定时已达最大创建数</string>
     <string name="add_time">添加时间</string>
     <string name="add_times">添加时间段</string>
+    <string name="to">至</string>
+    <string name="endTime">8:00</string>
+    <string name="standing_time">停留时间</string>
+    <string name="minute">分</string>
 
 </resources>

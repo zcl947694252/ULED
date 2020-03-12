@@ -978,6 +978,11 @@
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
     <string name="add_time">Add Time</string>
     <string name="add_times">Add Times</string>
+    <string name="to">To</string>
+    <string name="startTime">7:40</string>
+    <string name="endTime">8:00</string>
+    <string name="standing_time">Standing time</string>
+    <string name="minute">分</string>
 
 
 </resources>

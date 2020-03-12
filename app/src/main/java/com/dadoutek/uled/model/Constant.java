@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 
 /**
@@ -261,4 +263,9 @@ public class Constant implements Serializable {
     public static final String DEVICE_NUM = "DEVICE_NUM";
     public static final String IS_TECK="IS_TECK";
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
+    @Nullable
+    /**
+     * 是否是网关定时模式
+     */
+    public static final String GATEWAY_MODE_TIMER ="GATEWAY_MODE_TIMER";
 }

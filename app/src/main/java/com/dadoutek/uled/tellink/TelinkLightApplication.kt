@@ -27,19 +27,18 @@ import java.util.*
 class TelinkLightApplication : TelinkApplication() {
     companion object {
         private var app: TelinkLightApplication? = null
-
         fun getApp(): TelinkLightApplication {
             return app!!
         }
     }
 
-    internal val useIndex = mutableListOf<Int>()
-    internal val freeIndex = mutableListOf<Int>()
+    val useIndex = mutableListOf<Int>()
+    val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
-    private  var mStompManager: StompManager? = null
+    private var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null
-    private var  MIN_CLICK_DELAY_TIME = 10000
-    private var  lastClickTime:Long= 0
+    private var MIN_CLICK_DELAY_TIME = 10000
+    private var lastClickTime: Long = 0
     private
 
     var mCancelAuthorTopicDisposable: Disposable? = null
@@ -101,7 +100,7 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
 
-      override fun doDestroy() {
+    override fun doDestroy() {
         TelinkLog.onDestroy()
         super.doDestroy()
     }
@@ -117,13 +116,13 @@ class TelinkLightApplication : TelinkApplication() {
                 mStompManager = StompManager.get()
                 mStompManager?.initStompClient()
 
-                if (mStompManager?.mStompClient ==null)
-                  initStompClient()
+                if (mStompManager?.mStompClient == null)
+                    initStompClient()
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
 //                    LogUtils.e("zcl单点登录 It's time to cancel $it")
-                    if (it != key&&"no_have_key"!=it) {
+                    if (it != key && "no_have_key" != it) {
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
                         intent.putExtra(Constant.LOGIN_OUT, key)
@@ -133,24 +132,24 @@ class TelinkLightApplication : TelinkApplication() {
                 }, {
                     ToastUtils.showLong(it.localizedMessage)
                 })
-                if (DBUtils.lastUser?.id!=null)
-                paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
-                    LogUtils.e("zcl解析 It's time to parse $it")
-                    val intent = Intent()
-                    intent.action = Constant.PARSE_CODE
-                    intent.putExtra(Constant.PARSE_CODE, it)
-                    sendBroadcast(intent)
-                }, {
-                    ToastUtils.showLong(it.localizedMessage)
-                })
-                if (DBUtils.lastUser?.id!=null)
-                mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
-                    LogUtils.e("zcl取消授权 It's time to cancel $it")
-                    val intent = Intent()
-                    intent.action = Constant.CANCEL_CODE
-                    intent.putExtra(Constant.CANCEL_CODE, it)
-                    sendBroadcast(intent)
-                }, { ToastUtils.showLong(it.localizedMessage)})
+                if (DBUtils.lastUser?.id != null)
+                    paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
+                        LogUtils.e("zcl解析 It's time to parse $it")
+                        val intent = Intent()
+                        intent.action = Constant.PARSE_CODE
+                        intent.putExtra(Constant.PARSE_CODE, it)
+                        sendBroadcast(intent)
+                    }, {
+                        ToastUtils.showLong(it.localizedMessage)
+                    })
+                if (DBUtils.lastUser?.id != null)
+                    mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
+                        LogUtils.e("zcl取消授权 It's time to cancel $it")
+                        val intent = Intent()
+                        intent.action = Constant.CANCEL_CODE
+                        intent.putExtra(Constant.CANCEL_CODE, it)
+                        sendBroadcast(intent)
+                    }, { ToastUtils.showLong(it.localizedMessage) })
 
                 /**
                  * stomp断联监听
@@ -159,14 +158,14 @@ class TelinkLightApplication : TelinkApplication() {
                     when (lifecycleEvent.type) {
                         LifecycleEvent.Type.CLOSED -> {
 //                            LogUtils.d("zcl_Stomp******Stomp connection closed")
-                                var currentTime = Calendar.getInstance().timeInMillis
-                                if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
-                                    lastClickTime = currentTime
-                                    initStompClient()
-                                }
+                            var currentTime = Calendar.getInstance().timeInMillis
+                            if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
+                                lastClickTime = currentTime
+                                initStompClient()
+                            }
                         }
                     }
-                }, { ToastUtils.showLong(it.localizedMessage)})
+                }, { ToastUtils.showLong(it.localizedMessage) })
             }
         }
     }

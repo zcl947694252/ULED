@@ -12,10 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.gateway.bean.DbGatewayTimeBean;
+import com.dadoutek.uled.gateway.bean.DbGatewayBean;
+import com.dadoutek.uled.gateway.bean.GatewayTasksBean;
 import com.dadoutek.uled.gateway.util.IndexUtil;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
@@ -42,7 +44,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
     private int hourTime = 03;
     private int minuteTime = 15;
     private DbScene scene;
-    private DbGatewayTimeBean gatewayTimeBean;
+    private GatewayTasksBean gatewayTimeBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +64,9 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
             else {
                 Intent intent = new Intent();
                 gatewayTimeBean.setSceneId(scene.getId());
-                gatewayTimeBean.setSceneName(scene.getName());
+                gatewayTimeBean.setSenceName(scene.getName());
                 gatewayTimeBean.setStartHour(hourTime);
-                gatewayTimeBean.setStartMinute(minuteTime);
+                gatewayTimeBean.setStartMins(minuteTime);
 
                 intent.putExtra("data", gatewayTimeBean);
                 setResult(Activity.RESULT_OK, intent);
@@ -80,12 +82,12 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         Intent intent = getIntent();
         Parcelable data = intent.getParcelableExtra("data");
         if (data != null && !TextUtils.isEmpty(data.toString())) {
-            gatewayTimeBean = (DbGatewayTimeBean) data;
-            timerScene.setText(gatewayTimeBean.getSceneName());
-            gatewayTimeBean.setIsNew(false);
+            gatewayTimeBean = (GatewayTasksBean) data;
+            timerScene.setText(gatewayTimeBean.getSenceName());
+            gatewayTimeBean.setCreateNew(false);
             scene = DBUtils.INSTANCE.getSceneByID(gatewayTimeBean.getSceneId());
         } else{
-            gatewayTimeBean = new DbGatewayTimeBean(hourTime,minuteTime, true);
+            gatewayTimeBean = new GatewayTasksBean(1);
             gatewayTimeBean.setIndex(IndexUtil.getNum());
         }
     }
@@ -105,6 +107,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
 
     private View getTimePicker() {
         final TimePicker picker = new TimePicker(this);
+
         picker.setBackgroundColor(this.getResources().getColor(R.color.white));
         picker.setDividerConfig(null);
         picker.setTextColor(this.getResources().getColor(R.color.blue_text));
@@ -145,6 +148,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
             scene = (DbScene) par;
             LogUtils.v("zcl获取场景信息scene" + scene.toString());
             timerScene.setText(scene.getName());
+            GsonUtils.fromJson("", DbGatewayBean.class);
         }
     }
 

@@ -3,7 +3,7 @@ package com.dadoutek.uled.gateway.adapter
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.gateway.bean.DbGatewayTimeBean
+import com.dadoutek.uled.gateway.bean.GatewayTasksBean
 
 
 /**
@@ -15,10 +15,11 @@ import com.dadoutek.uled.gateway.bean.DbGatewayTimeBean
  * 更新时间   $
  * 更新描述
  */
-class GatewayTimeItemAdapter(resId:Int, data: MutableList<DbGatewayTimeBean>): BaseQuickAdapter<DbGatewayTimeBean, BaseViewHolder>(resId,data){
-    override fun convert(helper: BaseViewHolder?, item: DbGatewayTimeBean) {
-        val time =  "${item.startHour}:${item.startMinute}"
+class GatewayTimeItemAdapter(resId:Int, data: MutableList<GatewayTasksBean>): BaseQuickAdapter<GatewayTasksBean, BaseViewHolder>(resId,data){
+    override fun convert(helper: BaseViewHolder?, item: GatewayTasksBean) {
+        val time =  "${item.startHour}:${item.startMins}"
+
         helper?.setText(R.id.item_gate_way_timer_time, time)
-                ?.setText(R.id.item_gate_way_timer_scene,item.sceneName)
+                ?.setText(R.id.item_gate_way_timer_scene,item.senceName)
     }
 }

@@ -6,7 +6,7 @@
     android:background="#e5e5e5">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/startMinute"
+        android:id="@+id/minute"
         android:layout_width="70dp"
         android:layout_height="30dp"
         app:layout_constraintStart_toStartOf="parent"
