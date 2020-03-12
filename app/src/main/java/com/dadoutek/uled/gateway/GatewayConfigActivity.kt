@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import java.util.*
 
-
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/3 17:22
@@ -31,7 +30,7 @@ import java.util.*
  * 更新描述
  */
 class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
-    private  var tagsBean: GatewayTagsBean? = null
+    private var tagsBean: GatewayTagsBean? = null
     private var modeIsTimer: Boolean = true
     private var lin: View? = null
     private val requestModeCode: Int = 1000
@@ -63,6 +62,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        tv_function1.text = getString(R.string.complete)
         gate_way_repete_mode.text = getString(R.string.only_one)
         modeIsTimer = intent.getBooleanExtra("data", modeIsTimer)
         isCanEdite = false
@@ -82,43 +82,46 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
         //創建新tag任务
         swipe_recycleView.isItemViewSwipeEnabled = true // 侧滑删除，默认关闭。
-         tagsBean = GatewayTagsBean((maxId + 1).toLong(),getString(R.string.lable1),getString(R.string.only_one),getWeek(getString(R.string.only_one)))
+        tagsBean = GatewayTagsBean((maxId + 1).toLong(), getString(R.string.lable1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
     }
 
     private fun getWeek(str: String): Int {
         var week = 0x00000000
         val split = str.split(",").toMutableList()
         var weekDay = when {
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 0 -> getString(R.string.sunday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 1 -> getString(R.string.monday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 2 -> getString(R.string.tuesday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 3 -> getString(R.string.wednesday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 4 -> getString(R.string.thursday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 5 -> getString(R.string.friday)
-            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) -1 == 6 -> getString(R.string.saturday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 0 -> getString(R.string.sunday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 1 -> getString(R.string.monday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 2 -> getString(R.string.tuesday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 3 -> getString(R.string.wednesday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 4 -> getString(R.string.thursday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 5 -> getString(R.string.friday)
+            Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 6 -> getString(R.string.saturday)
             else -> getString(R.string.sunday)
         }//bit位 0-6 周日-周六 7代表当天
-        if (split.size==1&&weekDay == split[0]){
+        if (split.size == 1 && weekDay == split[0]) {
             split[0] = getString(R.string.only_one)
             week = week or 0x00000010
             return week
-        }else{
-            for (s in split){
+        } else {
+            for (s in split) {
                 when (s) {
-                    getString(R.string.sunday)    -> week =week or 0x10000000
-                    getString(R.string.monday)    -> week =week or 0x01000000
-                    getString(R.string.tuesday)   -> week =week or 0x00100000
-                    getString(R.string.wednesday) -> week =week or 0x00010000
-                    getString(R.string.thursday)  -> week =week or 0x00001000
-                    getString(R.string.friday)    -> week =week or 0x00000100
-                    getString(R.string.saturday)  -> week =week or 0x00000010
+                    getString(R.string.sunday) -> week = week or 0x10000000
+                    getString(R.string.monday) -> week = week or 0x01000000
+                    getString(R.string.tuesday) -> week = week or 0x00100000
+                    getString(R.string.wednesday) -> week = week or 0x00010000
+                    getString(R.string.thursday) -> week = week or 0x00001000
+                    getString(R.string.friday) -> week = week or 0x00000100
+                    getString(R.string.saturday) -> week = week or 0x00000010
                 }
             }
         }
-     return week
+        return week
     }
 
     fun initListener() {
+        tv_function1.setOnClickListener {
+
+        }
         gate_way_edite.setOnClickListener(this)
         gate_way_repete_mode.setOnClickListener(this)
         gate_way_repete_mode_arrow.setOnClickListener(this)
@@ -136,14 +139,48 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         })
 
+
+
         lin?.setOnClickListener {
+            val index = getIndex()
             when {
-                list.size >= 20 -> toast(getString(R.string.gate_way_time_max))
-                modeIsTimer -> startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java), requestTimeCode)
-                else -> startActivityForResult(Intent(this@GatewayConfigActivity, GatewayChoseTimesActivity::class.java), requestTimeCode)
+                list.size > 20 -> toast(getString(R.string.gate_way_time_max))
+                index == 0 -> toast(getString(R.string.gate_way_time_max))
+                modeIsTimer -> {
+                    val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java)
+                    intent.putExtra("index", index)
+                    startActivityForResult(intent, requestTimeCode)
+                }
+                else -> {
+                    val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimesActivity::class.java)
+                    intent.putExtra("index", index)
+                    startActivityForResult(intent, requestTimeCode)
+                }
             }
 
         }
+    }
+
+    private fun getIndex(): Int {
+        var index = 0
+        if (list.size == 0) {
+            index = 1
+        } else {
+            for (j in 1..20) {
+                var isUsed = false
+                for (i in list) {
+                    if (i.index == j) {//已用 跳出循环
+                        isUsed = true
+                        break
+                    }
+                }
+                if (!isUsed) {
+                    index = j
+                    break
+                }
+            }
+        }
+        return index
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -169,7 +206,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                             list.add(bean)
                         else
                             for (timeBean in list) {
-                                if (timeBean.startHour == bean.startHour && timeBean.startMinute == bean.startMinute) {
+                                if (timeBean.startHour == bean.startHour && timeBean.startMins == bean.startMins) {
                                     toast(getString(R.string.timer_exists))
                                     break
                                 } else
@@ -179,7 +216,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         var targetPosition: Int
                         for (i in 0 until list.size) {
                             val timeBean = list[i]
-                            if (timeBean.label_id == bean.label_id) {//存在
+                            if (timeBean.index == bean.index) {//存在
                                 targetPosition = i
                                 list.removeAt(targetPosition)
                                 list.add(bean)

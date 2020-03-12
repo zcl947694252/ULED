@@ -5,6 +5,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -268,6 +269,11 @@ object DBUtils {
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
         return ArrayList(query.list())
     }
+    fun getAllGateWay(): ArrayList<DbGateway> {
+        val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
+                .whereOr(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbGatewayDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
+        return ArrayList(query.list())
+    }
 
     fun getAllSwitch(): ArrayList<DbSwitch> {
         val query = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
@@ -356,6 +362,10 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbCurtainDao.load(mesAddr.toLong())
     }
 
+    fun getGatewayByID(id: Long): DbGateway? {
+        return DaoSessionInstance.getInstance().dbGatewayDao.load(id)
+    }
+
     fun getConnectorByID(id: Long): DbConnector? {
         return DaoSessionInstance.getInstance().dbConnectorDao.load(id)
     }
@@ -402,6 +412,13 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbEightSwitchDao.load(id)
     }
 
+    fun getGatewayByMeshAddr(meshAddr: Int): DbGateway? {
+        val dbGatewayList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
+                .where(DbGatewayDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return if (dbGatewayList.size > 0) {
+            dbGatewayList[0]
+        } else null
+    }
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
         val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
@@ -705,6 +722,29 @@ object DBUtils {
             }
         }
     }
+    fun saveGateWay(db: DbGateway, isFromServer: Boolean){
+        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
+
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
+            //如果该mesh地址的数据已经存在，就直接修改
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbGatewayDao.insertOrReplace(db)
+
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbGatewayDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbGatewayDao.tablename,
+                        Constant.DB_ADD)
+            }
+        }
+    }
+
     fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
         val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
 
@@ -784,7 +824,6 @@ object DBUtils {
                 Constant.DB_ADD)
     }
 
-
     fun saveUser(dbUser: DbUser) {
         DaoSessionInstance.getInstance().dbUserDao.insertOrReplace(dbUser)
 //        LogUtils.v("zcl-0--------------"+ getAllUser())
@@ -808,7 +847,6 @@ object DBUtils {
                     Constant.DB_ADD)
         }
     }
-
 
     fun saveSceneActions(sceneActions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
@@ -882,11 +920,14 @@ object DBUtils {
         }
     }
 
-    @Deprecated("")
+    @Deprecated("Use saveGateWay()")
+    private fun updateGate(gateway: DbGateway) {
+        saveGateWay(gateway, false)
+    }
+    @Deprecated("Use saveLight()")
     fun updateLight(light: DbLight) {
         saveLight(light, false)
     }
-
 
     @Deprecated("Use saveCurtain()")
     fun updateCurtain(curtain: DbCurtain) {
@@ -1031,6 +1072,13 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSensorDao.delete(dbSensor)
         recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_DELETE
+        )
+    }
+    fun deleteGateway(gateway: DbGateway) {
+        DaoSessionInstance.getInstance().dbGatewayDao.delete(gateway)
+        recordingChange(gateway.id,
+                DaoSessionInstance.getInstance().dbGatewayDao.tablename,
                 Constant.DB_DELETE
         )
     }

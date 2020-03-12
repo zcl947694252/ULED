@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.gateway.bean.DbGatewayBean;
+import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.GatewayTasksBean;
 import com.dadoutek.uled.gateway.util.IndexUtil;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -148,7 +148,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
             scene = (DbScene) par;
             LogUtils.v("zcl获取场景信息scene" + scene.toString());
             timerScene.setText(scene.getName());
-            GsonUtils.fromJson("", DbGatewayBean.class);
+            GsonUtils.fromJson("", DbGateway.class);
         }
     }
 

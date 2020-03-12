@@ -13,7 +13,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.EventItemAdapter
-import com.dadoutek.uled.gateway.bean.DbGatewayBean
+import com.dadoutek.uled.gateway.bean.DbGateway
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -33,7 +33,7 @@ class GateWayEventListActivity : TelinkBaseActivity() {
     private var addBtn: Button? = null
     private var lin: View? = null
     private var modeIsTimer: Boolean = true
-    val list = mutableListOf<DbGatewayBean>()
+    val list = mutableListOf<DbGateway>()
     val adapter = EventItemAdapter(R.layout.event_item, list)
 
     fun initView() {
@@ -66,6 +66,11 @@ class GateWayEventListActivity : TelinkBaseActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        addBtn?.setOnClickListener { //已有网关设备空界面跳转添加事件
+            val intent = Intent(this@GateWayEventListActivity, GatewayConfigActivity::class.java)
+            intent.putExtra("mode",modeIsTimer)
+            startActivity(intent)
+        }
         lin?.setOnClickListener {
             if (list.size >= 20)
                 toast(getString(R.string.gate_way_time_max))
@@ -82,11 +87,11 @@ class GateWayEventListActivity : TelinkBaseActivity() {
             if (checkedId == R.id.event_timer_mode) {//定時模式
                 event_timer_mode.setTextColor(getColor(R.color.blue_text))
                 event_time_pattern_mode.setTextColor(getColor(R.color.gray9))
-                list.addAll(mutableListOf())
+                list.addAll(mutableListOf(DbGateway()))
             } else {//時間段模式
                 event_timer_mode.setTextColor(getColor(R.color.gray9))
                 event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
-                list.addAll(mutableListOf())
+                list.addAll(mutableListOf(DbGateway(),DbGateway()))
             }
             adapter.notifyDataSetChanged()
         }

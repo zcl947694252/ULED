@@ -34,7 +34,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * 更新描述
  */
 @Entity
-public class DbGatewayBean implements Parcelable {
+public class DbGateway implements Parcelable {
     @Id(autoincrement = true)
     private  Long id;
     private  int meshAddr;
@@ -46,7 +46,7 @@ public class DbGatewayBean implements Parcelable {
     private  int belongRegionId;
     private  String tags;
 
-    protected DbGatewayBean(Parcel in) {
+    protected DbGateway(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
         } else {
@@ -62,8 +62,8 @@ public class DbGatewayBean implements Parcelable {
         tags = in.readString();
     }
 
-    @Generated(hash = 810737412)
-    public DbGatewayBean(Long id, int meshAddr, String name, String macAddr, int type,
+    @Generated(hash = 642238663)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, int type,
             int productUUID, String version, int belongRegionId, String tags) {
         this.id = id;
         this.meshAddr = meshAddr;
@@ -76,19 +76,20 @@ public class DbGatewayBean implements Parcelable {
         this.tags = tags;
     }
 
-    @Generated(hash = 1615511649)
-    public DbGatewayBean() {
+    @Generated(hash = 1696080529)
+    public DbGateway() {
     }
 
-    public static final Creator<DbGatewayBean> CREATOR = new Creator<DbGatewayBean>() {
+
+    public static final Creator<DbGateway> CREATOR = new Creator<DbGateway>() {
         @Override
-        public DbGatewayBean createFromParcel(Parcel in) {
-            return new DbGatewayBean(in);
+        public DbGateway createFromParcel(Parcel in) {
+            return new DbGateway(in);
         }
 
         @Override
-        public DbGatewayBean[] newArray(int size) {
-            return new DbGatewayBean[size];
+        public DbGateway[] newArray(int size) {
+            return new DbGateway[size];
         }
     };
 

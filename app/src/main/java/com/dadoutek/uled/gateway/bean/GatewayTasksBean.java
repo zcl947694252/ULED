@@ -154,4 +154,5 @@ public class GatewayTasksBean implements Parcelable {
         dest.writeInt(startMins);
         dest.writeInt(endMins);
     }
+
 }

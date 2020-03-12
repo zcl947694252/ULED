@@ -17,7 +17,7 @@ import cn.qqtheme.framework.picker.TimePicker
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.bean.DbGatewayBean
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.switches.SelectSceneListActivity
 import kotlinx.android.synthetic.main.item_gata_way_event_timer.*
@@ -39,7 +39,7 @@ class GatewayChoseTimesActivity : TelinkBaseActivity() {
     private var hourTime = 3
     private var minuteTime = 15
     private var scene: DbScene? = null
-    private var gatewayTimeBean: DbGatewayBean? = null
+    private var gatewayTimeBean: DbGateway? = null
 
     private val timePicker: View
         get() {
@@ -110,12 +110,12 @@ class GatewayChoseTimesActivity : TelinkBaseActivity() {
         val intent = intent
         val data = intent.getParcelableExtra<Parcelable>("data")
         if (data != null && !TextUtils.isEmpty(data.toString())) {
-            gatewayTimeBean = data as DbGatewayBean
+            gatewayTimeBean = data as DbGateway
 //            timerScene!!.text = gatewayTimeBean!!.sceneName
 //            gatewayTimeBean!!.new = false
 //            scene = DBUtils.getSceneByID(gatewayTimeBean!!.sceneId!!)
         } else {
-//            gatewayTimeBean = DbGatewayBean(hourTime, minuteTime, true)
+//            gatewayTimeBean = DbGateway(hourTime, minuteTime, true)
 //            gatewayTimeBean!!.index = IndexUtil.getNum()
         }
     }
