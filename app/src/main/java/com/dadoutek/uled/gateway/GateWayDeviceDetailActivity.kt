@@ -56,12 +56,11 @@ import kotlinx.android.synthetic.main.toolbar.view.*
 class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private var adaper: DeviceDetailGateWayAdapter? = null
     private var type: Int? = null
-    private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
+    private val gateWayDataList: MutableList<DbGateway> = DBUtils.getAllGateWay()
     private var inflater: LayoutInflater? = null
     private var currentDeviceData: DbGateway? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
-    private val requestCode: Int = 1000
     private var acitivityIsAlive = true
     private var mConnectDisposal: Disposable? = null
     private var install_device: TextView? = null
