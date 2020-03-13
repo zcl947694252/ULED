@@ -3,9 +3,14 @@ package com.dadoutek.uled.gateway.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.dadoutek.uled.R;
+import com.google.gson.annotations.Expose;
+import com.telink.bluetooth.light.ConnectionStatus;
+
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * 创建者     ZCL
@@ -38,14 +43,25 @@ public class DbGateway implements Parcelable {
     @Id(autoincrement = true)
     private  Long id;
     private  int meshAddr;
-    private  String name;
+    private  String name;//标签名
     private  String macAddr;
-    private  int type;
+    private  int type;//网关模式 0定时 1循环
     private  int productUUID;
     private  String version;
     private  int belongRegionId;
     private  String tags;
+    private  int state; //1代表在线 0代表离线
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int icon = R.drawable.icon_light_on;//灯状态显示图
 
+    public void updateIcon() {
+        if (this.state == ConnectionStatus.OFF.getValue()) {
+            this.icon = R.drawable.icon_controller;
+        } else if (this.state == ConnectionStatus.ON.getValue()) {
+            this.icon = R.drawable.icon_controller_open;
+        }
+    }
     protected DbGateway(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -62,9 +78,10 @@ public class DbGateway implements Parcelable {
         tags = in.readString();
     }
 
-    @Generated(hash = 642238663)
+    @Generated(hash = 915726227)
     public DbGateway(Long id, int meshAddr, String name, String macAddr, int type,
-            int productUUID, String version, int belongRegionId, String tags) {
+            int productUUID, String version, int belongRegionId, String tags,
+            int state) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -74,8 +91,8 @@ public class DbGateway implements Parcelable {
         this.version = version;
         this.belongRegionId = belongRegionId;
         this.tags = tags;
+        this.state = state;
     }
-
     @Generated(hash = 1696080529)
     public DbGateway() {
     }
@@ -186,6 +203,12 @@ public class DbGateway implements Parcelable {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+    public int getState() {
+        return this.state;
+    }
+    public void setState(int state) {
+        this.state = state;
     }
 
 }

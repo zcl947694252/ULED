@@ -51,7 +51,7 @@ public class ItemTypeGroup {
     public String toString() {
         return "ItemTypeGroup{" +
                 "name='" + name + '\'' +
-                ", list=" + list +
+                ", listTask=" + list +
                 ", icon=" + icon +
                 '}';
     }

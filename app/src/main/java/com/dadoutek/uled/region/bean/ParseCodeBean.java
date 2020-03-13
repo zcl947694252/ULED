@@ -20,7 +20,7 @@ public class ParseCodeBean {
          * type : 1
          *
 
-         newRegionIds	list	接收的新区域id数组
+         newRegionIds	listTask	接收的新区域id数组
          switchToAuthorizerUserId	int	切换使用的授权用户id，可用作自动切换
          switchToRegionId	int	切换使用的区域id，可用作自动切换
          switchToRegionName	String	切换使用的区域名称，可用作提示时显示

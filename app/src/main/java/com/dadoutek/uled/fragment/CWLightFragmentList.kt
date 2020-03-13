@@ -341,9 +341,9 @@ class CWLightFragmentList : BaseGroupFragment() {
                     var lightList: MutableList<DbLight> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {//一般情况下不会有这种情况
-                        val list = DBUtils.groupList
-                        for (j in list.indices) {
-                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                        val listTask = DBUtils.groupList
+                        for (j in listTask.indices) {
+                            lightList.addAll(DBUtils.getLightByGroupID(listTask[j].id))
                         }
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)

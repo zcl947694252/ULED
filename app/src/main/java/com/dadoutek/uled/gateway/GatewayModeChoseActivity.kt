@@ -59,7 +59,7 @@ class GatewayModeChoseActivity : TelinkBaseActivity() {
             var sb = StringBuilder()
             when {
                 checkedList.size == 0 -> sb.append(getString(R.string.only_one))
-                checkedList.size == 1 -> sb.append(getString(R.string.only_one))
+
                 checkedList.size == 7 -> sb.append(getString(R.string.every_day))
                 else -> {
                     checkedList.sortBy { it.pos }

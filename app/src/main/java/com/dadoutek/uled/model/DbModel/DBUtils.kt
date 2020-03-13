@@ -271,7 +271,7 @@ object DBUtils {
     }
     fun getAllGateWay(): ArrayList<DbGateway> {
         val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
-                .whereOr(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbGatewayDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
+                .whereOr(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY), DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
         return ArrayList(query.list())
     }
 
@@ -723,7 +723,7 @@ object DBUtils {
         }
     }
     fun saveGateWay(db: DbGateway, isFromServer: Boolean){
-        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
+        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.MeshAddr.eq(0)).list()
 
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
@@ -1004,6 +1004,13 @@ object DBUtils {
     }
 
 
+    fun deleteAllGateway() {
+        val gateways = getAllGateWay()
+        for (g in gateways) {
+            deleteGateway(g)
+        }
+    }
+
     fun deleteAllNormalLight() {
         val lights = getAllNormalLight()
         for (light in lights) {
@@ -1114,6 +1121,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
+        DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
     }
 
     fun deleteAllSensorAndSwitch() {
@@ -1136,6 +1144,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
+        DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
     }
 
 

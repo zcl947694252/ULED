@@ -543,6 +543,7 @@
     <string name="curtain">窗帘</string>
     <string name="smart_curtain">例如：智能窗帘</string>
     <string name="for_connector">例如：蓝牙接收器</string>
+    <string name="for_gateway">例如：网关</string>
     <string name="device">设备</string>
     <string name="install_tip1">准备工作</string>
     <string name="install_tip2">请确保设备已经接上电源</string>
@@ -557,7 +558,7 @@
     <string name="guide_tip_reset_sensor">传感器（有按键）：直接按住侧面复位键直至灯闪烁。\n传感器（无按键）：接上电源3秒，断开电源3秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
     <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
-
+    <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
     <!--窗帘相关-->
 
     <string name="up">上</string>
@@ -890,8 +891,8 @@
     <string name="friday">星期五</string>
     <string name="saturday">星期六</string>
     <string name="sunday">星期日</string>
-    <string name="lable1">标签1</string>
-    <string name="gate_way">网关</string>
+    <string name="tag1">标签1</string>
+    <string name="Gate_way">网关</string>
     <string name="every_day">每日</string>
     <string name="only_one">仅一次</string>
     <string name="please_select_scene">请选择场景</string>

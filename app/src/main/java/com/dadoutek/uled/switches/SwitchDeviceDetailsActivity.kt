@@ -66,7 +66,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private val SCENE_MAX_COUNT = 100
     private var isclickOTA: Boolean = false
     private var isOta: Boolean = false
-    private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
     private var last_start_time = 0
     private var debounce_time = 1000
     private lateinit var switchData: MutableList<DbSwitch>
@@ -76,7 +75,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var positionCurrent: Int = 0
     private var mConnectDevice: DeviceInfo? = null
     private var acitivityIsAlive = true
-    private var bestRSSIDevice: DeviceInfo? = null
     private var mApplication: TelinkLightApplication? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null

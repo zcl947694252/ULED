@@ -608,7 +608,7 @@
     <string name="guide_tip_reset_sensor">Sensor (with key) : press and hold the side reset key until the light flashes.\n Sensor (no button) : turn on the power for 3 seconds, turn off the power for 3 seconds, repeat about 5-6 times until the sensor flashes. </string>
     <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
     <string name="guide_tip_reset_relay">Bluetooth receiver: long press the white button of the receiver for 5 seconds, until the bluetooth receiver flashes. </string>
-
+    <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
     <!--窗帘相关-->
     <string name="up">up</string>
     <string name="down">down</string>
@@ -690,6 +690,7 @@
     <string name="two_password_inconsistent">Two passwords are inconsistent</string>
     <string name="number">Num</string>
     <string name="for_connector">Connector</string>
+    <string name="for_gateway">Gateway</string>
     <string name="login_password">Log in with a password</string>
     <string name="account_after_login">Automatically register an account after login</string>
     <string name="online_upgrade">Upgrade</string>
@@ -968,8 +969,8 @@
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
-    <string name="lable1">Lable 1</string>
-    <string name="gate_way">Gateway</string>
+    <string name="tag1">Lable 1</string>
+    <string name="Gate_way">Gateway</string>
     <string name="every_day">Everyday</string>
     <string name="only_one">Only once</string>
     <string name="please_select_scene">Please select the scene</string>

@@ -94,7 +94,7 @@ class SettingActivity : BaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
         list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
-       // list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
+       // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)

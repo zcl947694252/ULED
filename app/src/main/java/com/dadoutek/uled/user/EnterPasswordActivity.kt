@@ -136,7 +136,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         var user = SharedPreferencesUtils.getLastUser()
         user?.let {
             var list = it.split("-")
-            //("zcl**********************${list.size}----$list")
+            //("zcl**********************${listTask.size}----$listTask")
             if (list.size > 1 && user != "-" && !boolean) {
                 var s = list[1]
                 edit_user_password.setText(s)

@@ -33,7 +33,7 @@ object EightSwitchMdodel {
          * macAddr	      是	string	   mac地址
          * productUUID	 是	    int	productUUID
          * index	否	int	排序
-         * keys	是	list or string	key数组或者json格式的字符串
+         * keys	是	listTask or string	key数组或者json格式的字符串
          * key既可以是对象数组，也可以是json格式的字符串。
          *
          * {"featureId":28,"reserveValue_A":0,"reserveValue_B":0,"keyId":1}

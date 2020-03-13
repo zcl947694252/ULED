@@ -18,7 +18,6 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.GatewayTasksBean;
-import com.dadoutek.uled.gateway.util.IndexUtil;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.switches.SelectSceneListActivity;
@@ -81,14 +80,15 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         timerTitle.setText(getString(R.string.scene_name));
         Intent intent = getIntent();
         Parcelable data = intent.getParcelableExtra("data");
+        int index = intent.getIntExtra("index",0);
         if (data != null && !TextUtils.isEmpty(data.toString())) {
             gatewayTimeBean = (GatewayTasksBean) data;
             timerScene.setText(gatewayTimeBean.getSenceName());
             gatewayTimeBean.setCreateNew(false);
             scene = DBUtils.INSTANCE.getSceneByID(gatewayTimeBean.getSceneId());
         } else{
-            gatewayTimeBean = new GatewayTasksBean(1);
-            gatewayTimeBean.setIndex(IndexUtil.getNum());
+            gatewayTimeBean = new GatewayTasksBean(index);
+            gatewayTimeBean.setCreateNew(true);
         }
     }
 

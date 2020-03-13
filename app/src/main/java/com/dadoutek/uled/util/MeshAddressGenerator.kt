@@ -35,8 +35,5 @@ class MeshAddressGenerator {
                 addressList.last()
             }
         }
-
-
     }
-
 }

@@ -19,6 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
 import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.device.model.DeviceItem
+import com.dadoutek.uled.gateway.GateWayDeviceDetailActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
@@ -238,6 +239,10 @@ class DeviceFragment : BaseFragment() {
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
+            Constant.INSTALL_GATEWAY -> {
+                intent = Intent(activity, GateWayDeviceDetailActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
+            }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
     }
@@ -259,6 +264,8 @@ class DeviceFragment : BaseFragment() {
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN))
 
         deviceTypeList.add(DeviceItem(getString(R.string.relay), DBUtils.getAllRelay().size, DeviceType.SMART_RELAY))
+
+        deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), DBUtils.getAllGateWay().size, DeviceType.GATE_WAY))
     }
 
 

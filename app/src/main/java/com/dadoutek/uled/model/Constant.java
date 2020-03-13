@@ -192,6 +192,7 @@ public class Constant implements Serializable {
     public static final int INSTALL_SENSOR = 3;
     public static final int INSTALL_CURTAIN = 4;
     public static final int INSTALL_CONNECTOR = 5;
+    public static final int INSTALL_GATEWAY= 6;
 
     public static final int INSTALL_LIGHT_OF_CW = 10;
     public static final int INSTALL_LIGHT_OF_RGB = 11;

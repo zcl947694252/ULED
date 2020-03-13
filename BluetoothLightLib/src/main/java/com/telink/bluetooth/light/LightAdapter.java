@@ -751,7 +751,7 @@ public class LightAdapter {
 
         Parameters params = this.getParameters();
 
-        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
+        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);//从parmers内设置需要的类型从此处取出
         //如果有要连接的目标设备
         if (targetDevices.size() > 0)
             if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
