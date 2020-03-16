@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.EventItemAdapter
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GatewayTagBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -32,6 +33,7 @@ import org.jetbrains.anko.toast
  * 更新描述
  */
 class GateWayEventListActivity : TelinkBaseActivity() {
+    private var dbGateway: DbGateway? = null
     private var addBtn: Button? = null
     private var lin: View? = null
     private var modeIsTimer: Boolean = true
@@ -58,6 +60,8 @@ class GateWayEventListActivity : TelinkBaseActivity() {
     }
 
     fun initData() {
+        dbGateway = intent.getParcelableExtra<DbGateway>("data")
+
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
 
@@ -93,13 +97,16 @@ class GateWayEventListActivity : TelinkBaseActivity() {
                 val es = DBUtils.getAllGateWay()
                 if (es.size > 0) {
                     val toList = GsonUtil.stringToList(es[0].tags, GatewayTagBean::class.java)
+                    for (g in toList){
+                        g.tagName = dbGateway?.name
+                    }
                     if (toList.size == 0) {
                         list.addAll(toList)
                     } else {
                         list.addAll(toList)
                     }
-                }else{
-                    list.add(GatewayTagBean(1))
+                } else {
+                    list.add(GatewayTagBean(1,"122","12",1))
                 }
             } else {//時間段模式
                 event_timer_mode.setTextColor(getColor(R.color.gray9))

@@ -375,7 +375,7 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                             autoConnect()
                         } else {
                             var intent = Intent(this@GateWayDeviceDetailActivity, GateWayEventListActivity::class.java)
-                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDeviceData)
+                            intent.putExtra("data", currentDeviceData)
                             startActivity(intent)
                         }
                     }

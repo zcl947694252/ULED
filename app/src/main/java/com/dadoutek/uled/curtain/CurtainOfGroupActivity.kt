@@ -220,9 +220,6 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             curtainList.clear()
         }
 
-//        for(i in listTask.indices){
-//            nameList.add(listTask[i].name)
-//        }
 
         if (isSearch) {
             for (i in list.indices) {

@@ -86,9 +86,9 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     fun initData() {
         swipe_recycleView.adapter = adapter
         swipe_recycleView.isItemViewSwipeEnabled = true // 侧滑删除，默认关闭。
-
         tagsBean = intent.getParcelableExtra("data") ?: //創建新tag任务
                 GatewayTagBean((maxId + 1).toLong(), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
+        LogUtils.v("zcl-----------网关tag信息-------$tagsBean")
     }
 
     private fun getWeek(str: String): Int {

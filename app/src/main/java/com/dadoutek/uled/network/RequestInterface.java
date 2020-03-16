@@ -110,7 +110,7 @@ public interface RequestInterface {
     Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path("type") long type);
 
     //获取区域列表 (已过期) 仅用于获取自己的区域
-    @GET("region/listTask")
+    @GET("region/list")
     Observable<Response<List<DbRegion>>> getOldRegionList(@Header("token") String token);
 
     //8、获取单个区域(又有改动) region/get/300975/1
@@ -119,12 +119,12 @@ public interface RequestInterface {
 
     //47.获取区域列表 区域activity内使用
     // http://dev.dadoutek.com/smartlight/auth/region/list
-    @GET("auth/region/listTask")
+    @GET("auth/region/list")
     Observable<Response<List<RegionBean>>> gotRegionActivityList();
 
     //53授权区域列表
     //http://dev.dadoutek.com/smartlight/auth/authorization/authorizer-region/list
-    @GET("auth/authorization/authorizer-region/listTask")
+    @GET("auth/authorization/authorizer-region/list")
     Observable<Response<List<RegionAuthorizeBean>>> gotAuthorizerList();
 
     //更新区域
@@ -187,7 +187,7 @@ public interface RequestInterface {
                                           @Path("gid") int gid);
 
     //获取组列表
-    @GET("group/listTask")
+    @GET("group/list")
     Observable<Response<List<DbGroup>>> getGroupList(@Header("token") String token);
 
     //更新组
@@ -223,7 +223,7 @@ public interface RequestInterface {
                                           @Path("lid") int lid);
 
     //获取灯列表
-    @GET("light/listTask")
+    @GET("light/list")
     Observable<Response<List<DbLight>>> getLightList(@Header("token") String token);
 
     //更新灯
@@ -252,7 +252,7 @@ public interface RequestInterface {
                                           @Path("sid") int sid);
 
     //获取场景列表
-    @GET("scene/listTask")
+    @GET("scene/list")
     Observable<Response<List<DbScene>>> getSceneList(@Header("token") String token);
 
     //更新场景
@@ -274,7 +274,7 @@ public interface RequestInterface {
                                              @Path("did") int did);
 
     //获取渐变列表
-    @GET("dynamic-change/listTask")
+    @GET("dynamic-change/list")
     Observable<Response<List<DbDiyGradient>>> getGradientList(@Header("token") String token);
 
     //更新渐变
@@ -320,7 +320,7 @@ public interface RequestInterface {
                                            @Path("lid") int lid);
 
     //获取开关列表
-    @GET("switch/listTask")
+    @GET("switch/list")
     Observable<Response<List<DbSwitch>>> getSwitchList(@Header("token") String token);
 
     //更新开关
@@ -343,7 +343,7 @@ public interface RequestInterface {
                                            @Path("lid") int lid);
 
     //获取传感器列表
-    @GET("sensor/listTask")
+    @GET("sensor/list")
     Observable<Response<List<DbSensor>>> getSensorList(@Header("token") String token);
 
     //更新传感器
@@ -366,7 +366,7 @@ public interface RequestInterface {
                                          @Path("lid") int lid);
 
     //获取连接器列表
-    @GET("relay/listTask")
+    @GET("relay/list")
     Observable<Response<List<DbConnector>>> getRelyList(@Header("token") String token);
 
     //更新连接器
@@ -389,7 +389,7 @@ public interface RequestInterface {
                                             @Path("lid") int lid);
 
     //获取窗帘列表
-    @GET("curtain/listTask")
+    @GET("curtain/list")
     Observable<Response<List<DbCurtain>>> getCurtainList(@Header("token") String token);
 
     //更新窗帘
@@ -521,7 +521,7 @@ public interface RequestInterface {
      * GET
      * controlMesh字符串数组
      */
-    @GET("region/listTask/controlMesh")
+    @GET("region/list/controlMesh")
     Observable<Response<List<String>>> regionNameList();
 
 
@@ -546,7 +546,7 @@ public interface RequestInterface {
      * macAddr	      是	string	   mac地址
      * productUUID	 是	    int	productUUID
      * index	否	int	排序
-     * keys	是	listTask or string	key数组或者json格式的字符串
+     * keys	是	list or string	key数组或者json格式的字符串
      * key既可以是对象数组，也可以是json格式的字符串。
      */
     @FormUrlEncoded
@@ -559,7 +559,7 @@ public interface RequestInterface {
     /**
      * 7、批量添加/更新八键开关（new）  POST
      * https://dev.dadoutek.com/smartlight_java/switch/8ks/add-batch
-     * eightKeySwitches	是	listTask	八键开关数组
+     * eightKeySwitches	是	list	八键开关数组
      */
     @FormUrlEncoded
     @POST("switch/8ks/add-batch")
@@ -571,7 +571,7 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_java/switch/8ks/list?isKeySerialized=true
      * isKeySerialized	否	boolean（其实是string）	是否序列化八键开关的keys。默认true（会序列化）
      */
-    @GET("switch/8ks/listTask")
+    @GET("switch/8ks/list")
     Observable<Response<List<DbSwitch>>> getSwitch8kList(@Query("isKeySerialized") boolean isKeySerialized);
 
     /**
@@ -587,7 +587,7 @@ public interface RequestInterface {
      * 10、批量删除八键开关（new）
      * https://dev.dadoutek.com/smartlight_java/switch/8ks/remove
      * DELETE
-     * idList	是	listTask	id数组
+     * idList	是	list	id数组
      * 传参示例
      * {
      *     "idList": [1, 2, 3]

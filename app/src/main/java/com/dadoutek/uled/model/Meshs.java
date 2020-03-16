@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class Meshs implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // mesh info listTask saved
+    // mesh info list saved
 //    List<Mesh> localMeshList;
 
     // cur operation mesh

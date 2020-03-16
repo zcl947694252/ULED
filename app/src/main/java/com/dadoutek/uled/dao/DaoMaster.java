@@ -29,7 +29,6 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSceneDao.createTable(db, ifNotExists);
         DbSceneActionsDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
-        DbGatewayDao.createTable(db, ifNotExists);
         DbColorNodeDao.createTable(db, ifNotExists);
         DbConnectorDao.createTable(db, ifNotExists);
         DbCurtainDao.createTable(db, ifNotExists);
@@ -37,6 +36,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbEightSwitchDao.createTable(db, ifNotExists);
         DbSensorDao.createTable(db, ifNotExists);
         DbSwitchDao.createTable(db, ifNotExists);
+        DbGatewayDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -49,7 +49,6 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSceneDao.dropTable(db, ifExists);
         DbSceneActionsDao.dropTable(db, ifExists);
         DbUserDao.dropTable(db, ifExists);
-        DbGatewayDao.dropTable(db, ifExists);
         DbColorNodeDao.dropTable(db, ifExists);
         DbConnectorDao.dropTable(db, ifExists);
         DbCurtainDao.dropTable(db, ifExists);
@@ -57,6 +56,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbEightSwitchDao.dropTable(db, ifExists);
         DbSensorDao.dropTable(db, ifExists);
         DbSwitchDao.dropTable(db, ifExists);
+        DbGatewayDao.dropTable(db, ifExists);
     }
 
     /**
@@ -83,7 +83,6 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbSceneDao.class);
         registerDaoClass(DbSceneActionsDao.class);
         registerDaoClass(DbUserDao.class);
-        registerDaoClass(DbGatewayDao.class);
         registerDaoClass(DbColorNodeDao.class);
         registerDaoClass(DbConnectorDao.class);
         registerDaoClass(DbCurtainDao.class);
@@ -91,6 +90,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbEightSwitchDao.class);
         registerDaoClass(DbSensorDao.class);
         registerDaoClass(DbSwitchDao.class);
+        registerDaoClass(DbGatewayDao.class);
     }
 
     public DaoSession newSession() {
