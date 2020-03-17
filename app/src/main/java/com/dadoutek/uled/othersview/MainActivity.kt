@@ -171,6 +171,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
              val intent = Intent(this@MainActivity, GateWayEventListActivity::class.java)
             val dbGateway = DbGateway()
             dbGateway.name = "jsj"
+            DBUtils.saveGateWay(dbGateway,false)
             intent.putExtra("data", dbGateway)
             startActivity(intent)
              //startActivity(Intent(this@MainActivity, GatewayConfigActivity::class.java))

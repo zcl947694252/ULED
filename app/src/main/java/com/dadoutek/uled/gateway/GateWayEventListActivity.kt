@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -16,7 +18,9 @@ import com.dadoutek.uled.gateway.adapter.EventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GatewayTagBean
 import com.dadoutek.uled.gateway.util.GsonUtil
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -36,7 +40,6 @@ class GateWayEventListActivity : TelinkBaseActivity() {
     private var dbGateway: DbGateway? = null
     private var addBtn: Button? = null
     private var lin: View? = null
-    private var modeIsTimer: Boolean = true
     val list = mutableListOf<GatewayTagBean>()
     val adapter = EventItemAdapter(R.layout.event_item, list)
 
@@ -56,14 +59,29 @@ class GateWayEventListActivity : TelinkBaseActivity() {
         addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
         addBtn?.text = getString(R.string.add)
 
+
         adapter.emptyView = emptyView
     }
 
     fun initData() {
         dbGateway = intent.getParcelableExtra<DbGateway>("data")
-
+        if (dbGateway == null) {
+            ToastUtils.showShort(getString(R.string.no_get_device_info))
+            finish()
+        }
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dbGateway = DBUtils.getGatewayByID(dbGateway!!.id)
+        if (!TextUtils.isEmpty(dbGateway!!.tags)) {
+            list.clear()
+            val toList = GsonUtil.stringToList(dbGateway!!.tags, GatewayTagBean::class.java)
+            list.addAll(toList)
+            adapter.notifyDataSetChanged()
+        }
 
     }
 
@@ -74,67 +92,72 @@ class GateWayEventListActivity : TelinkBaseActivity() {
         }
         addBtn?.setOnClickListener {
             //已有网关设备空界面跳转添加事件
-            val intent = Intent(this@GateWayEventListActivity, GatewayConfigActivity::class.java)
-            intent.putExtra("mode", modeIsTimer)
-            startActivity(intent)
+            addNewTag()
         }
-        lin?.setOnClickListener {
-            if (list.size >= 20)
-                toast(getString(R.string.gate_way_time_max))
-            else {
-                val intent = Intent(this, GatewayConfigActivity::class.java)
-                intent.putExtra("mode", modeIsTimer)
-                startActivity(intent)
-            }
+        lin?.setOnClickListener {//底部添加
+            addNewTag()
         }
         event_mode_gp.setOnCheckedChangeListener { rg, checkedId ->
             list.clear()
-            modeIsTimer = rg.checkedRadioButtonId == R.id.event_timer_mode
-
-            if (checkedId == R.id.event_timer_mode) {//定時模式
+            if (checkedId == R.id.event_timer_mode) {//定時模式  0定时 1循环
+                dbGateway?.type = 0
                 event_timer_mode.setTextColor(getColor(R.color.blue_text))
                 event_time_pattern_mode.setTextColor(getColor(R.color.gray9))
                 val es = DBUtils.getAllGateWay()
                 if (es.size > 0) {
                     val toList = GsonUtil.stringToList(es[0].tags, GatewayTagBean::class.java)
-                    for (g in toList){
+                    for (g in toList)
                         g.tagName = dbGateway?.name
-                    }
-                    if (toList.size == 0) {
-                        list.addAll(toList)
-                    } else {
-                        list.addAll(toList)
-                    }
+                    list.addAll(toList)
                 } else {
-                    list.add(GatewayTagBean(1,"122","12",1))
+                    list.add(GatewayTagBean(1, "122", "12", 1))
                 }
             } else {//時間段模式
+                dbGateway?.type = 1
                 event_timer_mode.setTextColor(getColor(R.color.gray9))
                 event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
-                // listTask.addAll(mutableListOf(DbGateway(), DbGateway()))
+                val es = DBUtils.getAllGateWay()
+                if (es.size > 0) {
+                    val toList = GsonUtil.stringToList(es[0].tags, GatewayTagBean::class.java)
+                    for (g in toList) {
+                        g.tagName = dbGateway?.name
+                    }
+                    list.addAll(toList)
+                } else list.add(GatewayTagBean(1, "122", "12", 1))
             }
-
             adapter.notifyDataSetChanged()
         }
         adapter.setOnItemChildClickListener { _, view, position ->
             when (view.id) {
                 R.id.item_event_ly -> {
                     val intent = Intent(this, GatewayConfigActivity::class.java)
-                    intent.putExtra("mode", modeIsTimer)
-                    intent.putExtra("data", list[position])
+                     dbGateway?.pos = position
+                    SharedPreferencesHelper.putBoolean(this,Constant.IS_NEW_TAG,false)
+                    dbGateway?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+                    intent.putExtra("data", dbGateway)
                     startActivity(intent)
                 }
                 R.id.item_event_switch -> {
                     if ((view as CheckBox).isChecked) {
-                        //  listTask[position].type = 1
-                        ToastUtils.showLong("选中")
+                        list[position].status = 1
                     } else {
-                        //listTask[position].type = 0
-                        ToastUtils.showLong("未选中")
+                        list[position].status = 0
                     }
-                    //  DBUtils.saveGateWay(listTask[position],true)
+                    dbGateway?.tags = list.toString()
+                    DBUtils.saveGateWay(dbGateway!!, true)
                 }
             }
+        }
+    }
+
+    private fun addNewTag() {
+        if (list.size >= 20)
+            toast(getString(R.string.gate_way_time_max))
+        else {
+            val intent = Intent(this@GateWayEventListActivity, GatewayConfigActivity::class.java)
+            SharedPreferencesHelper.putBoolean(this,Constant.IS_NEW_TAG,true)
+            intent.putExtra("data", dbGateway)
+            startActivity(intent)
         }
     }
 

@@ -19,7 +19,7 @@ class GatewayTimeItemAdapter(resId:Int, data: MutableList<GatewayTasksBean>): Ba
     override fun convert(helper: BaseViewHolder?, item: GatewayTasksBean) {
         val time =  "${item.startHour}:${item.startMins}"
 
-        helper?.setText(R.id.item_gate_way_timer_time, time)
-                ?.setText(R.id.item_gate_way_timer_scene,item.senceName)
+        helper?.setText(R.id.item_gw_timer_time, time)
+                ?.setText(R.id.item_gw_timer_scene,item.senceName)
     }
 }

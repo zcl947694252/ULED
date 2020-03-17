@@ -17,11 +17,13 @@ import java.util.ArrayList;
 public class GatewayTagBean implements Parcelable {
     private Long tagId;
     private String tagName;
-    private int status; //开1 关0
+    private int status; //开1 关0 tag的外部现实
     private int startHour;
     private int endHour;
     private int startMins;
     private int endMins;
+    private int pos;
+    private boolean isTimer;
     private int week;//bit位 0-6 周日-周六
     private String  weekStr;//bit位 0-6 周日-周六 7代表当天
     private boolean isCreateNew;
@@ -123,6 +125,49 @@ public class GatewayTagBean implements Parcelable {
         return tasks;
     }
 
+    public boolean getIsTimer() {
+        return isTimer;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public boolean isTimer() {
+        return isTimer;
+    }
+
+    public void setTimer(boolean timer) {
+        isTimer = timer;
+    }
+
+    public void setIsTimer(boolean isTimer) {
+        this.isTimer = isTimer;
+    }
+
+    @Override
+    public String toString() {
+        return "GatewayTagBean{" +
+                "tagId=" + tagId +
+                ", tagName='" + tagName + '\'' +
+                ", status=" + status +
+                ", startHour=" + startHour +
+                ", endHour=" + endHour +
+                ", startMins=" + startMins +
+                ", endMins=" + endMins +
+                ", pos=" + pos +
+                ", isTimer=" + isTimer +
+                ", week=" + week +
+                ", weekStr='" + weekStr + '\'' +
+                ", isCreateNew=" + isCreateNew +
+                ", tasks=" + tasks +
+                '}';
+    }
+
     public void setTasks(ArrayList<GatewayTasksBean> tasks) {
         this.tasks = tasks;
     }
@@ -181,4 +226,5 @@ public class GatewayTagBean implements Parcelable {
         dest.writeByte((byte) (isCreateNew ? 1 : 0));
         dest.writeTypedList(tasks);
     }
+
 }

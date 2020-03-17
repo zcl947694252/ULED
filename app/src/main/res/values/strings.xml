@@ -983,7 +983,9 @@
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
     <string name="standing_time">Standing time</string>
-    <string name="minute">分</string>
+    <string name="minute">Minute</string>
+    <string name="no_get_device_info">Device information not obtained, please try again</string>
+    <string name="have_time_task">The response task already exists in this time period, please select another time</string>
 
 
 </resources>

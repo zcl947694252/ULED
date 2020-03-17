@@ -10,20 +10,4 @@
         android:id="@+id/wheel_time_container"
         android:orientation="horizontal"
         tools:showIn="@layout/activity_gate_way_chose_time2">
-
-<!--    <LinearLayout
-            android:id="@+id/wheel_hour"
-            android:layout_width="0dp"
-            android:layout_marginTop="-15dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical" />
-
-    <LinearLayout
-            android:id="@+id/wheel_minute"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginTop="-15dp"
-            android:orientation="vertical" />-->
 </LinearLayout>

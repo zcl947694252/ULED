@@ -12,15 +12,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.GatewayTasksBean;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.switches.SelectSceneListActivity;
+import com.dadoutek.uled.util.TmtUtils;
+
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -29,6 +30,7 @@ import cn.qqtheme.framework.picker.TimePicker;
 
 /**
  * 设置网关时间与场景传递进配config界面
+ * task任务
  */
 public class GatewayChoseTimeActivity extends TelinkBaseActivity {
     private TextView toolbarTv;
@@ -43,7 +45,8 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
     private int hourTime = 03;
     private int minuteTime = 15;
     private DbScene scene;
-    private GatewayTasksBean gatewayTimeBean;
+    private GatewayTasksBean tasksBean;
+    ArrayList<Parcelable> data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,35 +64,66 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
             if (scene == null)
                 Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene), Toast.LENGTH_SHORT).show();
             else {
-                Intent intent = new Intent();
-                gatewayTimeBean.setSceneId(scene.getId());
-                gatewayTimeBean.setSenceName(scene.getName());
-                gatewayTimeBean.setStartHour(hourTime);
-                gatewayTimeBean.setStartMins(minuteTime);
-
-                intent.putExtra("data", gatewayTimeBean);
-                setResult(Activity.RESULT_OK, intent);
-                finish();
+                if (isTimeHave()) {//如果已有该时间
+                    if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime) {//并且是当前的task的时间 返回结果
+                        setForResult();
+                    } else {
+                        TmtUtils.midToastLong(this, getString(R.string.have_time_task));
+                    }
+                } else {//没有此时间task返回结果
+                    setForResult();
+                }
             }
         });
         timerLy.setOnClickListener(v -> startActivityForResult(new Intent(this, SelectSceneListActivity.class), requestCodes));
     }
 
+    private void setForResult() {
+        Intent intent = new Intent();
+        tasksBean.setSceneId(scene.getId());
+        tasksBean.setSenceName(scene.getName());
+        tasksBean.setStartHour(hourTime);
+        tasksBean.setStartMins(minuteTime);
+        intent.putExtra("data", tasksBean);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+    }
+
+    private Boolean isTimeHave() {
+        Boolean isHave = false;
+        if (data!=null)
+        for (int i = 0; i < data.size(); i++) {
+            GatewayTasksBean tag = (GatewayTasksBean) data.get(i);
+            if (tag.getStartHour() == hourTime && tag.getStartMins() == minuteTime) {
+                isHave = true;
+            } else {
+                isHave = false;
+            }
+        }
+        return isHave;
+    }
+
     private void initData() {
         toolbarTv.setText(getString(R.string.chose_time));
-        timerTitle.setText(getString(R.string.scene_name));
+        timerTitle.setText(getString(R.string.scene_name));//底部item 的title
         Intent intent = getIntent();
-        Parcelable data = intent.getParcelableExtra("data");
-        int index = intent.getIntExtra("index",0);
-        if (data != null && !TextUtils.isEmpty(data.toString())) {
-            gatewayTimeBean = (GatewayTasksBean) data;
-            timerScene.setText(gatewayTimeBean.getSenceName());
-            gatewayTimeBean.setCreateNew(false);
-            scene = DBUtils.INSTANCE.getSceneByID(gatewayTimeBean.getSceneId());
-        } else{
-            gatewayTimeBean = new GatewayTasksBean(index);
-            gatewayTimeBean.setCreateNew(true);
+        data = intent.getParcelableArrayListExtra("data");
+
+        if (data != null && !TextUtils.isEmpty(data.toString())) {//编辑老的task
+            GatewayTasksBean tagBean = (GatewayTasksBean) data.get(0);
+            int pos = tagBean.getSelectPos();//拿到点击pos
+            tasksBean = (GatewayTasksBean) data.get(pos);
+            hourTime = tasksBean.getStartHour();
+            minuteTime = tasksBean.getStartMins();
+            timerScene.setText(tasksBean.getSenceName());
+            tasksBean.setCreateNew(false);
+            scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
+        } else {//新创建task 获取传过来的index值
+           int index =  intent.getIntExtra("index",0);
+            tasksBean = new GatewayTasksBean(index);
+            tasksBean.setCreateNew(true);
         }
+        wheelPickerLy.addView(getTimePicker());
     }
 
     private void initView() {
@@ -97,12 +131,11 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         toolbarTv = findViewById(R.id.toolbar_t_center);
         toolbarConfirm = findViewById(R.id.toolbar_t_confim);
 
-        timerTitle = findViewById(R.id.item_gate_way_timer_time);
-        timerScene = findViewById(R.id.item_gate_way_timer_scene);
+        //时间选择器底部item
+        timerTitle = findViewById(R.id.item_gw_timer_time);//条目头部
+        timerScene = findViewById(R.id.item_gw_timer_scene);//条目尾部
         timerLy = findViewById(R.id.timer_scene_ly);
         wheelPickerLy = findViewById(R.id.wheel_time_container);
-
-        wheelPickerLy.addView(getTimePicker());
     }
 
     private View getTimePicker() {
@@ -114,23 +147,25 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         picker.setLabel("", "");
         picker.setTextSize(25);
         picker.setOffset(3);
-        if (scene != null) {
-            String[] split = scene.getTimes().split("-");
-            if (split.length == 2)
-                picker.setSelectedItem(Integer.getInteger(split[1]), Integer.getInteger(split[0]));
-        } else
-            picker.setSelectedItem(3, 15);
+        picker.setSelectedItem(hourTime, minuteTime);
         picker.setOnWheelListener(new DateTimePicker.OnWheelListener() {
             @Override
-            public void onYearWheeled(int index, String year) { }
+            public void onYearWheeled(int index, String year) {
+            }
+
             @Override
-            public void onMonthWheeled(int index, String month) { }
+            public void onMonthWheeled(int index, String month) {
+            }
+
             @Override
-            public void onDayWheeled(int index, String day) { }
+            public void onDayWheeled(int index, String day) {
+            }
+
             @Override
             public void onHourWheeled(int index, String hour) {
                 hourTime = Integer.parseInt(hour);
             }
+
             @Override
             public void onMinuteWheeled(int index, String minute) {
                 minuteTime = Integer.parseInt(minute);
@@ -141,14 +176,13 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {//获取场景返回值
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
             Parcelable par = data.getParcelableExtra("data");
             scene = (DbScene) par;
             LogUtils.v("zcl获取场景信息scene" + scene.toString());
             timerScene.setText(scene.getName());
-            GsonUtils.fromJson("", DbGateway.class);
         }
     }
 

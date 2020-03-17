@@ -2,51 +2,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/timer_scene_ly"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="55dp"
         android:orientation="horizontal">
     <!--時間定時title的顔色是黑3 時間段時黑9-->
     <View
-            android:id="@+id/item_gate_way_timer_line_top"
+            android:id="@+id/item_gw_timer_line_top"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray_e"/>
     <View
-            android:id="@+id/item_gate_way_timer_line"
+            android:id="@+id/item_gw_timer_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/dp_10"
             android:layout_alignParentBottom="true"
             android:background="@color/gray_e"/>
     <TextView
-            android:id="@+id/item_gate_way_timer_time"
+            android:id="@+id/item_gw_timer_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="15dp"
             android:gravity="center"
-            android:layout_above="@id/item_gate_way_timer_line"
-            android:layout_below="@+id/item_gate_way_timer_line_top"
+            android:layout_above="@id/item_gw_timer_line"
+            android:layout_below="@+id/item_gw_timer_line_top"
             android:text="@string/edit"
             android:textColor="@color/black_three"
             android:textSize="18sp" />
 
     <ImageView
-            android:id="@+id/item_gate_way_timer_arr"
+            android:id="@+id/item_gw_timer_arr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/item_gate_way_timer_line"
-            android:layout_below="@+id/item_gate_way_timer_line_top"
+            android:layout_above="@id/item_gw_timer_line"
+            android:layout_below="@+id/item_gw_timer_line_top"
             android:layout_alignParentEnd="true"
             android:paddingEnd="15dp"
             android:src="@drawable/arrow_r" />
 
     <TextView
-            android:id="@+id/item_gate_way_timer_scene"
+            android:id="@+id/item_gw_timer_scene"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/dp_10"
-            android:layout_above="@id/item_gate_way_timer_line"
-            android:layout_below="@+id/item_gate_way_timer_line_top"
-            android:layout_toStartOf="@id/item_gate_way_timer_arr"
+            android:layout_above="@id/item_gw_timer_line"
+            android:layout_below="@+id/item_gw_timer_line_top"
+            android:layout_toStartOf="@id/item_gw_timer_arr"
             android:gravity="center"
             android:text="@string/edit"
             android:textColor="@color/black_six"

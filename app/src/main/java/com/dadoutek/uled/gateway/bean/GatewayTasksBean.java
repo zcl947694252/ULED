@@ -22,6 +22,8 @@ public class GatewayTasksBean implements Parcelable {
     private int endHour;
     private int startMins;
     private int endMins;
+    private int selectPos;
+    private int useIndex = 200;//可用index
 
     public GatewayTasksBean(int index) {
         this.index = index;
@@ -127,6 +129,22 @@ public class GatewayTasksBean implements Parcelable {
         this.createNew = createNew;
     }
 
+    public int getSelectPos() {
+        return selectPos;
+    }
+
+    public void setSelectPos(int selectPos) {
+        this.selectPos = selectPos;
+    }
+
+    public int getUseIndex() {
+        return useIndex;
+    }
+
+    public void setUseIndex(int useIndex) {
+        this.useIndex = useIndex;
+    }
+
     @Override
     public String toString() {
         return "GatewayTasksBean{" +
@@ -134,6 +152,13 @@ public class GatewayTasksBean implements Parcelable {
                 ", stateTime=" + stateTime +
                 ", sceneId=" + sceneId +
                 ", senceName='" + senceName + '\'' +
+                ", createNew=" + createNew +
+                ", startHour=" + startHour +
+                ", endHour=" + endHour +
+                ", startMins=" + startMins +
+                ", endMins=" + endMins +
+                ", selectPos=" + selectPos +
+                ", useIndex=" + useIndex +
                 '}';
     }
 
