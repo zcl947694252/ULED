@@ -18,14 +18,14 @@
             android:layout_alignParentBottom="true"
             android:background="@color/gray_e"/>
     <TextView
-            android:id="@+id/item_gw_timer_time"
+            android:id="@+id/item_gw_timer_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="15dp"
             android:gravity="center"
             android:layout_above="@id/item_gw_timer_line"
             android:layout_below="@+id/item_gw_timer_line_top"
-            android:text="@string/edit"
+            android:text="@string/scene_name"
             android:textColor="@color/black_three"
             android:textSize="18sp" />
 
@@ -48,7 +48,7 @@
             android:layout_below="@+id/item_gw_timer_line_top"
             android:layout_toStartOf="@id/item_gw_timer_arr"
             android:gravity="center"
-            android:text="@string/edit"
+            android:text="@string/select_scene"
             android:textColor="@color/black_six"
             android:textSize="15sp" />
 </RelativeLayout>

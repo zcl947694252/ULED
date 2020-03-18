@@ -12,13 +12,28 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-        <EditText
-                android:id="@+id/startTime"
+        <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="85dp"
-                android:text="@string/startTime"
-                android:textSize="30sp" />
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/startTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="85dp"
+                    android:text="@string/startTime"
+                    android:textColor="@color/blue_text"
+                    android:gravity="center"
+                    android:textSize="30sp" />
+
+            <View
+                    android:id="@+id/startTime_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1.5dp"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:background="@color/blue_text" />
+        </LinearLayout>
 
         <TextView
                 android:layout_width="wrap_content"
@@ -30,19 +45,36 @@
                 android:textColor="@color/gray9"
                 android:textSize="20sp" />
 
-        <EditText
-                android:id="@+id/endTime"
+        <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="85dp"
-                android:text="@string/endTime"
-                android:textSize="30sp" />
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/endTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="85dp"
+                    android:gravity="center"
+                    android:text="@string/endTime"
+                    android:textSize="30sp" />
+
+            <View
+                    android:id="@+id/endTime_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1.5dp"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:visibility="invisible"
+                    android:background="@color/blue_text" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
     <include layout="@layout/template_wheel_container" />
 
     <LinearLayout
+            android:id="@+id/gw_times_standing_time_ly"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:orientation="horizontal">
@@ -77,8 +109,6 @@
 
     <View
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="1dp"
             android:background="@color/gray_e" />
-
-    <include layout="@layout/item_gata_way_event_timer" />
 </LinearLayout>

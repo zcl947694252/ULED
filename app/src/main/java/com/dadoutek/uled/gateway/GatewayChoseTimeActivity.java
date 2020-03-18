@@ -132,7 +132,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         toolbarConfirm = findViewById(R.id.toolbar_t_confim);
 
         //时间选择器底部item
-        timerTitle = findViewById(R.id.item_gw_timer_time);//条目头部
+        timerTitle = findViewById(R.id.item_gw_timer_title);//条目头部
         timerScene = findViewById(R.id.item_gw_timer_scene);//条目尾部
         timerLy = findViewById(R.id.timer_scene_ly);
         wheelPickerLy = findViewById(R.id.wheel_time_container);

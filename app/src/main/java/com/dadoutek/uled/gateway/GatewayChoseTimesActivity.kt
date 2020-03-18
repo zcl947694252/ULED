@@ -7,42 +7,43 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.text.TextUtils
 import android.view.View
-import android.widget.Toast
 import cn.qqtheme.framework.picker.DateTimePicker
 import cn.qqtheme.framework.picker.TimePicker
-import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GatewayTasksBean
+import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.switches.SelectSceneListActivity
-import com.dadoutek.uled.util.TmtUtils
 import kotlinx.android.synthetic.main.activity_gate_way_chose_time.*
-import kotlinx.android.synthetic.main.item_gata_way_event_timer.*
+import kotlinx.android.synthetic.main.item_gw_time_scene.*
 import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
-import java.util.*
 
 /**
  * 设置网关时间与场景传递进配config界面
  */
-class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener, View.OnFocusChangeListener {
+class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var standingNum: Int = 1 //停留时间
+    private var picker: TimePicker? = null
     private var startTimeNum: Int = 0
     private var endTimeNum: Int = 0
     private val requestCodes = 1000
-    private var startHourTime = 3
-    private var startMinuteTime = 15
-    private var endHourTime = 3
-    private var endMinuteTime = 15
+    private val requestStandingCodes = 1001
+    private val requestTimerPeriodCodes = 1002
+    private var startHourTime = 7
+    private var startMinuteTime = 40
+    private var endHourTime = 8
+    private var endMinuteTime = 30
     private var scene: DbScene? = null
     private var tasksBean: GatewayTasksBean? = null
     internal var data: ArrayList<Parcelable>? = null
     private var selectStart = true
+    private var timesList = ArrayList<GwTimePeriodsBean>()
+
     private val isTimeHave: Boolean?
         get() {
             var isHave: Boolean? = false
@@ -55,43 +56,49 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener, Vi
 
     private val timePicker: View
         get() {
-            val picker = TimePicker(this)
+            picker = TimePicker(this)
+            picker?.let {
+                it.setBackgroundColor(this.resources.getColor(R.color.white))
+                it.setDividerConfig(null)
+                it.setTextColor(this.resources.getColor(R.color.blue_text))
+                it.setLabel("", "")
+                it.setTextSize(25)
+                it.setOffset(3)
+                if (selectStart)
+                    it.setSelectedItem(startHourTime, startMinuteTime)
+                else
+                    it.setSelectedItem(endHourTime, endMinuteTime)
 
-            picker.setBackgroundColor(this.resources.getColor(R.color.white))
-            picker.setDividerConfig(null)
-            picker.setTextColor(this.resources.getColor(R.color.blue_text))
-            picker.setLabel("", "")
-            picker.setTextSize(25)
-            picker.setOffset(3)
-            picker.setSelectedItem(startHourTime, startMinuteTime)
-            picker.setOnWheelListener(object : DateTimePicker.OnWheelListener {
-                override fun onYearWheeled(index: Int, year: String) {}
+                it.setOnWheelListener(object : DateTimePicker.OnWheelListener {
+                    override fun onYearWheeled(index: Int, year: String) {}
 
-                override fun onMonthWheeled(index: Int, month: String) {}
+                    override fun onMonthWheeled(index: Int, month: String) {}
 
-                override fun onDayWheeled(index: Int, day: String) {}
+                    override fun onDayWheeled(index: Int, day: String) {}
 
-                override fun onHourWheeled(index: Int, hour: String) {
-                    startHourTime = Integer.parseInt(hour)
-                    setTime()
-                }
+                    override fun onHourWheeled(index: Int, hour: String) {
+                        if (selectStart) {
+                            startHourTime = Integer.parseInt(hour)
+                            setStartTime()
+                        } else {
+                            endHourTime = Integer.parseInt(hour)
+                            setEndTime()
+                        }
+                    }
 
-                override fun onMinuteWheeled(index: Int, minute: String) {
-                    startMinuteTime = Integer.parseInt(minute)
-                    setTime()
-                }
-            })
-
-            return picker.contentView
+                    override fun onMinuteWheeled(index: Int, minute: String) {
+                        if (selectStart) {
+                            startMinuteTime = Integer.parseInt(minute)
+                            setStartTime()
+                        } else {
+                            endMinuteTime = Integer.parseInt(minute)
+                            setEndTime()
+                        }
+                    }
+                })
+            }
+            return picker!!.contentView
         }
-
-    private fun setTime() {
-        if (selectStart) {
-            setStartTime()
-        } else {
-            endTime.setText("$startHourTime:$startMinuteTime")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,69 +110,59 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener, Vi
 
     private fun initView() {
         toolbar_t_center.text = getString(R.string.chose_time)
-        item_gw_timer_time!!.text = getString(R.string.scene_name)
+        toolbar_t_confim.text = getString(R.string.next)
     }
 
     private fun initLisenter() {
         toolbar_t_cancel!!.setOnClickListener(this)
         toolbar_t_confim!!.setOnClickListener(this)
-        timer_scene_ly!!.setOnClickListener(this)
-        startTime.onFocusChangeListener = this
-        endTime.onFocusChangeListener = this
-    }
-
-    override fun onFocusChange(v: View?, hasFocus: Boolean) {
-        selectStart = v?.id == R.id.startTime
-        when (v?.id) {
-            R.id.startTime -> {
-                setStartTime()
-                startTime.setSelection(startTime.text.length)
-                startTime.setTextColor(getColor(R.color.blue_text))
-                endTime.setTextColor(getColor(R.color.gray_6))
-            }
-            R.id.endTime -> {
-                setEndTime()
-                endTime.setSelection(startTime.text.length)
-                endTime.setTextColor(getColor(R.color.blue_text))
-                startTime.setTextColor(getColor(R.color.gray_6))
-            }
-        }
+        gw_times_standing_time_ly!!.setOnClickListener(this)//选择停留时间
+        startTime.setOnClickListener(this)
+        endTime.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.toolbar_t_confim -> {
-                if (scene == null)
-                    Toast.makeText(applicationContext, getString(R.string.please_select_scene), Toast.LENGTH_SHORT).show()
+                if (startTimeNum>=endTimeNum)
+                    ToastUtils.showShort(getString(R.string.please_chose_right_time))
                 else {
-                    if (isTimeHave!!) {//如果已有该时间
-                        if (tasksBean!!.startHour == startHourTime && tasksBean!!.startMins == startMinuteTime) {//并且是当前的task的时间
-                            val intent = Intent()
-                            tasksBean!!.setSceneId(scene!!.id)
-                            tasksBean!!.senceName = scene!!.name
-                            tasksBean!!.startHour = startHourTime
-                            tasksBean!!.startMins = startMinuteTime
-                            intent.putExtra("data", tasksBean)
-                            setResult(Activity.RESULT_OK, intent)
-                            finish()
-                        } else {
-                            TmtUtils.midToastLong(this, getString(R.string.have_time_task))
-                        }
-                    } else {//没有此时间直接添加
-                        val intent = Intent()
-                        tasksBean!!.setSceneId(scene!!.id)
-                        tasksBean!!.senceName = scene!!.name
-                        tasksBean!!.startHour = startHourTime
-                        tasksBean!!.startMins = startMinuteTime
-
-                        intent.putExtra("data", tasksBean)
-                        setResult(Activity.RESULT_OK, intent)
-                        finish()
-                    }
+                    val intent = Intent(this@GatewayChoseTimesActivity, TimerPeriodListActivity::class.java)
+                    intent.putParcelableArrayListExtra("data",timesList)
+                    startActivityForResult(intent,requestTimerPeriodCodes)
                 }
             }
             R.id.toolbar_t_cancel -> finish()
-            R.id.timer_scene_ly -> startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
+            R.id.gw_times_standing_time_ly -> {
+
+                if (endTimeNum > startTimeNum)
+                    startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCodes)
+                else
+                    ToastUtils.showShort(getString(R.string.please_chose_right_time))
+                //startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
+            }
+
+            R.id.startTime -> {
+                selectStart = true
+                setStartTime()
+                wheel_time_container.removeAllViews()
+                wheel_time_container!!.addView(timePicker)
+
+                startTime.setTextColor(getColor(R.color.blue_text))
+                endTime.setTextColor(getColor(R.color.gray_6))
+                endTime_line.visibility = View.INVISIBLE
+                startTime_line.visibility = View.VISIBLE
+            }
+            R.id.endTime -> {
+                selectStart = false
+                setEndTime()
+                wheel_time_container.removeAllViews()
+                wheel_time_container!!.addView(timePicker)
+                endTime.setTextColor(getColor(R.color.blue_text))
+                startTime.setTextColor(getColor(R.color.gray_6))
+                endTime_line.visibility = View.VISIBLE
+                startTime_line.visibility = View.INVISIBLE
+            }
         }
     }
 
@@ -199,25 +196,49 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener, Vi
         wheel_time_container!!.addView(timePicker)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setEndTime() {
         endTimeNum = endHourTime * 60 + endMinuteTime
-        endTime.setText("$endHourTime:$endMinuteTime")
+        var endHourTimeStr = timeStr(endHourTime)
+        var endMinuteTimeStr = timeStr(endMinuteTime)
+        endTime.text = "$endHourTimeStr:$endMinuteTimeStr"
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setStartTime() {
         startTimeNum = startHourTime * 60 + startMinuteTime
-        startTime.setText("$startHourTime:$startMinuteTime")
+        var startHourTimeStr: String = timeStr(startHourTime)
+        var startMinuteTimeStr: String = timeStr(startMinuteTime)
+        startTime.text = "$startHourTimeStr:$startMinuteTimeStr"
+    }
+
+    private fun timeStr(time: Int): String {
+        return if (time < 10)
+            "0$time"
+        else
+            time.toString()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {//获取场景返回值
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
-            val par = data!!.getParcelableExtra<Parcelable>("data")
-            scene = par as DbScene
-            LogUtils.v("zcl获取场景信息scene" + scene!!.toString())
-            item_gw_timer_scene!!.text = scene!!.name
-            GsonUtils.fromJson("", DbGateway::class.java)
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == requestCodes) {
+                val par = data!!.getParcelableExtra<Parcelable>("data")
+                scene = par as DbScene
+                LogUtils.v("zcl获取场景信息scene" + scene!!.toString())
+                item_gw_timer_scene!!.text = scene!!.name
+            } else if (requestCode == requestStandingCodes) {
+                standingNum = data!!.getIntExtra("data", 0)
+                gw_times_standing_time.text = standingNum.toString()
+                   if (standingNum != 0) {
+                       timesList.clear()
+                       for (time in startTimeNum..endTimeNum step standingNum) {
+                           LogUtils.v("zcl----时间段-------$time-------$standingNum")
+                           timesList.add(GwTimePeriodsBean(time / 60, time % 60,getString(R.string.select_scene)))
+                       }
+
+                   }
+            }
         }
     }
-
 }

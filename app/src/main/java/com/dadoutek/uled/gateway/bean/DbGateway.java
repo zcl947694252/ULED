@@ -51,7 +51,7 @@ public class DbGateway implements Parcelable {
     private  int belongRegionId;
     private  int pos;
     private  String tags;
-    private  int addTag = 0;//0新添加 1旧数据
+    private  int addTag = 0;//暂时无用
     private  int state; //1代表在线 0代表离线
     @Expose(serialize = false, deserialize = false)
     @Transient

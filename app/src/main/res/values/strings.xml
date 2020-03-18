@@ -986,6 +986,8 @@
     <string name="minute">Minute</string>
     <string name="no_get_device_info">Device information not obtained, please try again</string>
     <string name="have_time_task">The response task already exists in this time period, please select another time</string>
+    <string name="please_chose_right_time">开始时间不能大于结束时间,请重新选择</string>
+    <string name="timer_period_set">时间段设置</string>
 
 
 </resources>

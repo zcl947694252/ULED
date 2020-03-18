@@ -55,7 +55,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var maxId = 0L
 
     val listTask = ArrayList<GatewayTasksBean>()
-    private val adapter = GatewayTimeItemAdapter(R.layout.item_gata_way_event_timer, listTask)
+    private val adapter = GatewayTimeItemAdapter(R.layout.item_gw_time_scene, listTask)
 
     /**
      * 默认重复设置为仅一次

@@ -907,5 +907,7 @@
     <string name="minute">分</string>
     <string name="no_get_device_info">未获取到设备信息,请重试</string>
     <string name="have_time_task">该时间段已存在响应任务,请选择其他时间</string>
+    <string name="please_chose_right_time">开始时间不能大于结束时间,请重新选择</string>
+    <string name="timer_period_set">时间段设置</string>
 
 </resources>

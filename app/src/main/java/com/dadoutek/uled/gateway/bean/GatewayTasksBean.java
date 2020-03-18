@@ -22,8 +22,8 @@ public class GatewayTasksBean implements Parcelable {
     private int endHour;
     private int startMins;
     private int endMins;
-    private int selectPos;
-    private int useIndex = 200;//可用index
+    private int selectPos;//本地使用
+    private String timingPeriods;//时间段list
 
     public GatewayTasksBean(int index) {
         this.index = index;
@@ -137,13 +137,14 @@ public class GatewayTasksBean implements Parcelable {
         this.selectPos = selectPos;
     }
 
-    public int getUseIndex() {
-        return useIndex;
+    public String getTimingPeriods() {
+        return timingPeriods;
     }
 
-    public void setUseIndex(int useIndex) {
-        this.useIndex = useIndex;
+    public void setTimingPeriods(String timingPeriods) {
+        this.timingPeriods = timingPeriods;
     }
+
 
     @Override
     public String toString() {
@@ -158,7 +159,7 @@ public class GatewayTasksBean implements Parcelable {
                 ", startMins=" + startMins +
                 ", endMins=" + endMins +
                 ", selectPos=" + selectPos +
-                ", useIndex=" + useIndex +
+                ", timingPeriods='" + timingPeriods + '\'' +
                 '}';
     }
 
