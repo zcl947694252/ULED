@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.event.MeshEvent;
@@ -38,6 +39,7 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
     protected void onDestroy() {
         super.onDestroy();
         ((TelinkLightApplication) getApplication()).removeEventListener(this);
+        mErrorDialog.dismiss();
     }
 
     private void dismissDialog() {
@@ -55,9 +57,9 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
                 instance.idleMode(true);
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 dialogBuilder.setTitle("Error")
-                        .setMessage("为扫描到设备，检测到定位未开启，是否打开定位？")
-                        .setNegativeButton("忽略", null)
-                        .setPositiveButton("去打开", (dialogInterface, i) -> {
+                        .setMessage(this.getString(R.string.open_gps_tip))
+                        .setNegativeButton( getString(R.string.cancel), null)
+                        .setPositiveButton(this.getString(R.string.go_open), (dialogInterface, i) -> {
                             Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                             startActivityForResult(enableLocationIntent, ACTIVITY_REQUEST_CODE_LOCATION);
                         });
@@ -65,7 +67,8 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
             }
             mErrorDialog.show();
         } else {
-            new AlertDialog.Builder(this).setMessage("蓝牙出问题了，重启蓝牙试试!!").show();
+           mErrorDialog  = new AlertDialog.Builder(this).setMessage("蓝牙出问题了，重启蓝牙试试!!").create();
+           mErrorDialog.show();
         }
     }
 

@@ -19,6 +19,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -40,7 +41,6 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.gateway.GwEventListActivity
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -163,18 +163,18 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
             Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
             main_toast.visibility = VISIBLE
-        }else{
+        } else {
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-             val intent = Intent(this@MainActivity, GwEventListActivity::class.java)
-            val dbGateway = DbGateway()
-            dbGateway.name = "jsj"
-            DBUtils.saveGateWay(dbGateway,false)
-            intent.putExtra("data", dbGateway)
+            val intent = Intent(this@MainActivity, GwEventListActivity::class.java)
+            var dbGw = DBUtils.getGatewayByID(5)
+
+            DBUtils.saveGateWay(dbGw!!, false)
+            intent.putExtra("data", dbGw)
             startActivity(intent)
-             //startActivity(Intent(this@MainActivity, GwConfigTagActivity::class.java))
+            //startActivity(Intent(this@MainActivity, GwConfigTagActivity::class.java))
         }
         initBottomNavigation()
 
@@ -191,16 +191,39 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val list = mutableListOf<String>()
         RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
             override fun onNext(t: MutableList<RegionBean>) {
-                    for (i in t) {
-                        i.controlMesh?.let { it -> list.add(it) }
-                    }
-                    SharedPreferencesUtils.saveRegionNameList(list)
+                for (i in t) {
+                    i.controlMesh?.let { it -> list.add(it) }
+                }
+                SharedPreferencesUtils.saveRegionNameList(list)
 
             }
         })
     }
 
+    private fun getGwId(): Long {
+        val list = DBUtils.getAllGateWay()
+        val idList = ArrayList<Int>()
+        for (i in list.indices) {
+            idList.add(list[i].id!!.toInt())
+        }
 
+        var id = 0
+        if (list.size == 0) {
+            id = 1
+        } else {
+            for (i in 1..10000) {
+                if (idList.contains(i)) {
+                    Log.d("gwID", "getGwId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getGwId: bbbbb$id")
+                    break
+                }
+            }
+        }
+        return java.lang.Long.valueOf(id.toLong())
+    }
 
     private fun startToRecoverDevices() {
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
@@ -348,12 +371,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         search_bar.setOnClickListener(dialogOnclick)
 
         val title = view.findViewById<TextView>(R.id.textView5)
-        if (position==INSTALL_NORMAL_LIGHT){
-            title.visibility =  GONE
-            install_tip_question.visibility =  GONE
-        }else{
-            title.visibility =  VISIBLE
-            install_tip_question.visibility =  VISIBLE
+        if (position == INSTALL_NORMAL_LIGHT) {
+            title.visibility = GONE
+            install_tip_question.visibility = GONE
+        } else {
+            title.visibility = VISIBLE
+            install_tip_question.visibility = VISIBLE
         }
 
         install_tip_question.text = describe
@@ -445,7 +468,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
@@ -513,7 +536,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                                ToastUtils.showLong(R.string.get_server_version_fail)
+                            ToastUtils.showLong(R.string.get_server_version_fail)
                         }
                     })
         }

@@ -21,10 +21,8 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
@@ -44,8 +42,9 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var currentTagStr: String? = null
     private var dbGateway: DbGateway? = null
-    private var tagBeans: ArrayList<GwTagBean> = arrayListOf()
+    private var tagList: ArrayList<GwTagBean> = arrayListOf()
     private var dbId: Long = 99999
     private var tagBean: GwTagBean? = null
     private val requestModeCode: Int = 1000//选择日期
@@ -62,7 +61,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbarTv.text = getString(R.string.Gate_way)
         gate_way_repete_mode.textSize = 15F
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            startActivity(Intent(this@GwConfigTagActivity, GwEventListActivity::class.java))
+            finish()
+        }
         tv_function1.text = getString(R.string.complete)
         tv_function1.visibility = View.VISIBLE
         gate_way_repete_mode.text = getString(R.string.only_one)
@@ -76,7 +78,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getMaxTagId() {
-        for (tag in tagBeans) {
+        for (tag in tagList) {
             if (tag.tagId > maxId)
                 maxId = tag.tagId
         }
@@ -86,20 +88,24 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         //創建新tag任务
         dbGateway = intent.getParcelableExtra<DbGateway>("data")
         if (dbGateway != null) {//拿到有效数据
+            currentTagStr = if (dbGateway?.type == 0) //定时
+                dbGateway?.tags
+            else
+                dbGateway?.timePeriodTags
 
-            if (!TextUtils.isEmpty(dbGateway?.tags)) {//不要移动 此处有新tag和老tag需要的东西
-                tagBeans.clear()
-                tagBeans.addAll(GsonUtil.stringToList(dbGateway?.tags, GwTagBean::class.java))//获取该设备tag列表
-                if (tagBeans.size > 0)
+            if (!TextUtils.isEmpty(currentTagStr)) {//不要移动 此处有新tag和老tag需要的东西
+                tagList.clear()
+                tagList.addAll(GsonUtil.stringToList(currentTagStr, GwTagBean::class.java))//获取该设备tag列表
+                if (tagList.size > 0)
                     getMaxTagId()//更新maxid
             }
 
-            tagBean = if (SharedPreferencesHelper.getBoolean(this, Constant.IS_NEW_TAG, false)) {//是否是添加新tag
+            tagBean = if (dbGateway?.addTag == 0) {//是否是添加新tag
                 //创建新的tag
                 GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             } else {//编辑已有tag
-                if (tagBeans.size > 0)
-                    tagBeans[dbGateway?.pos ?: 0]
+                if (tagList.size > 0)
+                    tagList[dbGateway?.pos ?: 0]
                 else
                     GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             }
@@ -140,22 +146,27 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                     LogUtils.v("zcl网关---$toJson")
                     tagBean?.tagName = gate_way_lable.text.toString()
                     tagBean?.weekStr = gate_way_repete_mode.text.toString()
-                    tagBean?.tasks = listTask
+                    tagBean?.tasks = listTask//添加tag的时间列表
 
                     //因为是新创建的对象所以直接创建list添加 如果不是需要查看是都有tags
-                    if (tagBeans.size == 0) {
-                        it.tags = GsonUtils.toJson(mutableListOf(tagBean))
+                    if (tagList.size == 0) {
+                        tagList.add(tagBean!!)
                     } else {
                         var removeTag: GwTagBean? = null
-                        for (tag in tagBeans)
+                        for (tag in tagList)
                             if (tag.tagId == tagBean?.tagId)
                                 removeTag = tag
-                        tagBeans.remove(removeTag)
-                        tagBeans.add(tagBean!!)
-                        it.tags = GsonUtils.toJson(tagBeans)
+                        tagList.remove(removeTag)
+                        tagList.add(tagBean!!)
                     }
+                    if (it.type == 0)
+                        it.tags = GsonUtils.toJson(tagList)
+                    else
+                        it.timePeriodTags = GsonUtils.toJson(tagList)//tag列表
+
                     DBUtils.saveGateWay(it, true)
                 }
+                startActivity(Intent(this@GwConfigTagActivity, GwEventListActivity::class.java))
                 finish()
             }
         }

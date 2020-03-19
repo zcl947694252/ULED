@@ -271,7 +271,7 @@ object DBUtils {
     }
     fun getAllGateWay(): ArrayList<DbGateway> {
         val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
-                .whereOr(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY), DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
+                .where(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
         return ArrayList(query.list())
     }
 
@@ -722,13 +722,13 @@ object DBUtils {
             }
         }
     }
-    fun saveGateWay(db: DbGateway, isFromServer: Boolean){
-        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.Id.eq(0)).list()
+    fun saveGateWay(db: DbGateway, isFromServer: Boolean){//添加mesh以后要改成mes地址
+        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.Id.eq(db.id)).list()
 
-        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {
-            //如果该mesh地址的数据已经存在，就直接修改
+        //如果该mesh地址的数据已经存在，就直接修改
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr)
             db.id = existList[0].id
-        }
+
         DaoSessionInstance.getInstance().dbGatewayDao.insertOrReplace(db)
 
         //不是从服务器下载下来的，才需要把变化写入数据变化表
@@ -746,7 +746,7 @@ object DBUtils {
     }
 
     fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
-        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(0)).list()
+        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
 
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改

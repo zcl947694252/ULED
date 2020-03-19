@@ -913,5 +913,7 @@
     <string name="timer_period_set">时间段设置</string>
     <string name="please_select_standing_time">请选择停留时间</string>
     <string name="please_setting_least_one">请至少配置一个时间段的场景</string>
+    <string name="open_gps_tip">为扫描到设备，检测到定位未开启，是否打开定位？</string>
+    <string name="go_open">去打开</string>
 
 </resources>

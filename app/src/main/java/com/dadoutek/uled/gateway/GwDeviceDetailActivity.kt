@@ -58,7 +58,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = DBUtils.getAllGateWay()
     private var inflater: LayoutInflater? = null
-    private var currentDeviceData: DbGateway? = null
+    private var dbGw: DbGateway? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
     private var acitivityIsAlive = true
@@ -368,7 +368,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-        currentDeviceData = gateWayDataList?.get(position)
+        dbGw = gateWayDataList?.get(position)
         positionCurrent = position
         when {
             view.id == R.id.tv_setting -> {
@@ -381,7 +381,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                             autoConnect()
                         } else {
                             var intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-                            intent.putExtra("data", currentDeviceData)
+                            intent.putExtra("data", dbGw)
                             startActivity(intent)
                         }
                     }

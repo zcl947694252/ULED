@@ -18,9 +18,7 @@ import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -77,8 +75,12 @@ class GwEventListActivity : TelinkBaseActivity() {
         dbGw = DBUtils.getGatewayByID(dbGw!!.id)
         if (!TextUtils.isEmpty(dbGw!!.tags)) {
             list.clear()
-            val toList = GsonUtil.stringToList(dbGw!!.tags, GwTagBean::class.java)
-            list.addAll(toList)
+            val tagList =if (dbGw?.type==0)
+                dbGw!!.tags
+             else
+                dbGw!!.timePeriodTags
+
+            list.addAll(GsonUtil.stringToList(tagList, GwTagBean::class.java))
             adapter.notifyDataSetChanged()
         }
     }
@@ -105,7 +107,11 @@ class GwEventListActivity : TelinkBaseActivity() {
                 event_timer_mode.setTextColor(getColor(R.color.gray9))
                 event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
             }
-            val tags = dbGw?.tags
+            val tags = if (dbGw?.type == 0) //定时
+                dbGw?.tags
+            else
+                dbGw?.timePeriodTags
+
             if (tags != null)
                 list.addAll(GsonUtil.stringToList(tags, GwTagBean::class.java))
             adapter.notifyDataSetChanged()
@@ -115,18 +121,27 @@ class GwEventListActivity : TelinkBaseActivity() {
                 R.id.item_event_ly -> {
                     val intent = Intent(this, GwConfigTagActivity::class.java)
                     dbGw?.pos = position
-                    SharedPreferencesHelper.putBoolean(this, Constant.IS_NEW_TAG, false)
-                    dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+                    dbGw?.addTag = 1//不是新的
+                    if (dbGw?.type == 0) //定时
+                        dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+                    else
+                        dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+
                     intent.putExtra("data", dbGw)
                     startActivity(intent)
+                    finish()
                 }
                 R.id.item_event_switch -> {
-                    if ((view as CheckBox).isChecked) {
+                    if ((view as CheckBox).isChecked)
                         list[position].status = 1
-                    } else {
+                    else
                         list[position].status = 0
-                    }
-                    dbGw?.tags = list.toString()
+
+                    if (dbGw?.type == 0) //定时
+                        dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+                    else
+                        dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+
                     DBUtils.saveGateWay(dbGw!!, true)
                 }
             }
@@ -138,7 +153,7 @@ class GwEventListActivity : TelinkBaseActivity() {
             toast(getString(R.string.gate_way_time_max))
         else {
             val intent = Intent(this@GwEventListActivity, GwConfigTagActivity::class.java)
-            SharedPreferencesHelper.putBoolean(this, Constant.IS_NEW_TAG, true)
+            dbGw?.addTag = 0//创建新的
             intent.putExtra("data", dbGw)
             startActivity(intent)
         }

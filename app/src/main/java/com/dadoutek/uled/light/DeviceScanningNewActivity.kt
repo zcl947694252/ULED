@@ -24,7 +24,6 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwEventListActivity
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
@@ -1234,10 +1233,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         val mesh = mApplication!!.mesh
                         if (mAddDeviceType == DeviceType.GATE_WAY) {
                             val intent = Intent(this@DeviceScanningNewActivity, GwEventListActivity::class.java)
-                            val gw = DbGateway()
-                            gw.meshAddr = 1
-                            DBUtils.saveGateWay(gw, false)
-                            intent.putExtra("data",gw)
+
+                           // DBUtils.saveGateWay(gw, false)
+                            DBUtils.getAllGateWay()
+                          //  intent.putExtra("data",gw)
                             startActivity(intent)
                             finish()
                         } else
