@@ -17,7 +17,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.adapter.DeviceDetailGateWayAdapter
+import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -53,8 +53,8 @@ import kotlinx.android.synthetic.main.toolbar.view.*
  * 更新时间   $Date$
  * 更新描述   ${TODO}$
  */
-class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var adaper: DeviceDetailGateWayAdapter? = null
+class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var adaper: GwDeviceItemAdapter? = null
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = DBUtils.getAllGateWay()
     private var inflater: LayoutInflater? = null
@@ -96,12 +96,12 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
 
-        adaper = DeviceDetailGateWayAdapter(R.layout.device_detail_adapter, gateWayDataList, this)
+        adaper = GwDeviceItemAdapter(R.layout.device_detail_adapter, gateWayDataList, this)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
-        for (i in gateWayDataList?.indices!!) {
+        for (i in gateWayDataList.indices)
             gateWayDataList!![i].updateIcon()
-        }
+
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
         create_scene = findViewById(R.id.create_scene)
@@ -329,7 +329,13 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                     INSTALL_GATEWAY -> {
-                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                        if (medressData <= DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                 }
             }
@@ -357,11 +363,11 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun addDevice() {//添加网关
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-        startActivityForResult(intent, 0)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+        startActivity(intent)
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentDeviceData = gateWayDataList?.get(position)
         positionCurrent = position
         when {
@@ -374,7 +380,7 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             autoConnect()
                         } else {
-                            var intent = Intent(this@GateWayDeviceDetailActivity, GateWayEventListActivity::class.java)
+                            var intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
                             intent.putExtra("data", currentDeviceData)
                             startActivity(intent)
                         }
@@ -393,12 +399,12 @@ class GateWayDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             toolbar!!.tv_function1.visibility = View.VISIBLE
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
-            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.visibility = View.GONE
+            toolbar.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
 
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+
+            gateWayDataList.addAll(allDeviceData)
         } else {
             recycleView.visibility = View.GONE
             no_device_relativeLayout.visibility = View.VISIBLE

@@ -9,6 +9,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -24,12 +26,12 @@ class GwSelectStandingTimeActivity : BaseActivity() {
 
     private val numPicker: View
         get() {
-           var picker = NumberPicker(this)
+            var picker = NumberPicker(this)
             picker.let {
                 it.setBackgroundColor(this.resources.getColor(R.color.white))
                 it.setDividerConfig(null)
                 it.setTextColor(this.resources.getColor(R.color.blue_text))
-                it.setRange(1,59)
+                it.setRange(1, 59)
                 it.setTextSize(25)
                 it.setOffset(3)
                 it.setOnWheelListener(NumberPicker.OnWheelListener { index, item ->
@@ -53,15 +55,19 @@ class GwSelectStandingTimeActivity : BaseActivity() {
         toolbar_t_center.text = getString(R.string.standing_time)
         toolbar_t_cancel.setOnClickListener { finish() }
         toolbar_t_confim.setOnClickListener {
-            val intent = Intent().putExtra("data", standingTime)
-            setResult(Activity.RESULT_OK,intent)
-            finish()
+            GlobalScope.launch {
+                if (standingTime == 0)
+                    kotlinx.coroutines.delay(1000)
+                val intent = Intent().putExtra("data", standingTime)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            }
+
+
         }
     }
 
     override fun setLayoutID(): Int {
-        return  R.layout.activity_select_standing_time
+        return R.layout.activity_select_standing_time
     }
-
-
 }

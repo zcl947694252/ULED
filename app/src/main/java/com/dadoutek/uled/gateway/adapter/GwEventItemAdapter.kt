@@ -3,7 +3,7 @@ package com.dadoutek.uled.gateway.adapter
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.gateway.bean.GatewayTagBean
+import com.dadoutek.uled.gateway.bean.GwTagBean
 
 
 /**
@@ -15,8 +15,8 @@ import com.dadoutek.uled.gateway.bean.GatewayTagBean
  * 更新时间   $
  * 更新描述
  */
-class EventItemAdapter(resId: Int, data: MutableList<GatewayTagBean>) : BaseQuickAdapter<GatewayTagBean, BaseViewHolder>(resId, data) {
-    override fun convert(helper: BaseViewHolder?, item: GatewayTagBean) {
+class GwEventItemAdapter(resId: Int, data: MutableList<GwTagBean>) : BaseQuickAdapter<GwTagBean, BaseViewHolder>(resId, data) {
+    override fun convert(helper: BaseViewHolder?, item: GwTagBean) {
 
         helper?.addOnClickListener(R.id.item_event_ly)
                 ?.addOnClickListener(R.id.item_event_switch)

@@ -911,5 +911,7 @@
     <string name="have_time_task">该时间段已存在响应任务,请选择其他时间</string>
     <string name="please_chose_right_time">开始时间不能大于结束时间,请重新选择</string>
     <string name="timer_period_set">时间段设置</string>
+    <string name="please_select_standing_time">请选择停留时间</string>
+    <string name="please_setting_least_one">请至少配置一个时间段的场景</string>
 
 </resources>

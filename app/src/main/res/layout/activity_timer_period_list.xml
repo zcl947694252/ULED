@@ -4,6 +4,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <include layout="@layout/toolbar" />
-    <include layout="@layout/template_recycleview"/>
+    <include layout="@layout/template_top_three" />
+
+    <include
+            layout="@layout/template_recycleview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 </LinearLayout>

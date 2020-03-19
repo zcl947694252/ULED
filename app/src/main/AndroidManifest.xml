@@ -73,29 +73,29 @@
                 android:enabled="true" />
 
         <activity
-                android:name=".gateway.TimerPeriodListActivity"
+                android:name=".gateway.GwTimerPeriodListActivity"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".gateway.GwSelectStandingTimeActivity"
                 android:screenOrientation="portrait" />
 
         <activity
-                android:name=".gateway.GateWayDeviceDetailActivity"
+                android:name=".gateway.GwDeviceDetailActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GatewayConfigActivity"
+                android:name=".gateway.GwConfigTagActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GatewayChoseTimeActivity"
+                android:name=".gateway.GwChoseTimeActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GatewayChoseTimesActivity"
+                android:name=".gateway.GwChoseTimePeriodActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GatewayModeChoseActivity"
+                android:name=".gateway.GwChoseModeActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GateWayEventListActivity"
+                android:name=".gateway.GwEventListActivity"
                 android:screenOrientation="portrait" />
 
         <activity

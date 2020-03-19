@@ -3,6 +3,8 @@ package com.dadoutek.uled.gateway.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/12 10:21
@@ -12,7 +14,7 @@ import android.os.Parcelable;
  * 更新时间   $
  * 更新描述
  */
-public class GatewayTasksBean implements Parcelable {
+public class GwTasksBean implements Parcelable {
     private int index;//循环模式下时间段下标
     private int stateTime;//停留时间
     private long sceneId;//场景id
@@ -23,13 +25,13 @@ public class GatewayTasksBean implements Parcelable {
     private int startMins;
     private int endMins;
     private int selectPos;//本地使用
-    private String timingPeriods;//时间段list
+    private ArrayList<GwTimePeriodsBean> timingPeriods;//时间段list
 
-    public GatewayTasksBean(int index) {
+    public GwTasksBean(int index) {
         this.index = index;
     }
 
-    protected GatewayTasksBean(Parcel in) {
+    protected GwTasksBean(Parcel in) {
         index = in.readInt();
         stateTime = in.readInt();
         sceneId = in.readLong();
@@ -39,17 +41,19 @@ public class GatewayTasksBean implements Parcelable {
         endHour = in.readInt();
         startMins = in.readInt();
         endMins = in.readInt();
+        selectPos = in.readInt();
+        timingPeriods = in.createTypedArrayList(GwTimePeriodsBean.CREATOR);
     }
 
-    public static final Creator<GatewayTasksBean> CREATOR = new Creator<GatewayTasksBean>() {
+    public static final Creator<GwTasksBean> CREATOR = new Creator<GwTasksBean>() {
         @Override
-        public GatewayTasksBean createFromParcel(Parcel in) {
-            return new GatewayTasksBean(in);
+        public GwTasksBean createFromParcel(Parcel in) {
+            return new GwTasksBean(in);
         }
 
         @Override
-        public GatewayTasksBean[] newArray(int size) {
-            return new GatewayTasksBean[size];
+        public GwTasksBean[] newArray(int size) {
+            return new GwTasksBean[size];
         }
     };
 
@@ -137,18 +141,18 @@ public class GatewayTasksBean implements Parcelable {
         this.selectPos = selectPos;
     }
 
-    public String getTimingPeriods() {
+    public ArrayList<GwTimePeriodsBean> getTimingPeriods() {
         return timingPeriods;
     }
 
-    public void setTimingPeriods(String timingPeriods) {
+    public void setTimingPeriods(ArrayList<GwTimePeriodsBean> timingPeriods) {
         this.timingPeriods = timingPeriods;
     }
 
 
     @Override
     public String toString() {
-        return "GatewayTasksBean{" +
+        return "GwTasksBean{" +
                 "index=" + index +
                 ", stateTime=" + stateTime +
                 ", sceneId=" + sceneId +
@@ -179,6 +183,7 @@ public class GatewayTasksBean implements Parcelable {
         dest.writeInt(endHour);
         dest.writeInt(startMins);
         dest.writeInt(endMins);
+        dest.writeInt(selectPos);
+        dest.writeTypedList(timingPeriods);
     }
-
 }

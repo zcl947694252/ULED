@@ -19,7 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.util.StringUtils
 
- class DeviceDetailGateWayAdapter(layoutResId: Int, data: MutableList<DbGateway>, internal var context: Context) : BaseQuickAdapter<DbGateway, BaseViewHolder>(layoutResId, data) {
+ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, internal var context: Context) : BaseQuickAdapter<DbGateway, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, data: DbGateway) {
         if (data != null) {

@@ -39,7 +39,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
-import com.dadoutek.uled.gateway.GateWayEventListActivity
+import com.dadoutek.uled.gateway.GwEventListActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
@@ -168,13 +168,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-             val intent = Intent(this@MainActivity, GateWayEventListActivity::class.java)
+             val intent = Intent(this@MainActivity, GwEventListActivity::class.java)
             val dbGateway = DbGateway()
             dbGateway.name = "jsj"
             DBUtils.saveGateWay(dbGateway,false)
             intent.putExtra("data", dbGateway)
             startActivity(intent)
-             //startActivity(Intent(this@MainActivity, GatewayConfigActivity::class.java))
+             //startActivity(Intent(this@MainActivity, GwConfigTagActivity::class.java))
         }
         initBottomNavigation()
 

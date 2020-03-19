@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.gateway.bean.GatewayTasksBean;
+import com.dadoutek.uled.gateway.bean.GwTasksBean;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.switches.SelectSceneListActivity;
@@ -32,7 +32,7 @@ import cn.qqtheme.framework.picker.TimePicker;
  * 设置网关时间与场景传递进配config界面
  * task任务
  */
-public class GatewayChoseTimeActivity extends TelinkBaseActivity {
+public class GwChoseTimeActivity extends TelinkBaseActivity {
     private TextView toolbarTv;
     private Unbinder unbinder;
     private TextView toolbarCancel;
@@ -45,7 +45,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
     private int hourTime = 03;
     private int minuteTime = 15;
     private DbScene scene;
-    private GatewayTasksBean tasksBean;
+    private GwTasksBean tasksBean;
     ArrayList<Parcelable> data;
 
     @Override
@@ -93,7 +93,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         Boolean isHave = false;
         if (data!=null)
         for (int i = 0; i < data.size(); i++) {
-            GatewayTasksBean tag = (GatewayTasksBean) data.get(i);
+            GwTasksBean tag = (GwTasksBean) data.get(i);
             if (tag.getStartHour() == hourTime && tag.getStartMins() == minuteTime) {
                 isHave = true;
             } else {
@@ -110,9 +110,9 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
         data = intent.getParcelableArrayListExtra("data");
 
         if (data != null && !TextUtils.isEmpty(data.toString())) {//编辑老的task
-            GatewayTasksBean tagBean = (GatewayTasksBean) data.get(0);
+            GwTasksBean tagBean = (GwTasksBean) data.get(0);
             int pos = tagBean.getSelectPos();//拿到点击pos
-            tasksBean = (GatewayTasksBean) data.get(pos);
+            tasksBean = (GwTasksBean) data.get(pos);
             hourTime = tasksBean.getStartHour();
             minuteTime = tasksBean.getStartMins();
             timerScene.setText(tasksBean.getSenceName());
@@ -120,7 +120,7 @@ public class GatewayChoseTimeActivity extends TelinkBaseActivity {
             scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
         } else {//新创建task 获取传过来的index值
            int index =  intent.getIntExtra("index",0);
-            tasksBean = new GatewayTasksBean(index);
+            tasksBean = new GwTasksBean(index);
             tasksBean.setCreateNew(true);
         }
         wheelPickerLy.addView(getTimePicker());

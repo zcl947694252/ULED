@@ -13,33 +13,44 @@ import android.os.Parcelable
  * 更新时间   $
  * 更新描述
  */
-//private  class GwTimePeriodsBean(private val hour: Int, private val minute: Int)
-internal open class GwTimePeriodsBean : Parcelable {
-     var hour: Int = 0
-     var minute: Int = 0
+//private  class GwTimePeriodsBean(private val startTime: Int, private val endTime: Int)
+open class GwTimePeriodsBean() : Parcelable {
+     var index: Int = 0
+     var startTime: Int = 0
+     var endTime: Int = 0
      var sceneId: Long = 0
      var sceneName: String = ""
 
-    constructor(hour: Int, minute: Int, sceneName:String) {
-        this.hour = hour
-        this.minute = minute
+    constructor(parcel: Parcel) : this() {
+        index = parcel.readInt()
+        startTime = parcel.readInt()
+        endTime = parcel.readInt()
+        sceneId = parcel.readLong()
+        sceneName = parcel.readString()
+    }
+
+
+    constructor(index: Int,startTime: Int, endTime: Int,sceneName:String) : this() {
+        this.index = index
+        this.startTime = startTime
+        this.endTime = endTime
         this.sceneName = sceneName
     }
 
-    protected constructor(`in`: Parcel) {
-        hour = `in`.readInt()
-        minute = `in`.readInt()
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(index)
+        parcel.writeInt(startTime)
+        parcel.writeInt(endTime)
+        parcel.writeLong(sceneId)
+        parcel.writeString(sceneName)
     }
-
-
 
     override fun describeContents(): Int {
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(hour)
-        dest.writeInt(minute)
+    override fun toString(): String {
+        return "GwTimePeriodsBean(index=$index, startTime=$startTime, endTime=$endTime, sceneId=$sceneId, sceneName='$sceneName')"
     }
 
     companion object CREATOR : Parcelable.Creator<GwTimePeriodsBean> {
@@ -51,4 +62,6 @@ internal open class GwTimePeriodsBean : Parcelable {
             return arrayOfNulls(size)
         }
     }
+
+
 }

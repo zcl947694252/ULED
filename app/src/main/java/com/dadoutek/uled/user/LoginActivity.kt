@@ -174,6 +174,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 2)
                     }
                 }
+                //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             }
         }
         btn_login.setOnClickListener(this)

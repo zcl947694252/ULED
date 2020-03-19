@@ -16,10 +16,10 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.adapter.GatewayTimeItemAdapter
+import com.dadoutek.uled.gateway.adapter.GwTaskItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.gateway.bean.GatewayTagBean
-import com.dadoutek.uled.gateway.bean.GatewayTasksBean
+import com.dadoutek.uled.gateway.bean.GwTagBean
+import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -37,25 +37,23 @@ import kotlin.collections.ArrayList
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/3 17:22
- * 描述
+ * 描述  此页只更改taglist内部的一个tag
  *
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
-class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dbGateway: DbGateway? = null
-    private var tagBeans: ArrayList<GatewayTagBean> = arrayListOf()
+    private var tagBeans: ArrayList<GwTagBean> = arrayListOf()
     private var dbId: Long = 99999
-    private var tagBean: GatewayTagBean? = null
-    private var modeIsTimer: Boolean = true
+    private var tagBean: GwTagBean? = null
     private val requestModeCode: Int = 1000//选择日期
     private val requestTimeCode: Int = 2000//时间段模式
     private var isCanEdite = false
     private var maxId = 0L
-
-    val listTask = ArrayList<GatewayTasksBean>()
-    private val adapter = GatewayTimeItemAdapter(R.layout.item_gw_time_scene, listTask)
+    val listTask = ArrayList<GwTasksBean>()
+    private val adapter = GwTaskItemAdapter(R.layout.item_gw_time_scene, listTask)
 
     /**
      * 默认重复设置为仅一次
@@ -78,7 +76,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getMaxTagId() {
-        for (tag in tagBeans!!) {
+        for (tag in tagBeans) {
             if (tag.tagId > maxId)
                 maxId = tag.tagId
         }
@@ -88,29 +86,28 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         //創建新tag任务
         dbGateway = intent.getParcelableExtra<DbGateway>("data")
         if (dbGateway != null) {//拿到有效数据
-            modeIsTimer = dbGateway?.type == 0//判断是不是timer
 
             if (!TextUtils.isEmpty(dbGateway?.tags)) {//不要移动 此处有新tag和老tag需要的东西
                 tagBeans.clear()
-                tagBeans.addAll(GsonUtil.stringToList(dbGateway?.tags, GatewayTagBean::class.java))//获取该设备tag列表
+                tagBeans.addAll(GsonUtil.stringToList(dbGateway?.tags, GwTagBean::class.java))//获取该设备tag列表
                 if (tagBeans.size > 0)
                     getMaxTagId()//更新maxid
             }
 
-            tagBean = if ( SharedPreferencesHelper.getBoolean(this, Constant.IS_NEW_TAG,false)) {//是否是添加新tag
+            tagBean = if (SharedPreferencesHelper.getBoolean(this, Constant.IS_NEW_TAG, false)) {//是否是添加新tag
                 //创建新的tag
-                GatewayTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
+                GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             } else {//编辑已有tag
-                if (tagBeans.size>0)
-                tagBeans[dbGateway?.pos ?: 0]
+                if (tagBeans.size > 0)
+                    tagBeans[dbGateway?.pos ?: 0]
                 else
-                    GatewayTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
+                    GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             }
+            tagBean?.setIsTimer(dbGateway?.type == 0) //判断是不是timer
         } else {
             ToastUtils.showShort(getString(R.string.invalid_data))
             finish()
         }
-
         listTask.clear()
         val tasks = tagBean!!.tasks
         if (tasks != null)
@@ -120,7 +117,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         gate_way_lable.setText(tagBean?.tagName)
         gate_way_repete_mode.text = tagBean?.weekStr
 
-        if (modeIsTimer)
+        if (tagBean?.getIsTimer() != false)
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
         else
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
@@ -129,7 +126,7 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
-                val intent = Intent(this@GatewayConfigActivity, GatewayModeChoseActivity::class.java)
+                val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
                 startActivityForResult(intent, requestModeCode)
             }
             R.id.gate_way_edite -> {//是否编辑
@@ -142,17 +139,17 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     val toJson = GsonUtils.toJson(listTask)//获取tasks字符串
                     LogUtils.v("zcl网关---$toJson")
                     tagBean?.tagName = gate_way_lable.text.toString()
+                    tagBean?.weekStr = gate_way_repete_mode.text.toString()
                     tagBean?.tasks = listTask
 
                     //因为是新创建的对象所以直接创建list添加 如果不是需要查看是都有tags
                     if (tagBeans.size == 0) {
                         it.tags = GsonUtils.toJson(mutableListOf(tagBean))
                     } else {
-                        var removeTag: GatewayTagBean? = null
-                        for (tag in tagBeans) {
+                        var removeTag: GwTagBean? = null
+                        for (tag in tagBeans)
                             if (tag.tagId == tagBean?.tagId)
                                 removeTag = tag
-                        }
                         tagBeans.remove(removeTag)
                         tagBeans.add(tagBean!!)
                         it.tags = GsonUtils.toJson(tagBeans)
@@ -222,9 +219,16 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         })
         adapter.setOnItemClickListener { _, _, position ->
-            val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java)
-            listTask[0].selectPos = position//默认使用第一个记录选中的pos
-            intent.putExtra("data", listTask)
+            val intent: Intent
+            if (tagBean?.getIsTimer() == true) {
+                intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
+                listTask[0].selectPos = position//默认使用第一个记录选中的pos
+                intent.putExtra("data", listTask)
+            } else {
+                intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
+                //传入时间段数据 重新配置时间段的场景值
+                intent.putExtra("data", listTask[position])
+            }
             startActivityForResult(intent, requestTimeCode)
         }
         add_group_btn?.setOnClickListener {
@@ -233,13 +237,13 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             when {
                 listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
                 index == 0 -> toast(getString(R.string.gate_way_time_max))
-                modeIsTimer -> {//跳转时间选择界面
-                    val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimeActivity::class.java)
+                tagBean?.getIsTimer() == true -> {//跳转时间选择界面
+                    val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
                     intent.putExtra("index", index)//传入已有时间防止重复
                     startActivityForResult(intent, requestTimeCode)
                 }
-                !modeIsTimer -> {//跳转时间段选择界面
-                    val intent = Intent(this@GatewayConfigActivity, GatewayChoseTimesActivity::class.java)
+                tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
+                    val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
                     intent.putExtra("index", index)//传入已有时间防止重复
                     startActivityForResult(intent, requestTimeCode)
                 }
@@ -288,9 +292,8 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     tagBean?.weekStr = mode
                     tagBean?.week = getWeek(mode)
                 }
-
-            } else if (requestCode == requestTimeCode) {//获取task
-                val bean = data?.getParcelableExtra<GatewayTasksBean>("data")
+            } else if (requestCode == requestTimeCode) {//获取定时和时间段的task
+                val bean = data?.getParcelableExtra<GwTasksBean>("data")
                 bean?.let {
                     if (bean.isCreateNew) {
                         listTask.add(bean)
@@ -340,8 +343,8 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             gate_way_lable.requestFocus()
 
             gate_way_lable.setSelection(gate_way_lable.text.length)//将光标移至文字末尾
-            val im =gate_way_lable.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            im.showSoftInput(gate_way_lable,0)
+            val im = gate_way_lable.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            im.showSoftInput(gate_way_lable, 0)
         } else {
             gate_way_lable.isFocusableInTouchMode = false//不可编辑
             gate_way_lable.isClickable = false//不可点击
@@ -349,8 +352,8 @@ class GatewayConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             gate_way_lable.isEnabled = false
             gate_way_lable.background = null
             val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            if (currentFocus!=null)
-            im.hideSoftInputFromWindow(currentFocus.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+            if (currentFocus != null)
+                im.hideSoftInputFromWindow(currentFocus.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }
 

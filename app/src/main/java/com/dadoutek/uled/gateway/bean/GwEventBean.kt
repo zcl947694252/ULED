@@ -10,4 +10,4 @@ package com.dadoutek.uled.gateway.bean
  * 更新时间   $Date$
  * 更新描述   ${TODO}$
  */
-class GateWayEventBean (var lable:String,var mode:Int = 0,var repetion:Int)
+class GwEventBean (var lable:String, var mode:Int = 0, var repetion:Int)

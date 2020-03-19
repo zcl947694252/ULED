@@ -23,6 +23,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.GwEventListActivity
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
@@ -97,7 +99,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var inflater: LayoutInflater? = null
     private var grouping: Boolean = false
     internal var isFirtst = true
-    private  var lastMyRegion = lastRegion
+    private var lastMyRegion = lastRegion
     //标记登录状态
     private lateinit var groupsRecyclerViewAdapter: GroupsRecyclerViewAdapter
     private var groups: MutableList<DbGroup> = ArrayList()
@@ -147,24 +149,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         startScan()
         // startNewScan()
 
-    }
-
-    private fun startNewScan() {
-        TelinkLightService.Instance()?.idleMode(true)
-        startAnimation()
-        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL)
-        mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe({
-                    bestRssiDevice = it
-                    LogUtils.d("onLogin")
-                    onLogin()
-                }, {
-                    scanFail()
-                    LogUtils.d(it)
-                })
     }
 
     private val currentGroup: DbGroup?
@@ -1224,12 +1208,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     val mesh = mApplication!!.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
-                    if (!AppUtils.isExynosSoc) {
+                    if (!AppUtils.isExynosSoc)
                         if (mAddDeviceType == DeviceType.NORMAL_SWITCH)
                             params.setScanFilters(getSwitchFilters())
                         else
                             params.setScanFilters(getFilters())
-                    }
+
                     params.setMeshName(mesh.factoryName)
                     params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
@@ -1245,10 +1229,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    if (bestRssiDevice != null){
+                    if (bestRssiDevice != null) {
                         val meshAddress = mMeshAddressGenerator.meshAddress
                         val mesh = mApplication!!.mesh
-                        updateMesh(bestRssiDevice!!, meshAddress, mesh)
+                        if (mAddDeviceType == DeviceType.GATE_WAY) {
+                            val intent = Intent(this@DeviceScanningNewActivity, GwEventListActivity::class.java)
+                            val gw = DbGateway()
+                            gw.meshAddr = 1
+                            DBUtils.saveGateWay(gw, false)
+                            intent.putExtra("data",gw)
+                            startActivity(intent)
+                            finish()
+                        } else
+                            updateMesh(bestRssiDevice!!, meshAddress, mesh)
+
                     }
                 }
 
@@ -1323,10 +1317,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun onLeScan(event: LeScanEvent) {
         val deviceInfo = event.args
         LogUtils.v("zcl獲得數據evnet$deviceInfo")
-          if (deviceInfo.productUUID == mAddDeviceType && deviceInfo.rssi < MAX_RSSI)
+        if (deviceInfo.productUUID == mAddDeviceType && deviceInfo.rssi < MAX_RSSI)
             if (bestRssiDevice == null || deviceInfo.rssi < bestRssiDevice!!.rssi)
                 bestRssiDevice = deviceInfo
-            connectBestRssiDevice()
+        connectBestRssiDevice()
     }
 
 
@@ -1385,14 +1379,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 mUpdateMeshRetryCount = 0
                 mConnectRetryCount = 0
                 this.startScan()    //继续开始扫描设备
-
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 retryScan()
             }
 
             LightAdapter.STATUS_LOGIN -> {
-
             }
 
         }
@@ -1415,13 +1407,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             startGrouping()
         } else {
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-            DBUtils.saveRegion(lastMyRegion,true)
-            var  meshAddress = 0
+            DBUtils.saveRegion(lastMyRegion, true)
+            var meshAddress = 0
             for (item in mAddedDevices) {
-                    val deviceInfo = item.deviceInfo
-                if (meshAddress==0)
+                val deviceInfo = item.deviceInfo
+                if (meshAddress == 0)
                     meshAddress = deviceInfo.meshAddress
-                 else if (meshAddress<item.deviceInfo.meshAddress)
+                else if (meshAddress < item.deviceInfo.meshAddress)
                     meshAddress = deviceInfo.meshAddress
 
                 mAddedDevicesInfos.add(item.deviceInfo)

@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新时间   $
  * 更新描述
  */
-class GatewayModeChoseActivity : TelinkBaseActivity() {
+class GwChoseModeActivity : TelinkBaseActivity() {
 
     private var list: MutableList<WeekBean>? = null
     private var adapter: WeeksItemAdapter? = null

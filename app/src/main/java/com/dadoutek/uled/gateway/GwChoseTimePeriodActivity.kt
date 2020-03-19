@@ -13,7 +13,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.bean.GatewayTasksBean
+import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
@@ -23,36 +23,25 @@ import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
 
 /**
- * 设置网关时间与场景传递进配config界面
+ * 设置网关 时间段时间与场景传递进配config界面
  */
-class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
+class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
 
-    private var standingNum: Int = 1 //停留时间
+    private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
-    private var startTimeNum: Int = 0
-    private var endTimeNum: Int = 0
-    private val requestCodes = 1000
-    private val requestStandingCodes = 1001
-    private val requestTimerPeriodCodes = 1002
+    private val requestStandingCode = 1001
+    private val requestTimerPeriodCode = 1002
     private var startHourTime = 7
     private var startMinuteTime = 40
+    private var startTimeNum: Int = startHourTime * 60 + startMinuteTime
     private var endHourTime = 8
     private var endMinuteTime = 30
+    private var endTimeNum: Int = endHourTime * 60 + endMinuteTime
     private var scene: DbScene? = null
-    private var tasksBean: GatewayTasksBean? = null
+    private var tasksBean: GwTasksBean? = null
     internal var data: ArrayList<Parcelable>? = null
     private var selectStart = true
     private var timesList = ArrayList<GwTimePeriodsBean>()
-
-    private val isTimeHave: Boolean?
-        get() {
-            var isHave: Boolean? = false
-            for (i in data!!.indices) {
-                val tag = data!![i] as GatewayTasksBean
-                isHave = tag.startHour == startHourTime && tag.startMins == startMinuteTime
-            }
-            return isHave
-        }
 
     private val timePicker: View
         get() {
@@ -124,22 +113,32 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.toolbar_t_confim -> {
-                if (startTimeNum>=endTimeNum)
+                if (startTimeNum >= endTimeNum)
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
                 else {
-                    val intent = Intent(this@GatewayChoseTimesActivity, TimerPeriodListActivity::class.java)
-                    intent.putParcelableArrayListExtra("data",timesList)
-                    startActivityForResult(intent,requestTimerPeriodCodes)
+                    if (standingNum <= 0) {
+                        ToastUtils.showShort(getString(R.string.please_select_standing_time))
+                        return
+                    }
+                    getTimerPeriods()//生成时间段
+
+                    tasksBean?.startHour = startHourTime
+                    tasksBean?.startMins = startMinuteTime
+                    tasksBean?.endHour = endHourTime
+                    tasksBean?.endMins = endMinuteTime
+                    tasksBean?.timingPeriods = timesList
+
+                    val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
+                    intent.putExtra("data",tasksBean)
+                    startActivityForResult(intent, requestTimerPeriodCode)
                 }
             }
             R.id.toolbar_t_cancel -> finish()
             R.id.gw_times_standing_time_ly -> {
-
                 if (endTimeNum > startTimeNum)
-                    startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCodes)
+                    startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCode)
                 else
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
-                //startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
             }
 
             R.id.startTime -> {
@@ -173,7 +172,7 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
         val index = intent.getIntExtra("index", 100)
 
         if (data != null && !TextUtils.isEmpty(data!!.toString()) && pos != 9999) {//编辑老的task
-            tasksBean = data!![pos] as GatewayTasksBean
+            tasksBean = data!![pos] as GwTasksBean
             startHourTime = tasksBean!!.startHour
             startMinuteTime = tasksBean!!.startMins
             setStartTime()
@@ -187,7 +186,7 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
             scene = DBUtils.getSceneByID(tasksBean!!.sceneId)
         } else {//新创建task
             if (index != 100) {
-                tasksBean = GatewayTasksBean(index)
+                tasksBean = GwTasksBean(index)
                 tasksBean!!.isCreateNew = true
             } else {
                 ToastUtils.showShort(getString(R.string.invalid_data))
@@ -222,22 +221,36 @@ class GatewayChoseTimesActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {//获取场景返回值
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == requestCodes) {
-                val par = data!!.getParcelableExtra<Parcelable>("data")
-                scene = par as DbScene
-                LogUtils.v("zcl获取场景信息scene" + scene!!.toString())
-                item_gw_timer_scene!!.text = scene!!.name
-            } else if (requestCode == requestStandingCodes) {
+            if (requestCode == requestTimerPeriodCode) {//获取时间段bean
+                val list = data!!.getParcelableArrayListExtra<GwTimePeriodsBean>("data")
+                tasksBean?.timingPeriods = list
+                intent.putExtra("data", tasksBean)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            } else if (requestCode == requestStandingCode) {//获取停留时间
                 standingNum = data!!.getIntExtra("data", 0)
                 gw_times_standing_time.text = standingNum.toString()
-                   if (standingNum != 0) {
-                       timesList.clear()
-                       for (time in startTimeNum..endTimeNum step standingNum) {
-                           LogUtils.v("zcl----时间段-------$time-------$standingNum")
-                           timesList.add(GwTimePeriodsBean(time / 60, time % 60,getString(R.string.select_scene)))
-                       }
+            }
+        }
+    }
 
-                   }
+    private fun getTimerPeriods() {
+        if (standingNum != 0) {
+            timesList.clear()
+            var index = 0
+            for (time in startTimeNum..endTimeNum step standingNum) {
+                val i = endTimeNum - time
+                index += 1
+                LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
+                if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
+                    var bean = GwTimePeriodsBean(index, time, endTimeNum, getString(R.string.select_scene))
+                    timesList.add(bean)
+                    break
+                } else if (endTimeNum - time >= standingNum) {
+                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.select_scene))
+                    bean.sceneName = getString(R.string.select_scene)
+                    timesList.add(bean)
+                }
             }
         }
     }

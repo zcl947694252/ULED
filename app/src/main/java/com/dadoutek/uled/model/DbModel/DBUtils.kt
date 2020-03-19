@@ -723,9 +723,9 @@ object DBUtils {
         }
     }
     fun saveGateWay(db: DbGateway, isFromServer: Boolean){
-        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.MeshAddr.eq(0)).list()
+        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.Id.eq(0)).list()
 
-        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
@@ -1372,5 +1372,12 @@ object DBUtils {
         return if (sensorDbList.size > 0) {
             sensorDbList[0]
         } else null
+    }
+
+     fun timeStr(time: Int): String {
+        return if (time < 10)
+            "0$time"
+        else
+            time.toString()
     }
 }

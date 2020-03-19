@@ -19,7 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
 import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.device.model.DeviceItem
-import com.dadoutek.uled.gateway.GateWayDeviceDetailActivity
+import com.dadoutek.uled.gateway.GwDeviceDetailActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
@@ -240,7 +240,7 @@ class DeviceFragment : BaseFragment() {
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
             Constant.INSTALL_GATEWAY -> {
-                intent = Intent(activity, GateWayDeviceDetailActivity::class.java)
+                intent = Intent(activity, GwDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }
         }
