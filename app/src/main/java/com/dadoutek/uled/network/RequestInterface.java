@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network;
 
+import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
@@ -552,9 +553,9 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("switch/8ks/add/{swid}")
     Observable<Response<String>> addSwitch8k(@Path("swid") Long swid,
-                                                    @Field("firmwareVersion") String firmwareVersion, @Field("meshAddr") int meshAddr, @Field("name") String name,
-                                                    @Field("macAddr") String macAddr, @Field("productUUID") int productUUID, @Field("index") int index,
-                                                    @Field("keys") String keys);
+                                             @Field("firmwareVersion") String firmwareVersion, @Field("meshAddr") int meshAddr, @Field("name") String name,
+                                             @Field("macAddr") String macAddr, @Field("productUUID") int productUUID, @Field("index") int index,
+                                             @Field("keys") String keys);
 
     /**
      * 7、批量添加/更新八键开关（new）  POST
@@ -590,9 +591,60 @@ public interface RequestInterface {
      * idList	是	list	id数组
      * 传参示例
      * {
-     *     "idList": [1, 2, 3]
+     * "idList": [1, 2, 3]
      * }
      */
     @HTTP(method = "DELETE", path = "switch/8ks/remove", hasBody = true)
     Observable<Response<String>> removeSwitch8kList(@Body BatchRemove8kBody body);
+
+    /**
+     * 6、添加网关（new）
+     * 简要描述：添加一条网关信息
+     *https://dev.dadoutek.com/xxxx/gateway/add/{gatewayId}
+     * 请求方式： POST
+     * 参数：
+     * meshAddr	是	int	mesh地址
+     * name	否	string	网关名，后台默认未命名
+     * type	否	byte/number	网关类型，后台默认0
+     * macAddr	是	string	设备mac地址
+     * productUUID	是	int	设备productUUID
+     * version	否	string	版本号，后台默认空串
+     * tags	是	string	json格式字符串
+     */
+    @POST("gateway/add/{gatewayId}")
+    Observable<Response<String>> addGw(@Path("gatewayId") long gwId, @Body DbGateway dbGateway);
+
+    /**
+     * 7、网关列表（new）查询网关列表
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/list
+     * 正式服 smartlight_java 替换xxxx
+     * 测试服 smartlight_test 替换xxxx
+     * 请求方式： GET
+     */
+    @GET("gateway/list")
+    Observable<Response<List<DbGateway>>> getGWList();
+
+    /**
+     * 8、删除网关（new）删除多条网关信息
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/add
+     * 正式服 smartlight_java 替换xxxx
+     * 测试服 smartlight_test 替换xxxx
+     * 请求方式：DELETE
+     * idlist	是	int数组	需要删除的网关id
+     */
+    @HTTP(method = "DELETE", path = "gateway/add", hasBody = true)
+    Observable<Response<String>> deleteGw(@Body GwGattBody body);
+
+    /**
+     * 9、下发标签给网关（new）
+     * 简要描述：添加一条网关信息
+     * https://dev.dadoutek.com/xxxx/mqtt/tag/pub
+     * 请求方式：POST
+     * 参数：
+     * macAddr	是	string	mac地址
+     * cmd	是	int	指令
+     * data	是	string	data
+     */
+    @POST("mqtt/tag/pub")
+    Observable<Response<String>> sendGwToService(@Body GwGattBody body);
 }

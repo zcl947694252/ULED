@@ -76,6 +76,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
     private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,8 +133,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
                     batchGroup.visibility = View.GONE
                     batchGroup.setOnClickListener {
@@ -355,6 +356,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
@@ -474,6 +479,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    Constant.INSTALL_GATEWAY -> {
+                        if (medressData <= DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))

@@ -24,6 +24,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwEventListActivity
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
@@ -34,8 +35,10 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.VENDOR_ID
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DbModel.DBUtils.lastRegion
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.switches.ConfigCurtainSwitchActivity
@@ -1233,10 +1236,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         val mesh = mApplication!!.mesh
                         if (mAddDeviceType == DeviceType.GATE_WAY) {
                             val intent = Intent(this@DeviceScanningNewActivity, GwEventListActivity::class.java)
+                                TelinkLightService.Instance().connect(bestRssiDevice?.macAddress,10)
+                            //DBUtils.saveGateWay(gw, false)
+                           //intent.putExtra("data",gw)
+                            val dbGw = DbGateway(getGwId())
+                            GwModel.add(dbGw, changeId)?.subscribe(object : NetworkObserver<String?>() {
+                                override fun onNext(t: String) {
+                                    LogUtils.v("zcl-----网关失添成功返回-------------$t")
+                                }
 
-                           // DBUtils.saveGateWay(gw, false)
-                            DBUtils.getAllGateWay()
-                          //  intent.putExtra("data",gw)
+                                override fun onError(e: Throwable) {
+                                    super.onError(e)
+                                    LogUtils.v("zcl-------网关失添加败-----------" + e.message)
+                                }
+                            })
                             startActivity(intent)
                             finish()
                         } else
@@ -1244,7 +1257,31 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
                     }
                 }
+    }
 
+    private fun getGwId(): Long {
+        val list = DBUtils.getAllGateWay()
+        val idList = ArrayList<Int>()
+        for (i in list.indices) {
+            idList.add(list[i].id!!.toInt())
+        }
+
+        var id = 0
+        if (list.size == 0) {
+            id = 1
+        } else {
+            for (i in 1..10000) {
+                if (idList.contains(i)) {
+                    Log.d("gwID", "getGwId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getGwId: bbbbb$id")
+                    break
+                }
+            }
+        }
+        return java.lang.Long.valueOf(id.toLong())
     }
 
     private fun getFilters(): ArrayList<ScanFilter> {

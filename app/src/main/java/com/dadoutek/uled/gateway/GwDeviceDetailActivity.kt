@@ -115,7 +115,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             finish()
         }
         toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
-
     }
 
     private val onClick = View.OnClickListener {
@@ -198,6 +197,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
@@ -228,10 +231,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_GATEWAY -> {
-                installId = INSTALL_GATEWAY
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
         }

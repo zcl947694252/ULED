@@ -41,6 +41,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.gateway.GwEventListActivity
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -74,6 +75,7 @@ import com.telink.bluetooth.event.ServiceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
+import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -169,12 +171,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
             val intent = Intent(this@MainActivity, GwEventListActivity::class.java)
-            var dbGw = DBUtils.getGatewayByID(5)
+            var dbGw = DBUtils.getGatewayByID(5)?: DbGateway(5)
 
-            DBUtils.saveGateWay(dbGw!!, false)
+            DBUtils.saveGateWay(dbGw, true)
             intent.putExtra("data", dbGw)
             startActivity(intent)
-            //startActivity(Intent(this@MainActivity, GwConfigTagActivity::class.java))
         }
         initBottomNavigation()
 
@@ -387,7 +388,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private val dialogOnclick = View.OnClickListener {
-
+        var medressData = 0
+        var allData = DBUtils.allLight
+        var sizeData = DBUtils.allLight.size
+        if (sizeData != 0) {
+            var lightData = allData[sizeData - 1]
+            medressData = lightData.meshAddr
+        }
         when (it.id) {
             R.id.close_install_list -> {
                 installDialog?.dismiss()
@@ -395,19 +402,31 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_CURTAIN -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_SWITCH -> {
                         //intent = Intent(this, DeviceScanningNewActivity::class.java)
@@ -419,9 +438,23 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         startActivity(Intent(this, ScanningSensorActivity::class.java))
                     }
                     INSTALL_CONNECTOR -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+
+                    INSTALL_GATEWAY -> {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                 }
                 installDialog?.dismiss()
@@ -461,11 +494,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val INSTALL_SENSOR = 3
     private val INSTALL_CURTAIN = 4
     private val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
 
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)

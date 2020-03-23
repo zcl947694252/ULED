@@ -43,6 +43,7 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -602,10 +603,15 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
@@ -680,6 +686,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private val dialogOnclick = View.OnClickListener {
+        var medressData = 0
+        var allData = DBUtils.allLight
+        var sizeData = DBUtils.allLight.size
+        if (sizeData != 0) {
+            var lightData = allData[sizeData - 1]
+            medressData = lightData.meshAddr
+        }
 
         when (it.id) {
             R.id.close_install_list -> {
@@ -688,34 +701,58 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_CURTAIN -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_SWITCH -> {
-
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
                         startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     }
-                    INSTALL_SENSOR -> {
-                        startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    }
+                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    Constant.INSTALL_GATEWAY -> {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                 }
-                installDialog?.dismiss()
             }
             R.id.btnBack -> {
                 installDialog?.dismiss()

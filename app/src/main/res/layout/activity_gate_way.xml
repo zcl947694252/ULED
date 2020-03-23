@@ -81,10 +81,7 @@
             android:layout_height="@dimen/dp_10"
             android:background="@color/gray_e" />
 
-    <com.yanzhenjie.recyclerview.SwipeRecyclerView
-            android:id="@+id/swipe_recycleView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+    <include layout="@layout/template_swipe_recycleview" />
 
     <include layout="@layout/template_bottom_add_no_line" />
 </LinearLayout>

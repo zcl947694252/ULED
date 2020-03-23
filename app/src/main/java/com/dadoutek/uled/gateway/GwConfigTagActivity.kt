@@ -23,14 +23,20 @@ import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
+import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 /**
  * 创建者     ZCL
@@ -43,7 +49,7 @@ import kotlin.collections.ArrayList
  */
 class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     private var currentTagStr: String? = null
-    private var dbGateway: DbGateway? = null
+    private var dbGw: DbGateway? = null
     private var tagList: ArrayList<GwTagBean> = arrayListOf()
     private var dbId: Long = 99999
     private var tagBean: GwTagBean? = null
@@ -86,12 +92,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
 
     fun initData() {
         //創建新tag任务
-        dbGateway = intent.getParcelableExtra<DbGateway>("data")
-        if (dbGateway != null) {//拿到有效数据
-            currentTagStr = if (dbGateway?.type == 0) //定时
-                dbGateway?.tags
+        dbGw = intent.getParcelableExtra<DbGateway>("data")
+
+        if (dbGw != null) {//拿到有效数据
+            currentTagStr = if (dbGw?.type == 0) //定时
+                dbGw?.tags
             else
-                dbGateway?.timePeriodTags
+                dbGw?.timePeriodTags
 
             if (!TextUtils.isEmpty(currentTagStr)) {//不要移动 此处有新tag和老tag需要的东西
                 tagList.clear()
@@ -100,16 +107,16 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                     getMaxTagId()//更新maxid
             }
 
-            tagBean = if (dbGateway?.addTag == 0) {//是否是添加新tag
+            tagBean = if (dbGw?.addTag == 0) {//是否是添加新tag
                 //创建新的tag
                 GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             } else {//编辑已有tag
                 if (tagList.size > 0)
-                    tagList[dbGateway?.pos ?: 0]
+                    tagList[dbGw?.pos ?: 0]
                 else
                     GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             }
-            tagBean?.setIsTimer(dbGateway?.type == 0) //判断是不是timer
+            tagBean?.setIsTimer(dbGw?.type == 0) //判断是不是timer
         } else {
             ToastUtils.showShort(getString(R.string.invalid_data))
             finish()
@@ -131,6 +138,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.add_group_btn -> addNewTask()//创建新的task传入可用的index
+
             R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
                 val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
                 startActivityForResult(intent, requestModeCode)
@@ -140,7 +149,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 isCanEdite()
             }
             R.id.tv_function1 -> {
-                dbGateway?.let { it ->
+                dbGw?.let { it ->
                     it.productUUID = DeviceType.GATE_WAY
                     val toJson = GsonUtils.toJson(listTask)//获取tasks字符串
                     LogUtils.v("zcl网关---$toJson")
@@ -165,13 +174,54 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                         it.timePeriodTags = GsonUtils.toJson(tagList)//tag列表
 
                     DBUtils.saveGateWay(it, true)
+                    sendLabelParams()
                 }
-                startActivity(Intent(this@GwConfigTagActivity, GwEventListActivity::class.java))
+                val intent = Intent(this@GwConfigTagActivity, GwEventListActivity::class.java)
+                intent.putExtra("data", dbGw)
+                startActivity(intent)
                 finish()
             }
         }
     }
 
+    /**
+     * 发送标签保存命令
+     */
+    private fun sendLabelParams() {
+        var meshAddress = dbGw?.meshAddr ?: 0
+        //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+        //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        LogUtils.v("zcl-----------当前日期:--------$month-$day")
+        tagBean?.let {
+            var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
+                    it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+
+            val opcodeHead =if (tagBean?.isTimer()==true)
+                Opcode.CONFIG_GW_TIMER_LABLE_HEAD
+            else
+                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
+            TelinkLightService.Instance().sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+
+            if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送
+                var delayTime = 0L
+                val tasks = it.tasks
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    delayTime += 200
+                    delay(timeMillis = delayTime)
+                    for (task in tasks) {//定时场景时间下发
+                        var params = byteArrayOf(it.tagId.toByte(), task.index.toByte(),
+                                it.startHour.toByte(), it.startMins.toByte(), task.sceneId.toByte(), 0, 0, 0)
+                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
+                    }
+                }
+            } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
+            }
+        }
+    }
     private fun getWeek(str: String): Int {
         var week = 0x00000000
         when (str) {
@@ -213,6 +263,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 listTask.removeAt(position!!)
                 adapter.notifyItemRemoved(position)
                 saveChangeTasks()
+                sendDeleteTask(listTask[position])
             }
 
             private fun saveChangeTasks() {
@@ -238,26 +289,51 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
                 //传入时间段数据 重新配置时间段的场景值
+                listTask[0].labelId = tagBean?.tagId?:0//默认使用第一个记录选中的pos
                 intent.putExtra("data", listTask[position])
             }
             startActivityForResult(intent, requestTimeCode)
         }
-        add_group_btn?.setOnClickListener {
-            //创建新的task传入可用的index
-            val index = getIndex()
-            when {
-                listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
-                index == 0 -> toast(getString(R.string.gate_way_time_max))
-                tagBean?.getIsTimer() == true -> {//跳转时间选择界面
-                    val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
-                    intent.putExtra("index", index)//传入已有时间防止重复
-                    startActivityForResult(intent, requestTimeCode)
-                }
-                tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
-                    val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
-                    intent.putExtra("index", index)//传入已有时间防止重复
-                    startActivityForResult(intent, requestTimeCode)
-                }
+        add_group_btn?.setOnClickListener(this)
+    }
+
+    private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
+        var opcodeDelete =   if (tagBean?.isTimer() == true)
+            Opcode.CONFIG_GW_TIMER_DELETE_TASK
+        else
+            Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
+            //11-18 11位标签id 12 时间条index
+            val id = dbGw?.id ?: 0
+            var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcodeDelete,
+                    dbGw?.meshAddr ?: 0, paramer)
+
+    }
+
+    private fun addNewTask() {
+        val index = getIndex()
+        when {
+            listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
+            index == 0 -> toast(getString(R.string.gate_way_time_max))
+            tagBean?.getIsTimer() == true -> {//跳转时间选择界面
+                val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
+
+                val tasksBean = GwTasksBean(index)
+                tasksBean.labelId = tagBean?.tagId?:0
+                intent.putExtra("newData", tasksBean)
+
+                startActivityForResult(intent, requestTimeCode)
+            }
+            tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
+                val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
+
+                val tasksBean = GwTasksBean(index)
+                tasksBean.labelId = tagBean?.tagId?:0
+                tasksBean.gwMeshAddr = dbGw?.meshAddr?:0
+                intent.putExtra("newData", tasksBean)
+
+                startActivityForResult(intent, requestTimeCode)
             }
         }
     }

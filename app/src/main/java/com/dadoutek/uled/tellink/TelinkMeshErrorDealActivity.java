@@ -39,7 +39,8 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
     protected void onDestroy() {
         super.onDestroy();
         ((TelinkLightApplication) getApplication()).removeEventListener(this);
-        mErrorDialog.dismiss();
+        if (mErrorDialog != null)
+            mErrorDialog.dismiss();
     }
 
     private void dismissDialog() {
@@ -53,12 +54,12 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
         if (event.getArgs() == LeBluetooth.SCAN_FAILED_LOCATION_DISABLE) {
             if (mErrorDialog == null) {
                 TelinkLightService instance = TelinkLightService.Instance();
-                if (instance!=null)
-                instance.idleMode(true);
+                if (instance != null)
+                    instance.idleMode(true);
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
                 dialogBuilder.setTitle("Error")
                         .setMessage(this.getString(R.string.open_gps_tip))
-                        .setNegativeButton( getString(R.string.cancel), null)
+                        .setNegativeButton(getString(R.string.cancel), null)
                         .setPositiveButton(this.getString(R.string.go_open), (dialogInterface, i) -> {
                             Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                             startActivityForResult(enableLocationIntent, ACTIVITY_REQUEST_CODE_LOCATION);
@@ -67,8 +68,8 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
             }
             mErrorDialog.show();
         } else {
-           mErrorDialog  = new AlertDialog.Builder(this).setMessage("蓝牙出问题了，重启蓝牙试试!!").create();
-           mErrorDialog.show();
+            mErrorDialog = new AlertDialog.Builder(this).setMessage("蓝牙出问题了，重启蓝牙试试!!").create();
+            mErrorDialog.show();
         }
     }
 

@@ -218,6 +218,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             var delay = 0L
             for (p in groupParamList) {
                 delay(delay)
+                //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+                //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
                 TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, p)
                 delay += 300
             }

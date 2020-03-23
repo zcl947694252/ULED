@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.template_wheel_container.*
  */
 class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var newData: GwTasksBean? = null
     private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
     private val requestStandingCode = 1001
@@ -168,8 +169,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun initData() {
         data = intent.getParcelableArrayListExtra("data")
+        newData = intent.getParcelableExtra<GwTasksBean>("newData")
         val pos = intent.getIntExtra("pos", 9999)
-        val index = intent.getIntExtra("index", 100)
 
         if (data != null && !TextUtils.isEmpty(data!!.toString()) && pos != 9999) {//编辑老的task
             tasksBean = data!![pos] as GwTasksBean
@@ -184,13 +185,9 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             item_gw_timer_scene!!.text = tasksBean!!.senceName
             tasksBean!!.isCreateNew = false
             scene = DBUtils.getSceneByID(tasksBean!!.sceneId)
-        } else {//新创建task
-            if (index != 100) {
-                tasksBean = GwTasksBean(index)
+        } else if (newData != null && !TextUtils.isEmpty(newData.toString())){//新创建task
+                tasksBean = newData
                 tasksBean!!.isCreateNew = true
-            } else {
-                ToastUtils.showShort(getString(R.string.invalid_data))
-            }
         }
         wheel_time_container!!.addView(timePicker)
     }

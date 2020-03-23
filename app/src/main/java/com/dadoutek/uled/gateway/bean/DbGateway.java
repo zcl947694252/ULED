@@ -8,9 +8,9 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * 创建者     ZCL
@@ -50,6 +50,7 @@ public class DbGateway implements Parcelable {
     private String version;
     private int belongRegionId;
     private int pos;
+    private int uid;
     private String tags;
     private String timePeriodTags;
     private int addTag = 0;//0 添加新的tag 1编辑已有tag
@@ -58,27 +59,8 @@ public class DbGateway implements Parcelable {
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
 
-    @Generated(hash = 1874632923)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, int type,
-            int productUUID, String version, int belongRegionId, int pos,
-            String tags, String timePeriodTags, int addTag, int state) {
+    public DbGateway(Long id) {
         this.id = id;
-        this.meshAddr = meshAddr;
-        this.name = name;
-        this.macAddr = macAddr;
-        this.type = type;
-        this.productUUID = productUUID;
-        this.version = version;
-        this.belongRegionId = belongRegionId;
-        this.pos = pos;
-        this.tags = tags;
-        this.timePeriodTags = timePeriodTags;
-        this.addTag = addTag;
-        this.state = state;
-    }
-
-    @Generated(hash = 1696080529)
-    public DbGateway() {
     }
 
     protected DbGateway(Parcel in) {
@@ -95,11 +77,36 @@ public class DbGateway implements Parcelable {
         version = in.readString();
         belongRegionId = in.readInt();
         pos = in.readInt();
+        uid = in.readInt();
         tags = in.readString();
         timePeriodTags = in.readString();
         addTag = in.readInt();
         state = in.readInt();
         icon = in.readInt();
+    }
+
+    @Generated(hash = 1886388378)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, int type,
+            int productUUID, String version, int belongRegionId, int pos, int uid,
+            String tags, String timePeriodTags, int addTag, int state) {
+        this.id = id;
+        this.meshAddr = meshAddr;
+        this.name = name;
+        this.macAddr = macAddr;
+        this.type = type;
+        this.productUUID = productUUID;
+        this.version = version;
+        this.belongRegionId = belongRegionId;
+        this.pos = pos;
+        this.uid = uid;
+        this.tags = tags;
+        this.timePeriodTags = timePeriodTags;
+        this.addTag = addTag;
+        this.state = state;
+    }
+
+    @Generated(hash = 1696080529)
+    public DbGateway() {
     }
 
     public static final Creator<DbGateway> CREATOR = new Creator<DbGateway>() {
@@ -226,6 +233,14 @@ public class DbGateway implements Parcelable {
         this.pos = pos;
     }
 
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
     public String getTimePeriodTags() {
         return timePeriodTags;
     }
@@ -246,6 +261,7 @@ public class DbGateway implements Parcelable {
                 ", version='" + version + '\'' +
                 ", belongRegionId=" + belongRegionId +
                 ", pos=" + pos +
+                ", uid=" + uid +
                 ", tags='" + tags + '\'' +
                 ", timePeriodTags='" + timePeriodTags + '\'' +
                 ", addTag=" + addTag +
@@ -275,6 +291,7 @@ public class DbGateway implements Parcelable {
         dest.writeString(version);
         dest.writeInt(belongRegionId);
         dest.writeInt(pos);
+        dest.writeInt(uid);
         dest.writeString(tags);
         dest.writeString(timePeriodTags);
         dest.writeInt(addTag);

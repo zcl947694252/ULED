@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.HttpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
@@ -55,7 +56,8 @@ class SyncDataPutOrGetUtils {
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
                     var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type,data.keys?:"")
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys
+                            ?: "")
                     observable?.let { observableList.add(it) }
                 }
 
@@ -113,6 +115,26 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
+                    "DB_GATEWAY" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val gw = DBUtils.getGatewayByID(changeId)
+                                return gw?.let { GwModel.add(it) }
+                            }
+                            Constant.DB_DELETE -> {
+                                val list = arrayListOf(changeId.toInt())
+                                val gattBody = GwGattBody()
+                                gattBody.deleteList = list
+                                return GwModel.deleteGwList(gattBody)
+                            }
+                            Constant.DB_UPDATE -> {
+                                val gw = DBUtils.getGatewayByID(changeId)
+                                gw?.let {
+                                    return GwModel.add(gw)
+                                }
+                            }
+                        }
+                    }
                     "DB_LIGHT" -> {
                         when (type) {
                             Constant.DB_ADD -> {
@@ -166,22 +188,22 @@ class SyncDataPutOrGetUtils {
 //                                }
 //                            }
 
-                            when (type) {
-                                Constant.DB_ADD -> {
-                                    val switch = DBUtils.getSwitchByID(changeId)
-                                    return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
-                                }
-                                Constant.DB_DELETE -> {
-                                    return SwitchMdodel.delete(token, id, changeId.toInt())
-                                }
-                                Constant.DB_UPDATE -> {
-                                    val switch = DBUtils.getSwitchByID(changeId)
-                                    switch?.let {
-                                        return SwitchMdodel.update(token, switch, changeId.toInt(), id)
-                                    }
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val switch = DBUtils.getSwitchByID(changeId)
+                                return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return SwitchMdodel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                val switch = DBUtils.getSwitchByID(changeId)
+                                switch?.let {
+                                    return SwitchMdodel.update(token, switch, changeId.toInt(), id)
                                 }
                             }
                         }
+                    }
 
                     "DB_EIGHT_SWITCH" -> {
                         when (type) {
@@ -418,11 +440,19 @@ class SyncDataPutOrGetUtils {
                             DBUtils.saveLight(item, true)
                         }
                         NetworkFactory.getApi()
+                                .gwList
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveGateWay(item, true)
+                        }
+                        NetworkFactory.getApi()
                                 .getSwitchList(token)
                                 .compose(NetworkTransformer())
                     }.flatMap {
                         for (item in it) {
-                                DBUtils.saveSwitch(item, true)
+                            DBUtils.saveSwitch(item, true)
                         }
                         NetworkFactory.getApi()
                                 .getSensorList(token)

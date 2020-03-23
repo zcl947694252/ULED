@@ -47,6 +47,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
     private DbScene scene;
     private GwTasksBean tasksBean;
     ArrayList<Parcelable> data;
+    private GwTasksBean newData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
         timerTitle.setText(getString(R.string.scene_name));//底部item 的title
         Intent intent = getIntent();
         data = intent.getParcelableArrayListExtra("data");
+        newData = intent.getParcelableExtra("newData");
 
         if (data != null && !TextUtils.isEmpty(data.toString())) {//编辑老的task
             GwTasksBean tagBean = (GwTasksBean) data.get(0);
@@ -118,9 +120,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
             timerScene.setText(tasksBean.getSenceName());
             tasksBean.setCreateNew(false);
             scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
-        } else {//新创建task 获取传过来的index值
-           int index =  intent.getIntExtra("index",0);
-            tasksBean = new GwTasksBean(index);
+        } else if (newData != null && !TextUtils.isEmpty(newData.toString())){//新创建task
+            tasksBean = newData;
             tasksBean.setCreateNew(true);
         }
         wheelPickerLy.addView(getTimePicker());

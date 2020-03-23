@@ -25,37 +25,13 @@ public class GwTasksBean implements Parcelable {
     private int startMins;
     private int endMins;
     private int selectPos;//本地使用
+    private long labelId;//本地使用 标签id
+    private int gwMeshAddr;//本地使用 标签id
     private ArrayList<GwTimePeriodsBean> timingPeriods;//时间段list
 
     public GwTasksBean(int index) {
         this.index = index;
     }
-
-    protected GwTasksBean(Parcel in) {
-        index = in.readInt();
-        stateTime = in.readInt();
-        sceneId = in.readLong();
-        senceName = in.readString();
-        createNew = in.readByte() != 0;
-        startHour = in.readInt();
-        endHour = in.readInt();
-        startMins = in.readInt();
-        endMins = in.readInt();
-        selectPos = in.readInt();
-        timingPeriods = in.createTypedArrayList(GwTimePeriodsBean.CREATOR);
-    }
-
-    public static final Creator<GwTasksBean> CREATOR = new Creator<GwTasksBean>() {
-        @Override
-        public GwTasksBean createFromParcel(Parcel in) {
-            return new GwTasksBean(in);
-        }
-
-        @Override
-        public GwTasksBean[] newArray(int size) {
-            return new GwTasksBean[size];
-        }
-    };
 
     public int getIndex() {
         return index;
@@ -77,7 +53,7 @@ public class GwTasksBean implements Parcelable {
         return sceneId;
     }
 
-    public void setSceneId(Long sceneId) {
+    public void setSceneId(long sceneId) {
         this.sceneId = sceneId;
     }
 
@@ -85,8 +61,16 @@ public class GwTasksBean implements Parcelable {
         return senceName;
     }
 
-    public void setSceneId(long sceneId) {
-        this.sceneId = sceneId;
+    public void setSenceName(String senceName) {
+        this.senceName = senceName;
+    }
+
+    public boolean isCreateNew() {
+        return createNew;
+    }
+
+    public void setCreateNew(boolean createNew) {
+        this.createNew = createNew;
     }
 
     public int getStartHour() {
@@ -121,24 +105,28 @@ public class GwTasksBean implements Parcelable {
         this.endMins = endMins;
     }
 
-    public void setSenceName(String senceName) {
-        this.senceName = senceName;
-    }
-
-    public boolean isCreateNew() {
-        return createNew;
-    }
-
-    public void setCreateNew(boolean createNew) {
-        this.createNew = createNew;
-    }
-
     public int getSelectPos() {
         return selectPos;
     }
 
     public void setSelectPos(int selectPos) {
         this.selectPos = selectPos;
+    }
+
+    public long getLabelId() {
+        return labelId;
+    }
+
+    public void setLabelId(long labelId) {
+        this.labelId = labelId;
+    }
+
+    public int getGwMeshAddr() {
+        return gwMeshAddr;
+    }
+
+    public void setGwMeshAddr(int gwMeshAddr) {
+        this.gwMeshAddr = gwMeshAddr;
     }
 
     public ArrayList<GwTimePeriodsBean> getTimingPeriods() {
@@ -149,27 +137,24 @@ public class GwTasksBean implements Parcelable {
         this.timingPeriods = timingPeriods;
     }
 
-
-    @Override
-    public String toString() {
-        return "GwTasksBean{" +
-                "index=" + index +
-                ", stateTime=" + stateTime +
-                ", sceneId=" + sceneId +
-                ", senceName='" + senceName + '\'' +
-                ", createNew=" + createNew +
-                ", startHour=" + startHour +
-                ", endHour=" + endHour +
-                ", startMins=" + startMins +
-                ", endMins=" + endMins +
-                ", selectPos=" + selectPos +
-                ", timingPeriods='" + timingPeriods + '\'' +
-                '}';
+    public static Creator<GwTasksBean> getCREATOR() {
+        return CREATOR;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    protected GwTasksBean(Parcel in) {
+        index = in.readInt();
+        stateTime = in.readInt();
+        sceneId = in.readLong();
+        senceName = in.readString();
+        createNew = in.readByte() != 0;
+        startHour = in.readInt();
+        endHour = in.readInt();
+        startMins = in.readInt();
+        endMins = in.readInt();
+        selectPos = in.readInt();
+        labelId = in.readLong();
+        gwMeshAddr = in.readInt();
+        timingPeriods = in.createTypedArrayList(GwTimePeriodsBean.CREATOR);
     }
 
     @Override
@@ -184,6 +169,25 @@ public class GwTasksBean implements Parcelable {
         dest.writeInt(startMins);
         dest.writeInt(endMins);
         dest.writeInt(selectPos);
+        dest.writeLong(labelId);
+        dest.writeInt(gwMeshAddr);
         dest.writeTypedList(timingPeriods);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<GwTasksBean> CREATOR = new Creator<GwTasksBean>() {
+        @Override
+        public GwTasksBean createFromParcel(Parcel in) {
+            return new GwTasksBean(in);
+        }
+
+        @Override
+        public GwTasksBean[] newArray(int size) {
+            return new GwTasksBean[size];
+        }
+    };
 }

@@ -1,6 +1,47 @@
 package com.dadoutek.uled.model
 
 object Opcode {
+    /**
+     * 设置wifi sdid
+     */
+    const val CONFIG_GW_WIFI_PASSWORD: Byte = 0xfb.toByte()
+    /**
+     * 设置wifi sdid
+     */
+    const val CONFIG_GW_WIFI_SDID: Byte = 0xfa.toByte()
+    /**
+     * 删除循环场景时间段
+     */
+    const val CONFIG_GW_TIMER_PERIOD_DELETE_TASK: Byte = 0xf9.toByte()
+    /**
+     * 删除循环场景标签:
+     */
+    const val CONFIG_GW_TIMER_PERIOD_DELETE_LABLE: Byte = 0xf8.toByte()
+    /**
+     * 循环场景时间下发:
+     */
+    const val CONFIG_GW_TIMER_PERIOD_LABLE_TASK: Byte = 0xf7.toByte()
+    /**
+     * w网关时间段模式标签头下发
+     */
+    const val CONFIG_GW_TIMER_PERIOD_LABLE_HEAD: Byte =0xf6.toByte()
+    /**
+     * 网关定时模式删除TASK
+     */
+    const val CONFIG_GW_TIMER_DELETE_TASK: Byte = 0xf5.toByte()
+    /**
+     * 网关定时模式删除标签
+     */
+    const val CONFIG_GW_TIMER_DELETE_LABLE: Byte = 0xf4.toByte()
+    /**
+     * 网关定时场景标签头下发
+     */
+    const val CONFIG_GW_TIMER_LABLE_HEAD: Byte = 0xf2.toByte()
+    /**
+     * 网关定时场景时间下发
+     */
+    const val CONFIG_GW_TIMER_LABLE_TIME: Byte = 0xf3.toByte()
+
     const val GROUP_BRIGHTNESS_ADD: Byte = 0x1C.toByte()//增加组亮度 C代表组 A代表灯
     const val GROUP_BRIGHTNESS_MINUS: Byte = 0x2C.toByte()//降低组亮度
     const val GROUP_CCT_ADD: Byte = 0x3C.toByte()//增加组色温
