@@ -2,6 +2,10 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 设置时区和时间
+     */
+    const val CONFIG_GW_SET_TIME_ZONE: Byte = 0xfd.toByte()
+    /**
      * 设置wifi sdid
      */
     const val CONFIG_GW_WIFI_PASSWORD: Byte = 0xfb.toByte()
