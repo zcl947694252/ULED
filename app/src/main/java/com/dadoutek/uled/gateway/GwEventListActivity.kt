@@ -208,7 +208,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
      */
     private fun addGw() {
         dbGw!!.macAddr = "1111"
-        GwModel.add(dbGw!!, changeId)?.subscribe(object : NetworkObserver<String?>() {
+        GwModel.add(dbGw!!)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
                 LogUtils.v("zcl-----网关失添成功返回-------------$t")
             }

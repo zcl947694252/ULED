@@ -21,7 +21,6 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
-        DbGatewayDao.createTable(db, ifNotExists);
         DbColorNodeDao.createTable(db, ifNotExists);
         DbConnectorDao.createTable(db, ifNotExists);
         DbCurtainDao.createTable(db, ifNotExists);
@@ -37,11 +36,11 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSensorDao.createTable(db, ifNotExists);
         DbSwitchDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
+        DbGatewayDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
-        DbGatewayDao.dropTable(db, ifExists);
         DbColorNodeDao.dropTable(db, ifExists);
         DbConnectorDao.dropTable(db, ifExists);
         DbCurtainDao.dropTable(db, ifExists);
@@ -57,6 +56,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbSensorDao.dropTable(db, ifExists);
         DbSwitchDao.dropTable(db, ifExists);
         DbUserDao.dropTable(db, ifExists);
+        DbGatewayDao.dropTable(db, ifExists);
     }
 
     /**
@@ -75,7 +75,6 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
-        registerDaoClass(DbGatewayDao.class);
         registerDaoClass(DbColorNodeDao.class);
         registerDaoClass(DbConnectorDao.class);
         registerDaoClass(DbCurtainDao.class);
@@ -91,6 +90,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbSensorDao.class);
         registerDaoClass(DbSwitchDao.class);
         registerDaoClass(DbUserDao.class);
+        registerDaoClass(DbGatewayDao.class);
     }
 
     public DaoSession newSession() {
