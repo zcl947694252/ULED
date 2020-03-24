@@ -992,6 +992,7 @@
     <string name="please_setting_least_one">Please configure the scene for at least one time period</string>
     <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
     <string name="go_open">To open</string>
+    <string name="config_gate_way">Configure gateway</string>
 
 
 </resources>

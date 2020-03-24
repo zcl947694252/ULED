@@ -89,23 +89,24 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
 
         val time = split[1].split(":")
         val tzHour = if (name.contains("+"))
-            time[0].toInt() and (0x0)
+            time[0].toInt() or (0x00000000)
         else
-            time[0].toInt() and (0x1)
+            time[0].toInt() or (0x10000000)
 
         val tzMinutes = time[1].toInt()
 
         val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
+        val year = calendar.get(Calendar.YEAR).toString()
         val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
         val second = calendar.get(Calendar.SECOND)
-        val week = calendar.get(Calendar.DAY_OF_WEEK_IN_MONTH)
-
-        var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), year.toByte(),
-                year.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        val week = calendar.get(Calendar.DAY_OF_WEEK) -1
+        val yearH = year.substring(0, 2).toInt()
+        val yearL = year.substring(2).toInt()
+        var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_WIFI_SDID, 11, params)
     }

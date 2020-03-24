@@ -190,7 +190,6 @@ public class Constant implements Serializable {
     public static final int INSTALL_SENSOR = 3;
     public static final int INSTALL_CURTAIN = 4;
     public static final int INSTALL_CONNECTOR = 5;
-    public static final int INSTALL_GATEWAY= 6;
 
     public static final int INSTALL_LIGHT_OF_CW = 10;
     public static final int INSTALL_LIGHT_OF_RGB = 11;
@@ -262,8 +261,4 @@ public class Constant implements Serializable {
     public static final String DEVICE_NUM = "DEVICE_NUM";
     public static final String IS_TECK="IS_TECK";
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
-    /**
-     * 是否是创建新的tag
-     */
-    public static final String IS_NEW_TAG = "IS_NEW_TAG";
 }

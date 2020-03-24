@@ -644,8 +644,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
                 retryTimes: Long = 1, deviceTypes: List<Int>? = null): Observable<DeviceInfo>? {
-        mConnectDisposable == null //代表这是第一次执行
-        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
+
+        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes)
                     ?.doOnSubscribe {
