@@ -24,10 +24,13 @@ import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -35,7 +38,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.empty_view.*
@@ -61,9 +63,9 @@ import java.util.*
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private var currentGw: DbGateway? = null
-    private var adaper: GwDeviceItemAdapter? = null
     private var type: Int? = null
-    private val gateWayDataList: MutableList<DbGateway> = DBUtils.getAllGateWay()
+    private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
+    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.device_detail_adapter, gateWayDataList, this)
     private var inflater: LayoutInflater? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
@@ -85,24 +87,23 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {//其他界面添加扫描网关待做
         super.onCreate(savedInstanceState)
         setContentView(R.layout.template_device_detail_list)
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-        initData()
         initView()
+        initData()
+
     }
 
     override fun onResume() {
         super.onResume()
         inflater = this.layoutInflater
         initData()
-        initView()
     }
 
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
 
-        adaper = GwDeviceItemAdapter(R.layout.device_detail_adapter, gateWayDataList, this)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
 
@@ -134,7 +135,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-
                     popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
             }
@@ -148,7 +148,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -192,13 +192,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         installDialog?.show()
     }
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
-    val INSTALL_GATEWAY = 6
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         isGuide = false
         installDialog?.dismiss()
@@ -292,7 +285,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -301,7 +294,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -310,7 +303,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_CURTAIN -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -323,7 +316,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_CONNECTOR -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            intent.putExtra(DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -332,7 +325,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_GATEWAY -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -364,14 +357,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun addDevice() {//添加网关
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+        intent.putExtra(DEVICE_TYPE, DeviceType.GATE_WAY)
         startActivity(intent)
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGw = gateWayDataList[position]
         positionCurrent = position
-
         if (view.id == R.id.tv_setting) {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
@@ -382,26 +374,25 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
         }
-
-  /*      when {
-            view.id == R.id.tv_setting -> {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (TelinkLightApplication.getApp().connectDevice == null) {
-                            autoConnect()
-                        } else {
-                            var intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-                            intent.putExtra("data", currentGw)
-                            startActivity(intent)
-                        }
-                    }
-                }
-            }
-            else -> ToastUtils.showLong(R.string.reconnecting)
-        }*/
+        /*      when {
+                  view.id == R.id.tv_setting -> {
+                      val lastUser = DBUtils.lastUser
+                      lastUser?.let {
+                          if (it.id.toString() != it.last_authorizer_user_id)
+                              ToastUtils.showLong(getString(R.string.author_region_warm))
+                          else {
+                              if (TelinkLightApplication.getApp().connectDevice == null) {
+                                  autoConnect()
+                              } else {
+                                  var intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
+                                  intent.putExtra("data", currentGw)
+                                  startActivity(intent)
+                              }
+                          }
+                      }
+                  }
+                  else -> ToastUtils.showLong(R.string.reconnecting)
+              }*/
     }
 
     private fun showPopupWindow(view: View?, position: Int) {
@@ -426,7 +417,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                 TelinkLightService.Instance()?.idleMode(true)
                 showLoadingDialog(getString(R.string.connecting))
                 connect(macAddress = currentGw?.macAddr, retryTimes = 3)?.subscribe({
-                    onLogin(it)//判断进入那个开关设置界面
+                    onLogin()//判断进入那个开关设置界面
                     LogUtils.d("login success")
                 }, {
                     hideLoadingDialog()
@@ -463,10 +454,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             val dbGateway = gateWayDataList[position]
             AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        DBUtils.deleteGateway(dbGateway)
-                        notifyData()
-
-                        Toast.makeText(this@GwDeviceDetailActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                        deleteGw(dbGateway)
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(dbGateway.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
@@ -476,8 +464,37 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun deleteGw(dbGw: DbGateway) {
+        DBUtils.deleteGateway(dbGw)
+        val gattBody = GwGattBody()
+        gattBody.idList = mutableListOf(dbGw.id.toInt())
+        GwModel.deleteGwList(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl-----网关删除成功返回-------------$t")
+                Toast.makeText(this@GwDeviceDetailActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                notifyData()
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showShort(e.message)
+                LogUtils.v("zcl-----网关删除成功返回-------------${e.message}")
+            }
+        })
+    }
+
     fun notifyData() {
         val mNewDatas: ArrayList<DbGateway> = getNewData()
+        gateWayDataList.clear()
+        gateWayDataList.addAll(mNewDatas)
+       if (mNewDatas.size>0){
+           recycleView.visibility = View.VISIBLE
+           no_device_relativeLayout.visibility = View.GONE
+       }else{
+           recycleView.visibility = View.GONE
+           no_device_relativeLayout.visibility = View.VISIBLE
+       }
+        adaper?.notifyDataSetChanged()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return gateWayDataList[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
@@ -494,12 +511,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val beanOld = gateWayDataList[oldItemPosition]
-                val beanNew = mNewDatas?.get(newItemPosition)
-                return if (beanOld.name != beanNew?.name) {
+                val beanNew = mNewDatas[newItemPosition]
+                return if (beanOld.name != beanNew.name) {
                     return false//如果有内容不同，就返回false
                 } else true
             }
         }, true)
+
     }
 
     private fun getNewData(): ArrayList<DbGateway> {
@@ -508,9 +526,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         return allGateWay
     }
 
-    private fun onLogin(it: DeviceInfo?) {
+    private fun onLogin() {
+        hideLoadingDialog()
         val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-        intent.putExtra("data",currentGw)
+        intent.putExtra("data", currentGw)
         startActivity(intent)
     }
 
@@ -528,6 +547,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
 
             gateWayDataList.addAll(allDeviceData)
+            adaper?.notifyDataSetChanged()
         } else {
             recycleView.visibility = View.GONE
             no_device_relativeLayout.visibility = View.VISIBLE

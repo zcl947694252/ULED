@@ -14,5 +14,5 @@ class GwGattBody {
     var macAddr: String? = null
     var cmd: Int = 0
     var data: String? = null
-    var deleteList: List<Int>? = null
+    var idList: List<Int>? = null
 }

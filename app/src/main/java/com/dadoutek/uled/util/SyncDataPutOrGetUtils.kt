@@ -117,22 +117,22 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_GATEWAY" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                         /*   Constant.DB_ADD -> {
                                 val gw = DBUtils.getGatewayByID(changeId)
                                 return gw?.let { GwModel.add(it) }
-                            }
+                            }*/
                             Constant.DB_DELETE -> {
                                 val list = arrayListOf(changeId.toInt())
                                 val gattBody = GwGattBody()
-                                gattBody.deleteList = list
+                                gattBody.idList = list
                                 return GwModel.deleteGwList(gattBody)
                             }
-                            Constant.DB_UPDATE -> {
+                           /* Constant.DB_UPDATE -> {
                                 val gw = DBUtils.getGatewayByID(changeId)
                                 gw?.let {
                                     return GwModel.add(gw)
                                 }
-                            }
+                            }*/
                         }
                     }
                     "DB_LIGHT" -> {

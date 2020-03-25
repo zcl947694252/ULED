@@ -681,7 +681,6 @@ object Commander : EventListener<String> {
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-
         }
                 .retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -690,7 +689,7 @@ object Commander : EventListener<String> {
                     it.onError(Throwable("get version failed"))
                 }
                 .doOnSubscribe {
-                    TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+                    TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
                 }
                 .doFinally {
                     TelinkLightApplication.getApp().removeEventListener(NotificationEvent.GET_DEVICE_STATE, this)

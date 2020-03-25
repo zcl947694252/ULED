@@ -28,7 +28,7 @@ public class Constant implements Serializable {
     public static final long downTime = isDebug ? 2 : 11;
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
-    public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
+    public static  String DEFAULT_MESH_FACTORY_NAME = /*isDebug ?*/"dadoutek1"/*:"dadousmart"*/;
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
@@ -190,6 +190,7 @@ public class Constant implements Serializable {
     public static final int INSTALL_SENSOR = 3;
     public static final int INSTALL_CURTAIN = 4;
     public static final int INSTALL_CONNECTOR = 5;
+    public static final int INSTALL_GATEWAY = 6;
 
     public static final int INSTALL_LIGHT_OF_CW = 10;
     public static final int INSTALL_LIGHT_OF_RGB = 11;

@@ -612,7 +612,7 @@ public interface RequestInterface {
      * tags	是	string	json格式字符串
      */
     @POST("gateway/add/{gatewayId}")
-    Observable<Response<String>> addGw(@Path("gatewayId") long gwId, @Body DbGateway dbGateway);
+    Observable<Response<DbGateway>> addGw(@Path("gatewayId") long gwId, @Body DbGateway dbGateway);
 
     /**
      * 7、网关列表（new）查询网关列表
@@ -626,13 +626,13 @@ public interface RequestInterface {
 
     /**
      * 8、删除网关（new）删除多条网关信息
-     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/add
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/delete
      * 正式服 smartlight_java 替换xxxx
      * 测试服 smartlight_test 替换xxxx
      * 请求方式：DELETE
      * idlist	是	int数组	需要删除的网关id
      */
-    @HTTP(method = "DELETE", path = "gateway/add", hasBody = true)
+    @HTTP(method = "DELETE", path = "gateway/delete", hasBody = true)
     Observable<Response<String>> deleteGw(@Body GwGattBody body);
 
     /**

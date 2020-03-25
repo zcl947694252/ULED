@@ -111,8 +111,10 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_WIFI_SDID, 11, params)
     }
 
+    @SuppressLint("SetTextI18n")
     fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
+        toolbarTv.text = getString(R.string.Gate_way)+dbGw?.name
         if (dbGw == null) {
             ToastUtils.showShort(getString(R.string.no_get_device_info))
             finish()
@@ -155,7 +157,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
             else
                 dbGw?.timePeriodTags
 
-            if (tags != null)
+            if (!TextUtils.isEmpty(tags))
                 list.addAll(GsonUtil.stringToList(tags, GwTagBean::class.java))
 
             addGw()
@@ -240,18 +242,6 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
      * 添加网关
      */
     private fun addGw() {
-        dbGw!!.macAddr = "1111"
-        GwModel.add(dbGw!!)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
-                LogUtils.v("zcl-----网关失添成功返回-------------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                LogUtils.v("zcl-------网关失添加败-----------" + e.message)
-            }
-        })
-
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
             override fun onNext(t: List<DbGateway>) {
                 LogUtils.v("zcl-------网关列表-----------$t")
@@ -260,19 +250,6 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
             override fun onError(e: Throwable) {
                 super.onError(e)
                 LogUtils.v("zcl-------网关列表失败-----------" + e.message)
-            }
-        })
-
-        val gattBody = GwGattBody()
-        gattBody.deleteList = mutableListOf(1)
-        GwModel.deleteGwList(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
-                LogUtils.v("zcl-----网关删除成功返回-------------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                LogUtils.v("zcl-----网关删除成功返回-------------${e.message}")
             }
         })
 
@@ -342,6 +319,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener {
             dbGw?.addTag = 0//创建新的
             intent.putExtra("data", dbGw)
             startActivity(intent)
+            finish()
         }
     }
 

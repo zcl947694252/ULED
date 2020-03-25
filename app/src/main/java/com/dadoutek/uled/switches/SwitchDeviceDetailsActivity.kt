@@ -26,6 +26,7 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
@@ -597,13 +598,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
-    val INSTALL_GATEWAY = 6
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
@@ -743,7 +737,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    Constant.INSTALL_GATEWAY -> {
+                    INSTALL_GATEWAY -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
@@ -780,7 +774,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }

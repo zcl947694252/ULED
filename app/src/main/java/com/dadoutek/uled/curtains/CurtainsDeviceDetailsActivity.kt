@@ -22,6 +22,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
@@ -70,13 +71,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
-    val INSTALL_GATEWAY = 6
     private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -484,7 +478,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
-                    Constant.INSTALL_GATEWAY -> {
+                   INSTALL_GATEWAY -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)

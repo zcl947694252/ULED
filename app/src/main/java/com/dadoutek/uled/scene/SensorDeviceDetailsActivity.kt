@@ -30,7 +30,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.INSTALL_GATEWAY
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
@@ -100,13 +100,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private val OTA_SENSOR: Int = 3//3是oat
     private val SENSOR_FINISH: Int = 4//4代表操作完成
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
-    val INSTALL_GATEWAY = 6
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false

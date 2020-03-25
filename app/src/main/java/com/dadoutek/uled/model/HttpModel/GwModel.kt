@@ -19,7 +19,7 @@ import io.reactivex.schedulers.Schedulers
  * 更新描述
  */
 object GwModel {
-    fun add(dbGateway: DbGateway): Observable<String>? {
+    fun add(dbGateway: DbGateway): Observable<DbGateway>? {
         return NetworkFactory.getApi().addGw(dbGateway.id, dbGateway)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
