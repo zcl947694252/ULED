@@ -100,7 +100,6 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  * 首页设备
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
-
     private var retryDisposable: Disposable? = null
     private lateinit var receiver: HomeKeyEventBroadCastReceiver
     private val mCompositeDisposable = CompositeDisposable()
@@ -130,6 +129,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -362,6 +362,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
@@ -371,6 +372,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
 
+        if (position== Constant.INSTALL_SWITCH)
+            stepThreeTextSmall.visibility = View.VISIBLE
+        else
+            stepThreeTextSmall.visibility = View.GONE
+
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position == INSTALL_NORMAL_LIGHT) {
             title.visibility = GONE
@@ -379,6 +385,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             title.visibility = VISIBLE
             install_tip_question.visibility = VISIBLE
         }
+
 
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()

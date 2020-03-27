@@ -162,6 +162,10 @@ public class LightPeripheral extends Peripheral {
         UUID characteristicUUID = UuidInformation.CHARACTERISTIC_FIRMWARE.getValue();
         return this.getCharacteristicValueAsString(characteristicUUID);
     }
+    public String getDeviceMac() {
+        UUID characteristicUUID = UuidInformation.CHARACTERISTIC_DEVICE_MAC.getValue();
+        return this.getCharacteristicValueAsString(characteristicUUID);
+    }
 
     public void connect(Context context, Callback callback) {
         this.mCallback = callback;

@@ -188,6 +188,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      * service.sendCommandNoResponse((byte) 0xD0, 0xFFFF, new byte[]{0x01, 0x00, 0x00});
      * }
      * </pre>
+     *
      * @param opcode  操作码
      * @param address 设备的地址
      * @param params  参数
@@ -195,6 +196,10 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      */
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params) {
         return this.sendCommandNoResponse(opcode, address, params, null, 0, false);
+    }
+
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag) {//"0"代表获取mac
+        return this.sendCommandResponse(opcode, address, params, tag, 0, false);
     }
 
     public boolean sendCommandNoResponseImmediate(byte opcode, int address, byte[] params) {
@@ -215,6 +220,11 @@ public abstract class LightService extends Service implements LightAdapter.Callb
 
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay, boolean immediate) {
         return this.mAdapter != null && AdvanceStrategy.getDefault().postCommand(opcode, address, params, delay, tag, true, immediate);
+//        return this.mAdapter.sendCommandNoResponse(opcode, address, params, tag, delay);
+    }
+
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag, int delay, boolean immediate) {
+        return this.mAdapter != null && AdvanceStrategy.getDefault().postCommand(opcode, address, params, delay, tag, false, immediate);
 //        return this.mAdapter.sendCommandNoResponse(opcode, address, params, tag, delay);
     }
 
@@ -395,6 +405,10 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         return this.mAdapter != null && this.mAdapter.getFirmwareVersion();
     }
 
+    public boolean getDeviceMac() {
+        return this.mAdapter != null && this.mAdapter.getDeviceMac();
+    }
+
 
     /*public boolean delete() {
         return this.mAdapter != null && this.mAdapter.delete();
@@ -421,7 +435,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);
 
-        TelinkLog.d("onLeScanResult"+deviceInfo.macAddress+"----"+deviceInfo.rssi);
+        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----" + deviceInfo.rssi);
         return true;
     }
 
@@ -444,6 +458,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             deviceInfo.macAddress = light.getMacAddress();
+            deviceInfo.macAddress = light.getDeviceMac();
             deviceInfo.progress = controller.getOtaProgress();
             deviceInfo.status = newStatus;
             deviceInfo.rssi = light.getRssi();
@@ -453,7 +468,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
 //            TelinkLog.d("onLeScanResult1："+deviceInfo.macAddress);
         } else {
             DeviceInfo deviceInfo = new DeviceInfo();
-            deviceInfo.macAddress = light.getMacAddress();
+            //deviceInfo.macAddress = light.getMacAddress();
+            deviceInfo.macAddress = light.getDeviceMac();
             deviceInfo.deviceName = light.getDeviceName();
             deviceInfo.meshName = light.getMeshNameStr();
             deviceInfo.meshAddress = light.getMeshAddress();
@@ -533,9 +549,12 @@ public abstract class LightService extends Service implements LightAdapter.Callb
     }
 
     @Override
-    public boolean onCommandSampled(byte opcode, int address, byte[] params, Object tag, int delay) {
+    public boolean onCommandSampled(byte opcode, int address, byte[] params, Object tag, int delay, boolean noResponse) {
         if (this.mAdapter == null)
             return false;
-        return this.mAdapter.sendCommandNoResponse(opcode, address, params, tag, delay);
+        if (noResponse)
+            return this.mAdapter.sendCommandNoResponse(opcode, address, params, tag, delay);
+        else
+            return this.mAdapter.sendCommandResponse(opcode, address, params, tag, delay);//如果又返回时
     }
 }

@@ -332,7 +332,7 @@ public class Peripheral extends BluetoothGattCallback {
                     this.writeCharacteristic(commandContext, command.serviceUUID,
                             command.characteristicUUID,
                             BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE,
-                            command.data);
+                            command.data);//获取原始数据
                     break;
                 case ENABLE_NOTIFY:
                     this.enableNotification(commandContext, command.serviceUUID,
@@ -788,6 +788,8 @@ public class Peripheral extends BluetoothGattCallback {
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             byte[] data = characteristic.getValue();
+            String s = new String(data);
+            Log.v("蓝牙数据 ","zcl------------------"+s);
             this.commandSuccess(data);
         } else {
             this.commandError("read characteristic failed");
@@ -821,7 +823,7 @@ public class Peripheral extends BluetoothGattCallback {
             this.cancelCommandTimeoutTask();
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                this.commandSuccess(null);
+                this.commandSuccess(characteristic.getValue());
             } else {
                 this.commandError("write characteristic fail");
             }

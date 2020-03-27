@@ -98,16 +98,14 @@ class GwTimerPeriodListActivity : BaseActivity() {
                 GlobalScope.launch(Dispatchers.Main) {
                     delayTime += 200
                     delay(timeMillis = delayTime)
-                    val sh = tp.startTime / 60
-                    val sm = tp.startTime % 60
-                    val eh = tp.endTime / 60
-                    val em = tp.endTime % 60
 
                     if (tasksBean != null) {
                         var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.startHour.toByte(), sh.toByte(), sm.toByte(), eh.toByte(), em.toByte(), tp.sceneId.toByte())
-                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME,
-                                tasksBean?.gwMeshAddr?:0, params)
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
+                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(),tp.sceneId.toByte())
+                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
+                                tasksBean?.gwMeshAddr ?: 0, params)
                     }
                 }
             }

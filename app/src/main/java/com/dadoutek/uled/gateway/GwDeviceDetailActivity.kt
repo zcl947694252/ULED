@@ -39,12 +39,14 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     zcl
@@ -62,6 +64,9 @@ import java.util.*
  * 更新描述   ${TODO}$
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
+    private lateinit var popupWindow: PopupWindow
+    private var disposableConnect: Disposable? = null
+    private var disposable: Disposable? = null
     private var currentGw: DbGateway? = null
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
@@ -82,6 +87,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
     private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {//其他界面添加扫描网关待做
@@ -242,6 +248,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
@@ -259,6 +266,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             title.visibility = View.VISIBLE
             installTipQuestion.visibility = View.VISIBLE
         }
+        if (position == INSTALL_SWITCH)
+            stepThreeTextSmall.visibility = View.VISIBLE
+        else
+            stepThreeTextSmall.visibility = View.GONE
+
+
+
         installTipQuestion.text = describe
         installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)
@@ -398,7 +412,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun showPopupWindow(view: View?, position: Int) {
         val views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
         val set = view!!.findViewById<ImageView>(R.id.tv_setting)
-        val popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         popupWindow.contentView = views
         popupWindow.isFocusable = true
         popupWindow.showAsDropDown(set)
@@ -408,46 +422,21 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         val ota = views.findViewById<TextView>(R.id.ota)
         val delete = views.findViewById<TextView>(R.id.deleteBtn)
         val rename = views.findViewById<TextView>(R.id.rename)
-        rename.visibility = View.GONE
+        rename.text = getString(R.string.config_net)
         delete.text = getString(R.string.delete)
 
+        rename.setOnClickListener {
+            connectGw(1)//配置网络
+        }
+
         reConfig.setOnClickListener {
-            popupWindow.dismiss()
-            if (currentGw != null) {
-                TelinkLightService.Instance()?.idleMode(true)
-                showLoadingDialog(getString(R.string.connecting))
-                connect(macAddress = currentGw?.macAddr, retryTimes = 3)?.subscribe({
-                    onLogin()//判断进入那个开关设置界面
-                    LogUtils.d("login success")
-                }, {
-                    hideLoadingDialog()
-                    LogUtils.d(it)
-                })
-            } else {
-                LogUtils.d("currentGw = $currentGw")
-            }
+            connectGw(0)//配置网关
         }
 
         ota.setOnClickListener {
-            popupWindow.dismiss()
-            if (currentGw != null) {
-                TelinkLightService.Instance()?.idleMode(true)
-                showLoadingDialog(getString(R.string.connecting))
-                connect(macAddress = currentGw?.macAddr, retryTimes = 3)
-                        ?.subscribe(
-                                {
-                                    getDeviceVersion(currentGw!!.meshAddr)
-                                    LogUtils.d("login success")
-                                },
-                                {
-                                    hideLoadingDialog()
-                                    LogUtils.d(it)
-                                }
-                        )
-            } else {
-                LogUtils.d("currentGw = $currentGw")
-            }
+            connectGw(2)
         }
+
         delete.setOnClickListener {
             //恢复出厂设置
             popupWindow.dismiss()
@@ -461,6 +450,34 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
+        }
+
+    }
+
+    private fun connectGw(configType: Int) {
+        popupWindow.dismiss()
+        if (currentGw != null) {
+            TelinkLightService.Instance()?.idleMode(true)
+            showLoadingDialog(getString(R.string.connecting))
+            disposable?.dispose()
+            disposable = Observable.timer(20, TimeUnit.SECONDS)
+                    .subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_fail2))
+                    }
+            disposableConnect?.dispose()
+            disposableConnect = connect(macAddress = currentGw?.macAddr, retryTimes = 1)?.subscribe({
+                if (configType == 2)
+                    getDeviceVersion(currentGw!!.meshAddr)
+                else
+                    onLogin(configType)//判断进入那个开关设置界面
+                LogUtils.d("login success")
+            }, {
+                hideLoadingDialog()
+                LogUtils.d(it)
+            })
+        } else {
+            LogUtils.d("currentGw = $currentGw")
         }
     }
 
@@ -487,13 +504,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         val mNewDatas: ArrayList<DbGateway> = getNewData()
         gateWayDataList.clear()
         gateWayDataList.addAll(mNewDatas)
-       if (mNewDatas.size>0){
-           recycleView.visibility = View.VISIBLE
-           no_device_relativeLayout.visibility = View.GONE
-       }else{
-           recycleView.visibility = View.GONE
-           no_device_relativeLayout.visibility = View.VISIBLE
-       }
+        if (mNewDatas.size > 0) {
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+        }
         adaper?.notifyDataSetChanged()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -526,9 +543,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         return allGateWay
     }
 
-    private fun onLogin() {
+    private fun onLogin(isConfigGw: Int) {
         hideLoadingDialog()
-        val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
+        val intent: Intent = if (isConfigGw == 0)
+            Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
+        else
+            Intent(this@GwDeviceDetailActivity, GwLoginActivity::class.java)
         intent.putExtra("data", currentGw)
         startActivity(intent)
     }

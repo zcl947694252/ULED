@@ -914,5 +914,12 @@
     <string name="open_gps_tip">为扫描到设备，检测到定位未开启，是否打开定位？</string>
     <string name="go_open">去打开</string>
     <string name="config_gate_way">配置网关</string>
+    <string name="switch_tip_small">*如扫描面板开关，接上电源按任意按键后点击蓝牙搜索。</string>
+    <string name="wifi_account">WIFI账号</string>
+    <string name="wifi_pwd">WIFI密码</string>
+    <string name="wifi_account_hinit">请输入WIFI账号</string>
+    <string name="wifi_pwd_hinit">请输入WIFI密码</string>
+    <string name="config_net">配置网络</string>
+    <string name="wifi_cannot_be_empty">WIFI账户与WIFI密码不能为空</string>
 
 </resources>

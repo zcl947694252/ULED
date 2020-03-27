@@ -130,7 +130,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                     tasksBean?.timingPeriods = timesList
 
                     val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
-                    intent.putExtra("data",tasksBean)
+                    intent.putExtra("data", tasksBean)
                     startActivityForResult(intent, requestTimerPeriodCode)
                 }
             }
@@ -185,9 +185,9 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             item_gw_timer_scene!!.text = tasksBean!!.senceName
             tasksBean!!.isCreateNew = false
             scene = DBUtils.getSceneByID(tasksBean!!.sceneId)
-        } else if (newData != null && !TextUtils.isEmpty(newData.toString())){//新创建task
-                tasksBean = newData
-                tasksBean!!.isCreateNew = true
+        } else if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
+            tasksBean = newData
+            tasksBean!!.isCreateNew = true
         }
         wheel_time_container!!.addView(timePicker)
     }
@@ -227,6 +227,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             } else if (requestCode == requestStandingCode) {//获取停留时间
                 standingNum = data!!.getIntExtra("data", 0)
                 gw_times_standing_time.text = standingNum.toString()
+                tasksBean?.stateTime =standingNum
             }
         }
     }

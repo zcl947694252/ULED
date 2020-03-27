@@ -48,4 +48,5 @@
     <color name="device_list_divider">#F8F8F8</color>
     <color name="brightness_add_color">#FF654405</color>
     <color name="gray9">#FF999999</color>
+    <color name="gray_d8">#FFD8D8D8</color>
 </resources>

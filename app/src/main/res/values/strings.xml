@@ -993,6 +993,13 @@
     <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
     <string name="go_open">To open</string>
     <string name="config_gate_way">Configure gateway</string>
+    <string name="switch_tip_small">* for example, scan the panel switch, connect to the power, press any button, and then click bluetooth search.</string>
+    <string name="wifi_account">WIFI Account</string>
+    <string name="wifi_pwd">WIFI Password</string>
+    <string name="wifi_account_hinit">Please enter WIFI account</string>
+    <string name="wifi_pwd_hinit">Please enter WIFI password</string>
+    <string name="config_net">Configure the network</string>
+    <string name="wifi_cannot_be_empty">WIFI account and WIFI password cannot be empty</string>
 
 
 </resources>

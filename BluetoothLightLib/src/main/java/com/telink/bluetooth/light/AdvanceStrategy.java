@@ -105,7 +105,7 @@ public abstract class AdvanceStrategy {
     abstract public void onStop();
 
     public interface Callback {
-        boolean onCommandSampled(byte opcode, int address, byte[] params, Object tag, int delay);
+        boolean onCommandSampled(byte opcode, int address, byte[] params, Object tag, int delay, boolean noResponse);
     }
 
     /**
@@ -132,13 +132,15 @@ public abstract class AdvanceStrategy {
             private byte[] params;
             private int delay;
             private Object tag;
+            private Boolean noResponse;
 
-            public void setCommandArgs(byte opcode, int address, byte[] params, int delay, Object tag) {
+            public void setCommandArgs(byte opcode, int address, byte[] params, int delay, Object tag,Boolean noResponse) {
                 this.opcode = opcode;
                 this.address = address;
                 this.params = params;
                 this.delay = delay;
                 this.tag = tag;
+                this.noResponse = noResponse;
             }
 
             @Override
@@ -146,7 +148,7 @@ public abstract class AdvanceStrategy {
                 Log.d(TAG, "Delay run Opcode : " + Integer.toHexString(opcode));
                 lastSampleTime = System.currentTimeMillis();
                 lastCmdTime = System.currentTimeMillis();
-                DefaultAdvanceStrategy.this.mCallback.onCommandSampled(opcode, address, params, tag, delay);
+                DefaultAdvanceStrategy.this.mCallback.onCommandSampled(opcode, address, params, tag, delay, noResponse);
             }
         }
 
@@ -187,7 +189,7 @@ public abstract class AdvanceStrategy {
                         lastSampleTime = currentTime;
                     } else {
                         commandSender.removeCallbacks(task);
-                        task.setCommandArgs(opcode, address, params, delay, tag);
+                        task.setCommandArgs(opcode, address, params, delay, tag,noResponse);
 //                        Log.d(TAG, "postCommand22: "+delay);
                         commandSender.postDelayed(task, this.getSampleRate() - interval);
                     }
@@ -219,7 +221,7 @@ public abstract class AdvanceStrategy {
                 }
                 lastCmdTime = System.currentTimeMillis() + delay;*/
                 //所有采样到的命令立即交给回调接口处理
-                return this.mCallback.onCommandSampled(opcode, address, params, tag, delay);
+                return this.mCallback.onCommandSampled(opcode, address, params, tag, delay,noResponse);
             }
             Log.d(TAG, "Delay Opcode : " + Integer.toHexString(opcode));
             return false;

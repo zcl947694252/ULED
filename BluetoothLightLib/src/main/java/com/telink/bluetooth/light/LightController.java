@@ -88,6 +88,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private final Command.Callback deleteCallback = new DeleteCommandCallback();
     private final Command.Callback otaCallback = new OtaCommandCallback();
     private final Command.Callback firmwareCallback = new FirmwareCallback();
+    private final Command.Callback deviceMacCallback = new DeviceMacCallback();
     private final OtaPacketParser otaPacketParser = new OtaPacketParser();
 
     private LightPeripheral light;
@@ -774,7 +775,11 @@ public final class LightController extends EventBus<Integer> implements LightPer
     }
 
     public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
+        if (tag.toString()=="0")
+        return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
+        else
         return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
+
     }
 
     /********************************************************************************
@@ -792,6 +797,18 @@ public final class LightController extends EventBus<Integer> implements LightPer
         cmd.type = Command.CommandType.READ;
 
         return this.sendCommand(this.firmwareCallback, cmd);
+    }
+
+    public boolean requestDeviceMac() {
+        UUID serviceUUID = UuidInformation.SERVICE_DEVICE_INFORMATION.getValue();
+        UUID characteristicUUID = UuidInformation.CHARACTERISTIC_DEVICE_MAC.getValue();
+
+        Command cmd = Command.newInstance();
+        cmd.serviceUUID = serviceUUID;
+        cmd.characteristicUUID = characteristicUUID;
+        cmd.type = Command.CommandType.READ;
+
+        return this.sendCommand(this.deviceMacCallback, cmd);
     }
 
     /********************************************************************************
@@ -1048,6 +1065,9 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         public static final int GET_FIRMWARE_SUCCESS = 80;
         public static final int GET_FIRMWARE_FAILURE = 81;
+
+        public static final int GET_DEVICE_MAC_SUCCESS = 82;
+        public static final int GET_DEVICE_MAC_FAILURE = 83;
 
         public static final int CONNECT_ERROR_REPORT_CONNECT = 90;
         public static final int CONNECT_ERROR_REPORT_ATT = 91;
@@ -1406,6 +1426,27 @@ public final class LightController extends EventBus<Integer> implements LightPer
                 return false;
             }
             TelinkLog.d("timeout : " + Arrays.bytesToHexString(command.data, ":"));
+            return false;
+        }
+    }
+
+    private final class DeviceMacCallback implements Command.Callback {
+
+        @Override
+        public void success(Peripheral peripheral, Command command, Object obj) {
+            LightPeripheral light = (LightPeripheral) peripheral;
+            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
+            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+
+        }
+
+        @Override
+        public void error(Peripheral peripheral, Command command, String errorMsg) {
+            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
+        }
+
+        @Override
+        public boolean timeout(Peripheral peripheral, Command command) {
             return false;
         }
     }

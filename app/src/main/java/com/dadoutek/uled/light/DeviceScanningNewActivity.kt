@@ -1435,6 +1435,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             startGrouping()
         } else if (mAddDeviceType == DeviceType.GATE_WAY) {
             val intent = Intent(this@DeviceScanningNewActivity, GwEventListActivity::class.java)
+            //val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
             val gw = DbGateway(getGwId())
             gw.macAddr = bestRssiDevice!!.macAddress
             gw.meshAddr = bestRssiDevice!!.meshAddress
@@ -1446,10 +1447,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             gw.timePeriodTags = ""
             gw.uid = (lastUser?.id?:0).toInt()
 
-            DBUtils.saveGateWay(gw, false)
             intent.putExtra("data", gw)
 
-            addGw(gw)
             startActivity(intent)
             finish()
         } else {

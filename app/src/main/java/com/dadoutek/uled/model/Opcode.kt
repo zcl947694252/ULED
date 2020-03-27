@@ -2,6 +2,10 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 设置获取MAC的Opcode
+     */
+    const val CONFIG_GW_GET_MAC: Byte = 0xfe.toByte()
+    /**
      * 设置时区和时间
      */
     const val CONFIG_GW_SET_TIME_ZONE: Byte = 0xfd.toByte()

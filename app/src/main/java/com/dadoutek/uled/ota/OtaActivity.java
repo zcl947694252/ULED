@@ -145,8 +145,8 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
 
         // idle
         TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null)
-                            instance.idleMode(true);
+        if (instance != null)
+            instance.idleMode(true);
     }
 
     private void showFileChooser() {
@@ -185,8 +185,8 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         /*params.set(Parameters.PARAM_MESH_NAME, this.selectedDevice.meshName);
         params.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 10);*/
         TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
-        instance.startScan(params);
+        if (instance != null)
+            instance.startScan(params);
     }
 
     /**
@@ -196,7 +196,7 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         otaCompleted = false;
         Mesh currentMesh = this.mApp.getMesh();
         LeOtaParameters params = LeOtaParameters.create();
-       //("currentMesh name = " + currentMesh.getName());
+        //("currentMesh name = " + currentMesh.getName());
         params.setMeshName(currentMesh.getName());
         params.setPassword(NetworkFactory.md5(NetworkFactory.md5(currentMesh.getName()) + currentMesh.getName()).substring(0, 16));
         params.setLeScanTimeoutSeconds(10);
@@ -210,8 +210,8 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         deviceInfo.firmware = this.firmware;
         params.setDeviceInfo(deviceInfo);
         TelinkLightService instance = TelinkLightService.Instance();
-        if (instance!=null)
-        instance.startOta(params);
+        if (instance != null)
+            instance.startOta(params);
     }
 
     /**
@@ -257,11 +257,11 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                     this.flag = true;
                     this.append("connecting");
                     TelinkLightService instance = TelinkLightService.Instance();
-                        if (instance!=null){
+                    if (instance != null) {
 
-                            instance.idleMode(true);
-                    instance.connect(deviceInfo.macAddress, 10);
-                        }
+                        instance.idleMode(true);
+                        instance.connect(deviceInfo.macAddress, 10);
+                    }
                 }
 
                 break;
@@ -291,8 +291,9 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                     this.append("connected");
                     this.append("get firmware");
                     TelinkLightService instance = TelinkLightService.Instance();
-                    if (instance!=null)
-                    instance.getFirmwareVersion();
+                    if (instance != null) {
+                        instance.getFirmwareVersion();
+                    }
                 } else if (status == LightAdapter.STATUS_LOGOUT) {
                     if (otaCompleted) {
                         this.append("ota success");

@@ -179,7 +179,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
 
                     DBUtils.saveGateWay(it, dbGw?.addTag == 1)//是否是添加新的
                     addGw(it)
-                    sendLabelParams()
+                    sendLabelHeadParams()
                 }
                 val intent = Intent(this@GwConfigTagActivity, GwEventListActivity::class.java)
                 intent.putExtra("data", dbGw)
@@ -205,12 +205,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     /**
      * 发送标签保存命令
      */
-    private fun sendLabelParams() {
+    private fun sendLabelHeadParams() {
         var meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
+        val month = calendar.get(Calendar.MONTH)+1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         LogUtils.v("zcl-----------当前日期:--------$month-$day")
         tagBean?.let {
@@ -232,7 +232,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                     delay(timeMillis = delayTime)
                     for (task in tasks) {//定时场景时间下发
                         var params = byteArrayOf(it.tagId.toByte(), task.index.toByte(),
-                                it.startHour.toByte(), it.startMins.toByte(), task.sceneId.toByte(), 0, 0, 0)
+                                task.startHour.toByte(), task.startMins.toByte(), task.sceneId.toByte(), 0, 0, 0)
                         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
                     }
                 }
@@ -242,27 +242,27 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getWeek(str: String): Int {
-        var week = 0x00000000
+        var week = 0b00000000
         when (str) {
             getString(R.string.only_one) -> {
-                week = 0x10000000
+                week = 0b10000000
                 return week
             }
             getString(R.string.every_day) -> {
-                week = 0x01111111
+                week = 0b01111111
                 return week
             }
             else -> {
                 val split = str.split(",").toMutableList()
                 for (s in split) {
                     when (s) {//bit位 0-6 周日-周六 7代表当天
-                        getString(R.string.sunday) -> week = week or 0x00000001
-                        getString(R.string.monday) -> week = week or 0x00000010
-                        getString(R.string.tuesday) -> week = week or 0x00000100
-                        getString(R.string.wednesday) -> week = week or 0x00001000
-                        getString(R.string.thursday) -> week = week or 0x00010000
-                        getString(R.string.friday) -> week = week or 0x00100000
-                        getString(R.string.saturday) -> week = week or 0x01000000
+                        getString(R.string.sunday) -> week = week or 0b00000001
+                        getString(R.string.monday) -> week = week or 0b00000010
+                        getString(R.string.tuesday) -> week = week or 0b00000100
+                        getString(R.string.wednesday) -> week = week or 0b00001000
+                        getString(R.string.thursday) -> week = week or 0b00010000
+                        getString(R.string.friday) -> week = week or 0b00100000
+                        getString(R.string.saturday) -> week = week or 0b01000000
                     }
                 }
                 return week
@@ -279,10 +279,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
                 // 从数据源移除该Item对应的数据，并刷新Adapter。
                 val position = srcHolder?.adapterPosition
+                sendDeleteTask(listTask[position?:0])
                 listTask.removeAt(position!!)
                 adapter.notifyItemRemoved(position)
                 saveChangeTasks()
-                sendDeleteTask(listTask[position])
             }
 
             private fun saveChangeTasks() {
@@ -336,6 +336,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
             index == 0 -> toast(getString(R.string.gate_way_time_max))
             tagBean?.getIsTimer() == true -> {//跳转时间选择界面
+                sendLabelHeadParams()
+
                 val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
 
                 val tasksBean = GwTasksBean(index)
@@ -345,6 +347,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 startActivityForResult(intent, requestTimeCode)
             }
             tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
+                sendLabelHeadParams()
+
                 val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
 
                 val tasksBean = GwTasksBean(index)

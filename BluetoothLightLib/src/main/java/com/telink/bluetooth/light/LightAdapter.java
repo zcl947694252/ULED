@@ -62,6 +62,8 @@ public class LightAdapter {
     public static final int STATUS_OTA_PROGRESS = 52;
     public static final int STATUS_GET_FIRMWARE_COMPLETED = 60;
     public static final int STATUS_GET_FIRMWARE_FAILURE = 61;
+    public static final int STATUS_GET_DEVICE_MAC_COMPLETED = 62;
+    public static final int STATUS_GET_DEVICE_MAC_FAILURE = 63;
     public static final int STATUS_DELETE_COMPLETED = 70;
     public static final int STATUS_DELETE_FAILURE = 71;
 
@@ -84,11 +86,12 @@ public class LightAdapter {
 
     //自动连接前，查找设备花的时间 ms
     private static final int AUTO_CONNECT_SCAN_TIMEOUT_SECONDS = 1500;
-
+    //创建notify监听
     private final EventListener<Integer> mConnectionListener = new ConnectionListener();
     private final EventListener<Integer> mResetMeshListener = new ResetMeshListener();
     private final EventListener<Integer> mOtaListener = new OtaListener();
     private final EventListener<Integer> mFirmwareListener = new GetFirmwareListener();
+    private final EventListener<Integer> mDeviceMacListener = new GetDeviceMacListener();
     private final EventListener<Integer> mGetLtkListener = new GetLongTermKeyListener();
     private final EventListener<Integer> mNotificationListener = new NotificationListener();
     private final EventListener<Integer> mDeleteListener = new DeleteListener();
@@ -210,6 +213,8 @@ public class LightAdapter {
         this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_FAILURE, this.mOtaListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_SUCCESS, this.mFirmwareListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_FAILURE, this.mFirmwareListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_SUCCESS, this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_FAILURE, this.mDeviceMacListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_SUCCESS, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_FAILURE, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_SUCCESS, this.mDeleteListener);
@@ -368,6 +373,17 @@ public class LightAdapter {
         return true;
     }
 
+    public boolean getDeviceMac() {
+        if (!this.isStarted.get())
+            return false;
+        LightPeripheral light = this.mLightCtrl.getCurrentLight();
+        if (light == null || !light.isConnected())
+            return false;
+        TelinkLog.e("LightAdapter#getFirmwareVersion");
+        this.mLightCtrl.requestDeviceMac();
+        return true;
+    }
+
 
     private void login(LightPeripheral light) {
 
@@ -440,6 +456,23 @@ public class LightAdapter {
         } else {
 //            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
+        }
+    }
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
+
+        if (!this.isStarted.get()) {
+            return false;
+        }
+
+        if (!this.mLightCtrl.isLogin())
+            return false;
+
+        if (tag == null) {
+//            Log.d("Test", "***********sendCommand***********");
+            return this.mLightCtrl.sendCommand(opcode, address, params, false, delay);
+        } else {
+//            Log.d("Test", "***********TEST***********ELSE");
+            return this.mLightCtrl.sendCommand(opcode, address, params, false, tag, delay);
         }
     }
 
@@ -1236,15 +1269,43 @@ public class LightAdapter {
         }
     }
 
-    private final class GetFirmwareListener implements EventListener<Integer> {
+    private final class GetDeviceMacListener implements EventListener<Integer> {
 
+        private void onGetDeviceMacSuccess() {
+            int mode = getMode();
+            /*if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
+                return;*/
+            setStatus(STATUS_GET_DEVICE_MAC_COMPLETED, true);
+        }
+
+        private void onGetDeviceMacFailure() {
+            int mode = getMode();
+//            if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
+//                return;
+            setStatus(STATUS_GET_DEVICE_MAC_FAILURE, true);
+        }
+
+        @Override
+        public void performed(Event<Integer> event) {
+            switch (event.getType()) {
+                case LightController.LightEvent.GET_DEVICE_MAC_SUCCESS:
+                    this.onGetDeviceMacSuccess();
+                    break;
+                case LightController.LightEvent.GET_DEVICE_MAC_FAILURE:
+                    this.onGetDeviceMacFailure();
+                    break;
+            }
+        }
+    }
+
+
+    private final class GetFirmwareListener implements EventListener<Integer> {
         private void onGetFirmwareSuccess() {
             int mode = getMode();
             if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
                 return;
             setStatus(STATUS_GET_FIRMWARE_COMPLETED, true);
         }
-
         private void onGetFirmwareFailure() {
             int mode = getMode();
             if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
