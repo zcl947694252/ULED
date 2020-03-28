@@ -17,7 +17,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.telink.bluetooth.light.UuidInformation;
 import com.telink.util.Arrays;
 
 import java.lang.reflect.Method;
@@ -69,8 +68,10 @@ public class Peripheral extends BluetoothGattCallback {
     protected byte[] scanRecord;
     protected String name;
     protected String mac;
+    protected String sixByteMac;
     protected byte[] macBytes;
     protected int type;
+    protected String recvie;
     protected List<BluetoothGattService> mServices;
 
     protected AtomicBoolean processing = new AtomicBoolean(false);
@@ -85,7 +86,7 @@ public class Peripheral extends BluetoothGattCallback {
     private String get4ByteMac(String macString) {
         String[] strArray = macString.split(":");
         this.macBytes = new byte[4];
-        this.macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);
+        this.macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);//78-9C-E7-08-A9-3D
         this.macBytes[1] = (byte) (Integer.parseInt(strArray[4], 16) & 0xFF);
         this.macBytes[2] = (byte) (Integer.parseInt(strArray[3], 16) & 0xFF);
         this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
@@ -99,8 +100,9 @@ public class Peripheral extends BluetoothGattCallback {
         this.scanRecord = scanRecord;
         this.rssi = rssi;
         this.name = device.getName();
+        this.type = device.getType(); //ble
         this.mac = get4ByteMac(device.getAddress());
-        this.type = device.getType();
+        this.sixByteMac = device.getAddress();
     }
 
     /********************************************************************************
@@ -118,9 +120,20 @@ public class Peripheral extends BluetoothGattCallback {
     public String getMacAddress() {
         return this.mac;
     }
+    public String getSixByteMacAddress() {
+        return this.sixByteMac;
+    }
 
     public List<BluetoothGattService> getServices() {
         return mServices;
+    }
+
+    public String getRecvie() {
+        return recvie;
+    }
+
+    public void setRecvie(String recvie) {
+        this.recvie = recvie;
     }
 
     public byte[] getMacBytes() {
@@ -436,6 +449,7 @@ public class Peripheral extends BluetoothGattCallback {
      *******************************************************************************/
     /**
      * 蓝牙读取操作
+     *
      * @param commandContext
      * @param serviceUUID
      * @param characteristicUUID
@@ -446,7 +460,7 @@ public class Peripheral extends BluetoothGattCallback {
         boolean success = true;
         String errorMsg = "";
 
-        if (gatt==null)
+        if (gatt == null)
             return;
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 
@@ -479,6 +493,7 @@ public class Peripheral extends BluetoothGattCallback {
 
     /**
      * 蓝牙写入操作
+     *
      * @param commandContext
      * @param serviceUUID
      * @param characteristicUUID
@@ -493,7 +508,7 @@ public class Peripheral extends BluetoothGattCallback {
 
 //        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
 
-        if (gatt==null)
+        if (gatt == null)
             return;
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 
@@ -789,14 +804,10 @@ public class Peripheral extends BluetoothGattCallback {
 
         this.cancelCommandTimeoutTask();
 
-        UUID serviceUUID = UuidInformation.SERVICE_DEVICE_INFORMATION.getValue();
-        UUID characteristicUUID = UuidInformation.TELINK_CHARACTERISTIC_COMMAND.getValue();
-
-
         if (status == BluetoothGatt.GATT_SUCCESS) {
             byte[] data = characteristic.getValue();
             String s = Arrays.bytesToHexString(data, ",");
-            Log.v("蓝牙数据 ","zcl------------------"+ s);
+            Log.v("蓝牙数据 ", "zcl------------------" + s);
             this.commandSuccess(data);
         } else {
             this.commandError("read characteristic failed");
@@ -820,7 +831,7 @@ public class Peripheral extends BluetoothGattCallback {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 byte[] data = characteristic.getValue();
                 String s = Arrays.bytesToHexString(data, ",");
-                Log.v("蓝牙数据写入1返回 ","zcl------------------"+ s);
+                Log.v("蓝牙数据写入1返回 ", "zcl------------------" + s);
                 this.commandSuccess(null);
             } else {
                 this.commandError("write characteristic fail");
@@ -835,7 +846,7 @@ public class Peripheral extends BluetoothGattCallback {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 this.commandSuccess(characteristic.getValue());
                 String s = Arrays.bytesToHexString(characteristic.getValue(), ",");
-                Log.v("蓝牙数据写入2返回 ","zcl------------------"+ s);
+                Log.v("蓝牙数据写入2返回 ", "zcl------------------" + s);
             } else {
                 this.commandError("write characteristic fail");
             }

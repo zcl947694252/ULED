@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;
 import com.telink.bluetooth.TelinkLog;
@@ -156,6 +157,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         this.light.disconnect();
         this.light.connect(this.mContext, this);
+        this.light.getMacAddress();
 
         this.isConnecting.set(true);
         this.mDelayHandler.removeCallbacks(this.mConnectTask);
@@ -208,10 +210,10 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         byte[] plaintext = new byte[16];
-        if (meshName!=null&&password!=null)
-        for (int i = 0; i < 16; i++) {
-            plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
-        }
+        if (meshName != null && password != null)
+            for (int i = 0; i < 16; i++) {
+                plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
+            }
 
         byte[] randm = this.generateRandom(this.loginRandm);
         byte[] sk = new byte[16];
@@ -701,7 +703,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.COMMAND);
 
         Command command = Command.newInstance();
-        if (command!=null){
+        if (command != null) {
             command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE : Command.CommandType.WRITE;
             command.data = data;
             command.serviceUUID = serviceUUID;
@@ -762,7 +764,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         /**
          * params从第十一位开始
-          */
+         */
         if (params != null) {
             System.arraycopy(params, 0, command, offset, params.length);
         }
@@ -775,10 +777,10 @@ public final class LightController extends EventBus<Integer> implements LightPer
     }
 
     public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
-        if (tag.toString()=="0")
-        return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
+        if (tag.toString() == "0")
+            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
         else
-        return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
+            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
 
     }
 
@@ -978,25 +980,24 @@ public final class LightController extends EventBus<Integer> implements LightPer
 //            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
 //        }
         System.arraycopy(data, 0, nonce, 3, 5);
-            byte[] result;
-        if (nonce!=null&&sessionKey!=null&&sessionKey.length>0&&nonce.length>0&&data.length>0) {
+        byte[] result;
+        if (nonce != null && sessionKey != null && sessionKey.length > 0 && nonce.length > 0 && data.length > 0) {
             result = AES.decrypt(this.sessionKey, nonce, data);
         } else {
             result = new byte[0];
         }
         TelinkLog.d("蓝牙数据Notify Data --> " + Arrays.bytesToHexString(result, ","));
-
+        LogUtils.e("result --> " + Arrays.bytesToHexString(result, ","));
         this.onDeviceAddressNotify(data, tag);
         this.dispatchEvent(new LightEvent(LightEvent.NOTIFICATION_RECEIVE, result));
-        /**
-         * if(mac_report)
-         * {
-         *     ....
-         *     dispatch
-         * }
-         * */
-
-        this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+      /*  if (result.length >= 8) {
+            int cmd = result[7] & 0xFF;
+            LogUtils.e("kcmd = " +  Integer.toHexString(cmd));
+            if (cmd == 0xFE) {
+                LogUtils.e();
+                this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+            }
+        }*/
     }
 
     private void onDeviceAddressNotify(byte[] data, Object tag) {
@@ -1443,10 +1444,12 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void success(Peripheral peripheral, Command command, Object obj) {
+            peripheral.setRecvie("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
             LightPeripheral light = (LightPeripheral) peripheral;
-            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
-            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
 
+            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
+            LogUtils.v("zcl-------蓝牙数据正确数据-----------"+Arrays.bytesToHexString((byte[]) obj, ","));
+            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
         }
 
         @Override
@@ -1521,7 +1524,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         private int progress;
 
         public void set(byte[] data) {
-            if(data!=null){
+            if (data != null) {
                 this.clear();
 
                 this.data = data;

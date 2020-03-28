@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.Peripheral;
@@ -874,7 +875,7 @@ public class LightAdapter {
     }
 
     synchronized private void setStatus(int newStatus, boolean ignoreIdleMode, boolean ignoreStatus) {
-
+        LogUtils.e(newStatus);
         if (!ignoreIdleMode) {
             if (this.getMode() == MODE_IDLE) {
                 Log.d("Saw", "return cause MODE_IDLE");
@@ -887,7 +888,6 @@ public class LightAdapter {
                 return;
             }
         }
-
         int oldStatus = this.status.getAndSet(newStatus);
 
         if (mCallback != null)
@@ -1275,6 +1275,7 @@ public class LightAdapter {
             int mode = getMode();
             /*if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
                 return;*/
+            LogUtils.e();
             setStatus(STATUS_GET_DEVICE_MAC_COMPLETED, true);
         }
 
@@ -1289,6 +1290,7 @@ public class LightAdapter {
         public void performed(Event<Integer> event) {
             switch (event.getType()) {
                 case LightController.LightEvent.GET_DEVICE_MAC_SUCCESS:
+
                     this.onGetDeviceMacSuccess();
                     break;
                 case LightController.LightEvent.GET_DEVICE_MAC_FAILURE:

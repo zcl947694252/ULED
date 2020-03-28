@@ -119,7 +119,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr?:0, params)
-        LogUtils.v("zcl---------蓝牙数据--dbGwmac:${dbGw?.macAddr}-----mes${dbGw?.meshAddr?:1000}--")//78-9c-e7-04-2e-bb
+        LogUtils.v("zcl---------蓝牙数据--dbGwmac:${dbGw?.macAddr}------${dbGw?.sixByteMacAddr}--------mes${dbGw?.meshAddr?:1000}--")//78-9c-e7-04-2e-bb
     }
 
     @SuppressLint("SetTextI18n")
@@ -231,15 +231,13 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
                        //mac信息获取成功
                        val deviceInfo = event.args
-                       LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------${deviceInfo.macAddress}")
+                       LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
                    }
                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
                        LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
                    }
                }
-
            }
-
        }
     }
 

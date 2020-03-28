@@ -45,6 +45,7 @@ public class DbGateway implements Parcelable {
     private int meshAddr;
     private String name;//标签名
     private String macAddr;
+    private String sixByteMacAddr;
     private int type;//网关模式 0定时 1循环
     private int productUUID;
     private String version;
@@ -63,6 +64,7 @@ public class DbGateway implements Parcelable {
         this.id = id;
     }
 
+
     protected DbGateway(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -72,6 +74,7 @@ public class DbGateway implements Parcelable {
         meshAddr = in.readInt();
         name = in.readString();
         macAddr = in.readString();
+        sixByteMacAddr = in.readString();
         type = in.readInt();
         productUUID = in.readInt();
         version = in.readString();
@@ -85,14 +88,17 @@ public class DbGateway implements Parcelable {
         icon = in.readInt();
     }
 
-    @Generated(hash = 1886388378)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, int type,
-            int productUUID, String version, int belongRegionId, int pos, int uid,
-            String tags, String timePeriodTags, int addTag, int state) {
+
+    @Generated(hash = 501866550)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr,
+            String sixByteMacAddr, int type, int productUUID, String version,
+            int belongRegionId, int pos, int uid, String tags,
+            String timePeriodTags, int addTag, int state) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
         this.macAddr = macAddr;
+        this.sixByteMacAddr = sixByteMacAddr;
         this.type = type;
         this.productUUID = productUUID;
         this.version = version;
@@ -104,6 +110,7 @@ public class DbGateway implements Parcelable {
         this.addTag = addTag;
         this.state = state;
     }
+
 
     @Generated(hash = 1696080529)
     public DbGateway() {
@@ -249,6 +256,14 @@ public class DbGateway implements Parcelable {
         this.timePeriodTags = timePeriodTags;
     }
 
+    public String getSixByteMacAddr() {
+        return sixByteMacAddr;
+    }
+
+    public void setSixByteMacAddr(String sixByteMacAddr) {
+        this.sixByteMacAddr = sixByteMacAddr;
+    }
+
     @Override
     public String toString() {
         return "DbGateway{" +
@@ -286,6 +301,7 @@ public class DbGateway implements Parcelable {
         dest.writeInt(meshAddr);
         dest.writeString(name);
         dest.writeString(macAddr);
+        dest.writeString(sixByteMacAddr);
         dest.writeInt(type);
         dest.writeInt(productUUID);
         dest.writeString(version);

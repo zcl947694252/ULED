@@ -41,6 +41,7 @@ public class LightPeripheral extends Peripheral {
     private int newMeshAddress = -1;
     private int retry = 0;
 
+
     public LightPeripheral(BluetoothDevice device, byte[] scanRecord, int rssi,
                            byte[] meshName, int meshAddress) {
         super(device, scanRecord, rssi);

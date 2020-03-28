@@ -419,6 +419,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
 
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.macAddress = light.getMacAddress();
+        deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
         deviceInfo.deviceName = light.getDeviceName();
         deviceInfo.meshName = light.getMeshNameStr();
         deviceInfo.meshAddress = light.getMeshAddress();
@@ -435,7 +436,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);
 
-        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----" + deviceInfo.rssi);
+        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----------"+deviceInfo.sixByteMacAddress+"------------" + deviceInfo.rssi);
         return true;
     }
 
@@ -458,6 +459,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             deviceInfo.macAddress = light.getMacAddress();
+            deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
            // =deviceInfo.macAddress = light.getDeviceMac();
             deviceInfo.progress = controller.getOtaProgress();
             deviceInfo.status = newStatus;
@@ -469,7 +471,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         } else {
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
-            //deviceInfo.macAddress = light.getDeviceMac();
+            deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
+            deviceInfo.recvie = light.getRecvie();
             deviceInfo.deviceName = light.getDeviceName();
             deviceInfo.meshName = light.getMeshNameStr();
             deviceInfo.meshAddress = light.getMeshAddress();
@@ -505,6 +508,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         if (light != null) {
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
+            deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
             deviceInfo.deviceName = light.getDeviceName();
             deviceInfo.meshName = light.getMeshNameStr();
             deviceInfo.meshAddress = light.getMeshAddress();
@@ -512,6 +516,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.productUUID = light.getProductUUID();
             notifyInfo.deviceInfo = deviceInfo;
         }
+
 
         intent.putExtra(EXTRA_NOTIFY, notifyInfo);
 

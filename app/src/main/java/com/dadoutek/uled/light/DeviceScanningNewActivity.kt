@@ -658,6 +658,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
                 dbItem.macAddr = item.deviceInfo.macAddress
+                dbItem.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.id = getGwId()
                 dbItem.tags = ""

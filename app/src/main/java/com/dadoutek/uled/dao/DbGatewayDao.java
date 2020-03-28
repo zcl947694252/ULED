@@ -28,16 +28,17 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         public final static Property MeshAddr = new Property(1, int.class, "meshAddr", false, "MESH_ADDR");
         public final static Property Name = new Property(2, String.class, "name", false, "NAME");
         public final static Property MacAddr = new Property(3, String.class, "macAddr", false, "MAC_ADDR");
-        public final static Property Type = new Property(4, int.class, "type", false, "TYPE");
-        public final static Property ProductUUID = new Property(5, int.class, "productUUID", false, "PRODUCT_UUID");
-        public final static Property Version = new Property(6, String.class, "version", false, "VERSION");
-        public final static Property BelongRegionId = new Property(7, int.class, "belongRegionId", false, "BELONG_REGION_ID");
-        public final static Property Pos = new Property(8, int.class, "pos", false, "POS");
-        public final static Property Uid = new Property(9, int.class, "uid", false, "UID");
-        public final static Property Tags = new Property(10, String.class, "tags", false, "TAGS");
-        public final static Property TimePeriodTags = new Property(11, String.class, "timePeriodTags", false, "TIME_PERIOD_TAGS");
-        public final static Property AddTag = new Property(12, int.class, "addTag", false, "ADD_TAG");
-        public final static Property State = new Property(13, int.class, "state", false, "STATE");
+        public final static Property SixByteMacAddr = new Property(4, String.class, "sixByteMacAddr", false, "SIX_BYTE_MAC_ADDR");
+        public final static Property Type = new Property(5, int.class, "type", false, "TYPE");
+        public final static Property ProductUUID = new Property(6, int.class, "productUUID", false, "PRODUCT_UUID");
+        public final static Property Version = new Property(7, String.class, "version", false, "VERSION");
+        public final static Property BelongRegionId = new Property(8, int.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Pos = new Property(9, int.class, "pos", false, "POS");
+        public final static Property Uid = new Property(10, int.class, "uid", false, "UID");
+        public final static Property Tags = new Property(11, String.class, "tags", false, "TAGS");
+        public final static Property TimePeriodTags = new Property(12, String.class, "timePeriodTags", false, "TIME_PERIOD_TAGS");
+        public final static Property AddTag = new Property(13, int.class, "addTag", false, "ADD_TAG");
+        public final static Property State = new Property(14, int.class, "state", false, "STATE");
     }
 
 
@@ -57,16 +58,17 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
                 "\"MESH_ADDR\" INTEGER NOT NULL ," + // 1: meshAddr
                 "\"NAME\" TEXT," + // 2: name
                 "\"MAC_ADDR\" TEXT," + // 3: macAddr
-                "\"TYPE\" INTEGER NOT NULL ," + // 4: type
-                "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 5: productUUID
-                "\"VERSION\" TEXT," + // 6: version
-                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 7: belongRegionId
-                "\"POS\" INTEGER NOT NULL ," + // 8: pos
-                "\"UID\" INTEGER NOT NULL ," + // 9: uid
-                "\"TAGS\" TEXT," + // 10: tags
-                "\"TIME_PERIOD_TAGS\" TEXT," + // 11: timePeriodTags
-                "\"ADD_TAG\" INTEGER NOT NULL ," + // 12: addTag
-                "\"STATE\" INTEGER NOT NULL );"); // 13: state
+                "\"SIX_BYTE_MAC_ADDR\" TEXT," + // 4: sixByteMacAddr
+                "\"TYPE\" INTEGER NOT NULL ," + // 5: type
+                "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 6: productUUID
+                "\"VERSION\" TEXT," + // 7: version
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 8: belongRegionId
+                "\"POS\" INTEGER NOT NULL ," + // 9: pos
+                "\"UID\" INTEGER NOT NULL ," + // 10: uid
+                "\"TAGS\" TEXT," + // 11: tags
+                "\"TIME_PERIOD_TAGS\" TEXT," + // 12: timePeriodTags
+                "\"ADD_TAG\" INTEGER NOT NULL ," + // 13: addTag
+                "\"STATE\" INTEGER NOT NULL );"); // 14: state
     }
 
     /** Drops the underlying database table. */
@@ -94,28 +96,33 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         if (macAddr != null) {
             stmt.bindString(4, macAddr);
         }
-        stmt.bindLong(5, entity.getType());
-        stmt.bindLong(6, entity.getProductUUID());
+ 
+        String sixByteMacAddr = entity.getSixByteMacAddr();
+        if (sixByteMacAddr != null) {
+            stmt.bindString(5, sixByteMacAddr);
+        }
+        stmt.bindLong(6, entity.getType());
+        stmt.bindLong(7, entity.getProductUUID());
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(7, version);
+            stmt.bindString(8, version);
         }
-        stmt.bindLong(8, entity.getBelongRegionId());
-        stmt.bindLong(9, entity.getPos());
-        stmt.bindLong(10, entity.getUid());
+        stmt.bindLong(9, entity.getBelongRegionId());
+        stmt.bindLong(10, entity.getPos());
+        stmt.bindLong(11, entity.getUid());
  
         String tags = entity.getTags();
         if (tags != null) {
-            stmt.bindString(11, tags);
+            stmt.bindString(12, tags);
         }
  
         String timePeriodTags = entity.getTimePeriodTags();
         if (timePeriodTags != null) {
-            stmt.bindString(12, timePeriodTags);
+            stmt.bindString(13, timePeriodTags);
         }
-        stmt.bindLong(13, entity.getAddTag());
-        stmt.bindLong(14, entity.getState());
+        stmt.bindLong(14, entity.getAddTag());
+        stmt.bindLong(15, entity.getState());
     }
 
     @Override
@@ -137,28 +144,33 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         if (macAddr != null) {
             stmt.bindString(4, macAddr);
         }
-        stmt.bindLong(5, entity.getType());
-        stmt.bindLong(6, entity.getProductUUID());
+ 
+        String sixByteMacAddr = entity.getSixByteMacAddr();
+        if (sixByteMacAddr != null) {
+            stmt.bindString(5, sixByteMacAddr);
+        }
+        stmt.bindLong(6, entity.getType());
+        stmt.bindLong(7, entity.getProductUUID());
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(7, version);
+            stmt.bindString(8, version);
         }
-        stmt.bindLong(8, entity.getBelongRegionId());
-        stmt.bindLong(9, entity.getPos());
-        stmt.bindLong(10, entity.getUid());
+        stmt.bindLong(9, entity.getBelongRegionId());
+        stmt.bindLong(10, entity.getPos());
+        stmt.bindLong(11, entity.getUid());
  
         String tags = entity.getTags();
         if (tags != null) {
-            stmt.bindString(11, tags);
+            stmt.bindString(12, tags);
         }
  
         String timePeriodTags = entity.getTimePeriodTags();
         if (timePeriodTags != null) {
-            stmt.bindString(12, timePeriodTags);
+            stmt.bindString(13, timePeriodTags);
         }
-        stmt.bindLong(13, entity.getAddTag());
-        stmt.bindLong(14, entity.getState());
+        stmt.bindLong(14, entity.getAddTag());
+        stmt.bindLong(15, entity.getState());
     }
 
     @Override
@@ -173,16 +185,17 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
             cursor.getInt(offset + 1), // meshAddr
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // macAddr
-            cursor.getInt(offset + 4), // type
-            cursor.getInt(offset + 5), // productUUID
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // version
-            cursor.getInt(offset + 7), // belongRegionId
-            cursor.getInt(offset + 8), // pos
-            cursor.getInt(offset + 9), // uid
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // tags
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // timePeriodTags
-            cursor.getInt(offset + 12), // addTag
-            cursor.getInt(offset + 13) // state
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // sixByteMacAddr
+            cursor.getInt(offset + 5), // type
+            cursor.getInt(offset + 6), // productUUID
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // version
+            cursor.getInt(offset + 8), // belongRegionId
+            cursor.getInt(offset + 9), // pos
+            cursor.getInt(offset + 10), // uid
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // tags
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // timePeriodTags
+            cursor.getInt(offset + 13), // addTag
+            cursor.getInt(offset + 14) // state
         );
         return entity;
     }
@@ -193,16 +206,17 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         entity.setMeshAddr(cursor.getInt(offset + 1));
         entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setMacAddr(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setType(cursor.getInt(offset + 4));
-        entity.setProductUUID(cursor.getInt(offset + 5));
-        entity.setVersion(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setBelongRegionId(cursor.getInt(offset + 7));
-        entity.setPos(cursor.getInt(offset + 8));
-        entity.setUid(cursor.getInt(offset + 9));
-        entity.setTags(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setTimePeriodTags(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setAddTag(cursor.getInt(offset + 12));
-        entity.setState(cursor.getInt(offset + 13));
+        entity.setSixByteMacAddr(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setType(cursor.getInt(offset + 5));
+        entity.setProductUUID(cursor.getInt(offset + 6));
+        entity.setVersion(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setBelongRegionId(cursor.getInt(offset + 8));
+        entity.setPos(cursor.getInt(offset + 9));
+        entity.setUid(cursor.getInt(offset + 10));
+        entity.setTags(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setTimePeriodTags(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setAddTag(cursor.getInt(offset + 13));
+        entity.setState(cursor.getInt(offset + 14));
      }
     
     @Override
