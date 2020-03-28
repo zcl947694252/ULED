@@ -724,6 +724,7 @@ object DBUtils {
     }
     fun saveGateWay(db: DbGateway, isFromServer: Boolean){//添加mesh以后要改成mes地址
         val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.Id.eq(db.id)).list()
+        LogUtils.v("zcl-----------蓝牙数据tianjia-------")
 
         //如果该mesh地址的数据已经存在，就直接修改
         if (existList.size > 0 && existList[0].macAddr == db.macAddr)

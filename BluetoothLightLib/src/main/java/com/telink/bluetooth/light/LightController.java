@@ -984,10 +984,19 @@ public final class LightController extends EventBus<Integer> implements LightPer
         } else {
             result = new byte[0];
         }
-        TelinkLog.d("Notify Data --> " + Arrays.bytesToHexString(result, ","));
+        TelinkLog.d("蓝牙数据Notify Data --> " + Arrays.bytesToHexString(result, ","));
 
         this.onDeviceAddressNotify(data, tag);
         this.dispatchEvent(new LightEvent(LightEvent.NOTIFICATION_RECEIVE, result));
+        /**
+         * if(mac_report)
+         * {
+         *     ....
+         *     dispatch
+         * }
+         * */
+
+        this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
     }
 
     private void onDeviceAddressNotify(byte[] data, Object tag) {

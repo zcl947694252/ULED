@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -33,6 +34,7 @@ import java.util.*
  * 更新描述
  */
 class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
+    private var dbGw: DbGateway? = null
     private lateinit var mApp: TelinkLightApplication
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -133,7 +135,12 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun initData() {}
+    private fun initData() {
+        dbGw = intent.getParcelableExtra<DbGateway>("data")
+
+        sendDeviceMacParmars()
+        //sendTimeZoneParmars()
+    }
 
     private fun initView() {
         this.mApp = this.application as TelinkLightApplication

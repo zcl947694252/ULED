@@ -230,6 +230,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     delayTime += 200
                     delay(timeMillis = delayTime)
+                    if (tasks!=null)
                     for (task in tasks) {//定时场景时间下发
                         var params = byteArrayOf(it.tagId.toByte(), task.index.toByte(),
                                 task.startHour.toByte(), task.startMins.toByte(), task.sceneId.toByte(), 0, 0, 0)

@@ -79,14 +79,11 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         addBtn?.text = getString(R.string.add)
 
         adapter.emptyView = emptyView
-
-        sendDeviceMacParmars()
-        sendTimeZoneParmars()
     }
 
     private fun sendDeviceMacParmars() {
         var params = byteArrayOf(0, 0, 0, 0, 0, 0, 0,0)
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_GET_MAC, 11, params)
+        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr?:0, params,"0")
     }
 
     private fun sendTimeZoneParmars() {
@@ -109,19 +106,20 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         val tzMinutes = time[1].toInt()
 
         val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR).toString()
+        val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
         val second = calendar.get(Calendar.SECOND)
         val week = calendar.get(Calendar.DAY_OF_WEEK) - 1
-        val yearH = year.substring(0, 2).toInt()
-        val yearL = year.substring(2).toInt()
+        val yearH = (year shr 8) and (0xff)
+        val yearL = year and (0xff)
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, 11, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr?:0, params)
+        LogUtils.v("zcl---------蓝牙数据--dbGwmac:${dbGw?.macAddr}-----mes${dbGw?.meshAddr?:1000}--")//78-9c-e7-04-2e-bb
     }
 
     @SuppressLint("SetTextI18n")
@@ -131,6 +129,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         dbGw = intent.getParcelableExtra<DbGateway>("data")
+
         toolbarTv.text = getString(R.string.Gate_way) + dbGw?.name
         if (dbGw == null) {
             ToastUtils.showShort(getString(R.string.no_get_device_info))
@@ -141,6 +140,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         swipe_recycleView.isItemViewSwipeEnabled = true //侧滑删除，默认关闭。
 
         changeData(R.id.event_timer_mode)
+        sendTimeZoneParmars()
     }
 
     @SuppressLint("SetTextI18n")
@@ -152,11 +152,10 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         event_mode_gp.setOnCheckedChangeListener { _, checkedId ->
             list.clear()
             changeData(checkedId)
-
+            sendDeviceMacParmars()
             dbGw?.let {
                 addGw(it)
             }
-
         }
         swipe_recycleView.setOnItemMoveListener(object : OnItemMoveListener {
             override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {

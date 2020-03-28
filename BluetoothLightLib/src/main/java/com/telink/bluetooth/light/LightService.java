@@ -458,7 +458,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             deviceInfo.macAddress = light.getMacAddress();
-            deviceInfo.macAddress = light.getDeviceMac();
+           // =deviceInfo.macAddress = light.getDeviceMac();
             deviceInfo.progress = controller.getOtaProgress();
             deviceInfo.status = newStatus;
             deviceInfo.rssi = light.getRssi();
@@ -468,8 +468,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
 //            TelinkLog.d("onLeScanResult1："+deviceInfo.macAddress);
         } else {
             DeviceInfo deviceInfo = new DeviceInfo();
-            //deviceInfo.macAddress = light.getMacAddress();
-            deviceInfo.macAddress = light.getDeviceMac();
+            deviceInfo.macAddress = light.getMacAddress();
+            //deviceInfo.macAddress = light.getDeviceMac();
             deviceInfo.deviceName = light.getDeviceName();
             deviceInfo.meshName = light.getMeshNameStr();
             deviceInfo.meshAddress = light.getMeshAddress();

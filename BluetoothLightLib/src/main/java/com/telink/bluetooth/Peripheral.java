@@ -17,6 +17,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.telink.bluetooth.light.UuidInformation;
+import com.telink.util.Arrays;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -786,10 +789,14 @@ public class Peripheral extends BluetoothGattCallback {
 
         this.cancelCommandTimeoutTask();
 
+        UUID serviceUUID = UuidInformation.SERVICE_DEVICE_INFORMATION.getValue();
+        UUID characteristicUUID = UuidInformation.TELINK_CHARACTERISTIC_COMMAND.getValue();
+
+
         if (status == BluetoothGatt.GATT_SUCCESS) {
             byte[] data = characteristic.getValue();
-            String s = new String(data);
-            Log.v("蓝牙数据 ","zcl------------------"+s);
+            String s = Arrays.bytesToHexString(data, ",");
+            Log.v("蓝牙数据 ","zcl------------------"+ s);
             this.commandSuccess(data);
         } else {
             this.commandError("read characteristic failed");
@@ -811,6 +818,9 @@ public class Peripheral extends BluetoothGattCallback {
             this.cancelCommandTimeoutTask();
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                byte[] data = characteristic.getValue();
+                String s = Arrays.bytesToHexString(data, ",");
+                Log.v("蓝牙数据写入1返回 ","zcl------------------"+ s);
                 this.commandSuccess(null);
             } else {
                 this.commandError("write characteristic fail");
@@ -824,6 +834,8 @@ public class Peripheral extends BluetoothGattCallback {
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 this.commandSuccess(characteristic.getValue());
+                String s = Arrays.bytesToHexString(characteristic.getValue(), ",");
+                Log.v("蓝牙数据写入2返回 ","zcl------------------"+ s);
             } else {
                 this.commandError("write characteristic fail");
             }
