@@ -484,7 +484,7 @@ object DBUtils {
      */
     fun isDeviceExist(meshAddr: Int): Boolean {
         return getLightByMeshAddr(meshAddr) != null || getRelyByMeshAddr(meshAddr) != null || getCurtainByMeshAddr(meshAddr) != null
-                || getSwitchByMeshAddr(meshAddr) != null || getSensorByMeshAddr(meshAddr) != null
+                || getSwitchByMeshAddr(meshAddr) != null || getSensorByMeshAddr(meshAddr) != null||getGatewayByMeshAddr(meshAddr)!=null
     }
 
     fun getSwitchByMeshAddr(meshAddr: Int): DbSwitch? {
@@ -723,15 +723,15 @@ object DBUtils {
         }
     }
     fun saveGateWay(db: DbGateway, isFromServer: Boolean){//添加mesh以后要改成mes地址
-        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.Id.eq(db.id)).list()
-        LogUtils.v("zcl-----------蓝牙数据tianjia-------")
+        val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+
 
         //如果该mesh地址的数据已经存在，就直接修改
         if (existList.size > 0 && existList[0].macAddr == db.macAddr)
             db.id = existList[0].id
 
         DaoSessionInstance.getInstance().dbGatewayDao.insertOrReplace(db)
-
+        LogUtils.v("zcl-----------保存网关-------${getAllGateWay()}")
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             if (existList.size > 0) {

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.gateway
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -14,6 +15,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_gw_login.*
@@ -21,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 /**
@@ -48,21 +49,39 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initListener() {
+        gw_login_skip.setOnClickListener {
+            if (TelinkLightApplication.getApp().connectDevice != null) {
+                skipEvent()
+            } else {
+                ToastUtils.showShort(getString(R.string.device_disconnected))
+                finish()
+            }
+        }
         gw_login.setOnClickListener {
             val account = gw_login_account.text.toString()
             val pwd = gw_login_pwd.text.toString()
             if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)) {
                 ToastUtils.showShort(getString(R.string.wifi_cannot_be_empty))
             } else {
-                //sendWIFIParmars(false, account)
-                //sendWIFIParmars(false, pwd)
-                sendDeviceMacParmars()
-                var bytes = byteArrayOf(0xff.toByte(),0xff.toByte())
-                val encoder = Base64.getEncoder()
-                val s = encoder.encodeToString(bytes)
-                LogUtils.v("zcl-----------s$s-------")
+                // sendWIFIParmars("Dadou", "Dadoutek2018")
+
+                showLoadingDialog(getString(R.string.config_setting_gw_wifi))
+                sendWIFIParmars(account, pwd)
             }
         }
+    }
+
+    private fun skipEvent() {
+        val intent = Intent(this@GwLoginActivity, GwEventListActivity::class.java)
+        intent.putExtra("data", dbGw)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun sendDeviceMacParmars() {
+        var params = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr
+                ?: 0, params, "0")
     }
 
     override fun performed(event: Event<String>?) {
@@ -72,16 +91,30 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onDeviceEvent(event: DeviceEvent) {
-        when(event.type){
-            DeviceEvent.STATUS_CHANGED ->{
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
                 when {
                     //连接成功后获取firmware信息
                     event.args.status == LightAdapter.STATUS_CONNECTED -> TelinkLightService.Instance()?.deviceMac
                     //获取设备mac
+                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                        //mac信息获取成功
+                        val deviceInfo = event.args
+                        LogUtils.v("zcl-----------蓝牙数据设置状态-------${deviceInfo.gwState}")//1连接失败  0连接成功
+                        if (deviceInfo.gwState == 0) {
+                            skipEvent()
+                            hideLoadingDialog()
+                        } else {
+                            hideLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                        }
+                    }
+                    //获取设备mac
                     event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
                         //mac信息获取成功
                         val deviceInfo = event.args
-                        LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------${deviceInfo.macAddress}")
+                        LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
+                        dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
                     }
                     event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
                         LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
@@ -91,14 +124,46 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun sendDeviceMacParmars() {
-        var params = byteArrayOf(0, 0, 0, 0, 0, 0, 0,0)
-        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, 11, params,"0")
-        //TelinkLightService.Instance()?.deviceMac
+    private fun sendWIFIParmars(account: String, pwd: String) {
+        val byteAccount = account.toByteArray()
+        val bytePwd = pwd.toByteArray()
+        val listAccount = getParmarsList(byteAccount)
+        val listPwd = getParmarsList(bytePwd)
+        val accountByteSize = byteAccount.size.toByte()
+        val pwdByteSize = bytePwd.size.toByte()
+
+        LogUtils.v("zcl----蓝牙数据账号list-------${Arrays.bytesToHexString(byteAccount, ",")}----------${listAccount.size}-----$accountByteSize")
+        LogUtils.v("zcl----蓝牙数据密码list-------${Arrays.bytesToHexString(bytePwd, ",")}----------${listPwd.size}----$pwdByteSize")
+
+        sendParmars(listAccount, accountByteSize, false)
+        sendParmars(listPwd, pwdByteSize, true)
     }
 
-    private fun sendWIFIParmars(isAccount: Boolean, account: String) {
-        val bytes = account.toByteArray()
+    private fun sendParmars(listParmars: MutableList<ByteArray>, byteSize: Byte, isPwd: Boolean) {
+        var num = 500L
+        GlobalScope.launch(Dispatchers.Main) {
+            for (i in 0 until listParmars.size) {
+                delay(num * i)
+                //11-18 11位labelId
+                val offset = i * 8
+                val bytesArray = listParmars[i]
+                var params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0],
+                        bytesArray[1], bytesArray[2], bytesArray[3], bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
+
+                if (isPwd) {
+                    LogUtils.v("zcl----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
+                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr
+                            ?: 0, params, "1")
+                } else {
+                    LogUtils.v("zcl----------蓝牙数据账号参数-------${Arrays.bytesToHexString(params, ",")}")
+                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr
+                            ?: 0, params, "1")
+                }
+            }
+        }
+    }
+
+    private fun getParmarsList(bytes: ByteArray): MutableList<ByteArray> {
         val lastNum = bytes.size % 8
         val list = mutableListOf<ByteArray>()
         for (index in 0 until bytes.size step 8) {
@@ -113,33 +178,12 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 list.add(b)
             }
         }
-        LogUtils.v("zcl----------发送命令list-------$list----------${list.size}")
-        var num = 500L
-        GlobalScope.launch(Dispatchers.Main) {
-            for (i in 0 until list.size) {
-                delay(num * i)
-                //11-18 11位labelId
-                val offset = i * 8
-                val bytesArray = list[i]
-                var params = byteArrayOf(bytes.size.toByte(), offset.toByte(), bytesArray[0],
-                        bytesArray[1], bytesArray[2], bytesArray[3], bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
-
-                if (isAccount)
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_WIFI_SDID, 11, params)
-                else
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, 11, params)
-                if (!isAccount&&i==list.size-1){
-                    finish()
-                }
-            }
-        }
+        return list
     }
 
     private fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
-
         sendDeviceMacParmars()
-        //sendTimeZoneParmars()
     }
 
     private fun initView() {

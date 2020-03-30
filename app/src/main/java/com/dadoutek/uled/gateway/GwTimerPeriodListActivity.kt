@@ -74,7 +74,10 @@ class GwTimerPeriodListActivity : BaseActivity() {
         if (tpList == null || tpList.size <= 0) {
             ToastUtils.showShort(getString(R.string.invalid_data))
         } else {
-            timesList.addAll(tpList)
+            if (tpList.size > 20)
+                timesList.addAll(tpList.subList(0, 19))
+            else
+                timesList.addAll(tpList)
             for (tp in tpList)
                 if (tp.sceneId != 0L) {
                     isHaveLastOne = true
@@ -99,11 +102,14 @@ class GwTimerPeriodListActivity : BaseActivity() {
                     delayTime += 200
                     delay(timeMillis = delayTime)
 
-                    if (tasksBean != null) {
+                    if (tasksBean != null&&tasksBean?.sceneId !=0L) {
                         var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
-                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
-                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(),tp.sceneId.toByte())
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour
+                                ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
+                                ?: 0).toByte(),
+                                (tasksBean?.endMins
+                                        ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
                         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
                                 tasksBean?.gwMeshAddr ?: 0, params)
                     }

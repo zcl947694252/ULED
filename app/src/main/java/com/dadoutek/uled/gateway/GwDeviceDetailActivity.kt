@@ -512,6 +512,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             no_device_relativeLayout.visibility = View.VISIBLE
         }
         adaper?.notifyDataSetChanged()
+        toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return gateWayDataList[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
@@ -586,6 +587,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
         }
+        toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
     }
 
     override fun onPause() {

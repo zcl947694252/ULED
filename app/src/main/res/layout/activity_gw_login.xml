@@ -24,7 +24,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/dp_40"
             android:hint="@string/wifi_account_hinit"
-            android:textColor="@color/gray_d8"
+            android:textColor="@color/gray_3"
             android:textSize="@dimen/sp_14" />
 
     <TextView
@@ -45,7 +45,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/dp_40"
             android:hint="@string/wifi_pwd_hinit"
-            android:textColor="@color/gray_d8"
+            android:textColor="@color/gray_3"
             android:textSize="@dimen/sp_14" />
 
     <Button

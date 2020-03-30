@@ -921,5 +921,7 @@
     <string name="wifi_pwd_hinit">请输入WIFI密码</string>
     <string name="config_net">配置网络</string>
     <string name="wifi_cannot_be_empty">WIFI账户与WIFI密码不能为空</string>
+    <string name="config_WIFI_FAILE">配置WIFI网络失败</string>
+    <string name="config_setting_gw_wifi">正在配置wifi网络,请稍后</string>
 
 </resources>

@@ -61,7 +61,7 @@ public class DeviceInfo implements Parcelable {
     /**
      * 获取返回的数据
      */
-    public String recvie;
+    public int gwState;
 
     public DeviceInfo() {
     }
@@ -80,7 +80,7 @@ public class DeviceInfo implements Parcelable {
         isConfirm = in.readInt();
         longTermKey = in.createByteArray();
         firmwareRevision = in.readString();
-        recvie = in.readString();
+        gwState = in.readInt();
     }
 
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
@@ -111,7 +111,7 @@ public class DeviceInfo implements Parcelable {
                 ", isConfirm=" + isConfirm +
                 ", longTermKey=" + Arrays.toString(longTermKey) +
                 ", firmwareRevision='" + firmwareRevision + '\'' +
-                ", recvie='" + recvie + '\'' +
+                ", gwState='" + gwState + '\'' +
                 '}';
     }
 
@@ -135,6 +135,6 @@ public class DeviceInfo implements Parcelable {
         dest.writeInt(isConfirm);
         dest.writeByteArray(longTermKey);
         dest.writeString(firmwareRevision);
-        dest.writeString(recvie);
+        dest.writeInt(gwState);
     }
 }

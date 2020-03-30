@@ -71,7 +71,7 @@ public class Peripheral extends BluetoothGattCallback {
     protected String sixByteMac;
     protected byte[] macBytes;
     protected int type;
-    protected String recvie;
+    protected int gwState =10;
     protected List<BluetoothGattService> mServices;
 
     protected AtomicBoolean processing = new AtomicBoolean(false);
@@ -124,16 +124,20 @@ public class Peripheral extends BluetoothGattCallback {
         return this.sixByteMac;
     }
 
+    public void setSixByteMacAddress(String mac) {
+        this.sixByteMac = mac;
+    }
+
     public List<BluetoothGattService> getServices() {
         return mServices;
     }
 
-    public String getRecvie() {
-        return recvie;
+    public int getGwState() {
+        return gwState;
     }
 
-    public void setRecvie(String recvie) {
-        this.recvie = recvie;
+    public void setGwState(int gwState) {
+        this.gwState = gwState;
     }
 
     public byte[] getMacBytes() {
@@ -831,7 +835,6 @@ public class Peripheral extends BluetoothGattCallback {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 byte[] data = characteristic.getValue();
                 String s = Arrays.bytesToHexString(data, ",");
-                Log.v("蓝牙数据写入1返回 ", "zcl------------------" + s);
                 this.commandSuccess(null);
             } else {
                 this.commandError("write characteristic fail");
@@ -846,7 +849,6 @@ public class Peripheral extends BluetoothGattCallback {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 this.commandSuccess(characteristic.getValue());
                 String s = Arrays.bytesToHexString(characteristic.getValue(), ",");
-                Log.v("蓝牙数据写入2返回 ", "zcl------------------" + s);
             } else {
                 this.commandError("write characteristic fail");
             }

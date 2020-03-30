@@ -90,6 +90,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private final Command.Callback otaCallback = new OtaCommandCallback();
     private final Command.Callback firmwareCallback = new FirmwareCallback();
     private final Command.Callback deviceMacCallback = new DeviceMacCallback();
+    private final Command.Callback setGwCallback = new SetGwCallback();
     private final OtaPacketParser otaPacketParser = new OtaPacketParser();
 
     private LightPeripheral light;
@@ -779,6 +780,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
     public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
         if (tag.toString() == "0")
             return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
+        else if(tag.toString() == "1")
+            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag, delay);
         else
             return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
 
@@ -987,17 +990,25 @@ public final class LightController extends EventBus<Integer> implements LightPer
             result = new byte[0];
         }
         TelinkLog.d("蓝牙数据Notify Data --> " + Arrays.bytesToHexString(result, ","));
-        LogUtils.e("result --> " + Arrays.bytesToHexString(result, ","));
         this.onDeviceAddressNotify(data, tag);
         this.dispatchEvent(new LightEvent(LightEvent.NOTIFICATION_RECEIVE, result));
-      /*  if (result.length >= 8) {
+        if (result.length >= 8) {
             int cmd = result[7] & 0xFF;
-            LogUtils.e("kcmd = " +  Integer.toHexString(cmd));
+            int gwType = result[10] & 0xFF;
+            LogUtils.e("kcmd = " + Integer.toHexString(cmd));
             if (cmd == 0xFE) {
-                LogUtils.e();
+                String s = Arrays.bytesToHexString(result,"");
+                String sixByteMacAddress = s.substring(20, 32);
+                LogUtils.v("zcl----蓝牙数据切割mac--------"+s+"------"+sixByteMacAddress);
+                light.setSixByteMacAddress(sixByteMacAddress);
                 this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+            } else if (cmd == 0xEA) {
+                if (gwType == 0X10)//0x10代表连接业务标识
+                    light.setGwState(result[11]);//通过此处的peripheral设置数据
+                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------"+result[11]);
+                this.dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
             }
-        }*/
+        }
     }
 
     private void onDeviceAddressNotify(byte[] data, Object tag) {
@@ -1028,8 +1039,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         light.setMeshAddress(meshAddress);
 
-        TelinkLog.d("Device Address Update Success --> old : " + Integer.toHexString(light.getMeshAddress()) + " new: " + Integer.toHexString(meshAddress));
-
+        LogUtils.v("蓝牙数据Device Address Update Success --> old : " + Integer.toHexString(light.getMeshAddress()) + " new: " + Integer.toHexString(meshAddress));
         this.reset(this.newMeshName, this.newPassword, this.newLongTermKey);
     }
 
@@ -1084,6 +1094,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         public static final int LOGIN_ERROR_REPORT_WRITE = 92;
         public static final int LOGIN_ERROR_REPORT_READ = 93;
         public static final int LOGIN_ERROR_REPORT_CHECK = 94;
+        public static final int SET_GW_SUCCESS = 95;
+        public static final int SET_GW_FAIL = 96;
 
 
         private Object args;
@@ -1440,21 +1452,47 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
     }
 
-    private final class DeviceMacCallback implements Command.Callback {
+
+    private final class SetGwCallback implements Command.Callback {
 
         @Override
         public void success(Peripheral peripheral, Command command, Object obj) {
-            peripheral.setRecvie("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
+            // peripheral.setGwState("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
             LightPeripheral light = (LightPeripheral) peripheral;
 
             light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
-            LogUtils.v("zcl-------蓝牙数据正确数据-----------"+Arrays.bytesToHexString((byte[]) obj, ","));
-            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+            String s = Arrays.bytesToHexString((byte[]) obj, ",");
+            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
+           // dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
         }
 
         @Override
         public void error(Peripheral peripheral, Command command, String errorMsg) {
-            dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
+        }
+
+        @Override
+        public boolean timeout(Peripheral peripheral, Command command) {
+            return false;
+        }
+    }
+
+    private final class DeviceMacCallback implements Command.Callback {
+
+        @Override
+        public void success(Peripheral peripheral, Command command, Object obj) {
+            // peripheral.setGwState("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
+            LightPeripheral light = (LightPeripheral) peripheral;
+
+            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
+            LogUtils.v("zcl-------蓝牙数据正确数据-----------" + Arrays.bytesToHexString((byte[]) obj, ","));
+
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+        }
+
+        @Override
+        public void error(Peripheral peripheral, Command command, String errorMsg) {
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
         }
 
         @Override

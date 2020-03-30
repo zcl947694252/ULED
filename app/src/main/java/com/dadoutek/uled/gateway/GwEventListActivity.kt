@@ -25,12 +25,7 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
@@ -52,9 +47,8 @@ import java.util.*
  * 更新时间   $
  * 更新描述
  */
-class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener{
 
-    private lateinit var mApp: TelinkLightApplication
     private var dbGw: DbGateway? = null
     private var addBtn: Button? = null
     private var lin: View? = null
@@ -79,11 +73,6 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         addBtn?.text = getString(R.string.add)
 
         adapter.emptyView = emptyView
-    }
-
-    private fun sendDeviceMacParmars() {
-        var params = byteArrayOf(0, 0, 0, 0, 0, 0, 0,0)
-        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr?:0, params,"0")
     }
 
     private fun sendTimeZoneParmars() {
@@ -124,10 +113,6 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
     @SuppressLint("SetTextI18n")
     fun initData() {
-        //监听事件
-        this.mApp = this.application as TelinkLightApplication
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
         dbGw = intent.getParcelableExtra<DbGateway>("data")
 
         toolbarTv.text = getString(R.string.Gate_way) + dbGw?.name
@@ -152,7 +137,6 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         event_mode_gp.setOnCheckedChangeListener { _, checkedId ->
             list.clear()
             changeData(checkedId)
-            sendDeviceMacParmars()
             dbGw?.let {
                 addGw(it)
             }
@@ -209,36 +193,33 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     dbGw?.let {
                         addGw(it)
                     }
+
+                    sendOpenOrCloseGw(list[position])
                     sendParamToService(list[position])
                 }
             }
         }
     }
 
-    override fun performed(event: Event<String>?) {
-        if (event is DeviceEvent) {
-            this.onDeviceEvent(event)
-        }
-    }
+    private fun sendOpenOrCloseGw(dbGwTag: GwTagBean) {
+        var meshAddress = dbGw?.meshAddr ?: 0
+        //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+        //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)+1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        LogUtils.v("zcl-----------当前日期:--------$month-$day")
+        dbGwTag?.let {
+            var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
+                    it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
 
-    private fun onDeviceEvent(event: DeviceEvent) {
-       when(event.type){
-           DeviceEvent.STATUS_CHANGED ->{
-               when {
-                   event.args.status == LightAdapter.STATUS_CONNECTED -> //连接成功后获取firmware信息
-                       TelinkLightService.Instance()?.deviceMac
-                   //获取设备mac
-                   event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
-                       //mac信息获取成功
-                       val deviceInfo = event.args
-                       LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
-                   }
-                   event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
-                       LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
-                   }
-               }
-           }
-       }
+            val opcodeHead = if (dbGwTag?.isTimer())
+                Opcode.CONFIG_GW_TIMER_LABLE_HEAD
+            else
+                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
+
+            TelinkLightService.Instance().sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+        }
     }
 
     override fun onClick(v: View?) {
@@ -265,22 +246,30 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         adapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NewApi")
     private fun sendParamToService(dbGwTag: GwTagBean) {
         // 网关定时或者时间段模式标签头下发
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH)+1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
+
         val opcodeHead = if (dbGwTag?.isTimer())
             Opcode.CONFIG_GW_TIMER_LABLE_HEAD
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
+
         var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
-                dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
-                dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+                dbGwTag.tagId.toByte(), dbGwTag.status.toByte(), dbGwTag.week.toByte(), 0,
+                month.toByte(), day.toByte(), 0, 0)// status 开1 关0 tag的外部现实
+
+        val encoder = Base64.getEncoder()
+        val s = encoder.encodeToString(labHeadPar)
+
         val gattBody = GwGattBody()
-        gattBody.cmd = opcodeHead.toInt()
-        gattBody.data = labHeadPar.toString()
-        gattBody.macAddr = "789ce70aa87e"
+        gattBody.ser_id = 11
+        gattBody.data = s
+        gattBody.macAddr = dbGw?.macAddr
+        gattBody.isTagHead = 1
 
         GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {

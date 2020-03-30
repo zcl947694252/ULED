@@ -23,7 +23,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.gateway.GwEventListActivity
+import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
@@ -655,8 +655,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
             DeviceType.GATE_WAY -> {
                 val dbItem = DbGateway()
-                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
+                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
                 dbItem.macAddr = item.deviceInfo.macAddress
                 dbItem.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
                 dbItem.productUUID = item.deviceInfo.productUUID
@@ -1239,6 +1239,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun connectBestRssiDevice() {
         disposable?.dispose()
         val meshAddress = MeshAddressGenerator().meshAddress
+        LogUtils.v("zcl-----------网关新的meshAddress-------$meshAddress")
         disposable = Observable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1435,7 +1436,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else if (mAddDeviceType == DeviceType.SMART_CURTAIN) {
             startGrouping()
         } else if (mAddDeviceType == DeviceType.GATE_WAY) {
-            val intent = Intent(this@DeviceScanningNewActivity, GwEventListActivity::class.java)
+            val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
             //val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
             val gw = DbGateway(getGwId())
             gw.macAddr = bestRssiDevice!!.macAddress

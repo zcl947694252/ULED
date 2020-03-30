@@ -1000,6 +1000,8 @@
     <string name="wifi_pwd_hinit">Please enter WIFI password</string>
     <string name="config_net">Configure the network</string>
     <string name="wifi_cannot_be_empty">WIFI account and WIFI password cannot be empty</string>
+    <string name="config_WIFI_FAILE">WIFI network configuration failed</string>
+    <string name="config_setting_gw_wifi">Please wait while the wifi network is being configured</string>
 
 
 </resources>

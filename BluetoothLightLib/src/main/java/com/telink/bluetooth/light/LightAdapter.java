@@ -65,6 +65,9 @@ public class LightAdapter {
     public static final int STATUS_GET_FIRMWARE_FAILURE = 61;
     public static final int STATUS_GET_DEVICE_MAC_COMPLETED = 62;
     public static final int STATUS_GET_DEVICE_MAC_FAILURE = 63;
+    public static final int STATUS_SET_GW_SUCCESS= 64;
+    public static final int STATUS_SET_GW_COMPLETED = 65;
+    public static final int STATUS_SET_GW_FAIL = 66;
     public static final int STATUS_DELETE_COMPLETED = 70;
     public static final int STATUS_DELETE_FAILURE = 71;
 
@@ -93,6 +96,7 @@ public class LightAdapter {
     private final EventListener<Integer> mOtaListener = new OtaListener();
     private final EventListener<Integer> mFirmwareListener = new GetFirmwareListener();
     private final EventListener<Integer> mDeviceMacListener = new GetDeviceMacListener();
+    private final EventListener<Integer> mSetGwListener = new SetGwListener();
     private final EventListener<Integer> mGetLtkListener = new GetLongTermKeyListener();
     private final EventListener<Integer> mNotificationListener = new NotificationListener();
     private final EventListener<Integer> mDeleteListener = new DeleteListener();
@@ -216,6 +220,8 @@ public class LightAdapter {
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_FAILURE, this.mFirmwareListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_SUCCESS, this.mDeviceMacListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_FAILURE, this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_SUCCESS, this.mSetGwListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_FAIL, this.mSetGwListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_SUCCESS, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_FAILURE, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_SUCCESS, this.mDeleteListener);
@@ -1268,6 +1274,32 @@ public class LightAdapter {
             }
         }
     }
+
+    private final class SetGwListener implements EventListener<Integer> {
+
+        private void onSetGwSuccess() {
+            LogUtils.e();
+            setStatus(STATUS_SET_GW_COMPLETED, true);
+        }
+
+        private void onSetGwFailure() {
+            setStatus(STATUS_SET_GW_FAIL, true);
+        }
+
+        @Override
+        public void performed(Event<Integer> event) {
+            switch (event.getType()) {
+                case LightController.LightEvent.SET_GW_SUCCESS:
+                    setStatus(STATUS_SET_GW_SUCCESS);
+                    this.onSetGwSuccess();
+                    break;
+                case LightController.LightEvent.SET_GW_FAIL:
+                    this.onSetGwFailure();
+                    break;
+            }
+        }
+    }
+
 
     private final class GetDeviceMacListener implements EventListener<Integer> {
 

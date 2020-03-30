@@ -138,6 +138,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
         else
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
+
+        sendLabelHeadParams()
     }
 
     override fun onClick(v: View?) {
@@ -148,6 +150,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
                 startActivityForResult(intent, requestModeCode)
             }
+
             R.id.gate_way_edite -> {//是否编辑
                 isCanEdite = !isCanEdite
                 isCanEdite()
@@ -210,7 +213,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)+1
+        val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         LogUtils.v("zcl-----------当前日期:--------$month-$day")
         tagBean?.let {
@@ -222,23 +225,23 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             else
                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
             TelinkLightService.Instance().sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+        }
+    }
 
-            if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送
-                var delayTime = 0L
-                val tasks = it.tasks
+    private fun sendTime(tasks: GwTasksBean?, meshAddress: Int): Any {
+        return if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送
+            var delayTime = 0L
 
-                GlobalScope.launch(Dispatchers.Main) {
-                    delayTime += 200
-                    delay(timeMillis = delayTime)
-                    if (tasks!=null)
-                    for (task in tasks) {//定时场景时间下发
-                        var params = byteArrayOf(it.tagId.toByte(), task.index.toByte(),
-                                task.startHour.toByte(), task.startMins.toByte(), task.sceneId.toByte(), 0, 0, 0)
-                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
-                    }
+            GlobalScope.launch(Dispatchers.Main) {
+                delayTime += 200
+                delay(timeMillis = delayTime)
+                if (tasks != null) {//定时场景时间下发
+                    var params = byteArrayOf((tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
+                            tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
                 }
-            } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
             }
+        } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
         }
     }
 
@@ -246,7 +249,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         var week = 0b00000000
         when (str) {
             getString(R.string.only_one) -> {
-                week = 0b10000000
+                week = 0b00000000
                 return week
             }
             getString(R.string.every_day) -> {
@@ -256,7 +259,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             else -> {
                 val split = str.split(",").toMutableList()
                 for (s in split) {
-                    when (s) {//bit位 0-6 周日-周六 7代表当天
+                    when (s) {//bit位 0-6 周日-周六 7代表当天 0代表仅一次
                         getString(R.string.sunday) -> week = week or 0b00000001
                         getString(R.string.monday) -> week = week or 0b00000010
                         getString(R.string.tuesday) -> week = week or 0b00000100
@@ -280,7 +283,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
                 // 从数据源移除该Item对应的数据，并刷新Adapter。
                 val position = srcHolder?.adapterPosition
-                sendDeleteTask(listTask[position?:0])
+                sendDeleteTask(listTask[position ?: 0])
                 listTask.removeAt(position!!)
                 adapter.notifyItemRemoved(position)
                 saveChangeTasks()
@@ -324,11 +327,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
         //11-18 11位标签id 12 时间条index
         val id = dbGw?.id ?: 0
+
         var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
-
-        TelinkLightService.Instance().sendCommandNoResponse(opcodeDelete,
-                dbGw?.meshAddr ?: 0, paramer)
-
+        TelinkLightService.Instance().sendCommandNoResponse(opcodeDelete, dbGw?.meshAddr
+                ?: 0, paramer)
     }
 
     private fun addNewTask() {
@@ -337,24 +339,22 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
             index == 0 -> toast(getString(R.string.gate_way_time_max))
             tagBean?.getIsTimer() == true -> {//跳转时间选择界面
-                sendLabelHeadParams()
-
                 val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
 
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0
+                tasksBean.listTask = listTask
                 intent.putExtra("newData", tasksBean)
 
                 startActivityForResult(intent, requestTimeCode)
             }
             tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
-                sendLabelHeadParams()
-
                 val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
 
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0
                 tasksBean.gwMeshAddr = dbGw?.meshAddr ?: 0
+                tasksBean.listTask = listTask
                 intent.putExtra("newData", tasksBean)
 
                 startActivityForResult(intent, requestTimeCode)
@@ -421,6 +421,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                         listTask.sortBy { it.startHour }
                     }
+                    //sendTime(tagBean!!, dbGw?.meshAddr ?: 0)
+                    sendTime(bean, dbGw?.meshAddr ?: 0)
                     adapter.notifyDataSetChanged()
                 }
             }
