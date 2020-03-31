@@ -3,6 +3,7 @@ package com.dadoutek.uled.gateway
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -11,6 +12,7 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -25,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -33,10 +36,6 @@ import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 import java.util.*
 import kotlin.collections.ArrayList
@@ -140,9 +139,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         else
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
 
-        sendLabelHeadParams()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            sendLabelHeadParams()
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.add_group_btn -> addNewTask()//创建新的task传入可用的index
@@ -183,7 +185,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
 
                     DBUtils.saveGateWay(it, dbGw?.addTag == 1)//是否是添加新的
                     addGw(it)
-                    sendLabelHeadParams()
+                        sendLabelHeadParams()
                 }
                 val intent = Intent(this@GwConfigTagActivity, GwEventListActivity::class.java)
                 intent.putExtra("data", dbGw)
@@ -209,6 +211,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     /**
      * 发送标签保存命令
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendLabelHeadParams() {
         var meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
@@ -216,34 +219,100 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
-        LogUtils.v("zcl-----------当前日期:--------$month-$day")
-        tagBean?.let {
-            var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
-                    it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
 
-            val opcodeHead = if (tagBean?.isTimer() == true)
-                Opcode.CONFIG_GW_TIMER_LABLE_HEAD
-            else
-                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+        LogUtils.v("zcl-----------当前日期:--------$month-$day")
+
+        val opcodeHead = if (tagBean?.isTimer() == true)
+            Opcode.CONFIG_GW_TIMER_LABLE_HEAD
+        else
+            Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
+
+        if (TelinkLightApplication.getApp().offLine) {
+            tagBean?.let {
+                var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
+                        it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
+                        month.toByte(), day.toByte(), 0, 0)// status 开1 关0 tag的外部现实
+
+                val encoder = Base64.getEncoder()
+                val s = encoder.encodeToString(labHeadPar)
+                val gattBody = GwGattBody()
+                gattBody.data = s
+                gattBody.macAddr = dbGw?.macAddr
+                gattBody.isTagHead = 1
+                sendToServer(gattBody)
+            }
+        } else {
+            tagBean?.let {
+                var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
+                        it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+            }
         }
     }
+    /**
+     * 定时场景标签头下发,时间段时间下发
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendTime(tasks: GwTasksBean, meshAddress: Int) {
+        if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送 定时场景时间下发
+            if (TelinkLightApplication.getApp().offLine) {
+                var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_TIMER_LABLE_TIME, 0x11, 0x02,
+                        (tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
+                        tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
 
-    private fun sendTime(tasks: GwTasksBean?, meshAddress: Int): Any {
-        return if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送
-            var delayTime = 0L
+                val encoder = Base64.getEncoder()
+                val s = encoder.encodeToString(labHeadPar)
+                val gattBody = GwGattBody()
+                gattBody.data = s
+                gattBody.macAddr = dbGw?.macAddr
 
-            GlobalScope.launch(Dispatchers.Main) {
-                delayTime += 200
-                delay(timeMillis = delayTime)
-                if (tasks != null) {//定时场景时间下发
-                    var params = byteArrayOf((tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
-                            tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
-                }
+                sendToServer(gattBody)
+            } else {
+                var params = byteArrayOf((tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
+                        tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params)
             }
         } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
+        val id = dbGw?.id ?: 0
+        var opcodeDelete = if (tagBean?.isTimer() == true)
+            Opcode.CONFIG_GW_TIMER_DELETE_TASK
+        else
+            Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
+
+        if (TelinkLightApplication.getApp().offLine) {
+            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
+                    id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+
+            val encoder = Base64.getEncoder()
+            val s = encoder.encodeToString(labHeadPar)
+            val gattBody = GwGattBody()
+            gattBody.data = s
+            gattBody.macAddr = dbGw?.macAddr
+            sendToServer(gattBody)
+        } else {
+            //11-18 11位标签id 12 时间条index
+            var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+            TelinkLightService.Instance().sendCommandNoResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer)
+        }
+    }
+
+    private fun sendToServer(gattBody: GwGattBody): Unit? {
+        return GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl------------------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.e("zcl------------------${e.message}")
+            }
+        })
     }
 
     private fun getWeek(str: String): Int {
@@ -281,6 +350,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         gate_way_repete_mode.setOnClickListener(this)
         gate_way_repete_mode_arrow.setOnClickListener(this)
         swipe_recycleView.setOnItemMoveListener(object : OnItemMoveListener {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
                 // 从数据源移除该Item对应的数据，并刷新Adapter。
                 val position = srcHolder?.adapterPosition
@@ -311,31 +381,20 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 val tasksBean = listTask[position]
                 tasksBean.isCreateNew = false
 
-               TelinkLightApplication.getApp().listTask = listTask
+                TelinkLightApplication.getApp().listTask = listTask
                 intent.putExtra("data", tasksBean)
             } else {
                 intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
                 //传入时间段数据 重新配置时间段的场景值
-                listTask[0].labelId = tagBean?.tagId ?: 0//默认使用第一个记录选中的pos
-                listTask[0].isCreateNew = false
-                intent.putExtra("data", listTask[position])
+                val tasksBean = listTask[position]
+                tasksBean.labelId =tagBean?.tagId ?: 0
+                tasksBean.isCreateNew = false
+                tasksBean.gwMacAddr = dbGw?.macAddr
+                intent.putExtra("data", tasksBean)
             }
             startActivityForResult(intent, requestTimeCode)
         }
         add_group_btn?.setOnClickListener(this)
-    }
-
-    private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
-        var opcodeDelete = if (tagBean?.isTimer() == true)
-            Opcode.CONFIG_GW_TIMER_DELETE_TASK
-        else
-            Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
-        //11-18 11位标签id 12 时间条index
-        val id = dbGw?.id ?: 0
-
-        var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
-        TelinkLightService.Instance().sendCommandNoResponse(opcodeDelete, dbGw?.meshAddr
-                ?: 0, paramer)
     }
 
     private fun addNewTask() {
@@ -393,6 +452,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
         return index
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -411,10 +471,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             } else if (requestCode == requestTimeCode) {//获取定时和时间段的task
                 val bean = data?.getParcelableExtra<GwTasksBean>("data")
-                bean?.let {
-                    if (bean.isCreateNew) {
-                        bean.isCreateNew = false
-                        listTask.add(bean)
+                bean?.let { b ->
+                    if (b.isCreateNew) {
+                        b.isCreateNew = false
+                        listTask.add(b)
                     } else {
                         bean.isCreateNew = false
                         var targetPosition: Int
@@ -429,8 +489,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                         listTask.sortBy { it.startHour }
                     }
-                    //sendTime(tagBean!!, dbGw?.meshAddr ?: 0)
-                    sendTime(bean, dbGw?.meshAddr ?: 0)
+                        sendTime(b, dbGw?.meshAddr ?: 0)
                     adapter.notifyDataSetChanged()
                 }
             }

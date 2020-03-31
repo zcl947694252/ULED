@@ -2,6 +2,7 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -11,6 +12,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -140,8 +142,10 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr?:0, params)
-        LogUtils.v("zcl---------蓝牙数据--dbGwmac:${dbGw?.macAddr}------${dbGw?.sixByteMacAddr}--------mes${dbGw?.meshAddr?:1000}--")//78-9c-e7-04-2e-bb
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr
+                ?: 0, params)
+        LogUtils.v("zcl---------蓝牙数据--dbGwmac:${dbGw?.macAddr}------${dbGw?.sixByteMacAddr}--------mes${dbGw?.meshAddr
+                ?: 1000}--")//78-9c-e7-04-2e-bb
     }
 
     @SuppressLint("SetTextI18n")
@@ -161,6 +165,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         sendTimeZoneParmars()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun initListener() {
         toolbar.setNavigationOnClickListener { finish() }
@@ -222,37 +227,63 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     else
                         dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
 
-                    DBUtils.saveGateWay(dbGw!!, true)
                     dbGw?.let {
+                        DBUtils.saveGateWay(it, true)
                         addGw(it)
                     }
-
                     sendOpenOrCloseGw(list[position])
-                    sendParamToService(list[position])
                 }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendOpenOrCloseGw(dbGwTag: GwTagBean) {
         var meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)+1
+        val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         LogUtils.v("zcl-----------当前日期:--------$month-$day")
-        dbGwTag?.let {
-            var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
-                    it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
 
-            val opcodeHead = if (dbGwTag?.isTimer())
-                Opcode.CONFIG_GW_TIMER_LABLE_HEAD
-            else
-                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
+        val opcodeHead = if (dbGwTag.isTimer())
+            Opcode.CONFIG_GW_TIMER_LABLE_HEAD
+        else
+            Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
+        if (TelinkLightApplication.getApp().offLine) {
+            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+                    Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
+                    dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
+                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+
+            val encoder = Base64.getEncoder()
+            val s = encoder.encodeToString(labHeadPar)
+            val gattBody = GwGattBody()
+            gattBody.data = s
+            gattBody.macAddr = dbGw?.macAddr
+            gattBody.isTagHead = 1
+            sendToServer(gattBody)
+        } else {
+            var labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
+                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
             TelinkLightService.Instance().sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
         }
+
+    }
+
+    private fun sendToServer(gattBody: GwGattBody): Unit? {
+        return GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl------------------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.e("zcl------------------${e.message}")
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -279,57 +310,20 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         adapter.notifyDataSetChanged()
     }
 
-    @SuppressLint("NewApi")
-    private fun sendParamToService(dbGwTag: GwTagBean) {
-        // 网关定时或者时间段模式标签头下发
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)+1
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val opcodeHead = if (dbGwTag?.isTimer())
-            Opcode.CONFIG_GW_TIMER_LABLE_HEAD
-        else
-            Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
-
-        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
-                dbGwTag.tagId.toByte(), dbGwTag.status.toByte(), dbGwTag.week.toByte(), 0,
-                month.toByte(), day.toByte(), 0, 0)// status 开1 关0 tag的外部现实
-
-        val encoder = Base64.getEncoder()
-        val s = encoder.encodeToString(labHeadPar)
-
-        val gattBody = GwGattBody()
-        gattBody.ser_id = 11
-        gattBody.data = s
-        gattBody.macAddr = dbGw?.macAddr
-        gattBody.isTagHead = 1
-
-        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
-                LogUtils.v("zcl------------------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                LogUtils.e("zcl------------------${e.message}")
-            }
-        })
-    }
-
     /**
      * 添加网关
      */
     private fun addGw(dbGw: DbGateway) {
-            GwModel.add(dbGw)?.subscribe(object : NetworkObserver<DbGateway?>() {
-                override fun onNext(t: DbGateway) {
-                    LogUtils.v("zcl-----网关失添成功返回-------------$t")
-                }
+        GwModel.add(dbGw)?.subscribe(object : NetworkObserver<DbGateway?>() {
+            override fun onNext(t: DbGateway) {
+                LogUtils.v("zcl-----网关失添成功返回-------------$t")
+            }
 
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    LogUtils.v("zcl-------网关失添加败-----------" + e.message)
-                }
-            })
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.v("zcl-------网关失添加败-----------" + e.message)
+            }
+        })
     }
 
     private fun deleteTimerLable(gwTagBean: GwTagBean, currentTime: Long) {
@@ -341,12 +335,14 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         //11-18 11位labelId
         if (currentTime - lastTime > 400) {
             var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
-            TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer)
+            TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr
+                    ?: 0, paramer)
         } else {
             GlobalScope.launch(Dispatchers.Main) {
                 delay(400)
                 var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
-                TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer)
+                TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr
+                        ?: 0, paramer)
             }
         }
     }
@@ -363,6 +359,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_list)

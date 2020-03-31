@@ -1,9 +1,12 @@
 package com.dadoutek.uled.gateway
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -12,11 +15,17 @@ import com.dadoutek.uled.gateway.adapter.GwTpItemAdapter
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.switches.SelectSceneListActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.template_top_three.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -80,10 +89,11 @@ class GwTimerPeriodListActivity : BaseActivity() {
                     break
                 }
         }
-
         adapter.notifyDataSetChanged()
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun initView() {
         toolbar_t_center.text = getString(R.string.timer_period_set)
         toolbar_t_cancel.setOnClickListener { finish() }
@@ -95,13 +105,30 @@ class GwTimerPeriodListActivity : BaseActivity() {
 
             for (tp in timesList) {
                 if (tasksBean != null && tp.sceneId != 0L) {
-                    var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                            tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
-                            (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
-                            (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+                    if (TelinkLightApplication.getApp().offLine){
+                        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+                                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
+                                tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
+                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
 
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
-                            tasksBean?.gwMeshAddr ?: 0, params)
+                        val encoder = Base64.getEncoder()
+                        val s = encoder.encodeToString(labHeadPar)
+                        val gattBody = GwGattBody()
+                        gattBody.data = s
+                        gattBody.macAddr = tasksBean!!.gwMacAddr
+                        gattBody.isTagHead = 1
+                        sendToServer(gattBody)
+                    }else{
+                        var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
+                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+
+                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
+                                tasksBean?.gwMeshAddr ?: 0, params)
+                    }
                 }
             }
             tasksBean?.timingPeriods = timesList
@@ -114,5 +141,18 @@ class GwTimerPeriodListActivity : BaseActivity() {
 
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
+    }
+
+    private fun sendToServer(gattBody: GwGattBody): Unit? {
+        return GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl------------------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.e("zcl------------------${e.message}")
+            }
+        })
     }
 }

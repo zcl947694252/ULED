@@ -122,33 +122,6 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
             TmtUtils.midToastLong(this,getString(R.string.invalid_data));
             finish();
         }
-
-
-       /* ArrayList<Parcelable> datas = intent.getParcelableArrayListExtra("data");//传入list代表旧的
-        if (datas != null)
-            for (int i = 0; i < datas.size(); i++) {
-                GwTasksBean tag = (GwTasksBean) datas.get(i);
-                data.add(tag);
-            }
-
-        newData = intent.getParcelableExtra("newData");//传入data代表新的
-
-        if (datas != null && !TextUtils.isEmpty(datas.toString())) {//编辑老的task
-            GwTasksBean tagBean = this.data.get(0);
-            int pos = tagBean.getSelectPos();//拿到点击pos
-            tasksBean = this.data.get(pos);
-            hourTime = tasksBean.getStartHour();
-            minuteTime = tasksBean.getStartMins();
-            timerScene.setText(tasksBean.getSenceName());
-            tasksBean.setCreateNew(false);
-            scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
-            isNew = false;
-        } else if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
-            isNew = true;
-            tasksBean = newData;
-            data = newData.getListTask();
-            tasksBean.setCreateNew(true);
-        }*/
         wheelPickerLy.addView(getTimePicker());
     }
 
@@ -197,7 +170,6 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
                 minuteTime = Integer.parseInt(minute);
             }
         });
-
         return picker.getContentView();
     }
 

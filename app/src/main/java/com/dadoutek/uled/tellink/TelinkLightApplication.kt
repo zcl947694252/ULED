@@ -33,7 +33,8 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
-     var listTask: ArrayList<GwTasksBean> =ArrayList<GwTasksBean>()
+    var offLine: Boolean = false
+    var listTask: ArrayList<GwTasksBean> =ArrayList()
     val useIndex = mutableListOf<Int>()
     val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null

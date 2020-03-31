@@ -28,7 +28,8 @@ public class GwTasksBean implements Parcelable {
     private int endMinuts;
     private int selectPos;//本地使用
     private long labelId;//本地使用 标签id
-    private int gwMeshAddr;//本地使用 标签id
+    private int gwMeshAddr;//本地使用 标签mesh地址
+    private String  gwMacAddr;//本地使用 标签mac
     private ArrayList<GwTasksBean> listTask;//本地使用 已存在时间task
     private ArrayList<GwTimePeriodsBean> timingPeriods;//时间段list
 
@@ -51,6 +52,7 @@ public class GwTasksBean implements Parcelable {
         selectPos = in.readInt();
         labelId = in.readLong();
         gwMeshAddr = in.readInt();
+        gwMacAddr = in.readString();
         listTask = in.createTypedArrayList(GwTasksBean.CREATOR);
         timingPeriods = in.createTypedArrayList(GwTimePeriodsBean.CREATOR);
     }
@@ -71,6 +73,7 @@ public class GwTasksBean implements Parcelable {
         dest.writeInt(selectPos);
         dest.writeLong(labelId);
         dest.writeInt(gwMeshAddr);
+        dest.writeString(gwMacAddr);
         dest.writeTypedList(listTask);
         dest.writeTypedList(timingPeriods);
     }
@@ -91,6 +94,14 @@ public class GwTasksBean implements Parcelable {
             return new GwTasksBean[size];
         }
     };
+
+    public String getGwMacAddr() {
+        return gwMacAddr;
+    }
+
+    public void setGwMacAddr(String gwMacAddr) {
+        this.gwMacAddr = gwMacAddr;
+    }
 
     public int getStartMinuts() {
         return startMinuts;

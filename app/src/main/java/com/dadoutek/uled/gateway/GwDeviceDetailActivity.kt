@@ -387,30 +387,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     showPopupWindow(view, position)
                 }
             }
+        }else if (view.id == R.id.img_light){
+            TelinkLightApplication.getApp().offLine = true
+            val intent = Intent(this@GwDeviceDetailActivity, GwLoginActivity::class.java)
+            intent.putExtra("data", currentGw)
+            startActivity(intent)
         }
-        /*      when {
-                  view.id == R.id.tv_setting -> {
-                      val lastUser = DBUtils.lastUser
-                      lastUser?.let {
-                          if (it.id.toString() != it.last_authorizer_user_id)
-                              ToastUtils.showLong(getString(R.string.author_region_warm))
-                          else {
-                              if (TelinkLightApplication.getApp().connectDevice == null) {
-                                  autoConnect()
-                              } else {
-                                  var intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-                                  intent.putExtra("data", currentGw)
-                                  startActivity(intent)
-                              }
-                          }
-                      }
-                  }
-                  else -> ToastUtils.showLong(R.string.reconnecting)
-              }
-
-       fun autoConnect() {
-            mConnectDisposal = connect()?.subscribe({ LogUtils.d(it) }, { LogUtils.d(it) })
-    }  */
     }
 
     private fun showPopupWindow(view: View?, position: Int) {
@@ -471,6 +453,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
             disposableConnect?.dispose()
             disposableConnect = connect(macAddress = currentGw?.macAddr, retryTimes = 1)?.subscribe({
+                TelinkLightApplication.getApp().offLine = false
                 if (configType == 2)//代表OTA
                     getDeviceVersion(currentGw!!.meshAddr)
                 else
