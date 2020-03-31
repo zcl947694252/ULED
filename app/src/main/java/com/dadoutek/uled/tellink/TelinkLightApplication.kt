@@ -6,6 +6,7 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
+import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
@@ -32,6 +33,7 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
+     var listTask: ArrayList<GwTasksBean> =ArrayList<GwTasksBean>()
     val useIndex = mutableListOf<Int>()
     val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
@@ -39,9 +41,7 @@ class TelinkLightApplication : TelinkApplication() {
     private var singleLoginTopicDisposable: Disposable? = null
     private var MIN_CLICK_DELAY_TIME = 10000
     private var lastClickTime: Long = 0
-    private
-
-    var mCancelAuthorTopicDisposable: Disposable? = null
+    private var mCancelAuthorTopicDisposable: Disposable? = null
     var paserCodedisposable: Disposable? = null
 
 

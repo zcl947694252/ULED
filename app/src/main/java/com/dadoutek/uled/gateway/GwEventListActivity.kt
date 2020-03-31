@@ -25,7 +25,12 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.Event
+import com.telink.util.EventListener
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
@@ -47,8 +52,33 @@ import java.util.*
  * 更新时间   $
  * 更新描述
  */
-class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener{
+class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+    override fun performed(event: Event<String>?) {
+        if (event is DeviceEvent) {
+            this.onDeviceEvent(event)
+        }
+    }
 
+    private fun onDeviceEvent(event: DeviceEvent) {
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                when {
+                    //获取设备mac
+                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
+                        //mac信息获取成功
+                        val deviceInfo = event.args
+                        LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
+                        dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
+                    }
+                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
+                        LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
+                    }
+                }
+            }
+        }
+    }
+
+    private lateinit var mApp: TelinkLightApplication
     private var dbGw: DbGateway? = null
     private var addBtn: Button? = null
     private var lin: View? = null
@@ -59,6 +89,9 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener{
     fun initView() {
         toolbarTv.text = getString(R.string.event_list)
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+
+        this.mApp = this.application as TelinkLightApplication
+        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         img_function1.visibility = View.VISIBLE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)

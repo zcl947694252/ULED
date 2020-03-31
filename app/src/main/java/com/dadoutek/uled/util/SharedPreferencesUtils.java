@@ -45,6 +45,7 @@ public class SharedPreferencesUtils {
                 Constant.CURRENT_USE_LIST_KEY, userList);
     }
 
+
     public static List<String> getCurrentUserList() {
         List<String> list = (List<String>) SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
                 Constant.CURRENT_USE_LIST_KEY);

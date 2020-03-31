@@ -26,6 +26,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import kotlinx.android.synthetic.main.activity_gate_way.*
@@ -307,9 +308,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             val intent: Intent
             if (tagBean?.getIsTimer() == true) {
                 intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
-                listTask[0].selectPos = position//默认使用第一个记录选中的pos
-                listTask[0].isCreateNew = false
-                intent.putExtra("data", listTask)
+                val tasksBean = listTask[position]
+                tasksBean.isCreateNew = false
+
+               TelinkLightApplication.getApp().listTask = listTask
+                intent.putExtra("data", tasksBean)
             } else {
                 intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
                 //传入时间段数据 重新配置时间段的场景值
@@ -345,9 +348,9 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0
-                tasksBean.listTask = listTask
-                intent.putExtra("newData", tasksBean)
                 tasksBean.isCreateNew = true
+                TelinkLightApplication.getApp().listTask = listTask
+                intent.putExtra("data", tasksBean)
                 startActivityForResult(intent, requestTimeCode)
             }
             tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
@@ -356,7 +359,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0
                 tasksBean.gwMeshAddr = dbGw?.meshAddr ?: 0
-                tasksBean.listTask = listTask
+                TelinkLightApplication.getApp().listTask = listTask
                 tasksBean.isCreateNew = true
                 intent.putExtra("newData", tasksBean)
 

@@ -24,6 +24,8 @@ public class GwTasksBean implements Parcelable {
     private int endHour;
     private int startMins;
     private int endMins;
+    private int startMinuts;
+    private int endMinuts;
     private int selectPos;//本地使用
     private long labelId;//本地使用 标签id
     private int gwMeshAddr;//本地使用 标签id
@@ -33,7 +35,6 @@ public class GwTasksBean implements Parcelable {
     public GwTasksBean(int index) {
         this.index = index;
     }
-
 
     protected GwTasksBean(Parcel in) {
         index = in.readInt();
@@ -45,6 +46,8 @@ public class GwTasksBean implements Parcelable {
         endHour = in.readInt();
         startMins = in.readInt();
         endMins = in.readInt();
+        startMinuts = in.readInt();
+        endMinuts = in.readInt();
         selectPos = in.readInt();
         labelId = in.readLong();
         gwMeshAddr = in.readInt();
@@ -63,6 +66,8 @@ public class GwTasksBean implements Parcelable {
         dest.writeInt(endHour);
         dest.writeInt(startMins);
         dest.writeInt(endMins);
+        dest.writeInt(startMinuts);
+        dest.writeInt(endMinuts);
         dest.writeInt(selectPos);
         dest.writeLong(labelId);
         dest.writeInt(gwMeshAddr);
@@ -86,6 +91,22 @@ public class GwTasksBean implements Parcelable {
             return new GwTasksBean[size];
         }
     };
+
+    public int getStartMinuts() {
+        return startMinuts;
+    }
+
+    public void setStartMinuts(int startMinuts) {
+        this.startMinuts = startMinuts;
+    }
+
+    public int getEndMinuts() {
+        return endMinuts;
+    }
+
+    public void setEndMinuts(int endMinuts) {
+        this.endMinuts = endMinuts;
+    }
 
     public ArrayList<GwTasksBean> getListTask() {
         return listTask;

@@ -81,6 +81,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private lateinit var dbGw: DbGateway
     private var mConnectDisposal: Disposable? = null
     private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为6次
     private val MAX_RSSI = 90
@@ -149,7 +150,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         initClick()
         startScan()
         // startNewScan()
-
     }
 
     private val currentGroup: DbGroup?
@@ -654,19 +654,18 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 LogUtils.e("zcl保存分组curtain----${DBUtils.getCurtainByGroupID(item.belongGroupId).size}----------${DBUtils.getAllCurtains().size}")
             }
             DeviceType.GATE_WAY -> {
-                val dbItem = DbGateway()
-                dbItem.meshAddr = item.deviceInfo.meshAddress
-                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
-                dbItem.macAddr = item.deviceInfo.macAddress
-                dbItem.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
-                dbItem.productUUID = item.deviceInfo.productUUID
-                dbItem.id = getGwId()
-                dbItem.tags = ""
-                dbItem.timePeriodTags = ""
-                dbItem.uid = (lastUser?.id?:0).toInt()
-                DBUtils.saveGateWay(dbItem, false)
-                LogUtils.e("zcl保存分组网关-------------${DBUtils.getAllGateWay().size}")
-                addGw(dbItem)
+                dbGw = DbGateway(getGwId())
+                dbGw.macAddr = item.deviceInfo.macAddress
+                dbGw.meshAddr = item.deviceInfo.meshAddress
+                dbGw.productUUID = item.deviceInfo.productUUID
+                dbGw.version = item.deviceInfo.firmwareRevision
+                dbGw.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
+                dbGw.name = getString(R.string.device_name) + dbGw.meshAddr
+                dbGw.tags = ""
+                dbGw.timePeriodTags = ""
+                dbGw.uid = (lastUser?.id?:0).toInt()
+                DBUtils.saveGateWay(dbGw, false)
+                addGw(dbGw)
             }
         }
     }
@@ -1437,19 +1436,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             startGrouping()
         } else if (mAddDeviceType == DeviceType.GATE_WAY) {
             val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
-            //val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
-            val gw = DbGateway(getGwId())
-            gw.macAddr = bestRssiDevice!!.macAddress
-            gw.meshAddr = bestRssiDevice!!.meshAddress
-            gw.productUUID = bestRssiDevice!!.productUUID
-            gw.version = bestRssiDevice!!.firmwareRevision
-            gw.uid = lastUser!!.id.toInt()//用户id
-            gw.name = getString(R.string.device_name) + bestRssiDevice!!.meshAddress
-            gw.tags = ""
-            gw.timePeriodTags = ""
-            gw.uid = (lastUser?.id?:0).toInt()
-
-            intent.putExtra("data", gw)
+            intent.putExtra("data", dbGw)
 
             startActivity(intent)
             finish()

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -19,6 +18,7 @@ import com.dadoutek.uled.gateway.bean.GwTasksBean;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.switches.SelectSceneListActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.util.TmtUtils;
 
 import java.util.ArrayList;
@@ -47,8 +47,6 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
     private DbScene scene;
     private GwTasksBean tasksBean;
     ArrayList<GwTasksBean> data = new ArrayList();
-    private GwTasksBean newData;
-    private Boolean isNew;
 
 
     @Override
@@ -68,7 +66,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
                 Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene), Toast.LENGTH_SHORT).show();
             else {
                 if (isTimeHave()) {//如果已有该时间
-                    if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !isNew) {//并且是当前的task的时间 返回结果
+                    if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !tasksBean.isCreateNew()) {//并且是当前的task的时间 返回结果
                         setForResult();
                     } else {
                         TmtUtils.midToastLong(this, getString(R.string.have_time_task));
@@ -110,7 +108,23 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
         toolbarTv.setText(getString(R.string.chose_time));
         timerTitle.setText(getString(R.string.scene_name));//底部item 的title
         Intent intent = getIntent();
-        ArrayList<Parcelable> datas = intent.getParcelableArrayListExtra("data");//传入list代表旧的
+        Parcelable dataParcelable = intent.getParcelableExtra("data");
+        tasksBean = (GwTasksBean) dataParcelable;
+        if (tasksBean != null){
+           data = TelinkLightApplication.Companion.getApp().getListTask();
+            if (!tasksBean.isCreateNew()) {//不是新的赋值旧的数据
+                hourTime = tasksBean.getStartHour();
+                minuteTime = tasksBean.getStartMins();
+                timerScene.setText(tasksBean.getSenceName());
+                scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
+            }
+        }else{
+            TmtUtils.midToastLong(this,getString(R.string.invalid_data));
+            finish();
+        }
+
+
+       /* ArrayList<Parcelable> datas = intent.getParcelableArrayListExtra("data");//传入list代表旧的
         if (datas != null)
             for (int i = 0; i < datas.size(); i++) {
                 GwTasksBean tag = (GwTasksBean) datas.get(i);
@@ -134,7 +148,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
             tasksBean = newData;
             data = newData.getListTask();
             tasksBean.setCreateNew(true);
-        }
+        }*/
         wheelPickerLy.addView(getTimePicker());
     }
 

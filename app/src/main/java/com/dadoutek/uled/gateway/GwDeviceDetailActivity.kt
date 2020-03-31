@@ -406,7 +406,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                       }
                   }
                   else -> ToastUtils.showLong(R.string.reconnecting)
-              }*/
+              }
+
+       fun autoConnect() {
+            mConnectDisposal = connect()?.subscribe({ LogUtils.d(it) }, { LogUtils.d(it) })
+    }  */
     }
 
     private fun showPopupWindow(view: View?, position: Int) {
@@ -467,7 +471,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
             disposableConnect?.dispose()
             disposableConnect = connect(macAddress = currentGw?.macAddr, retryTimes = 1)?.subscribe({
-                if (configType == 2)
+                if (configType == 2)//代表OTA
                     getDeviceVersion(currentGw!!.meshAddr)
                 else
                     onLogin(configType)//判断进入那个开关设置界面
@@ -545,6 +549,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun onLogin(isConfigGw: Int) {
+        disposable?.dispose()
         hideLoadingDialog()
         val intent: Intent = if (isConfigGw == 0)
             Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
@@ -606,9 +611,4 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
         acitivityIsAlive = false
         installDialog?.dismiss()
     }
-
-    fun autoConnect() {
-        mConnectDisposal = connect()?.subscribe({ LogUtils.d(it) }, { LogUtils.d(it) })
-    }
-
 }

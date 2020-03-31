@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.TextUtils
 import android.view.View
 import cn.qqtheme.framework.picker.DateTimePicker
@@ -15,10 +14,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import kotlinx.android.synthetic.main.activity_gate_way_chose_time.*
-import kotlinx.android.synthetic.main.item_gw_time_scene.*
 import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
 
@@ -38,9 +35,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private var endHourTime = 8
     private var endMinuteTime = 30
     private var endTimeNum: Int = endHourTime * 60 + endMinuteTime
-    private var scene: DbScene? = null
     private var tasksBean: GwTasksBean? = null
-    internal var data: ArrayList<Parcelable>? = null
+    private var data = ArrayList<GwTasksBean>()
     private var selectStart = true
     private var timesList = ArrayList<GwTimePeriodsBean>()
 
@@ -114,9 +110,16 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.toolbar_t_confim -> {
-                if (startTimeNum >= endTimeNum)
+                val repeatTime = isRepeatTime()
+                if (repeatTime){
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
-                else {
+                    return
+                }
+                if (startTimeNum >= endTimeNum){
+                    ToastUtils.showShort(getString(R.string.please_chose_right_time))
+                    return
+                }
+
                     if (standingNum <= 0) {
                         ToastUtils.showShort(getString(R.string.please_select_standing_time))
                         return
@@ -127,12 +130,12 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                     tasksBean?.startMins = startMinuteTime
                     tasksBean?.endHour = endHourTime
                     tasksBean?.endMins = endMinuteTime
+                    tasksBean?.startMinuts = startTimeNum
+                    tasksBean?.endMinuts = endTimeNum
                     tasksBean?.timingPeriods = timesList
-
                     val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
                     intent.putExtra("data", tasksBean)
                     startActivityForResult(intent, requestTimerPeriodCode)
-                }
             }
             R.id.toolbar_t_cancel -> finish()
             R.id.gw_times_standing_time_ly -> {
@@ -166,28 +169,25 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun isRepeatTime(): Boolean {
+        var isRepeatTime  = false
+        for (task in data){//开始时间不能再他的开始时间与结束时间之间 ,结束时间再他之间
+            if( (startMinuteTime>=task.startMinuts&&startMinuteTime<task.endMinuts) ||(endMinuteTime>=task.startMinuts&&startMinuteTime<=task.endMinuts))
+                isRepeatTime =  true
+        }
+        return  isRepeatTime
+    }
+
     @SuppressLint("SetTextI18n")
     private fun initData() {
-        data = intent.getParcelableArrayListExtra("data")
         newData = intent.getParcelableExtra<GwTasksBean>("newData")
-        val pos = intent.getIntExtra("pos", 9999)
-
-        if (data != null && !TextUtils.isEmpty(data!!.toString()) && pos != 9999) {//编辑老的task
-            tasksBean = data!![pos] as GwTasksBean
-            startHourTime = tasksBean!!.startHour
-            startMinuteTime = tasksBean!!.startMins
-            setStartTime()
-
-            endHourTime = tasksBean!!.endHour
-            endMinuteTime = tasksBean!!.endMins
-            setEndTime()
-
-            item_gw_timer_scene!!.text = tasksBean!!.senceName
-            tasksBean!!.isCreateNew = false
-            scene = DBUtils.getSceneByID(tasksBean!!.sceneId)
-        } else if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
+        if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
             tasksBean = newData
             tasksBean!!.isCreateNew = true
+            data =   TelinkLightApplication.getApp().listTask
+        }else{
+            ToastUtils.showShort(getString(R.string.invalid_data))
+            finish()
         }
         wheel_time_container!!.addView(timePicker)
     }
