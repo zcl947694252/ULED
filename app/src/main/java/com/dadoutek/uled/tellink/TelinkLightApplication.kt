@@ -6,12 +6,14 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uledtest.ble.RxBleManager
+import com.google.gson.Gson
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -33,6 +35,8 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
+    var isDeviceOnline: Boolean = false
+    private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> =ArrayList()
     val useIndex = mutableListOf<Int>()
@@ -120,10 +124,26 @@ class TelinkLightApplication : TelinkApplication() {
                 if (mStompManager?.mStompClient == null)
                     initStompClient()
 
+                gwCommendDisposable = mStompManager?.gwCommend()?.subscribe({
+                    if (TextUtils.isEmpty(it))
+                        return@subscribe
+
+                    val msg = Gson().fromJson(it, GwStompBean::class.java)
+                    LogUtils.e("zcl长连接网关接收 $it")
+                    val intent = Intent()
+                    intent.action = Constant.GW_COMMEND_CODE
+                    intent.putExtra(Constant.GW_COMMEND_CODE, msg)
+                    sendBroadcast(intent)
+
+                }, {
+                    ToastUtils.showLong(it.localizedMessage)
+                })
+
+
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
 //                    LogUtils.e("zcl单点登录 It's time to cancel $it")
-                    if (it != key && "no_have_key" != it) {
+                    if (it != key && "no_have_key" != it) {//确保登录时成功的
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
                         intent.putExtra(Constant.LOGIN_OUT, key)

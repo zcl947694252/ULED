@@ -68,6 +68,17 @@ class StompManager private constructor() {
         return mStompClient?.lifecycle()
     }
 
+    private fun getGwHeaders(): List<StompHeader> {
+        val headersLogin = ArrayList<StompHeader>()
+        /**
+         * ack	String	是	固定: auto
+         * id	String	是	固定: common-cmd
+         */
+        headersLogin.add(StompHeader("ack", "auto"))
+        headersLogin.add(StompHeader("id", "common-cmd"))
+        return headersLogin
+    }
+
     private fun getLoginHeaders(): List<StompHeader> {
         val headersLogin = ArrayList<StompHeader>()
         /**
@@ -135,6 +146,21 @@ class StompManager private constructor() {
     fun singleLoginTopic(): Flowable<String> {
         val headersLogin = getLoginHeaders()
         return mStompClient!!.topic(WS_TOPIC_LOGIN, headersLogin)
+                .map { topicMessage ->
+                    topicMessage.payload
+                }
+    }
+
+    /**
+     * 通用推送订阅，通过不同的cmd值进行逻辑判断
+     * ack	String	是	固定: auto
+     * id	String	是	固定: common-cmd
+     */
+    fun gwCommend(): Flowable<String> {
+        val gwHeaders = getGwHeaders()
+       // /topic/common.cmd. + 用户id
+        var gwCommendUrl = "/topic/common.cmd." + DBUtils.lastUser?.id
+        return mStompClient!!.topic(gwCommendUrl, gwHeaders)
                 .map { topicMessage ->
                     topicMessage.payload
                 }

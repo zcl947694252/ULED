@@ -389,7 +389,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         }else if (view.id == R.id.img_light){
             TelinkLightApplication.getApp().offLine = true
-            val intent = Intent(this@GwDeviceDetailActivity, GwLoginActivity::class.java)
+            val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
             intent.putExtra("data", currentGw)
             startActivity(intent)
         }

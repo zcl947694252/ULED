@@ -305,12 +305,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun sendToServer(gattBody: GwGattBody): Unit? {
         return GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
-                LogUtils.v("zcl------------------$t")
+                LogUtils.v("zcl---发送服务器返回----------$t")
             }
 
             override fun onError(e: Throwable) {
                 super.onError(e)
-                LogUtils.e("zcl------------------${e.message}")
+                LogUtils.e("zcl-------发送服务器返回-----------${e.message}")
             }
         })
     }

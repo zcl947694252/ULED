@@ -31,6 +31,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -515,6 +516,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
+        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
         filter.addAction(Constant.CANCEL_CODE)
         filter.addAction(Constant.PARSE_CODE)
@@ -526,6 +528,16 @@ open class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                    LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
+                    when(gwStompBean.cmd){
+                        700-> TelinkLightApplication.getApp().isDeviceOnline = true
+                        701-> TelinkLightApplication.getApp().isDeviceOnline = false
+                        2000-> LogUtils.v("zcl-----------长连接网关标签下发成功-------")
+                    }
+
+                }
                 Constant.LOGIN_OUT -> {
                     LogUtils.e("zcl_baseMe___________收到登出消息")
                     loginOutMethod()

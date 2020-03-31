@@ -49,7 +49,7 @@ import java.util.*
  * 创建者     ZCL
  * 创建时间   2020/3/3 14:46
  * 描述 等待老谭联调
- *
+ *  todo 修改时间段的发送到服务器 一次发送400字节 拼接到一起的
  * 更新者     $
  * 更新时间   $
  * 更新描述
@@ -175,13 +175,11 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         event_mode_gp.setOnCheckedChangeListener { _, checkedId ->
             list.clear()
             changeData(checkedId)
-            dbGw?.let {
-                addGw(it)
-            }
         }
         swipe_recycleView.setOnItemMoveListener(object : OnItemMoveListener {
             override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
                 val position = srcHolder?.adapterPosition
+
                 deleteTimerLable(list[position ?: 0], Date().time)
                 list.removeAt(position ?: 0)
 
@@ -192,7 +190,7 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
                 DBUtils.saveGateWay(dbGw!!, true)
                 dbGw?.let {
-                    addGw(it)
+                    addGw(it)//添加网关就是更新网关
                 }
                 adapter.notifyItemRemoved(position ?: 0)
             }
@@ -333,17 +331,13 @@ class GwEventListActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_LABLE
 
         //11-18 11位labelId
-        if (currentTime - lastTime > 400) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+            if (currentTime - lastTime < 400)
+                delay(400)
             var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
             TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr
                     ?: 0, paramer)
-        } else {
-            GlobalScope.launch(Dispatchers.Main) {
-                delay(400)
-                var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
-                TelinkLightService.Instance().sendCommandNoResponse(opcodedelete, dbGw?.meshAddr
-                        ?: 0, paramer)
-            }
         }
     }
 
