@@ -224,7 +224,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 Opcode.CONFIG_GW_TIMER_LABLE_HEAD
             else
                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
-            TelinkLightService.Instance().sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcodeHead, meshAddress, labHeadPar)
         }
     }
 
@@ -308,11 +308,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
             if (tagBean?.getIsTimer() == true) {
                 intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
                 listTask[0].selectPos = position//默认使用第一个记录选中的pos
+                listTask[0].isCreateNew = false
                 intent.putExtra("data", listTask)
             } else {
                 intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
                 //传入时间段数据 重新配置时间段的场景值
                 listTask[0].labelId = tagBean?.tagId ?: 0//默认使用第一个记录选中的pos
+                listTask[0].isCreateNew = false
                 intent.putExtra("data", listTask[position])
             }
             startActivityForResult(intent, requestTimeCode)
@@ -345,7 +347,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 tasksBean.labelId = tagBean?.tagId ?: 0
                 tasksBean.listTask = listTask
                 intent.putExtra("newData", tasksBean)
-
+                tasksBean.isCreateNew = true
                 startActivityForResult(intent, requestTimeCode)
             }
             tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
@@ -355,6 +357,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 tasksBean.labelId = tagBean?.tagId ?: 0
                 tasksBean.gwMeshAddr = dbGw?.meshAddr ?: 0
                 tasksBean.listTask = listTask
+                tasksBean.isCreateNew = true
                 intent.putExtra("newData", tasksBean)
 
                 startActivityForResult(intent, requestTimeCode)
@@ -407,8 +410,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener {
                 val bean = data?.getParcelableExtra<GwTasksBean>("data")
                 bean?.let {
                     if (bean.isCreateNew) {
+                        bean.isCreateNew = false
                         listTask.add(bean)
                     } else {
+                        bean.isCreateNew = false
                         var targetPosition: Int
                         for (i in 0 until listTask.size) {
                             val timeBean = listTask[i]

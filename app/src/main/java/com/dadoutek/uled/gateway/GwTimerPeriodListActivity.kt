@@ -17,10 +17,6 @@ import com.dadoutek.uled.switches.SelectSceneListActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.template_top_three.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 /**
@@ -75,7 +71,7 @@ class GwTimerPeriodListActivity : BaseActivity() {
             ToastUtils.showShort(getString(R.string.invalid_data))
         } else {
             if (tpList.size > 20)
-                timesList.addAll(tpList.subList(0, 19))
+                timesList.addAll(tpList.subList(0, 20))
             else
                 timesList.addAll(tpList)
             for (tp in tpList)
@@ -96,26 +92,22 @@ class GwTimerPeriodListActivity : BaseActivity() {
                 ToastUtils.showShort(getString(R.string.please_setting_least_one))
                 return@setOnClickListener
             }
-            var delayTime = 0L
-            for (tp in timesList) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    delayTime += 200
-                    delay(timeMillis = delayTime)
 
-                    if (tasksBean != null&&tasksBean?.sceneId !=0L) {
-                        var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour
-                                ?: 0).toByte(),
-                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
-                                ?: 0).toByte(),
-                                (tasksBean?.endMins
-                                        ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
-                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
-                                tasksBean?.gwMeshAddr ?: 0, params)
-                    }
+            for (tp in timesList) {
+                if (tasksBean != null && tp.sceneId != 0L) {
+                    var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                            tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                            (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
+                            (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
+                            tasksBean?.gwMeshAddr ?: 0, params)
                 }
             }
-            intent.putParcelableArrayListExtra("data", timesList)
+            tasksBean?.timingPeriods = timesList
+
+            intent.putExtra("data", tasksBean)
+
             setResult(Activity.RESULT_OK, intent)
             finish()
         }

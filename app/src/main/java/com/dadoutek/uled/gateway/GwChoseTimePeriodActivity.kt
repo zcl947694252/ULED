@@ -219,9 +219,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == requestTimerPeriodCode) {//获取时间段bean
-                val list = data!!.getParcelableArrayListExtra<GwTimePeriodsBean>("data")
-                tasksBean?.timingPeriods = list
-                intent.putExtra("data", tasksBean)
+                val bean = data!!.getParcelableExtra<GwTasksBean>("data")
+                intent.putExtra("data", bean)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             } else if (requestCode == requestStandingCode) {//获取停留时间

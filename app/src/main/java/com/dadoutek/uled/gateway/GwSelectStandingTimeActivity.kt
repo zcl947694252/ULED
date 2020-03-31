@@ -41,7 +41,7 @@ class GwSelectStandingTimeActivity : BaseActivity() {
             }
             return picker!!.contentView
         }
-    private var standingTime = 0
+    private var standingTime = 1
 
     override fun initListener() {
     }

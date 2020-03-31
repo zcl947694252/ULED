@@ -110,13 +110,14 @@ public class GwChoseTimeActivity extends TelinkBaseActivity {
         toolbarTv.setText(getString(R.string.chose_time));
         timerTitle.setText(getString(R.string.scene_name));//底部item 的title
         Intent intent = getIntent();
-        ArrayList<Parcelable> datas = intent.getParcelableArrayListExtra("data");
+        ArrayList<Parcelable> datas = intent.getParcelableArrayListExtra("data");//传入list代表旧的
         if (datas != null)
             for (int i = 0; i < datas.size(); i++) {
-                GwTasksBean tag = (GwTasksBean)datas.get(i);
+                GwTasksBean tag = (GwTasksBean) datas.get(i);
                 data.add(tag);
             }
-        newData = intent.getParcelableExtra("newData");
+
+        newData = intent.getParcelableExtra("newData");//传入data代表新的
 
         if (datas != null && !TextUtils.isEmpty(datas.toString())) {//编辑老的task
             GwTasksBean tagBean = this.data.get(0);
