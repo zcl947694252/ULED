@@ -95,7 +95,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         toolbarTv.text = getString(R.string.event_list)
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         this.mApp = this.application as TelinkLightApplication
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         img_function1.visibility = View.VISIBLE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
@@ -110,6 +109,18 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         addBtn?.text = getString(R.string.add)
 
         adapter.emptyView = emptyView
+    }
+
+    override fun onResume() {
+        super.onResume()
+        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        getNewData()
+        changeData(checkedIdType)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun performed(event: Event<String>?) {
@@ -620,12 +631,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         initView()
         initData()
         initListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        getNewData()
-        changeData(checkedIdType)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

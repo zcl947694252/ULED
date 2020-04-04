@@ -117,16 +117,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        inflater = this.layoutInflater
-        initData()
-    }
-
     private fun initView() {
         disableConnectionStatusListener()
         this.mApp = this.application as TelinkLightApplication
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         tv_function1.visibility = View.GONE
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
@@ -187,7 +180,18 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         dialog_relay.visibility = View.GONE
         showInstallDeviceList(isGuide, isRgbClick)
     }
+    override fun onResume() {
+        super.onResume()
+        inflater = this.layoutInflater
+        initData()
+        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+    }
 
+    override fun onPause() {
+        super.onPause()
+        disposableAll()
+        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+    }
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false
@@ -746,10 +750,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
     }
 
-    override fun onPause() {
-        super.onPause()
-        disposableAll()
-    }
 
     private fun disposableAll() {
         mConnectDisposal?.dispose()

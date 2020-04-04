@@ -58,7 +58,7 @@ import kotlin.collections.ArrayList
  * 创建者     ZCL
  * 创建时间   2020/3/3 17:22
  * 描述  此页只更改taglist内部的一个tag
- *
+ * 再接收的回调中写入代码后闪退找不到问题时注意一下是不是线程问题
  * 更新者     $
  * 更新时间   $
  * 更新描述
