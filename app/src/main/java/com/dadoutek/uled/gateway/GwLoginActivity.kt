@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -18,11 +19,15 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_gw_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -35,6 +40,7 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
+    private var disposableTimer: Disposable? = null
     private var dbGw: DbGateway? = null
     private lateinit var mApp: TelinkLightApplication
 
@@ -94,19 +100,26 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
                 when {
-                    //连接成功后获取firmware信息
-                    event.args.status == LightAdapter.STATUS_CONNECTED -> TelinkLightService.Instance()?.deviceMac
                     //获取设备mac
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         //mac信息获取成功
                         val deviceInfo = event.args
-                        LogUtils.v("zcl-----------蓝牙数据设置状态-------${deviceInfo.gwState}")//1连接失败  0连接成功
-                        if (deviceInfo.gwState == 0) {
-                            skipEvent()
-                            hideLoadingDialog()
-                        } else {
-                            hideLoadingDialog()
-                            ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+
+                        when (deviceInfo.gwVoipState) {
+                            Constant.GW_WIFI_VOIP ->{
+                                disposableTimer?.dispose()
+                                hideLoadingDialog()
+                                if (deviceInfo.gwWifiState == 0)
+                                    skipEvent()
+                                else
+                                    ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                            }
+
+                            Constant.GW_TIME_ZONE_VOIP ->  {
+                                disposableTimer?.dispose()
+                                hideLoadingDialog()
+                            }
                         }
                     }
                     //获取设备mac
@@ -125,6 +138,12 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun sendWIFIParmars(account: String, pwd: String) {
+            disposableTimer?.dispose()
+        disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                }
+        showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()
         val bytePwd = pwd.toByteArray()
         val listAccount = getParmarsList(byteAccount)
@@ -137,6 +156,45 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
         sendParmars(listAccount, accountByteSize, false)
         sendParmars(listPwd, pwdByteSize, true)
+    }
+
+    private fun sendTimeZoneParmars() {
+        disposableTimer?.dispose()
+         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    hideLoadingDialog()
+                    ToastUtils.showLong(getString(R.string.get_time_zone_fail))
+                    finish()
+                }
+        showLoadingDialog(getString(R.string.please_wait))
+        val default = TimeZone.getDefault()
+        val name = default.getDisplayName(true, TimeZone.SHORT)
+        val split = if (name.contains("+")) //0正时区 1负时区
+            name.split("+")
+        else
+            name.split("-")
+
+        val time = split[1].split(":")// +/- 08:46
+        val tzHour = if (name.contains("+"))
+            time[0].toInt() or (0b00000000)
+        else
+            time[0].toInt() or (0b10000000)
+
+        val tzMinutes = time[1].toInt()
+
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val hour: Int = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+        val second = calendar.get(Calendar.SECOND)
+        val week = calendar.get(Calendar.DAY_OF_WEEK) - 1
+        val yearH = (year shr 8) and (0xff)
+        val yearL = year and (0xff)
+        var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params,"1")
     }
 
     private fun sendParmars(listParmars: MutableList<ByteArray>, byteSize: Byte, isPwd: Boolean) {
@@ -183,11 +241,18 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
-        sendDeviceMacParmars()
+       // sendDeviceMacParmars()
     }
 
     private fun initView() {
         this.mApp = this.application as TelinkLightApplication
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        if (TelinkLightApplication.getApp().isConnectGwBle)
+            sendTimeZoneParmars()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposableTimer?.dispose()
     }
 }

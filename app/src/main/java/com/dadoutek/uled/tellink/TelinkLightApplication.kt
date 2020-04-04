@@ -7,6 +7,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -35,7 +36,8 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
-    var isDeviceOnline: Boolean = false
+    var currentGwTagBean: GwTagBean? = null
+    var isConnectGwBle: Boolean =false
     private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> =ArrayList()

@@ -58,7 +58,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private var switchData: DbSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
-    private lateinit var mDeviceInfo: DeviceInfo
+    private  var mDeviceInfo: DeviceInfo? = null
     private var configSwitchType = 0
     private var configButtonTag = 0
     private val requestCodeNum = 100
@@ -177,7 +177,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         GlobalScope.launch {
             for (p in sceneParamList) {
                 delay(delay)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, p)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress?:0, p)
                 delay += 300
             }
             delay(1500)
@@ -220,7 +220,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 delay(delay)
                 //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
                 //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, p)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress?:0, p)
                 delay += 300
             }
             delay(1500)
@@ -242,7 +242,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun updateMeshGroup(isConfigGroup: Int) {
         newMeshAddr = MeshAddressGenerator().meshAddress
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
-            mDeviceInfo.meshAddress = newMeshAddr
+            mDeviceInfo?.meshAddress = newMeshAddr
 
             updateSwitch(isConfigGroup)
             GlobalScope.launch(Dispatchers.Main) {
@@ -263,9 +263,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateSwitch(configGroup: Int) {
         if (groupName == "false") {
-            var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")
             if (dbEightSwitch != null) {
-                dbEightSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + "-" + dbEightSwitch.meshAddr
+                dbEightSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo?.productUUID?:0, this) + "-" + dbEightSwitch.meshAddr
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
                 dbEightSwitch!!.keys = listKeysBean.toString()
@@ -277,9 +277,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveSwitch(eightSwitch, isFromServer = false, type = eightSwitch.type, keys = eightSwitch.keys)
                 eightSwitch = setGroupIdsOrSceneIds(configGroup == 0, eightSwitch)
                 eightSwitch.type = configGroup
-                eightSwitch.macAddr = mDeviceInfo.macAddress
-                eightSwitch.meshAddr = mDeviceInfo.meshAddress
-                eightSwitch.productUUID = mDeviceInfo.productUUID
+                eightSwitch.macAddr = mDeviceInfo?.macAddress
+                eightSwitch.meshAddr = mDeviceInfo?.meshAddress?:0
+                eightSwitch.productUUID = mDeviceInfo?.productUUID?:0
                 eightSwitch.index = eightSwitch.id.toInt()
                 eightSwitch.version = version
 
@@ -289,7 +289,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveSwitch(eightSwitch, isFromServer = false, type = eightSwitch.type, keys = eightSwitch.keys)
 
                 LogUtils.v("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
-                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")
                 DBUtils.recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD, eightSwitch.type, eightSwitch.keys)
@@ -536,7 +536,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 switchData?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 if (switchData == null)
-                    switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                    switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress?:0)
                 if (switchData != null)
                     DBUtils.updateSwicth(switchData!!)
                 else
@@ -544,7 +544,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
-                LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)?.name}")
+                LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress?:0)?.name}")
             }
         }
         renameCancel?.setOnClickListener {
@@ -576,7 +576,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             renameEditText?.setText(switchData?.name)
         else {
             var text = eight_switch_title.text.toString()
-            renameEditText?.setText(text + "*" + DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)?.meshAddr)
+            renameEditText?.setText(text + "*" + DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")?.meshAddr)
         }
         renameEditText?.setSelection(renameEditText?.text.toString().length)
         if (this != null && !this.isFinishing) {

@@ -56,6 +56,7 @@ public class DbGateway implements Parcelable {
     private String timePeriodTags;
     private int addTag = 0;//0 添加新的tag 1编辑已有tag
     private int state; //1代表在线 0代表离线
+    private Boolean openTag; //true代表开 false代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
@@ -63,7 +64,6 @@ public class DbGateway implements Parcelable {
     public DbGateway(Long id) {
         this.id = id;
     }
-
 
     protected DbGateway(Parcel in) {
         if (in.readByte() == 0) {
@@ -85,15 +85,13 @@ public class DbGateway implements Parcelable {
         timePeriodTags = in.readString();
         addTag = in.readInt();
         state = in.readInt();
+        byte tmpOpenTag = in.readByte();
+        openTag = tmpOpenTag == 0 ? null : tmpOpenTag == 1;
         icon = in.readInt();
     }
 
-
-    @Generated(hash = 501866550)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr,
-            String sixByteMacAddr, int type, int productUUID, String version,
-            int belongRegionId, int pos, int uid, String tags,
-            String timePeriodTags, int addTag, int state) {
+    @Generated(hash = 393489854)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, Boolean openTag) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -109,11 +107,42 @@ public class DbGateway implements Parcelable {
         this.timePeriodTags = timePeriodTags;
         this.addTag = addTag;
         this.state = state;
+        this.openTag = openTag;
     }
-
 
     @Generated(hash = 1696080529)
     public DbGateway() {
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeInt(meshAddr);
+        dest.writeString(name);
+        dest.writeString(macAddr);
+        dest.writeString(sixByteMacAddr);
+        dest.writeInt(type);
+        dest.writeInt(productUUID);
+        dest.writeString(version);
+        dest.writeInt(belongRegionId);
+        dest.writeInt(pos);
+        dest.writeInt(uid);
+        dest.writeString(tags);
+        dest.writeString(timePeriodTags);
+        dest.writeInt(addTag);
+        dest.writeInt(state);
+        dest.writeByte((byte) (openTag == null ? 0 : openTag ? 1 : 2));
+        dest.writeInt(icon);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<DbGateway> CREATOR = new Creator<DbGateway>() {
@@ -266,52 +295,16 @@ public class DbGateway implements Parcelable {
 
     @Override
     public String toString() {
-        return "DbGateway{" +
-                "id=" + id +
-                ", meshAddr=" + meshAddr +
-                ", name='" + name + '\'' +
-                ", macAddr='" + macAddr + '\'' +
-                ", type=" + type +
-                ", productUUID=" + productUUID +
-                ", version='" + version + '\'' +
-                ", belongRegionId=" + belongRegionId +
-                ", pos=" + pos +
-                ", uid=" + uid +
-                ", tags='" + tags + '\'' +
-                ", timePeriodTags='" + timePeriodTags + '\'' +
-                ", addTag=" + addTag +
-                ", state=" + state +
-                ", icon=" + icon +
-                '}';
+        return "DbGateway{" + "id=" + id + ", meshAddr=" + meshAddr + ", name='" + name + '\'' +
+                ", macAddr='" + macAddr + '\'' + ", sixByteMacAddr='" + sixByteMacAddr + '\'' +
+                ", type=" + type + ", productUUID=" + productUUID + ", version='" + version + '\'' + ", belongRegionId=" + belongRegionId + ", pos=" + pos + ", uid=" + uid + ", tags='" + tags + '\'' + ", timePeriodTags='" + timePeriodTags + '\'' + ", addTag=" + addTag + ", state=" + state + ", openTag=" + openTag + ", icon=" + icon + '}';
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public Boolean getOpenTag() {
+        return this.openTag;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeLong(id);
-        }
-        dest.writeInt(meshAddr);
-        dest.writeString(name);
-        dest.writeString(macAddr);
-        dest.writeString(sixByteMacAddr);
-        dest.writeInt(type);
-        dest.writeInt(productUUID);
-        dest.writeString(version);
-        dest.writeInt(belongRegionId);
-        dest.writeInt(pos);
-        dest.writeInt(uid);
-        dest.writeString(tags);
-        dest.writeString(timePeriodTags);
-        dest.writeInt(addTag);
-        dest.writeInt(state);
-        dest.writeInt(icon);
+    public void setOpenTag(Boolean openTag) {
+        this.openTag = openTag;
     }
 }

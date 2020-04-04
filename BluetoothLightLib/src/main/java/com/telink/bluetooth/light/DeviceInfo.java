@@ -61,11 +61,11 @@ public class DeviceInfo implements Parcelable {
     /**
      * 获取返回的数据
      */
-    public int gwState;
-
-    public DeviceInfo() {
-    }
-
+    public int gwWifiState;
+    /**
+     * 获取返回的业务数据
+     */
+    public int gwVoipState;
     protected DeviceInfo(Parcel in) {
         macAddress = in.readString();
         sixByteMacAddress = in.readString();
@@ -80,44 +80,8 @@ public class DeviceInfo implements Parcelable {
         isConfirm = in.readInt();
         longTermKey = in.createByteArray();
         firmwareRevision = in.readString();
-        gwState = in.readInt();
-    }
-
-    public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
-        @Override
-        public DeviceInfo createFromParcel(Parcel in) {
-            return new DeviceInfo(in);
-        }
-
-        @Override
-        public DeviceInfo[] newArray(int size) {
-            return new DeviceInfo[size];
-        }
-    };
-
-    @Override
-    public String toString() {
-        return "DeviceInfo{" +
-                "macAddress='" + macAddress + '\'' +
-                ", sixByteMacAddress='" + sixByteMacAddress + '\'' +
-                ", deviceName='" + deviceName + '\'' +
-                ", meshName='" + meshName + '\'' +
-                ", meshAddress=" + meshAddress +
-                ", meshUUID=" + meshUUID +
-                ", productUUID=" + productUUID +
-                ", status=" + status +
-                ", rssi=" + rssi +
-                ", id='" + id + '\'' +
-                ", isConfirm=" + isConfirm +
-                ", longTermKey=" + Arrays.toString(longTermKey) +
-                ", firmwareRevision='" + firmwareRevision + '\'' +
-                ", gwState='" + gwState + '\'' +
-                '}';
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        gwWifiState = in.readInt();
+        gwVoipState = in.readInt();
     }
 
     @Override
@@ -135,6 +99,35 @@ public class DeviceInfo implements Parcelable {
         dest.writeInt(isConfirm);
         dest.writeByteArray(longTermKey);
         dest.writeString(firmwareRevision);
-        dest.writeInt(gwState);
+        dest.writeInt(gwWifiState);
+        dest.writeInt(gwVoipState);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
+        @Override
+        public DeviceInfo createFromParcel(Parcel in) {
+            return new DeviceInfo(in);
+        }
+
+        @Override
+        public DeviceInfo[] newArray(int size) {
+            return new DeviceInfo[size];
+        }
+    };
+
+    public DeviceInfo() {
+    }
+
+
+    @Override
+    public String toString() {
+        return "DeviceInfo{" + "macAddress='" + macAddress + '\'' + ", sixByteMacAddress='" + sixByteMacAddress + '\'' + ", deviceName='" + deviceName + '\'' + ", meshName='" + meshName + '\'' + ", meshAddress=" + meshAddress + ", meshUUID=" + meshUUID + ", productUUID=" + productUUID + ", status=" + status + ", rssi=" + rssi + ", id='" + id + '\'' + ", isConfirm=" + isConfirm + ", longTermKey=" + Arrays.toString(longTermKey) + ", firmwareRevision='" + firmwareRevision + '\'' + ", gwWifiState=" + gwWifiState + ", gwVoipState=" + gwVoipState + '}';
+    }
+
+
 }

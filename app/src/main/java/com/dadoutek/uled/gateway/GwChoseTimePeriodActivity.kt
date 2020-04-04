@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.template_wheel_container.*
  * 设置网关 时间段时间与场景传递进配config界面
  */
 class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
-
     private var newData: GwTasksBean? = null
     private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
@@ -180,6 +179,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     private fun initData() {
+
         newData = intent.getParcelableExtra<GwTasksBean>("newData")
         if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
             tasksBean = newData

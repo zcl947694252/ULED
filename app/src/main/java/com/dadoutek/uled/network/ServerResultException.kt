@@ -79,8 +79,30 @@ object ServerResultException {
             }
             NetworkStatusCode.ERROR_REGION_NOT_EXIST -> {//30000  该区域不存在  需要弹框
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.region_not_exist))
-            }  NetworkStatusCode.ERROR_BIN_NOT_EXIST -> {//30000  该区域不存在  需要弹框
+            }  NetworkStatusCode.ERROR_BIN_NO_NEW -> {   //没有比当前版本更新bin文件50001
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.no_have_bin))
+            }  NetworkStatusCode.ERROR_BIN_NO_BIN -> {//资源服务器上无该bin文件,请联系管理员50002
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.no_this_bin))
+            }  NetworkStatusCode.ERROR_NO_NEW_VERSION -> {//没有比当前更新的app版本无需更新60001
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.no_new_app_version))
+            }  NetworkStatusCode.ERROR_MESH_ERROR -> {//mesh密码错误70000
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.mesh_error))
+            }  NetworkStatusCode.ERROR_UNKOWN_TYPE -> {//未收录的type70001
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.no_have_type))
+            }
+
+            NetworkStatusCode.ERROR_MESH_NOT_ENOUGH -> { //mesh地址不够70002
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_MESH_NOT_ENOUGH))
+            }  NetworkStatusCode.ERROR_GW_OR_ACCOUNT_NOT_EXIST -> {//该网关不存在/账号下无网关 80000
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_GW_OR_ACCOUNT_NOT_EXIST))
+            }  NetworkStatusCode.ERROR_GW_UNONLIN -> {//该网关不在线/网关全部不在线 80001
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_GW_UNONLIN))
+            }  NetworkStatusCode.ERROR_GW_BASE64 -> {//base64字符串解码失败 80002
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_GW_BASE64))
+            }NetworkStatusCode.ERROR_SERVER_BUSYNEWSS -> {//服务忙 501
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_SERVER_BUSYNEWSS))
+            } NetworkStatusCode.ERROR_SERVER_CRASH -> {//服务器崩溃 502
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.ERROR_SERVER_CRASH))
             }
             else -> {
                 //throw RuntimeException(response.message)

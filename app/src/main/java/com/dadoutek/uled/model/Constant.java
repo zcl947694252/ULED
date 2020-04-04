@@ -1,7 +1,5 @@
 package com.dadoutek.uled.model;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.Serializable;
 
 /**
@@ -267,4 +265,53 @@ public class Constant implements Serializable {
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
 
     public static final String GW_COMMEND_CODE="GW_COMMEND_CODE";
+    /**
+     * 网关设置wifi连接标识
+     */
+    public static final int GW_WIFI_VOIP =0X10;
+    /**
+     * 网关开关业务标识
+     */
+    public static final int GW_SWITCH_VOIP =0X11;
+    /**
+     * 网关恢复出厂业务标识
+     */
+    public static final int GW_RESET_VOIP =0X12;
+    /**
+     *网关定时场景标签头下发
+     */
+    public static final int GW_CONFIG_TIMER_LABEL_VOIP =0X13;
+    /**
+     *网关定时场景时间下发
+     */
+    public static final int GW_CONFIG_TIMER_TASK_VOIP =0X14;
+    /**
+     *网关删除定时场景标签:
+     */
+    public static final int GW_DELETE_TIMER_LABEL_VOIP =0X15;
+    /**
+     * 网关删除定时场景时间
+     */
+    public static final int GW_DELETE_TIMER_TASK_VOIP =0X16;
+    /**
+     * w网关循环场景标签头下发:
+     */
+    public static final int GW_CONFIG_TIME_PERIVODE_LABEL_VOIP =0X17;
+    /**
+     * 网关删除循环时间段下发业务标识
+     */
+    public static final int GW_CONFIG_TIME_PERIVODE_TASK_VOIP =0X18;
+    /**
+     * 网关删除循环场景标签业务标识
+     */
+    public static final int GW_DELETE_TIME_PERIVODE_LABEL_VOIP =0X19;
+    /**
+     * 网关删除循环场景时间段业务标识
+     */
+    public static final int GW_DELETE_TIME_PERIVODE_TASK_VOIP =0X1A;
+    /**
+     * 网关设置时区和时间连接标识
+     */
+    public static final int GW_TIME_ZONE_VOIP =0X1B;
+
 }

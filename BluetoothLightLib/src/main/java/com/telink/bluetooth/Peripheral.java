@@ -71,7 +71,9 @@ public class Peripheral extends BluetoothGattCallback {
     protected String sixByteMac;
     protected byte[] macBytes;
     protected int type;
-    protected int gwState =10;
+
+    protected int gwVoipState = 10;
+    protected int gwWifiState = 10;
     protected List<BluetoothGattService> mServices;
 
     protected AtomicBoolean processing = new AtomicBoolean(false);
@@ -83,6 +85,13 @@ public class Peripheral extends BluetoothGattCallback {
     //    private int mConnState = CONN_STATE_IDLE;
     private AtomicInteger mConnState = new AtomicInteger(CONN_STATE_IDLE);
 
+    public int getGwVoipState() {
+        return gwVoipState;
+    }
+
+    public void setGwVoipState(int gwVoipState) {
+        this.gwVoipState = gwVoipState;
+    }
     private String get4ByteMac(String macString) {
         String[] strArray = macString.split(":");
         this.macBytes = new byte[4];
@@ -92,7 +101,9 @@ public class Peripheral extends BluetoothGattCallback {
         this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
 
         long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
-        return String.valueOf(mac4Byte);
+
+        String mac = strArray[5]+":"+strArray[4]+":"+strArray[3]+":"+strArray[2];
+         return String.valueOf(mac4Byte);
     }
 
     public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
@@ -101,8 +112,18 @@ public class Peripheral extends BluetoothGattCallback {
         this.rssi = rssi;
         this.name = device.getName();
         this.type = device.getType(); //ble
+       // this.mac = get4ByteMac2(scanRecord);
         this.mac = get4ByteMac(device.getAddress());
         this.sixByteMac = device.getAddress();
+    }
+
+    private String formatHex(String one) {
+        if (one.length() > 2) {
+            one = one.substring(one.length() - 2);
+        } else if (one.length() == 1) {
+            one = "0" + one;
+        }
+        return one;
     }
 
     /********************************************************************************
@@ -120,6 +141,7 @@ public class Peripheral extends BluetoothGattCallback {
     public String getMacAddress() {
         return this.mac;
     }
+
     public String getSixByteMacAddress() {
         return this.sixByteMac;
     }
@@ -132,12 +154,12 @@ public class Peripheral extends BluetoothGattCallback {
         return mServices;
     }
 
-    public int getGwState() {
-        return gwState;
+    public int getGwWifiState() {
+        return gwWifiState;
     }
 
-    public void setGwState(int gwState) {
-        this.gwState = gwState;
+    public void setGwWifiState(int gwWifiState) {
+        this.gwWifiState = gwWifiState;
     }
 
     public byte[] getMacBytes() {

@@ -925,5 +925,20 @@
     <string name="wifi_cannot_be_empty">WIFI账户与WIFI密码不能为空</string>
     <string name="config_WIFI_FAILE">配置WIFI网络失败</string>
     <string name="config_setting_gw_wifi">正在配置wifi网络,请稍后</string>
+    <string name="no_this_bin">资源服务器上无该bin文件,请联系管理员</string>
+    <string name="no_new_app_version">没有比当前更新的app版本无需更新</string>
+    <string name="mesh_error">mesh密码错误70000</string>
+    <string name="no_have_type">未收录的type类型</string>
+    <string name="ERROR_MESH_NOT_ENOUGH">mesh地址不足</string>
+    <string name="ERROR_GW_OR_ACCOUNT_NOT_EXIST">该网关不存在/账号下无网关</string>
+    <string name="ERROR_GW_UNONLIN">该网关不在线/网关全部不在线</string>
+    <string name="ERROR_GW_BASE64">base64字符串解码失败</string>
+    <string name="ERROR_SERVER_BUSYNEWSS">服务器繁忙</string>
+    <string name="ERROR_SERVER_CRASH">服务器崩溃</string>
+    <string name="gw_not_online">该网关不在线</string>
+    <string name="tag_mutex">该标签与%1$s标签冲突请先关闭冲突标签后再启动该标签</string>
+    <string name="label">标签</string>
+    <string name="get_time_zone_fail">获取时区信息失败</string>
+    <string name="config_gate_way_fail">配置网关失败</string>
 
 </resources>

@@ -224,7 +224,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private fun isDirectConnectDevice(granted: Boolean) {
         var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
-            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             if (granted!!) {
                 if (isBoolean) {
                     transformView()

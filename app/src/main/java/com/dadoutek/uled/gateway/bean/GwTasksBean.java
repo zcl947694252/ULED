@@ -29,8 +29,7 @@ public class GwTasksBean implements Parcelable {
     private int selectPos;//本地使用
     private long labelId;//本地使用 标签id
     private int gwMeshAddr;//本地使用 标签mesh地址
-    private String  gwMacAddr;//本地使用 标签mac
-    private ArrayList<GwTasksBean> listTask;//本地使用 已存在时间task
+    private String gwMacAddr;//本地使用 标签mac
     private ArrayList<GwTimePeriodsBean> timingPeriods;//时间段list
 
     public GwTasksBean(int index) {
@@ -53,7 +52,6 @@ public class GwTasksBean implements Parcelable {
         labelId = in.readLong();
         gwMeshAddr = in.readInt();
         gwMacAddr = in.readString();
-        listTask = in.createTypedArrayList(GwTasksBean.CREATOR);
         timingPeriods = in.createTypedArrayList(GwTimePeriodsBean.CREATOR);
     }
 
@@ -74,7 +72,6 @@ public class GwTasksBean implements Parcelable {
         dest.writeLong(labelId);
         dest.writeInt(gwMeshAddr);
         dest.writeString(gwMacAddr);
-        dest.writeTypedList(listTask);
         dest.writeTypedList(timingPeriods);
     }
 
@@ -119,13 +116,6 @@ public class GwTasksBean implements Parcelable {
         this.endMinuts = endMinuts;
     }
 
-    public ArrayList<GwTasksBean> getListTask() {
-        return listTask;
-    }
-
-    public void setListTask(ArrayList<GwTasksBean> listTask) {
-        this.listTask = listTask;
-    }
 
     public int getIndex() {
         return index;
@@ -231,4 +221,8 @@ public class GwTasksBean implements Parcelable {
         this.timingPeriods = timingPeriods;
     }
 
+    @Override
+    public String toString() {
+        return "GwTasksBean{" + "index=" + index + ", stateTime=" + stateTime + ", sceneId=" + sceneId + ", senceName='" + senceName + '\'' + ", createNew=" + createNew + ", startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins + ", endMins=" + endMins + ", startMinuts=" + startMinuts + ", endMinuts=" + endMinuts + ", selectPos=" + selectPos + ", labelId=" + labelId + ", gwMeshAddr=" + gwMeshAddr + ", gwMacAddr='" + gwMacAddr + '\'' + ", timingPeriods=" + timingPeriods + '}';
+    }
 }

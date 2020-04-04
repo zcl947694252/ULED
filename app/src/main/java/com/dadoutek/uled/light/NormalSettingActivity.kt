@@ -956,7 +956,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun transformView() {
         disableConnectionStatusListener()
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
-            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             startOtaAct()
         } else {
             showLoadingDialog(getString(R.string.please_wait))

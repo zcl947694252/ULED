@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/12 9:57
@@ -17,6 +15,8 @@ import java.util.ArrayList;
  */
 @SuppressLint("ParcelCreator")
 public class GwTagBean implements Parcelable {
+    private String macAddr;//本地使用
+    private int meshAddr;//本地使用
     private Long tagId;
     private String tagName;
     private int status; //开1 关0 tag的外部现实
@@ -29,7 +29,7 @@ public class GwTagBean implements Parcelable {
     private int week;//bit位 0-6 周日-周六
     private String  weekStr;//bit位 0-6 周日-周六 7代表当天
     private boolean isCreateNew;
-    private ArrayList<GwTasksBean> tasks;//json字符串
+    private String tasks;//json字符串
 
 
     public GwTagBean(Long tagId) {
@@ -43,64 +43,21 @@ public class GwTagBean implements Parcelable {
         this.week =  week;
     }
 
-    protected GwTagBean(Parcel in) {
-        if (in.readByte() == 0) {
-            tagId = null;
-        } else {
-            tagId = in.readLong();
-        }
-        tagName = in.readString();
-        status = in.readInt();
-        startHour = in.readInt();
-        endHour = in.readInt();
-        startMins = in.readInt();
-        endMins = in.readInt();
-        pos = in.readInt();
-        isTimer = in.readByte() != 0;
-        week = in.readInt();
-        weekStr = in.readString();
-        isCreateNew = in.readByte() != 0;
-        tasks = in.createTypedArrayList(GwTasksBean.CREATOR);
+    public int getMeshAddr() {
+        return meshAddr;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (tagId == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeLong(tagId);
-        }
-        dest.writeString(tagName);
-        dest.writeInt(status);
-        dest.writeInt(startHour);
-        dest.writeInt(endHour);
-        dest.writeInt(startMins);
-        dest.writeInt(endMins);
-        dest.writeInt(pos);
-        dest.writeByte((byte) (isTimer ? 1 : 0));
-        dest.writeInt(week);
-        dest.writeString(weekStr);
-        dest.writeByte((byte) (isCreateNew ? 1 : 0));
-        dest.writeTypedList(tasks);
+    public void setMeshAddr(int meshAddr) {
+        this.meshAddr = meshAddr;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getMacAddr() {
+        return macAddr;
     }
 
-    public static final Creator<GwTagBean> CREATOR = new Creator<GwTagBean>() {
-        @Override
-        public GwTagBean createFromParcel(Parcel in) {
-            return new GwTagBean(in);
-        }
-
-        @Override
-        public GwTagBean[] newArray(int size) {
-            return new GwTagBean[size];
-        }
-    };
+    public void setMacAddr(String macAddr) {
+        this.macAddr = macAddr;
+    }
 
     public Long getTagId() {
         return tagId;
@@ -182,7 +139,7 @@ public class GwTagBean implements Parcelable {
         isCreateNew = createNew;
     }
 
-    public ArrayList<GwTasksBean> getTasks() {
+    public String getTasks() {
         return tasks;
     }
 
@@ -212,25 +169,23 @@ public class GwTagBean implements Parcelable {
 
     @Override
     public String toString() {
-        return "GwTagBean{" +
-                "tagId=" + tagId +
-                ", tagName='" + tagName + '\'' +
-                ", status=" + status +
-                ", startHour=" + startHour +
-                ", endHour=" + endHour +
-                ", startMins=" + startMins +
-                ", endMins=" + endMins +
-                ", pos=" + pos +
-                ", isTimer=" + isTimer +
-                ", week=" + week +
-                ", weekStr='" + weekStr + '\'' +
-                ", isCreateNew=" + isCreateNew +
-                ", tasks=" + tasks +
-                '}';
+        return "GwTagBean{" + "macAddr='" + macAddr + '\'' + ", meshAddr=" + meshAddr + ", tagId" +
+                "=" + tagId + ", tagName='" + tagName + '\'' + ", status=" + status + ", " +
+                "startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins +
+                ", endMins=" + endMins + ", pos=" + pos + ", isTimer=" + isTimer + ", week=" + week + ", weekStr='" + weekStr + '\'' + ", isCreateNew=" + isCreateNew + ", tasks=" + tasks + '}';
     }
 
-    public void setTasks(ArrayList<GwTasksBean> tasks) {
+    public void setTasks(String tasks) {
         this.tasks = tasks;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+    }
 }

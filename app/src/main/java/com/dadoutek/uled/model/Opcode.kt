@@ -2,6 +2,14 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 开关网关
+     */
+    const val CONFIG_GW_SWITCH: Byte = 0xd0.toByte()
+    /**
+     * 网关默认恢复出厂
+     */
+    const val CONFIG_GW_REST_FACTORY: Byte = 0xf0.toByte()
+    /**
      * 设置获取MAC的Opcode
      */
     const val CONFIG_GW_GET_MAC: Byte = 0xfe.toByte()
@@ -30,7 +38,7 @@ object Opcode {
      */
     const val CONFIG_GW_TIMER_PERIOD_LABLE_TASK: Byte = 0xf7.toByte()
     /**
-     * w网关时间段模式标签头下发
+     * w网关循环场景标签头下发
      */
     const val CONFIG_GW_TIMER_PERIOD_LABLE_HEAD: Byte =0xf6.toByte()
     /**

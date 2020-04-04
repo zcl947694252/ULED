@@ -63,7 +63,6 @@ object RecoverMeshDeviceUtil {
                 .observeOn(Schedulers.io())
                 .map {
                     val data = parseData(it)
-                    LogUtils.v("zcl=====$data")
                     data
                 }          //解析数据
                 .filter {

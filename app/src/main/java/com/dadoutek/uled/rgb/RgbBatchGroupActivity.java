@@ -335,10 +335,8 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         //倒计时10s，出问题了就超时。
         mConnectTimer = createConnectTimeout();
 
-
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
-
 
         btnAddGroups.setOnClickListener(v -> {
             if (isLoginSuccess) {

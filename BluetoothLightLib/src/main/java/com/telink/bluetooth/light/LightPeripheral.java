@@ -27,20 +27,15 @@ public class LightPeripheral extends Peripheral {
 
     protected final Map<String, Object> advProperties = new HashMap<>();
     protected final Map<UUID, byte[]> characteristicsValue = new HashMap<>();
-
     public boolean meshChanged;
-
     private byte[] meshName;
     private byte[] password;
     private byte[] longTermKey;
     private int meshAddress;
-
     private Callback mCallback;
-
     private String meshNameStr;
     private int newMeshAddress = -1;
     private int retry = 0;
-
 
     public LightPeripheral(BluetoothDevice device, byte[] scanRecord, int rssi,
                            byte[] meshName, int meshAddress) {
@@ -60,6 +55,7 @@ public class LightPeripheral extends Peripheral {
 
     public void setMeshName(byte[] value) {
         this.meshNameStr = Strings.bytesToString(value);
+
         this.meshName = value;
     }
 

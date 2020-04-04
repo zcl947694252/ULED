@@ -21,7 +21,6 @@ import android.util.Log;
 
 import com.telink.util.ContextUtil;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -122,7 +121,7 @@ public final class LeBluetooth {
                         if (mCallback != null)
                             mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
 
-//                        Log.d("Saw","result.getScanRecord() = " + result.getScanRecord() + ", mCallback = " + mCallback);
+                       // LogUtils.v("Saw蓝牙数据扫描","result.getScanRecord() = " + result.getScanRecord() + ", mCallback = " + mCallback);
                     }
 
                     if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {

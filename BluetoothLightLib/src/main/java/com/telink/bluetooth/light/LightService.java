@@ -198,7 +198,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         return this.sendCommandNoResponse(opcode, address, params, null, 0, false);
     }
 
-    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag) {// tag "0"代表获取mac
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag) {
+        // tag "0"代表获取mac "1"代表设置网关通用返回
         return this.sendCommandResponse(opcode, address, params, tag, 0, false);
     }
 
@@ -472,7 +473,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
             deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
-            deviceInfo.gwState = light.getGwState();
+            deviceInfo.gwVoipState = light.getGwVoipState();
+            deviceInfo.gwWifiState = light.getGwWifiState();
             deviceInfo.deviceName = light.getDeviceName();
             deviceInfo.meshName = light.getMeshNameStr();
             deviceInfo.meshAddress = light.getMeshAddress();

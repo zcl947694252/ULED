@@ -590,7 +590,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun isDirectConnectDevice() {
             var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
-            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             if (isBoolean) {
                 transformView()
             } else {

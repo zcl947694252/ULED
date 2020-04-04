@@ -311,8 +311,8 @@ abstract class BaseActivity : AppCompatActivity() {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                    when(gwStompBean.cmd){
-                       700-> TelinkLightApplication.getApp().isDeviceOnline = true
-                       701-> TelinkLightApplication.getApp().isDeviceOnline = false
+                       700-> TelinkLightApplication.getApp().offLine = false
+                       701-> TelinkLightApplication.getApp().offLine = true
                        2000-> LogUtils.v("zcl-----------长连接网关标签下发成功-------")
                    }
                 }

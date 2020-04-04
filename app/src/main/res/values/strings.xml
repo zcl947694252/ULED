@@ -960,8 +960,8 @@
     <string name="times_mode">Timer_Mode</string>
     <string name="time_pattern_mode">Time_pattern</string>
     <string name="event_list">Even List</string>
-    <string name="repetition">重复</string>
-    <string name="chose_time">选择时间</string>
+    <string name="repetition">repetition</string>
+    <string name="chose_time">Chose time</string>
     <string name="monday">Monday</string>
     <string name="tuesday">Tuesday</string>
     <string name="wednesday">Wednesday</string>
@@ -1002,6 +1002,20 @@
     <string name="wifi_cannot_be_empty">WIFI account and WIFI password cannot be empty</string>
     <string name="config_WIFI_FAILE">WIFI network configuration failed</string>
     <string name="config_setting_gw_wifi">Please wait while the wifi network is being configured</string>
-
+    <string name="no_this_bin">The bin file is not available on the resource server, please contact the administrator</string>
+    <string name="no_new_app_version">There is no bin file on the resource server, please contact the administrator. There is no need to update the current updated version of app</string>
+    <string name="mesh_error">mesh password error 70000</string>
+    <string name="no_have_type">Type not included</string>
+    <string name="ERROR_MESH_NOT_ENOUGH">Insufficient mesh address</string>
+    <string name="ERROR_GW_OR_ACCOUNT_NOT_EXIST">The gateway does not exist/there is no gateway under the account</string>
+    <string name="ERROR_GW_UNONLIN">The gateway is not online / the gateway is not online at all</string>
+    <string name="ERROR_GW_BASE64">base64 String decoding failed</string>
+    <string name="ERROR_SERVER_BUSYNEWSS">Server busy</string>
+    <string name="ERROR_SERVER_CRASH">Server crash</string>
+    <string name="gw_not_online">The gateway is not online</string>
+    <string name="tag_mutex">This tag conflicts with the %1$s tag. Please close the tag before starting it</string>
+    <string name="label">Label</string>
+    <string name="get_time_zone_fail">Failed to obtain time zone information</string>
+    <string name="config_gate_way_fail">Configuration gateway failed</string>
 
 </resources>
