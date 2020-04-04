@@ -245,9 +245,9 @@ public final class LeBluetooth {
                 if (mCallback != null)
                     mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
 
-                Log.d("Saw", "######## mScanner = null, mCallback =  " + mScanCallback);
+               // Log.d("Saw", "######## mScanner = null, mCallback =  " + mScanCallback);
             } else {
-                Log.d("Saw", "######## mScanner.startScan(mScanCallback) = " + mScanCallback);
+                //Log.d("Saw", "######## mScanner.startScan(mScanCallback) = " + mScanCallback);
                 mScanner.startScan(mScanCallback);
                 synchronized (this) {
                     mScanning = true;

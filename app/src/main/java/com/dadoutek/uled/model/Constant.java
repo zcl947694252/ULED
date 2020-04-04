@@ -313,5 +313,27 @@ public class Constant implements Serializable {
      * 网关设置时区和时间连接标识
      */
     public static final int GW_TIME_ZONE_VOIP =0X1B;
+    /**
+     * 开关网关
+     */
+    public static final int GW_GATT_SWITCH =1;
 
+    /**
+     * 开关网关标签
+     */
+    public static final int GW_GATT_LABEL_SWITCH =2;
+    /**
+     * 删除网关标签
+     */
+    public static final int GW_GATT_DELETE_LABEL_SWITCH =3;
+
+    /**
+     * 保存网关标签头
+     */
+    public static final int GW_GATT_SAVE_LABEL_HEAD =4;
+
+    /**
+     * 保存网关标签头
+     */
+    public static final int GW_GATT_SAVE_TASK_TIME =5;
 }

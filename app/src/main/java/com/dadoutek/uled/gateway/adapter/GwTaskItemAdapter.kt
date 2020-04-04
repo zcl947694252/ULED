@@ -16,7 +16,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
  * 更新时间   $
  * 更新描述
  */
-class GwTaskItemAdapter(resId: Int, data: MutableList<GwTasksBean>) : BaseQuickAdapter<GwTasksBean, BaseViewHolder>(resId, data) {
+class GwTaskItemAdapter(resId: Int, data: ArrayList<GwTasksBean>) : BaseQuickAdapter<GwTasksBean, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: GwTasksBean) {
         val periods = item.timingPeriods
         val time = if (periods == null)

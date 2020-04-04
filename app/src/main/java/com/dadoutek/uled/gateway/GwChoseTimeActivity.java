@@ -51,9 +51,7 @@ import butterknife.Unbinder;
 import cn.qqtheme.framework.picker.DateTimePicker;
 import cn.qqtheme.framework.picker.TimePicker;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * 设置网关时间与场景传递进配config界面
@@ -133,12 +131,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         showLoadingDialog(getString(R.string.please_wait));
         if (disposableTimer != null) disposableTimer.dispose();
         disposableHeadTimer =
-                Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
-            TmtUtils.midToastLong(this, getString(R.string.config_gate_way_fail));
-        });
+                Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe(aLong -> runOnUiThread(() -> ToastUtils.showLong(getString(R.string.config_gate_way_fail))));
         int meshAddress = gwTagBean.getMeshAddr();
-        //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode
-        // .GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH) + 1;
@@ -146,7 +140,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
 
         opcodeHead = Opcode.CONFIG_GW_TIMER_LABLE_HEAD;
 
-        if (gwTagBean != null) if (TelinkLightApplication.Companion.getApp().getOffLine()) {
+        if (gwTagBean != null) if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
 
             byte[] labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                     (byte) (gwTagBean.getTagId() & 0xff), (byte) gwTagBean.getStatus(),
@@ -171,8 +165,6 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                 TmtUtils.midToastLong(this, "TelinkLightService is null , please retry.");
             }
         }
-
-        sendTime(tasksBean);
     }
 
 
@@ -181,18 +173,16 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void sendTime(GwTasksBean tasks) {
+        sendCount++;
         if (disposableTimer != null) disposableTimer.dispose();
         disposableTimer =
-                Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
-            sendCount++;
-            if (sendCount < 3) {
-                sendTime(tasks);
-            } else {
-                ToastUtils.showLong(getString(R.string.config_gate_way_fail));
-            }
-        });
-
-        //sendLabelHeadParams()
+                Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+                    if (sendCount < 3) {
+                        sendTime(tasks);
+                    } else {
+                        runOnUiThread(() -> ToastUtils.showLong(getString(R.string.config_gate_way_fail)));
+                    }
+                });
         if (gwTagBean != null && gwTagBean.isTimer()) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送 定时场景时间下发
             if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
                 labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0,
@@ -223,13 +213,11 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         GwModel.INSTANCE.sendToGatt(gattBody).subscribe(new NetworkObserver<String>() {
             @Override
             public void onNext(String s) {
-                LogUtils.v("zcl---发送服务器返回----------" + s);
             }
 
             @Override
             public void onError(@NotNull Throwable e) {
                 super.onError(e);
-                LogUtils.e("zcl-------发送服务器返回-----------$" + e.getMessage());
             }
         });
 
@@ -366,8 +354,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                         Intent intent = new Intent();
                         intent.putExtra("data", tasksBean);
                         setResult(Activity.RESULT_OK, intent);
+                        runOnUiThread(() -> hideLoadingDialog());
                         finish();
-                        hideLoadingDialog();
                         break;
                 }
                 break;
@@ -375,7 +363,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     }
 
 
-    public void receviedGwCmd2000(String serId) {
+    public void receviedGwCmd2000(@NotNull String serId) {
 
     }
 

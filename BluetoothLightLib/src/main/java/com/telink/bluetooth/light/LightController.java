@@ -1003,7 +1003,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
                 light.setGwVoipState(voipStatus);
                 if (voipStatus == 0X10)//0x10代表连接业务标识 11位是业务标识
                     light.setGwWifiState(result[11]);//通过此处的peripheral设置数据
-                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------" + result[11]);
+//                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------" + result[11]);
                 this.dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
             }
         }
@@ -1456,7 +1456,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
             light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
             String s = Arrays.bytesToHexString((byte[]) obj, ",");
-            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
+//            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
             // dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
         }
 

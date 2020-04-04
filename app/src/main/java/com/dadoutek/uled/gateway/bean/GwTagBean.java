@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/12 9:57
@@ -31,7 +29,7 @@ public class GwTagBean implements Parcelable {
     private int week;//bit位 0-6 周日-周六
     private String  weekStr;//bit位 0-6 周日-周六 7代表当天
     private boolean isCreateNew;
-    private ArrayList<GwTasksBean> tasks;//json字符串
+    private String tasks;//json字符串
 
 
     public GwTagBean(Long tagId) {
@@ -141,7 +139,7 @@ public class GwTagBean implements Parcelable {
         isCreateNew = createNew;
     }
 
-    public ArrayList<GwTasksBean> getTasks() {
+    public String getTasks() {
         return tasks;
     }
 
@@ -177,7 +175,7 @@ public class GwTagBean implements Parcelable {
                 ", endMins=" + endMins + ", pos=" + pos + ", isTimer=" + isTimer + ", week=" + week + ", weekStr='" + weekStr + '\'' + ", isCreateNew=" + isCreateNew + ", tasks=" + tasks + '}';
     }
 
-    public void setTasks(ArrayList<GwTasksBean> tasks) {
+    public void setTasks(String tasks) {
         this.tasks = tasks;
     }
 

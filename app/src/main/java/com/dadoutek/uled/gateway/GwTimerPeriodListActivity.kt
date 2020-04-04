@@ -52,6 +52,8 @@ import kotlin.collections.ArrayList
  */
 class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
 
+    private var receviedCount: Int = 0
+    private var timeListTp: MutableList<GwTimePeriodsBean>? = null
     private var gwTagBean: GwTagBean? = null
     private lateinit var mApp: TelinkLightApplication
     private var connectCount: Int = 0
@@ -68,32 +70,44 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene, timesList)
     private val requestCodes: Int = 1000
     private var selectPosition: Int = 0
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun performed(event: Event<String>?) {
-                if (event is DeviceEvent) {
-                    this.onDeviceEvent(event)
-                }
-            }
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun performed(event: Event<String>?) {
+        if (event is DeviceEvent) {
+            this.onDeviceEvent(event)
+        }
+    }
 
 
-            @RequiresApi(Build.VERSION_CODES.O)
-            private fun onDeviceEvent(event: DeviceEvent) {
-                when (event.type) {
-                    DeviceEvent.STATUS_CHANGED -> {
-                        when {
-                            event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
-                                val deviceInfo = event.args
-                                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-                                hideLoadingDialog()
-                                when (deviceInfo.gwVoipState) {
-                                    Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP ->
-                                        sendTime(tasksBean!!)
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun onDeviceEvent(event: DeviceEvent) {
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                when {
+                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                        val deviceInfo = event.args
+                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                        hideLoadingDialog()
+                        when (deviceInfo.gwVoipState) {
+                            Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP ->
+                                sendTime(tasksBean!!)
+                            Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {
+                                receviedCount++
+                                if (receviedCount == timeListTp?.size ?: 0) {
+
+                                    tasksBean?.timingPeriods = timesList
+                                    intent.putExtra("data", tasksBean)
+                                    setResult(Activity.RESULT_OK, intent)
+                                    finish()
+                                } else {
+                                    showLoadingDialog(getString(R.string.config_gate_way_fail))
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun initListener() {
@@ -105,11 +119,6 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
             }
 
             sendLabelHeadParams()
-
-            tasksBean?.timingPeriods = timesList
-            intent.putExtra("data", tasksBean)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
         }
         adapter.setOnItemClickListener { _, _, position ->
             selectPosition = position
@@ -185,50 +194,55 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
 
 
         val listOf: MutableList<ByteArray> = arrayListOf()
-        val timeListTp = mutableListOf<GwTimePeriodsBean>()
+        timeListTp = mutableListOf()
+
         for (t in timesList) //获取时间段的有效时间
             if (t.sceneId != 0L)
-                timeListTp.add(t)
+                timeListTp?.add(t)
 
         var os = ByteArrayOutputStream()
-        for (i in 0 until timeListTp.size) {
-            val tp = timeListTp[i]
-            if (tasksBean != null) {
-                if (!TelinkLightApplication.getApp().isConnectGwBle) {
-                    var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
-                            Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
-                            tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                            tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
-                            (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
-                            (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
-                    os.write(labHeadPar)
-                    listOf.add(labHeadPar)
+        receviedCount = 0
+        timeListTp?.let {
+            for (i in 0 until it.size) {
+                val tp = it[i]
+                if (tasksBean != null) {
+                    if (!TelinkLightApplication.getApp().isConnectGwBle) {
+                        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+                                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
+                                tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
+                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+                        os.write(labHeadPar)
+                        listOf.add(labHeadPar)
 
-                    if (i == timeListTp.size - 1) {
-                        val byteArray = os.toByteArray()
+                        if (i == it.size - 1) {
+                            val byteArray = os.toByteArray()
 
-                        val encoder = Base64.getEncoder()
-                        val s = encoder.encodeToString(byteArray)
-                        val gattBody = GwGattBody()
-                        gattBody.data = s
-                        gattBody.macAddr = tasksBean!!.gwMacAddr
-                        gattBody.tagHead = 1
-                        sendToServer(gattBody)
+                            val encoder = Base64.getEncoder()
+                            val s = encoder.encodeToString(byteArray)
+                            val gattBody = GwGattBody()
+                            gattBody.data = s
+                            gattBody.macAddr = tasksBean!!.gwMacAddr
+                            gattBody.tagHead = 1
+                            sendToServer(gattBody)
+                        }
+                    } else {
+                        var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour
+                                ?: 0).toByte(),
+                                (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
+                                ?: 0).toByte(),
+                                (tasksBean?.endMins
+                                        ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+
+                        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
+                                tasksBean?.gwMeshAddr ?: 0, params, "1")
                     }
-                } else {
-                    var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                            tasksBean!!.stateTime.toByte(), (tasksBean?.startHour
-                            ?: 0).toByte(),
-                            (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
-                            ?: 0).toByte(),
-                            (tasksBean?.endMins
-                                    ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
-
-                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
-                            tasksBean?.gwMeshAddr ?: 0, params,"1")
                 }
             }
         }
+
     }
 
     /**
@@ -240,12 +254,12 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-            connectCount++
-            if (connectCount<3)
-                sendLabelHeadParams()
-            else
-                showLoadingDialog(getString(R.string.config_gate_way_fail))
-        }
+                    connectCount++
+                    if (connectCount < 3)
+                        sendLabelHeadParams()
+                    else
+                        showLoadingDialog(getString(R.string.config_gate_way_fail))
+                }
         var meshAddress = gwTagBean?.meshAddr ?: 0
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()

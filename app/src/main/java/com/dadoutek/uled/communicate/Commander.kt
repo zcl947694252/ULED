@@ -653,7 +653,7 @@ object Commander : EventListener<String> {
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
-                LogUtils.d("connect doFinally")
+               // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
 

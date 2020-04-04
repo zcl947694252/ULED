@@ -1017,5 +1017,6 @@
     <string name="label">Label</string>
     <string name="get_time_zone_fail">Failed to obtain time zone information</string>
     <string name="config_gate_way_fail">Configuration gateway failed</string>
+    <string name="delete_gate_way">删除网关标签失败</string>
 
 </resources>

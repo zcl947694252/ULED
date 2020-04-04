@@ -534,7 +534,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     when(gwStompBean.cmd){
                         700-> TelinkLightApplication.getApp().offLine = false
                         701-> TelinkLightApplication.getApp().offLine = true
-                        2000->receviedGwCmd2000(gwStompBean.ser_id)
+                        2000->if (gwStompBean.status==0)receviedGwCmd2000(gwStompBean.ser_id)
                         2500->receviedGwCmd2500(gwStompBean)
                     }
 

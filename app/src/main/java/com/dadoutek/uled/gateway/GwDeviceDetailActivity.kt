@@ -2,6 +2,7 @@ package com.dadoutek.uled.gateway
 
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -14,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -22,7 +24,6 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant.*
@@ -66,6 +67,8 @@ import java.util.concurrent.TimeUnit
  *if (targetDevices.size() > 0)
  *if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
  *return false;
+ *
+ *
  *}}
  *
  * 更新者    $author$
@@ -121,6 +124,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun initView() {
+        disableConnectionStatusListener()
         this.mApp = this.application as TelinkLightApplication
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         tv_function1.visibility = View.GONE
@@ -392,6 +396,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         startActivity(intent)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGw = gateWayDataList[position]
         positionCurrent = position
@@ -408,37 +413,72 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         } else if (view.id == R.id.img_light) {
             //开关网关通过普通灯的连接状态发送
             if (TelinkLightApplication.getApp().connectDevice != null)
-                sendOpenOrCloseGw()
+                sendOpenOrCloseGw(true)
             else
                 getGw()
         }
     }
 
-    private fun sendOpenOrCloseGw() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendOpenOrCloseGw(isBleConnect: Boolean) {
         //第是一位0x01代表开 默认开 0x00代表关
         currentGw?.let {
-            var labHeadPar: ByteArray = if (it.openTag == true)//如果是开就执行关闭
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-            else
-                byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
-            TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_SWITCH, it.meshAddr, labHeadPar, "1")
-            it.openTag = (it.openTag)
-            DBUtils.saveGateWay(it, false)
-        }
+            if (isBleConnect) {
+                var labHeadPar: ByteArray = if (it.openTag == true)//如果是开就执行关闭
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+                else
+                    byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
+                TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_SWITCH, it.meshAddr, labHeadPar, "1")
+                it.openTag = (!it.openTag)
+                DBUtils.saveGateWay(it, false)
+            } else {
 
+                disposableTimer?.dispose()
+                disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
+                            showLoadingDialog(getString(R.string.config_gate_way_fail))
+                        }
+
+                var labHeadPar: ByteArray = if (it.openTag == true)//如果是开就执行关闭
+                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0)
+                else
+                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0)
+
+                val encoder = Base64.getEncoder()
+                val s = encoder.encodeToString(labHeadPar)
+                val gattBody = GwGattBody()
+                gattBody.data = s
+                gattBody.ser_id = GW_GATT_SWITCH
+                gattBody.macAddr = currentGw?.macAddr
+                sendToServer(gattBody)
+            }
+        }
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+            }
+        })
     }
 
     private fun getGw() {
         TelinkLightApplication.getApp().offLine = false
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onNext(t: List<DbGateway>) {
                 hideLoadingDialog()
                 t.forEach { db ->
                     if (db.meshAddr == currentGw!!.meshAddr) {//网关在线状态，1表示在线，0表示离线
                         val b = db.state == 0
                         TelinkLightApplication.getApp().offLine = b
-                        if (!b) {
-                            sendOpenOrCloseGw()
+                        if (!TelinkLightApplication.getApp().offLine) {
+                            sendOpenOrCloseGw(false)
                         } else {
                             ToastUtils.showShort(getString(R.string.gw_not_online))
                         }
@@ -514,7 +554,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     1 -> onLogin(configType)
                     2 -> getDeviceVersion(currentGw!!.meshAddr)//代表OTA
                     3 -> {
-                        retryCount = 0
                         sendGwResetFactory()
                     }
                 }//判断进入那个开关设置界面
@@ -548,7 +587,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                         }
                     })
                 } else {
-                   ToastUtils.showShort(getString(R.string.connect_fail))
+                    ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             })
         } else {
@@ -557,14 +596,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun sendGwResetFactory() {
-        retryCount++
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (!isRestSuccess && retryCount < 2)
-                        sendGwResetFactory()
-                }
         var labHeadPar = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr
                 ?: 0, labHeadPar, "1")
@@ -582,12 +613,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 when {
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
-                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                         if (deviceInfo.gwVoipState == GW_RESET_VOIP) {
+                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                             isRestSuccess = true
                             deleteGwData()
                         }
-
                     }
                 }
             }
@@ -601,6 +631,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         DBUtils.deleteGateway(currentGw!!)
         val gattBody = GwGattBody()
         gattBody.idList = mutableListOf(currentGw!!.id.toInt())
+
         GwModel.deleteGwList(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
                 LogUtils.v("zcl-----网关删除成功返回-------------$t")
@@ -612,6 +643,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             override fun onError(e: Throwable) {
                 super.onError(e)
                 ToastUtils.showShort(e.message)
+                hideLoadingDialog()
                 LogUtils.v("zcl-----网关删除成功返回-------------${e.message}")
             }
         })
@@ -738,11 +770,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         installDialog?.dismiss()
     }
 
-    override fun receviedGwCmd2000(serId: String) {
-
-    }
-
-    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
-
+    override fun receviedGwCmd2000(ser_id: String) {
+        if (GW_GATT_SWITCH == ser_id?.toInt()) {
+            currentGw?.openTag = !(currentGw?.openTag ?: false)
+            currentGw?.updateIcon()
+            DBUtils.saveGateWay(currentGw!!, false)
+            disposableTimer?.dispose()
+        }
     }
 }

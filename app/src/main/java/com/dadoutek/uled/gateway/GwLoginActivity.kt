@@ -10,7 +10,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -36,7 +35,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/26 14:10
- * 描述
+ * 描述 设置wifi不需要发送标签头 并且只能通过本地设置
  *
  * 更新者     $
  * 更新时间   $
@@ -73,7 +72,6 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showShort(getString(R.string.wifi_cannot_be_empty))
             } else {
                 // sendWIFIParmars("Dadou", "Dadoutek2018")
-
                 showLoadingDialog(getString(R.string.config_setting_gw_wifi))
                 sendWIFIParmars(account, pwd)
             }
@@ -110,18 +108,22 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
 
                         when (deviceInfo.gwVoipState) {
-                            Constant.GW_WIFI_VOIP ->{
-                                disposableTimer?.dispose()
-                                hideLoadingDialog()
-                                if (deviceInfo.gwWifiState == 0)
-                                    skipEvent()
-                                else
-                                    ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                            Constant.GW_WIFI_VOIP -> {
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    disposableTimer?.dispose()
+                                    hideLoadingDialog()
+                                    if (deviceInfo.gwWifiState == 0)
+                                        skipEvent()
+                                    else
+                                        ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                                }
                             }
 
-                            Constant.GW_TIME_ZONE_VOIP ->  {
-                                disposableTimer?.dispose()
-                                hideLoadingDialog()
+                            Constant.GW_TIME_ZONE_VOIP -> {
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    disposableTimer?.dispose()
+                                    hideLoadingDialog()
+                                }
                             }
                         }
                     }
@@ -141,7 +143,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun sendWIFIParmars(account: String, pwd: String) {
-            disposableTimer?.dispose()
+        disposableTimer?.dispose()
         disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -165,12 +167,11 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun sendTimeZoneParmars() {
         disposableTimer?.dispose()
-         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
-                 .subscribeOn(AndroidSchedulers.mainThread())
+        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     ToastUtils.showLong(getString(R.string.get_time_zone_fail))
-                    finish()
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val default = TimeZone.getDefault()
@@ -200,7 +201,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         val yearL = year and (0xff)
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
-        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params,"1")
+        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
     }
 
     private fun sendParmars(listParmars: MutableList<ByteArray>, byteSize: Byte, isPwd: Boolean) {
@@ -247,10 +248,11 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
-       // sendDeviceMacParmars()
+        // sendDeviceMacParmars()
     }
 
     private fun initView() {
+        disableConnectionStatusListener()
         this.mApp = this.application as TelinkLightApplication
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         if (TelinkLightApplication.getApp().isConnectGwBle)
@@ -263,10 +265,6 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun receviedGwCmd2000(serId: String) {
-
-    }
-
-    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
 
     }
 }
