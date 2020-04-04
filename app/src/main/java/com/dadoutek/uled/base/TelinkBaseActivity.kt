@@ -534,7 +534,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     when(gwStompBean.cmd){
                         700-> TelinkLightApplication.getApp().offLine = false
                         701-> TelinkLightApplication.getApp().offLine = true
-                        2000-> LogUtils.v("zcl-----------长连接网关标签下发成功-------")
+                        2000->receviedGwCmd2000(gwStompBean.ser_id)
+                        2500->receviedGwCmd2500(gwStompBean)
                     }
 
                 }
@@ -575,6 +576,14 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
+    }
+
+    open fun receviedGwCmd2000(serId: String) {
+
     }
 
     open fun loginOutMethod() {

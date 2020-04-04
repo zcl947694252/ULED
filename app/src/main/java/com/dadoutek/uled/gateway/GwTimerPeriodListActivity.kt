@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.gateway.adapter.GwTpItemAdapter
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
@@ -29,7 +30,9 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.template_top_three.*
 import java.io.ByteArrayOutputStream
@@ -169,6 +172,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     sendCount++
                     if (sendCount < 3) {
@@ -232,7 +237,9 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendLabelHeadParams() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe {
+        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
             connectCount++
             if (connectCount<3)
                 sendLabelHeadParams()
@@ -280,4 +287,13 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
             }
         })
     }
+
+    override fun receviedGwCmd2000(serId: String) {
+
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
+    }
+
 }

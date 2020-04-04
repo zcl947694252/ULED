@@ -21,6 +21,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.GwTaskItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.util.GsonUtil
@@ -39,7 +40,9 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
@@ -149,7 +152,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         listTask.clear()
         val tasks = tagBean!!.tasks
         if (tasks != null)
-            listTask.addAll(GsonUtil.stringToList(tasks, GwTasksBean::class.java))
+            listTask.addAll(tasks)
         adapter.notifyDataSetChanged()
 
         gate_way_lable.setText(getString(R.string.label) + tagBean?.tagId)
@@ -187,7 +190,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         LogUtils.v("zcl网关---$toJson")
         tagBean?.tagName = gate_way_lable.text.toString()
         tagBean?.weekStr = gate_way_repete_mode.text.toString()
-        tagBean?.tasks = toJson//添加tag的时间列表
+        tagBean?.tasks = listTask//添加tag的时间列表
 
         //因为是新创建的对象所以直接创建list添加 如果不是需要查看是都有tags
         if (tagList.size == 0) {
@@ -262,7 +265,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
         connectCount++
         disposableTimer?.dispose()
-         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe {
+         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                 .observeOn(Schedulers.io())
+                 .subscribeOn(AndroidSchedulers.mainThread())
+                 .subscribe {
             if (connectCount<3)
                 sendDeleteTask(gwTaskBean)
             else
@@ -341,6 +347,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     sendCount++
                     if (sendCount < 3) {
@@ -601,5 +609,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         initView()
         initData()
         initListener()
+    }
+
+    override fun receviedGwCmd2000(serId: String) {
+
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
     }
 }

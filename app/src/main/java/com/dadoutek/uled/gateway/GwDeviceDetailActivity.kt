@@ -22,6 +22,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant.*
@@ -45,7 +46,9 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -120,7 +123,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private fun initView() {
         this.mApp = this.application as TelinkLightApplication
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
+        tv_function1.visibility = View.GONE
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
 
@@ -463,7 +466,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         val delete = views.findViewById<TextView>(R.id.deleteBtn)
         val rename = views.findViewById<TextView>(R.id.rename)
         rename.text = getString(R.string.config_net)
-        delete.text = getString(R.string.delete)
 
         rename.setOnClickListener {
             connectGw(1)//配置网络
@@ -497,6 +499,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             showLoadingDialog(getString(R.string.connecting))
             disposable?.dispose()
             disposable = Observable.timer(20, TimeUnit.SECONDS)
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         hideLoadingDialog()
                         ToastUtils.showShort(getString(R.string.connect_fail2))
@@ -529,6 +533,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                                         val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
                                         intent.putExtra("data", currentGw)
                                         startActivity(intent)
+                                        finish()
                                     } else {
                                         ToastUtils.showShort(getString(R.string.gw_not_online))
                                     }
@@ -554,6 +559,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private fun sendGwResetFactory() {
         retryCount++
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (!isRestSuccess && retryCount < 2)
                         sendGwResetFactory()
@@ -667,6 +674,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         if (intent != null) {
             intent!!.putExtra("data", currentGw)
             startActivity(intent)
+            finish()
         }
     }
 
@@ -728,5 +736,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         canBeRefresh = false
         acitivityIsAlive = false
         installDialog?.dismiss()
+    }
+
+    override fun receviedGwCmd2000(serId: String) {
+
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
     }
 }

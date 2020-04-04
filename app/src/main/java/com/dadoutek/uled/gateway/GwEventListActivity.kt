@@ -21,8 +21,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
-import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -40,7 +40,9 @@ import com.telink.util.EventListener
 import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -165,9 +167,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     ToastUtils.showLong(getString(R.string.get_time_zone_fail))
+                    intent = Intent(this, GwDeviceDetailActivity::class.java)
+                    startActivity(intent)
                     finish()
                 }
         val default = TimeZone.getDefault()
@@ -211,6 +217,8 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
         if (dbGw == null) {
             ToastUtils.showShort(getString(R.string.no_get_device_info))
+            intent = Intent(this, GwDeviceDetailActivity::class.java)
+            startActivity(intent)
             finish()
         }
 
@@ -238,17 +246,24 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     private fun getNewData() {
         listOne.clear()
         listTwo.clear()
-        if (!TextUtils.isEmpty(dbGw?.tags))
-            listOne.addAll(GsonUtil.stringToList(dbGw?.tags, GwTagBean::class.java))
-        if (!TextUtils.isEmpty(dbGw?.timePeriodTags))
-            listTwo.addAll(GsonUtil.stringToList(dbGw?.timePeriodTags, GwTagBean::class.java))
+        if (!TextUtils.isEmpty(dbGw?.tags)) {
+            val elements = GsonUtil.stringToList(dbGw?.tags, GwTagBean::class.java)
+            listOne.addAll(elements)
+        }
+        if (!TextUtils.isEmpty(dbGw?.timePeriodTags)) {
+            val elements = GsonUtil.stringToList(dbGw?.timePeriodTags, GwTagBean::class.java)
+            listTwo.addAll(elements)
+        }
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun initListener() {
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            intent = Intent(this, GwDeviceDetailActivity::class.java)
+            startActivity(intent)
+            finish() }
         addBtn?.setOnClickListener { addNewTag() }
         lin?.setOnClickListener { addNewTag() }
 
@@ -312,7 +327,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
 
-        val taskList = GsonUtil.stringToList(dbGwTag.tasks, GwTasksBean::class.java)
+        val taskList = dbGwTag.tasks
         if (dbGwTag.status == 1 && taskList.size > 0) {//开启任务 并且该标签有需要执行的时间
             if (checkedIdType == event_timer_mode.id) {//定时模式 开启任务判断
                 //获取要开启的标签的有效时间
@@ -337,8 +352,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 val oldList = mutableListOf<GwTimeAndDataBean>()
                 //it.tasks.size代表该标签有时间或者时间段
                 val listTwoOpen = listTwo.filter {
-                    val listTwoTask = GsonUtil.stringToList<GwTasksBean>(it.tasks)
-                    it.status == 1 && listTwoTask.size > 0
+                    it.status == 1 && it.tasks.size > 0
                 }
 
                 listTwoOpen.forEach {
@@ -399,7 +413,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getGwTimerAllTime(dbGwTag: GwTagBean): MutableList<GwTimeAndDataBean> {
-        val tasks = GsonUtil.stringToList<GwTasksBean>(dbGwTag.tasks)
+        val tasks = dbGwTag.tasks
         var splitWeek = dbGwTag.weekStr.split(",")
         if (splitWeek.size == 1) {
             if (splitWeek[0] == getString(R.string.every_day)) {
@@ -438,7 +452,10 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendOpenOrCloseGw(dbGwTag: GwTagBean) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe {
+        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe {
             connectCount++
             if (connectCount < 3)
                 sendOpenOrCloseGw(dbGwTag)
@@ -586,4 +603,11 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         disposableTimer?.dispose()
     }
 
+    override fun receviedGwCmd2000(serId: String) {
+
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
+    }
 }

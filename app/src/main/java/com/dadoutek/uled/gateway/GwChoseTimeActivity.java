@@ -18,6 +18,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
+import com.dadoutek.uled.gateway.bean.GwStompBean;
 import com.dadoutek.uled.gateway.bean.GwTagBean;
 import com.dadoutek.uled.gateway.bean.GwTasksBean;
 import com.dadoutek.uled.model.Constant;
@@ -50,7 +51,9 @@ import butterknife.Unbinder;
 import cn.qqtheme.framework.picker.DateTimePicker;
 import cn.qqtheme.framework.picker.TimePicker;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 设置网关时间与场景传递进配config界面
@@ -129,9 +132,9 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private void sendLabelHeadParams() {
         showLoadingDialog(getString(R.string.please_wait));
         if (disposableTimer != null) disposableTimer.dispose();
-        disposableHeadTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+        disposableHeadTimer =
+                Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
             TmtUtils.midToastLong(this, getString(R.string.config_gate_way_fail));
-            return;
         });
         int meshAddress = gwTagBean.getMeshAddr();
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode
@@ -141,8 +144,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-
-         opcodeHead = Opcode.CONFIG_GW_TIMER_LABLE_HEAD;
+        opcodeHead = Opcode.CONFIG_GW_TIMER_LABLE_HEAD;
 
         if (gwTagBean != null) if (TelinkLightApplication.Companion.getApp().getOffLine()) {
 
@@ -162,10 +164,15 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             byte[] labHeadPar = new byte[]{(byte) (gwTagBean.getTagId() & 0xff),
                     (byte) gwTagBean.getStatus(), (byte) gwTagBean.getWeek(), 0, (byte) month,
                     (byte) day, 0, 0};
-            TelinkLightService.Instance().sendCommandResponse(opcodeHead, meshAddress, labHeadPar
-                    , "1");
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance != null) {
+                instance.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1");
+            } else {
+                TmtUtils.midToastLong(this, "TelinkLightService is null , please retry.");
+            }
         }
-        sendLabelHeadParams();
+
+        sendTime(tasksBean);
     }
 
 
@@ -175,7 +182,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void sendTime(GwTasksBean tasks) {
         if (disposableTimer != null) disposableTimer.dispose();
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+        disposableTimer =
+                Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
             sendCount++;
             if (sendCount < 3) {
                 sendTime(tasks);
@@ -348,11 +356,11 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         DeviceInfo deviceInfo = event.getArgs();
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_SET_GW_COMPLETED:
-                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo"+deviceInfo);
+                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo" + deviceInfo);
                 switch (deviceInfo.gwVoipState) {
                     case Constant.GW_CONFIG_TIMER_LABEL_VOIP://定时标签头下发
                         if (disposableHeadTimer != null) disposableHeadTimer.dispose();
-                            sendTime(tasksBean);//下发task
+                        sendTime(tasksBean);//下发task
                         break;
                     case Constant.GW_CONFIG_TIMER_TASK_VOIP://下发成功返回数据给配置也保存更新
                         Intent intent = new Intent();
@@ -364,5 +372,15 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                 }
                 break;
         }
+    }
+
+
+    public void receviedGwCmd2000(String serId) {
+
+    }
+
+
+    public void receviedGwCmd2500(GwStompBean gwStompBean) {
+
     }
 }

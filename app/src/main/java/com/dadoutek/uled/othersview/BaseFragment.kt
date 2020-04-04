@@ -30,6 +30,9 @@ import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class BaseFragment : Fragment() {
 
@@ -41,7 +44,7 @@ open class BaseFragment : Fragment() {
     private var groupType: Long = 0L
     private var dialogGroupName: TextView? = null
     private var dialogGroupType: TextView? = null
-     lateinit var popMain: PopupWindow
+    lateinit var popMain: PopupWindow
 
 
     fun showLoadingDialog(content: String) {
@@ -64,6 +67,7 @@ open class BaseFragment : Fragment() {
             loadDialog!!.show()
         }
     }
+
     private fun makeDialog() {
         dialog = Dialog(context)
         list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
@@ -109,11 +113,11 @@ open class BaseFragment : Fragment() {
         adapterType?.setOnItemClickListener { _, _, position ->
             dialogGroupType?.text = list!![position]
             recyclerView.visibility = View.GONE
-            when(position){
-                0-> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                1-> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                2-> groupType = Constant.DEVICE_TYPE_CURTAIN
-                3-> groupType = Constant.DEVICE_TYPE_CONNECTOR
+            when (position) {
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
             }
         }
         popMain.setOnDismissListener {
@@ -149,22 +153,24 @@ open class BaseFragment : Fragment() {
      * @param isConnected       是否是连接状态
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
-        if (isConnected) {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-            }//meFragment 不存在toolbar 所以要拉出来
+        GlobalScope.launch(Dispatchers.Main) {
+            if (isConnected) {
+                if (toolbar != null) {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+                }//meFragment 不存在toolbar 所以要拉出来
                 setLoginChange()
-        } else {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                    val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                    dialog.show()
+            } else {
+                if (toolbar != null) {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
+                        val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
+                        dialog.show()
+                    }
                 }
-            }
                 setLoginOutChange()
+            }
         }
     }
 
@@ -187,7 +193,6 @@ open class BaseFragment : Fragment() {
             }
         }
     }
-
 
 
     fun onDeviceStatusChanged(event: DeviceEvent) {
@@ -221,8 +226,9 @@ open class BaseFragment : Fragment() {
         initChangeRecevicer()
         makeDialog()
     }
+
     private fun initChangeRecevicer() {
-         changeRecevicer = ChangeRecevicer()
+        changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
@@ -255,7 +261,7 @@ open class BaseFragment : Fragment() {
 
 
     open fun endCurrentGuide() {}
-    inner class ChangeRecevicer : BroadcastReceiver(){
+    inner class ChangeRecevicer : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
 //            LogUtils.e("zcl获取通知$deviceInfo")

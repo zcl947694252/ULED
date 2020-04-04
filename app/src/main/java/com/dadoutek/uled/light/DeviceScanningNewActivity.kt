@@ -663,7 +663,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbGw.name = getString(R.string.device_name) + dbGw.meshAddr
                 dbGw.tags = ""
                 dbGw.timePeriodTags = ""
-                dbGw.uid = (lastUser?.id?:0).toInt()
+                dbGw.uid = (lastUser?.id ?: 0).toInt()
                 DBUtils.saveGateWay(dbGw, false)
                 addGw(dbGw)
             }
@@ -1405,7 +1405,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 mConnectRetryCount = 0
                 if (mAddDeviceType != DeviceType.GATE_WAY)
                     this.startScan()    //继续开始扫描设备
-                else{
+                else {
                     btn_add_groups?.setText(R.string.config_gate_way)
                     scanSuccess()
                 }
@@ -1435,6 +1435,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else if (mAddDeviceType == DeviceType.SMART_CURTAIN) {
             startGrouping()
         } else if (mAddDeviceType == DeviceType.GATE_WAY) {
+            TelinkLightApplication.getApp().isConnectGwBle = true
             val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
             intent.putExtra("data", dbGw)
 

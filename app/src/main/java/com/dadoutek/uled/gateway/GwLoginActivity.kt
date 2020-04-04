@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -20,7 +21,9 @@ import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gw_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -140,6 +143,8 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     private fun sendWIFIParmars(account: String, pwd: String) {
             disposableTimer?.dispose()
         disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
                 }
@@ -160,7 +165,8 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun sendTimeZoneParmars() {
         disposableTimer?.dispose()
-         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
+                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     ToastUtils.showLong(getString(R.string.get_time_zone_fail))
@@ -254,5 +260,13 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         disposableTimer?.dispose()
+    }
+
+    override fun receviedGwCmd2000(serId: String) {
+
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
     }
 }
