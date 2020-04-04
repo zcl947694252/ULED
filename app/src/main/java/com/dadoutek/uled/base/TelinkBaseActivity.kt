@@ -180,11 +180,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
         adapterType?.setOnItemClickListener { _, _, position ->
             dialogGroupType?.text = list!![position]
             recyclerView.visibility = View.GONE
-            when(position){
-                0-> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                1-> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                2-> groupType = Constant.DEVICE_TYPE_CURTAIN
-                3-> groupType = Constant.DEVICE_TYPE_CONNECTOR
+            when (position) {
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
             }
         }
         popMain.setOnDismissListener {
@@ -211,7 +211,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-   open  fun refreshGroupData() {
+    open fun refreshGroupData() {
 
 
     }
@@ -358,6 +358,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (loadDialog == null) {
             loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
+
+        if (loadDialog!!.isShowing)
+            return
+
         //loadDialog没显示才把它显示出来
         if (!loadDialog!!.isShowing && !this.isFinishing) {
             loadDialog!!.setCancelable(false)
@@ -370,8 +374,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (loadDialog != null &&loadDialog!!.isShowing&& !this@TelinkBaseActivity.isFinishing) {
-            loadDialog!!.dismiss()
+        if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
+                loadDialog!!.dismiss()
         }
     }
 
@@ -486,7 +490,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     PopUtil.dismiss(pop)
                     when (type) {
                         -1, 0, 2 -> { //移交的区域已被接收 账号已被接收 解除了区域%1$s的授权
-                            if (lastRegionId== rid || rid == 1) {//如果正在使用或者是区域一则退出
+                            if (lastRegionId == rid || rid == 1) {//如果正在使用或者是区域一则退出
                                 //DBUtils.deleteAllData()//删除数据
                                 restartApplication()
                                 ToastUtils.showLong(getString(R.string.cancel_authorization))
@@ -498,7 +502,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 initOnLayoutListener()
                 LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -531,11 +535,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
-                    when(gwStompBean.cmd){
-                        700-> TelinkLightApplication.getApp().offLine = false
-                        701-> TelinkLightApplication.getApp().offLine = true
-                        2000->if (gwStompBean.status==0)receviedGwCmd2000(gwStompBean.ser_id)
-                        2500->receviedGwCmd2500(gwStompBean)
+                    when (gwStompBean.cmd) {
+                        700 -> TelinkLightApplication.getApp().offLine = false
+                        701 -> TelinkLightApplication.getApp().offLine = true
+                        2000 -> if (gwStompBean.status == 0) receviedGwCmd2000(gwStompBean.ser_id)
+                        2500 -> receviedGwCmd2500(gwStompBean)
                     }
 
                 }
@@ -565,9 +569,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         }
                     }
 
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid ,cancelBean.region_name,lastRegionId?.toInt()) }//2代表解除授权信息type
-                    
-                    LogUtils.e("zcl_baseMe___________取消授权${cancelBean==null}")
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid, cancelBean.region_name, lastRegionId?.toInt()) }//2代表解除授权信息type
+
+                    LogUtils.e("zcl_baseMe___________取消授权${cancelBean == null}")
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg

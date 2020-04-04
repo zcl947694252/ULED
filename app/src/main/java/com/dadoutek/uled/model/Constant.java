@@ -298,7 +298,7 @@ public class Constant implements Serializable {
      */
     public static final int GW_CONFIG_TIME_PERIVODE_LABEL_VOIP =0X17;
     /**
-     * 网关删除循环时间段下发业务标识
+     * 网关循环时间段下发业务标识
      */
     public static final int GW_CONFIG_TIME_PERIVODE_TASK_VOIP =0X18;
     /**
@@ -325,15 +325,35 @@ public class Constant implements Serializable {
     /**
      * 删除网关标签
      */
-    public static final int GW_GATT_DELETE_LABEL_SWITCH =3;
+    public static final int GW_GATT_DELETE_LABEL =3;
+    /**
+     * 删除网关标签的task时间
+     */
+    public static final int GW_GATT_DELETE_LABEL_TASK =4;
 
     /**
      * 保存网关标签头
      */
-    public static final int GW_GATT_SAVE_LABEL_HEAD =4;
+    public static final int GW_GATT_SAVE_LABEL_HEAD =5;
+
 
     /**
-     * 保存网关标签头
+     * 保存网关定时选择时间标签头
      */
-    public static final int GW_GATT_SAVE_TASK_TIME =5;
+    public static final int GW_GATT_CHOSE_TIME_LABEL_HEAD =6;
+
+    /**
+     * 保存网关定时模式task任务
+     */
+    public static final int GW_GATT_SAVE_TIMER_TASK_TIME =7;
+
+    /**
+     * 保存网关循环模式选择时间标签头
+     */
+    public static final int GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD =8;
+
+    /**
+     * 保存网关x循环模式task任务
+     */
+    public static final int GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME =9;
 }

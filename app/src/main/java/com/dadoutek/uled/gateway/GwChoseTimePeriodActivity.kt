@@ -110,31 +110,31 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.toolbar_t_confim -> {
                 val repeatTime = isRepeatTime()
-                if (repeatTime){
+                if (repeatTime) {
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
                     return
                 }
-                if (startTimeNum >= endTimeNum){
+                if (startTimeNum >= endTimeNum) {
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
                     return
                 }
 
-                    if (standingNum <= 0) {
-                        ToastUtils.showShort(getString(R.string.please_select_standing_time))
-                        return
-                    }
-                    getTimerPeriods()//生成时间段
+                if (standingNum <= 0) {
+                    ToastUtils.showShort(getString(R.string.please_select_standing_time))
+                    return
+                }
+                getTimerPeriods()//生成时间段
 
-                    tasksBean?.startHour = startHourTime
-                    tasksBean?.startMins = startMinuteTime
-                    tasksBean?.endHour = endHourTime
-                    tasksBean?.endMins = endMinuteTime
-                    tasksBean?.startMinuts = startTimeNum
-                    tasksBean?.endMinuts = endTimeNum
-                    tasksBean?.timingPeriods = timesList
-                    val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
-                    intent.putExtra("data", tasksBean)
-                    startActivityForResult(intent, requestTimerPeriodCode)
+                tasksBean?.startHour = startHourTime
+                tasksBean?.startMins = startMinuteTime
+                tasksBean?.endHour = endHourTime
+                tasksBean?.endMins = endMinuteTime
+                tasksBean?.startMinuts = startTimeNum
+                tasksBean?.endMinuts = endTimeNum
+                tasksBean?.timingPeriods = timesList
+                val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
+                intent.putExtra("data", tasksBean)
+                startActivityForResult(intent, requestTimerPeriodCode)
             }
             R.id.toolbar_t_cancel -> finish()
             R.id.gw_times_standing_time_ly -> {
@@ -169,12 +169,12 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isRepeatTime(): Boolean {
-        var isRepeatTime  = false
-        for (task in data){//开始时间不能再他的开始时间与结束时间之间 ,结束时间再他之间
-            if( (startMinuteTime>=task.startMinuts&&startMinuteTime<task.endMinuts) ||(endMinuteTime>=task.startMinuts&&startMinuteTime<=task.endMinuts))
-                isRepeatTime =  true
+        var isRepeatTime = false
+        for (task in data) {//开始时间不能再他的开始时间与结束时间之间 ,结束时间再他之间
+            if ((startMinuteTime >= task.startMinuts && startMinuteTime < task.endMinuts) || (endMinuteTime >= task.startMinuts && startMinuteTime <= task.endMinuts))
+                isRepeatTime = true
         }
-        return  isRepeatTime
+        return isRepeatTime
     }
 
     @SuppressLint("SetTextI18n")
@@ -184,8 +184,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         if (newData != null && !TextUtils.isEmpty(newData.toString())) {//新创建task
             tasksBean = newData
             tasksBean!!.isCreateNew = true
-            data =   TelinkLightApplication.getApp().listTask
-        }else{
+            data = TelinkLightApplication.getApp().listTask
+        } else {
             ToastUtils.showShort(getString(R.string.invalid_data))
             finish()
         }
@@ -226,7 +226,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             } else if (requestCode == requestStandingCode) {//获取停留时间
                 standingNum = data!!.getIntExtra("data", 0)
                 gw_times_standing_time.text = standingNum.toString()
-                tasksBean?.stateTime =standingNum
+                tasksBean?.stateTime = standingNum
             }
         }
     }

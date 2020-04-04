@@ -170,8 +170,8 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    hideLoadingDialog()
-                    ToastUtils.showLong(getString(R.string.get_time_zone_fail))
+                 runOnUiThread {    hideLoadingDialog()
+                     ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val default = TimeZone.getDefault()
@@ -267,4 +267,6 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     override fun receviedGwCmd2000(serId: String) {
 
     }
+
+
 }

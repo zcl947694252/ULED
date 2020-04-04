@@ -441,7 +441,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                         .observeOn(Schedulers.io())
                         .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-                            showLoadingDialog(getString(R.string.config_gate_way_fail))
+                            showLoadingDialog(getString(R.string.gate_way_switch_fail))
                         }
 
                 var labHeadPar: ByteArray = if (it.openTag == true)//如果是开就执行关闭

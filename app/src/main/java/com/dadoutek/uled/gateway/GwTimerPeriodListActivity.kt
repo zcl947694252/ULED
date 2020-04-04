@@ -12,7 +12,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.gateway.adapter.GwTpItemAdapter
-import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
@@ -25,6 +24,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.switches.SelectSceneListActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
@@ -35,6 +35,10 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.template_top_three.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -61,6 +65,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     private var disposableTimer: Disposable? = null
     private var tasksBean: GwTasksBean? = null
     private var isHaveLastOne = false
+
     override fun setLayoutID(): Int {
         return R.layout.activity_timer_period_list
     }
@@ -86,26 +91,37 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-                        hideLoadingDialog()
                         when (deviceInfo.gwVoipState) {
-                            Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP ->
-                                sendTime(tasksBean!!)
-                            Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {
-                                receviedCount++
-                                if (receviedCount == timeListTp?.size ?: 0) {
-
-                                    tasksBean?.timingPeriods = timesList
-                                    intent.putExtra("data", tasksBean)
-                                    setResult(Activity.RESULT_OK, intent)
-                                    finish()
-                                } else {
-                                    showLoadingDialog(getString(R.string.config_gate_way_fail))
-                                }
+                            Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
+                                sendTime()
+                                LogUtils.v("zcl-----------收到回调发送次数-------")
+                            }
+                            Constant.GW_CONFIG_TIME_PERIVODE_TASK_VOIP -> {
+                                receviceSuceessTaskSmallTimes()
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun receviceSuceessTaskSmallTimes() {
+        disposableTimer?.dispose()
+        receviedCount++
+        LogUtils.v("zcl-----------收到发送次数-------$receviedCount-----${timeListTp!!.size}-----${System.currentTimeMillis()}")
+
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(timeListTp!!.size * 250L)
+            LogUtils.v("zcl-----------发送次数结束时间-------" + System.currentTimeMillis())
+            if (receviedCount >= timeListTp?.size ?: 0) {
+                tasksBean?.timingPeriods = timesList
+                intent.putExtra("data", tasksBean)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            } else
+                showLoadingDialog(getString(R.string.config_gate_way_tp_task_fail))
         }
     }
 
@@ -117,7 +133,6 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 ToastUtils.showShort(getString(R.string.please_setting_least_one))
                 return@setOnClickListener
             }
-
             sendLabelHeadParams()
         }
         adapter.setOnItemClickListener { _, _, position ->
@@ -166,8 +181,6 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun initView() {
         this.mApp = this.application as TelinkLightApplication
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
         toolbar_t_center.text = getString(R.string.timer_period_set)
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
@@ -177,21 +190,12 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
      * 定时场景标签头下发,时间段时间下发
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendTime(tasks: GwTasksBean) {
-        showLoadingDialog(getString(R.string.please_wait))
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    sendCount++
-                    if (sendCount < 3) {
-                        sendTime(tasks)
-                    } else {
-                        ToastUtils.showLong(getString(R.string.config_gate_way_fail))
-                    }
-                }
+    private fun sendTime() {
+        LogUtils.v("zcl-----------发送次数开始时间-------" + System.currentTimeMillis())
+        connectCount++
+        receviedCount = 0
 
+        showLoadingDialog(getString(R.string.please_wait))
 
         val listOf: MutableList<ByteArray> = arrayListOf()
         timeListTp = mutableListOf()
@@ -201,8 +205,19 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 timeListTp?.add(t)
 
         var os = ByteArrayOutputStream()
-        receviedCount = 0
+
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(timeListTp!!.size * 300L, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail))
+                    }
+                }
+
         timeListTp?.let {
+            var sendK = 0
             for (i in 0 until it.size) {
                 val tp = it[i]
                 if (tasksBean != null) {
@@ -223,18 +238,19 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                             val s = encoder.encodeToString(byteArray)
                             val gattBody = GwGattBody()
                             gattBody.data = s
+                            gattBody.ser_id = Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
                             gattBody.macAddr = tasksBean!!.gwMacAddr
                             gattBody.tagHead = 1
                             sendToServer(gattBody)
                         }
                     } else {
+                        sendK++
+                        LogUtils.v("zcl-----------发送次数-------$sendK")
+
                         var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour
-                                ?: 0).toByte(),
+                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
-                                ?: 0).toByte(),
-                                (tasksBean?.endMins
-                                        ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
+                                ?: 0).toByte(), (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
 
                         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
                                 tasksBean?.gwMeshAddr ?: 0, params, "1")
@@ -250,15 +266,16 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendLabelHeadParams() {
+        TelinkApplication.getInstance().removeEventListeners()
+        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
-                    connectCount++
-                    if (connectCount < 3)
-                        sendLabelHeadParams()
-                    else
-                        showLoadingDialog(getString(R.string.config_gate_way_fail))
+                    GlobalScope.launch(Dispatchers.Main) {
+                        ToastUtils.showLong(getString(R.string.send_gate_way_label_head_fail))
+                    }
                 }
         var meshAddress = gwTagBean?.meshAddr ?: 0
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
@@ -269,6 +286,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         val opcodeHead = Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
         gwTagBean?.let {
+            it.status = 0//修改数据后状态设置成关闭
             if (!TelinkLightApplication.getApp().isConnectGwBle) {//如果是网络离线通过服务器
                 var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
@@ -278,6 +296,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 val s = encoder.encodeToString(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
+                gattBody.ser_id = Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD
                 gattBody.macAddr = gwTagBean?.macAddr
                 gattBody.tagHead = 1
                 sendToServer(gattBody)
@@ -289,8 +308,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         }
     }
 
-    private fun sendToServer(gattBody: GwGattBody): Unit? {
-        return GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
                 LogUtils.v("zcl---发送服务器返回----------$t")
             }
@@ -302,12 +321,20 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun receviedGwCmd2000(serId: String) {
-
+        when (serId.toInt()) {
+            Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD -> {
+                sendTime()
+            }
+            Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME -> {
+                receviceSuceessTaskSmallTimes()
+            }
+        }
     }
 
-    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
-
+    override fun onDestroy() {
+        super.onDestroy()
+        disposableTimer?.dispose()
     }
-
 }

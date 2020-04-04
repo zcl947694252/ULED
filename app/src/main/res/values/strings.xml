@@ -1017,6 +1017,12 @@
     <string name="label">Label</string>
     <string name="get_time_zone_fail">Failed to obtain time zone information</string>
     <string name="config_gate_way_fail">Configuration gateway failed</string>
-    <string name="delete_gate_way">删除网关标签失败</string>
+    <string name="delete_gate_way_label_fail">Failed to remove the gateway label</string>
+    <string name="delete_gate_way_task_fail">The delete gateway task failed</string>
+    <string name="send_gate_way_label_head_fail">Failed to send tag header</string>
+    <string name="config_gate_way_tp_task_fail">Failed to configure the gateway loop mode time period</string>
+    <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
+    <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
+    <string name="gate_way_switch_fail">Gateway switch failed</string>
 
 </resources>
