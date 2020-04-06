@@ -86,6 +86,11 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gate_way_chose_time2);
         unbinder = ButterKnife.bind(this);
+
+        //打开时设置为当前时间
+        hourTime = Calendar.getInstance().get(Calendar.HOUR);
+        minuteTime = Calendar.getInstance().get(Calendar.MINUTE);
+
         initView();
         initData();
         initLisenter();
@@ -238,7 +243,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             for (int i = 0; i < data.size(); i++) {
                 GwTasksBean tag = data.get(i);
                 if (tag.getStartHour() == hourTime && tag.getStartMins() == minuteTime) {
-                    isHave = true;
+                    //匹配到有一条, 表明已经有一条是重复
+                    return true;
                 } else {
                     isHave = false;
                 }

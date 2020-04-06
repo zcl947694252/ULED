@@ -648,6 +648,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 super.onError(e)
                 ToastUtils.showShort(e.message)
                 hideLoadingDialog()
+                //清除网关的时候。已经从数据库删除了数据，此处也需要从数据库重新拿数据，更新到UI
+                notifyData()
                 LogUtils.v("zcl-----网关删除成功返回-------------${e.message}")
             }
         })
