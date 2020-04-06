@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:paddingStart="@dimen/dp_10"
     android:paddingEnd="@dimen/dp_10"
-    android:background="@drawable/rect_88"
+    android:background="@drawable/popwindow_install_background"
     android:orientation="vertical"
    >
 

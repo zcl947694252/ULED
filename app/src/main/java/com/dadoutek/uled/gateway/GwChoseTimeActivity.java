@@ -88,7 +88,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         unbinder = ButterKnife.bind(this);
 
         //打开时设置为当前时间
-        hourTime = Calendar.getInstance().get(Calendar.HOUR);
+        hourTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         minuteTime = Calendar.getInstance().get(Calendar.MINUTE);
 
         initView();

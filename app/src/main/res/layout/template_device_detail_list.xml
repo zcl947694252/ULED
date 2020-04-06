@@ -18,6 +18,13 @@
 
     <include layout="@layout/empty_view" />
 
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recycleView"
+        android:visibility="gone"
+        android:layout_below="@+id/topView"
+        />
     <include
         android:id="@+id/dialog_relay"
         layout="@layout/popwindow_install_deive_list"
@@ -25,14 +32,6 @@
         android:layout_height="200dp"
         android:layout_below="@+id/topView"
         android:visibility="gone"
-        />
-
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/recycleView"
-        android:visibility="gone"
-        android:layout_below="@+id/topView"
         />
 
 </RelativeLayout>

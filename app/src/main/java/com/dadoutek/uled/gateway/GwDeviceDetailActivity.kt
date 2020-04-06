@@ -10,10 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -54,6 +51,7 @@ import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import org.jetbrains.anko.sdk27.coroutines.onTouch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -123,7 +121,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         tv_function1.visibility = View.GONE
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
 
@@ -726,9 +723,22 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             no_device_relativeLayout.visibility = View.GONE
             toolbar.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
 
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-
+//            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
+                    else {
+                        if (dialog_relay?.visibility == View.GONE) {
+                            showPopupMenu()
+                        }else{
+                            hidePopupMenu()
+                        }
+                    }
+                }
+            }
             gateWayDataList.addAll(allDeviceData)
             adaper?.notifyDataSetChanged()
         } else {
@@ -744,6 +754,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     else {
                         if (dialog_relay?.visibility == View.GONE) {
                             showPopupMenu()
+                        }else{
+                            hidePopupMenu()
                         }
                     }
                 }
@@ -762,6 +774,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun showPopupMenu() {
         dialog_relay?.visibility = View.VISIBLE
+    }
+    private fun hidePopupMenu() {
+        dialog_relay?.visibility = View.GONE
     }
 
     override fun onDestroy() {
