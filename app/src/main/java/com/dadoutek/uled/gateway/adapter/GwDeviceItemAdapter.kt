@@ -31,7 +31,7 @@ import com.dadoutek.uled.util.StringUtils
 
             helper.setVisible(R.id.name,false)
 
-            helper.setImageResource(R.id.img_light, R.drawable.icon_switch)
+            helper.setImageResource(R.id.img_light,data.icon)
             helper.addOnClickListener(R.id.tv_setting)
                     .setTag(R.id.tv_setting, helper.adapterPosition)
                     .setTag(R.id.img_light, helper.adapterPosition)

@@ -887,7 +887,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 

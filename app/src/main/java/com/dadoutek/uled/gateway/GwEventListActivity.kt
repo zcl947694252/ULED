@@ -7,18 +7,17 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
@@ -43,6 +42,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_event_list.*
+import kotlinx.android.synthetic.main.bottom_version_ly.*
+import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -74,16 +75,14 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     private var checkedIdType: Int = 0
     private var dbGw: DbGateway? = null
     private var addBtn: Button? = null
-    private var lin: View? = null
     private var lastTime: Long = 0
     val list = mutableListOf<GwTagBean>()
-    val listBefore = mutableListOf<GwTagBean>()
     val adapter = GwEventItemAdapter(R.layout.event_item, list)
     var lastType = 0
     private val function: (leftMenu: SwipeMenu, rightMenu: SwipeMenu, position: Int) -> Unit = { _, rightMenu, _ ->
         val menuItem = SwipeMenuItem(this@GwEventListActivity)// 创建菜单
         menuItem.height = ViewGroup.LayoutParams.MATCH_PARENT
-        menuItem.weight = DensityUtil.dip2px(this, 300f)
+        menuItem.weight = DensityUtil.dip2px(this, 500f)
         menuItem.textSize = 20
         menuItem.setBackgroundColor(getColor(R.color.red))
         menuItem.setText(R.string.delete)
@@ -100,10 +99,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
 
-        lin = LayoutInflater.from(this).inflate(R.layout.template_bottom_add_no_line, null)
-        lin?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add)
-        adapter.addFooterView(lin)
-
+        add_group_btn_tv.text = getString(R.string.add)
         var emptyView = View.inflate(this, R.layout.empty_view, null)
         addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
         addBtn?.text = getString(R.string.add)
@@ -163,6 +159,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun deleteSuceess() {
+        hideLoadingDialog()
         disposableTimer?.dispose()
         list.remove(deleteBean)
 
@@ -180,12 +177,18 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         dbGw?.let {
             addGw(it)//添加网关就是更新网关
         }
+        if (list.size <= 0)
+            add_group_btn?.visibility = View.GONE
+        else
+            add_group_btn?.visibility = View.VISIBLE
+
         adapter.notifyDataSetChanged()
     }
 
     /**
      * 蓝牙直连时发送时区信息
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendTimeZoneParmars() {
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
@@ -225,6 +228,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         val week = calendar.get(Calendar.DAY_OF_WEEK) - 1
         val yearH = (year shr 8) and (0xff)
         val yearL = year and (0xff)
+
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
@@ -247,24 +251,37 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             finish()
         }
 
+        if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
+            val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
+                    { s: String ->
+                        dbGw!!.version = s
+                        DBUtils.saveGateWay(dbGw!!, true)
+                    }, {
+                ToastUtils.showLong(getString(R.string.get_version_fail))
+            })
+        }
+
         getNewData()
 
-        toolbarTv.text = getString(R.string.Gate_way) + dbGw?.name
+        toolbarTv.text = getString(R.string.device_name) + dbGw?.name
 
         swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         // 设置监听器。
         swipe_recycleView.setSwipeMenuCreator(function)
         swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->
-            menuBridge.closeMenu()//删除标签的回调
+            menuBridge.closeMenu()
             deleteBean = list[adapterPosition]
             deleteTimerLable(deleteBean!!, Date().time)
         }
         swipe_recycleView.adapter = adapter
+
+        bottom_version_number.text = dbGw?.version
+
         getNewData()
         changeData(checkedIdType)
         // sendDeviceMacParmars()
-        if (!TelinkLightApplication.getApp().isConnectGwBle)
+        if (TelinkLightApplication.getApp().isConnectGwBle)//直连发送时区 不是直连不发
             sendTimeZoneParmars()
     }
 
@@ -291,7 +308,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             finish()
         }
         addBtn?.setOnClickListener { addNewTag() }
-        lin?.setOnClickListener { addNewTag() }
+        add_group_btn?.setOnClickListener { addNewTag() }
 
         event_mode_gp.setOnCheckedChangeListener { _, checkedId ->
             if (checkedIdType == event_timer_mode.id)
@@ -317,18 +334,14 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                     startActivityForResult(intent, 1000)
                 }
                 R.id.item_event_switch -> {
-                    if ((view as CheckBox).isChecked)
-                        list[position].status = 1
-                    else
-                        list[position].status = 0
-
-                    if (dbGw?.type == 0) //定时
-                        dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
-                    else
-                        dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
-
                     val dbGwTag = list[position]
+                    if ((view as CheckBox).isChecked)
+                        dbGwTag.status = 1
+                    else
+                        dbGwTag.status = 0
+
                     if (dbGwTag.status == 1) {//执行开的操作 status; //开1 关0
+                        showLoadingDialog(getString(R.string.please_wait))
                         isMutexType(dbGwTag)
                     } else {
                         sendOpenOrCloseGw(dbGwTag)
@@ -344,16 +357,22 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun isMutexType(dbGwTag: GwTagBean) {
         if (lastType != checkedIdType) {//当前选择的类型不是上一个类型 定时/时间段
-            if (lastType == event_timer_mode.id)//恢复上一类型的数据
+            if (lastType == event_timer_mode.id) {//恢复上一类型的数据
                 listOne.forEach {
                     it.status = 0
                 }
-            else
+                dbGw?.tags = GsonUtils.toJson(listOne)//赋值时一定要转换为gson字符串
+                dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+            } else {
                 listTwo.forEach {
                     it.status = 0
                 }
+                dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+                dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)//赋值时一定要转换为gson字符串
+            }
         }
 
+        DBUtils.saveGateWay(dbGw!!, true)
 
         val taskList = GsonUtil.stringToList(dbGwTag.tasks, GwTagBean::class.java)
         if (dbGwTag.status == 1 && taskList.size > 0) {//开启任务 并且该标签有需要执行的时间
@@ -370,6 +389,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
 
                 val canOpen = canOpenTG(currentAllTime, oldList, true)
                 if (!canOpen) {
+                    hideLoadingDialog()
                     return
                 }
             } else {//时间段开启任务判断
@@ -388,11 +408,15 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 }
 
                 val canOpen = canOpenTG(currentAllTime, oldList, false)
-                if (!canOpen)
+                if (!canOpen) {
+                    hideLoadingDialog()
                     return
+                }
             }
         }
-        showLoadingDialog(getString(R.string.please_wait))
+        dbGw?.tags = GsonUtils.toJson(listOne)//赋值时一定要转换为gson字符串
+        dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)//赋值时一定要转换为gson字符串
+        DBUtils.saveGateWay(dbGw!!, true)
         sendOpenOrCloseGw(dbGwTag)
     }
 
@@ -512,7 +536,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                     Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
                     dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
-                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0)
 
             val encoder = Base64.getEncoder()
             val s = encoder.encodeToString(labHeadPar)
@@ -526,6 +550,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             var labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
             TelinkLightService.Instance().sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
+            LogUtils.v("zcl-----------发送命令0xf6-------")
         }
     }
 
@@ -557,7 +582,11 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
             dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
         }
-        DBUtils.saveGateWay(dbGw!!,true)
+        DBUtils.saveGateWay(dbGw!!, true)
+        if (list.size > 0)
+            add_group_btn?.visibility = View.VISIBLE
+        else
+            add_group_btn?.visibility = View.GONE
         adapter.notifyDataSetChanged()
     }
 
@@ -582,21 +611,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
         connectCount++
-        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
-                .subscribe {
-                    if (connectCount < 3)
-                        deleteTimerLable(gwTagBean, currentTime)
-                    else
-                        GlobalScope.launch(Dispatchers.Main) {
-                            ToastUtils.showShort(getString(R.string.delete_gate_way_label_fail))
-                        }
-                }
         val opcodedelete = if (gwTagBean.isTimer())
             Opcode.CONFIG_GW_TIMER_DELETE_LABLE
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_LABLE
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {
+            setTimerDelay(gwTagBean, currentTime,2000)
             //11-18 11位labelId
             GlobalScope.launch(Dispatchers.Main) {
                 if (currentTime - lastTime < 400)
@@ -605,8 +626,9 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 TelinkLightService.Instance().sendCommandResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer, "1")
             }
         } else {
-            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
-                    opcodedelete, 0x11, 0x02, gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
+            setTimerDelay(gwTagBean, currentTime,6500)
+            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
+                    gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
             val encoder = Base64.getEncoder()
             val s = encoder.encodeToString(labHeadPar)
@@ -617,6 +639,19 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             gattBody.tagHead = 1
             sendToServer(gattBody)
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setTimerDelay(gwTagBean: GwTagBean, currentTime: Long, delay: Long) {
+        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    if (connectCount < 3)
+                        deleteTimerLable(gwTagBean, currentTime)
+                    else
+                        GlobalScope.launch(Dispatchers.Main) {
+                            ToastUtils.showShort(getString(R.string.delete_gate_way_label_fail))
+                        }
+                }
     }
 
     private fun addNewTag() {
@@ -664,7 +699,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         if (GW_GATT_LABEL_SWITCH == serId.toInt()) {
             runOnUiThread { hideLoadingDialog() }
             disposableTimer?.dispose()
-        } else if (GW_GATT_LABEL_SWITCH == serId?.toInt()) {
+        } else if (GW_GATT_DELETE_LABEL == serId?.toInt()) {
             runOnUiThread { deleteSuceess() }
         }
     }

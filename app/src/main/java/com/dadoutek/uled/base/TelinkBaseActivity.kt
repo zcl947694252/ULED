@@ -69,8 +69,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     private var authorStompClient: Disposable? = null
-    private var pop: PopupWindow? = null
-    private var popView: View? = null
+    var pop: PopupWindow? = null
+    var popView: View? = null
     private var codeWarmDialog: AlertDialog? = null
     private var singleLogin: AlertDialog? = null
     private var payload: String? = null

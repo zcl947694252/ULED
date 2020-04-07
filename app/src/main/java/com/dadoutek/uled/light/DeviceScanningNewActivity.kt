@@ -1435,12 +1435,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else if (mAddDeviceType == DeviceType.SMART_CURTAIN) {
             startGrouping()
         } else if (mAddDeviceType == DeviceType.GATE_WAY) {
-            TelinkLightApplication.getApp().isConnectGwBle = true
-            val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
-            intent.putExtra("data", dbGw)
+            if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
+                val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
+                        { s: String ->
+                            dbGw!!.version = s
+                            DBUtils.saveGateWay(dbGw!!, true)
+                            skipeGw()
+                        }, {
+                    skipeGw()
+                })
+            }
 
-            startActivity(intent)
-            finish()
         } else {
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
             DBUtils.saveRegion(lastMyRegion, true)
@@ -1463,6 +1468,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             finish()
             LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
         }
+    }
+
+    private fun skipeGw() {
+        TelinkLightApplication.getApp().isConnectGwBle = true
+        val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
+        intent.putExtra("data", dbGw)
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
+
+        startActivity(intent)
+        finish()
     }
 
     override fun onDestroy() {

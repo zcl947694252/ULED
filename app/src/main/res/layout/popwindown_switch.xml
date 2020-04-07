@@ -55,4 +55,28 @@
         android:text="@string/factory_reset"
         android:textColor="@color/white"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/configGwNet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="4dp"
+            android:visibility="gone"
+        android:text="@string/config_net"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/deleteBtnNoFactory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/delete"
+        android:textColor="@color/white"
+            android:visibility="gone"
+        android:textSize="16sp" />
 </LinearLayout>

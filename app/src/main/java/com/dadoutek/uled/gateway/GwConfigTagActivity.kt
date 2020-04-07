@@ -8,9 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -33,11 +33,13 @@ import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.DensityUtil
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.yanzhenjie.recyclerview.touch.OnItemMoveListener
+import com.yanzhenjie.recyclerview.SwipeMenu
+import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -65,6 +67,7 @@ import kotlin.collections.ArrayList
  */
 class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
 
+    private var deleteBean: GwTasksBean? = null
     private var connectCount: Int = 0
     private lateinit var mApp: TelinkLightApplication
     private var deletePosition: Int? = null
@@ -79,11 +82,20 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     private var maxId = 0L
     val listTask = ArrayList<GwTasksBean>()
     private val adapter = GwTaskItemAdapter(R.layout.item_gw_time_scene, listTask)
-    private var sendCount = 0
+    private val function: (leftMenu: SwipeMenu, rightMenu: SwipeMenu, position: Int) -> Unit = { _, rightMenu, _ ->
+        val menuItem = SwipeMenuItem(this@GwConfigTagActivity)// 创建菜单
+        menuItem.height = ViewGroup.LayoutParams.MATCH_PARENT
+        menuItem.weight = DensityUtil.dip2px(this, 500f)
+        menuItem.textSize = 20
+        menuItem.setBackgroundColor(getColor(R.color.red))
+        menuItem.setText(R.string.delete)
+        rightMenu.addMenuItem(menuItem)//添加进右侧菜单
+    }
 
     /**
      * 默认重复设置为仅一次
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
         toolbarTv.text = getString(R.string.Gate_way)
         gate_way_repete_mode.textSize = 15F
@@ -100,10 +112,17 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
         isCanEdite = false
         isCanEdite()
+
         swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         swipe_recycleView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
+        swipe_recycleView.setSwipeMenuCreator(function) // 设置监听器。
+        swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->
+            menuBridge.closeMenu()//删除标签的回调
+            sendDeleteTask(listTask[deletePosition ?: 0])
+        }
         swipe_recycleView.adapter = adapter
-        swipe_recycleView.isItemViewSwipeEnabled = true //侧滑删除，默认关闭。
+
 
         this.mApp = this.application as TelinkLightApplication
     }
@@ -156,6 +175,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             val elements = GsonUtil.stringToList(tasks, GwTasksBean::class.java)
             listTask.addAll(elements)
         }
+
         adapter.notifyDataSetChanged()
 
         gate_way_lable.setText(getString(R.string.label) + tagBean?.tagId)
@@ -254,10 +274,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         when (deviceInfo.gwVoipState) {
-                            Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP ->//删除task回调 收到一定是成功
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    hideLoadingDialog()
-                                }
+                            Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
+                                hideLoadingDialog()
+                                disposableTimer?.dispose()
+                                upDataDeleteUi()
+                            }
 
                             Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
                                 LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
@@ -274,33 +295,35 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         }
     }
 
+    private fun upDataDeleteUi() {
+        listTask.remove(deleteBean)
+        adapter.notifyDataSetChanged()
+
+       saveOrUpdataGw(dbGw!!)
+    }
+
     /**
      * 删除标签task任务
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
+        deleteBean = gwTaskBean
         connectCount++
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (connectCount < 3)
-                        sendDeleteTask(gwTaskBean)
-                    else
-                        GlobalScope.launch(Dispatchers.Main) {
-                            showLoadingDialog(getString(R.string.delete_gate_way_task_fail))
-                        }
-                }
         val id = dbGw?.id ?: 0
         var opcodeDelete = if (tagBean?.isTimer() == true)
             Opcode.CONFIG_GW_TIMER_DELETE_TASK
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
 
-        if (!TelinkLightApplication.getApp().isConnectGwBle) {
+        if (TelinkLightApplication.getApp().isConnectGwBle) {
+            setTimerDelay(1500L, gwTaskBean)
+            //11-18 11位标签id 12 时间条index
+            var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+            TelinkLightService.Instance().sendCommandResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer, "1")
+        } else {
+            setTimerDelay(6500L, gwTaskBean)
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
-                    id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+                    id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
 
             val encoder = Base64.getEncoder()
             val s = encoder.encodeToString(labHeadPar)
@@ -309,11 +332,21 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             gattBody.data = s
             gattBody.macAddr = dbGw?.macAddr
             sendToServer(gattBody)
-        } else {
-            //11-18 11位标签id 12 时间条index
-            var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
-            TelinkLightService.Instance().sendCommandResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer, "1")
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setTimerDelay(delay: Long, gwTaskBean: GwTasksBean) {
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (connectCount < 3)
+                        sendDeleteTask(gwTaskBean)
+                    else
+                        ToastUtils.showShort(getString(R.string.delete_gate_way_task_fail))
+                }
     }
 
     /**
@@ -325,7 +358,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                 .subscribe {
                     GlobalScope.launch(Dispatchers.Main) {
-                        showLoadingDialog(getString(R.string.send_gate_way_label_head_fail))
+                        ToastUtils.showShort(getString(R.string.send_gate_way_label_head_fail))
                     }
                 }
         var meshAddress = dbGw?.meshAddr ?: 0
@@ -347,7 +380,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 it.status = 0//修改数据后状态设置成关闭
                 var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
-                        month.toByte(), day.toByte(), 0, 0)// status 开1 关0 tag的外部现实
+                        month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
                 val encoder = Base64.getEncoder()
                 val s = encoder.encodeToString(labHeadPar)
@@ -363,6 +396,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
                         it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
                 TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
+                LogUtils.v("zcl-----------发送命令0xf6-------配置界面")
             }
         }
     }
@@ -455,18 +489,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         gate_way_edite.setOnClickListener(this)
         gate_way_repete_mode.setOnClickListener(this)
         gate_way_repete_mode_arrow.setOnClickListener(this)
-        swipe_recycleView.setOnItemMoveListener(object : OnItemMoveListener {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onItemDismiss(srcHolder: RecyclerView.ViewHolder?) {
-                // 从数据源移除该Item对应的数据，并刷新Adapter。
-                deletePosition = srcHolder?.adapterPosition
-                sendDeleteTask(listTask[deletePosition ?: 0])
-            }
 
-            override fun onItemMove(srcHolder: RecyclerView.ViewHolder?, targetHolder: RecyclerView.ViewHolder?): Boolean {
-                return false//表示数据移动不成功
-            }
-        })
         adapter.setOnItemClickListener { _, _, position ->
             val intent: Intent
             if (tagBean?.getIsTimer() == true) {
@@ -482,6 +505,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 tasksBean.labelId = tagBean?.tagId ?: 0
                 tasksBean.isCreateNew = false
                 tasksBean.gwMacAddr = dbGw?.macAddr
+                TelinkLightApplication.getApp().listTask = listTask
                 intent.putExtra("data", tasksBean)
             }
             startActivityForResult(intent, requestTimeCode)
@@ -631,6 +655,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gate_way)
@@ -645,6 +670,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 //删除标签task时间任务 不成功定时会将数据还原
                 disposableTimer?.dispose()
                 hideLoadingDialog()
+                upDataDeleteUi()
             }
             Constant.GW_GATT_SAVE_LABEL_HEAD -> {
                 //保存标签头信息  保存成功发送数据会上一页 不成功不做操作

@@ -29,6 +29,7 @@ import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
+import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -72,7 +73,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        eight_switch_tvLightVersion?.text = version
+        bottom_version_number?.text = version
 
         groupName = intent.getStringExtra("group")
         eight_switch_mode.visibility = View.GONE

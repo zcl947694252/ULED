@@ -39,7 +39,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         public final static Property TimePeriodTags = new Property(12, String.class, "timePeriodTags", false, "TIME_PERIOD_TAGS");
         public final static Property AddTag = new Property(13, int.class, "addTag", false, "ADD_TAG");
         public final static Property State = new Property(14, int.class, "state", false, "STATE");
-        public final static Property OpenTag = new Property(15, Boolean.class, "openTag", false, "OPEN_TAG");
+        public final static Property OpenTag = new Property(15, int.class, "openTag", false, "OPEN_TAG");
     }
 
 
@@ -70,7 +70,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
                 "\"TIME_PERIOD_TAGS\" TEXT," + // 12: timePeriodTags
                 "\"ADD_TAG\" INTEGER NOT NULL ," + // 13: addTag
                 "\"STATE\" INTEGER NOT NULL ," + // 14: state
-                "\"OPEN_TAG\" INTEGER);"); // 15: openTag
+                "\"OPEN_TAG\" INTEGER NOT NULL );"); // 15: openTag
     }
 
     /** Drops the underlying database table. */
@@ -125,11 +125,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         }
         stmt.bindLong(14, entity.getAddTag());
         stmt.bindLong(15, entity.getState());
- 
-        Boolean openTag = entity.getOpenTag();
-        if (openTag != null) {
-            stmt.bindLong(16, openTag ? 1L: 0L);
-        }
+        stmt.bindLong(16, entity.getOpenTag());
     }
 
     @Override
@@ -178,11 +174,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         }
         stmt.bindLong(14, entity.getAddTag());
         stmt.bindLong(15, entity.getState());
- 
-        Boolean openTag = entity.getOpenTag();
-        if (openTag != null) {
-            stmt.bindLong(16, openTag ? 1L: 0L);
-        }
+        stmt.bindLong(16, entity.getOpenTag());
     }
 
     @Override
@@ -208,7 +200,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // timePeriodTags
             cursor.getInt(offset + 13), // addTag
             cursor.getInt(offset + 14), // state
-            cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0 // openTag
+            cursor.getInt(offset + 15) // openTag
         );
         return entity;
     }
@@ -230,7 +222,7 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         entity.setTimePeriodTags(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setAddTag(cursor.getInt(offset + 13));
         entity.setState(cursor.getInt(offset + 14));
-        entity.setOpenTag(cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0);
+        entity.setOpenTag(cursor.getInt(offset + 15));
      }
     
     @Override

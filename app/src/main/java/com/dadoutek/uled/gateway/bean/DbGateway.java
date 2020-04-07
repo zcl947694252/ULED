@@ -56,21 +56,18 @@ public class DbGateway implements Parcelable {
     private String timePeriodTags;
     private int addTag = 0;//0 添加新的tag 1编辑已有tag
     private int state; //1代表在线 0代表离线
-    private Boolean openTag =false; //true代表开 false代表关
+    private int openTag =0; //1代表开 0代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int icon = R.drawable.icon_gw_close;//灯状态显示图
 
     public DbGateway(Long id) {
         this.id = id;
     }
 
+
     protected DbGateway(Parcel in) {
-        if (in.readByte() == 0) {
-            id = null;
-        } else {
-            id = in.readLong();
-        }
+        if (in.readByte() == 0) { id = null; } else { id = in.readLong(); }
         meshAddr = in.readInt();
         name = in.readString();
         macAddr = in.readString();
@@ -85,13 +82,13 @@ public class DbGateway implements Parcelable {
         timePeriodTags = in.readString();
         addTag = in.readInt();
         state = in.readInt();
-        byte tmpOpenTag = in.readByte();
-        openTag = tmpOpenTag == 0 ? null : tmpOpenTag == 1;
+        openTag = in.readInt();
         icon = in.readInt();
     }
 
-    @Generated(hash = 393489854)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, Boolean openTag) {
+
+    @Generated(hash = 874974623)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, int openTag) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -110,15 +107,14 @@ public class DbGateway implements Parcelable {
         this.openTag = openTag;
     }
 
+
     @Generated(hash = 1696080529)
     public DbGateway() {
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) 0);
-        } else {
+        if (id == null) { dest.writeByte((byte) 0); } else {
             dest.writeByte((byte) 1);
             dest.writeLong(id);
         }
@@ -136,7 +132,7 @@ public class DbGateway implements Parcelable {
         dest.writeString(timePeriodTags);
         dest.writeInt(addTag);
         dest.writeInt(state);
-        dest.writeByte((byte) (openTag == null ? 0 : openTag ? 1 : 2));
+        dest.writeInt(openTag);
         dest.writeInt(icon);
     }
 
@@ -159,9 +155,9 @@ public class DbGateway implements Parcelable {
 
     public void updateIcon() {
         if (this.state == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_controller;
+            this.icon = R.drawable.icon_gw_close;
         } else if (this.state == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_controller_open;
+            this.icon = R.drawable.icon_gw_open;
         }
     }
 
@@ -300,11 +296,11 @@ public class DbGateway implements Parcelable {
                 ", type=" + type + ", productUUID=" + productUUID + ", version='" + version + '\'' + ", belongRegionId=" + belongRegionId + ", pos=" + pos + ", uid=" + uid + ", tags='" + tags + '\'' + ", timePeriodTags='" + timePeriodTags + '\'' + ", addTag=" + addTag + ", state=" + state + ", openTag=" + openTag + ", icon=" + icon + '}';
     }
 
-    public Boolean getOpenTag() {
+    public int getOpenTag() {
         return this.openTag;
     }
 
-    public void setOpenTag(Boolean openTag) {
+    public void setOpenTag(int openTag) {
         this.openTag = openTag;
     }
 }

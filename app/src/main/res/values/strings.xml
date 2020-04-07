@@ -1024,5 +1024,6 @@
     <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
     <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
     <string name="gate_way_switch_fail">Gateway switch failed</string>
+    <string name="config_WIFI">Set gateway WIFI</string>
 
 </resources>

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -78,6 +79,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private byte opcodeHead;
     private Disposable disposableHeadTimer;
     private TelinkApplication application;
+    private View popView;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -134,12 +136,10 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
      */
     @RequiresApi(Build.VERSION_CODES.O)
     private void sendLabelHeadParams() {
+        sendCount++;
         showLoadingDialog(getString(R.string.please_wait));
         if (disposableTimer != null)
             disposableTimer.dispose();
-        disposableHeadTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                .subscribe(aLong -> runOnUiThread(() ->
-                        ToastUtils.showLong(getString(R.string.send_gate_way_label_head_fail))));
         int meshAddress = gwTagBean.getMeshAddr();
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         Calendar calendar = Calendar.getInstance();
@@ -150,32 +150,49 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
 
         if (gwTagBean != null)
             gwTagBean.setStatus(0); //修改数据后状态设置成关闭
-            if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
+        if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
+            setHeadTimerDelay(6500L);
 
-                byte[] labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
-                        (byte) (gwTagBean.getTagId() & 0xff), (byte) gwTagBean.getStatus(),
-                        (byte) gwTagBean.getWeek(), 0, (byte) month, (byte) day, 0, 0};// status 开1
-                // 关0 tag的外部现实
+            byte[] labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
+                    (byte) (gwTagBean.getTagId() & 0xff), (byte) gwTagBean.getStatus(),
+                    (byte) gwTagBean.getWeek(), 0, (byte) month, (byte) day, 0, 0, 0, 0};//
+            // status 开1
+            // 关0 tag的外部现实
 
-                Base64.Encoder encoder = Base64.getEncoder();
-                String s = encoder.encodeToString(labHeadPar);
-                GwGattBody gattBody = new GwGattBody();
-                gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
-                gattBody.setData(s);
-                gattBody.setMacAddr(gwTagBean.getMacAddr());
-                gattBody.setTagHead(1);
-                sendToServer(gattBody);
+            Base64.Encoder encoder = Base64.getEncoder();
+            String s = encoder.encodeToString(labHeadPar);
+            GwGattBody gattBody = new GwGattBody();
+            gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
+            gattBody.setData(s);
+            gattBody.setMacAddr(gwTagBean.getMacAddr());
+            gattBody.setTagHead(1);
+            sendToServer(gattBody);
+        } else {
+            setHeadTimerDelay(1500L);
+
+            byte[] labHeadPar = new byte[]{(byte) (gwTagBean.getTagId() & 0xff),
+                    (byte) gwTagBean.getStatus(), (byte) gwTagBean.getWeek(), 0, (byte) month,
+                    (byte) day, 0, 0};
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance != null) {
+                instance.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1");
             } else {
-                byte[] labHeadPar = new byte[]{(byte) (gwTagBean.getTagId() & 0xff),
-                        (byte) gwTagBean.getStatus(), (byte) gwTagBean.getWeek(), 0, (byte) month,
-                        (byte) day, 0, 0};
-                TelinkLightService instance = TelinkLightService.Instance();
-                if (instance != null) {
-                    instance.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1");
-                } else {
-                    TmtUtils.midToastLong(this, "TelinkLightService is null , please retry.");
-                }
+                TmtUtils.midToastLong(this, "TelinkLightService is null , please retry.");
             }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setHeadTimerDelay(long delay) {
+        disposableHeadTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                .subscribe(aLong -> runOnUiThread(() -> {
+                    if (sendCount < 3)
+                        sendLabelHeadParams();
+                    else {
+                        hideLoadingDialog();
+                        ToastUtils.showLong(getString(R.string.send_gate_way_label_head_fail));
+                    }
+                }));
     }
 
 
@@ -187,22 +204,16 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         sendCount++;
         if (disposableTimer != null)
             disposableTimer.dispose();
-        disposableTimer =
-                Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe(aLong -> {
-                    if (sendCount < 3) {
-                        sendTime(tasks);
-                    } else {
-                        runOnUiThread(() -> ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail)));
-                    }
-                });
+
         if (gwTagBean != null && gwTagBean.isTimer()) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送 定时场景时间下发
+
             if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
+                sendTimeTimerDelay(tasks, 6500L);
                 labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0,
                         Opcode.CONFIG_GW_TIMER_LABLE_TIME, 0x11, 0x02,
                         (byte) (gwTagBean.getTagId() & 0xff), (byte) (tasks.getIndex() & 0xff),
-                        (byte) (tasks.getStartHour() & 0xff),
-                        (byte) (tasks.getStartMins() & 0xff), (byte) (tasks.getSceneId() & 0xff),
-                        0, 0, 0};
+                        (byte) (tasks.getStartHour() & 0xff), (byte) (tasks.getStartMins() & 0xff),
+                        (byte) (tasks.getSceneId() & 0xff), 0, 0, 0, 0, 0};
 
                 Base64.Encoder encoder = Base64.getEncoder();
                 String s = encoder.encodeToString(labHeadPar);
@@ -212,6 +223,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                 gattBody.setMacAddr(gwTagBean.getMacAddr());
                 sendToServer(gattBody);
             } else {
+                sendTimeTimerDelay(tasks, 1500L);
+
                 byte[] params = new byte[]{(byte) (gwTagBean.getTagId() & 0xff),
                         (byte) (tasks.getIndex() & 0xff), (byte) (tasks.getStartHour() & 0xff),
                         (byte) (tasks.getStartMins() & 0xff), (byte) (tasks.getSceneId() & 0xff),
@@ -220,6 +233,17 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             }
         } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void sendTimeTimerDelay(GwTasksBean tasks, long delay) {
+        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+            if (sendCount < 3) {
+                sendTime(tasks);
+            } else {
+                runOnUiThread(() -> ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail)));
+            }
+        });
     }
 
     private void sendToServer(GwGattBody gattBody) {
@@ -377,9 +401,11 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                     case Constant.GW_CONFIG_TIMER_LABEL_VOIP://定时标签头下发
                         if (disposableHeadTimer != null)
                             disposableHeadTimer.dispose();
+                        sendCount= 0;
                         sendTime(tasksBean);//下发task
                         break;
                     case Constant.GW_CONFIG_TIMER_TASK_VOIP://下发成功返回数据给配置也保存更新
+                        sendCount= 0;
                         Intent intent = new Intent();
                         intent.putExtra("data", tasksBean);
                         setResult(Activity.RESULT_OK, intent);
@@ -394,19 +420,23 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void receviedGwCmd2000(String serId) {
-        switch (Integer.getInteger(serId)) {
-            case Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD:
-                if (disposableHeadTimer != null)
-                    disposableHeadTimer.dispose();
-                sendTime(tasksBean);//下发task
-                break;
-            case Constant.GW_GATT_SAVE_TIMER_TASK_TIME:
-                Intent intent = new Intent();
-                intent.putExtra("data", tasksBean);
-                setResult(Activity.RESULT_OK, intent);
-                runOnUiThread(() -> hideLoadingDialog());
-                finish();
-                break;
+        if (!TextUtils.isEmpty(serId)) {
+            switch (Integer.parseInt(serId)) {
+                case Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD:
+                    if (disposableHeadTimer != null)
+                        disposableHeadTimer.dispose();
+                    sendCount= 0;
+                    sendTime(tasksBean);//下发task
+                    break;
+                case Constant.GW_GATT_SAVE_TIMER_TASK_TIME:
+                    sendCount= 0;
+                    Intent intent = new Intent();
+                    intent.putExtra("data", tasksBean);
+                    setResult(Activity.RESULT_OK, intent);
+                    runOnUiThread(() -> hideLoadingDialog());
+                    finish();
+                    break;
+            }
         }
 
     }

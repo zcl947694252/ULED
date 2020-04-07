@@ -3,9 +3,18 @@ package com.dadoutek.uled.gateway
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupWindow
 import cn.qqtheme.framework.picker.DateTimePicker
 import cn.qqtheme.framework.picker.TimePicker
 import com.blankj.utilcode.util.LogUtils
@@ -23,6 +32,8 @@ import kotlinx.android.synthetic.main.template_wheel_container.*
  * 设置网关 时间段时间与场景传递进配config界面
  */
 class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var standingItemAdapter: StandingItemAdapter? = null
+    private var popRecycle: RecyclerView? = null
     private var newData: GwTasksBean? = null
     private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
@@ -30,9 +41,9 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private val requestTimerPeriodCode = 1002
     private var startHourTime = 7
     private var startMinuteTime = 40
-    private var startTimeNum: Int = startHourTime * 60 + startMinuteTime
     private var endHourTime = 8
     private var endMinuteTime = 30
+    private var startTimeNum: Int = startHourTime * 60 + startMinuteTime
     private var endTimeNum: Int = endHourTime * 60 + endMinuteTime
     private var tasksBean: GwTasksBean? = null
     private var data = ArrayList<GwTasksBean>()
@@ -96,6 +107,38 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initView() {
         toolbar_t_center.text = getString(R.string.chose_time)
         toolbar_t_confim.text = getString(R.string.next)
+        makeStandingTimePop()
+    }
+
+    private fun makeStandingTimePop() {
+        popView = LayoutInflater.from(this).inflate(R.layout.pop_standing_time_check, null)
+        popView?.let {
+            popRecycle = it.findViewById<View>(R.id.template_recycleView) as RecyclerView?
+        }
+
+        val list = mutableListOf<Int>()
+        for (i in 1..59)
+            list.add(i)
+
+        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_nine)))
+        popRecycle?.addItemDecoration(decorations)
+        standingItemAdapter = StandingItemAdapter(R.layout.standing_item, list)
+        popRecycle?.adapter = standingItemAdapter
+        standingItemAdapter?.bindToRecyclerView(popRecycle)
+
+        standingItemAdapter?.setOnItemClickListener { _, _, position ->
+            standingNum = list[position]
+            gw_times_standing_time.text = standingNum.toString()
+            pop?.dismiss()
+        }
+        pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        pop?.let {
+            it.isFocusable = true // 设置PopupWindow可获得焦点
+            it.isTouchable = true // 设置PopupWindow可触摸补充：
+            //it.isOutsideTouchable = false
+        }
     }
 
     private fun initLisenter() {
@@ -111,7 +154,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.toolbar_t_confim -> {
                 val repeatTime = isRepeatTime()
                 if (repeatTime) {
-                    ToastUtils.showShort(getString(R.string.please_chose_right_time))
+                    ToastUtils.showShort(getString(R.string.have_time_task))
                     return
                 }
                 if (startTimeNum >= endTimeNum) {
@@ -129,8 +172,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                 tasksBean?.startMins = startMinuteTime
                 tasksBean?.endHour = endHourTime
                 tasksBean?.endMins = endMinuteTime
-                tasksBean?.startMinuts = startTimeNum
-                tasksBean?.endMinuts = endTimeNum
+                tasksBean?.startAllMinuts = startTimeNum
+                tasksBean?.endAllMinuts = endTimeNum
                 tasksBean?.timingPeriods = timesList
                 val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
                 intent.putExtra("data", tasksBean)
@@ -139,7 +182,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.toolbar_t_cancel -> finish()
             R.id.gw_times_standing_time_ly -> {
                 if (endTimeNum > startTimeNum)
-                    startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCode)
+                // startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCode)
+                    pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
                 else
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
             }
@@ -171,7 +215,12 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun isRepeatTime(): Boolean {
         var isRepeatTime = false
         for (task in data) {//开始时间不能再他的开始时间与结束时间之间 ,结束时间再他之间
-            if ((startMinuteTime >= task.startMinuts && startMinuteTime < task.endMinuts) || (endMinuteTime >= task.startMinuts && startMinuteTime <= task.endMinuts))
+            if (task.startAllMinuts == 0 || task.endAllMinuts == 0) {
+                task.startAllMinuts = task.startHour * 60 + task.startMins
+                task.endAllMinuts = task.endHour * 60 + task.endMins
+            }
+            if ((startTimeNum >= task.startAllMinuts && startTimeNum < task.endAllMinuts)
+                    || (endTimeNum >= task.startAllMinuts && endTimeNum <= task.endAllMinuts))
                 isRepeatTime = true
         }
         return isRepeatTime

@@ -945,5 +945,6 @@
     <string name="config_gate_way_t_task_fail">配置网关定时模式时间失败</string>
     <string name="gate_way_label_switch_fail">网关标签任务开关失败</string>
     <string name="gate_way_switch_fail">网关开关失败</string>
+    <string name="config_WIFI">设置网关WIFI</string>
 
 </resources>

@@ -4,14 +4,18 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.event.DeviceEvent
@@ -24,6 +28,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gw_login.*
+import kotlinx.android.synthetic.main.bottom_version_ly.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -165,13 +171,16 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         sendParmars(listPwd, pwdByteSize, true)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendTimeZoneParmars() {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                 runOnUiThread {    hideLoadingDialog()
-                     ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
+                    runOnUiThread {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.get_time_zone_fail))
+                    }
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val default = TimeZone.getDefault()
@@ -199,6 +208,12 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         val week = calendar.get(Calendar.DAY_OF_WEEK) - 1
         val yearH = (year shr 8) and (0xff)
         val yearL = year and (0xff)
+
+        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02, tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+
+
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
@@ -248,11 +263,33 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
+        bottom_version_number.text = dbGw?.version
+        val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
+        if (boolean)
+            gw_login_skip.visibility = View.GONE
+        else
+            gw_login_skip.visibility = View.VISIBLE
+
+        if (TelinkLightApplication.getApp().isConnectGwBle){
+        val disposable = getDeviceVersion(dbGw!!.meshAddr).subscribe(
+                { s: String ->
+                    dbGw!!.version = s
+                    DBUtils.saveGateWay(dbGw!!, true)
+                }, {
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+        }
         // sendDeviceMacParmars()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
         disableConnectionStatusListener()
+        toolbarTv.text = getString(R.string.config_WIFI)
+        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
         this.mApp = this.application as TelinkLightApplication
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         if (TelinkLightApplication.getApp().isConnectGwBle)

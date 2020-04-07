@@ -24,8 +24,8 @@ public class GwTasksBean implements Parcelable {
     private int endHour;
     private int startMins;
     private int endMins;
-    private int startMinuts;
-    private int endMinuts;
+    private int startAllMinuts;
+    private int endAllMinuts;
     private int selectPos;//本地使用
     private long labelId;//本地使用 标签id
     private int gwMeshAddr;//本地使用 标签mesh地址
@@ -46,8 +46,8 @@ public class GwTasksBean implements Parcelable {
         endHour = in.readInt();
         startMins = in.readInt();
         endMins = in.readInt();
-        startMinuts = in.readInt();
-        endMinuts = in.readInt();
+        startAllMinuts = in.readInt();
+        endAllMinuts = in.readInt();
         selectPos = in.readInt();
         labelId = in.readLong();
         gwMeshAddr = in.readInt();
@@ -66,8 +66,8 @@ public class GwTasksBean implements Parcelable {
         dest.writeInt(endHour);
         dest.writeInt(startMins);
         dest.writeInt(endMins);
-        dest.writeInt(startMinuts);
-        dest.writeInt(endMinuts);
+        dest.writeInt(startAllMinuts);
+        dest.writeInt(endAllMinuts);
         dest.writeInt(selectPos);
         dest.writeLong(labelId);
         dest.writeInt(gwMeshAddr);
@@ -100,20 +100,20 @@ public class GwTasksBean implements Parcelable {
         this.gwMacAddr = gwMacAddr;
     }
 
-    public int getStartMinuts() {
-        return startMinuts;
+    public int getStartAllMinuts() {
+        return startAllMinuts;
     }
 
-    public void setStartMinuts(int startMinuts) {
-        this.startMinuts = startMinuts;
+    public void setStartAllMinuts(int startAllMinuts) {
+        this.startAllMinuts = startAllMinuts;
     }
 
-    public int getEndMinuts() {
-        return endMinuts;
+    public int getEndAllMinuts() {
+        return endAllMinuts;
     }
 
-    public void setEndMinuts(int endMinuts) {
-        this.endMinuts = endMinuts;
+    public void setEndAllMinuts(int endAllMinuts) {
+        this.endAllMinuts = endAllMinuts;
     }
 
 
@@ -223,6 +223,6 @@ public class GwTasksBean implements Parcelable {
 
     @Override
     public String toString() {
-        return "GwTasksBean{" + "index=" + index + ", stateTime=" + stateTime + ", sceneId=" + sceneId + ", senceName='" + senceName + '\'' + ", createNew=" + createNew + ", startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins + ", endMins=" + endMins + ", startMinuts=" + startMinuts + ", endMinuts=" + endMinuts + ", selectPos=" + selectPos + ", labelId=" + labelId + ", gwMeshAddr=" + gwMeshAddr + ", gwMacAddr='" + gwMacAddr + '\'' + ", timingPeriods=" + timingPeriods + '}';
+        return "GwTasksBean{" + "index=" + index + ", stateTime=" + stateTime + ", sceneId=" + sceneId + ", senceName='" + senceName + '\'' + ", createNew=" + createNew + ", startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins + ", endMins=" + endMins + ", startAllMinuts=" + startAllMinuts + ", endAllMinuts=" + endAllMinuts + ", selectPos=" + selectPos + ", labelId=" + labelId + ", gwMeshAddr=" + gwMeshAddr + ", gwMacAddr='" + gwMacAddr + '\'' + ", timingPeriods=" + timingPeriods + '}';
     }
 }

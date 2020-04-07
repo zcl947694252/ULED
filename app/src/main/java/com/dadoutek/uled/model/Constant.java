@@ -356,4 +356,8 @@ public class Constant implements Serializable {
      * 保存网关x循环模式task任务
      */
     public static final int GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME =9;
+    /**
+     * 是否是重新配置网关wifi
+     */
+    public static final String IS_GW_CONFIG_WIFI ="IS_GW_CONFIG_WIFI";
 }

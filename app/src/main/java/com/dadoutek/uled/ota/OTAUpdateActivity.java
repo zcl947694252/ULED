@@ -382,8 +382,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         switch (lightType){
             case DeviceType.SENSOR:
+            case DeviceType.GATE_WAY:
             case DeviceType.NORMAL_SWITCH:
-
                 TelinkLightService instance = TelinkLightService.Instance();
                 if (instance!=null)
                 instance.idleMode(true);
