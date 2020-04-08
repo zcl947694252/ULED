@@ -217,6 +217,8 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_CURTAIN = Long.valueOf(0x10);
     //连接器
     public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
+    //网关
+    public static final Long DEVICE_TYPE_GATE_WAY = Long.valueOf(0x07);
 
     //升级标记t
     public static final String UP_VERSION = "UP_VERSION";

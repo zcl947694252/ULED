@@ -255,12 +255,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
                     { s: String ->
                         dbGw!!.version = s
+                        bottom_version_number.text = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, true)
                     }, {
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             })
         }
-
+        bottom_version_number.text = dbGw?.version
         getNewData()
 
         toolbarTv.text = getString(R.string.device_name) + dbGw?.name
@@ -276,7 +277,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         }
         swipe_recycleView.adapter = adapter
 
-        bottom_version_number.text = dbGw?.version
 
         getNewData()
         changeData(checkedIdType)

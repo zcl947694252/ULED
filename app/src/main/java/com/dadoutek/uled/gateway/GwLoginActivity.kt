@@ -118,8 +118,11 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                                 GlobalScope.launch(Dispatchers.Main) {
                                     disposableTimer?.dispose()
                                     hideLoadingDialog()
-                                    if (deviceInfo.gwWifiState == 0)
-                                        skipEvent()
+                                    if (deviceInfo.gwWifiState == 0){
+                                        ToastUtils.showShort(getString(R.string.config_success))
+                                        finish()
+                                    }
+                                    // skipEvent()
                                     else
                                         ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
                                 }
@@ -263,7 +266,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         dbGw = intent.getParcelableExtra<DbGateway>("data")
-        bottom_version_number.text = dbGw?.version
+
         val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
         if (boolean)
             gw_login_skip.visibility = View.GONE
@@ -274,11 +277,13 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         val disposable = getDeviceVersion(dbGw!!.meshAddr).subscribe(
                 { s: String ->
                     dbGw!!.version = s
+                    bottom_version_number.text = dbGw?.version
                     DBUtils.saveGateWay(dbGw!!, true)
                 }, {
             ToastUtils.showLong(getString(R.string.get_version_fail))
         })
         }
+                    bottom_version_number.text = dbGw?.version
         // sendDeviceMacParmars()
     }
 
