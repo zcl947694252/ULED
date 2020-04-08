@@ -709,9 +709,11 @@ object Commander : EventListener<String> {
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
+                if (version==null){
+                    mGetVersionObservable?.onError(Throwable("get empty version,please retry"))
+                }
                 mGetVersionObservable?.onNext(version!!)
                 mGetVersionObservable?.onComplete()
-
             } else {
             }
         } else {
