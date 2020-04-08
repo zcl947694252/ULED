@@ -68,6 +68,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 skipEvent()
             } else {
                 ToastUtils.showShort(getString(R.string.device_disconnected))
+                startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                 finish()
             }
         }
@@ -118,8 +119,9 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                                 GlobalScope.launch(Dispatchers.Main) {
                                     disposableTimer?.dispose()
                                     hideLoadingDialog()
-                                    if (deviceInfo.gwWifiState == 0){
+                                    if (deviceInfo.gwWifiState == 0) {
                                         ToastUtils.showShort(getString(R.string.config_success))
+                                        startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                                         finish()
                                     }
                                     // skipEvent()
@@ -273,17 +275,17 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         else
             gw_login_skip.visibility = View.VISIBLE
 
-        if (TelinkLightApplication.getApp().isConnectGwBle){
-        val disposable = getDeviceVersion(dbGw!!.meshAddr).subscribe(
-                { s: String ->
-                    dbGw!!.version = s
-                    bottom_version_number.text = dbGw?.version
-                    DBUtils.saveGateWay(dbGw!!, true)
-                }, {
-            ToastUtils.showLong(getString(R.string.get_version_fail))
-        })
+        if (TelinkLightApplication.getApp().isConnectGwBle) {
+            val disposable = getDeviceVersion(dbGw!!.meshAddr).subscribe(
+                    { s: String ->
+                        dbGw!!.version = s
+                        bottom_version_number.text = dbGw?.version
+                        DBUtils.saveGateWay(dbGw!!, true)
+                    }, {
+                ToastUtils.showLong(getString(R.string.get_version_fail))
+            })
         }
-                    bottom_version_number.text = dbGw?.version
+        bottom_version_number.text = dbGw?.version
         // sendDeviceMacParmars()
     }
 
@@ -293,9 +295,11 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         toolbarTv.text = getString(R.string.config_WIFI)
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbar.setNavigationOnClickListener {
+            startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
             finish()
         }
         this.mApp = this.application as TelinkLightApplication
+        this.mApp.removeEventListeners()
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         if (TelinkLightApplication.getApp().isConnectGwBle)
             sendTimeZoneParmars()
@@ -304,6 +308,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         disposableTimer?.dispose()
+        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun receviedGwCmd2000(serId: String) {
