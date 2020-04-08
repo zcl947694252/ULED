@@ -626,7 +626,7 @@ object Commander : EventListener<String> {
     @JvmStatic
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null,connectTimeOutTime:Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
@@ -653,7 +653,7 @@ object Commander : EventListener<String> {
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
-               // LogUtils.d("connect doFinally")
+                // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
 
@@ -709,7 +709,7 @@ object Commander : EventListener<String> {
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
-                if (version==null){
+                if (version == null) {
                     mGetVersionObservable?.onError(Throwable("get empty version,please retry"))
                 }
                 mGetVersionObservable?.onNext(version!!)
@@ -717,7 +717,8 @@ object Commander : EventListener<String> {
             } else {
             }
         } else {
-            mGetVersionObservable?.onError(Throwable("get empty version"))
+            if (mGetVersionObservable?.isDisposed == false)
+                mGetVersionObservable?.onError(Throwable("get empty version"))
             LogUtils.d("get empty version")
         }
 
