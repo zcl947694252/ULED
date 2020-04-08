@@ -25,6 +25,6 @@ class GwTaskItemAdapter(resId: Int, data: ArrayList<GwTasksBean>) : BaseQuickAda
             "${DBUtils.timeStr(item.startHour)}:${DBUtils.timeStr(item.startMins)} - ${DBUtils.timeStr(item.endHour)}:${DBUtils.timeStr(item.endMins)}"
 
         helper?.setText(R.id.item_gw_timer_title, time)
-                ?.setText(R.id.item_gw_timer_scene, item.senceName)
+                ?.setText(R.id.item_gw_timer_scene, item.sceneName)
     }
 }

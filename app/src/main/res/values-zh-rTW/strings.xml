@@ -949,5 +949,6 @@
     <string name="gate_way_switch_fail">网关开关失败</string>
     <string name="config_WIFI">设置网关WIFI</string>
     <string name="gate_way_offline">网关不在线</string>
+    <string name="delete_device_confim">删除后需要手动恢复该设备的出厂设置,确定删除该设备?</string>
 
 </resources>

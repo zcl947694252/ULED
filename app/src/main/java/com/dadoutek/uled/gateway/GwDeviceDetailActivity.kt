@@ -523,7 +523,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         popupWindow.isFocusable = true
         val reConfig = views.findViewById<TextView>(R.id.switch_group)
         val ota = views.findViewById<TextView>(R.id.ota)
-        val delete = views.findViewById<TextView>(R.id.deleteBtn)
+        val restFactory = views.findViewById<TextView>(R.id.deleteBtn)
         val rename = views.findViewById<TextView>(R.id.rename)
         val configGwNet = views.findViewById<TextView>(R.id.configGwNet)
         val deleteBtnNoFactory = views.findViewById<TextView>(R.id.deleteBtnNoFactory)
@@ -532,7 +532,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         deleteBtnNoFactory.visibility = View.VISIBLE
 
         deleteBtnNoFactory.setOnClickListener {
-            deleteGwData()
+            popupWindow.dismiss()//删除网关
+            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_device_confim)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        deleteGwData()
+                    }
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
         }
 
         configGwNet.setOnClickListener {
@@ -551,15 +557,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         ota.setOnClickListener {
             connectGw(2)//ota
         }
-        delete.setOnClickListener {
+        restFactory.setOnClickListener {
             //恢复出厂设置
-            popupWindow.dismiss()
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        connectGw(3)//删除网关
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+            connectGw(3)
         }
     }
 
@@ -639,6 +639,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     @SuppressLint("SetTextI18n")
     private fun showRenameDialog() {
+        popupWindow.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
         if (currentGw != null && currentGw?.name != "")
             renameEditText?.setText(currentGw?.name)
@@ -671,9 +672,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     0 -> onLogin(configType)
                     1 -> onLogin(configType)
                     2 -> getDeviceVersion(currentGw!!.meshAddr)
-                    3 -> {
-                        sendGwResetFactory()
-                    }
+                    3 -> sendGwResetFactory()
                 }//判断进入那个开关设置界面
             }, {
                 if (configType == 0) {//重新配置为0   现在设置成10防止通过服务器连接

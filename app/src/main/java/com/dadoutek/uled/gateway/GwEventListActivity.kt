@@ -95,7 +95,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         this.mApp = this.application as TelinkLightApplication
 
-        img_function1.visibility = View.VISIBLE
+        img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
 

@@ -124,7 +124,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setForResult() {
         tasksBean.setSceneId(scene.getId());
-        tasksBean.setSenceName(scene.getName());
+        tasksBean.setSceneName(scene.getName());
         tasksBean.setStartHour(hourTime);
         tasksBean.setStartMins(minuteTime);
         sendLabelHeadParams();
@@ -288,7 +288,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             if (!tasksBean.isCreateNew()) {//不是新的赋值旧的数据
                 hourTime = tasksBean.getStartHour();
                 minuteTime = tasksBean.getStartMins();
-                timerScene.setText(tasksBean.getSenceName());
+                timerScene.setText(tasksBean.getSceneName());
                 scene = DBUtils.INSTANCE.getSceneByID(tasksBean.getSceneId());
             }
         } else {

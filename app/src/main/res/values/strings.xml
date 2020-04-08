@@ -1025,6 +1025,7 @@
     <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
     <string name="gate_way_switch_fail">Gateway switch failed</string>
     <string name="config_WIFI">Set gateway WIFI</string>
-    <string name="gate_way_offline">网关不在线</string>
+    <string name="gate_way_offline">Gateway offline</string>
+    <string name="delete_device_confim">After deleting, the factory Settings of the device need to be restored manually. Are you sure to delete the device?</string>
 
 </resources>

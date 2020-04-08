@@ -580,7 +580,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     tagBean?.week = getWeek(mode.replace("6", ""))
                 } else {
                     gate_way_repete_mode.textSize = 15F
-                    mode = isOnlyOne(mode)
+                    //mode = isOnlyOne(mode) 如果不选择就是仅一次 但凡选中任意一个星期日都是现实星期几
                     gate_way_repete_mode.text = mode
                     tagBean?.weekStr = mode
                     tagBean?.week = getWeek(mode)
