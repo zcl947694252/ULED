@@ -81,6 +81,9 @@
                 android:name=".gateway.GwTimerPeriodListActivity"
                 android:screenOrientation="portrait" />
         <activity
+                android:name=".gateway.GwTimerPeriodListActivity2"
+                android:screenOrientation="portrait" />
+        <activity
                 android:name=".gateway.GwSelectStandingTimeActivity"
                 android:screenOrientation="portrait" />
 

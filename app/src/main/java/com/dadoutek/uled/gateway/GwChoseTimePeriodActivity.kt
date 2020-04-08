@@ -174,9 +174,10 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                 tasksBean?.endMins = endMinuteTime
                 tasksBean?.startAllMinuts = startTimeNum
                 tasksBean?.endAllMinuts = endTimeNum
-                tasksBean?.timingPeriods =timesList
+                //tasksBean?.timingPeriods =timesList
                 tasksBean?.stateTime = standingNum
-                val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
+                //val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
+                val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity2::class.java)
                 intent.putExtra("data", tasksBean)
                 startActivityForResult(intent, requestTimerPeriodCode)
             }

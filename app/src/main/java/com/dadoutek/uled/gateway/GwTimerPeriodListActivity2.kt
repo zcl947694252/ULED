@@ -1,5 +1,15 @@
 package com.dadoutek.uled.gateway
 
+
+/**
+ * 创建者     ZCL
+ * 创建时间   2020/4/8 18:25
+ * 描述
+ *
+ * 更新者     $
+ * 更新时间   $
+ * 更新描述
+ */
 import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Intent
@@ -56,8 +66,9 @@ import kotlin.collections.ArrayList
  * 更新时间   $
  * 更新描述
  */
-class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
+class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
+    private var indexAll: Int = 0
     private var linAdd: View? = null
     private var receviedCount: Int = 0
     private var timeListTp: MutableList<GwTimePeriodsBean>? = null
@@ -71,6 +82,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     override fun setLayoutID(): Int {
         return R.layout.activity_timer_period_list
     }
+
     private var scene: DbScene? = null
     private var timesList: ArrayList<GwTimePeriodsBean> = ArrayList()
     private var timesNowList: ArrayList<GwTimePeriodsBean> = ArrayList()
@@ -137,15 +149,21 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     override fun initListener() {
         toolbar_t_cancel.setOnClickListener { finish() }
         toolbar_t_confim.setOnClickListener {
-            if (!isHaveLastOne) {
-                ToastUtils.showShort(getString(R.string.please_setting_least_one))
-                return@setOnClickListener
+            /*  if (!isHaveLastOne) {
+                  ToastUtils.showShort(getString(R.string.please_setting_least_one))
+                  return@setOnClickListener
+              }*/
+            timesNowList.forEach {
+                if (it.sceneId == 0L) {
+                    ToastUtils.showShort(getString(R.string.please_select_scene))
+                    return@setOnClickListener
+                }
             }
             sendLabelHeadParams()
         }
         adapter.setOnItemClickListener { _, _, position ->
             selectPosition = position
-            startActivityForResult(Intent(this@GwTimerPeriodListActivity, SelectSceneListActivity::class.java), requestCodes)
+            startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
         }
     }
 
@@ -166,23 +184,25 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
 
     override fun initData() {
         gwTagBean = TelinkLightApplication.getApp().currentGwTagBean
-        timesList.clear()
         tasksBean = intent.getParcelableExtra<GwTasksBean>("data")
+        getTimerPeriods()
 
         val tpList = tasksBean?.timingPeriods//ArrayList<GwTimePeriodsBean>
-        if (tpList == null || tpList.size <= 0) {
-            ToastUtils.showShort(getString(R.string.invalid_data))
-        } else {
-            if (tpList.size > 20)
-                timesList.addAll(tpList.subList(0, 20))
-            else
-                timesList.addAll(tpList)
-            for (tp in tpList)
-                if (tp.sceneId != 0L) {
-                    isHaveLastOne = true
-                    break
-                }
+        tpList?.let {
+            timesNowList.addAll(it)
+            var num = 0 until timesNowList.size
+            val reversed = num.reversed()
+            for (i in reversed)//倒序输出
+                if (i < timesList.size)
+                    timesList.removeAt(i)
+
+            if (timesList.size > 0 || timesNowList.size < 20) {
+                linAdd?.visibility = View.VISIBLE
+            } else {
+                linAdd?.visibility = View.GONE
+            }
         }
+
         adapter.notifyDataSetChanged()
     }
 
@@ -196,18 +216,17 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         linAdd = View.inflate(this, R.layout.template_bottom_add_no_line, null)
         val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)
         linAdd?.setOnClickListener {
-            if (timesList.size > 0) {
-                val element = timesList[0]
-                element.let { it1 ->
-                    timesNowList.add(it1)
-                    timesList.remove(it1)
-                    if (timesList.size <=0||timesNowList.size>=20)
-                        linAdd?.visibility =View.GONE
-                    else
-                        linAdd?.visibility =View.VISIBLE
-                }
-                adapter.notifyDataSetChanged()
-            }
+            val periodsBean = timesList[0]
+            timesNowList.add(periodsBean)
+            timesList.remove(periodsBean)
+
+            if (timesList.size <= 0 || timesNowList.size >= 20)
+                linAdd?.visibility = View.GONE
+            else
+                linAdd?.visibility = View.VISIBLE
+
+            adapter.notifyDataSetChanged()
+
         }
         tv?.text = getString(R.string.add_times)
         adapter.addFooterView(linAdd)
@@ -375,5 +394,35 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         disposableTimer?.dispose()
+    }
+
+    private fun getTimerPeriods() {
+        //  var minutes = tasksBean?.endAllMinuts ?: 0 - tasksBean?.startAllMinuts!!
+        //        indexAll = minutes / (tasksBean?.stateTime ?: 0)
+        if (tasksBean?.stateTime != 0) {
+            timesList.clear()
+            var index = 0
+            val startTime = (tasksBean?.startHour?:0) * 60 + (tasksBean?.startMins?:0)
+            val endTime = (tasksBean?.endHour?:0)* 60 + (tasksBean?.endMins?:0)
+            val standingNum = tasksBean?.stateTime ?: 0
+
+            for (time in startTime..endTime step standingNum) {
+                val i = endTime - time //判断还剩时间用于判断是不是最后一个
+                index += 1
+                LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
+                if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
+                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.select_scene))
+                    timesList.add(bean)
+                    break
+                } else if (endTime - time >= standingNum) {
+                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.select_scene))
+                    bean.sceneName = getString(R.string.select_scene)
+                    timesList.add(bean)
+                }
+            }
+            if (timesList.size>20) {
+                timesList.subList(0,20)
+            }
+        }
     }
 }

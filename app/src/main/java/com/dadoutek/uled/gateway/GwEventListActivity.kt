@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
@@ -32,6 +33,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
@@ -129,6 +131,29 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
                 when {
+                    event.args.status == LightAdapter.STATUS_LOGIN -> {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                    }
+                    event.args.status == LightAdapter.STATUS_LOGOUT -> {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                        connect(macAddress = dbGw!!.macAddr, retryTimes = 2)?.subscribe(
+                                object : NetworkObserver<DeviceInfo?>() {
+                                    override fun onNext(t: DeviceInfo) {
+                                        ToastUtils.showShort(getString(R.string.config_success))
+                                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                                    }
+
+                                    override fun onError(e: Throwable) {
+                                        super.onError(e)
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                       var intent = Intent(this@GwEventListActivity, GwDeviceDetailActivity::class.java)
+                                        startActivity(intent)
+                                        DBUtils.saveGateWay(dbGw!!, true)
+                                        finish()
+                                    }
+                                }
+                        )
+                    }
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         when (deviceInfo.gwVoipState) {
@@ -617,7 +642,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_LABLE
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {
-            setTimerDelay(gwTagBean, currentTime,2000)
+            setTimerDelay(gwTagBean, currentTime, 2000)
             //11-18 11位labelId
             GlobalScope.launch(Dispatchers.Main) {
                 if (currentTime - lastTime < 400)
@@ -626,7 +651,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 TelinkLightService.Instance().sendCommandResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer, "1")
             }
         } else {
-            setTimerDelay(gwTagBean, currentTime,6500)
+            setTimerDelay(gwTagBean, currentTime, 6500)
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
                     gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 

@@ -499,7 +499,9 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 TelinkLightApplication.getApp().listTask = listTask
                 intent.putExtra("data", tasksBean)
             } else {
-                intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
+               // intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
+                intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity2::class.java)
+
                 //传入时间段数据 重新配置时间段的场景值
                 val tasksBean = listTask[position]
                 tasksBean.labelId = tagBean?.tagId ?: 0

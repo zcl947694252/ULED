@@ -243,8 +243,10 @@ abstract class BaseActivity : AppCompatActivity() {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
-            if (!this.isFinishing)
-                GlobalScope.launch(Dispatchers.Main) { loadDialog!!.show() }
+            if (!this.isFinishing){
+                loadDialog?.dismiss()
+                loadDialog!!.show()
+            }
         }
     }
 
@@ -291,6 +293,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
     }
 

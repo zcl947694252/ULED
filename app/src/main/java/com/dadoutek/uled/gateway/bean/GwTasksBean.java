@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class GwTasksBean implements Parcelable {
     private int index;//循环模式下时间段下标
-    private int stateTime;//停留时间
+    private int stateTime = 0;//停留时间
     private long sceneId;//场景id
     private String sceneName;//场景名
     private boolean createNew;//是否是新创建对象
@@ -24,8 +24,8 @@ public class GwTasksBean implements Parcelable {
     private int endHour;
     private int startMins;
     private int endMins;
-    private int startAllMinuts;
-    private int endAllMinuts;
+    private int startAllMinuts = 0;
+    private int endAllMinuts =0;
     private int selectPos;//本地使用
     private long labelId;//本地使用 标签id
     private int gwMeshAddr;//本地使用 标签mesh地址
