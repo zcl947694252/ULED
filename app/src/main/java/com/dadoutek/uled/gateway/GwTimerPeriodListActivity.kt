@@ -6,6 +6,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -56,12 +58,12 @@ import kotlin.collections.ArrayList
  */
 class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
 
+    private var linAdd: View? = null
     private var receviedCount: Int = 0
     private var timeListTp: MutableList<GwTimePeriodsBean>? = null
     private var gwTagBean: GwTagBean? = null
     private lateinit var mApp: TelinkLightApplication
     private var connectCount: Int = 0
-    private var sendCount: Int = 0
     private var disposableTimer: Disposable? = null
     private var tasksBean: GwTasksBean? = null
     private var isHaveLastOne = false
@@ -69,10 +71,10 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     override fun setLayoutID(): Int {
         return R.layout.activity_timer_period_list
     }
-
     private var scene: DbScene? = null
     private var timesList: ArrayList<GwTimePeriodsBean> = ArrayList()
-    private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene, timesList)
+    private var timesNowList: ArrayList<GwTimePeriodsBean> = ArrayList()
+    private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene, timesNowList)
     private val requestCodes: Int = 1000
     private var selectPosition: Int = 0
     @RequiresApi(Build.VERSION_CODES.O)
@@ -122,7 +124,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
             delay(timeListTp!!.size * 250L)
             LogUtils.v("zcl-----------发送次数结束时间-------" + System.currentTimeMillis())
             if (receviedCount >= timeListTp?.size ?: 0) {
-                tasksBean?.timingPeriods = timesList
+                tasksBean?.timingPeriods = timesNowList
                 intent.putExtra("data", tasksBean)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
@@ -155,8 +157,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
             LogUtils.v("zcl获取场景信息scene" + scene.toString())
             if (scene != null) {
                 isHaveLastOne = true
-                timesList[selectPosition].sceneName = scene!!.name
-                timesList[selectPosition].sceneId = scene!!.id
+                timesNowList[selectPosition].sceneName = scene!!.name
+                timesNowList[selectPosition].sceneId = scene!!.id
                 adapter.notifyDataSetChanged()
             }
         }
@@ -166,7 +168,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         gwTagBean = TelinkLightApplication.getApp().currentGwTagBean
         timesList.clear()
         tasksBean = intent.getParcelableExtra<GwTasksBean>("data")
-        val tpList = tasksBean?.timingPeriods
+        val tpList = tasksBean?.timingPeriods//ArrayList<GwTimePeriodsBean>
         if (tpList == null || tpList.size <= 0) {
             ToastUtils.showShort(getString(R.string.invalid_data))
         } else {
@@ -190,6 +192,24 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         toolbar_t_center.text = getString(R.string.timer_period_set)
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
+        linAdd = View.inflate(this, R.layout.template_bottom_add_no_line, null)
+        val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)
+        linAdd?.setOnClickListener {
+            if (timesList.size > 0) {
+                val element = timesList[0]
+                element.let { it1 ->
+                    timesNowList.add(it1)
+                    timesList.remove(it1)
+                    if (timesList.size <=0||timesNowList.size>=20)
+                        linAdd?.visibility =View.GONE
+                    else
+                        linAdd?.visibility =View.VISIBLE
+                }
+                adapter.notifyDataSetChanged()
+            }
+        }
+        tv?.text = getString(R.string.add_times)
+        adapter.addFooterView(linAdd)
     }
 
     /**
@@ -201,14 +221,14 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         connectCount++
         receviedCount = 0
 
-        val size = if (timeListTp!=null) timeListTp!!.size else 1
+        val size = if (timeListTp != null) timeListTp!!.size else 1
         setTimerDelay(size * 300L)
         showLoadingDialog(getString(R.string.please_wait))
 
         val listOf: MutableList<ByteArray> = arrayListOf()
         timeListTp = mutableListOf()
 
-        for (t in timesList) //获取时间段的有效时间
+        for (t in timesNowList) //获取时间段的有效时间
             if (t.sceneId != 0L)
                 timeListTp?.add(t)
 
@@ -225,7 +245,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                                 tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
                                 tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
-                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte(),0)
+                                (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte(), 0)
                         os.write(labHeadPar)
                         listOf.add(labHeadPar)
 
@@ -265,8 +285,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail))
+                    hideLoadingDialog()
+                    ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail))
                 }
     }
 
@@ -342,8 +362,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     override fun receviedGwCmd2000(serId: String) {
         when (serId.toInt()) {
             Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD -> {
-            sendTime()
-        }
+                sendTime()
+            }
             Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME -> {
                 hideLoadingDialog()
                 receviceSuceessTaskSmallTimes()

@@ -30,13 +30,17 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -71,6 +75,8 @@ import kotlinx.coroutines.launch
 private const val MAX_RETRY_CONNECT_TIME = 5
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
+    private  var currentGw: DbGateway? = null
+    private var disposableTimer: Disposable? = null
     private lateinit var allLightData: ArrayList<DbLight>
     private var directLight: DbLight? = null
     private var mConnectDisposable: Disposable? = null
@@ -139,31 +145,31 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-       /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
-            device_detail_direct_item.visibility = View.VISIBLE
-            device_detail_direct_name.text = directLight?.name
-            directLight?.groupName = StringUtils.getLightGroupName(directLight)
-            device_detail_direct_group_name.text = directLight?.groupName
-            if (directLight?.groupName == null || directLight?.groupName == getString(R.string.not_grouped))
-                device_detail_direct_group_name.visibility = View.GONE
-            else
-                device_detail_direct_group_name.visibility = View.VISIBLE
-            getString(R.string.rename)
-            setTopLightState()
+        /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
+             device_detail_direct_item.visibility = View.VISIBLE
+             device_detail_direct_name.text = directLight?.name
+             directLight?.groupName = StringUtils.getLightGroupName(directLight)
+             device_detail_direct_group_name.text = directLight?.groupName
+             if (directLight?.groupName == null || directLight?.groupName == getString(R.string.not_grouped))
+                 device_detail_direct_group_name.visibility = View.GONE
+             else
+                 device_detail_direct_group_name.visibility = View.VISIBLE
+             getString(R.string.rename)
+             setTopLightState()
 
-            device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }
-            device_detail_direct_name_ly?.setOnClickListener {
-                currentLight = directLight
-                goSetting()
-            }
-            device_detail_direct_go_arr?.setOnClickListener {
-                currentLight = directLight
-                goSetting()
-            }
+             device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }
+             device_detail_direct_name_ly?.setOnClickListener {
+                 currentLight = directLight
+                 goSetting()
+             }
+             device_detail_direct_go_arr?.setOnClickListener {
+                 currentLight = directLight
+                 goSetting()
+             }
 
-        } else {*/
-            device_detail_direct_item?.visibility = View.GONE
-       // }
+         } else {*/
+        device_detail_direct_item?.visibility = View.GONE
+        // }
 
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.addItemDecoration(RecyclerGridDecoration(this, 2))
@@ -192,7 +198,48 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         retryConnectCount = 0
                         autoConnect()
                     }
-                } else
+                } else {
+              /*      GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+                        @RequiresApi(Build.VERSION_CODES.O)
+                        override fun onNext(t: List<DbGateway>) {
+                            TelinkLightApplication.getApp().offLine = true
+                            hideLoadingDialog()
+                            t.forEach { db ->
+                                //网关在线状态，1表示在线，0表示离线
+                                if (db.state == 1){
+                                     currentGw = db
+                                    TelinkLightApplication.getApp().offLine = false
+                                }
+                            }
+                            if (!TelinkLightApplication.getApp().offLine) {
+                                disposableTimer?.dispose()
+                                disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
+                                    showLoadingDialog(getString(R.string.gate_way_offline))
+                                }
+
+                                var labHeadPar: ByteArray = if (currentGw?.openTag == 1)//如果是开就执行关闭
+                                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
+                                else
+                                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
+
+                                val encoder = Base64.getEncoder()
+                                val s = encoder.encodeToString(labHeadPar)
+                                val gattBody = GwGattBody()
+                                gattBody.data = s
+                                gattBody.ser_id = Constant.GW_GATT_SWITCH
+                                gattBody.macAddr = currentGw?.macAddr
+                                sendToServer(gattBody)
+                            } else {
+                                ToastUtils.showShort(getString(R.string.gw_not_online))
+                            }
+                        }
+
+                        override fun onError(e: Throwable) {
+                            super.onError(e)
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gw_not_online))
+                        }
+                    })*/
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
 
@@ -218,13 +265,17 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             goSetting()
                         }
                     }
+                }
             }
         }
+
+
+
         adaper!!.bindToRecyclerView(recycleView)
         val size =/* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
             lightsData.size + 1
         else*/
-            lightsData.size
+                lightsData.size
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
@@ -258,7 +309,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
-        search_clear.setOnClickListener{
+        search_clear.setOnClickListener {
             clearSearch()
         }
         search_btn.setOnClickListener {
@@ -282,15 +333,16 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     search_btn.setTextColor(getColor(R.color.gray_6))
                     search_clear.visibility = View.VISIBLE
                     val list = allLightData.filter { dbLight -> dbLight.name.contains(s.toString()) }
-                    if (list.isEmpty()){
+                    if (list.isEmpty()) {
                         search_no_result.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         search_no_result.visibility = View.GONE
-                    lightsData.addAll(list)
-                    adaper?.notifyDataSetChanged()
+                        lightsData.addAll(list)
+                        adaper?.notifyDataSetChanged()
                     }
                 }
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
@@ -364,7 +416,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
 //                    addNewGroup()
-                    popMain.showAtLocation(window.decorView,Gravity.CENTER,0,0)
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
 
             }
@@ -444,7 +496,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
@@ -494,12 +546,12 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         search_bar.setOnClickListener(dialogOnclick)
 
         val title = view.findViewById<TextView>(R.id.textView5)
-        if (position==INSTALL_NORMAL_LIGHT){
-            title.visibility =  View.GONE
-            install_tip_question.visibility =  View.GONE
-        }else{
-            title.visibility =  View.VISIBLE
-            install_tip_question.visibility =  View.VISIBLE
+        if (position == INSTALL_NORMAL_LIGHT) {
+            title.visibility = View.GONE
+            install_tip_question.visibility = View.GONE
+        } else {
+            title.visibility = View.VISIBLE
+            install_tip_question.visibility = View.VISIBLE
         }
 
         install_tip_question.text = describe
@@ -658,16 +710,16 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     allLightData = DBUtils.getAllNormalLight()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
-                          /*  if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
-                                    == TelinkLightApplication.getApp().connectDevice?.meshAddress)
-                                directLight = allLightData[i]
-                            else {*/
-                                val groupName = StringUtils.getLightGroupName(allLightData[i])
-                                if (groupName != getString(R.string.not_grouped))
-                                    allLightData[i].groupName = groupName
-                                else
-                                    allLightData[i].groupName = ""
-                                lightsData.add(allLightData[i])
+                            /*  if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
+                                      == TelinkLightApplication.getApp().connectDevice?.meshAddress)
+                                  directLight = allLightData[i]
+                              else {*/
+                            val groupName = StringUtils.getLightGroupName(allLightData[i])
+                            if (groupName != getString(R.string.not_grouped))
+                                allLightData[i].groupName = groupName
+                            else
+                                allLightData[i].groupName = ""
+                            lightsData.add(allLightData[i])
                             //}
                         }
                         lightsData = sortList(lightsData)
@@ -702,19 +754,19 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     lightsData.clear()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
-                           /* if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
-                                    == TelinkLightApplication.getApp().connectDevice?.meshAddress)
-                                directLight = allLightData[i]
-                            else {*/
-                                val groupName = StringUtils.getLightGroupName(allLightData[i])
-                                if (groupName != getString(R.string.not_grouped))
-                                    allLightData[i].groupName = groupName
-                                else
-                                    allLightData[i].groupName = ""
-                                lightsData.add(allLightData[i])
+                            /* if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
+                                     == TelinkLightApplication.getApp().connectDevice?.meshAddress)
+                                 directLight = allLightData[i]
+                             else {*/
+                            val groupName = StringUtils.getLightGroupName(allLightData[i])
+                            if (groupName != getString(R.string.not_grouped))
+                                allLightData[i].groupName = groupName
+                            else
+                                allLightData[i].groupName = ""
+                            lightsData.add(allLightData[i])
 
-                                lightsData = sortList(lightsData)
-                           // }
+                            lightsData = sortList(lightsData)
+                            // }
                         }
 
                         var batchGroup = changeHaveDeviceView()
@@ -1008,10 +1060,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
         mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 10)
                 ?.subscribe({
-                            onLogin()
-                        }, {
-                            LogUtils.d("connect failed")
-                        }
+                    onLogin()
+                }, {
+                    LogUtils.d("connect failed")
+                }
                 )
     }
 
@@ -1052,5 +1104,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         }
         return arr
     }
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+            }
 
+            override fun onError(e: Throwable) {
+                super.onError(e)
+            }
+        })
+    }
 }

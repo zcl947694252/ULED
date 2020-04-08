@@ -540,8 +540,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
 
         reConfig.setOnClickListener {
-            //connectGw(0)//重新配置
-            connectService()
+            connectGw(0)//重新配置
+            //connectService()
         }
 
         rename.setOnClickListener {

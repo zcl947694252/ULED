@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import cn.qqtheme.framework.picker.NumberPicker
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import kotlinx.android.synthetic.main.template_top_three.*
@@ -56,11 +57,14 @@ class GwSelectStandingTimeActivity : BaseActivity() {
         toolbar_t_cancel.setOnClickListener { finish() }
         toolbar_t_confim.setOnClickListener {
             GlobalScope.launch {
-                if (standingTime == 0)
+                if (standingTime != 0) {
                     kotlinx.coroutines.delay(1000)
-                val intent = Intent().putExtra("data", standingTime)
-                setResult(Activity.RESULT_OK, intent)
-                finish()
+                    val intent = Intent().putExtra("data", standingTime)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                } else {
+                    ToastUtils.showShort(getString(R.string.please_select_standing_time))
+                }
             }
 
 
