@@ -19,7 +19,7 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
 
-    public static  Boolean isDebug = true;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -29,7 +29,7 @@ public class Constant implements Serializable {
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     //public static  String DEFAULT_MESH_FACTORY_NAME = /*isDebug ?"dadoutek3":*/"dadousmart";
-    public static  String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
+    public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
@@ -55,7 +55,7 @@ public class Constant implements Serializable {
 
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
-    public static  String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
+    public static String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
@@ -230,7 +230,6 @@ public class Constant implements Serializable {
     public static final String OTA_MES_Add = "OTA_MES_Add";
 
 
-
     //是否显示区域弹框
     public static final String IS_SHOW_REGION_DIALOG = "IS_SHOW_REGION_DIALOG";
     //区域列表key
@@ -263,103 +262,111 @@ public class Constant implements Serializable {
     public static final String ISCONFIRM = "isConfirm";
     public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
-    public static final String IS_TECK="IS_TECK";
+    public static final String IS_TECK = "IS_TECK";
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
 
-    public static final String GW_COMMEND_CODE="GW_COMMEND_CODE";
+    public static final String GW_COMMEND_CODE = "GW_COMMEND_CODE";
     /**
      * 网关设置wifi连接标识
      */
-    public static final int GW_WIFI_VOIP =0X10;
+    public static final int GW_WIFI_VOIP = 0X10;
     /**
      * 网关开关业务标识
      */
-    public static final int GW_SWITCH_VOIP =0X11;
+    public static final int GW_SWITCH_VOIP = 0X11;
     /**
      * 网关恢复出厂业务标识
      */
-    public static final int GW_RESET_VOIP =0X12;
+    public static final int GW_RESET_VOIP = 0X12;
     /**
-     *网关定时场景标签头下发
+     * 网关定时场景标签头下发
      */
-    public static final int GW_CONFIG_TIMER_LABEL_VOIP =0X13;
+    public static final int GW_CONFIG_TIMER_LABEL_VOIP = 0X13;
     /**
-     *网关定时场景时间下发
+     * 网关定时场景时间下发
      */
-    public static final int GW_CONFIG_TIMER_TASK_VOIP =0X14;
+    public static final int GW_CONFIG_TIMER_TASK_VOIP = 0X14;
     /**
-     *网关删除定时场景标签:
+     * 网关删除定时场景标签:
      */
-    public static final int GW_DELETE_TIMER_LABEL_VOIP =0X15;
+    public static final int GW_DELETE_TIMER_LABEL_VOIP = 0X15;
     /**
      * 网关删除定时场景时间
      */
-    public static final int GW_DELETE_TIMER_TASK_VOIP =0X16;
+    public static final int GW_DELETE_TIMER_TASK_VOIP = 0X16;
     /**
      * w网关循环场景标签头下发:
      */
-    public static final int GW_CONFIG_TIME_PERIVODE_LABEL_VOIP =0X17;
+    public static final int GW_CONFIG_TIME_PERIVODE_LABEL_VOIP = 0X17;
     /**
      * 网关循环时间段下发业务标识
      */
-    public static final int GW_CONFIG_TIME_PERIVODE_TASK_VOIP =0X18;
+    public static final int GW_CONFIG_TIME_PERIVODE_TASK_VOIP = 0X18;
     /**
      * 网关删除循环场景标签业务标识
      */
-    public static final int GW_DELETE_TIME_PERIVODE_LABEL_VOIP =0X19;
+    public static final int GW_DELETE_TIME_PERIVODE_LABEL_VOIP = 0X19;
     /**
      * 网关删除循环场景时间段业务标识
      */
-    public static final int GW_DELETE_TIME_PERIVODE_TASK_VOIP =0X1A;
+    public static final int GW_DELETE_TIME_PERIVODE_TASK_VOIP = 0X1A;
     /**
      * 网关设置时区和时间连接标识
      */
-    public static final int GW_TIME_ZONE_VOIP =0X1B;
+    public static final int GW_TIME_ZONE_VOIP = 0X1B;
     /**
      * 开关网关
      */
-    public static final int GW_GATT_SWITCH =1;
+    public static final int GW_GATT_SWITCH = 1;
 
     /**
      * 开关网关标签
      */
-    public static final int GW_GATT_LABEL_SWITCH =2;
+    public static final int GW_GATT_LABEL_SWITCH = 2;
     /**
      * 删除网关标签
      */
-    public static final int GW_GATT_DELETE_LABEL =3;
+    public static final int GW_GATT_DELETE_LABEL = 3;
     /**
      * 删除网关标签的task时间
      */
-    public static final int GW_GATT_DELETE_LABEL_TASK =4;
+    public static final int GW_GATT_DELETE_LABEL_TASK = 4;
 
     /**
      * 保存网关标签头
      */
-    public static final int GW_GATT_SAVE_LABEL_HEAD =5;
+    public static final int GW_GATT_SAVE_LABEL_HEAD = 5;
 
 
     /**
      * 保存网关定时选择时间标签头
      */
-    public static final int GW_GATT_CHOSE_TIME_LABEL_HEAD =6;
+    public static final int GW_GATT_CHOSE_TIME_LABEL_HEAD = 6;
 
     /**
      * 保存网关定时模式task任务
      */
-    public static final int GW_GATT_SAVE_TIMER_TASK_TIME =7;
+    public static final int GW_GATT_SAVE_TIMER_TASK_TIME = 7;
 
     /**
      * 保存网关循环模式选择时间标签头
      */
-    public static final int GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD =8;
+    public static final int GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD = 8;
 
     /**
      * 保存网关x循环模式task任务
      */
-    public static final int GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME =9;
+    public static final int GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME = 9;
     /**
      * 是否是重新配置网关wifi
      */
-    public static final String IS_GW_CONFIG_WIFI ="IS_GW_CONFIG_WIFI";
+    public static final String IS_GW_CONFIG_WIFI = "IS_GW_CONFIG_WIFI";
+
+    public static final int SATURDAY = 1 << 6;
+    public static final int FRIDAY = 1 << 5;
+    public static final int THURSDAY = 1 << 4;
+    public static final int WEDNESDAY = 1 << 3;
+    public static final int TUESDAY = 1 << 2;
+    public static final int MONDAY = 1 << 1;
+    public static final int SUNDAY = 1 << 0;
 }

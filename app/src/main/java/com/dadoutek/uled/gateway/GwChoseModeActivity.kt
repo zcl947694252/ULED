@@ -4,12 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.WeeksItemAdapter
 import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.model.Constant
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -25,16 +29,42 @@ class GwChoseModeActivity : TelinkBaseActivity() {
 
     private var list: MutableList<WeekBean>? = null
     private var adapter: WeeksItemAdapter? = null
-
+    private var week: Int = 0
     private val checkedList = ArrayList<WeekBean>()
     fun initListener() {
 
     }
 
     fun initData() {
-        list = mutableListOf(WeekBean(getString(R.string.monday), 1), WeekBean(getString(R.string.tuesday), 2),
-                WeekBean(getString(R.string.wednesday), 3), WeekBean(getString(R.string.thursday), 4), WeekBean(getString(R.string.friday), 5)
-                , WeekBean(getString(R.string.saturday), 6), WeekBean(getString(R.string.sunday), 7))
+        week = intent.getIntExtra("data", 0);
+        LogUtils.e(week)
+        var tmpWeek = week;
+        if ((week and 0b100000000) != 0) {
+            tmpWeek = Constant.SATURDAY or Constant.FRIDAY or Constant.THURSDAY or Constant.WEDNESDAY or Constant.TUESDAY or Constant.MONDAY or Constant.SUNDAY //每一天
+        }
+//仅一次的，暂不做转换
+//        else if (week == 0) //仅一次
+//        {
+//            var dayOfWeek = Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK) - 1
+//            tmpWeek = 1 shl dayOfWeek
+//        }
+
+        list = mutableListOf(
+                WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
+                WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
+                WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
+                WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
+                WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
+                WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
+                WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+
+        for (i in 0..(list!!.size-1)) {
+            var weekBean = list!!.get(i)
+            if (weekBean.checked) {
+                checkedList.add(weekBean)
+            }
+        }
+
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         adapter = WeeksItemAdapter(R.layout.item_week_day_tick, list!!)
         template_recycleView.adapter = adapter

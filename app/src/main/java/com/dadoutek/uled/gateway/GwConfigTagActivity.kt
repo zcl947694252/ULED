@@ -195,6 +195,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
             R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
                 val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
+                intent.putExtra("data", tagBean!!.week)
                 startActivityForResult(intent, requestModeCode)
             }
 
