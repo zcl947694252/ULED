@@ -74,7 +74,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     private var scene: DbScene? = null
     private var timesList: ArrayList<GwTimePeriodsBean> = ArrayList()
     private var timesNowList: ArrayList<GwTimePeriodsBean> = ArrayList()
-    private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene, timesNowList)
+    private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene2, timesNowList)
     private val requestCodes: Int = 1000
     private var selectPosition: Int = 0
     @RequiresApi(Build.VERSION_CODES.O)
@@ -128,8 +128,10 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 intent.putExtra("data", tasksBean)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
-            } else
-                showLoadingDialog(getString(R.string.config_gate_way_tp_task_fail))
+            } else{
+             hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.config_gate_way_tp_task_fail))
+            }
         }
     }
 

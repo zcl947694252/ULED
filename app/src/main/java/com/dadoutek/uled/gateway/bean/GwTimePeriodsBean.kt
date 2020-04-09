@@ -20,6 +20,7 @@ open class GwTimePeriodsBean() : Parcelable {
      var endTime: Int = 0
      var sceneId: Long = 0
      var sceneName: String = ""
+    var standingTime: Int = 0
 
     constructor(parcel: Parcel) : this() {
         index = parcel.readInt()
@@ -27,8 +28,8 @@ open class GwTimePeriodsBean() : Parcelable {
         endTime = parcel.readInt()
         sceneId = parcel.readLong()
         sceneName = parcel.readString()
+        standingTime = parcel.readInt()
     }
-
 
     constructor(index: Int,startTime: Int, endTime: Int,sceneName:String) : this() {
         this.index = index
@@ -37,20 +38,23 @@ open class GwTimePeriodsBean() : Parcelable {
         this.sceneName = sceneName
     }
 
+
+
+    override fun toString(): String {
+        return "GwTimePeriodsBean(index=$index, startTime=$startTime, endTime=$endTime, sceneId=$sceneId, sceneName='$sceneName', standingTime=$standingTime)"
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(index)
         parcel.writeInt(startTime)
         parcel.writeInt(endTime)
         parcel.writeLong(sceneId)
         parcel.writeString(sceneName)
+        parcel.writeInt(standingTime)
     }
 
     override fun describeContents(): Int {
         return 0
-    }
-
-    override fun toString(): String {
-        return "GwTimePeriodsBean(index=$index, startTime=$startTime, endTime=$endTime, sceneId=$sceneId, sceneName='$sceneName')"
     }
 
     companion object CREATOR : Parcelable.Creator<GwTimePeriodsBean> {

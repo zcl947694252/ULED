@@ -633,7 +633,7 @@
 
     <string name="delete_switch_confirm"> After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete switch?</string>
 
-    <string name="delete_switch_success">Delete Success</string>
+    <string name="delete_switch_success">Delete successfully, please power on again after power off</string>
 
     <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
 
@@ -983,6 +983,7 @@
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
     <string name="standing_time">Standing time</string>
+    <string name="standing_time_num">Stay time :%1$s per minute</string>
     <string name="minute">Minute</string>
     <string name="no_get_device_info">Device information not obtained, please try again</string>
     <string name="have_time_task">The response task already exists in this time period, please select another time</string>

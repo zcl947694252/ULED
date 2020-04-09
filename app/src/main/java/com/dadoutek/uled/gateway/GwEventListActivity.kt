@@ -32,6 +32,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.TmtUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -139,13 +140,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                         connect(macAddress = dbGw!!.macAddr, retryTimes = 2)?.subscribe(
                                 object : NetworkObserver<DeviceInfo?>() {
                                     override fun onNext(t: DeviceInfo) {
-                                        ToastUtils.showShort(getString(R.string.config_success))
+                                       TmtUtils.midToast(this@GwEventListActivity,getString(R.string.config_success))
                                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                                     }
 
                                     override fun onError(e: Throwable) {
                                         super.onError(e)
-                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                       TmtUtils.midToast(this@GwEventListActivity,getString(R.string.connect_fail))
                                        var intent = Intent(this@GwEventListActivity, GwDeviceDetailActivity::class.java)
                                         startActivity(intent)
                                         DBUtils.saveGateWay(dbGw!!, true)
@@ -270,7 +271,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         checkedIdType = event_timer_mode.id
         dbGw = intent.getParcelableExtra<DbGateway>("data")
         if (dbGw == null) {
-            ToastUtils.showShort(getString(R.string.no_get_device_info))
+           TmtUtils.midToast(this@GwEventListActivity,getString(R.string.no_get_device_info))
             intent = Intent(this, GwDeviceDetailActivity::class.java)
             startActivity(intent)
             finish()
@@ -409,13 +410,15 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 val oldList = mutableListOf<GwTimeAndDataBean>()
                 val listOneOpen = listOne.filter { it.status == 1 && taskList.size > 0 }//时间任务大于0个
                 listOneOpen.forEach {
-                    oldList.addAll(getGwTimerAllTime(it))
+                    oldList.addAll(getGwTimerAllTime(it))//获取所有日期的时间
                 }
 
                 val canOpen = canOpenTG(currentAllTime, oldList, true)
                 if (!canOpen) {
                     hideLoadingDialog()
-                    dbGwTag.status = 0
+                    DBUtils.saveGateWay(dbGw!!, true)
+
+                    addGw(dbGw!!)//添加网关就是更新网关
                     return
                 }
             } else {//时间段开启任务判断
@@ -435,8 +438,10 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
 
                 val canOpen = canOpenTG(currentAllTime, oldList, false)
                 if (!canOpen) {
-                    hideLoadingDialog()
                     dbGwTag.status = 0
+                    DBUtils.saveGateWay(dbGw!!, true)
+                    addGw(dbGw!!)//添加网关就是更新网关
+                    hideLoadingDialog()
                     return
                 }
             }
@@ -455,7 +460,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 if (isTimer) {
                     if (it.id != itOld.id && it.week == itOld.week && it.startTime == itOld.startTime) {
                         canOpenTag = false
-                        ToastUtils.showShort(getString(R.string.tag_mutex, itOld.name))
+                       TmtUtils.midToast(this@GwEventListActivity,getString(R.string.tag_mutex, itOld.name))
                         updateBackStatus()
                         return@forEach
                     }
@@ -475,21 +480,10 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun updateBackStatus() {
-
         GlobalScope.launch(Dispatchers.Main) {
             list[dbGw?.pos ?: 0].status = 0
             adapter.notifyDataSetChanged()
         }
-
-        if (checkedIdType == event_timer_mode.id) //定时
-            dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
-        else
-            dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
-
-        DBUtils.saveGateWay(dbGw!!, true)
-
-        addGw(dbGw!!)//添加网关就是更新网关
-
     }
 
     private fun getGwTimerAllTime(dbGwTag: GwTagBean): MutableList<GwTimeAndDataBean> {
@@ -541,7 +535,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                         sendOpenOrCloseGw(dbGwTag)
                     else {
                         updateBackStatus()
-                        ToastUtils.showShort(getString(R.string.gate_way_label_switch_fail))
+                       TmtUtils.midToast(this@GwEventListActivity,getString(R.string.gate_way_label_switch_fail))
                     }
                 }
 
@@ -554,6 +548,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         LogUtils.v("zcl-----------当前日期:--------$month-$day")
         lastType = checkedIdType
         lastGwTag = dbGwTag
+
         val opcodeHead = if (dbGwTag.isTimer())
             Opcode.CONFIG_GW_TIMER_LABLE_HEAD
         else
@@ -561,7 +556,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
 
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
-                    Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
+                    opcodeHead, 0x11, 0x02,
                     dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0)
 
@@ -602,11 +597,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             event_timer_mode.setTextColor(getColor(R.color.blue_text))
             event_time_pattern_mode.setTextColor(getColor(R.color.gray9))
             dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+            dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)
         } else {//時間段模式
             dbGw?.type = 1
             list.addAll(listTwo)
             event_timer_mode.setTextColor(getColor(R.color.gray9))
             event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
+            dbGw?.tags = GsonUtils.toJson(listOne)
             dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
         }
         DBUtils.saveGateWay(dbGw!!, true)
@@ -677,7 +674,8 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                         deleteTimerLable(gwTagBean, currentTime)
                     else
                         GlobalScope.launch(Dispatchers.Main) {
-                            ToastUtils.showShort(getString(R.string.delete_gate_way_label_fail))
+
+                            TmtUtils.midToast(this@GwEventListActivity,getString(R.string.delete_gate_way_label_fail))
                         }
                 }
     }
@@ -717,7 +715,9 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         //定时
         if (checkedIdType == R.id.event_timer_mode) {//定時模式  0定时 1循环
             dbGw?.tags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
+            dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)
         } else {//時間段模式
+            dbGw?.tags = GsonUtils.toJson(listOne)
             dbGw?.timePeriodTags = GsonUtils.toJson(list)//赋值时一定要转换为gson字符串
         }
         DBUtils.saveGateWay(dbGw!!, true)
