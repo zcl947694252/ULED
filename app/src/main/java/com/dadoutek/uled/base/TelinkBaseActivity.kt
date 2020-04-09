@@ -11,6 +11,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
@@ -94,6 +96,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
 
+    private var mHandler: Handler? = null
+    private val SHOW_LOADING_DIALOG_DELAY : Long = 300 //ms
+
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,6 +109,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
+
+        mHandler = object : Handler(){
+            override fun handleMessage(msg: Message?) {
+            }
+        }
     }
 
     private fun initChangeRecevicer() {
@@ -375,7 +385,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
-                loadDialog!!.dismiss()
+            mHandler!!.postDelayed(Runnable { loadDialog?.dismiss() }, SHOW_LOADING_DIALOG_DELAY)
         }
     }
 

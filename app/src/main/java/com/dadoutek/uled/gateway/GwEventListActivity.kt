@@ -612,6 +612,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
             add_group_btn?.visibility = View.VISIBLE
         else
             add_group_btn?.visibility = View.GONE
+        list.sortBy { gwTagBean -> gwTagBean.tagId }
         adapter.notifyDataSetChanged()
     }
 
