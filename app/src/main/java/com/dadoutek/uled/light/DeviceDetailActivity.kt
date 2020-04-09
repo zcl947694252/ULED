@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
@@ -23,6 +24,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -31,6 +33,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
@@ -39,6 +42,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.pir.ScanningSensorActivity
@@ -52,6 +56,7 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.widget.RecyclerGridDecoration
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.util.MeshUtils
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.template_search_tool.*
@@ -61,6 +66,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 /**
  * 创建者     zcl
@@ -75,7 +83,6 @@ import kotlinx.coroutines.launch
 private const val MAX_RETRY_CONNECT_TIME = 5
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
-    private  var currentGw: DbGateway? = null
     private var disposableTimer: Disposable? = null
     private lateinit var allLightData: ArrayList<DbLight>
     private var directLight: DbLight? = null
@@ -194,40 +201,52 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     GlobalScope.launch(Dispatchers.Main) {
-                        ToastUtils.showLong(getString(R.string.connecting_tip))
+                        //ToastUtils.showLong(getString(R.string.connecting_tip))
                         retryConnectCount = 0
                         autoConnect()
                     }
-                } else {
-              /*      GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+                    GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
                         @RequiresApi(Build.VERSION_CODES.O)
                         override fun onNext(t: List<DbGateway>) {
                             TelinkLightApplication.getApp().offLine = true
                             hideLoadingDialog()
                             t.forEach { db ->
                                 //网关在线状态，1表示在线，0表示离线
-                                if (db.state == 1){
-                                     currentGw = db
+                                if (db.state == 1)
                                     TelinkLightApplication.getApp().offLine = false
-                                }
                             }
                             if (!TelinkLightApplication.getApp().offLine) {
                                 disposableTimer?.dispose()
-                                disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
-                                    showLoadingDialog(getString(R.string.gate_way_offline))
+                                disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.config_gate_way_fail))
+                                }
+                                val low = currentLight!!.meshAddr and 0xff
+                                val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                                val gattBody = GwGattBody()
+                                var gattPar: ByteArray = byteArrayOf()
+                                if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                                    if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                            || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                                        //开灯
+                                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                        gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                                    }
+                                } else {
+                                    if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                            || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                        gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                                    }
                                 }
 
-                                var labHeadPar: ByteArray = if (currentGw?.openTag == 1)//如果是开就执行关闭
-                                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
-                                else
-                                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
-
                                 val encoder = Base64.getEncoder()
-                                val s = encoder.encodeToString(labHeadPar)
-                                val gattBody = GwGattBody()
+                                val s = encoder.encodeToString(gattPar)
                                 gattBody.data = s
-                                gattBody.ser_id = Constant.GW_GATT_SWITCH
-                                gattBody.macAddr = currentGw?.macAddr
+                                gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                                gattBody.meshAddr = currentLight!!.meshAddr
                                 sendToServer(gattBody)
                             } else {
                                 ToastUtils.showShort(getString(R.string.gw_not_online))
@@ -239,7 +258,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.gw_not_online))
                         }
-                    })*/
+                    })
+
+                } else {
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
 
@@ -345,6 +366,19 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl-----------远程控制-------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
+            }
         })
     }
 
@@ -926,6 +960,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         canBeRefresh = false
         acitivityIsAlive = false
+        disableConnectionStatusListener()
     }
 
 
@@ -1104,14 +1139,25 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         }
         return arr
     }
-    private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
-            }
 
-            override fun onError(e: Throwable) {
-                super.onError(e)
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when(gwStompBean.ser_id.toInt()){
+            Constant.SER_ID_LIGHT_ON->{
+                LogUtils.v("zcl-----------远程控制开灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
             }
-        })
+            Constant.SER_ID_LIGHT_OFF->{
+                LogUtils.v("zcl-----------远程控制关灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
+            }
+        }
     }
+
 }

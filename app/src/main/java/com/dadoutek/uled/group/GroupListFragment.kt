@@ -22,6 +22,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -29,6 +30,7 @@ import com.dadoutek.uled.fragment.CWLightFragmentList
 import com.dadoutek.uled.fragment.CurtainFragmentList
 import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -465,8 +467,10 @@ class GroupListFragment : BaseFragment() {
 
             R.id.btn_on, R.id.tv_on -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                   // ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
+
+
                 } else {
                     if (allGroup != null) {
                         val dstAddr = this.allGroup!!.meshAddr
@@ -663,6 +667,25 @@ class GroupListFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         sendGroupResterNormal()
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when(gwStompBean.ser_id.toInt()){
+            Constant.SER_ID_LIGHT_ON->{
+                LogUtils.v("zcl-----------远程控制开灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
+            }
+            Constant.SER_ID_LIGHT_OFF->{
+                LogUtils.v("zcl-----------远程控制关灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
+            }
+        }
     }
 
 }

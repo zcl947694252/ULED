@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -20,6 +21,7 @@ import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
 import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.device.model.DeviceItem
 import com.dadoutek.uled.gateway.GwDeviceDetailActivity
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
@@ -401,5 +403,21 @@ class DeviceFragment : BaseFragment() {
     private fun showInstallDeviceList() {
         dialog_pop.visibility = View.GONE
         callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide, isRgbClick)
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when(gwStompBean.ser_id.toInt()){
+            Constant.SER_ID_GROUP_ALLON->{
+                LogUtils.v("zcl-----------远程控制组全开成功-------")
+                hideLoadingDialog()
+
+            }
+            Constant.SER_ID_GROUP_ALLOFF->{
+                LogUtils.v("zcl-----------远程控制组全关成功-------")
+                hideLoadingDialog()
+            }
+
+
+        }
     }
 }

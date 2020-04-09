@@ -50,5 +50,12 @@ object GwModel {
                 .doOnNext { }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    fun sendDeviceToGatt(gattBody: GwGattBody): Observable<String>? {
+        return NetworkFactory.getApi().sendDeviceToMqtt(gattBody)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext { }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
 }

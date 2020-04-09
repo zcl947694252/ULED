@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -16,8 +18,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -36,6 +40,7 @@ import kotlinx.coroutines.launch
 
 open class BaseFragment : Fragment() {
 
+    private  var stompRecevice: StompReceiver? = null
     private lateinit var changeRecevicer: ChangeRecevicer
     private var loadDialog: Dialog? = null
     private lateinit var dialog: Dialog
@@ -66,6 +71,36 @@ open class BaseFragment : Fragment() {
             loadDialog!!.setContentView(layout)
             loadDialog!!.show()
         }
+    }
+
+    private fun initStompReceiver() {
+        stompRecevice = StompReceiver()
+        val filter = IntentFilter()
+        filter.addAction(Constant.GW_COMMEND_CODE)
+        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constant.CANCEL_CODE)
+        filter.addAction(Constant.PARSE_CODE)
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        context?.registerReceiver(stompRecevice, filter)
+    }
+
+    inner class StompReceiver : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                    LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
+                    when (gwStompBean.cmd) {
+                        2500 -> receviedGwCmd2500(gwStompBean)
+                    }
+                }
+            }
+        }
+    }
+
+    open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
     }
 
     private fun makeDialog() {
@@ -280,6 +315,6 @@ open class BaseFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        context?.unregisterReceiver(changeRecevicer)
+        context?.unregisterReceiver(stompRecevice)
     }
 }

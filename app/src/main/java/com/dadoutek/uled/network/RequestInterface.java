@@ -647,4 +647,19 @@ public interface RequestInterface {
      */
     @POST("mqtt/tag/pub")
     Observable<Response<String>> sendGwToService(@Body GwGattBody body);
+    /**
+     * 10、下发控制指令让网关转发（new）
+     * 简要描述：下发一条控制指令，网关接受后转发至对应的mesh网络
+     * 请求URL： https://dev.dadoutek.com/xxxx/mqtt/control
+     * 请求方式 POST
+     * content-type : application/json
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * 参数名	必选	类型	说明
+     * data	是	string	byte[]经过Base64编码得到的字符串
+     * ser_id	是	string	会话id，推送中回传
+     * cmd	是	int	操作类型，推送中回传
+     * meshAddr	是	int	设备or组的mesh地址，推送中回传
+     */
+    @POST("mqtt/control")
+    Observable<Response<String>> sendDeviceToMqtt(@Body GwGattBody body);
 }

@@ -184,7 +184,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun deleteSuceess() {
-        hideLoadingDialog()
+        runOnUiThread {    hideLoadingDialog()
         disposableTimer?.dispose()
         list.remove(deleteBean)
 
@@ -207,7 +207,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
         else
             add_group_btn?.visibility = View.VISIBLE
 
-        adapter.notifyDataSetChanged()
+      adapter.notifyDataSetChanged() }
     }
 
     /**

@@ -17,7 +17,8 @@ public class Constant implements Serializable {
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
-    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
+    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
+            "-endpoint";
 
     public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
@@ -369,4 +370,27 @@ public class Constant implements Serializable {
     public static final int TUESDAY = 1 << 2;
     public static final int MONDAY = 1 << 1;
     public static final int SUNDAY = 1 << 0;
+    /**
+     * 通过服务器转发命令到网关CMD
+     */
+    public static final int CMD_MQTT_CONTROL = 2500;
+    /**
+     * Y远程控制业务标识
+     */
+    public static final int SER_ID_GROUP_ALLON = 0x51;
+    public static final int SER_ID_GROUP_ALLOFF = 0x52;
+    public static final int SER_ID_GROUP_ON = 0x53;
+    public static final int SER_ID_GROUP_OFF = 0x54;
+
+    public static final int SER_ID_LIGHT_ON = 0x55;
+    public static final int SER_ID_LIGHT_OFF = 0x56;
+    public static final int SER_ID_RGBLIGHT_ON = 0x57;
+    public static final int SER_ID_RGBLIGHT_OFF = 0x58;
+    public static final int SER_ID_SCENE_ON = 0x59;
+    public static final int SER_ID_CURTAIN_ON = 0x60;
+    public static final int SER_ID_CURTAIN_OFF = 0x61;
+    public static final int SER_ID_RELAY_ON = 0x62;
+    public static final int SER_ID_RELAY_OFF = 0x63;
+    public static final int SER_ID_GATEWAY_ON = 0x64;
+    public static final int SER_ID_GATEWAY_OFF = 0x65;
 }
