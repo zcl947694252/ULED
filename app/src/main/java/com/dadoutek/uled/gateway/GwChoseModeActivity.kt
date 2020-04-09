@@ -12,8 +12,6 @@ import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.model.Constant
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -58,7 +56,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
                 WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
                 WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
 
-        for (i in 0..(list!!.size-1)) {
+        for (i in 0 until list!!.size) {
             var weekBean = list!!.get(i)
             if (weekBean.checked) {
                 checkedList.add(weekBean)

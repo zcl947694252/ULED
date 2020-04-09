@@ -671,21 +671,14 @@ class GroupListFragment : BaseFragment() {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when(gwStompBean.ser_id.toInt()){
-            Constant.SER_ID_LIGHT_ON->{
-                LogUtils.v("zcl-----------远程控制开灯成功-------")
+            Constant.SER_ID_GROUP_ALLON->{
+                LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 hideLoadingDialog()
-                lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
-                lightsData[positionCurrent].updateIcon()
-                adaper?.notifyDataSetChanged()
             }
-            Constant.SER_ID_LIGHT_OFF->{
-                LogUtils.v("zcl-----------远程控制关灯成功-------")
+            Constant.SER_ID_GROUP_ALLOFF->{
+                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 hideLoadingDialog()
-                lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
-                lightsData[positionCurrent].updateIcon()
-                adaper?.notifyDataSetChanged()
             }
         }
     }
-
 }
