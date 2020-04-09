@@ -77,9 +77,6 @@ open class BaseFragment : Fragment() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
         filter.addAction(Constant.GW_COMMEND_CODE)
-        filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         context?.registerReceiver(stompRecevice, filter)
     }
@@ -259,6 +256,7 @@ open class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initChangeRecevicer()
+        initStompReceiver()
         makeDialog()
     }
 

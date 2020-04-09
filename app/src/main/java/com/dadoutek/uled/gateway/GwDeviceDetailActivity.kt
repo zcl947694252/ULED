@@ -12,7 +12,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -54,15 +57,10 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.empty_view.*
-import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -86,6 +84,7 @@ import java.util.concurrent.TimeUnit
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
 
+    private var removeGw: DbGateway? = null
     private var downloadDispoable: Disposable? = null
     private var removeBean: DbGateway? = null
     private var renameDialog: Dialog? = null
@@ -421,7 +420,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGw = gateWayDataList[position]
         positionCurrent = position
-        hidePopupMenu()
         if (view.id == R.id.tv_setting) {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
@@ -446,29 +444,46 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendOpenOrCloseGw(isBleConnect: Boolean) {
         //第是一位0x01代表开 默认开 0x00代表关
-        currentGw?.let {
+        currentGw?.let { it ->
             if (isBleConnect) {
                 var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
                     byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
                 else
                     byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
                 TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_SWITCH, it.meshAddr, labHeadPar, "1")
-                it.openTag = if (it.openTag == 0)
+                gateWayDataList.forEach { it1 ->
+                    if (it1.id == it.id) {
+                        it1.openTag = if (it.openTag == 0){
+                            it.icon = R.drawable.icon_gw_open
+                            1
+                        }
+                        else{
+                            it.icon = R.drawable.icon_gw_open
+                            0
+                        }
+                    }
+                }
+
+                adaper!!.notifyDataSetChanged()
+         /*       it.openTag = if (it.openTag == 0)
                     1
                 else
                     0
-                DBUtils.saveGateWay(it, false)
+                it.updateIcon()*/
+               // DBUtils.saveGateWay(it, false)
+
+
             } else {
                 disposableTimer?.dispose()
                 disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
 
-                            showLoadingDialog(getString(R.string.gate_way_switch_fail))
-                        }
+                    showLoadingDialog(getString(R.string.gate_way_switch_fail))
+                }
 
                 var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
-                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
+                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
                 else
-                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0,0,0, 0, 0)
+                    byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                 val encoder = Base64.getEncoder()
                 val s = encoder.encodeToString(labHeadPar)
@@ -561,14 +576,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             connectGw(2)//ota
         }
         restFactory.setOnClickListener {
-            popupWindow.dismiss()//删除网关
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.gateway_reset_confim)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        //恢复出厂设置
-                        connectGw(3)
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+            //恢复出厂设置
+            connectGw(3)
         }
     }
 
@@ -921,8 +930,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     override fun receviedGwCmd2000(ser_id: String) {
         if (GW_GATT_SWITCH == ser_id?.toInt()) {
-            currentGw?.openTag= if (currentGw?.openTag == 0) 1 else 0
-            currentGw?.icon = if (currentGw?.openTag==0) R.drawable.icon_gw_close else R.drawable.icon_gw_open
+            currentGw?.openTag = if (currentGw?.openTag == 0) 1 else 0
+            currentGw?.icon = if (currentGw?.openTag == 0) R.drawable.icon_gw_close else R.drawable.icon_gw_open
             DBUtils.saveGateWay(currentGw!!, false)
             updataUi()
             disposableTimer?.dispose()

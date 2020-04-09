@@ -205,60 +205,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-                        @RequiresApi(Build.VERSION_CODES.O)
-                        override fun onNext(t: List<DbGateway>) {
-                            TelinkLightApplication.getApp().offLine = true
-                            hideLoadingDialog()
-                            t.forEach { db ->
-                                //网关在线状态，1表示在线，0表示离线
-                                if (db.state == 1)
-                                    TelinkLightApplication.getApp().offLine = false
-                            }
-                            if (!TelinkLightApplication.getApp().offLine) {
-                                disposableTimer?.dispose()
-                                disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                                    hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.config_gate_way_fail))
-                                }
-                                val low = currentLight!!.meshAddr and 0xff
-                                val hight = (currentLight!!.meshAddr shr 8) and 0xff
-                                val gattBody = GwGattBody()
-                                var gattPar: ByteArray = byteArrayOf()
-                                if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                                    if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                            || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
-                                        //开灯
-                                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                        gattBody.ser_id = Constant.SER_ID_LIGHT_ON
-                                    }
-                                } else {
-                                    if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                            || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
-                                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                        gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
-                                    }
-                                }
-
-                                val encoder = Base64.getEncoder()
-                                val s = encoder.encodeToString(gattPar)
-                                gattBody.data = s
-                                gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                                gattBody.meshAddr = currentLight!!.meshAddr
-                                sendToServer(gattBody)
-                            } else {
-                                ToastUtils.showShort(getString(R.string.gw_not_online))
-                            }
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.gw_not_online))
-                        }
-                    })
+                    sendToGw()
 
                 } else {
                     when (view.id) {
@@ -366,6 +313,63 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun sendToGw() {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.gate_way_offline))
+                    }
+                    val low = currentLight!!.meshAddr and 0xff
+                    val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray = byteArrayOf()
+                    if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                            //开灯
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                        }
+                    } else {
+                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                        }
+                    }
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentLight!!.meshAddr
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
         })
     }
 

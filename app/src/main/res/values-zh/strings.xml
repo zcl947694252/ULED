@@ -582,7 +582,7 @@
     <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
     <string name="title_curtain_lights_num_total">扫描完毕：%1$d个窗帘</string>
     <string name="delete_switch_confirm">删除后需要手动恢复该开关的出厂设置,确定删除此开关？</string>
-    <string name="delete_switch_success">删除成功</string>
+    <string name="delete_switch_success">删除成功,请断电后重新上电</string>
     <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
     <string name="grouping_curtain_wait_tip">当前有%1$s个窗帘正在分组，请稍候！</string>
     <string name="selected_curtain_tip">至少选择一个窗帘进行分组</string>
@@ -904,6 +904,7 @@
     <string name="to">至</string>
     <string name="endTime">8:30</string>
     <string name="standing_time">停留时间</string>
+    <string name="standing_time_num">停留时间:%1$s分</string>
     <string name="minute">分</string>
     <string name="no_get_device_info">未获取到设备信息,请重试</string>
     <string name="have_time_task">该时间段已存在响应任务,请选择其他时间</string>

@@ -581,10 +581,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun skipSetting() {
         var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
-        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-        intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
-        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+        intent.putExtra(TYPE_VIEW, TYPE_CURTAIN)
+        intent.putExtra(LIGHT_ARESS_KEY, currentLight)
+        intent.putExtra(CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(LIGHT_REFRESH_KEY, LIGHT_REFRESH_KEY_OK)
         Log.d("currentLight", currentLight!!.meshAddr.toString())
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }

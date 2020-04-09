@@ -241,6 +241,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             if (sendCount < 3) {
                 sendTime(tasks);
             } else {
+                hideLoadingDialog();
                 runOnUiThread(() -> ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail)));
             }
         });

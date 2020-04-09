@@ -840,12 +840,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 此处用作设备登录
      */
     private fun autoConnect(elements: MutableList<Int>) {
-        mAutoConnectDisposable = connect(deviceTypes = elements)
+        mAutoConnectDisposable = connect(deviceTypes = elements,retryTimes = 2)
                 ?.subscribe(
                         {
                             onLogin()
-                        },
-                        {
+                        }, {
                             hideLoadingDialog()
                             ToastUtils.showLong(getString(R.string.connect_fail))
                             LogUtils.d(it)
@@ -1415,6 +1414,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
 
             LightAdapter.STATUS_LOGIN -> {
+
             }
 
         }

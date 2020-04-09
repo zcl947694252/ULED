@@ -52,6 +52,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
+import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -119,6 +120,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         swipe_recycleView.setSwipeMenuCreator(function) // 设置监听器。
         swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->
             menuBridge.closeMenu()//删除标签的回调
+            deletePosition = adapterPosition
             sendDeleteTask(listTask[deletePosition ?: 0])
         }
         swipe_recycleView.adapter = adapter
@@ -179,6 +181,34 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         adapter.notifyDataSetChanged()
 
         gate_way_lable.setText(getString(R.string.label) + tagBean?.tagId)
+      /*  var weekStr = StringBuilder()
+        when (tagBean!!.week) {
+            0b00000000 -> weekStr.append(getString(R.string.only_one))
+            0b01111111 -> weekStr.append(getString(R.string.every_day))
+            else -> {
+                var binaryString = Integer.toBinaryString(tagBean!!.week)
+                for (z in 0..8)
+                    if (binaryString.length < 8)
+                        binaryString = "0$binaryString"
+                    else return
+                val length = binaryString.length
+                val intRange = (0 until length).reversed()
+                for (i in intRange) {
+                    val c = binaryString[i]
+                    if (c.toString() == "1")
+                        when (i) {
+                            0 -> weekStr.append(getString(R.string.sunday))
+                            1 -> weekStr.append(getString(R.string.monday))
+                            2 -> weekStr.append(getString(R.string.tuesday))
+                            3 -> weekStr.append(getString(R.string.wednesday))
+                            4 -> weekStr.append(getString(R.string.thursday))
+                            5 -> weekStr.append(getString(R.string.friday))
+                            6 -> weekStr.append(getString(R.string.saturday))
+                            7 -> weekStr.append(getString(R.string.every_day))
+                        }
+                }
+            }
+        }*/
         gate_way_repete_mode.text = tagBean?.weekStr
 
         if (tagBean?.getIsTimer() != false)
@@ -187,6 +217,34 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
     }
 
+    /**
+     * 16进制转换成为string类型字符串
+     * @param s
+     * @return
+     */
+    fun hexStringToString(s: String?): String? {
+        var s = s
+        if (s == null || s == "") {
+            return null
+        }
+        s = s.replace(" ", "")
+        val baKeyword = ByteArray(s.length / 2)
+        for (i in baKeyword.indices) {
+            try {
+                baKeyword[i] = (0xff and Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16)).toByte()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+        try {
+            s = String(baKeyword, Charset.forName("UTF-8"))
+        } catch (e1: Exception) {
+            e1.printStackTrace()
+        }
+
+        return s
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(v: View?) {
@@ -196,6 +254,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
                 val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
                 intent.putExtra("data", tagBean!!.week)
+
                 startActivityForResult(intent, requestModeCode)
             }
 
@@ -300,7 +359,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         listTask.remove(deleteBean)
         adapter.notifyDataSetChanged()
 
-       saveOrUpdataGw(dbGw!!)
+        saveOrUpdataGw(dbGw!!)
     }
 
     /**
@@ -310,7 +369,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
         deleteBean = gwTaskBean
         connectCount++
-        val id = dbGw?.id ?: 0
+        val id = gwTaskBean?.labelId
         var opcodeDelete = if (tagBean?.isTimer() == true)
             Opcode.CONFIG_GW_TIMER_DELETE_TASK
         else
@@ -500,7 +559,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 TelinkLightApplication.getApp().listTask = listTask
                 intent.putExtra("data", tasksBean)
             } else {
-               // intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
+                // intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity::class.java)
                 intent = Intent(this@GwConfigTagActivity, GwTimerPeriodListActivity2::class.java)
 
                 //传入时间段数据 重新配置时间段的场景值

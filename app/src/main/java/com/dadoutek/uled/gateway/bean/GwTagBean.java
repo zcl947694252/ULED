@@ -7,7 +7,7 @@ import android.os.Parcelable;
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/12 9:57
- * 描述
+ * 描述  tag标签时间表tasks的bean
  * <p>
  * 更新者     $
  * 更新时间   $
