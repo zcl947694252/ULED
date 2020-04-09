@@ -12,10 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -57,10 +54,15 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.empty_view.*
+import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -419,6 +421,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGw = gateWayDataList[position]
         positionCurrent = position
+        hidePopupMenu()
         if (view.id == R.id.tv_setting) {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
@@ -558,8 +561,14 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             connectGw(2)//ota
         }
         restFactory.setOnClickListener {
-            //恢复出厂设置
-            connectGw(3)
+            popupWindow.dismiss()//删除网关
+            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.gateway_reset_confim)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        //恢复出厂设置
+                        connectGw(3)
+                    }
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
         }
     }
 
@@ -971,4 +980,33 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         gateWayDataList.add(0, currentGw!!)
         adaper?.notifyDataSetChanged()
     }
+
+    fun myPopViewClickPosition(x: Float, y: Float) {
+        if (x < dialog_relay?.left ?: 0 || y < dialog_relay?.top ?: 0 || y > dialog_relay?.bottom ?: 0) {
+            if (dialog_relay?.visibility == View.VISIBLE) {
+                Thread {
+                    //避免点击过快点击到下层View
+                    Thread.sleep(100)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        hidePopupMenu()
+                    }
+                }.start()
+            } else if (dialog_pop == null) {
+                hidePopupMenu()
+            }
+        }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        try {
+            if (ev?.action == MotionEvent.ACTION_DOWN) {
+                myPopViewClickPosition(ev.x, ev.y)
+            }
+        } catch (ex: IllegalArgumentException) {
+            ex.printStackTrace()
+        }
+        return super.dispatchTouchEvent(ev)
+
+    }
+
 }

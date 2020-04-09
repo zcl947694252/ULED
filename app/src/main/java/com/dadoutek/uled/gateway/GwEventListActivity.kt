@@ -415,6 +415,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 val canOpen = canOpenTG(currentAllTime, oldList, true)
                 if (!canOpen) {
                     hideLoadingDialog()
+                    dbGwTag.status = 0
                     return
                 }
             } else {//时间段开启任务判断
@@ -435,6 +436,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String> {
                 val canOpen = canOpenTG(currentAllTime, oldList, false)
                 if (!canOpen) {
                     hideLoadingDialog()
+                    dbGwTag.status = 0
                     return
                 }
             }

@@ -701,7 +701,7 @@
     <string name="add_group">Add group</string>
 
     <string name="total">Total</string>
-    <string name="piece"></string>
+    <string name="piece">piece</string>
 
     <string name="gradient_mode">Gradient mode</string>
     <string name="color_mode">Color mode</string>
@@ -1024,8 +1024,9 @@
     <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
     <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
     <string name="gate_way_switch_fail">Gateway switch failed</string>
-    <string name="config_WIFI">Set gateway WIFI</string>
+    <string name="delete_device_confim">After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete Gateway?</string>
+    <string name="config_WIFI">ConfigGateWIFI</string>
     <string name="gate_way_offline">Gateway offline</string>
-    <string name="delete_device_confim">After deleting, the factory Settings of the device need to be restored manually. Are you sure to delete the device?</string>
+    <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
 
 </resources>

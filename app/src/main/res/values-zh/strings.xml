@@ -754,7 +754,7 @@
     <string name="error_http_400">错误请求</string>
     <string name="error_socket_timeout">网络超时</string>
     <string name="error_socket_unreachable">无法连接到服务器</string>
-    <string name="error_http" />
+    <string name="error_http" >网络连接错误</string>
     <string name="QR_cancel">撤销二维码</string>
     <string name="QR_canceled">当前二维码已撤销</string>
     <string name="QR_expired">二维码已失效,请重新生成</string>
@@ -948,5 +948,7 @@
     <string name="config_WIFI">设置网关WIFI</string>
     <string name="gate_way_offline">网关不在线</string>
     <string name="delete_device_confim">删除后需要手动恢复该设备的出厂设置,确定删除该设备?</string>
+    <string name="gateway_reset_confim">复位网关，配置的数据将会丢失,确定复位设备?</string>
+    <string name="startTime">7:40</string>
 
 </resources>
