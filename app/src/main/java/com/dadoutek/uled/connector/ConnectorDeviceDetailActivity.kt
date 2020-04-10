@@ -43,8 +43,8 @@ import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -57,6 +57,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 蓝牙接收器列表
  */
 class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
+    private  var launch: Job? = null
     private var type: Int? = null
     private val lightsData: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
@@ -216,13 +217,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         }
 
         installDialog?.show()
-
-        Thread {
-            Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main) {
-                //                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
     val INSTALL_NORMAL_LIGHT = 0
@@ -560,13 +554,15 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         mConnectDisposal?.dispose()
         canBeRefresh = false
         acitivityIsAlive = false
+        launch?.cancel()
     }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
-        GlobalScope.launch {
+        launch?.cancel()
+         launch = GlobalScope.launch {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2500)
             if (this@ConnectorDeviceDetailActivity == null ||

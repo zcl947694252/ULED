@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network
 
+import android.text.TextUtils
 import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -27,7 +28,8 @@ abstract class NetworkObserver<T> : Observer<T> {
                     ToastUtils.showLong(e.message)  //服务器接口报错
             }
             else -> //未知错误
-                ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
+                if (!TextUtils.isEmpty(e.message))
+                    ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
         }
     }
 

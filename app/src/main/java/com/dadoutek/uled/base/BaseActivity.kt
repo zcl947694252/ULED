@@ -337,7 +337,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             user.last_region_id = 1.toString()
                             user.last_authorizer_user_id = user.id.toString()
                             DBUtils.deleteAllData()
-                            AccountModel.initDatBase(it)
+                       AccountModel.initDatBase(it)
                             //更新last—region-id
                             DBUtils.saveUser(user)
                             Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
@@ -364,6 +364,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
         isResume = true
     }
 

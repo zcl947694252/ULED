@@ -337,7 +337,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                             Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
                                 hideLoadingDialog()
                                 disposableTimer?.dispose()
-                                upDataDeleteUi()
+                                runOnUiThread {  upDataDeleteUi() }
+
                             }
 
                             Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
@@ -357,8 +358,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
     private fun upDataDeleteUi() {
         listTask.remove(deleteBean)
-        adapter.notifyDataSetChanged()
 
+        adapter.notifyDataSetChanged()
         saveOrUpdataGw(dbGw!!)
     }
 
@@ -384,7 +385,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             setTimerDelay(6500L, gwTaskBean)
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
                     id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
-
+            LogUtils.v("zcl-----------发送到服务器删除标签-------$labHeadPar")
             val encoder = Base64.getEncoder()
             val s = encoder.encodeToString(labHeadPar)
             val gattBody = GwGattBody()
@@ -442,6 +443,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
+                LogUtils.v("zcl-----------发送到服务器标签头-------$labHeadPar")
                 val encoder = Base64.getEncoder()
                 val s = encoder.encodeToString(labHeadPar)
                 val gattBody = GwGattBody()

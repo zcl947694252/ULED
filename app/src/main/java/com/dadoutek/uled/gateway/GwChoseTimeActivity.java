@@ -151,7 +151,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         if (gwTagBean != null)
             gwTagBean.setStatus(0); //修改数据后状态设置成关闭
         if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
-            setHeadTimerDelay(6500L);
+            setHeadTimerDelay(7500L);
 
             byte[] labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                     (byte) (gwTagBean.getTagId() & 0xff), (byte) gwTagBean.getStatus(),
@@ -159,6 +159,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             // status 开1
             // 关0 tag的外部现实
 
+            LogUtils.v("zcl-----------发送到服务器定时标签头-------"+labHeadPar);
             Base64.Encoder encoder = Base64.getEncoder();
             String s = encoder.encodeToString(labHeadPar);
             GwGattBody gattBody = new GwGattBody();
@@ -186,7 +187,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private void setHeadTimerDelay(long delay) {
         disposableHeadTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribe(aLong -> runOnUiThread(() -> {
-                    if (sendCount < 3)
+                    if (sendCount < 2)
                         sendLabelHeadParams();
                     else {
                         hideLoadingDialog();
@@ -215,6 +216,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                         (byte) (tasks.getStartHour() & 0xff), (byte) (tasks.getStartMins() & 0xff),
                         (byte) (tasks.getSceneId() & 0xff), 0, 0, 0, 0, 0};
 
+                LogUtils.v("zcl-----------发送到服务器定时时间task-------"+labHeadPar);
                 Base64.Encoder encoder = Base64.getEncoder();
                 String s = encoder.encodeToString(labHeadPar);
                 GwGattBody gattBody = new GwGattBody();

@@ -56,7 +56,7 @@ public class DbGateway implements Parcelable {
     private String timePeriodTags;
     private int addTag = 0;//0 添加新的tag 1编辑已有tag
     private int state = 1; //1代表在线 0代表离线
-    private int openTag =0; //1代表开 0代表关
+    private int openTag =1; //1代表开 0代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_gw_open;//灯状态显示图

@@ -44,7 +44,7 @@ class TelinkLightApplication : TelinkApplication() {
     val useIndex = mutableListOf<Int>()
     val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
-    private var mStompManager: StompManager? = null
+    open var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null
     private var MIN_CLICK_DELAY_TIME = 10000
     private var lastClickTime: Long = 0
@@ -125,6 +125,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 if (mStompManager?.mStompClient == null)
                     initStompClient()
+
 
                 gwCommendDisposable = mStompManager?.gwCommend()?.subscribe({
                     if (TextUtils.isEmpty(it))

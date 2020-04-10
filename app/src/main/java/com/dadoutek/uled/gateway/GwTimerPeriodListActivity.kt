@@ -246,7 +246,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                         var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
                                 tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
                                 (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte(), 0)
                         os.write(labHeadPar)
@@ -270,7 +270,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                         LogUtils.v("zcl-----------发送次数-------$sendK")
 
                         var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
                                 ?: 0).toByte(), (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
 

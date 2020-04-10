@@ -97,7 +97,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     open lateinit var popMain: PopupWindow
 
     private var mHandler: Handler? = null
-    private val SHOW_LOADING_DIALOG_DELAY : Long = 300 //ms
+    private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,7 +110,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         initStompReceiver()
         initChangeRecevicer()
 
-        mHandler = object : Handler(){
+        mHandler = object : Handler() {
             override fun handleMessage(msg: Message?) {
             }
         }
@@ -320,6 +320,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
         isResume = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
         if (LeBluetooth.getInstance().isSupport(applicationContext))

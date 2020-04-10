@@ -9,14 +9,13 @@ import java.util.ArrayList;
  * 创建者     ZCL
  * 创建时间   2020/3/12 10:21
  * 描述
- * <p>
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
 public class GwTasksBean implements Parcelable {
     private int index;//循环模式下时间段下标
-    private int stateTime = 0;//停留时间
+    private int stayTime = 0;//停留时间
     private long sceneId;//场景id
     private String sceneName;//场景名
     private boolean createNew;//是否是新创建对象
@@ -38,7 +37,7 @@ public class GwTasksBean implements Parcelable {
 
     protected GwTasksBean(Parcel in) {
         index = in.readInt();
-        stateTime = in.readInt();
+        stayTime = in.readInt();
         sceneId = in.readLong();
         sceneName = in.readString();
         createNew = in.readByte() != 0;
@@ -58,7 +57,7 @@ public class GwTasksBean implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(index);
-        dest.writeInt(stateTime);
+        dest.writeInt(stayTime);
         dest.writeLong(sceneId);
         dest.writeString(sceneName);
         dest.writeByte((byte) (createNew ? 1 : 0));
@@ -125,12 +124,12 @@ public class GwTasksBean implements Parcelable {
         this.index = index;
     }
 
-    public int getStateTime() {
-        return stateTime;
+    public int getStayTime() {
+        return stayTime;
     }
 
-    public void setStateTime(int stateTime) {
-        this.stateTime = stateTime;
+    public void setStayTime(int stayTime) {
+        this.stayTime = stayTime;
     }
 
     public long getSceneId() {
@@ -223,6 +222,6 @@ public class GwTasksBean implements Parcelable {
 
     @Override
     public String toString() {
-        return "GwTasksBean{" + "index=" + index + ", stateTime=" + stateTime + ", sceneId=" + sceneId + ", sceneName='" + sceneName + '\'' + ", createNew=" + createNew + ", startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins + ", endMins=" + endMins + ", startAllMinuts=" + startAllMinuts + ", endAllMinuts=" + endAllMinuts + ", selectPos=" + selectPos + ", labelId=" + labelId + ", gwMeshAddr=" + gwMeshAddr + ", gwMacAddr='" + gwMacAddr + '\'' + ", timingPeriods=" + timingPeriods + '}';
+        return "GwTasksBean{" + "index=" + index + ", stayTime=" + stayTime + ", sceneId=" + sceneId + ", sceneName='" + sceneName + '\'' + ", createNew=" + createNew + ", startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins + ", endMins=" + endMins + ", startAllMinuts=" + startAllMinuts + ", endAllMinuts=" + endAllMinuts + ", selectPos=" + selectPos + ", labelId=" + labelId + ", gwMeshAddr=" + gwMeshAddr + ", gwMacAddr='" + gwMacAddr + '\'' + ", timingPeriods=" + timingPeriods + '}';
     }
 }

@@ -32,6 +32,9 @@ class DeviceTypeRecycleViewAdapter(layoutResId: Int, data: List<DeviceItem>?) : 
             DeviceType.SMART_RELAY -> {
                 helper.setImageResource(R.id.device_image,R.drawable.icon_acceptor_device)
             }
+            DeviceType.GATE_WAY -> {
+                helper.setImageResource(R.id.device_image,R.drawable.icon_gw_small)
+            }
         }
         }
 }

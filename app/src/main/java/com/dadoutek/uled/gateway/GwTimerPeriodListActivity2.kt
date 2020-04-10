@@ -65,9 +65,9 @@ import kotlin.collections.ArrayList
  */
 class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
+    private var isAddNew: Boolean = false
     private var launch: Job? = null
     private var indexAll: Int = 0
-    private var linAdd: View? = null
     private var receviedCount: Int = 0
     private var timeListTp: MutableList<GwTimePeriodsBean>? = null
     private var gwTagBean: GwTagBean? = null
@@ -86,7 +86,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private var timesNowList: ArrayList<GwTimePeriodsBean> = ArrayList()
     private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene2, timesNowList)
     private val requestCodes: Int = 1000
-    private var selectPosition: Int = 0
+    private var selectPosition: Int = 1000
     @RequiresApi(Build.VERSION_CODES.O)
     override fun performed(event: Event<String>?) {
         if (event is DeviceEvent) {
@@ -168,6 +168,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         }
         adapter.setOnItemClickListener { _, _, position ->
             selectPosition = position
+            isAddNew = false
             startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
         }
     }
@@ -181,25 +182,29 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             if (scene != null) {
                 isHaveLastOne = true
 
-                //adapter.notifyDataSetChanged()
+                if (isAddNew && timesList.size > 0) {//如果是冲洗创建
+                    val periodsBean = timesList[0]
+                    timesNowList.add(periodsBean)
+                    timesList.remove(periodsBean)
 
+                    if (timesList.size <= 0 || timesNowList.size >= 20)
+                        add_group_btn?.visibility = View.GONE
+                    else
+                        add_group_btn?.visibility = View.VISIBLE
 
-                val periodsBean = timesList[0]
-                timesNowList.add(periodsBean)
-                timesList.remove(periodsBean)
+                    val size = if (timesNowList.size > 0)
+                        timesNowList.size - 1
+                    else
+                        0
+                    timesNowList[size].sceneName = scene!!.name
+                    timesNowList[size].sceneId = scene!!.id
+                    timesNowList[size].standingTime = tasksBean?.stayTime ?: 0
+                } else {
+                    timesNowList[selectPosition].sceneName = scene!!.name
+                    timesNowList[selectPosition].sceneId = scene!!.id
+                    timesNowList[selectPosition].standingTime = tasksBean?.stayTime ?: 0
+                }
 
-                if (timesList.size <= 0 || timesNowList.size >= 20)
-                    linAdd?.visibility = View.GONE
-                else
-                    linAdd?.visibility = View.VISIBLE
-
-                val size = if (timesNowList.size>0)
-                    timesNowList.size-1
-                else
-                    0
-                timesNowList[size].sceneName = scene!!.name
-                timesNowList[size].sceneId = scene!!.id
-                timesNowList[size].standingTime = tasksBean?.stateTime?:0
                 adapter.notifyDataSetChanged()
             }
         }
@@ -213,7 +218,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         val tpList = tasksBean?.timingPeriods//ArrayList<GwTimePeriodsBean>
         tpList?.let {
             tpList.forEach { it1 ->
-                it1.standingTime = tasksBean?.stateTime ?: 0
+                it1.standingTime = tasksBean?.stayTime ?: 0
             }
             timesNowList.addAll(it)
             var num = 0 until timesNowList.size
@@ -223,9 +228,9 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                     timesList.removeAt(i)
 
             if (timesList.size > 0 || timesNowList.size < 20) {
-                linAdd?.visibility = View.VISIBLE
+                add_group_btn?.visibility = View.VISIBLE
             } else {
-                linAdd?.visibility = View.GONE
+                add_group_btn?.visibility = View.GONE
             }
         }
 
@@ -242,10 +247,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         // linAdd = View.inflate(this, R.layout.template_bottom_add_no_line, null)
         //     val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)
         add_group_btn?.setOnClickListener {
-            selectPosition = if (timesNowList.size > 0)
-                timesNowList.size - 1
-            else
-                0
+            isAddNew = true
             startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
         }
         add_group_btn_tv?.text = getString(R.string.add_times)
@@ -262,7 +264,10 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         receviedCount = 0
 
         val size = if (timeListTp != null) timeListTp!!.size else 1
-        setTimerDelay(size * 300L)
+        if (size * 300L < 7500) {
+            setTimerDelay(7500L)
+        } else
+            setTimerDelay(size * 300L)
         showLoadingDialog(getString(R.string.please_wait))
 
         val listOf: MutableList<ByteArray> = arrayListOf()
@@ -283,19 +288,21 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                         var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
                                 tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour ?: 0).toByte(),
                                 (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte(), 0)
                         os.write(labHeadPar)
                         listOf.add(labHeadPar)
 
                         if (i == it.size - 1) {
-                            setTimerDelay(6500L)
+//                            LogUtils.v("zcl-----------发送到服务器时间段小时间命令-------$os")
+                            setTimerDelay(7500L)
                             val byteArray = os.toByteArray()
 
                             val encoder = Base64.getEncoder()
                             val s = encoder.encodeToString(byteArray)
                             val gattBody = GwGattBody()
+                            //
                             gattBody.data = s
                             gattBody.ser_id = Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
                             gattBody.macAddr = gwTagBean!!.macAddr
@@ -307,7 +314,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                         LogUtils.v("zcl-----------发送次数-------$sendK")
 
                         var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
-                                tasksBean!!.stateTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
+                                tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
                                 ?: 0).toByte(), (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
 
@@ -355,6 +362,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
+                LogUtils.v("zcl-----------发送到服务器-------循环时间段标签头$labHeadPar")
                 val encoder = Base64.getEncoder()
                 val s = encoder.encodeToString(labHeadPar)
                 val gattBody = GwGattBody()
@@ -406,7 +414,10 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             }
             Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME -> {
                 hideLoadingDialog()
-                receviceSuceessTaskSmallTimes()
+                tasksBean?.timingPeriods = timesNowList
+                intent.putExtra("data", tasksBean)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
             }
         }
     }
@@ -419,12 +430,12 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private fun getTimerPeriods() {
         //  var minutes = tasksBean?.endAllMinuts ?: 0 - tasksBean?.startAllMinuts!!
         //        indexAll = minutes / (tasksBean?.stateTime ?: 0)
-        if (tasksBean?.stateTime != 0) {
+        if (tasksBean?.stayTime != 0) {
             timesList.clear()
             var index = 0
             val startTime = (tasksBean?.startHour ?: 0) * 60 + (tasksBean?.startMins ?: 0)
             val endTime = (tasksBean?.endHour ?: 0) * 60 + (tasksBean?.endMins ?: 0)
-            val standingNum = tasksBean?.stateTime ?: 0
+            val standingNum = tasksBean?.stayTime ?: 0
 
             for (time in startTime..endTime step standingNum) {
                 val i = endTime - time //判断还剩时间用于判断是不是最后一个
@@ -432,7 +443,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
                     var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.select_scene))
-                    bean.standingTime = tasksBean?.stateTime ?: 0
+                    bean.standingTime = tasksBean?.stayTime ?: 0
                     timesList.add(bean)
                     break
                 } else if (endTime - time >= standingNum) {

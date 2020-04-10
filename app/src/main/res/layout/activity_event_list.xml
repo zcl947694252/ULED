@@ -6,13 +6,13 @@
 
     <include layout="@layout/toolbar" />
 
-    <RadioGroup
+    <LinearLayout
             android:id="@+id/event_mode_gp"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_50"
             android:orientation="horizontal">
 
-        <RadioButton
+        <TextView
                 android:id="@+id/event_timer_mode"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/gray_e" />
 
-        <RadioButton
+        <TextView
                 android:id="@+id/event_time_pattern_mode"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -38,7 +38,7 @@
                 android:text="@string/time_pattern_mode"
                 android:textColor="@color/gray9"
                 android:textSize="18sp" />
-    </RadioGroup>
+    </LinearLayout>
 
     <View
             android:layout_width="match_parent"
@@ -51,16 +51,28 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-
-        <include
-                layout="@layout/template_swipe_recycleview"
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1">
+
+
+            <include
+                    layout="@layout/template_swipe_recycleview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                    android:id="@+id/swipe_recycleView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/color_c8"
+                    android:visibility="gone"/>
+        </RelativeLayout>
 
         <include layout="@layout/template_bottom_add_no_line" />
 
-    <include layout="@layout/bottom_version_ly" />
+        <include layout="@layout/bottom_version_ly" />
 
-</LinearLayout>
+    </LinearLayout>
 </LinearLayout>

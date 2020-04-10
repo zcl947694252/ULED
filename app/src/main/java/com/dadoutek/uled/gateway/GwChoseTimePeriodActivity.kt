@@ -175,7 +175,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                 tasksBean?.startAllMinuts = startTimeNum
                 tasksBean?.endAllMinuts = endTimeNum
                 //tasksBean?.timingPeriods =timesList
-                tasksBean?.stateTime = standingNum
+                tasksBean?.stayTime = standingNum
                 //val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity::class.java)
                 val intent = Intent(this@GwChoseTimePeriodActivity, GwTimerPeriodListActivity2::class.java)
                 intent.putExtra("data", tasksBean)
@@ -217,10 +217,9 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun isRepeatTime(): Boolean {
         var isRepeatTime = false
         for (task in data) {//开始时间不能再他的开始时间与结束时间之间 ,结束时间再他之间
-            if (task.startAllMinuts == 0 || task.endAllMinuts == 0) {
                 task.startAllMinuts = task.startHour * 60 + task.startMins
                 task.endAllMinuts = task.endHour * 60 + task.endMins
-            }
+
             if ((startTimeNum >= task.startAllMinuts && startTimeNum < task.endAllMinuts)
                     || (endTimeNum >= task.startAllMinuts && endTimeNum <= task.endAllMinuts))
                 isRepeatTime = true
@@ -277,7 +276,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             } else if (requestCode == requestStandingCode) {//获取停留时间
                 standingNum = data!!.getIntExtra("data", 0)
                 gw_times_standing_time.text = standingNum.toString()
-                tasksBean?.stateTime = standingNum
+                tasksBean?.stayTime = standingNum
             }
         }
     }

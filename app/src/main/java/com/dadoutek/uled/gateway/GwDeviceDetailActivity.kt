@@ -12,10 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -61,6 +58,10 @@ import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -453,11 +454,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_SWITCH, it.meshAddr, labHeadPar, "1")
                 gateWayDataList.forEach { it1 ->
                     if (it1.id == it.id) {
-                        it1.openTag = if (it.openTag == 0){
+                        it1.openTag = if (it.openTag == 0) {
                             it.icon = R.drawable.icon_gw_open
                             1
-                        }
-                        else{
+                        } else {
                             it.icon = R.drawable.icon_gw_open
                             0
                         }
@@ -465,19 +465,17 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 }
 
                 adaper!!.notifyDataSetChanged()
-         /*       it.openTag = if (it.openTag == 0)
-                    1
-                else
-                    0
-                it.updateIcon()*/
-               // DBUtils.saveGateWay(it, false)
+                /*       it.openTag = if (it.openTag == 0)
+                           1
+                       else
+                           0
+                       it.updateIcon()*/
+                // DBUtils.saveGateWay(it, false)
 
 
             } else {
                 disposableTimer?.dispose()
                 disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
-
-                    showLoadingDialog(getString(R.string.gate_way_switch_fail))
                 }
 
                 var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
@@ -485,6 +483,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 else
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
+                LogUtils.v("zcl-----------发送到服务器开关网关-------$labHeadPar")
                 val encoder = Base64.getEncoder()
                 val s = encoder.encodeToString(labHeadPar)
                 val gattBody = GwGattBody()
@@ -564,8 +563,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
 
         reConfig.setOnClickListener {
-            connectGw(0)//重新配置
-            //connectService()
+            if (toolbar.title == "蓝牙")
+                connectGw(0)//重新配置
+            else
+                connectService()
         }
 
         rename.setOnClickListener {
@@ -774,9 +775,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         GwModel.deleteGwList(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
                 LogUtils.v("zcl-----网关删除成功返回-------------$t")
-                Toast.makeText(this@GwDeviceDetailActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                notifyData()
-                hideLoadingDialog()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(10000)
+                    notifyData()
+                    Toast.makeText(this@GwDeviceDetailActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                    hideLoadingDialog()
+                }
             }
 
             override fun onError(e: Throwable) {
@@ -901,6 +905,14 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
         }
         toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbar.title = "蓝牙"
+        toolbar.setOnClickListener {
+            if (toolbar.title == "蓝牙")
+                toolbar.title = "服务器"
+            else
+                toolbar.title = "蓝牙"
+        }
+
     }
 
 
@@ -929,6 +941,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     override fun receviedGwCmd2000(ser_id: String) {
+
         if (GW_GATT_SWITCH == ser_id?.toInt()) {
             currentGw?.openTag = if (currentGw?.openTag == 0) 1 else 0
             currentGw?.icon = if (currentGw?.openTag == 0) R.drawable.icon_gw_close else R.drawable.icon_gw_open
@@ -1000,7 +1013,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                         hidePopupMenu()
                     }
                 }.start()
-            } else if (dialog_pop == null) {
+            } else if (dialog_relay == null) {
                 hidePopupMenu()
             }
         }

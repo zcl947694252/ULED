@@ -49,16 +49,14 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.toast
 
 /**
  * 登录界面 输入密码
  */
 class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
+    private var launch: Job? = null
     private var itemAdapter: RegionDialogAdapter? = null
     private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
     private var popConfirm: TextView? = null
@@ -486,7 +484,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                GlobalScope.launch(Dispatchers.Main) {
+                launch?.cancel()
+                 launch = GlobalScope.launch(Dispatchers.Main) {
                     loadDialog!!.show()
                 }
             }
@@ -494,7 +493,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     }
 
     fun hideLoadingDialog() {
-        GlobalScope.launch(Dispatchers.Main) {
+        launch?.cancel()
+         launch = GlobalScope.launch(Dispatchers.Main) {
             if (loadDialog != null && this.isActive && isRunning) {
                 loadDialog!!.dismiss()
             }
@@ -505,6 +505,11 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     override fun onStop() {
         super.onStop()
         isRunning = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        launch?.cancel()
     }
 
 }
