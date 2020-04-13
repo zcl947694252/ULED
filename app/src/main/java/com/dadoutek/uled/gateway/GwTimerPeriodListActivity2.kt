@@ -122,14 +122,13 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
     override fun onPause() {
         super.onPause()
-        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+        TelinkLightApplication.getApp().removeEventListeners()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun receviceSuceessTaskSmallTimes() {
         disposableTimer?.dispose()
         receviedCount++
-        LogUtils.v("zcl-----------收到发送次数-------$receviedCount-----${timeListTp!!.size}-----${System.currentTimeMillis()}")
         launch?.cancel()
         launch = GlobalScope.launch(Dispatchers.Main) {
             delay(timeListTp!!.size * 200L)
@@ -169,6 +168,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         adapter.setOnItemClickListener { _, _, position ->
             selectPosition = position
             isAddNew = false
+
             startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
         }
     }
@@ -178,34 +178,35 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
             val par = data!!.getParcelableExtra<Parcelable>("data")
             scene = par as DbScene
-            LogUtils.v("zcl获取场景信息scene" + scene.toString())
-            if (scene != null) {
-                isHaveLastOne = true
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(200)
+                LogUtils.v("zcl获取场景信息scene" + scene.toString())
+                if (scene != null) {
+                    if (isAddNew && timesList.size > 0) {//如果是冲洗创建
+                        val periodsBean = timesList[0]
+                        timesNowList.add(periodsBean)
+                        timesList.remove(periodsBean)
 
-                if (isAddNew && timesList.size > 0) {//如果是冲洗创建
-                    val periodsBean = timesList[0]
-                    timesNowList.add(periodsBean)
-                    timesList.remove(periodsBean)
+                        if (timesList.size <= 0 || timesNowList.size >= 20)
+                            add_group_btn?.visibility = View.GONE
+                        else
+                            add_group_btn?.visibility = View.VISIBLE
 
-                    if (timesList.size <= 0 || timesNowList.size >= 20)
-                        add_group_btn?.visibility = View.GONE
-                    else
-                        add_group_btn?.visibility = View.VISIBLE
+                        val size = if (timesNowList.size > 0)
+                            timesNowList.size - 1
+                        else
+                            0
+                        timesNowList[size].sceneName = scene!!.name
+                        timesNowList[size].sceneId = scene!!.id
+                        timesNowList[size].standingTime = tasksBean?.stayTime ?: 0
+                    } else {
+                        timesNowList[selectPosition].sceneName = scene!!.name
+                        timesNowList[selectPosition].sceneId = scene!!.id
+                        timesNowList[selectPosition].standingTime = tasksBean?.stayTime ?: 0
+                    }
 
-                    val size = if (timesNowList.size > 0)
-                        timesNowList.size - 1
-                    else
-                        0
-                    timesNowList[size].sceneName = scene!!.name
-                    timesNowList[size].sceneId = scene!!.id
-                    timesNowList[size].standingTime = tasksBean?.stayTime ?: 0
-                } else {
-                    timesNowList[selectPosition].sceneName = scene!!.name
-                    timesNowList[selectPosition].sceneId = scene!!.id
-                    timesNowList[selectPosition].standingTime = tasksBean?.stayTime ?: 0
+                    adapter.notifyDataSetChanged()
                 }
-
-                adapter.notifyDataSetChanged()
             }
         }
     }
@@ -248,7 +249,10 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         //     val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)
         add_group_btn?.setOnClickListener {
             isAddNew = true
-            startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(200)
+                startActivityForResult(Intent(this@GwTimerPeriodListActivity2, SelectSceneListActivity::class.java), requestCodes)
+            }
         }
         add_group_btn_tv?.text = getString(R.string.add_times)
         //adapter.addFooterView(linAdd)
@@ -302,11 +306,11 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                             val encoder = Base64.getEncoder()
                             val s = encoder.encodeToString(byteArray)
                             val gattBody = GwGattBody()
-                            //
+
                             gattBody.data = s
                             gattBody.ser_id = Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
                             gattBody.macAddr = gwTagBean!!.macAddr
-                            gattBody.tagHead = 1
+                            gattBody.tagName = gwTagBean?.tagName
                             sendToServer(gattBody)
                         }
                     } else {
@@ -333,7 +337,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribe {
                     hideLoadingDialog()
-                    ToastUtils.showLong(getString(R.string.config_gate_way_tp_task_fail))
+                   runOnUiThread {  ToastUtils.showLong(getString(R.string.config_gate_way_tp_task_fail)) }
                 }
     }
 
@@ -369,7 +373,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD
                 gattBody.macAddr = gwTagBean?.macAddr
-                gattBody.tagHead = 1
+                gattBody.tagName = gwTagBean?.tagName
                 sendToServer(gattBody)
             } else {
                 setHeadTimerDelay(1500L)

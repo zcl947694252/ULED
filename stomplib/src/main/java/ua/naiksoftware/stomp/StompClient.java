@@ -28,6 +28,8 @@ import ua.naiksoftware.stomp.dto.StompHeader;
 
 /**
  * Created by naik on 05.05.16.
+ * <p>
+ * 更改长连接传递参数id common_cmd
  */
 public class StompClient {
 
@@ -99,12 +101,12 @@ public class StompClient {
      */
     public void connect(@Nullable List<StompHeader> _headers) {
 
-//        Log.d(TAG, "Connect");
+        //        Log.d(TAG, "Connect");
 
         this.headers = _headers;
 
         if (isConnected()) {
-//            Log.d(TAG, "Already connected, ignore");
+            //            Log.d(TAG, "Already connected, ignore");
             return;
         }
         lifecycleDisposable = connectionProvider.lifecycle()
@@ -116,22 +118,25 @@ public class StompClient {
                             headers.add(new StompHeader(StompHeader.HEART_BEAT,
                                     heartBeatTask.getClientHeartbeat() + "," + heartBeatTask.getServerHeartbeat()));
 
-                            if (_headers != null) headers.addAll(_headers);
+                            if (_headers != null)
+                                headers.addAll(_headers);
 
-                            connectionProvider.send(new StompMessage(StompCommand.CONNECT, headers, null).compile(legacyWhitespace))
+                            connectionProvider.send(new StompMessage(StompCommand.CONNECT,
+                                    headers, null).compile(legacyWhitespace))
                                     .subscribe(() -> {
-//                                        Log.d(TAG, "Publish open");
+                                        //                                        Log.d(TAG,
+                                        //                                        "Publish open");
                                         lifecyclePublishSubject.onNext(lifecycleEvent);
-                                    },throwable -> {});
+                                    }, throwable -> {});
                             break;
 
                         case CLOSED:
-//                            Log.d(TAG, "Socket closed");
+                            //                            Log.d(TAG, "Socket closed");
                             disconnect();
                             break;
 
                         case ERROR:
-//                            Log.d(TAG, "Socket closed with error");
+                            //                            Log.d(TAG, "Socket closed with error");
                             lifecyclePublishSubject.onNext(lifecycleEvent);
                             break;
                     }
@@ -146,7 +151,8 @@ public class StompClient {
                 .subscribe(stompMessage -> {
                     getConnectionStream().onNext(true);
                 }, throwable -> {
-                   // Log.e("zcl","zcl** stomp****"+throwable.getLocalizedMessage()+"================"+throwable.getStackTrace());
+                    // Log.e("zcl","zcl** stomp****"+throwable.getLocalizedMessage()
+                    // +"================"+throwable.getStackTrace());
                 });
 
     }
@@ -195,13 +201,14 @@ public class StompClient {
         headers.add(new StompHeader(StompHeader.DESTINATION, destPath));
         headers.add(new StompHeader(StompHeader.ACK, INITIATIVE_ACK));
         StompMessage stompMessage = new StompMessage(StompCommand.SEND,
-                Collections.singletonList(new StompHeader(StompHeader.DESTINATION, destPath)), null);
+                Collections.singletonList(new StompHeader(StompHeader.DESTINATION, destPath)),
+                null);
 
         Completable completable = connectionProvider.send(stompMessage.compile(legacyWhitespace));
         CompletableSource connectionComplete = getConnectionStream()
                 .filter(isConnected -> isConnected)
                 .firstElement().ignoreElement();
-         completable.startWith(connectionComplete).onErrorComplete()
+        completable.startWith(connectionComplete).onErrorComplete()
                 .subscribe();
     }
 
@@ -249,7 +256,7 @@ public class StompClient {
 
         return connectionProvider.disconnect()
                 .doFinally(() -> {
-//                    Log.d(TAG, "Stomp disconnected");
+                    //                    Log.d(TAG, "Stomp disconnected");
                     getConnectionStream().onComplete();
                     getMessageStream().onComplete();
                     lifecyclePublishSubject.onNext(new LifecycleEvent(LifecycleEvent.Type.CLOSED));
@@ -274,10 +281,12 @@ public class StompClient {
         return streamMap.get(destPath);
     }
 
-    private Completable subscribePath(String destinationPath, @Nullable List<StompHeader> headerList) {
+    private Completable subscribePath(String destinationPath,
+                                      @Nullable List<StompHeader> headerList) {
         String topicId = UUID.randomUUID().toString();
 
-        if (topics == null) topics = new ConcurrentHashMap<>();
+        if (topics == null)
+            topics = new ConcurrentHashMap<>();
 
         // Only continue if we don't already have a subscription to the topic
         if (topics.containsKey(destinationPath)) {
@@ -285,12 +294,25 @@ public class StompClient {
             return Completable.complete();
         }
 
+        String value = null;
+        for (int i = 0; i < headerList.size(); i++) {
+            StompHeader stompHeader = headerList.get(i);
+            if (stompHeader.getKey().equals("id")) {
+                value = stompHeader.getValue();
+            }
+        }
+
         topics.put(destinationPath, topicId);
         List<StompHeader> headers = new ArrayList<>();
-        headers.add(new StompHeader(StompHeader.ID, topicId));
+        if (value != null)
+            headers.add(new StompHeader(StompHeader.ID, value));
+        else
+            headers.add(new StompHeader(StompHeader.ID, topicId));
+
         headers.add(new StompHeader(StompHeader.DESTINATION, destinationPath));
         headers.add(new StompHeader(StompHeader.ACK, DEFAULT_ACK));
-        if (headerList != null) headers.addAll(headerList);
+        if (headerList != null)
+            headers.addAll(headerList);
         return send(new StompMessage(StompCommand.SUBSCRIBE,
                 headers, null));
     }
@@ -302,7 +324,7 @@ public class StompClient {
         String topicId = topics.get(dest);
         topics.remove(dest);
 
-//        Log.d(TAG, "Unsubscribe path: " + dest + " id: " + topicId);
+        //        Log.d(TAG, "Unsubscribe path: " + dest + " id: " + topicId);
 
         return send(new StompMessage(StompCommand.UNSUBSCRIBE,
                 Collections.singletonList(new StompHeader(StompHeader.ID, topicId)), null)).onErrorComplete();
@@ -314,7 +336,8 @@ public class StompClient {
      * Right now, the only options are simple, rmq supported.
      * But you can write you own matcher by implementing {@link PathMatcher}
      * <p>
-     * When set to {@link ua.naiksoftware.stomp.pathmatcher.RabbitPathMatcher}, topic subscription allows for RMQ-style wildcards.
+     * When set to {@link ua.naiksoftware.stomp.pathmatcher.RabbitPathMatcher}, topic
+     * subscription allows for RMQ-style wildcards.
      * <p>
      *
      * @param pathMatcher Set to {@link SimplePathMatcher} by default
@@ -336,7 +359,8 @@ public class StompClient {
      * Default: Body^@
      *
      * @param legacyWhitespace whether to append an extra two newlines
-     * @see <a href="http://stomp.github.io/stomp-specification-1.2.html#STOMP_Frames">The STOMP spec</a>
+     * @see
+     * <a href="http://stomp.github.io/stomp-specification-1.2.html#STOMP_Frames">The STOMP spec</a>
      */
     public void setLegacyWhitespace(boolean legacyWhitespace) {
         this.legacyWhitespace = legacyWhitespace;

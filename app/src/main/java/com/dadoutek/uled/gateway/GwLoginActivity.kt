@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -108,6 +110,17 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
                 when {
+                    event.args.status ==  LightAdapter.STATUS_LOGIN -> {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                        Log.e("zcl", "zcl***STATUS_LOGIN***")
+                    }
+                    event.args.status ==   LightAdapter.STATUS_LOGOUT -> {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                        Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
+                        ToastUtils.showShort(getString(R.string.connecting_tip))
+                          connect(macAddress = dbGw?.macAddr, retryTimes = 10)
+                                ?.subscribe({}, { LogUtils.d("connect failed") })
+                    }
                     //获取设备mac
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         //mac信息获取成功
@@ -159,7 +172,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                   runOnUiThread {  ToastUtils.showLong(getString(R.string.config_WIFI_FAILE)) }
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()

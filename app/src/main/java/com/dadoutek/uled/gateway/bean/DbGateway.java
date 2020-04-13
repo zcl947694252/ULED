@@ -25,7 +25,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * "firmwareVersion": "gateway-1.0.0",
  * "tags": "[{
  * \"id\": 1,
- * \"tagName\": \"标签名\",
+ * \"macAddr\": \"标签名\",
  * \"status\": 0,
  * ...
  * },
@@ -52,11 +52,11 @@ public class DbGateway implements Parcelable {
     private int belongRegionId;
     private int pos;
     private int uid;
-    private String tags;
-    private String timePeriodTags;
+    private String tags = "";
+    private String timePeriodTags = "";
     private int addTag = 0;//0 添加新的tag 1编辑已有tag
     private int state = 1; //1代表在线 0代表离线
-    private int openTag =1; //1代表开 0代表关
+    private int openTag = 1; //1代表开 0代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_gw_open;//灯状态显示图
@@ -88,7 +88,10 @@ public class DbGateway implements Parcelable {
 
 
     @Generated(hash = 874974623)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, int openTag) {
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr,
+                     int type, int productUUID, String version, int belongRegionId, int pos,
+                     int uid, String tags, String timePeriodTags, int addTag, int state,
+                     int openTag) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;

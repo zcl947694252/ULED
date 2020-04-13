@@ -52,7 +52,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
-import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -137,10 +136,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     }
 
     @SuppressLint("SetTextI18n")
-    fun initData() {
-        //創建新tag任务
+    fun initData() {//創建新tag任务
         dbGw = intent.getParcelableExtra<DbGateway>("data")
-
         if (dbGw != null) {//拿到有效数据
             currentTagStr = if (dbGw?.type == 0) //定时
                 dbGw?.tags
@@ -154,8 +151,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     getMaxTagId()//更新maxid
             }
 
-            tagBean = if (dbGw?.addTag == 0) {//是否是添加新tag
-                //创建新的tag
+            tagBean = if (dbGw?.addTag == 0) {//是否是添加新tag 0创建新的tag 1编辑已有tag
                 GwTagBean((maxId + 1), getString(R.string.tag1), getString(R.string.only_one), getWeek(getString(R.string.only_one)))
             } else {//编辑已有tag
                 if (tagList.size > 0)
@@ -176,26 +172,43 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         if (tasks != null) {
             val elements = GsonUtil.stringToList(tasks, GwTasksBean::class.java)
             listTask.addAll(elements)
+            listTask.sortBy { it.startHour * 60 + it.startMins }
         }
 
         adapter.notifyDataSetChanged()
 
         gate_way_lable.setText(getString(R.string.label) + tagBean?.tagId)
-      /*  var weekStr = StringBuilder()
+
+        getWeekStr()
+
+
+        gate_way_repete_mode.text = tagBean?.weekStr
+
+        if (tagBean?.getIsTimer() != false)
+            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
+        else
+            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
+    }
+
+    private fun getWeekStr(): StringBuilder {
+        var weekStr = StringBuilder()
         when (tagBean!!.week) {
             0b00000000 -> weekStr.append(getString(R.string.only_one))
-            0b01111111 -> weekStr.append(getString(R.string.every_day))
+            0b10000000 -> weekStr.append(getString(R.string.every_day))
             else -> {
                 var binaryString = Integer.toBinaryString(tagBean!!.week)
+                val length1 = binaryString.length
                 for (z in 0..8)
                     if (binaryString.length < 8)
                         binaryString = "0$binaryString"
-                    else return
+                    else break
                 val length = binaryString.length
-                val intRange = (0 until length).reversed()
+                val intRange = (0 until length)
                 for (i in intRange) {
                     val c = binaryString[i]
-                    if (c.toString() == "1")
+                    if (c.toString() == "1") {
+                        if (i != 0 && i != length1-1)
+                            weekStr.append(",")
                         when (i) {
                             0 -> weekStr.append(getString(R.string.sunday))
                             1 -> weekStr.append(getString(R.string.monday))
@@ -206,45 +219,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                             6 -> weekStr.append(getString(R.string.saturday))
                             7 -> weekStr.append(getString(R.string.every_day))
                         }
+                    }
                 }
             }
-        }*/
-        gate_way_repete_mode.text = tagBean?.weekStr
-
-        if (tagBean?.getIsTimer() != false)
-            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
-        else
-            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
+        }
+        return weekStr
     }
 
-    /**
-     * 16进制转换成为string类型字符串
-     * @param s
-     * @return
-     */
-    fun hexStringToString(s: String?): String? {
-        var s = s
-        if (s == null || s == "") {
-            return null
-        }
-        s = s.replace(" ", "")
-        val baKeyword = ByteArray(s.length / 2)
-        for (i in baKeyword.indices) {
-            try {
-                baKeyword[i] = (0xff and Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16)).toByte()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-        }
-        try {
-            s = String(baKeyword, Charset.forName("UTF-8"))
-        } catch (e1: Exception) {
-            e1.printStackTrace()
-        }
-
-        return s
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(v: View?) {
@@ -337,7 +318,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                             Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
                                 hideLoadingDialog()
                                 disposableTimer?.dispose()
-                                runOnUiThread {  upDataDeleteUi() }
+                                runOnUiThread { upDataDeleteUi() }
 
                             }
 
@@ -406,7 +387,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                     if (connectCount < 3)
                         sendDeleteTask(gwTaskBean)
                     else
-                        ToastUtils.showShort(getString(R.string.delete_gate_way_task_fail))
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.delete_gate_way_task_fail)) }
                 }
     }
 
@@ -436,6 +417,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
+        if (tagBean?.weekStr==null){
+            tagBean?.weekStr= getString(R.string.only_one)
+            tagBean?.week = 0b00000000
+        }
+
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
             tagBean?.let {
                 it.status = 0//修改数据后状态设置成关闭
@@ -450,7 +436,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_SAVE_LABEL_HEAD
                 gattBody.macAddr = dbGw?.macAddr
-                gattBody.tagHead = 1
+                gattBody.tagName = it.tagName
                 sendToServer(gattBody)
             }
         } else {
@@ -525,7 +511,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 return week
             }
             getString(R.string.every_day) -> {
-                week = 0b01111111
+                week = 0b10000000
                 return week
             }
             else -> {
@@ -751,5 +737,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     override fun onDestroy() {
         super.onDestroy()
         disposableTimer?.dispose()
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent()
+        intent.putExtra("data", dbGw)
+        setResult(Activity.RESULT_OK, intent)
+        super.onBackPressed()
     }
 }

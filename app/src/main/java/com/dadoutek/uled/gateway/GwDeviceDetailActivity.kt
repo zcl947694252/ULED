@@ -51,9 +51,7 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -563,10 +561,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
 
         reConfig.setOnClickListener {
-            if (toolbar.title == "蓝牙")
                 connectGw(0)//重新配置
-            else
-                connectService()
         }
 
         rename.setOnClickListener {
@@ -642,6 +637,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun transformView() {
         disableConnectionStatusListener()
+
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == currentGw?.meshAddr) {
             val intent = Intent(this@GwDeviceDetailActivity, OTAUpdateActivity::class.java)
             intent.putExtra(UPDATE_LIGHT, currentGw)
@@ -675,16 +671,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         if (currentGw != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting))
-            disposable?.dispose()
-            disposable = Observable.timer(20, TimeUnit.SECONDS)
-                    .observeOn(Schedulers.io())
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.connect_fail2))
-                    }
             disposableConnect?.dispose()
-            disposableConnect = connect(macAddress = currentGw?.macAddr, retryTimes = 1)?.subscribe({
+            disposableConnect = connect(macAddress = currentGw?.macAddr,connectTimeOutTime = 15L)?.subscribe({
                 disposable?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
                 when (configType) {
@@ -694,7 +682,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     3 -> sendGwResetFactory()
                 }//判断进入那个开关设置界面
             }, {
-                if (configType == 0) {//重新配置为0   现在设置成10防止通过服务器连接
+                hideLoadingDialog()
+                if (configType == 0) {//重新配置为0
                     connectService()
                 } else {
                     ToastUtils.showShort(getString(R.string.connect_fail))
@@ -706,6 +695,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun connectService() {
+        disposable?.dispose()
+        showLoadingDialog(getString(R.string.please_wait))
         TelinkLightApplication.getApp().offLine = false
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
             override fun onNext(t: List<DbGateway>) {
@@ -714,16 +705,16 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     if (db.meshAddr == currentGw!!.meshAddr) {//网关在线状态，1表示在线，0表示离线
                         val b = db.state == 0
                         TelinkLightApplication.getApp().offLine = b
-                        if (!b) {
-                            TelinkLightApplication.getApp().isConnectGwBle = false
-                            val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-                            intent.putExtra("data", currentGw)
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            ToastUtils.showShort(getString(R.string.gw_not_online))
-                        }
                     }
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    TelinkLightApplication.getApp().isConnectGwBle = false
+                    val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
+                    intent.putExtra("data", currentGw)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
             }
 
@@ -737,8 +728,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun sendGwResetFactory() {
         var labHeadPar = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr
-                ?: 0, labHeadPar, "1")
+        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr ?: 0, labHeadPar, "1")
     }
 
     override fun performed(event: Event<String>?) {
@@ -756,7 +746,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                         if (deviceInfo.gwVoipState == GW_RESET_VOIP) {
                             LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                             isRestSuccess = true
-                            deleteGwData()
+                            deleteGwData(isRestSuccess)
                         }
                     }
                 }
@@ -764,7 +754,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
     }
 
-    private fun deleteGwData() {
+    private fun deleteGwData(restSuccess: Boolean = false) {
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentGw!!.meshAddr))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
 
@@ -776,7 +766,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             override fun onNext(t: String) {
                 LogUtils.v("zcl-----网关删除成功返回-------------$t")
                 GlobalScope.launch(Dispatchers.Main) {
-                    delay(10000)
+                    if (restSuccess)
+                        delay(10000)
                     notifyData()
                     Toast.makeText(this@GwDeviceDetailActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                     hideLoadingDialog()
@@ -905,14 +896,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
         }
         toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
-        toolbar.title = "蓝牙"
-        toolbar.setOnClickListener {
-            if (toolbar.title == "蓝牙")
-                toolbar.title = "服务器"
-            else
-                toolbar.title = "蓝牙"
-        }
-
     }
 
 
@@ -934,6 +917,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     override fun onDestroy() {
         super.onDestroy()
         disposableAll()
+
         canBeRefresh = false
         acitivityIsAlive = false
         installDialog?.dismiss()

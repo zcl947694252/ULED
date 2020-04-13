@@ -262,7 +262,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                             gattBody.data = s
                             gattBody.ser_id = Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
                             gattBody.macAddr = gwTagBean!!.macAddr
-                            gattBody.tagHead = 1
+                            gattBody.tagName = gwTagBean?.tagName
                             sendToServer(gattBody)
                         }
                     } else {
@@ -289,7 +289,8 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribe {
                     hideLoadingDialog()
-                    ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail))
+                    runOnUiThread { ToastUtils.showLong(getString(R.string.config_gate_way_t_task_fail)) }
+
                 }
     }
 
@@ -324,7 +325,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD
                 gattBody.macAddr = gwTagBean?.macAddr
-                gattBody.tagHead = 1
+                gattBody.tagName = gwTagBean?.tagName
                 sendToServer(gattBody)
             } else {
                 setHeadTimerDelay(1500L)

@@ -66,14 +66,14 @@
                 android:gravity="center_vertical|end"
                 android:text="@string/edit"
                 android:textColor="@color/black_three"
-                android:textSize="15sp" />
+                android:textSize="12sp"/>
 
         <ImageView
                 android:id="@+id/gate_way_repete_mode_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/dp_10"
-                android:src="@drawable/arrow_r" />
+                android:src="@drawable/arrow_r"/>
     </LinearLayout>
 
     <View

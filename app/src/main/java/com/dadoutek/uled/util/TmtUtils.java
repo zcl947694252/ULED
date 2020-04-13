@@ -22,12 +22,14 @@ public class TmtUtils {
     static Toast toast;
 
     public static void midToast(Context context, String str) {
-        toast = Toast.makeText(context, str, Toast.LENGTH_SHORT);
-        if (toast != null) {
+        if (toast == null) {
+            toast = Toast.makeText(context, str, Toast.LENGTH_SHORT);
             toast.setText(str);
             toast.setGravity(Gravity.CENTER, 0, 0);  //设置显示位置
             TextView v = toast.getView().findViewById(android.R.id.message);
             v.setTextColor(context.getResources().getColor(R.color.blue_background));     //设置字体颜色
+        } else {
+            toast.setText(str);
         }
         toast.show();
     }
@@ -63,7 +65,9 @@ public class TmtUtils {
             LinearLayout view = (LinearLayout) toast.getView();
             view.setOrientation(LinearLayout.VERTICAL);
             //view.setGravity(Gravity.HORIZONTAL_GRAVITY_MASK);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams lp =
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
             //此处相当于布局文件中的Android:layout_gravity属性
             lp.gravity = Gravity.CENTER;
             view.setLayoutParams(lp);

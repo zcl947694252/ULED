@@ -69,6 +69,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemChildClickListener {
+    private lateinit var currentGwTag: GwTagBean
     private var addBtn2: Button? = null
     private var deleteBean: GwTagBean? = null
     private var connectCount: Int = 0
@@ -140,23 +141,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                     }
                     event.args.status == LightAdapter.STATUS_LOGOUT -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        connect(macAddress = dbGw!!.macAddr, retryTimes = 2)?.subscribe(
-                                object : NetworkObserver<DeviceInfo?>() {
-                                    override fun onNext(t: DeviceInfo) {
-                                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.config_success))
-                                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                                    }
-
-                                    override fun onError(e: Throwable) {
-                                        super.onError(e)
-                                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
-                                        var intent = Intent(this@GwEventListActivity, GwDeviceDetailActivity::class.java)
-                                        startActivity(intent)
-                                        DBUtils.saveGateWay(dbGw!!, true)
-                                        finish()
-                                    }
-                                }
-                        )
+                        retryConnect()
                     }
                     event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
@@ -185,6 +170,26 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                 }
             }
         }
+    }
+
+    private fun retryConnect() {
+        connect(macAddress = dbGw!!.macAddr, fastestMode = true)?.subscribe(
+                object : NetworkObserver<DeviceInfo?>() {
+                    override fun onNext(t: DeviceInfo) {
+                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.config_success))
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
+                        var intent = Intent(this@GwEventListActivity, GwDeviceDetailActivity::class.java)
+                        startActivity(intent)
+                        DBUtils.saveGateWay(dbGw!!, true)
+                        finish()
+                    }
+                }
+        )
     }
 
     private fun deleteSuceess() {
@@ -222,7 +227,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
-                    ToastUtils.showLong(getString(R.string.get_time_zone_fail))
+                    runOnUiThread { ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
                     intent = Intent(this, GwDeviceDetailActivity::class.java)
                     startActivity(intent)
                     DBUtils.saveGateWay(dbGw!!, true)
@@ -282,7 +287,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             })
         }
         bottom_version_number.text = dbGw?.version
-        dbGw?.type = 0
 
         toolbarTv.text = getString(R.string.device_name) + dbGw?.name
 
@@ -311,7 +315,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
 
 
         getNewData()
-
+        dbGw?.type = 0
         if (TelinkLightApplication.getApp().isConnectGwBle)//直连发送时区 不是直连不发
             sendTimeZoneParmars()
     }
@@ -321,9 +325,11 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         listTwo.clear()
         if (!TextUtils.isEmpty(dbGw?.tags)) {
             val elements = GsonUtil.stringToList(dbGw?.tags, GwTagBean::class.java)
-            listOne.sortBy { gwTagBean -> gwTagBean.tagId }
             listOne.addAll(elements)
-
+            listOne.sortBy { gwTagBean -> gwTagBean.tagId }
+            listOne.forEach {
+                it.weekStr = getWeekStr(it.week)
+            }
             val list = listOne.filter { it.status == 1 }
             if (list.isNotEmpty()) {
                 changeRecycleView()
@@ -338,14 +344,17 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             val elements = GsonUtil.stringToList(dbGw?.timePeriodTags, GwTagBean::class.java)
             listTwo.addAll(elements)
             listTwo.sortBy { gwTagBean -> gwTagBean.tagId }
+            listTwo.forEach {
+                it.weekStr = getWeekStr(it.week)
+            }
 
             val list = listTwo.filter { it.status == 1 }
 
             if (list.isNotEmpty()) {
                 changeRecycleView()
             }
-            if (dbGw?.type==1){
-             changeRecycleView2()
+            if (dbGw?.type == 1) {
+                changeRecycleView2()
                 isShowAdd(listTwo)
             }
         }
@@ -357,7 +366,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         else
             add_group_btn?.visibility = View.GONE
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
@@ -374,11 +382,13 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         event_timer_mode.setOnClickListener {
             changeRecycleView()
             dbGw?.type = 0///网关模式 0定时 1循环
+            isShowAdd(listOne)
         }
 
         event_time_pattern_mode.setOnClickListener {
             changeRecycleView2()
             dbGw?.type = 1///网关模式 0定时 1循环
+            isShowAdd(listTwo)
         }
 
         adapter.onItemChildClickListener = this
@@ -401,21 +411,20 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                 startActivityForResult(intent, 1000)
             }
             R.id.item_event_switch -> {
-                val dbGwTag: GwTagBean = if (adapter == adapter2)
+                currentGwTag = if (adapter == adapter2)
                     listTwo[position]
                 else
                     listOne[position]
 
                 if ((view as CheckBox).isChecked)
-                    dbGwTag.status = 1
+                    currentGwTag.status = 1
                 else
-                    dbGwTag.status = 0
-
-                if (dbGwTag.status == 1) {//执行开的操作 status; //开1 关0
-                    showLoadingDialog(getString(R.string.please_wait))
-                    isMutexType(dbGwTag, adapter)
+                    currentGwTag.status = 0
+                showLoadingDialog(getString(R.string.please_wait))
+                if (currentGwTag.status == 1) {//执行开的操作 status; //开1 关0
+                    isMutexType(currentGwTag, adapter)
                 } else {
-                    sendOpenOrCloseGw(dbGwTag)
+                    sendOpenOrCloseGw(currentGwTag, false)
                 }
             }
         }
@@ -507,42 +516,50 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         dbGw?.tags = GsonUtils.toJson(listOne)//赋值时一定要转换为gson字符串
         dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)//赋值时一定要转换为gson字符串
         DBUtils.saveGateWay(dbGw!!, true)
-        sendOpenOrCloseGw(dbGwTag)
+        sendOpenOrCloseGw(dbGwTag, true)
     }
 
 
     private fun canOpenTG(currentAllTime: MutableList<GwTimeAndDataBean>, oldList: MutableList<GwTimeAndDataBean>, isTimer: Boolean): Boolean {
         var canOpenTag = true
         currentAllTime.forEach {
-            oldList.forEach { itOld ->
-                if (isTimer) {
-                    if (it.id != itOld.id && it.week == itOld.week && it.startTime == itOld.startTime) {
-                        canOpenTag = false
-                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.tag_mutex, itOld.name))
-                        updateBackStatus()
-                        return@forEach
-                    }
-                } else {
-                    if (it.id != itOld.id && it.week == itOld.week) {
-                        if ((it.startTime < itOld.endTime && it.startTime >= itOld.startTime) || (it.endTime <= itOld.endTime && it.endTime < itOld.startTime))
+            if (canOpenTag)
+                oldList.forEach { itOld ->
+                    if (isTimer) {
+                        if (it.id != itOld.id && it.week == itOld.week && it.startTime == itOld.startTime) {
                             canOpenTag = false
-                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.tag_mutex, itOld.name))
-
-                        updateBackStatus()
-                        return@forEach
+                            TmtUtils.midToast(this@GwEventListActivity, getString(R.string.tag_mutex, itOld.name))
+                            updateBackStatus(true)
+                            return@forEach
+                        }
+                    } else {
+                        if (it.id != itOld.id && it.week == itOld.week) {
+                            if ((it.startTime < itOld.endTime && it.startTime >= itOld.startTime) || (it.endTime >= itOld.endTime && it.endTime <= itOld.startTime)) {
+                                canOpenTag = false
+                                TmtUtils.midToast(this@GwEventListActivity, getString(R.string.tag_mutex, itOld.name))
+                                updateBackStatus(true)
+                                return@forEach
+                            }
+                        }
                     }
                 }
-            }
         }
         return canOpenTag
     }
 
-    private fun updateBackStatus() {
+    private fun updateBackStatus(isMutex: Boolean) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (dbGw?.type == 0)
-                listOne[dbGw?.pos ?: 0].status = 0
-            else
-                listTwo[dbGw?.pos ?: 0].status = 0
+            if (isMutex) {
+                if (dbGw?.type == 0)
+                    listOne[dbGw?.pos ?: 0].status = 0
+                else
+                    listTwo[dbGw?.pos ?: 0].status = 0
+            } else {
+                if (currentGwTag.status == 0)
+                    currentGwTag.status = 1
+                else
+                    currentGwTag.status = 0
+            }
 
             adapter.notifyDataSetChanged()
             adapter2.notifyDataSetChanged()
@@ -551,7 +568,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
 
     private fun getGwTimerAllTime(dbGwTag: GwTagBean): MutableList<GwTimeAndDataBean> {
         val tasks = GsonUtil.stringToList(dbGwTag.tasks, GwTagBean::class.java)
-        var splitWeek = dbGwTag.weekStr.split(",")
+        var splitWeek: List<String> = dbGwTag.weekStr.split(",")
         if (splitWeek.size == 1) {
             if (splitWeek[0] == getString(R.string.every_day)) {
                 splitWeek = mutableListOf(getString(R.string.monday), getString(R.string.tuesday), getString(R.string.wednesday),
@@ -572,6 +589,42 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         return listCurrent
     }
 
+    private fun getWeekStr(week: Int): String {
+        var weekStr = StringBuilder()
+        when (week) {
+            0b00000000 -> weekStr.append(getString(R.string.only_one))
+            0b10000000 -> weekStr.append(getString(R.string.every_day))
+            else -> {
+                var binaryString = Integer.toBinaryString(week)
+                val length1 = binaryString.length
+                for (z in 0..8)
+                    if (binaryString.length < 8)
+                        binaryString = "0$binaryString"
+                    else break
+                val length = binaryString.length
+                val intRange = (0 until length).reversed()
+                for (i in intRange) {
+                    val c = binaryString[i]
+                    if (c.toString() == "1") {
+                        if (i != 0 &&  i != length1 - 1)
+                            weekStr.append(",")
+                        when (i) {
+                            0 -> weekStr.append(getString(R.string.sunday))
+                            1 -> weekStr.append(getString(R.string.monday))
+                            2 -> weekStr.append(getString(R.string.tuesday))
+                            3 -> weekStr.append(getString(R.string.wednesday))
+                            4 -> weekStr.append(getString(R.string.thursday))
+                            5 -> weekStr.append(getString(R.string.friday))
+                            6 -> weekStr.append(getString(R.string.saturday))
+                            7 -> weekStr.append(getString(R.string.every_day))
+                        }
+                    }
+                }
+            }
+        }
+        return weekStr.toString()
+    }
+
     private fun getOnlyOne(): MutableList<String> {
         var weekDay = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) {
             0 -> getString(R.string.sunday)
@@ -587,19 +640,17 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendOpenOrCloseGw(dbGwTag: GwTagBean) {
+    private fun sendOpenOrCloseGw(dbGwTag: GwTagBean, isMutex: Boolean) {
         disposableTimer?.dispose()
         connectCount++
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (connectCount < 3)
-                        sendOpenOrCloseGw(dbGwTag)
+                        sendOpenOrCloseGw(dbGwTag, isMutex)
                     else {
-                        updateBackStatus()
+                        updateBackStatus(isMutex)
                         hideLoadingDialog()
-                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.gate_way_label_switch_fail))
+                        runOnUiThread { TmtUtils.midToast(this@GwEventListActivity, getString(R.string.gate_way_label_switch_fail)) }
                     }
                 }
 
@@ -629,7 +680,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             gattBody.data = s
             gattBody.ser_id = GW_GATT_LABEL_SWITCH
             gattBody.macAddr = dbGw?.macAddr
-            gattBody.tagHead = 1
+            gattBody.tagName = dbGwTag.tagName
             sendToServer(gattBody)
         } else {
             var labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
@@ -698,7 +749,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             gattBody.data = s
             gattBody.ser_id = GW_GATT_DELETE_LABEL
             gattBody.macAddr = dbGw?.macAddr
-            gattBody.tagHead = 1
+            gattBody.tagName = gwTagBean.tagName
             sendToServer(gattBody)
         }
     }

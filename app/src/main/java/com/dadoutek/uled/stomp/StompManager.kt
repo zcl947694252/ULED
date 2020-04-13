@@ -53,7 +53,7 @@ class StompManager private constructor() {
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)
                     ?.withServerHeartbeat(5000)   //设置心跳
-        } else if (mStompClient?.isConnected == false) { //如果断连了就再连一次
+        } else if (mStompClient?.isConnected != true) { //如果断连了就再连一次
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)?.withServerHeartbeat(5000)   //设置心跳
         }
@@ -158,7 +158,7 @@ class StompManager private constructor() {
      */
     fun gwCommend(): Flowable<String> {
         val gwHeaders = getGwHeaders()
-       // /topic/common.cmd. + 用户id
+        // /topic/common.cmd. + 用户id
         var gwCommendUrl = "/topic/common.cmd." + DBUtils.lastUser?.id
         return mStompClient!!.topic(gwCommendUrl, gwHeaders)
                 .map { topicMessage ->

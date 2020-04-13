@@ -494,7 +494,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe({
                             LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_fail))
+                            ToastUtils.showShort(getString(R.string.connect_fail))
                             finish()
                         }, {})
             }

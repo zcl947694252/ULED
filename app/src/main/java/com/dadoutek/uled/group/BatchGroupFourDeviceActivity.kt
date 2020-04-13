@@ -963,7 +963,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
-                    ToastUtils.showLong(getString(R.string.group_fail_tip))
+                    runOnUiThread { ToastUtils.showLong(getString(R.string.group_fail_tip)) }
                 }
         setGroupOneByOne(currentGroup!!, deviceType, 0)
     }

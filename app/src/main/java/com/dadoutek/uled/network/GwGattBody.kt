@@ -19,7 +19,7 @@ class GwGattBody {
    //ser_id	是	string	app会话id，成功or失败会回传给app
    //下发标签给网关
    open var macAddr: String? = null
-   open var tagHead:Int = 0//是否是标签头 1是标签头
+   open var tagName:String? = null//标签名
 
    //同步delete时候用
    open var idList: List<Int>? = null

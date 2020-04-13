@@ -233,7 +233,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
-                            SharedPreferencesHelper.putString(this@EnterConfirmationCodeActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             showLoadingDialog(getString(R.string.sync_now))

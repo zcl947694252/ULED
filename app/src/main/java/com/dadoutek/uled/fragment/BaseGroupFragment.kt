@@ -341,7 +341,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
                         hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.gate_way_offline))
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
                     val low = currentLight!!.meshAddr and 0xff
                     val hight = (currentLight!!.meshAddr shr 8) and 0xff

@@ -144,12 +144,11 @@ class TelinkLightApplication : TelinkApplication() {
 
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
-                    val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
-//                    LogUtils.e("zcl单点登录 It's time to cancel $it")
-                    if (it != key && "no_have_key" != it) {//确保登录时成功的
+                   LogUtils.e("zcl单点登录 It's time to cancel $it")
+                    if (it != DBUtils.lastUser?.login_state_key) {//确保登录时成功的
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
-                        intent.putExtra(Constant.LOGIN_OUT, key)
+                        intent.putExtra(Constant.LOGIN_OUT, it)
                         sendBroadcast(intent)
                     }
 

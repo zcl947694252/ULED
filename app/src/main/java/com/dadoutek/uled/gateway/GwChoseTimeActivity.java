@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -79,8 +80,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private byte opcodeHead;
     private Disposable disposableHeadTimer;
     private TelinkApplication application;
-    private View popView;
-
+    private Handler handlerm = new Handler();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -102,20 +102,23 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private void initLisenter() {
         toolbarCancel.setOnClickListener(v -> finish());
         toolbarConfirm.setOnClickListener(v -> {
-            if (scene == null)
-                Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene),
-                        Toast.LENGTH_SHORT).show();
-            else {
-                if (isTimeHave()) {//如果已有该时间
-                    if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !tasksBean.isCreateNew()) {//并且是当前的task的时间 返回结果
+
+            handlerm.postDelayed(() -> {
+                if (scene == null)
+                    Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene),
+                            Toast.LENGTH_SHORT).show();
+                else {
+                    if (isTimeHave()) {//如果已有该时间
+                        if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !tasksBean.isCreateNew()) {//并且是当前的task的时间 返回结果
+                            setForResult();
+                        } else {
+                            TmtUtils.midToastLong(this, getString(R.string.have_time_task));
+                        }
+                    } else {//没有此时间task返回结果
                         setForResult();
-                    } else {
-                        TmtUtils.midToastLong(this, getString(R.string.have_time_task));
                     }
-                } else {//没有此时间task返回结果
-                    setForResult();
                 }
-            }
+            },500);
         });
         timerLy.setOnClickListener(v -> startActivityForResult(new Intent(this,
                 SelectSceneListActivity.class), requestCodes));
@@ -129,6 +132,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         tasksBean.setStartMins(minuteTime);
         sendLabelHeadParams();
     }
+
+
 
 
     /**
@@ -166,7 +171,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
             gattBody.setData(s);
             gattBody.setMacAddr(gwTagBean.getMacAddr());
-            gattBody.setTagHead(1);
+            gattBody.setTagName(gwTagBean.getTagName());
             sendToServer(gattBody);
         } else {
             setHeadTimerDelay(1500L);
@@ -304,13 +309,14 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     @Override
     protected void onResume() {
         super.onResume();
+        TelinkLightApplication.Companion.getApp().removeEventListeners();
         application.addEventListener(DeviceEvent.STATUS_CHANGED, this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        application.removeEventListener(DeviceEvent.STATUS_CHANGED, this);
+        TelinkLightApplication.Companion.getApp().removeEventListeners();
     }
 
     private void initView() {
@@ -379,6 +385,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     protected void onDestroy() {
         super.onDestroy();
         unbinder.unbind();
+        handlerm.removeMessages(0);
         if (disposableTimer != null)
             disposableTimer.dispose();
     }
@@ -390,7 +397,6 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             case DeviceEvent.STATUS_CHANGED:
                 onDeviceEvent((DeviceEvent) event);
                 break;
-
         }
     }
 

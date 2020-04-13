@@ -170,7 +170,7 @@ public class GwTagBean implements Parcelable {
     @Override
     public String toString() {
         return "GwTagBean{" + "macAddr='" + macAddr + '\'' + ", meshAddr=" + meshAddr + ", tagId" +
-                "=" + tagId + ", tagName='" + tagName + '\'' + ", status=" + status + ", " +
+                "=" + tagId + ", macAddr='" + tagName + '\'' + ", status=" + status + ", " +
                 "startHour=" + startHour + ", endHour=" + endHour + ", startMins=" + startMins +
                 ", endMins=" + endMins + ", pos=" + pos + ", isTimer=" + isTimer + ", week=" + week + ", weekStr='" + weekStr + '\'' + ", isCreateNew=" + isCreateNew + ", tasks=" + tasks + '}';
     }

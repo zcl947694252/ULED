@@ -840,16 +840,30 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 此处用作设备登录
      */
     private fun autoConnect(elements: MutableList<Int>) {
-        mAutoConnectDisposable = connect(deviceTypes = elements,retryTimes = 2)
-                ?.subscribe(
-                        {
-                            onLogin()
-                        }, {
-                            hideLoadingDialog()
-                            ToastUtils.showLong(getString(R.string.connect_fail))
-                            LogUtils.d(it)
-                        }
-                )
+        //mAutoConnectDisposable = connect(deviceTypes = elements,retryTimes = 2)
+        if (mAddDeviceType == DeviceType.GATE_WAY)
+            mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, retryTimes = 2)
+                    ?.subscribe(
+                            {
+                                TelinkLightApplication.getApp().isConnectGwBle = true
+                                onLogin()
+                            }, {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.connect_fail))
+                        LogUtils.d(it)
+                    }
+                    )
+        else
+            mAutoConnectDisposable = connect(deviceTypes = elements, retryTimes = 2)
+                    ?.subscribe(
+                            {
+                                onLogin()
+                            }, {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.connect_fail))
+                        LogUtils.d(it)
+                    }
+                    )
     }
 
     private fun closeAnimation() {

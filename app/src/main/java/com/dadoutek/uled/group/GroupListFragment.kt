@@ -63,6 +63,7 @@ import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -456,7 +457,7 @@ class GroupListFragment : BaseFragment() {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
                         hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.gate_way_offline))
+                     runOnUiThread {    ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
                     val low = allGroup!!.meshAddr and 0xff
                     val hight = (allGroup!!.meshAddr shr 8) and 0xff

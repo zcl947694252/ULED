@@ -423,7 +423,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                             ,
                             {
                                 hideLoadingDialog()
-                                ToastUtils.showLong(R.string.connect_fail2)
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                                 LogUtils.d(it)
                             })
         }

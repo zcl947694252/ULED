@@ -11,8 +11,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
@@ -96,7 +94,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
 
-    private var mHandler: Handler? = null
     private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
 
     @SuppressLint("ShowToast")
@@ -109,11 +106,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-
-        mHandler = object : Handler() {
-            override fun handleMessage(msg: Message?) {
-            }
-        }
     }
 
     private fun initChangeRecevicer() {
@@ -320,8 +312,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
         isResume = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
         if (LeBluetooth.getInstance().isSupport(applicationContext))
@@ -387,7 +377,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
-            mHandler!!.postDelayed(Runnable { loadDialog?.dismiss() }, SHOW_LOADING_DIALOG_DELAY)
+           loadDialog?.dismiss()
         }
     }
 
@@ -441,11 +431,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
         override fun complete() {
             hideLoadingDialog()
-            val b = this@TelinkBaseActivity.isFinishing
-            val showing = singleLogin?.isShowing
-            if (!b && showing != null && !showing!!) {
-                singleLogin!!.show()
-            }
         }
 
         override fun error(msg: String) {
@@ -603,7 +588,37 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     open fun loginOutMethod() {
-        checkNetworkAndSync(this@TelinkBaseActivity)
+        if (!NetWorkUtils.isNetworkAvalible(this)) {
+            AlertDialog.Builder(this)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(android.R.string.ok
+                    ) { _, _ ->
+                        // 跳转到设置界面
+                        this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
+                    }.create().show()
+        } else {
+            SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                override fun start() {
+                    showLoadingDialog(getString(R.string.tip_start_sync))
+                }
+
+                override fun complete() {
+                    hideLoadingDialog()
+                    val b = this@TelinkBaseActivity.isFinishing
+                    val showing = singleLogin?.isShowing
+                    if (!b && showing != null && !showing!!) {
+                        singleLogin!!.show()
+                    }
+                }
+
+                override fun error(msg: String) {
+                    hideLoadingDialog()
+                    if (msg != null && msg != "null")
+                        ToastUtils.showLong(msg)
+                }
+            })
+        }
     }
 
 
@@ -680,11 +695,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null,connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes)
+            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes,connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
