@@ -101,6 +101,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            LeBluetooth.getInstance().enable(applicationContext)
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
         makeDialog()
@@ -222,10 +224,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun showOpenBluetoothDialog(context: Context) {
         val dialogTip = AlertDialog.Builder(context)
         dialogTip.setMessage(R.string.openBluetooth)
-        dialogTip.setPositiveButton(android.R.string.ok) { dialog, which ->
+        dialogTip.setPositiveButton(android.R.string.ok) { _, _ ->
             LeBluetooth.getInstance().enable(applicationContext)
         }
-        dialogTip.setCancelable(false)
+        dialogTip.setCancelable(true)
         dialogTip.create().show()
     }
 
@@ -314,8 +316,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onResume()
         isResume = true
         val lightService: TelinkLightService? = TelinkLightService.Instance()
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)
 
         if (LeBluetooth.getInstance().isEnabled) {
             if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
@@ -377,7 +377,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
-           loadDialog?.dismiss()
+            loadDialog?.dismiss()
         }
     }
 
@@ -695,11 +695,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null,connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes,connectTimeOutTime)
+            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
@@ -725,8 +725,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     @Deprecated("use connect()")
     fun connectOld(macAddr: String?) {
         //如果支持蓝牙就打开蓝牙
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
+        // if (LeBluetooth.getInstance().isSupport(applicationContext))
+        //  LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
 
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
         if (!BleUtils.isLocationEnable(this)) {

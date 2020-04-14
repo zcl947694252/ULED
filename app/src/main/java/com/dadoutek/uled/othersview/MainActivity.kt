@@ -40,8 +40,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
-import com.dadoutek.uled.gateway.GwEventListActivity
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -66,7 +64,6 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.widget.BaseUpDateDialog
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
-import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -170,11 +167,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-            val intent = Intent(this@MainActivity, GwEventListActivity::class.java)
-            var dbGw = DBUtils.getGatewayByID(5)?: DbGateway(5)
-
-            DBUtils.saveGateWay(dbGw, true)
-            intent.putExtra("data", dbGw)
+            val intent = Intent(this@MainActivity, ExtendActivity::class.java)
             startActivity(intent)
         }
         initBottomNavigation()
@@ -732,8 +725,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     fun autoConnect() {
         //如果支持蓝牙就打开蓝牙
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
+       // if (LeBluetooth.getInstance().isSupport(applicationContext))
+            //LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
 
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
         if (!BleUtils.isLocationEnable(this)) {

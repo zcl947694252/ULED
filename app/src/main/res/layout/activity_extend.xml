@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <TextView
+            android:id="@+id/tv_jbzl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="渐变指令"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+    <TextView
+            android:id="@+id/tv_jbsd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="渐变速度"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+    <TextView
+            android:id="@+id/tv_pwm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="修改PWM输出频率"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+
+    <RadioGroup
+            android:id="@+id/rg_ly"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_30"
+            android:background="@color/color_a_ca"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+        <RadioButton
+                android:id="@+id/rb_slow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/gray_e"/>
+        <RadioButton
+                android:id="@+id/rb_mid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/gray_e"/>
+        <RadioButton
+                android:id="@+id/rb_fast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </RadioGroup>
+</LinearLayout>

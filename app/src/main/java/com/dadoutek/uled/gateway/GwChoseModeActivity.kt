@@ -37,9 +37,9 @@ class GwChoseModeActivity : TelinkBaseActivity() {
         week = intent.getIntExtra("data", 0);
         LogUtils.e(week)
         var tmpWeek = week;
-        if ((week and 0b100000000) != 0) {
+        if (week  == 0b10000000)
             tmpWeek = Constant.SATURDAY or Constant.FRIDAY or Constant.THURSDAY or Constant.WEDNESDAY or Constant.TUESDAY or Constant.MONDAY or Constant.SUNDAY //每一天
-        }
+
 //仅一次的，暂不做转换
 //        else if (week == 0) //仅一次
 //        {
@@ -57,7 +57,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
                 WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
 
         for (i in 0 until list!!.size) {
-            var weekBean = list!!.get(i)
+            var weekBean = list!![i]
             if (weekBean.checked) {
                 checkedList.add(weekBean)
             }

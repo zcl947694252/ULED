@@ -23,6 +23,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
+import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -590,39 +591,32 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     }
 
     private fun getWeekStr(week: Int): String {
-        var weekStr = StringBuilder()
-        when (week) {
-            0b00000000 -> weekStr.append(getString(R.string.only_one))
-            0b10000000 -> weekStr.append(getString(R.string.every_day))
+        var tmpWeek = week
+        val sb = StringBuilder()
+        when (tmpWeek) {
+            0b10000000 -> sb.append(getString(R.string.every_day))
+            0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
-                var binaryString = Integer.toBinaryString(week)
-                val length1 = binaryString.length
-                for (z in 0..8)
-                    if (binaryString.length < 8)
-                        binaryString = "0$binaryString"
-                    else break
-                val length = binaryString.length
-                val intRange = (0 until length).reversed()
-                for (i in intRange) {
-                    val c = binaryString[i]
-                    if (c.toString() == "1") {
-                        if (i != 0 &&  i != length1 - 1)
-                            weekStr.append(",")
-                        when (i) {
-                            0 -> weekStr.append(getString(R.string.sunday))
-                            1 -> weekStr.append(getString(R.string.monday))
-                            2 -> weekStr.append(getString(R.string.tuesday))
-                            3 -> weekStr.append(getString(R.string.wednesday))
-                            4 -> weekStr.append(getString(R.string.thursday))
-                            5 -> weekStr.append(getString(R.string.friday))
-                            6 -> weekStr.append(getString(R.string.saturday))
-                            7 -> weekStr.append(getString(R.string.every_day))
-                        }
+                var list = mutableListOf(
+                        WeekBean(getString(R.string.monday), 1, (tmpWeek and MONDAY) != 0),
+                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and TUESDAY) != 0),
+                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and WEDNESDAY) != 0),
+                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and THURSDAY) != 0),
+                        WeekBean(getString(R.string.friday), 5, (tmpWeek and FRIDAY) != 0),
+                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and SATURDAY) != 0),
+                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and SUNDAY) != 0))
+                for (i in 0 until list!!.size) {
+                    var weekBean = list!![i]
+                    if (weekBean.checked) {
+                        if (i == list!!.size - 1)
+                            sb.append(weekBean.week)
+                        else
+                            sb.append(weekBean.week).append(",")
                     }
                 }
             }
         }
-        return weekStr.toString()
+        return sb.toString()
     }
 
     private fun getOnlyOne(): MutableList<String> {

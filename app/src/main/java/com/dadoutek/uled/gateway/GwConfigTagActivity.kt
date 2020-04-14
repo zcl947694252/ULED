@@ -23,6 +23,7 @@ import com.dadoutek.uled.gateway.adapter.GwTaskItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
+import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -190,40 +191,33 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
     }
 
-    private fun getWeekStr(): StringBuilder {
-        var weekStr = StringBuilder()
-        when (tagBean!!.week) {
-            0b00000000 -> weekStr.append(getString(R.string.only_one))
-            0b10000000 -> weekStr.append(getString(R.string.every_day))
+    private fun getWeekStr(): String {
+        var tmpWeek = tagBean!!.week
+        val sb = StringBuilder()
+        when (tmpWeek) {
+            0b10000000 -> sb.append(getString(R.string.every_day))
+            0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
-                var binaryString = Integer.toBinaryString(tagBean!!.week)
-                val length1 = binaryString.length
-                for (z in 0..8)
-                    if (binaryString.length < 8)
-                        binaryString = "0$binaryString"
-                    else break
-                val length = binaryString.length
-                val intRange = (0 until length)
-                for (i in intRange) {
-                    val c = binaryString[i]
-                    if (c.toString() == "1") {
-                        if (i != 0 && i != length1-1)
-                            weekStr.append(",")
-                        when (i) {
-                            0 -> weekStr.append(getString(R.string.sunday))
-                            1 -> weekStr.append(getString(R.string.monday))
-                            2 -> weekStr.append(getString(R.string.tuesday))
-                            3 -> weekStr.append(getString(R.string.wednesday))
-                            4 -> weekStr.append(getString(R.string.thursday))
-                            5 -> weekStr.append(getString(R.string.friday))
-                            6 -> weekStr.append(getString(R.string.saturday))
-                            7 -> weekStr.append(getString(R.string.every_day))
-                        }
+                var list = mutableListOf(
+                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
+                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
+                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
+                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
+                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
+                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
+                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+                for (i in 0 until list!!.size) {
+                    var weekBean = list!![i]
+                    if (weekBean.checked) {
+                        if (i == list!!.size - 1)
+                            sb.append(weekBean.week)
+                        else
+                            sb.append(weekBean.week).append(",")
                     }
                 }
             }
         }
-        return weekStr
+        return sb.toString()
     }
 
 
@@ -417,8 +411,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
-        if (tagBean?.weekStr==null){
-            tagBean?.weekStr= getString(R.string.only_one)
+        if (tagBean?.weekStr == null) {
+            tagBean?.weekStr = getString(R.string.only_one)
             tagBean?.week = 0b00000000
         }
 

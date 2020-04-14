@@ -20,7 +20,7 @@ public class Constant implements Serializable {
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
 
-    public static Boolean isDebug = true;
+    public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -29,8 +29,8 @@ public class Constant implements Serializable {
     public static final long downTime = isDebug ? 2 : 11;
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
-    //public static  String DEFAULT_MESH_FACTORY_NAME = /*isDebug ?"dadoutek3":*/"dadousmart";
-    public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
+    public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek3":"dadousmart";
+    //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
@@ -362,7 +362,9 @@ public class Constant implements Serializable {
      * 是否是重新配置网关wifi
      */
     public static final String IS_GW_CONFIG_WIFI = "IS_GW_CONFIG_WIFI";
-
+    /**
+     * 0b0000 0001 and 0b1111 1111 相同为1 不同为0  等于0b0000 0001
+     */
     public static final int SATURDAY = 1 << 6;
     public static final int FRIDAY = 1 << 5;
     public static final int THURSDAY = 1 << 4;

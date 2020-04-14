@@ -818,6 +818,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
+
+
+
     private fun refreshView() {
         currentGroupIndex = groups!!.size - 1
         for (i in groups!!.indices.reversed()) {
@@ -1093,7 +1096,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             groupName?.visibility = View.GONE
             checkBox?.isChecked = item?.isSelected ?: false
             deviceName?.text = item?.name
-            icon?.setImageResource(R.drawable.icon_device_open)
+            if (mAddDeviceType == DeviceType.GATE_WAY)
+                icon?.setImageResource(R.drawable.icon_gw_open)
+            else
+                icon?.setImageResource(R.drawable.icon_device_open)
 
             if (item?.hasGroup == true) {
                 icon?.visibility = View.VISIBLE

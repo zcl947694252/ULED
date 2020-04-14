@@ -2,6 +2,26 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 扩展指令用户数据清除功能
+     */
+    const val CONFIG_EXTEND_ALL_CLEAR: Byte = 0x04.toByte()
+    /**
+     * 扩展指令修改调光频率
+     */
+    const val CONFIG_EXTEND_ALL_PWM: Byte = 0x03.toByte()
+    /**
+     * 扩展指令修改渐变速度
+     */
+    const val CONFIG_EXTEND_ALL_JBSD: Byte = 0x02.toByte()
+    /**
+     * 扩展指令设置渐变指令
+     */
+    const val CONFIG_EXTEND_ALL_JBZL: Byte = 0x01.toByte()
+    /**
+     * 扩展指令头
+     */
+    const val CONFIG_EXTEND_OPCODE: Byte = 0x26.toByte()
+    /**
      * 开关网关
      */
     const val CONFIG_GW_SWITCH: Byte = 0xd0.toByte()
