@@ -175,7 +175,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             listTask.addAll(elements)
             listTask.sortBy { it.startHour * 60 + it.startMins }
         }
-
+        listTask.sortWith(compareBy({ it.startHour }, { it.startMins }))
         adapter.notifyDataSetChanged()
 
         gate_way_lable.setText(getString(R.string.label) + tagBean?.tagId)
@@ -647,11 +647,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                                 break
                             }
                         }
-                        listTask.sortBy { it.startHour }
+//                        listTask.sortBy { it.startHour }
+                        listTask.sortWith(compareBy({ it.startHour }, { it.startMins }))
                     }
                     dbGw?.state = 0
                     saveOrUpdataGw(dbGw!!)
                     // sendTime(b, dbGw?.meshAddr ?: 0)
+                    listTask.sortWith(compareBy({ it.startHour }, { it.startMins }))
                     adapter.notifyDataSetChanged()
                 }
             }
