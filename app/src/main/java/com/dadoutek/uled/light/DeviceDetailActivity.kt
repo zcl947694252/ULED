@@ -210,7 +210,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 } else {
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
-
                             canBeRefresh = true
                             openOrClose(currentLight!!)
 
@@ -376,11 +375,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
+                disposableTimer?.dispose()
                 LogUtils.v("zcl-----------远程控制-------$t")
             }
 
             override fun onError(e: Throwable) {
                 super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
                 LogUtils.v("zcl-----------远程控制-------${e.message}")
             }
         })
@@ -964,6 +966,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         canBeRefresh = false
         acitivityIsAlive = false
+        disposableTimer?.dispose()
+        mConnectDisposable?.dispose()
         disableConnectionStatusListener()
     }
 
@@ -1095,9 +1099,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
      * 自动重连
      */
     fun autoConnect() {
-        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
-                DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-        mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 10)
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        mConnectDisposable?.dispose()
+        mConnectDisposable = connect(deviceTypes = deviceTypes,fastestMode = true ,retryTimes = 10)
                 ?.subscribe({
                     onLogin()
                 }, {

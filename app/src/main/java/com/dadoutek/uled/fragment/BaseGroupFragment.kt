@@ -346,7 +346,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     val low = currentLight!!.meshAddr and 0xff
                     val hight = (currentLight!!.meshAddr shr 8) and 0xff
                     val gattBody = GwGattBody()
-                    var gattPar: ByteArray = byteArrayOf()
+                    var gattPar: ByteArray
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -379,11 +379,14 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
+                disposableTimer?.dispose()
                 LogUtils.v("zcl-----------远程控制-------$t")
             }
 
             override fun onError(e: Throwable) {
                 super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
                 LogUtils.v("zcl-----------远程控制-------${e.message}")
             }
         })

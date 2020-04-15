@@ -69,6 +69,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
         adapter?.bindToRecyclerView(template_recycleView)
         adapter?.setOnItemClickListener { _, _, position ->
             if (checkedList.contains(list?.get(position)!!)) {
+
                 list?.get(position)!!.checked = false
                 checkedList.remove(list?.get(position)!!)
             } else {

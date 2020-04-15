@@ -127,9 +127,18 @@ class TelinkLightApplication : TelinkApplication() {
                     initStompClient()
 
 
+
+                singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
+                    LogUtils.e("zcl单点登录 It's time to cancel $it")
+                    if (it != DBUtils.lastUser?.login_state_key) {//确保登录时成功的
+                        val intent = Intent()
+                        intent.action = Constant.LOGIN_OUT
+                        intent.putExtra(Constant.LOGIN_OUT, it)
+                        sendBroadcast(intent)
+                    }
+                }, {})
+
                 gwCommendDisposable = mStompManager?.gwCommend()?.subscribe({
-                    if (TextUtils.isEmpty(it))
-                        return@subscribe
 
                     val msg = Gson().fromJson(it, GwStompBean::class.java)
                     LogUtils.e("zcl长连接网关接收 $it")
@@ -137,24 +146,9 @@ class TelinkLightApplication : TelinkApplication() {
                     intent.action = Constant.GW_COMMEND_CODE
                     intent.putExtra(Constant.GW_COMMEND_CODE, msg)
                     sendBroadcast(intent)
-
-                }, {
-                    ToastUtils.showLong(it.localizedMessage)
-                })
+                }, {})
 
 
-                singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
-                   LogUtils.e("zcl单点登录 It's time to cancel $it")
-                    if (it != DBUtils.lastUser?.login_state_key) {//确保登录时成功的
-                        val intent = Intent()
-                        intent.action = Constant.LOGIN_OUT
-                        intent.putExtra(Constant.LOGIN_OUT, it)
-                        sendBroadcast(intent)
-                    }
-
-                }, {
-                    ToastUtils.showLong(it.localizedMessage)
-                })
                 if (DBUtils.lastUser?.id != null)
                     paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
                         LogUtils.e("zcl解析 It's time to parse $it")
@@ -162,9 +156,7 @@ class TelinkLightApplication : TelinkApplication() {
                         intent.action = Constant.PARSE_CODE
                         intent.putExtra(Constant.PARSE_CODE, it)
                         sendBroadcast(intent)
-                    }, {
-                        ToastUtils.showLong(it.localizedMessage)
-                    })
+                    }, {})
                 if (DBUtils.lastUser?.id != null)
                     mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
                         LogUtils.e("zcl取消授权 It's time to cancel $it")
@@ -172,7 +164,7 @@ class TelinkLightApplication : TelinkApplication() {
                         intent.action = Constant.CANCEL_CODE
                         intent.putExtra(Constant.CANCEL_CODE, it)
                         sendBroadcast(intent)
-                    }, { ToastUtils.showLong(it.localizedMessage) })
+                    }, {})
 
                 /**
                  * stomp断联监听

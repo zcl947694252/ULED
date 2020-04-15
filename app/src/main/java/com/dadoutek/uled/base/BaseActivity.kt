@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
@@ -48,7 +49,7 @@ import java.util.*
  * 创建者     zcl
  * 创建时间   2019/8/21 20:06
  * 描述	      ${19928748860   %1$s  %2$s  %1$d Android s代表string  d代表int  1-9  }$
- *
+ *   private  var netWorkChangReceiver: NetWorkChangReceiver? = null
  * 更新者     $Author$
  * 更新时间   $Date$
  * 更新描述   ${//GlobalScope.launch { delay(1000) } // 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程}$
@@ -63,12 +64,18 @@ abstract class BaseActivity : AppCompatActivity() {
     private var singleLogin: AlertDialog? = null
     protected var foreground = false
     private var mApplication: TelinkLightApplication? = null
-
+    private  var netWorkChangReceiver: TelinkBaseActivity.NetWorkChangReceiver? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutID())
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
+        //注册网络状态监听广播
+         netWorkChangReceiver = TelinkBaseActivity.NetWorkChangReceiver()
+        var filter = IntentFilter()
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(netWorkChangReceiver, filter)
+
         makeDialogAndPop()
         initView()
         initData()
@@ -107,7 +114,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
-    private fun makeCodeDialog(type: Int, phone: String, regionName: String,rid: Int = 0 ) {
+    private fun makeCodeDialog(type: Int, phone: String, regionName: String, rid: Int = 0) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
@@ -144,7 +151,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
                 LogUtils.v("zcl---------判断---${!this@BaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
                 try {
-                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
+                    if (!this@BaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -243,7 +250,7 @@ abstract class BaseActivity : AppCompatActivity() {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
-            if (!this.isFinishing){
+            if (!this.isFinishing) {
                 loadDialog?.dismiss()
                 loadDialog!!.show()
             }
@@ -295,6 +302,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onDestroy()
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
+        unregisterReceiver(netWorkChangReceiver)
     }
 
     private fun initStompReceiver() {
@@ -313,13 +321,12 @@ abstract class BaseActivity : AppCompatActivity() {
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
-                   when(gwStompBean.cmd){
-                       700-> TelinkLightApplication.getApp().offLine = false
-                       701-> TelinkLightApplication.getApp().offLine = true
-                       2000-> receviedGwCmd2000(gwStompBean.ser_id)
-                       2500-> receviedGwCmd2500(gwStompBean)
-
-                   }
+                    when (gwStompBean.cmd) {
+                        700 -> TelinkLightApplication.getApp().offLine = false
+                        701 -> TelinkLightApplication.getApp().offLine = true
+                        2000 -> receviedGwCmd2000(gwStompBean.ser_id)
+                        2500 -> receviedGwCmd2500(gwStompBean)
+                    }
                 }
                 Constant.LOGIN_OUT -> {
                     checkNetworkAndSync(this@BaseActivity)
@@ -337,7 +344,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             user.last_region_id = 1.toString()
                             user.last_authorizer_user_id = user.id.toString()
                             DBUtils.deleteAllData()
-                       AccountModel.initDatBase(it)
+                            AccountModel.initDatBase(it)
                             //更新last—region-id
                             DBUtils.saveUser(user)
                             Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
@@ -346,7 +353,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
 
                     LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone,  cancelBean?.region_name,cancelBean.rid) }//2代表解除授权信息type
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
 
                 }
                 Constant.PARSE_CODE -> {
@@ -359,17 +366,41 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
-
     }
 
     override fun onResume() {
         super.onResume()
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
+//        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+//            TelinkLightApplication.getApp().initStompClient()
         isResume = true
     }
 
-     open fun receviedGwCmd2000(serId: String){
+    open fun receviedGwCmd2000(serId: String) {
 
-     }
+    }
+
+    class NetWorkChangReceiver : BroadcastReceiver() {
+        private var isHaveNetwork: Boolean = false
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            try {
+                var connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                var networkInfo = connectivityManager.activeNetworkInfo
+                if (networkInfo != null && networkInfo.isAvailable) {
+                    if (!isHaveNetwork) {
+                        val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
+                        if (connected != true)
+                            TelinkLightApplication.getApp().initStompClient()
+                        LogUtils.v("zcl-----------base收到监听有网状态-------$connected")
+                        isHaveNetwork = true
+                    }
+                } else {
+                    LogUtils.v("zcl-----------base收到监听无网状态-------")
+                    isHaveNetwork = false
+                }
+            } catch (e: Exception) {
+                //ignore
+            }
+        }
+    }
 }

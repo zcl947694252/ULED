@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_40"
             android:layout_marginTop="8dp"
+            android:singleLine="true"
             android:layout_marginEnd="@dimen/dp_40"
             android:hint="@string/wifi_account_hinit"
             android:textColor="@color/gray_3"
@@ -33,6 +34,7 @@
             android:layout_marginStart="@dimen/dp_40"
             android:layout_marginTop="23dp"
             android:gravity="center"
+            android:singleLine="true"
             android:text="@string/wifi_pwd"
             android:textColor="@color/gray_3"
             android:textSize="15sp"/>

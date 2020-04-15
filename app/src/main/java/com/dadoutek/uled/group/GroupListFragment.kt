@@ -495,11 +495,15 @@ class GroupListFragment : BaseFragment() {
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
+                disposableTimer?.dispose()
                 LogUtils.v("zcl-----------远程控制-------$t")
             }
 
             override fun onError(e: Throwable) {
                 super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+
                 LogUtils.v("zcl-----------远程控制-------${e.message}")
             }
         })

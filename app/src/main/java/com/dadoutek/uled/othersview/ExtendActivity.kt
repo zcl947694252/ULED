@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_extend.*
  */
 class ExtendActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
-        var address = 1
+        var address = 0
         when(v?.id){
             R.id.tv_jbzl-> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,address,
                     byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL))

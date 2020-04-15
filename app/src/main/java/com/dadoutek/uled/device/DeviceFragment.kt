@@ -418,8 +418,6 @@ class DeviceFragment : BaseFragment() {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
             }
-
-
         }
     }
 }

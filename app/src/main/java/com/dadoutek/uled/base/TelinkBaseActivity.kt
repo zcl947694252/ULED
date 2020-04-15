@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -64,6 +65,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private  var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
@@ -103,6 +105,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
         enableConnectionStatusListener()    //尽早注册监听
         if (LeBluetooth.getInstance().isSupport(applicationContext))
             LeBluetooth.getInstance().enable(applicationContext)
+
+        //注册网络状态监听广播
+         netWorkChangReceiver = NetWorkChangReceiver()
+        var filter = IntentFilter()
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(netWorkChangReceiver, filter)
+
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
         makeDialog()
@@ -315,17 +324,19 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         isResume = true
-        val lightService: TelinkLightService? = TelinkLightService.Instance()
+//       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
+//           TelinkLightApplication.getApp().initStompClient()
 
-        if (LeBluetooth.getInstance().isEnabled) {
-            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
-                changeDisplayImgOnToolbar(true)
-            } else {
-                changeDisplayImgOnToolbar(false)
-            }
-        } else {
-            changeDisplayImgOnToolbar(false)
-        }
+           if (LeBluetooth.getInstance().isEnabled) {
+               if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
+                   changeDisplayImgOnToolbar(true)
+               } else {
+                   changeDisplayImgOnToolbar(false)
+               }
+           } else {
+               changeDisplayImgOnToolbar(false)
+           }
+
     }
 
     override fun onDestroy() {
@@ -334,6 +345,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable?.dispose()
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
+        unregisterReceiver(netWorkChangReceiver)
         SMSSDK.unregisterAllEventHandler()
     }
 
@@ -791,6 +803,31 @@ open class TelinkBaseActivity : AppCompatActivity() {
             hideLoadingDialog()
         else
             finish()
+    }
+
+    class NetWorkChangReceiver : BroadcastReceiver() {
+        private var isHaveNetwork: Boolean = true
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            try {
+                var connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                var networkInfo = connectivityManager.activeNetworkInfo
+                if (networkInfo != null && networkInfo.isAvailable) {
+                    if (!isHaveNetwork) {
+                        val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
+                        if (connected !=true)
+                            TelinkLightApplication.getApp().initStompClient()
+                    LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
+                        isHaveNetwork = true
+                    }
+                } else {
+                    LogUtils.v("zcl-----------telinbase收到监听无网状态-------")
+                    isHaveNetwork = false
+                }
+            } catch (e: Exception) {
+                //ignore
+            }
+        }
     }
 
 }
