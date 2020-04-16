@@ -154,7 +154,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
-                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek3"
+                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
                 2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
             }
             Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME

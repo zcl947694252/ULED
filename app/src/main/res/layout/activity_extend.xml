@@ -33,6 +33,42 @@
             android:text="修改PWM输出频率"
             android:textColor="@color/red"
             android:textSize="18sp" />
+    <CheckBox
+            android:id="@+id/cb_light_open_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="打开开灯渐变功能"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+    <CheckBox
+            android:id="@+id/cb_light_close_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="打开关灯渐变功能"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+    <CheckBox
+            android:id="@+id/cb_light_power_on_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="打开上电亮灯的渐变"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
+    <CheckBox
+            android:id="@+id/cb_light_sence_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_15"
+            android:gravity="center"
+            android:text="打开场景的渐变功能"
+            android:textColor="@color/red"
+            android:textSize="18sp" />
 
     <RadioGroup
             android:id="@+id/rg_ly"
