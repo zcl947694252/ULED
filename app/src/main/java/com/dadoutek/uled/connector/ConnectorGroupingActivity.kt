@@ -394,7 +394,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
 
-            R.id.menu_install -> addNewGroup()
+            R.id.menu_install -> popMain.showAtLocation(window.decorView,Gravity.CENTER,0,0)  /*addNewGroup()*/
         }
         return super.onOptionsItemSelected(item)
     }

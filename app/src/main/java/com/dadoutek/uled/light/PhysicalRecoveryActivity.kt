@@ -97,6 +97,8 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         disposableScan?.dispose()
                         disposableFiveTimer?.dispose()
                         disposableConnectTimer?.dispose()
+                        disposableScanTimer?.dispose()
+                        changeVisiable(View.GONE,View.GONE, View.GONE, View.VISIBLE, View.GONE)
                     })
 
             disposableScanTimer?.dispose()

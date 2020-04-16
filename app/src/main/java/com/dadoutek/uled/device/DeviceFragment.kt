@@ -7,21 +7,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
 import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.device.model.DeviceItem
+import com.dadoutek.uled.gateway.GwDeviceDetailActivity
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
@@ -53,11 +53,12 @@ import java.util.*
  *
  */
 class DeviceFragment : BaseFragment() {
+    private var viewContent: View? = null
     private var deviceTypeList: ArrayList<DeviceItem> = ArrayList()
     private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList)
     private var isGuide = false
     private var isRgbClick = false
-    var firstShowGuide = true
+    private var firstShowGuide = true
     private var guideShowCurrentPage = false
     private val SCENE_MAX_COUNT = 100
 
@@ -240,6 +241,10 @@ class DeviceFragment : BaseFragment() {
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
+            Constant.INSTALL_GATEWAY -> {
+                intent = Intent(activity, GwDeviceDetailActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
+            }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
     }
@@ -261,6 +266,10 @@ class DeviceFragment : BaseFragment() {
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN))
 
         deviceTypeList.add(DeviceItem(getString(R.string.relay), DBUtils.getAllRelay().size, DeviceType.SMART_RELAY))
+
+        deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), DBUtils.getAllGateWay().size, DeviceType.GATE_WAY))
+
+
     }
 
 
@@ -276,8 +285,8 @@ class DeviceFragment : BaseFragment() {
      * 初始化布局
      */
     private fun initLayout(inflater: LayoutInflater): View? {
-        val view = inflater.inflate(R.layout.fragment_new_device, null)
-        return view
+         viewContent = inflater.inflate(R.layout.fragment_new_device, null)
+        return viewContent
     }
 
     private val onClick = View.OnClickListener {
@@ -290,7 +299,8 @@ class DeviceFragment : BaseFragment() {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                   // addNewGroup()
+                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -395,5 +405,19 @@ class DeviceFragment : BaseFragment() {
     private fun showInstallDeviceList() {
         dialog_pop.visibility = View.GONE
         callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide, isRgbClick)
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when(gwStompBean.ser_id.toInt()){
+            Constant.SER_ID_GROUP_ALLON->{
+                LogUtils.v("zcl-----------远程控制组全开成功-------")
+                hideLoadingDialog()
+
+            }
+            Constant.SER_ID_GROUP_ALLOFF->{
+                LogUtils.v("zcl-----------远程控制组全关成功-------")
+                hideLoadingDialog()
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -29,6 +30,11 @@ public class DbSwitch implements Serializable {
     private int index;
     private Long belongGroupId;
     public int rssi =1000;
+    private String keys = "";
+    @Nullable
+    public String groupIds;
+    @Nullable
+    public String sceneIds;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -48,10 +54,18 @@ public class DbSwitch implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int connectionStatus = 1;//链接状态
+    /**
+     * 是否是配置八鍵群組開關
+     * 0 八鍵群組開關
+     * 1八鍵場景開關
+     */
+    public int type;
 
-    @Generated(hash = 1494781249)
-    public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr, String macAddr,
-            int productUUID, String controlSceneId, int index, Long belongGroupId, int rssi) {
+    @Generated(hash = 1964613481)
+    public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
+            String macAddr, int productUUID, String controlSceneId, int index,
+            Long belongGroupId, int rssi, String keys, String groupIds,
+            String sceneIds, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -62,10 +76,15 @@ public class DbSwitch implements Serializable {
         this.index = index;
         this.belongGroupId = belongGroupId;
         this.rssi = rssi;
+        this.keys = keys;
+        this.groupIds = groupIds;
+        this.sceneIds = sceneIds;
+        this.type = type;
     }
     @Generated(hash = 1179115222)
     public DbSwitch() {
     }
+    
     public Long getId() {
         return this.id;
     }
@@ -204,5 +223,29 @@ public class DbSwitch implements Serializable {
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+    public String getKeys() {
+        return this.keys;
+    }
+    public void setKeys(String keys) {
+        this.keys = keys;
+    }
+    public String getGroupIds() {
+        return this.groupIds;
+    }
+    public void setGroupIds(String groupIds) {
+        this.groupIds = groupIds;
+    }
+    public String getSceneIds() {
+        return this.sceneIds;
+    }
+    public void setSceneIds(String sceneIds) {
+        this.sceneIds = sceneIds;
+    }
+    public int getType() {
+        return this.type;
+    }
+    public void setType(int type) {
+        this.type = type;
     }
 }

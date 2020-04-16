@@ -25,7 +25,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             showGroupList = ArrayList()
             for (i in actions.indices) {
-                val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
+                val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
                 val itemGroup = ItemGroup()
                 if (item != null) {
                     itemGroup.gpName = item.name

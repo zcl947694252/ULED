@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.HttpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
@@ -53,8 +54,10 @@ class SyncDataPutOrGetUtils {
 
                 for (data in dbDataChangeList) {
                     data.changeId ?: break
+                    //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
                     var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!)
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys
+                            ?: "")
                     observable?.let { observableList.add(it) }
                 }
 
@@ -69,15 +72,18 @@ class SyncDataPutOrGetUtils {
                                         syncCallback.complete()
                                     }
                                 }
+
                                 override fun onSubscribe(d: Disposable) {
                                 }
+
                                 override fun onNext(t: String) {
                                 }
+
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {
-                                        if (e.message!="")
-                                        syncCallback.error(e.cause.toString())
+                                        if (e.message != "")
+                                            syncCallback.error(e.cause.toString())
                                     }
                                 }
                             })
@@ -90,9 +96,9 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String, id: Long): Observable<String>? {
+                                     token: String, id: Long, switchType: Int, keys: String): Observable<String>? {
             if (changeId != null) {
-                //Log.e("zcl", "zcl**tableName****$tableName")
+                LogUtils.v("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
@@ -107,6 +113,26 @@ class SyncDataPutOrGetUtils {
                                     return GroupMdodel.add(token, group, /*group.belongRegionId, */id, changeId)!!
                                 }
                             }
+                        }
+                    }
+                    "DB_GATEWAY" -> {
+                        when (type) {
+                         /*   Constant.DB_ADD -> {
+                                val gw = DBUtils.getGatewayByID(changeId)
+                                return gw?.let { GwModel.add(it) }
+                            }*/
+                            Constant.DB_DELETE -> {
+                                val list = arrayListOf(changeId.toInt())
+                                val gattBody = GwGattBody()
+                                gattBody.idList = list
+                                return GwModel.deleteGwList(gattBody)
+                            }
+                           /* Constant.DB_UPDATE -> {
+                                val gw = DBUtils.getGatewayByID(changeId)
+                                gw?.let {
+                                    return GwModel.add(gw)
+                                }
+                            }*/
                         }
                     }
                     "DB_LIGHT" -> {
@@ -145,6 +171,23 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     "DB_SWITCH" -> {
+//                            when (type) {
+//                                Constant.DB_ADD -> {
+//                                    val switch = DBUtils.getSwitchByID(changeId)
+//                                  return SwitchMdodel.add(token, switch!!, id, changeId)//判断是否是八键开关接口问题
+//                                   //return switch?.let { EightSwitchMdodel.add(it,changeId) }
+//                                }
+//                                Constant.DB_DELETE -> {
+//                                    return EightSwitchMdodel.delete(id, changeId)
+//                                }
+//                                Constant.DB_UPDATE -> {
+//                                    val switch = DBUtils.getSwitchByID(changeId)
+//                                    switch?.let {
+//                                        return EightSwitchMdodel.update(switch, changeId)
+//                                    }
+//                                }
+//                            }
+
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
@@ -161,6 +204,25 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
+
+                    "DB_EIGHT_SWITCH" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val switch = DBUtils.getEightSwitchByID(changeId)
+                                return switch?.let { EightSwitchMdodel.add8k(it, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return EightSwitchMdodel.delete(id, changeId)
+                            }
+                            Constant.DB_UPDATE -> {
+                                val switch = DBUtils.getEightSwitchByID(changeId)
+                                switch?.let {
+                                    return EightSwitchMdodel.update8k(switch, changeId)
+                                }
+                            }
+                        }
+                    }
+
                     "DB_SENSOR" -> {
                         when (type) {
                             Constant.DB_ADD -> {
@@ -200,7 +262,7 @@ class SyncDataPutOrGetUtils {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
-                           // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
+                            // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.update(token,
@@ -364,7 +426,7 @@ class SyncDataPutOrGetUtils {
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
 
-                        SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                        SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
                         application.setupMesh(mesh)
                         LogUtils.v("zcl", "zcl下拉数据更新******mesh信息" + DBUtils.lastUser + "------------------" + mesh)
                         DBUtils.saveUser(DBUtils.lastUser!!)
@@ -378,10 +440,17 @@ class SyncDataPutOrGetUtils {
                             DBUtils.saveLight(item, true)
                         }
                         NetworkFactory.getApi()
-                                .getSwitchList(token)
+                                .gwList
                                 .compose(NetworkTransformer())
                     }
                     .flatMap {
+                        for (item in it) {
+                            DBUtils.saveGateWay(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getSwitchList(token)
+                                .compose(NetworkTransformer())
+                    }.flatMap {
                         for (item in it) {
                             DBUtils.saveSwitch(item, true)
                         }
@@ -457,8 +526,8 @@ class SyncDataPutOrGetUtils {
                     }, {
                 GlobalScope.launch(Dispatchers.Main) {
                     it ?: return@launch
-                    syncCallBack.error(it.message?:"")
-                    ToastUtils.showLong(it.message?:"")
+                    syncCallBack.error(it.message ?: "")
+                    ToastUtils.showLong(it.message ?: "")
                 }
             }
             )
@@ -486,7 +555,7 @@ class SyncDataPutOrGetUtils {
             SharedPreferencesUtils.getLastUser()
             //数据库有区域数据直接加载
             if (regionList.isNotEmpty()) {
-//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
+//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegionId()
                 val dbRegion = DBUtils.lastRegion
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
@@ -496,7 +565,7 @@ class SyncDataPutOrGetUtils {
                 mesh.factoryName = dbRegion?.installMesh
                 mesh.factoryPassword = dbRegion?.installMeshPwd
                 application.setupMesh(mesh)
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion?.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion?.id!!)
                 return
             } else {
                 setupMeshCreat(this!!.acc!!)

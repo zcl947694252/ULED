@@ -30,6 +30,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
@@ -99,12 +100,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private val OTA_SENSOR: Int = 3//3是oat
     private val SENSOR_FINISH: Int = 4//4代表操作完成
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false
@@ -128,6 +123,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
     private var popupWindow: PopupWindow? = null
     private val SCENE_MAX_COUNT = 100
     private var compositeDisposable = CompositeDisposable()
@@ -219,7 +215,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(window.decorView,Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
@@ -306,21 +303,26 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -330,11 +332,11 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
         }
     }
@@ -346,6 +348,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
@@ -354,6 +357,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
@@ -362,6 +366,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             title.visibility =  View.VISIBLE
             install_tip_question.visibility =  View.VISIBLE
         }
+
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
@@ -423,6 +428,15 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_GATEWAY -> {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))

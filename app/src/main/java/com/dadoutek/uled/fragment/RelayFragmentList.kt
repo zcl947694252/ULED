@@ -390,9 +390,9 @@ class RelayFragmentList : BaseGroupFragment() {
 
                     if (group.meshAddr == 0xffff) {
                         //            lightList = DBUtils.getAllLight();
-                        val list = DBUtils.groupList
-                        for (j in list.indices) {
-                            lightList.addAll(DBUtils.getConnectorByGroupID(list[j].id))
+                        val listTask = DBUtils.groupList
+                        for (j in listTask.indices) {
+                            lightList.addAll(DBUtils.getConnectorByGroupID(listTask[j].id))
                         }
                     } else {
                         lightList = DBUtils.getConnectorByGroupID(group.id)

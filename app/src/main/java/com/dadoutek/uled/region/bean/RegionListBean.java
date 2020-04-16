@@ -15,7 +15,7 @@ public class RegionListBean {
     /**
      * data : ["e8e54634354663b2","9df2a4c38f390319"]
      * errorCode : 0
-     * message : get region list succeed!
+     * message : get region listsucceed!
      * serverTime : 1576637639145
      */
 

@@ -183,10 +183,31 @@ object NetworkStatusCode {
     const val ERROR_PERMISSION_DENFINED = 20028
     // 权限不足,无法操作: 20028
     const val ERROR_REGION_NOT_EXIST = 30000
-    //不存在改bin文件
+    //不存在该类型bin文件
     const val ERROR_BIN_NOT_EXIST = 50000
-    //20025  该区域不存在
+    //没有比当前版本更新bin文件
+    const val ERROR_BIN_NO_NEW = 50001
+    //资源服务器上无该bin文件,请联系管理员
+    const val ERROR_BIN_NO_BIN = 50002
+    //没有比当前更新的app版本无需更新
+    const val ERROR_NO_NEW_VERSION = 60001
+    //mesh密码错误
+    const val ERROR_MESH_ERROR = 70000
+    //未收录的type
+    const val ERROR_UNKOWN_TYPE = 70001
+    //mesh地址不够
+    const val ERROR_MESH_NOT_ENOUGH= 70002
+    //该网关不存在/账号下无网关 80000
+    const val ERROR_GW_OR_ACCOUNT_NOT_EXIST= 80000
+    //该网关不在线/网关全部不在线 80001
+    const val ERROR_GW_UNONLIN= 80001
+    //base64字符串解码失败 80002
+    const val ERROR_GW_BASE64= 80002
+    //服务忙 501
+    const val ERROR_SERVER_BUSYNEWSS= 501
 
+    //服务崩溃 502
+    const val ERROR_SERVER_CRASH= 502
 
     /**
      * 请求成功处理: 0

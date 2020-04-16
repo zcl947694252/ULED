@@ -173,7 +173,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
 
-                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                    if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
                         val opcode = Opcode.KICK_OUT
 
                         val disposable = Commander.resetDevice(light!!.meshAddr)
@@ -494,7 +494,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe({
                             LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_fail))
+                            ToastUtils.showShort(getString(R.string.connect_fail))
                             finish()
                         }, {})
             }

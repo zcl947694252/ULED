@@ -7,12 +7,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -28,6 +32,8 @@ import com.dadoutek.uled.fragment.CWLightFragmentList
 import com.dadoutek.uled.fragment.CurtainFragmentList
 import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
+import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -35,7 +41,11 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbDeviceName
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.ItemTypeGroup
+import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
@@ -53,11 +63,14 @@ import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
+    private var disposableTimer: Disposable? = null
+    private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -105,6 +118,7 @@ class GroupListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
+
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
         val intentFilter = IntentFilter()
@@ -169,6 +183,10 @@ class GroupListFragment : BaseFragment() {
         return view
     }
 
+    override fun refreshGroupData() {
+        refreshView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initDeviceTypeNavigation()
@@ -186,14 +204,14 @@ class GroupListFragment : BaseFragment() {
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
 
-        val view = inflater.inflate(R.layout.fragment_group_list, null)
+        viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
-        viewPager = view.findViewById(R.id.list_groups)
+        viewPager = viewContent.findViewById(R.id.list_groups)
 
-        toolbar = view.findViewById(R.id.toolbar)
+        toolbar = viewContent.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
 
-        allLightText = view.findViewById(R.id.textView6)
+        allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
@@ -215,18 +233,18 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
-        btnOn = view.findViewById(R.id.btn_on)
-        btnOff = view.findViewById(R.id.btn_off)
-        btnSet = view.findViewById(R.id.btn_set)
-        onText = view.findViewById(R.id.tv_on)
-        offText = view.findViewById(R.id.tv_off)
+        btnOn = viewContent.findViewById(R.id.btn_on)
+        btnOff = viewContent.findViewById(R.id.btn_off)
+        btnSet = viewContent.findViewById(R.id.btn_set)
+        onText = viewContent.findViewById(R.id.tv_on)
+        offText = viewContent.findViewById(R.id.tv_off)
 
 
-        totalNum = view.findViewById(R.id.total_num)
+        totalNum = viewContent.findViewById(R.id.total_num)
 
-        install_device = view.findViewById(R.id.install_device)
-        create_group = view.findViewById(R.id.create_group)
-        create_scene = view.findViewById(R.id.create_scene)
+        install_device = viewContent.findViewById(R.id.install_device)
+        create_group = viewContent.findViewById(R.id.create_group)
+        create_scene = viewContent.findViewById(R.id.create_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
@@ -238,7 +256,7 @@ class GroupListFragment : BaseFragment() {
         btnDelete.setOnClickListener(onClick)
         allLightText?.setOnClickListener(onClick)
 
-        return view
+        return viewContent
     }
 
     /**
@@ -281,7 +299,7 @@ class GroupListFragment : BaseFragment() {
         showList = ArrayList()
         showList = gpList
 
-        allGroup = DBUtils.getGroupByMesh(0xFFFF)
+        allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
 
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
@@ -417,11 +435,78 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            allGroup = DBUtils.getGroupByMesh(0xFFFF)
+            allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
             toolbar!!.setTitle(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 
         }
+    }
+
+    private fun sendToGw(isOpen: Boolean) {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                     runOnUiThread {    ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                    }
+                    val low = allGroup!!.meshAddr and 0xff
+                    val hight = (allGroup!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray = byteArrayOf()
+                    if (isOpen) {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ALLON
+                    } else {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
+                    }
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = allGroup!!.meshAddr
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                disposableTimer?.dispose()
+                LogUtils.v("zcl-----------远程控制-------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
+            }
+        })
     }
 
 
@@ -437,7 +522,8 @@ class GroupListFragment : BaseFragment() {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -457,20 +543,14 @@ class GroupListFragment : BaseFragment() {
 
             R.id.btn_on, R.id.tv_on -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    // ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
+                    sendToGw(true)
                 } else {
                     if (allGroup != null) {
                         val dstAddr = this.allGroup!!.meshAddr
                         Commander.openOrCloseLights(dstAddr, true)
-                        btnOn?.setBackgroundResource(R.drawable.icon_open_group)
-                        btnOff?.setBackgroundResource(R.drawable.icon_down_group)
-                        onText?.setTextColor(resources.getColor(R.color.white))
-                        offText?.setTextColor(resources.getColor(R.color.black_nine))
-                        updateLights(true, this.allGroup!!)
-                        val intent = Intent("switch_here")
-                        intent.putExtra("switch_here", "on")
-                        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
+                        allGroupOpenSuccess()
                     }
                 }
             }
@@ -478,21 +558,14 @@ class GroupListFragment : BaseFragment() {
             R.id.btn_off, R.id.tv_off -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     //TelinkLightService.Instance()?.isLogin 有时候会出现连接状态下返回false的情况所以不用
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
+                    sendToGw(false)
                 } else {
                     if (allGroup != null) {
                         val dstAddr = this.allGroup!!.meshAddr
                         Commander.openOrCloseLights(dstAddr, false)
-                        btnOn?.setBackgroundResource(R.drawable.icon_down_group)
-                        btnOff?.setBackgroundResource(R.drawable.icon_open_group)
-                        onText?.setTextColor(resources.getColor(R.color.black_nine))
-                        offText?.setTextColor(resources.getColor(R.color.white))
-                        updateLights(false, this.allGroup!!)
-                        val intent = Intent("switch_here")
-                        intent.putExtra("switch_here", "false")
-                        LocalBroadcastManager.getInstance(this!!.mContext!!)
-                                .sendBroadcast(intent)
+                        allGroupOffSuccess()
                     }
                 }
             }
@@ -523,15 +596,6 @@ class GroupListFragment : BaseFragment() {
                 deleteList.addAll(curtianFragment.getGroupDeleteList())
                 deleteList.addAll(relayFragment.getGroupDeleteList())
 
-                /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
-                    if (listLight.size > 0) {
-                        for (i in listLight.indices) {
-                            if (listLight[i].isSelected) {
-                                deleteList.add(listLight[i])
-                            }
-                        }
-                    }*/
-
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -548,6 +612,29 @@ class GroupListFragment : BaseFragment() {
                 Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun allGroupOpenSuccess() {
+        btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+        btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+        onText?.setTextColor(resources.getColor(R.color.white))
+        offText?.setTextColor(resources.getColor(R.color.black_nine))
+        updateLights(true, this.allGroup!!)
+        val intent = Intent("switch_here")
+        intent.putExtra("switch_here", "on")
+        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
+    }
+
+    private fun allGroupOffSuccess() {
+        btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+        btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+        onText?.setTextColor(resources.getColor(R.color.black_nine))
+        offText?.setTextColor(resources.getColor(R.color.white))
+        updateLights(false, this.allGroup!!)
+        val intent = Intent("switch_here")
+        intent.putExtra("switch_here", "false")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
     }
 
     val CREATE_SCENE_REQUESTCODE = 3
@@ -666,4 +753,20 @@ class GroupListFragment : BaseFragment() {
         sendGroupResterNormal()
     }
 
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ALLON -> {
+                LogUtils.v("zcl-----------远程控制群组开启成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOpenSuccess()
+            }
+            Constant.SER_ID_GROUP_ALLOFF -> {
+                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOffSuccess()
+            }
+        }
+    }
 }

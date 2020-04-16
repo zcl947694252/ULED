@@ -1,11 +1,11 @@
 package com.dadoutek.uled.util
 
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.telink.util.MeshUtils
 
 /**
  * 专门用于生成可用的Mesh地址
+ * 线程内不能频繁操作数据库否则gc
  */
 class MeshAddressGenerator {
     var meshAddress: Int = 0
@@ -35,8 +35,5 @@ class MeshAddressGenerator {
                 addressList.last()
             }
         }
-
-
     }
-
 }

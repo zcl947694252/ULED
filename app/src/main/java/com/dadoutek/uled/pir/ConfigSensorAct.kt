@@ -273,7 +273,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else if (tietDelay.text.toString().toInt() > 255) {
                     ToastUtils.showLong(getString(R.string.time_max_tip))
                 } else {
-                    showLoadingDialog(getString(R.string.configuring_switch))
+                    showLoadingDialog(getString(R.string.configuring_sensor))
                     Thread {
                         val mode = getModeValue()
 
@@ -322,7 +322,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+mDeviceInfo!!.meshAddress
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+mDeviceInfo!!.meshAddress
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

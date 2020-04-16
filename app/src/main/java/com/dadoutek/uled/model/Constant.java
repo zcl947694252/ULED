@@ -17,9 +17,10 @@ public class Constant implements Serializable {
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
-    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
+    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
+            "-endpoint";
 
-    public static  Boolean isDebug = false;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -29,6 +30,7 @@ public class Constant implements Serializable {
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
+    //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
     //单点登录key
@@ -54,7 +56,7 @@ public class Constant implements Serializable {
 
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
-    public static  String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
+    public static String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
@@ -140,16 +142,11 @@ public class Constant implements Serializable {
     public static final String DB_UPDATE = "DB_UPDATE";
     //用户类型
     public static String USER_TYPE = "USER_TYPE";
-    //    //用户类型老用户
-//    public static String USER_TYPE_OLD = "OLD_USER";
     //用户类型老用户（2018-7-23：取消新老用户的标识，全部标记为新用户数据类型）
     public static String USER_TYPE_OLD = "NEW_USER";
     //用户类型新用户
     public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户
-    public static int CTROL_PASSWORD_REGION = 1000000000;
-
-    public static String LIGHT_STATE_KEY = "LIGHT_STATE_KEY";
 
     //是否在一键恢复出厂设置
     public static String DELETEING = "DELETEING";
@@ -159,8 +156,6 @@ public class Constant implements Serializable {
 
     public static String DEVICE_TYPE = "DEVICE_TYPE";
 
-    //管理权限本地保存key
-    public static String OLD_INDEX_DATA = "oldIndexData";
 
     //管理权限本地保存key
     public static int SWITCH_PIR_ADDRESS = 0xFF;
@@ -170,40 +165,9 @@ public class Constant implements Serializable {
 
     public static String UPDATE_LIGHT = "UPDATE_LIGHT";
 
-    public static String FIRMWARE_TYPE_LIGHT = "FIRMWARE_TYPE_LIGHT";
-    public static String FIRMWARE_TYPE_CONTROLLER = "FIRMWARE_TYPE_CONTROLLER";
-
     public static String PRESET_COLOR = "PRESET_COLOR";
 
-    public static int LIGHT = 1;
-    public static int CONTROLLER = 2;
-
-    //l有频闪;ln无频闪;lns无频闪单调光;ln不带s调光调色
-
-    //🈶频闪
-    public static int LIGHT_TYPE_STROBE = 1;
-    //无频闪单调光
-    public static int LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 2;
-    //无频闪调光调色
-    public static int LIGHT_TYPE_NO_STROBO_DIMMING = 3;
-    //无频闪costdown
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN = 4;
-    //无频闪costdown双调光
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING = 5;
-    //无频闪costdown48转36V
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V = 6;
-
-    //无频闪单调光
-    public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 1;
-    //无频闪调光调色
-    public static int CONTROLLER_TYPE_NO_STROBO_DIMMING = 2;
-    //RGB控制器
-    public static int CONTROLLER_TYPE_RGB = 3;
-
     public static int OTA_SUPPORT_LOWEST_VERSION = 206;
-
-    public static int TURN_ON_THE_LIGHT_AFTER_PASSING = 0;
-    public static int TURN_OFF_THE_LIGHT_AFTER_PASSING = 1;
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT = "IS_SCAN_RGB_LIGHT";
@@ -220,15 +184,7 @@ public class Constant implements Serializable {
     public static String TYPE_LOGIN = "TYPE_LOGIN";
 
     //导航页标签
-    public static String TAG_GroupListFragment = "GroupListFragment";
     public static String TAG_SceneFragment = "SceneFragment";
-    public static String TAG_SceneFragment1 = "SceneFragment1";
-    public static String TAG_SceneFragment2 = "SceneFragment2";
-    public static String TAG_DeviceScanningNewActivity = "DeviceScanningNewActivity";
-    public static String TAG_SetSceneAct = "TAG_SetSceneAct";
-    public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
-    public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
-    //    public static String TAG_GroupListFragment = "GroupListFragment";
 
     public static final int INSTALL_NORMAL_LIGHT = 0;
     public static final int INSTALL_RGB_LIGHT = 1;
@@ -236,6 +192,7 @@ public class Constant implements Serializable {
     public static final int INSTALL_SENSOR = 3;
     public static final int INSTALL_CURTAIN = 4;
     public static final int INSTALL_CONNECTOR = 5;
+    public static final int INSTALL_GATEWAY = 6;
 
     public static final int INSTALL_LIGHT_OF_CW = 10;
     public static final int INSTALL_LIGHT_OF_RGB = 11;
@@ -261,6 +218,8 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_CURTAIN = Long.valueOf(0x10);
     //连接器
     public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
+    //网关
+    public static final Long DEVICE_TYPE_GATE_WAY = Long.valueOf(0x07);
 
     //升级标记t
     public static final String UP_VERSION = "UP_VERSION";
@@ -270,7 +229,6 @@ public class Constant implements Serializable {
 
     public static final String OTA_MAC = "OTA_MAC";
     public static final String OTA_MES_Add = "OTA_MES_Add";
-
 
 
     //是否显示区域弹框
@@ -305,5 +263,136 @@ public class Constant implements Serializable {
     public static final String ISCONFIRM = "isConfirm";
     public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
-    public static final String IS_TECK="IS_TECK";
+    public static final String IS_TECK = "IS_TECK";
+    public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
+
+    public static final String GW_COMMEND_CODE = "GW_COMMEND_CODE";
+    /**
+     * 网关设置wifi连接标识
+     */
+    public static final int GW_WIFI_VOIP = 0X10;
+    /**
+     * 网关开关业务标识
+     */
+    public static final int GW_SWITCH_VOIP = 0X11;
+    /**
+     * 网关恢复出厂业务标识
+     */
+    public static final int GW_RESET_VOIP = 0X12;
+    /**
+     * 网关定时场景标签头下发
+     */
+    public static final int GW_CONFIG_TIMER_LABEL_VOIP = 0X13;
+    /**
+     * 网关定时场景时间下发
+     */
+    public static final int GW_CONFIG_TIMER_TASK_VOIP = 0X14;
+    /**
+     * 网关删除定时场景标签:
+     */
+    public static final int GW_DELETE_TIMER_LABEL_VOIP = 0X15;
+    /**
+     * 网关删除定时场景时间
+     */
+    public static final int GW_DELETE_TIMER_TASK_VOIP = 0X16;
+    /**
+     * w网关循环场景标签头下发:
+     */
+    public static final int GW_CONFIG_TIME_PERIVODE_LABEL_VOIP = 0X17;
+    /**
+     * 网关循环时间段下发业务标识
+     */
+    public static final int GW_CONFIG_TIME_PERIVODE_TASK_VOIP = 0X18;
+    /**
+     * 网关删除循环场景标签业务标识
+     */
+    public static final int GW_DELETE_TIME_PERIVODE_LABEL_VOIP = 0X19;
+    /**
+     * 网关删除循环场景时间段业务标识
+     */
+    public static final int GW_DELETE_TIME_PERIVODE_TASK_VOIP = 0X1A;
+    /**
+     * 网关设置时区和时间连接标识
+     */
+    public static final int GW_TIME_ZONE_VOIP = 0X1B;
+    /**
+     * 开关网关
+     */
+    public static final int GW_GATT_SWITCH = 1;
+
+    /**
+     * 开关网关标签
+     */
+    public static final int GW_GATT_LABEL_SWITCH = 2;
+    /**
+     * 删除网关标签
+     */
+    public static final int GW_GATT_DELETE_LABEL = 3;
+    /**
+     * 删除网关标签的task时间
+     */
+    public static final int GW_GATT_DELETE_LABEL_TASK = 4;
+
+    /**
+     * 保存网关标签头
+     */
+    public static final int GW_GATT_SAVE_LABEL_HEAD = 5;
+
+
+    /**
+     * 保存网关定时选择时间标签头
+     */
+    public static final int GW_GATT_CHOSE_TIME_LABEL_HEAD = 6;
+
+    /**
+     * 保存网关定时模式task任务
+     */
+    public static final int GW_GATT_SAVE_TIMER_TASK_TIME = 7;
+
+    /**
+     * 保存网关循环模式选择时间标签头
+     */
+    public static final int GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD = 8;
+
+    /**
+     * 保存网关x循环模式task任务
+     */
+    public static final int GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME = 9;
+    /**
+     * 是否是重新配置网关wifi
+     */
+    public static final String IS_GW_CONFIG_WIFI = "IS_GW_CONFIG_WIFI";
+    /**
+     * 0b0000 0001 and 0b1111 1111 相同为1 不同为0  等于0b0000 0001
+     */
+    public static final int SATURDAY = 1 << 6;
+    public static final int FRIDAY = 1 << 5;
+    public static final int THURSDAY = 1 << 4;
+    public static final int WEDNESDAY = 1 << 3;
+    public static final int TUESDAY = 1 << 2;
+    public static final int MONDAY = 1 << 1;
+    public static final int SUNDAY = 1 << 0;
+    /**
+     * 通过服务器转发命令到网关CMD
+     */
+    public static final int CMD_MQTT_CONTROL = 2500;
+    /**
+     * Y远程控制业务标识
+     */
+    public static final int SER_ID_GROUP_ALLON = 0x51;
+    public static final int SER_ID_GROUP_ALLOFF = 0x52;
+    public static final int SER_ID_GROUP_ON = 0x53;
+    public static final int SER_ID_GROUP_OFF = 0x54;
+
+    public static final int SER_ID_LIGHT_ON = 0x55;
+    public static final int SER_ID_LIGHT_OFF = 0x56;
+    public static final int SER_ID_RGBLIGHT_ON = 0x57;
+    public static final int SER_ID_RGBLIGHT_OFF = 0x58;
+    public static final int SER_ID_SCENE_ON = 0x59;
+    public static final int SER_ID_CURTAIN_ON = 0x60;
+    public static final int SER_ID_CURTAIN_OFF = 0x61;
+    public static final int SER_ID_RELAY_ON = 0x62;
+    public static final int SER_ID_RELAY_OFF = 0x63;
+    public static final int SER_ID_GATEWAY_ON = 0x64;
+    public static final int SER_ID_GATEWAY_OFF = 0x65;
 }

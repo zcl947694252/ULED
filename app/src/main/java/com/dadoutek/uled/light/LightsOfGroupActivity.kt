@@ -188,8 +188,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             lightList.clear()
         }
 
-//        for(i in list.indices){
-//            nameList.add(list[i].name)
+//        for(i in listTask.indices){
+//            nameList.add(listTask[i].name)
 //        }
 
         if (isSearch) {

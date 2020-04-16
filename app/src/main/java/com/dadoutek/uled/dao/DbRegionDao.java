@@ -31,6 +31,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         public final static Property InstallMeshPwd = new Property(4, String.class, "installMeshPwd", false, "INSTALL_MESH_PWD");
         public final static Property BelongAccount = new Property(5, String.class, "belongAccount", false, "BELONG_ACCOUNT");
         public final static Property Name = new Property(6, String.class, "name", false, "NAME");
+        public final static Property LastGenMeshAddr = new Property(7, int.class, "lastGenMeshAddr", false, "LAST_GEN_MESH_ADDR");
     }
 
 
@@ -52,7 +53,8 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
                 "\"INSTALL_MESH\" TEXT," + // 3: installMesh
                 "\"INSTALL_MESH_PWD\" TEXT," + // 4: installMeshPwd
                 "\"BELONG_ACCOUNT\" TEXT," + // 5: belongAccount
-                "\"NAME\" TEXT);"); // 6: name
+                "\"NAME\" TEXT," + // 6: name
+                "\"LAST_GEN_MESH_ADDR\" INTEGER NOT NULL );"); // 7: lastGenMeshAddr
     }
 
     /** Drops the underlying database table. */
@@ -99,6 +101,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (name != null) {
             stmt.bindString(7, name);
         }
+        stmt.bindLong(8, entity.getLastGenMeshAddr());
     }
 
     @Override
@@ -139,6 +142,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (name != null) {
             stmt.bindString(7, name);
         }
+        stmt.bindLong(8, entity.getLastGenMeshAddr());
     }
 
     @Override
@@ -155,7 +159,8 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // installMesh
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // installMeshPwd
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // belongAccount
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // name
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // name
+            cursor.getInt(offset + 7) // lastGenMeshAddr
         );
         return entity;
     }
@@ -169,6 +174,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         entity.setInstallMeshPwd(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setBelongAccount(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setLastGenMeshAddr(cursor.getInt(offset + 7));
      }
     
     @Override

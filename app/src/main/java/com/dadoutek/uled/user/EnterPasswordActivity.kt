@@ -46,20 +46,17 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.dadoutek.uled.util.ToastUtil
 import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.toast
 
 /**
  * 登录界面 输入密码
  */
 class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
+    private var launch: Job? = null
     private var itemAdapter: RegionDialogAdapter? = null
     private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
     private var popConfirm: TextView? = null
@@ -202,7 +199,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             intent.putExtra("password", editPassWord)
             startActivityForResult(intent, 0)
         } else {
-            ToastUtil.showToast(this, getString(R.string.password_cannot))
+            ToastUtils.showShort( getString(R.string.password_cannot))
         }
     }
 
@@ -224,7 +221,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
                             Log.e("zcl", "zcl登录成功返回******$dbUser")
-                            SharedPreferencesHelper.putString(this@EnterPasswordActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
@@ -238,7 +234,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                         }
                     })
         } else {
-            ToastUtil.showToast(this, getString(R.string.password_cannot))
+            ToastUtils.showShort(getString(R.string.password_cannot))
         }
     }
 
@@ -398,7 +394,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
 
-                            SharedPreferencesUtils.saveCurrentUseRegion(it.id)
+                            SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
                             application.setupMesh(mesh)
                             val lastUser = DBUtils.lastUser!!
                             DBUtils.saveUser(lastUser)
@@ -435,7 +431,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun syncComplet() {
         hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
     }
@@ -487,7 +483,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                GlobalScope.launch(Dispatchers.Main) {
+                launch?.cancel()
+                 launch = GlobalScope.launch(Dispatchers.Main) {
                     loadDialog!!.show()
                 }
             }
@@ -495,7 +492,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     }
 
     fun hideLoadingDialog() {
-        GlobalScope.launch(Dispatchers.Main) {
+        launch?.cancel()
+         launch = GlobalScope.launch(Dispatchers.Main) {
             if (loadDialog != null && this.isActive && isRunning) {
                 loadDialog!!.dismiss()
             }
@@ -506,6 +504,11 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     override fun onStop() {
         super.onStop()
         isRunning = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        launch?.cancel()
     }
 
 }

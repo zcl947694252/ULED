@@ -53,7 +53,7 @@ class StompManager private constructor() {
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)
                     ?.withServerHeartbeat(5000)   //设置心跳
-        } else if (mStompClient?.isConnected == false) { //如果断连了就再连一次
+        } else if (mStompClient?.isConnected != true) { //如果断连了就再连一次
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)?.withServerHeartbeat(5000)   //设置心跳
         }
@@ -66,6 +66,17 @@ class StompManager private constructor() {
      */
     fun lifeCycle(): Flowable<LifecycleEvent>? {
         return mStompClient?.lifecycle()
+    }
+
+    private fun getGwHeaders(): List<StompHeader> {
+        val headersLogin = ArrayList<StompHeader>()
+        /**
+         * ack	String	是	固定: auto
+         * id	String	是	固定: common-cmd
+         */
+        headersLogin.add(StompHeader("ack", "auto"))
+        headersLogin.add(StompHeader("id", "common-cmd"))
+        return headersLogin
     }
 
     private fun getLoginHeaders(): List<StompHeader> {
@@ -114,13 +125,14 @@ class StompManager private constructor() {
      * 解析二维码的Flowable
      * @return onNext中的数据为key
      */
-    fun parseQRCodeTopic(): Flowable<QrCodeTopicMsg> {
+    fun parseQRCodeTopic(): Flowable<QrCodeTopicMsg>? {
         val headersLogin = getQRHeaders()
 
         val WS_TOPIC_CODE = "/topic/code.parse." + DBUtils.lastUser?.id
         // LogUtils.v("zcld订阅频道$WS_TOPIC_CODE")
-        return mStompClient!!.topic(WS_TOPIC_CODE, headersLogin)
-                .map { topicMessage ->
+
+        return mStompClient?.topic(WS_TOPIC_CODE, headersLogin)
+                ?.map { topicMessage ->
                     val payloadCode = topicMessage.payload
                     LogUtils.e("zcl_解析二维码$payloadCode")
                     val msg = Gson().fromJson(payloadCode, QrCodeTopicMsg::class.java)
@@ -132,10 +144,25 @@ class StompManager private constructor() {
      * 单点登录的Flowable
      * @return onNext中的数据为key
      */
-    fun singleLoginTopic(): Flowable<String> {
+    fun singleLoginTopic(): Flowable<String>? {
         val headersLogin = getLoginHeaders()
-        return mStompClient!!.topic(WS_TOPIC_LOGIN, headersLogin)
-                .map { topicMessage ->
+        return mStompClient?.topic(WS_TOPIC_LOGIN, headersLogin)
+                ?.map { topicMessage ->
+                    topicMessage.payload
+                }
+    }
+
+    /**
+     * 通用推送订阅，通过不同的cmd值进行逻辑判断
+     * ack	String	是	固定: auto
+     * id	String	是	固定: common-cmd
+     */
+    fun gwCommend(): Flowable<String>? {
+        val gwHeaders = getGwHeaders()
+        // /topic/common.cmd. + 用户id
+        var gwCommendUrl = "/topic/common.cmd." + DBUtils.lastUser?.id
+        return mStompClient?.topic(gwCommendUrl, gwHeaders)
+                ?.map { topicMessage ->
                     topicMessage.payload
                 }
     }
@@ -144,13 +171,13 @@ class StompManager private constructor() {
      * 解除授权的Flowable
      * @return onNext中的数据为key
      */
-    fun cancelAuthorization(): Flowable<CancelAuthorMsg> {
+    fun cancelAuthorization(): Flowable<CancelAuthorMsg>? {
         val headersLogin = getAuthorHeaders()
 //        LogUtils.e("解除授权的订阅id  ----${DBUtils.lastUser}")
         var WSAUTHOR_CODE_NOW = "/topic/authorization.cancel." + DBUtils.lastUser?.id
 
-        return mStompClient!!.topic(WSAUTHOR_CODE_NOW, headersLogin)
-                .map { topicMessage ->
+        return mStompClient?.topic(WSAUTHOR_CODE_NOW, headersLogin)
+                ?.map { topicMessage ->
                     val payload = topicMessage.payload
                     val msg = Gson().fromJson(payload, CancelAuthorMsg::class.java)
                     LogUtils.v("zcl解除授权得到信息$msg")

@@ -314,10 +314,10 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                         //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
-                            confirm?.text = getString(R.string.btn_ok)
+                            confirm?.text = getString(R.string.btn_sure)
                         } else {
                             confirm?.isClickable = false
-                            confirm?.text = getString(R.string.btn_ok) + "(" + num + "s)"
+                            confirm?.text = getString(R.string.btn_sure) + "(" + num + "s)"
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)

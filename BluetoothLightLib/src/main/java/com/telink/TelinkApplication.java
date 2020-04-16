@@ -41,7 +41,6 @@ import com.telink.util.Strings;
 public class TelinkApplication extends Application {
 
     private static TelinkApplication mThis;
-
     public final EventBus<String> mEventBus = new EventBus<>();
     public Context mContext;
     public boolean serviceStarted;

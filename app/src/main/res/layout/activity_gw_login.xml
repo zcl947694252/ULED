@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="69dp"
+            android:gravity="center"
+            android:text="@string/wifi_account"
+            android:textColor="@color/gray_3"
+            android:textSize="15sp" />
+
+    <EditText
+            android:id="@+id/gw_login_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="8dp"
+            android:singleLine="true"
+            android:layout_marginEnd="@dimen/dp_40"
+            android:hint="@string/wifi_account_hinit"
+            android:textColor="@color/gray_3"
+            android:textSize="@dimen/sp_14" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="23dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/wifi_pwd"
+            android:textColor="@color/gray_3"
+            android:textSize="15sp"/>
+
+    <EditText
+            android:id="@+id/gw_login_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="@dimen/dp_40"
+            android:hint="@string/wifi_pwd_hinit"
+            android:textColor="@color/gray_3"
+            android:textSize="@dimen/sp_14" />
+
+    <Button
+            android:id="@+id/gw_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="69dp"
+            android:layout_marginEnd="@dimen/dp_40"
+            android:background="@drawable/btn_rec_blue_bt"
+            android:text="@string/complete" />
+
+    <TextView
+            android:id="@+id/gw_login_skip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="23dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/btn_jump_over"
+            android:textColor="@color/gray_6"
+            android:textSize="@dimen/sp_14" />
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    <include layout="@layout/bottom_version_ly"/>
+</LinearLayout>

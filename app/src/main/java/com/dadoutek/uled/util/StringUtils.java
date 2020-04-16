@@ -251,30 +251,31 @@ public class StringUtils {
                 return context.getString(R.string.guide_tip_reset_curtain);
             case Constant.INSTALL_CONNECTOR:
                 return context.getString(R.string.guide_tip_reset_relay);
+                case Constant.INSTALL_GATEWAY:
+                return context.getString(R.string.guide_tip_reset_relay);
         }
         return "";
     }
 
-    public static String getSwitchPirDefaultName(int productUUID) {
+    public static  String getSwitchPirDefaultName(int productUUID, Context context) {
         String startStr = "";
         switch (productUUID) {
             case DeviceType.NORMAL_SWITCH:
-                startStr = "普通开关";
+            case DeviceType.NORMAL_SWITCH2:
+                startStr = context.getString(R.string.normal_swith);
                 break;
             case DeviceType.SCENE_SWITCH:
-                startStr = "场景开关";
+                startStr = context.getString(R.string.scene_switch);
                 break;
+
             case DeviceType.SMART_CURTAIN_SWITCH:
-                startStr = "窗帘开关";
+                startStr = context.getString(R.string.curtain_switch);
                 break;
             case DeviceType.NIGHT_LIGHT:
-                startStr = "小夜灯";
+                startStr = context.getString(R.string.night_light);
                 break;
             case DeviceType.SENSOR:
-                startStr = "传感器";
-                break;
-            case DeviceType.NORMAL_SWITCH2:
-                startStr = "普通开关";
+                startStr =  context.getString(R.string.sensor);
                 break;
         }
 

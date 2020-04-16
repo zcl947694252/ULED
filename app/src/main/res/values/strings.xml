@@ -115,7 +115,6 @@
     <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">Scanning lights need related permissions, otherwise it can not proceed to the next step</string>
-    <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add Group</string>
     <string name="set_group">CONFIRM GROUPING</string>
@@ -210,7 +209,7 @@
     <string name="scene4">Scene 4</string>
     <string name="scene_set">Scene assignment</string>
     <string name="setting_switch">Configuring switch…</string>
-    <string name="configuring_switch">Configuring sensor…</string>
+    <string name="configuring_sensor">Configuring sensor…</string>
     <string name="pace_fail">Configuration failed</string>
     <string name="tip_switch">Please add Scene first</string>
     <string name="tip_add_scene">All existing groups have been added!</string>
@@ -609,7 +608,7 @@
     <string name="guide_tip_reset_sensor">Sensor (with key) : press and hold the side reset key until the light flashes.\n Sensor (no button) : turn on the power for 3 seconds, turn off the power for 3 seconds, repeat about 5-6 times until the sensor flashes. </string>
     <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
     <string name="guide_tip_reset_relay">Bluetooth receiver: long press the white button of the receiver for 5 seconds, until the bluetooth receiver flashes. </string>
-
+    <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
     <!--窗帘相关-->
     <string name="up">up</string>
     <string name="down">down</string>
@@ -634,7 +633,7 @@
 
     <string name="delete_switch_confirm"> After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete switch?</string>
 
-    <string name="delete_switch_success">Delete Success</string>
+    <string name="delete_switch_success">Delete successfully, please power on again after power off</string>
 
     <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
 
@@ -691,6 +690,7 @@
     <string name="two_password_inconsistent">Two passwords are inconsistent</string>
     <string name="number">Num</string>
     <string name="for_connector">Connector</string>
+    <string name="for_gateway">Gateway</string>
     <string name="login_password">Log in with a password</string>
     <string name="account_after_login">Automatically register an account after login</string>
     <string name="online_upgrade">Upgrade</string>
@@ -701,7 +701,7 @@
     <string name="add_group">Add group</string>
 
     <string name="total">Total</string>
-    <string name="piece"></string>
+    <string name="piece">piece</string>
 
     <string name="gradient_mode">Gradient mode</string>
     <string name="color_mode">Color mode</string>
@@ -765,7 +765,7 @@
     <string name="light_on">Turn on </string>
     <string name="light_off">Turn off </string>
 
-    <string name="minute">Min</string>
+    <string name="startMinute">Min</string>
     <string name="second">Sec</string>
 
     <string name="moment">Instant</string>
@@ -909,7 +909,7 @@
     <string name="timeout_period_is_empty">The timeout period is empty</string>
     <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
     <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
-    <string name="timeout_1m">The timeout cannot be less than 1 minute</string>
+    <string name="timeout_1m">The timeout cannot be less than 1 startMinute</string>
     <string name="timeout_255_big">The timeout cannot be greater than 255 minutes</string>
     <string name="compatibility_mode">if the light does not flash, please turn on the compatibility mode.</string>
     <string name="rename_faile">Rename failed</string>
@@ -941,6 +941,93 @@
     <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
     <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
     <string name="config_success">Configuration is successful</string>
+    <string name="normal_swith">Ordinary switch</string>
+    <string name="scene_switch">Scene switch</string>
+    <string name="curtain_switch">Curtain switch</string>
+    <string name="night_light">Night light</string>
+    <string name="click_config">Config</string>
+    <string name="select_scene">Select the scene</string>
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
+    <string name="select_type">Please select type</string>
+    <string name="group_switch">Group switch</string>
+    <string name="close">close</string>
+    <string name="brightness_add">brightness+</string>
+    <string name="color_temperature_add">cct+</string>
+    <string name="brightness_minus">brightness-</string>
+    <string name="color_temperature_minus">cct-</string>
+    <string name="click_config_tip">Click the configure button to complete the configuration</string>
+    <string name="change_mode_8k">switching mode</string>
+    <string name="times_mode">Timer_Mode</string>
+    <string name="time_pattern_mode">Time_pattern</string>
+    <string name="event_list">Even List</string>
+    <string name="repetition">repetition</string>
+    <string name="chose_time">Chose time</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="tag1">Lable 1</string>
+    <string name="Gate_way">Gateway</string>
+    <string name="every_day">Everyday</string>
+    <string name="only_one">Only once</string>
+    <string name="please_select_scene">Please select the scene</string>
+    <string name="timer_exists">The timing time already exists</string>
+    <string name="invalid_data">Invalid data </string>
+    <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
+    <string name="add_time">Add Time</string>
+    <string name="add_times">Add Times</string>
+    <string name="to">To</string>
+    <string name="startTime">7:40</string>
+    <string name="endTime">8:00</string>
+    <string name="standing_time">Standing time</string>
+    <string name="standing_time_num">Stay time :%1$s per minute</string>
+    <string name="minute">Minute</string>
+    <string name="no_get_device_info">Device information not obtained, please try again</string>
+    <string name="have_time_task">The response task already exists in this time period, please select another time</string>
+    <string name="please_chose_right_time">The start time cannot be greater than the end time, please choose again</string>
+    <string name="timer_period_set">Time period setting</string>
+    <string name="please_select_standing_time">Please select your stay time</string>
+    <string name="please_setting_least_one">Please configure the scene for at least one time period</string>
+    <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
+    <string name="go_open">To open</string>
+    <string name="config_gate_way">Configure gateway</string>
+    <string name="switch_tip_small">* for example, scan the panel switch, connect to the power, press any button, and then click bluetooth search.</string>
+    <string name="wifi_account">WIFI Account</string>
+    <string name="wifi_pwd">WIFI Password</string>
+    <string name="wifi_account_hinit">Please enter WIFI account</string>
+    <string name="wifi_pwd_hinit">Please enter WIFI password</string>
+    <string name="config_net">Configure the network</string>
+    <string name="wifi_cannot_be_empty">WIFI account and WIFI password cannot be empty</string>
+    <string name="config_WIFI_FAILE">WIFI configuration failed, please retry the power</string>
+    <string name="config_setting_gw_wifi">Please wait while the wifi network is being configured</string>
+    <string name="no_this_bin">The bin file is not available on the resource server, please contact the administrator</string>
+    <string name="no_new_app_version">There is no bin file on the resource server, please contact the administrator. There is no need to update the current updated version of app</string>
+    <string name="mesh_error">mesh password error 70000</string>
+    <string name="no_have_type">Type not included</string>
+    <string name="ERROR_MESH_NOT_ENOUGH">Insufficient mesh address</string>
+    <string name="ERROR_GW_OR_ACCOUNT_NOT_EXIST">The gateway does not exist/there is no gateway under the account</string>
+    <string name="ERROR_GW_UNONLIN">The gateway is not online / the gateway is not online at all</string>
+    <string name="ERROR_GW_BASE64">base64 String decoding failed</string>
+    <string name="ERROR_SERVER_BUSYNEWSS">Server busy</string>
+    <string name="ERROR_SERVER_CRASH">Server crash</string>
+    <string name="gw_not_online">The gateway is not online</string>
+    <string name="tag_mutex">This tag conflicts with the %1$s tag. Please close the tag before starting it</string>
+    <string name="label">Label</string>
+    <string name="get_time_zone_fail">Failed to obtain time zone information</string>
+    <string name="config_gate_way_fail">Configuration gateway failed</string>
+    <string name="delete_gate_way_label_fail">Failed to remove the gateway label</string>
+    <string name="delete_gate_way_task_fail">The delete gateway task failed</string>
+    <string name="send_gate_way_label_head_fail">Failed to send tag header</string>
+    <string name="config_gate_way_tp_task_fail">Failed to configure the gateway loop mode time period</string>
+    <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
+    <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
+    <string name="gate_way_switch_fail">Gateway switch failed</string>
+    <string name="delete_device_confim">After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete Gateway?</string>
+    <string name="config_WIFI">ConfigGateWIFI</string>
+    <string name="gate_way_offline">Gateway offline</string>
+    <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
 
 </resources>

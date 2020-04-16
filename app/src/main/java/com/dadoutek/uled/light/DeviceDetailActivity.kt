@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
@@ -15,6 +16,7 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +24,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -29,13 +32,19 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -47,6 +56,7 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.widget.RecyclerGridDecoration
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.util.MeshUtils
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.template_search_tool.*
@@ -56,6 +66,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 /**
  * 创建者     zcl
@@ -70,6 +83,7 @@ import kotlinx.coroutines.launch
 private const val MAX_RETRY_CONNECT_TIME = 5
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
+    private var disposableTimer: Disposable? = null
     private lateinit var allLightData: ArrayList<DbLight>
     private var directLight: DbLight? = null
     private var mConnectDisposable: Disposable? = null
@@ -96,6 +110,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null
@@ -137,31 +152,31 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-       /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
-            device_detail_direct_item.visibility = View.VISIBLE
-            device_detail_direct_name.text = directLight?.name
-            directLight?.groupName = StringUtils.getLightGroupName(directLight)
-            device_detail_direct_group_name.text = directLight?.groupName
-            if (directLight?.groupName == null || directLight?.groupName == getString(R.string.not_grouped))
-                device_detail_direct_group_name.visibility = View.GONE
-            else
-                device_detail_direct_group_name.visibility = View.VISIBLE
-            getString(R.string.rename)
-            setTopLightState()
+        /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
+             device_detail_direct_item.visibility = View.VISIBLE
+             device_detail_direct_name.text = directLight?.name
+             directLight?.groupName = StringUtils.getLightGroupName(directLight)
+             device_detail_direct_group_name.text = directLight?.groupName
+             if (directLight?.groupName == null || directLight?.groupName == getString(R.string.not_grouped))
+                 device_detail_direct_group_name.visibility = View.GONE
+             else
+                 device_detail_direct_group_name.visibility = View.VISIBLE
+             getString(R.string.rename)
+             setTopLightState()
 
-            device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }
-            device_detail_direct_name_ly?.setOnClickListener {
-                currentLight = directLight
-                goSetting()
-            }
-            device_detail_direct_go_arr?.setOnClickListener {
-                currentLight = directLight
-                goSetting()
-            }
+             device_detail_direct_icon?.setOnClickListener { openOrClose(directLight!!) }
+             device_detail_direct_name_ly?.setOnClickListener {
+                 currentLight = directLight
+                 goSetting()
+             }
+             device_detail_direct_go_arr?.setOnClickListener {
+                 currentLight = directLight
+                 goSetting()
+             }
 
-        } else {*/
-            device_detail_direct_item?.visibility = View.GONE
-       // }
+         } else {*/
+        device_detail_direct_item?.visibility = View.GONE
+        // }
 
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.addItemDecoration(RecyclerGridDecoration(this, 2))
@@ -186,14 +201,15 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     GlobalScope.launch(Dispatchers.Main) {
-                        ToastUtils.showLong(getString(R.string.connecting_tip))
+                        //ToastUtils.showLong(getString(R.string.connecting_tip))
                         retryConnectCount = 0
                         autoConnect()
                     }
-                } else
+                    sendToGw()
+
+                } else {
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
-
                             canBeRefresh = true
                             openOrClose(currentLight!!)
 
@@ -216,13 +232,17 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             goSetting()
                         }
                     }
+                }
             }
         }
+
+
+
         adaper!!.bindToRecyclerView(recycleView)
         val size =/* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
             lightsData.size + 1
         else*/
-            lightsData.size
+                lightsData.size
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
@@ -256,7 +276,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
-        search_clear.setOnClickListener{
+        search_clear.setOnClickListener {
             clearSearch()
         }
         search_btn.setOnClickListener {
@@ -280,17 +300,91 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     search_btn.setTextColor(getColor(R.color.gray_6))
                     search_clear.visibility = View.VISIBLE
                     val list = allLightData.filter { dbLight -> dbLight.name.contains(s.toString()) }
-                    if (list.isEmpty()){
+                    if (list.isEmpty()) {
                         search_no_result.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         search_no_result.visibility = View.GONE
-                    lightsData.addAll(list)
-                    adaper?.notifyDataSetChanged()
+                        lightsData.addAll(list)
+                        adaper?.notifyDataSetChanged()
                     }
                 }
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun sendToGw() {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                    }
+                    val low = currentLight!!.meshAddr and 0xff
+                    val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray = byteArrayOf()
+                    if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                            //开灯
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                        }
+                    } else {
+                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                        }
+                    }
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentLight!!.meshAddr
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                disposableTimer?.dispose()
+                LogUtils.v("zcl-----------远程控制-------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
+            }
         })
     }
 
@@ -361,8 +455,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+//                    addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
+
             }
             R.id.create_scene -> {
                 dialog_device?.visibility = View.GONE
@@ -429,25 +525,31 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -457,11 +559,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
         }
     }
@@ -473,6 +575,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
@@ -481,14 +584,16 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
+
         val title = view.findViewById<TextView>(R.id.textView5)
-        if (position==INSTALL_NORMAL_LIGHT){
-            title.visibility =  View.GONE
-            install_tip_question.visibility =  View.GONE
-        }else{
-            title.visibility =  View.VISIBLE
-            install_tip_question.visibility =  View.VISIBLE
+        if (position == INSTALL_NORMAL_LIGHT) {
+            title.visibility = View.GONE
+            install_tip_question.visibility = View.GONE
+        } else {
+            title.visibility = View.VISIBLE
+            install_tip_question.visibility = View.VISIBLE
         }
+
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)
@@ -554,6 +659,15 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_GATEWAY -> {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -636,16 +750,16 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     allLightData = DBUtils.getAllNormalLight()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
-                          /*  if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
-                                    == TelinkLightApplication.getApp().connectDevice?.meshAddress)
-                                directLight = allLightData[i]
-                            else {*/
-                                val groupName = StringUtils.getLightGroupName(allLightData[i])
-                                if (groupName != getString(R.string.not_grouped))
-                                    allLightData[i].groupName = groupName
-                                else
-                                    allLightData[i].groupName = ""
-                                lightsData.add(allLightData[i])
+                            /*  if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
+                                      == TelinkLightApplication.getApp().connectDevice?.meshAddress)
+                                  directLight = allLightData[i]
+                              else {*/
+                            val groupName = StringUtils.getLightGroupName(allLightData[i])
+                            if (groupName != getString(R.string.not_grouped))
+                                allLightData[i].groupName = groupName
+                            else
+                                allLightData[i].groupName = ""
+                            lightsData.add(allLightData[i])
                             //}
                         }
                         lightsData = sortList(lightsData)
@@ -680,19 +794,19 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     lightsData.clear()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
-                           /* if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
-                                    == TelinkLightApplication.getApp().connectDevice?.meshAddress)
-                                directLight = allLightData[i]
-                            else {*/
-                                val groupName = StringUtils.getLightGroupName(allLightData[i])
-                                if (groupName != getString(R.string.not_grouped))
-                                    allLightData[i].groupName = groupName
-                                else
-                                    allLightData[i].groupName = ""
-                                lightsData.add(allLightData[i])
+                            /* if (TelinkLightApplication.getApp().connectDevice != null && allLightData[i].meshAddr
+                                     == TelinkLightApplication.getApp().connectDevice?.meshAddress)
+                                 directLight = allLightData[i]
+                             else {*/
+                            val groupName = StringUtils.getLightGroupName(allLightData[i])
+                            if (groupName != getString(R.string.not_grouped))
+                                allLightData[i].groupName = groupName
+                            else
+                                allLightData[i].groupName = ""
+                            lightsData.add(allLightData[i])
 
-                                lightsData = sortList(lightsData)
-                           // }
+                            lightsData = sortList(lightsData)
+                            // }
                         }
 
                         var batchGroup = changeHaveDeviceView()
@@ -852,6 +966,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         canBeRefresh = false
         acitivityIsAlive = false
+        disposableTimer?.dispose()
+        mConnectDisposable?.dispose()
+        disableConnectionStatusListener()
     }
 
 
@@ -982,14 +1099,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
      * 自动重连
      */
     fun autoConnect() {
-        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
-                DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-        mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 10)
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        mConnectDisposable?.dispose()
+        mConnectDisposable = connect(deviceTypes = deviceTypes,fastestMode = true ,retryTimes = 10)
                 ?.subscribe({
-                            onLogin()
-                        }, {
-                            LogUtils.d("connect failed")
-                        }
+                    onLogin()
+                }, {
+                    LogUtils.d("connect failed")
+                }
                 )
     }
 
@@ -1029,6 +1146,26 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         return arr
+    }
+
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when(gwStompBean.ser_id.toInt()){
+            Constant.SER_ID_LIGHT_ON->{
+                LogUtils.v("zcl-----------远程控制开灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
+            }
+            Constant.SER_ID_LIGHT_OFF->{
+                LogUtils.v("zcl-----------远程控制关灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
+                lightsData[positionCurrent].updateIcon()
+                adaper?.notifyDataSetChanged()
+            }
+        }
     }
 
 }

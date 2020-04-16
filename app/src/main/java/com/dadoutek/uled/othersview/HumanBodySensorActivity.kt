@@ -35,7 +35,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -270,7 +269,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initView() {
-        tv_function1.text = getString(R.string.btn_ok)
+        tv_function1.text = getString(R.string.btn_sure)
         tv_function1.setOnClickListener(this)
         triggering_conditions.setOnClickListener(this)
         trigger_time.setOnClickListener(this)
@@ -420,11 +419,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                     brightness = "0"
                                 var brin = brightness.toInt()
                                 if (brin == 0) {
-                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot))
+                                    ToastUtils.showShort(getString(R.string.brightness_cannot))
                                     return@setPositiveButton
                                 }
                                 if (brin > 100) {
-                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot_be_greater_than))
+                                    ToastUtils.showShort( getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
                                 trigger_time_text.text = textGp.text.toString() + "%"
@@ -838,7 +837,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         if (device != null&&device.macAddress==mDeviceInfo.macAddress){
         Thread {
             GlobalScope.launch(Dispatchers.Main) {
-                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_switch))
+                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
             }
             LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
             configLightlight()
@@ -872,28 +871,28 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var time = editText.text.toString()
 
         if (time == "") {
-            ToastUtil.showToast(this, getString(R.string.timeout_period_is_empty))
+            ToastUtils.showShort(getString(R.string.timeout_period_is_empty))
             return
         }
 
         if (time_type_text.text.toString() == getString(R.string.second)) {
             if (time.toInt() < 10) {
-                ToastUtil.showToast(this, getString(R.string.timeout_time_less_ten))
+                ToastUtils.showShort( getString(R.string.timeout_time_less_ten))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, getString(R.string.timeout_255))
+                ToastUtils.showShort(getString(R.string.timeout_255))
                 return
             }
         } else if (time_type_text.text.toString() == getString(R.string.minute)) {
             if (time.toInt() < 1) {
-                ToastUtil.showToast(this, getString(R.string.timeout_1m))
+                ToastUtils.showShort( getString(R.string.timeout_1m))
                 return
             }
 
             if (time.toInt() > 255) {
-                ToastUtil.showToast(this, getString(R.string.timeout_255_big))
+                ToastUtils.showShort(getString(R.string.timeout_255_big))
                 return
             }
         }
@@ -973,7 +972,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 
@@ -1045,13 +1044,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val device = TelinkLightApplication.getApp().connectDevice
         if (device != null&&device.macAddress==mDeviceInfo.macAddress) {
             GlobalScope.launch(Dispatchers.Main) {
-                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_switch))
+                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
             }
             val address = device.meshAddress
             //val address = mDeviceInfo.meshAddress
             //此处不能使用mes地址 应当使用0x00代表直连灯 所以用mes的时候断联后可以成功因为灯可能变为了直连灯
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    0x00, paramBytes)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, 0x00, paramBytes)
+
 
             LogUtils.v("zcl配置传感器-------------${editText.text}-----------${byteToHex(paramBytes)}------------${byteToHex(paramBytesGroup)}")
 

@@ -220,9 +220,6 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             curtainList.clear()
         }
 
-//        for(i in list.indices){
-//            nameList.add(list[i].name)
-//        }
 
         if (isSearch) {
             for (i in list.indices) {
@@ -535,9 +532,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
+                                //if (!com.dadoutek.uled.util.AppUtils.isExynosSoc)
                                     params.setScanFilters(scanFilters)
-                                }
+
                                 params.setMeshName(account)
                                 params.setOutOfMeshName(account)
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

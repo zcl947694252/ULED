@@ -15,22 +15,16 @@ import java.util.Arrays;
 
 public class DeviceInfo implements Parcelable {
 
-    public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
-        @Override
-        public DeviceInfo createFromParcel(Parcel in) {
-            return new DeviceInfo(in);
-        }
-
-        @Override
-        public DeviceInfo[] newArray(int size) {
-            return new DeviceInfo[size];
-        }
-    };
-
     /**
      * Mac地址
      */
     public String macAddress;
+
+    /**
+     * SixByteMac地址
+     */
+    public String sixByteMacAddress;
+
     /**
      * 设备名称
      */
@@ -64,23 +58,49 @@ public class DeviceInfo implements Parcelable {
      * 设备的firmware版本
      */
     public String firmwareRevision;
-
-    public DeviceInfo() {
+    /**
+     * 获取返回的数据
+     */
+    public int gwWifiState;
+    /**
+     * 获取返回的业务数据
+     */
+    public int gwVoipState;
+    protected DeviceInfo(Parcel in) {
+        macAddress = in.readString();
+        sixByteMacAddress = in.readString();
+        deviceName = in.readString();
+        meshName = in.readString();
+        meshAddress = in.readInt();
+        meshUUID = in.readInt();
+        productUUID = in.readInt();
+        status = in.readInt();
+        rssi = in.readInt();
+        id = in.readString();
+        isConfirm = in.readInt();
+        longTermKey = in.createByteArray();
+        firmwareRevision = in.readString();
+        gwWifiState = in.readInt();
+        gwVoipState = in.readInt();
     }
 
-    public DeviceInfo(Parcel in) {
-        this.id = in.readString();
-        this.macAddress = in.readString();
-        this.deviceName = in.readString();
-        this.meshName = in.readString();
-        this.firmwareRevision = in.readString();
-        this.meshAddress = in.readInt();
-        this.meshUUID = in.readInt();
-        this.productUUID = in.readInt();
-        this.status = in.readInt();
-        this.isConfirm = in.readInt();
-        this.rssi = in.readInt();
-        in.readByteArray(this.longTermKey);
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(macAddress);
+        dest.writeString(sixByteMacAddress);
+        dest.writeString(deviceName);
+        dest.writeString(meshName);
+        dest.writeInt(meshAddress);
+        dest.writeInt(meshUUID);
+        dest.writeInt(productUUID);
+        dest.writeInt(status);
+        dest.writeInt(rssi);
+        dest.writeString(id);
+        dest.writeInt(isConfirm);
+        dest.writeByteArray(longTermKey);
+        dest.writeString(firmwareRevision);
+        dest.writeInt(gwWifiState);
+        dest.writeInt(gwVoipState);
     }
 
     @Override
@@ -88,37 +108,26 @@ public class DeviceInfo implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
-        dest.writeString(this.macAddress);
-        dest.writeString(this.deviceName);
-        dest.writeString(this.meshName);
-        dest.writeString(this.firmwareRevision);
-        dest.writeInt(this.meshAddress);
-        dest.writeInt(this.meshUUID);
-        dest.writeInt(this.productUUID);
-        dest.writeInt(this.status);
-        dest.writeInt(this.isConfirm);
-        dest.writeInt(this.rssi);
-        dest.writeByteArray(this.longTermKey);
+    public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
+        @Override
+        public DeviceInfo createFromParcel(Parcel in) {
+            return new DeviceInfo(in);
+        }
+
+        @Override
+        public DeviceInfo[] newArray(int size) {
+            return new DeviceInfo[size];
+        }
+    };
+
+    public DeviceInfo() {
     }
+
 
     @Override
     public String toString() {
-        return "DeviceInfo{" +
-                "macAddress='" + macAddress + '\'' +
-                ", deviceName='" + deviceName + '\'' +
-                ", meshName='" + meshName + '\'' +
-                ", meshAddress=" + meshAddress +
-                ", meshUUID=" + meshUUID +
-                ", productUUID=" + productUUID +
-                ", status=" + status +
-                ", rssi=" + rssi +
-                ", id='" + id + '\'' +
-                ", isConfirm=" + isConfirm +
-                ", longTermKey=" + Arrays.toString(longTermKey) +
-                ", firmwareRevision='" + firmwareRevision + '\'' +
-                '}';
+        return "DeviceInfo{" + "macAddress='" + macAddress + '\'' + ", sixByteMacAddress='" + sixByteMacAddress + '\'' + ", deviceName='" + deviceName + '\'' + ", meshName='" + meshName + '\'' + ", meshAddress=" + meshAddress + ", meshUUID=" + meshUUID + ", productUUID=" + productUUID + ", status=" + status + ", rssi=" + rssi + ", id='" + id + '\'' + ", isConfirm=" + isConfirm + ", longTermKey=" + Arrays.toString(longTermKey) + ", firmwareRevision='" + firmwareRevision + '\'' + ", gwWifiState=" + gwWifiState + ", gwVoipState=" + gwVoipState + '}';
     }
+
+
 }

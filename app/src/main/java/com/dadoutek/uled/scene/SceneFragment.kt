@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v7.util.DiffUtil
@@ -16,27 +17,36 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.TmtUtils
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by hejiajun on 2018/5/2.
@@ -44,6 +54,8 @@ import java.util.*
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+    private var disposableTimer: Disposable? = null
+    private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
     private var adaper: SceneRecycleListAdapter? = null
     private var toolbar: Toolbar? = null
@@ -64,7 +76,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         try {
             if (position < adapter.data.size) {
-                setScene(scenesListData!![position].id!!)
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    sendToGw(scenesListData!![position])
+                } else {
+                    setScene(scenesListData!![position].id!!)
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -99,7 +116,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 R.id.scene_apply -> {
                     Log.e("zcl场景", "zcl场景******scene_apply")
                     if (TelinkLightApplication.getApp().connectDevice == null) {
-                        ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                        //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                        sendToGw(scenesListData!![position])
                     } else {
                         try {
                             if (position < adapter.data.size) {
@@ -114,17 +132,76 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
+    private fun sendToGw(dbScene: DbScene) {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.gate_way_offline))
+                    }
+                    var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
+                            dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+                    val gattBody = GwGattBody()
+                    gattBody.ser_id = Constant.SER_ID_SCENE_ON
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = Constant.SER_ID_SCENE_ON
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                disposableTimer?.dispose()
+                LogUtils.v("zcl-----------远程控制-------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
+            }
+        })
+    }
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
-        val view = inflater.inflate(R.layout.fragment_scene, null)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        no_scene = view.findViewById(R.id.no_scene)
-        add_scenes = view.findViewById(R.id.add_scenes)
+        viewContent = inflater.inflate(R.layout.fragment_scene, null)
+        recyclerView = viewContent.findViewById(R.id.recyclerView)
+        no_scene = viewContent.findViewById(R.id.no_scene)
+        add_scenes = viewContent.findViewById(R.id.add_scenes)
 
-        install_device = view.findViewById(R.id.install_device)
-        create_group = view.findViewById(R.id.create_group)
-        create_scene = view.findViewById(R.id.create_scene)
-        addNewScene = view.findViewById(R.id.add_new_scene)
+        install_device = viewContent.findViewById(R.id.install_device)
+        create_group = viewContent.findViewById(R.id.create_group)
+        create_scene = viewContent.findViewById(R.id.create_scene)
+        addNewScene = viewContent.findViewById(R.id.add_new_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
@@ -132,10 +209,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         add_scenes!!.setOnClickListener(this)
         addNewScene!!.setOnClickListener(this)
 
-        initToolBar(view)
+        initToolBar(viewContent)
         initData()
         initView()
-        return view
+        return viewContent
     }
 
     private val onClick = View.OnClickListener {
@@ -148,7 +225,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -388,7 +466,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
         }
 
-        TmtUtils.midToastW(activity, getString(R.string.scene_apply_success))
+        //ToastUtils.showShort(activity, getString(R.string.scene_apply_success))
+
+        ToastUtils.showShort(getString(R.string.scene_apply_success))
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -401,7 +481,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         } else {
             refreshView()
         }
-
     }
 
     fun refreshView() {
@@ -610,4 +689,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         private const val SCENE_MAX_COUNT = 100
     }
 
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_SCENE_ON -> {
+                LogUtils.v("zcl-----------远程控制场景开启成功-------")
+                ToastUtils.showShort(getString(R.string.scene_apply_success))
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+            }
+        }
+    }
 }

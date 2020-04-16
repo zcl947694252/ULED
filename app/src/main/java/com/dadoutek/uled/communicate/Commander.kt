@@ -626,7 +626,7 @@ object Commander : EventListener<String> {
     @JvmStatic
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null,connectTimeOutTime:Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
@@ -647,13 +647,13 @@ object Commander : EventListener<String> {
 
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-                LogUtils.d("Commander auto connect meshName = $meshName, mConnectEmitter = ${mConnectEmitter}, mac = $macAddress")
+                LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
 
                 TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
-                LogUtils.d("connect doFinally")
+                // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
 
@@ -681,7 +681,6 @@ object Commander : EventListener<String> {
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-
         }
                 .retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -690,7 +689,7 @@ object Commander : EventListener<String> {
                     it.onError(Throwable("get version failed"))
                 }
                 .doOnSubscribe {
-                    TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+                    TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
                 }
                 .doFinally {
                     TelinkLightApplication.getApp().removeEventListener(NotificationEvent.GET_DEVICE_STATE, this)
@@ -700,23 +699,26 @@ object Commander : EventListener<String> {
 
     private fun onGetLightVersion(event: NotificationEvent) {
         val data = event.args.params
-        if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
-            version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
+        version = if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
+            Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
 
         } else {
-            version = Strings.bytesToString(data)
+            Strings.bytesToString(data)
         }
 
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
+                if (version == null) {
+                    mGetVersionObservable?.onError(Throwable("get empty version,please retry"))
+                }
                 mGetVersionObservable?.onNext(version!!)
                 mGetVersionObservable?.onComplete()
-
             } else {
             }
         } else {
-            mGetVersionObservable?.onError(Throwable("get empty version"))
+            if (mGetVersionObservable?.isDisposed == false)
+                mGetVersionObservable?.onError(Throwable("get empty version"))
             LogUtils.d("get empty version")
         }
 

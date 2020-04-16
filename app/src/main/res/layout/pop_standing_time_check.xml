@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container_single"
+        android:layout_width="match_parent"
+        android:layout_height="420dp"
+        android:background="@drawable/rect_a_c8"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/dp_18">
+
+    <include layout="@layout/template_recycleview"
+            android:layout_width="match_parent"
+            android:layout_height="370dp"/>
+</LinearLayout>

@@ -8,6 +8,7 @@ import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.EditText;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 
 public class InputRGBColorDialog extends AlertDialog implements View.OnClickListener {
@@ -75,32 +76,32 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
                 String blue = blueEditText.getText().toString().trim();
 
                 if(red.equals("")){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
+                    ToastUtils.showShort(mContext.getString(R.string.cannot_rgb_null));
                     return;
                 }
 
                 if(green.equals("")){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
+                    ToastUtils.showShort(mContext.getString(R.string.cannot_rgb_null));
                     return;
                 }
 
                 if(blue.equals("")){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
+                    ToastUtils.showShort(mContext.getString(R.string.cannot_rgb_null));
                     return;
                 }
 
                 if(Integer.parseInt(red) >255){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
+                    ToastUtils.showShort(mContext.getString(R.string.rgb_max));
                     return;
                 }
 
                 if(Integer.parseInt(green) >255){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
+                    ToastUtils.showShort(mContext.getString(R.string.rgb_max));
                     return;
                 }
 
                 if(Integer.parseInt(blue) >255){
-                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
+                    ToastUtils.showShort(mContext.getString(R.string.rgb_max));
                     return;
                 }
 

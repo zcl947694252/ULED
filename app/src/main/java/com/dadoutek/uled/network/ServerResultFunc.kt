@@ -30,9 +30,7 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
                 AppUtils.relaunchApp()
             } else if ( response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT) {
                 response.t = "" as T
-            }
-            else
-             {
+            } else {
                 ServerResultException.handleException(response)
             }
         }

@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -334,10 +335,8 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         //倒计时10s，出问题了就超时。
         mConnectTimer = createConnectTimeout();
 
-
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
-
 
         btnAddGroups.setOnClickListener(v -> {
             if (isLoginSuccess) {
@@ -704,7 +703,8 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     @OnClick(R.id.add_group_layout)
     public void onViewClicked() {
         isGuide = false;
-        addNewGroup();
+       // addNewGroup();
+        popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
     }
 
     private void addNewGroup() {
@@ -868,7 +868,8 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP3_GUIDE_CREATE_GROUP())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
                         isGuide = true;
-                        addNewGroup();
+                       // addNewGroup();
+                        popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
                     }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
                     .show();
         }
@@ -994,7 +995,8 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         this.updateList = new ArrayList<>();
 
         add_relativeLayout.setOnClickListener(v -> {
-            addNewGroup();
+           // addNewGroup();
+            popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
         });
 
         startGrouping();
@@ -1065,7 +1067,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         }
 
         //所有灯的meshId
-        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        allLightId = DBUtils.INSTANCE.getGroupByMeshAddr(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();

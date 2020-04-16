@@ -21,6 +21,7 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#c9c9c9</color>
+    <color name="divider2">#999</color>
     <color name="background_color">#f6f6f6</color>
     <color name="mode_check_color">#80858C91</color>
     <color name="color_gray">#00000000</color>
@@ -33,6 +34,8 @@
     <color name="black_ee">#eeeeee</color>
     <color name="text_red">#ff0000</color>
     <color name="color_c8">#c8c8c8</color>
+    <color name="color_a_c8">#c8c8c8c8</color>
+    <color name="color_a_ca">#ddcacaca</color>
     <color name="transparent">#00000000</color>
     <color name="app_bg_color">#3c3c52</color>
     <color name="blue_light">#6FD8FF</color>
@@ -43,5 +46,9 @@
     <color name="blue_dark">#0083B3</color>
     <color name="gray_c">#ccc</color>
     <color name="gray_d">#ddd</color>
+    <color name="dark_glod">#FF654405</color>
     <color name="device_list_divider">#F8F8F8</color>
+    <color name="brightness_add_color">#FF654405</color>
+    <color name="gray9">#FF999999</color>
+    <color name="gray_d8">#FFD8D8D8</color>
 </resources>

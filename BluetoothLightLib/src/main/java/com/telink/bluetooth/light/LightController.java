@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;
 import com.telink.bluetooth.TelinkLog;
@@ -66,7 +67,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private static final int TAG_NORMAL_COMMAND = 1000;
 
     // 控制指令 默认320ms延时
-//    private static final int DEFAULT_DELAY_TIME = 320;
+    //    private static final int DEFAULT_DELAY_TIME = 320;
     /********************************************************************************
      * Attributes
      *******************************************************************************/
@@ -88,6 +89,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private final Command.Callback deleteCallback = new DeleteCommandCallback();
     private final Command.Callback otaCallback = new OtaCommandCallback();
     private final Command.Callback firmwareCallback = new FirmwareCallback();
+    private final Command.Callback deviceMacCallback = new DeviceMacCallback();
+    private final Command.Callback setGwCallback = new SetGwCallback();
     private final OtaPacketParser otaPacketParser = new OtaPacketParser();
 
     private LightPeripheral light;
@@ -155,6 +158,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         this.light.disconnect();
         this.light.connect(this.mContext, this);
+        this.light.getMacAddress();
 
         this.isConnecting.set(true);
         this.mDelayHandler.removeCallbacks(this.mConnectTask);
@@ -167,7 +171,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
     synchronized public void disconnect() {
         /*if (mContext != null)
-            ((TelinkApplication) mContext.getApplicationContext()).saveLog("DISCONNECT" + (light == null ? "null" : (" : " + light.getDeviceName() + " -- " + light.getMacAddress())));*/
+            ((TelinkApplication) mContext.getApplicationContext()).saveLog("DISCONNECT" + (light
+            == null ? "null" : (" : " + light.getDeviceName() + " -- " + light.getMacAddress())));*/
         /*synchronized (this) {
             this.isLogin = false;
         }*/
@@ -207,10 +212,9 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         byte[] plaintext = new byte[16];
-        if (meshName != null && password != null)
-            for (int i = 0; i < 16; i++) {
-                plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
-            }
+        if (meshName != null && password != null) for (int i = 0; i < 16; i++) {
+            plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
+        }
 
         byte[] randm = this.generateRandom(this.loginRandm);
         byte[] sk = new byte[16];
@@ -221,10 +225,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         try {
             encrypted = AES.encrypt(sk, plaintext);
-        } catch (InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchPaddingException | UnsupportedEncodingException
-                | IllegalBlockSizeException | BadPaddingException
-                | NoSuchProviderException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException | NoSuchProviderException e) {
             this.disconnect();
             this.dispatchEvent(new LightEvent(LightEvent.LOGIN_FAILURE, e.getMessage()));
             return;
@@ -263,15 +264,15 @@ public final class LightController extends EventBus<Integer> implements LightPer
     public void reset(byte[] meshName, byte[] password, byte[] longTermKey) {
         TelinkLog.d("prepare update mesh info");
 
-//        synchronized (this) {
-//            if (!this.isLogin) {
+        //        synchronized (this) {
+        //            if (!this.isLogin) {
         if (!this.isLogin.get()) {
             this.dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "not login"));
             return;
         }
 
-//            }
-//        }
+        //            }
+        //        }
 
         this.light.meshChanged = false;
 
@@ -284,8 +285,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         this.newLongTermKey = longTermKey;
 
-        if (this.resetDeviceAddress())
-            return;
+        if (this.resetDeviceAddress()) return;
 
         this.mDelayHandler.removeCallbacksAndMessages(null);
 
@@ -302,10 +302,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             Arrays.reverse(pwd, 0, pwd.length - 1);
             Arrays.reverse(ltk, 0, ltk.length - 1);
 
-        } catch (InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchPaddingException | UnsupportedEncodingException
-                | IllegalBlockSizeException | BadPaddingException
-                | NoSuchProviderException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException | NoSuchProviderException e) {
             this.dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, e.getMessage()));
             return;
         }
@@ -326,15 +323,14 @@ public final class LightController extends EventBus<Integer> implements LightPer
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
         UUID pairUUID = manufacture.getUUID(Manufacture.UUIDType.PAIR);
 
-        Command nnCmd = new Command(serviceUUID,
-                pairUUID, Command.CommandType.WRITE,
-                nnData, TAG_RESET_MESH_NAME);
-        Command pwdCmd = new Command(serviceUUID, pairUUID, Command.CommandType.WRITE,
-                pwdData, TAG_RESET_MESH_PASSWORD);
-        Command ltkCmd = new Command(serviceUUID, pairUUID, Command.CommandType.WRITE,
-                ltkData, TAG_RESET_MESH_LTK);
-        Command checkCmd = new Command(serviceUUID, pairUUID, Command.CommandType.READ,
-                null, TAG_RESET_MESH_CHECK);
+        Command nnCmd = new Command(serviceUUID, pairUUID, Command.CommandType.WRITE, nnData,
+                TAG_RESET_MESH_NAME);
+        Command pwdCmd = new Command(serviceUUID, pairUUID, Command.CommandType.WRITE, pwdData,
+                TAG_RESET_MESH_PASSWORD);
+        Command ltkCmd = new Command(serviceUUID, pairUUID, Command.CommandType.WRITE, ltkData,
+                TAG_RESET_MESH_LTK);
+        Command checkCmd = new Command(serviceUUID, pairUUID, Command.CommandType.READ, null,
+                TAG_RESET_MESH_CHECK);
 
         this.sendCommand(this.resetCallback, nnCmd);
         pwdCmd.delay = 200;
@@ -352,8 +348,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         TelinkLog.d("mesh address -->" + newAddress + " : " + oldAddress);
 
-        if (newAddress == oldAddress)
-            return false;
+        if (newAddress == oldAddress) return false;
 
         this.enableNotification(this.notifyCallback, TAG_RESET_MESH_ADDRESS_NOTIFY_DATA);
         byte opcode = (byte) 0xE0;
@@ -361,9 +356,11 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         TelinkLog.d("prepare update mesh address -->" + light.getMacAddress() + " src : " + Integer.toHexString(oldAddress) + " new : " + Integer.toHexString(newAddress));
 
-        this.sendCommand(this.normalCallback, opcode, 0x0000, params, true, TAG_RESET_MESH_ADDRESS, 0);
-//        byte[] params1 = new byte[]{(byte) 0xFF, (byte) 0xFF};
-//        this.sendCommand(this.normalCallback, opcode, 0x0000, params1, false, TAG_NORMAL_COMMAND, 0);
+        this.sendCommand(this.normalCallback, opcode, 0x0000, params, true,
+                TAG_RESET_MESH_ADDRESS, 0);
+        //        byte[] params1 = new byte[]{(byte) 0xFF, (byte) 0xFF};
+        //        this.sendCommand(this.normalCallback, opcode, 0x0000, params1, false,
+        //        TAG_NORMAL_COMMAND, 0);
         this.mDelayHandler.postDelayed(this.mAllocAddressTask, 3000);
 
         return true;
@@ -378,8 +375,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get())
-            return;
+        if (!this.isLogin.get()) return;
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.NOTIFY);
@@ -403,8 +399,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get())
-            return;
+        if (!this.isLogin.get()) return;
 
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
@@ -425,8 +420,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get())
-            return;
+        if (!this.isLogin.get()) return;
 
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
@@ -438,7 +432,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         updateNotifyCmd.serviceUUID = serviceUUID;
         updateNotifyCmd.characteristicUUID = characteristicUUID;
         updateNotifyCmd.tag = TAG_NOTIFY_UPDATE;
-//        updateNotifyCmd.delay = DEFAULT_DELAY_TIME;
+        //        updateNotifyCmd.delay = DEFAULT_DELAY_TIME;
 
         this.sendCommand(null, updateNotifyCmd);
         TelinkLog.d("LightController#updateNotification");
@@ -521,12 +515,12 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
     public void delete() {
 
-//        synchronized (this) {
+        //        synchronized (this) {
         if (!this.isLogin.get()) {
             this.dispatchEvent(new LightEvent(LightEvent.DELETE_FAILURE, "not login"));
             return;
         }
-//        }
+        //        }
 
         byte[] plaintext = new byte[16];
 
@@ -545,10 +539,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         try {
             encrypted = AES.encrypt(sk, plaintext);
-        } catch (InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchPaddingException | UnsupportedEncodingException
-                | IllegalBlockSizeException | BadPaddingException
-                | NoSuchProviderException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException | NoSuchProviderException e) {
             this.dispatchEvent(new LightEvent(LightEvent.DELETE_FAILURE, e.getMessage()));
             return;
         }
@@ -589,13 +580,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
     public void startOta(byte[] firmware) {
 
-//        synchronized (this) {
+        //        synchronized (this) {
         //this.otaCompleted = false;
         if (!this.isLogin.get()) {
             this.dispatchEvent(new LightEvent(LightEvent.OTA_FAILURE, "not login"));
             return;
         }
-//        }
+        //        }
 
         TelinkLog.d("Start OTA");
         this.resetOta();
@@ -685,7 +676,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
      * Command API
      *******************************************************************************/
 
-    private boolean sendCommand(Command.Callback callback, byte[] commandData, boolean noResponse, Object tag, int delay) {
+    private boolean sendCommand(Command.Callback callback, byte[] commandData, boolean noResponse
+            , Object tag, int delay) {
 
         byte[] sk = this.sessionKey;
         int sn = this.sequenceNumber;
@@ -701,7 +693,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         Command command = Command.newInstance();
         if (command != null) {
-            command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE : Command.CommandType.WRITE;
+            command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE :
+                    Command.CommandType.WRITE;
             command.data = data;
             command.serviceUUID = serviceUUID;
             command.characteristicUUID = characteristicUUID;
@@ -716,19 +709,20 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         boolean success = true;
 
-//        synchronized (this) {
-//        Log.d("checkXConnect", "sendCommand: "+isLogin);
+        //        synchronized (this) {
+        //        Log.d("checkXConnect", "sendCommand: "+isLogin);
         if (!this.isLogin.get()) {
             success = false;
         }
-//        }
+        //        }
 
         this.light.sendCommand(callback, cmd);
 
         return success;
     }
 
-    public boolean sendCommand(Command.Callback callback, byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
+    public boolean sendCommand(Command.Callback callback, byte opcode, int address, byte[] params
+            , boolean noResponse, Object tag, int delay) {
 
         int sn = this.generateSequenceNumber();
 
@@ -759,7 +753,9 @@ public final class LightController extends EventBus<Integer> implements LightPer
         command[offset++] = (byte) (vendorId >> 8 & 0xFF);
         command[offset++] = (byte) (vendorId & 0xFF);
 
-        // params
+        /**
+         * params从第十一位开始
+         */
         if (params != null) {
             System.arraycopy(params, 0, command, offset, params.length);
         }
@@ -767,12 +763,23 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return this.sendCommand(callback, command, noResponse, tag, delay);
     }
 
-    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, int delay) {
+    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse,
+                               int delay) {
         return this.sendCommand(opcode, address, params, noResponse, TAG_NORMAL_COMMAND, delay);
     }
 
-    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
-        return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
+    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse,
+                               Object tag, int delay) {
+        if (tag.toString() == "0")
+            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse,
+                    tag, delay);
+        else if (tag.toString() == "1")
+            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag,
+                    delay);
+        else
+            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag
+                    , delay);
+
     }
 
     /********************************************************************************
@@ -792,6 +799,18 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return this.sendCommand(this.firmwareCallback, cmd);
     }
 
+    public boolean requestDeviceMac() {
+        UUID serviceUUID = UuidInformation.SERVICE_DEVICE_INFORMATION.getValue();
+        UUID characteristicUUID = UuidInformation.CHARACTERISTIC_DEVICE_MAC.getValue();
+
+        Command cmd = Command.newInstance();
+        cmd.serviceUUID = serviceUUID;
+        cmd.characteristicUUID = characteristicUUID;
+        cmd.type = Command.CommandType.READ;
+
+        return this.sendCommand(this.deviceMacCallback, cmd);
+    }
+
     /********************************************************************************
      * Private API
      *******************************************************************************/
@@ -800,9 +819,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         int maxNum = 0xFFFFFF;
 
-        if (this.sequenceNumber > maxNum)
-            this.sequenceNumber = Math.round((float) Math.random()
-                    * (maxNum - 1)) + 1;
+        if (this.sequenceNumber > maxNum)//生成指定范围内的随机数
+            this.sequenceNumber = Math.round((float) Math.random() * (maxNum - 1)) + 1;
 
         this.sequenceNumber++;
 
@@ -839,8 +857,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return ivs;
     }
 
-    private byte[] getSessionKey(byte[] meshName, byte[] password,
-                                 byte[] randm, byte[] rands, byte[] sk) throws Exception {
+    private byte[] getSessionKey(byte[] meshName, byte[] password, byte[] randm, byte[] rands,
+                                 byte[] sk) throws Exception {
 
         byte[] key = new byte[16];
 
@@ -859,8 +877,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         System.arraycopy(encrypted, 8, result, 8, 8);
         Arrays.reverse(result, 8, 15);
 
-        if (!Arrays.equals(result, sk))
-            return null;
+        if (!Arrays.equals(result, sk)) return null;
 
         System.arraycopy(randm, 0, key, 0, randm.length);
         System.arraycopy(rands, 0, key, 8, rands.length);
@@ -886,13 +903,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void run() {
-//            synchronized (LightController.this) {
+            //            synchronized (LightController.this) {
             if (!LightController.this.isLogin.get()) {
                 TelinkLog.d("LightController.Connection Timeout N");
                 disconnect();
                 isChecking = true;
             }
-//            }
+            //            }
         }
     }
 
@@ -900,14 +917,14 @@ public final class LightController extends EventBus<Integer> implements LightPer
     @Override
     public void onConnect(LightPeripheral light) {
         TelinkLog.d("LightController#onConnect");
-//        if (isN()) {
+        //        if (isN()) {
         TelinkLog.d("mDelayHandler#attCheckRunnable");
-//            mDelayHandler.removeCallbacks(mConnectTask);
+        //            mDelayHandler.removeCallbacks(mConnectTask);
         mDelayHandler.postDelayed(attCheckRunnable, ATT_CHECK_TIMEOUT);
 
         isChecking = false;
         isConnecting.set(false);
-//        }
+        //        }
     }
 
     @Override
@@ -918,9 +935,11 @@ public final class LightController extends EventBus<Integer> implements LightPer
         this.disconnect();
 
         if (isChecking) {
-            this.dispatchEvent(new LightEvent(LightEvent.CONNECT_ERROR_REPORT_ATT, " onAttError " + light.getMacAddress()));
+            this.dispatchEvent(new LightEvent(LightEvent.CONNECT_ERROR_REPORT_ATT,
+                    " onAttError " + light.getMacAddress()));
         } else if (isConnecting.get()) {
-            this.dispatchEvent(new LightEvent(LightEvent.CONNECT_ERROR_REPORT_CONNECT, " onConnect " + light.getMacAddress()));
+            this.dispatchEvent(new LightEvent(LightEvent.CONNECT_ERROR_REPORT_CONNECT, " " +
+                    "onConnect " + light.getMacAddress()));
             isConnecting.set(false);
         }
 
@@ -931,15 +950,16 @@ public final class LightController extends EventBus<Integer> implements LightPer
             TelinkLog.d("fail count:" + failCount);
             if (failCount >= MAX_RETRY) {
                 TelinkLog.d("LightController.onDisconnect.CONNECT_FAILURE_N");
-                this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE_N, " onDisconnect " + light.getMacAddress()));
+                this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE_N,
+                        " onDisconnect " + light.getMacAddress()));
             }
         }
-        this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE, " onDisconnect " + light.getMacAddress()));
+        this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE,
+                " onDisconnect " + light.getMacAddress()));
     }
 
     @Override
-    public void onServicesDiscovered(LightPeripheral light,
-                                     List<BluetoothGattService> services) {
+    public void onServicesDiscovered(LightPeripheral light, List<BluetoothGattService> services) {
 
         if (isN() && services.size() == 0) {
             disconnect();
@@ -950,15 +970,15 @@ public final class LightController extends EventBus<Integer> implements LightPer
     }
 
     @Override
-    public void onNotify(LightPeripheral light, byte[] data,
-                         UUID serviceUUID, UUID characteristicUUID, Object tag) {
+    public void onNotify(LightPeripheral light, byte[] data, UUID serviceUUID,
+                         UUID characteristicUUID, Object tag) {
 
         byte[] macAddress = light.getMacBytes();
         byte[] nonce = getSecIVS(macAddress);
 
-//        for(int i=0;i<data.length;i++){
-//            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
-//        }
+        //        for(int i=0;i<data.length;i++){
+        //            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
+        //        }
         System.arraycopy(data, 0, nonce, 3, 5);
         byte[] result;
         if (nonce != null && sessionKey != null && sessionKey.length > 0 && nonce.length > 0 && data.length > 0) {
@@ -966,42 +986,53 @@ public final class LightController extends EventBus<Integer> implements LightPer
         } else {
             result = new byte[0];
         }
-        TelinkLog.d("Notify Data --> " + Arrays.bytesToHexString(result, ","));
-
+        TelinkLog.d("蓝牙数据设置状态Notify Data --> " + Arrays.bytesToHexString(result, ","));
         this.onDeviceAddressNotify(data, tag);
         this.dispatchEvent(new LightEvent(LightEvent.NOTIFICATION_RECEIVE, result));
+        if (result.length >= 8) {
+            int cmd = result[7] & 0xFF;
+            //  LogUtils.e("kcmd = " + Integer.toHexString(cmd));
+            if (cmd == 0xFE) {
+                String s = Arrays.bytesToHexString(result, "");
+                String sixByteMacAddress = s.substring(20, 32);
+                LogUtils.v("zcl----蓝牙数据切割mac--------" + s + "------" + sixByteMacAddress);
+                light.setSixByteMacAddress(sixByteMacAddress);
+                this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+            } else if (cmd == 0xEA) {
+                int voipStatus = result[10] & 0xFF;
+                light.setGwVoipState(voipStatus);
+                if (voipStatus == 0X10)//0x10代表连接业务标识 11位是业务标识
+                    light.setGwWifiState(result[11]);//通过此处的peripheral设置数据
+//                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------" + result[11]);
+                this.dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
+            }
+        }
     }
 
     private void onDeviceAddressNotify(byte[] data, Object tag) {
 
-        if (!tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_DATA))
-            return;
+        if (!tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_DATA)) return;
 
         int length = data.length;
         int minLength = 20;
         int position = 7;
 
-        if (length < minLength)
-            return;
+        if (length < minLength) return;
 
         int opcode = data[position++] & 0xFF;
         int vendorId = ((data[position++] & 0xFF) << 8) + (data[position++] & 0xFF);
 
-        if (vendorId != Manufacture.getDefault().getVendorId())
-            return;
+        if (vendorId != Manufacture.getDefault().getVendorId()) return;
 
-        if (opcode != 0xE1)
-            return;
+        if (opcode != 0xE1) return;
 
         int meshAddress = (data[10] & 0xFF) + (data[11] << 8);
 
-        if (meshAddress == light.getMeshAddress())
-            return;
+        if (meshAddress == light.getMeshAddress()) return;
 
         light.setMeshAddress(meshAddress);
 
-        TelinkLog.d("Device Address Update Success --> old : " + Integer.toHexString(light.getMeshAddress()) + " new: " + Integer.toHexString(meshAddress));
-
+        LogUtils.v("蓝牙数据Device Address Update Success --> old : " + Integer.toHexString(light.getMeshAddress()) + " new: " + Integer.toHexString(meshAddress));
         this.reset(this.newMeshName, this.newPassword, this.newLongTermKey);
     }
 
@@ -1048,11 +1079,16 @@ public final class LightController extends EventBus<Integer> implements LightPer
         public static final int GET_FIRMWARE_SUCCESS = 80;
         public static final int GET_FIRMWARE_FAILURE = 81;
 
+        public static final int GET_DEVICE_MAC_SUCCESS = 82;
+        public static final int GET_DEVICE_MAC_FAILURE = 83;
+
         public static final int CONNECT_ERROR_REPORT_CONNECT = 90;
         public static final int CONNECT_ERROR_REPORT_ATT = 91;
         public static final int LOGIN_ERROR_REPORT_WRITE = 92;
         public static final int LOGIN_ERROR_REPORT_READ = 93;
         public static final int LOGIN_ERROR_REPORT_CHECK = 94;
+        public static final int SET_GW_SUCCESS = 95;
+        public static final int SET_GW_FAIL = 96;
 
 
         private Object args;
@@ -1080,32 +1116,33 @@ public final class LightController extends EventBus<Integer> implements LightPer
         @Override
         public void run() {
 
-//            synchronized (LightController.this) {
+            //            synchronized (LightController.this) {
             if (!LightController.this.isLogin.get()) {
                 TelinkLog.d("LightController.Connection Timeout");
                 disconnect();
-                LightController.this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE, "connection timeout"));
+                LightController.this.dispatchEvent(new LightEvent(LightEvent.CONNECT_FAILURE,
+                        "connection timeout"));
             }
-//            }
+            //            }
         }
     }
 
     private final class LoginCommandCallback implements Command.Callback {
 
         @Override
-        public void success(Peripheral peripheral, Command command,
-                            Object response) {
+        public void success(Peripheral peripheral, Command command, Object response) {
 
-            if (!command.tag.equals(TAG_LOGIN_READ))
-                return;
+            if (!command.tag.equals(TAG_LOGIN_READ)) return;
 
             byte[] data = (byte[]) response;
 
             if (data[0] == Opcode.BLE_GATT_OP_PAIR_ENC_FAIL.getValue()) {
                 disconnect();
-                dispatchEvent(new LightEvent(LightEvent.LOGIN_FAILURE, "encryption is not correct"));
+                dispatchEvent(new LightEvent(LightEvent.LOGIN_FAILURE, "encryption is not " +
+                        "correct"));
 
-                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK, "LOGIN_ERROR_REPORT_CHECK"));
+                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK,
+                        "LOGIN_ERROR_REPORT_CHECK"));
                 return;
             }
 
@@ -1123,7 +1160,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
                     disconnect();
                     dispatchEvent(new LightEvent(LightEvent.LOGIN_FAILURE, "sessionKey invalid"));
 
-                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK, "LOGIN_ERROR_REPORT_CHECK"));
+                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK,
+                            "LOGIN_ERROR_REPORT_CHECK"));
                     return;
                 }
 
@@ -1140,21 +1178,23 @@ public final class LightController extends EventBus<Integer> implements LightPer
                 disconnect();
                 dispatchEvent(new LightEvent(LightEvent.LOGIN_FAILURE, e.getMessage()));
 
-                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK, "LOGIN_ERROR_REPORT_CHECK"));
+                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_CHECK,
+                        "LOGIN_ERROR_REPORT_CHECK"));
             }
         }
 
         @Override
-        public void error(Peripheral peripheral, Command command,
-                          String reason) {
+        public void error(Peripheral peripheral, Command command, String reason) {
             TelinkLog.d("login command error  : " + reason);
 
             if (command.tag.equals(TAG_LOGIN_WRITE)) {
-                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_WRITE, "LOGIN_ERROR_REPORT_WRITE"));
+                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_WRITE,
+                        "LOGIN_ERROR_REPORT_WRITE"));
                 isLoginWriteFail.set(true);
             } else if (command.tag.equals(TAG_LOGIN_READ)) {
                 if (!isLoginWriteFail.get())
-                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_READ, "LOGIN_ERROR_REPORT_READ"));
+                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_READ,
+                            "LOGIN_ERROR_REPORT_READ"));
             }
 
             disconnect();
@@ -1164,11 +1204,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
         @Override
         public boolean timeout(Peripheral peripheral, Command command) {
             if (command.tag.equals(TAG_LOGIN_WRITE)) {
-                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_WRITE, "LOGIN_ERROR_REPORT_WRITE"));
+                dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_WRITE,
+                        "LOGIN_ERROR_REPORT_WRITE"));
                 isLoginWriteFail.set(true);
             } else if (command.tag.equals(TAG_LOGIN_READ)) {
                 if (!isLoginWriteFail.get())
-                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_READ, "LOGIN_ERROR_REPORT_READ"));
+                    dispatchEvent(new LightEvent(LightEvent.LOGIN_ERROR_REPORT_READ,
+                            "LOGIN_ERROR_REPORT_READ"));
             }
 
             return false;
@@ -1179,18 +1221,17 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void run() {
-            dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set device address timeout"));
+            dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set device address " +
+                    "timeout"));
         }
     }
 
     private final class ResetCommandCallback implements Command.Callback {
 
         @Override
-        public void success(Peripheral peripheral, Command command,
-                            Object response) {
+        public void success(Peripheral peripheral, Command command, Object response) {
 
-            if (!command.tag.equals(TAG_RESET_MESH_CHECK))
-                return;
+            if (!command.tag.equals(TAG_RESET_MESH_CHECK)) return;
 
             byte[] data = (byte[]) response;
 
@@ -1212,15 +1253,15 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
                     if (!Arrays.equals(sk, sk1)) {
                         light.meshChanged = false;
-                        dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set mesh failure"));
+                        dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set mesh " +
+                                "failure"));
                         return;
                     }
 
-                } catch (InvalidKeyException | IllegalBlockSizeException
-                        | BadPaddingException | NoSuchAlgorithmException
-                        | NoSuchPaddingException | NoSuchProviderException | UnsupportedEncodingException e) {
+                } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException | UnsupportedEncodingException e) {
                     light.meshChanged = false;
-                    dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set mesh failure"));
+                    dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set mesh " +
+                            "failure"));
                     return;
                 }
 
@@ -1242,8 +1283,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         @Override
-        public void error(Peripheral peripheral, Command command,
-                          String reason) {
+        public void error(Peripheral peripheral, Command command, String reason) {
             dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, reason));
         }
 
@@ -1261,8 +1301,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         @Override
-        public void error(Peripheral peripheral, Command command,
-                          String reason) {
+        public void error(Peripheral peripheral, Command command, String reason) {
 
             if (command.tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_ENABLE) || command.tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_DATA)) {
                 dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set address fail"));
@@ -1327,8 +1366,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void success(Peripheral peripheral, Command command, Object object) {
-            if (!command.tag.equals(TAG_DELETE_READ))
-                return;
+            if (!command.tag.equals(TAG_DELETE_READ)) return;
             dispatchEvent(new LightEvent(LightEvent.DELETE_SUCCESS));
         }
 
@@ -1350,8 +1388,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (command.tag.equals(TAG_OTA_WRITE)) {
                 int delay = Manufacture.getDefault().getOtaDelay();
                 if (delay <= 0) {
-                    if (!validateOta())
-                        sendNextOtaPacketCommand();
+                    if (!validateOta()) sendNextOtaPacketCommand();
                 } else {
                     mDelayHandler.postDelayed(otaTask, delay);
                 }
@@ -1409,6 +1446,53 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
     }
 
+
+    private final class SetGwCallback implements Command.Callback {
+
+        @Override
+        public void success(Peripheral peripheral, Command command, Object obj) {
+            // peripheral.setGwWifiState("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
+            LightPeripheral light = (LightPeripheral) peripheral;
+
+            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
+            String s = Arrays.bytesToHexString((byte[]) obj, ",");
+//            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
+            // dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
+        }
+
+        @Override
+        public void error(Peripheral peripheral, Command command, String errorMsg) {
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
+        }
+
+        @Override
+        public boolean timeout(Peripheral peripheral, Command command) {
+            return false;
+        }
+    }
+
+    private final class DeviceMacCallback implements Command.Callback {
+
+        @Override
+        public void success(Peripheral peripheral, Command command, Object obj) {
+            // peripheral.setGwWifiState("aaaaaaaaaaaaaaa");//通过此处的peripheral设置数据
+            LightPeripheral light = (LightPeripheral) peripheral;
+            light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
+
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
+        }
+
+        @Override
+        public void error(Peripheral peripheral, Command command, String errorMsg) {
+            //dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_FAILURE));
+        }
+
+        @Override
+        public boolean timeout(Peripheral peripheral, Command command) {
+            return false;
+        }
+    }
+
     private final class FirmwareCallback implements Command.Callback {
 
         @Override
@@ -1432,14 +1516,12 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private final class NormalCommandCallback implements Command.Callback {
 
         @Override
-        public void success(Peripheral peripheral, Command command,
-                            Object obj) {
+        public void success(Peripheral peripheral, Command command, Object obj) {
             dispatchEvent(new LightEvent(LightEvent.COMMAND_SUCCESS, command));
         }
 
         @Override
-        public void error(Peripheral peripheral, Command command,
-                          String reason) {
+        public void error(Peripheral peripheral, Command command, String reason) {
             if (command.tag.equals(TAG_RESET_MESH_ADDRESS)) {
                 dispatchEvent(new LightEvent(LightEvent.RESET_MESH_FAILURE, "set address fail"));
             } else {
@@ -1457,8 +1539,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void run() {
-            if (!validateOta())
-                sendNextOtaPacketCommand();
+            if (!validateOta()) sendNextOtaPacketCommand();
         }
     }
 
@@ -1527,7 +1608,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             }
 
             packetSize = packetSize + 4;
-//            byte[] packet = new byte[packetSize];
+            //            byte[] packet = new byte[packetSize];
             byte[] packet = new byte[20];
 
             if (packetSize < packet.length) {
@@ -1551,7 +1632,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
             this.fillIndex(packet, index);
             int crc = this.crc16(packet);
             this.fillCrc(packet, crc);
-            TelinkLog.d("ota check packet ---> index : " + index + " crc : " + crc + " content : " + Arrays.bytesToHexString(packet, ":"));
+            TelinkLog.d("ota check packet ---> index : " + index + " crc : " + crc + " content : "
+                    + Arrays.bytesToHexString(packet, ":"));
             return packet;
         }
 
@@ -1594,8 +1676,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
             int progress = (int) Math.floor((a / b * 100));
 
-            if (progress == this.progress)
-                return false;
+            if (progress == this.progress) return false;
 
             this.progress = progress;
 

@@ -381,7 +381,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 diyGradient?.id = getGradientId()
                 diyGradient?.name = editName.text.toString().trim()
                 diyGradient?.type = NODE_MODE_RGB_GRADIENT
-                diyGradient?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion()
+                diyGradient?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
                 diyGradient?.speed = speed
 
                 DBUtils.saveGradient(diyGradient!!, false)

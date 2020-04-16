@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
@@ -41,7 +43,7 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -65,7 +67,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private val SCENE_MAX_COUNT = 100
     private var isclickOTA: Boolean = false
     private var isOta: Boolean = false
-    private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
     private var last_start_time = 0
     private var debounce_time = 1000
     private lateinit var switchData: MutableList<DbSwitch>
@@ -75,7 +76,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var positionCurrent: Int = 0
     private var mConnectDevice: DeviceInfo? = null
     private var acitivityIsAlive = true
-    private var bestRSSIDevice: DeviceInfo? = null
     private var mApplication: TelinkLightApplication? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -86,6 +86,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
 
     private var isRgbClick = false
     private var installId = 0
@@ -105,18 +106,19 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         switchData = DBUtils.getAllSwitch()
+
         setScanningMode(true)
         SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
             override fun start() {
-                LogUtils.e("zcl____同步开关________start")
+                LogUtils.v("zcl____同步开关________start")
             }
 
             override fun complete() {
-                LogUtils.e("zcl____同步开关________complete")
+                LogUtils.v("zcl____同步开关________complete")
             }
 
             override fun error(msg: String?) {
-                LogUtils.e("zcl____同步开关________error")
+                LogUtils.v("zcl____同步开关________error")
             }
         })
         if (switchData.size > 0) {
@@ -152,7 +154,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-
     private fun onLogin(bestRSSIDevice: DeviceInfo) {
         mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
@@ -165,10 +166,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                                             bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
                                         startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
-                                    } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                                        startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                                        if (version.contains(DeviceType.EIGHT_SWITCH))
+                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
+                                        else
+                                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
-                                    } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
                                         startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
                                         finish()
                                     }
@@ -198,7 +202,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData)
+        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData,this)
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
@@ -390,9 +394,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isDirectConnectDevice() {
-                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentLight?.macAddr) {
-            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
                 if (isBoolean) {
                     transformView()
                 } else {
@@ -420,7 +423,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                             ,
                             {
                                 hideLoadingDialog()
-                                ToastUtils.showLong(R.string.connect_fail2)
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                                 LogUtils.d(it)
                             })
         }
@@ -429,10 +432,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun transformView() {
         mConnectDeviceDisposable?.dispose()
         val intent = Intent(this@SwitchDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.NORMAL_SWITCH)
+        intent.putExtra(OTA_MAC, currentLight?.macAddr)
+        intent.putExtra(OTA_MES_Add, currentLight?.meshAddr)
+        intent.putExtra(OTA_VERSION, currentLight?.version)
+        intent.putExtra(OTA_TYPE, DeviceType.NORMAL_SWITCH)
         val timeMillis = System.currentTimeMillis()
         if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
             startActivity(intent)
@@ -522,7 +525,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
@@ -593,16 +597,14 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
@@ -632,6 +634,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun goSearchSwitch() {
         installId = INSTALL_SWITCH
         showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId)
+
         stepOneText.visibility = View.GONE
         stepTwoText.visibility = View.GONE
         stepThreeText.visibility = View.GONE
@@ -647,6 +650,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
@@ -676,6 +680,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private val dialogOnclick = View.OnClickListener {
+        var medressData = 0
+        var allData = DBUtils.allLight
+        var sizeData = DBUtils.allLight.size
+        if (sizeData != 0) {
+            var lightData = allData[sizeData - 1]
+            medressData = lightData.meshAddr
+        }
 
         when (it.id) {
             R.id.close_install_list -> {
@@ -684,34 +695,58 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_CURTAIN -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                     INSTALL_SWITCH -> {
-
+                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
+                        //startActivityForResult(intent, 0)
                         startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     }
-                    INSTALL_SENSOR -> {
-                        startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    }
+                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                        startActivityForResult(intent, 0)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_GATEWAY -> {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
                     }
                 }
-                installDialog?.dismiss()
             }
             R.id.btnBack -> {
                 installDialog?.dismiss()
@@ -727,7 +762,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -739,7 +774,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }

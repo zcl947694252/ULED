@@ -3,21 +3,20 @@ package com.dadoutek.uled.model.DbModel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.dao.DbSceneDao;
+import com.google.gson.annotations.Expose;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
-
-import java.util.List;
-import com.dadoutek.uled.dao.DbSceneActionsDao;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Transient;
 
-import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.dao.DbSceneDao;
-import com.google.gson.annotations.Expose;
+import java.util.List;
 
 /**
  * Created by hejiajun on 2018/5/5.
@@ -43,6 +42,8 @@ public class DbScene implements Parcelable{
     @Transient
     public boolean selected;//选择状态
 
+    private String times;
+
     protected DbScene(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -57,12 +58,13 @@ public class DbScene implements Parcelable{
         }
     }
 
-    @Generated(hash = 276307427)
-    public DbScene(Long id, String name, @NotNull Long belongRegionId, int index) {
+    @Generated(hash = 312396504)
+    public DbScene(Long id, String name, @NotNull Long belongRegionId, int index, String times) {
         this.id = id;
         this.name = name;
         this.belongRegionId = belongRegionId;
         this.index = index;
+        this.times = times;
     }
 
     @Generated(hash = 662958756)
@@ -223,5 +225,27 @@ public class DbScene implements Parcelable{
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    @Override
+    public String toString() {
+        return "DbScene{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", belongRegionId=" + belongRegionId +
+                ", index=" + index +
+                ", actions=" + actions +
+                ", selected=" + selected +
+                ", daoSession=" + daoSession +
+                ", myDao=" + myDao +
+                '}';
+    }
+
+    public String getTimes() {
+        return this.times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
     }
 }

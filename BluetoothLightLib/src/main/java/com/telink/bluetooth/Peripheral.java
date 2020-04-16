@@ -17,6 +17,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.telink.util.Arrays;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +68,12 @@ public class Peripheral extends BluetoothGattCallback {
     protected byte[] scanRecord;
     protected String name;
     protected String mac;
+    protected String sixByteMac;
     protected byte[] macBytes;
     protected int type;
+
+    protected int gwVoipState = 10;
+    protected int gwWifiState = 10;
     protected List<BluetoothGattService> mServices;
 
     protected AtomicBoolean processing = new AtomicBoolean(false);
@@ -79,16 +85,25 @@ public class Peripheral extends BluetoothGattCallback {
     //    private int mConnState = CONN_STATE_IDLE;
     private AtomicInteger mConnState = new AtomicInteger(CONN_STATE_IDLE);
 
+    public int getGwVoipState() {
+        return gwVoipState;
+    }
+
+    public void setGwVoipState(int gwVoipState) {
+        this.gwVoipState = gwVoipState;
+    }
     private String get4ByteMac(String macString) {
         String[] strArray = macString.split(":");
         this.macBytes = new byte[4];
-        this.macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);
+        this.macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);//78-9C-E7-08-A9-3D
         this.macBytes[1] = (byte) (Integer.parseInt(strArray[4], 16) & 0xFF);
         this.macBytes[2] = (byte) (Integer.parseInt(strArray[3], 16) & 0xFF);
         this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
 
         long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
-        return String.valueOf(mac4Byte);
+
+        String mac = strArray[5]+":"+strArray[4]+":"+strArray[3]+":"+strArray[2];
+         return String.valueOf(mac4Byte);
     }
 
     public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
@@ -96,8 +111,19 @@ public class Peripheral extends BluetoothGattCallback {
         this.scanRecord = scanRecord;
         this.rssi = rssi;
         this.name = device.getName();
+        this.type = device.getType(); //ble
+       // this.mac = get4ByteMac2(scanRecord);
         this.mac = get4ByteMac(device.getAddress());
-        this.type = device.getType();
+        this.sixByteMac = device.getAddress();
+    }
+
+    private String formatHex(String one) {
+        if (one.length() > 2) {
+            one = one.substring(one.length() - 2);
+        } else if (one.length() == 1) {
+            one = "0" + one;
+        }
+        return one;
     }
 
     /********************************************************************************
@@ -116,8 +142,24 @@ public class Peripheral extends BluetoothGattCallback {
         return this.mac;
     }
 
+    public String getSixByteMacAddress() {
+        return this.sixByteMac;
+    }
+
+    public void setSixByteMacAddress(String mac) {
+        this.sixByteMac = mac;
+    }
+
     public List<BluetoothGattService> getServices() {
         return mServices;
+    }
+
+    public int getGwWifiState() {
+        return gwWifiState;
+    }
+
+    public void setGwWifiState(int gwWifiState) {
+        this.gwWifiState = gwWifiState;
     }
 
     public byte[] getMacBytes() {
@@ -332,7 +374,7 @@ public class Peripheral extends BluetoothGattCallback {
                     this.writeCharacteristic(commandContext, command.serviceUUID,
                             command.characteristicUUID,
                             BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE,
-                            command.data);
+                            command.data);//获取原始数据
                     break;
                 case ENABLE_NOTIFY:
                     this.enableNotification(commandContext, command.serviceUUID,
@@ -790,6 +832,8 @@ public class Peripheral extends BluetoothGattCallback {
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             byte[] data = characteristic.getValue();
+            String s = Arrays.bytesToHexString(data, ",");
+            Log.v("蓝牙数据 ", "zcl------------------" + s);
             this.commandSuccess(data);
         } else {
             this.commandError("read characteristic failed");
@@ -811,6 +855,8 @@ public class Peripheral extends BluetoothGattCallback {
             this.cancelCommandTimeoutTask();
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                byte[] data = characteristic.getValue();
+                String s = Arrays.bytesToHexString(data, ",");
                 this.commandSuccess(null);
             } else {
                 this.commandError("write characteristic fail");
@@ -823,7 +869,8 @@ public class Peripheral extends BluetoothGattCallback {
             this.cancelCommandTimeoutTask();
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                this.commandSuccess(null);
+                this.commandSuccess(characteristic.getValue());
+                String s = Arrays.bytesToHexString(characteristic.getValue(), ",");
             } else {
                 this.commandError("write characteristic fail");
             }

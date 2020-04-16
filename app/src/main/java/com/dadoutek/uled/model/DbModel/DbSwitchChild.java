@@ -1,7 +1,5 @@
 package com.dadoutek.uled.model.DbModel;
 
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
@@ -20,23 +18,14 @@ public class DbSwitchChild implements Serializable {
     private String list;
     private int index;
     private Long belongGroupId;
-    @Generated(hash = 811812800)
-    public DbSwitchChild(Long id, int meshAddr, String name, int controlGroupAddr,
-                    String macAddr, int productUUID, String controlSceneId, int index,
-                    Long belongGroupId) {
-        this.id = id;
-        this.meshAddr = meshAddr;
-        this.name = name;
-        this.controlGroupAddr = controlGroupAddr;
-        this.macAddr = macAddr;
-        this.productUUID = productUUID;
-        this.list = controlSceneId;
-        this.index = index;
-        this.belongGroupId = belongGroupId;
-    }
-    @Generated(hash = 1179115222)
-    public DbSwitchChild() {
-    }
+ //firmwareVersion	否	String	固件版本号
+ //keys	否	String	八键开关keys
+ //type
+    public String firmwareVersion;
+    public String keys;
+    public int type; // 群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
+
+
     public Long getId() {
         return this.id;
     }

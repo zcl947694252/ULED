@@ -100,6 +100,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)

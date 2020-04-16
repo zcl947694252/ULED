@@ -62,6 +62,11 @@ public class LightAdapter {
     public static final int STATUS_OTA_PROGRESS = 52;
     public static final int STATUS_GET_FIRMWARE_COMPLETED = 60;
     public static final int STATUS_GET_FIRMWARE_FAILURE = 61;
+    public static final int STATUS_GET_DEVICE_MAC_COMPLETED = 62;
+    public static final int STATUS_GET_DEVICE_MAC_FAILURE = 63;
+    public static final int STATUS_SET_GW_SUCCESS= 64;
+    public static final int STATUS_SET_GW_COMPLETED = 65;
+    public static final int STATUS_SET_GW_FAIL = 66;
     public static final int STATUS_DELETE_COMPLETED = 70;
     public static final int STATUS_DELETE_FAILURE = 71;
 
@@ -84,11 +89,13 @@ public class LightAdapter {
 
     //自动连接前，查找设备花的时间 ms
     private static final int AUTO_CONNECT_SCAN_TIMEOUT_SECONDS = 1500;
-
+    //创建notify监听
     private final EventListener<Integer> mConnectionListener = new ConnectionListener();
     private final EventListener<Integer> mResetMeshListener = new ResetMeshListener();
     private final EventListener<Integer> mOtaListener = new OtaListener();
     private final EventListener<Integer> mFirmwareListener = new GetFirmwareListener();
+    private final EventListener<Integer> mDeviceMacListener = new GetDeviceMacListener();
+    private final EventListener<Integer> mSetGwListener = new SetGwListener();
     private final EventListener<Integer> mGetLtkListener = new GetLongTermKeyListener();
     private final EventListener<Integer> mNotificationListener = new NotificationListener();
     private final EventListener<Integer> mDeleteListener = new DeleteListener();
@@ -210,6 +217,10 @@ public class LightAdapter {
         this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_FAILURE, this.mOtaListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_SUCCESS, this.mFirmwareListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_FAILURE, this.mFirmwareListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_SUCCESS, this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_FAILURE, this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_SUCCESS, this.mSetGwListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_FAIL, this.mSetGwListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_SUCCESS, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_FAILURE, this.mGetLtkListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_SUCCESS, this.mDeleteListener);
@@ -368,6 +379,17 @@ public class LightAdapter {
         return true;
     }
 
+    public boolean getDeviceMac() {
+        if (!this.isStarted.get())
+            return false;
+        LightPeripheral light = this.mLightCtrl.getCurrentLight();
+        if (light == null || !light.isConnected())
+            return false;
+        TelinkLog.e("LightAdapter#getFirmwareVersion");
+        this.mLightCtrl.requestDeviceMac();
+        return true;
+    }
+
 
     private void login(LightPeripheral light) {
 
@@ -440,6 +462,23 @@ public class LightAdapter {
         } else {
 //            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
+        }
+    }
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
+
+        if (!this.isStarted.get()) {
+            return false;
+        }
+
+        if (!this.mLightCtrl.isLogin())
+            return false;
+
+        if (tag == null) {
+//            Log.d("Test", "***********sendCommand***********");
+            return this.mLightCtrl.sendCommand(opcode, address, params, false, delay);
+        } else {
+//            Log.d("Test", "***********TEST***********ELSE");
+            return this.mLightCtrl.sendCommand(opcode, address, params, false, tag, delay);
         }
     }
 
@@ -731,7 +770,7 @@ public class LightAdapter {
         while (iterator.hasNext()) {
             filter = iterator.next();
             try {
-                light = filter.filter(device, rssi, scanRecord);
+                 light = filter.filter(device, rssi, scanRecord);
             } catch (Exception e) {
                 TelinkLog.e("Advertise Filter Exception : " + filter.toString() + "--" + e.getMessage(), e);
             }
@@ -744,35 +783,30 @@ public class LightAdapter {
     }
 
     protected boolean onLeScanFilter(LightPeripheral light) {
-
         if (light == null)
             return false;
         int mode = this.getMode();
 
         Parameters params = this.getParameters();
 
-        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
+        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);//从parmers内设置需要的类型从此处取出
         //如果有要连接的目标设备
         if (targetDevices.size() > 0)
             if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
                 return false;
             }
-
         if (params == null)
             return false;
-
         byte[] outOfMeshName;
-
         String paramsString = params.getString(Parameters.PARAM_MESH_NAME);
         if (paramsString == null)
             return false;
         byte[] meshName = Strings.stringToBytes(paramsString, 16);
         byte[] meshName1 = light.getMeshName();
-
         if (mode == MODE_SCAN_MESH) {
 //            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
 
-            Log.v("zcl", "lightAdapter 0nLeScan" + meshName.toString() + "------------------" + light.getMacAddress());
+            Log.v("zcl","lightAdapter 0nLeScan"+ meshName.toString() +"------------------"+ light.getMacAddress());
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
             if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
                 return false;
@@ -784,9 +818,10 @@ public class LightAdapter {
             if (!Arrays.equals(meshName, meshName1))
                 return false;
             String mac = params.getString(Parameters.PARAM_AUTO_CONNECT_MAC);
-            if (!TextUtils.isEmpty(mac)) {//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
+            if (!TextUtils.isEmpty(mac)){//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
                 // 没有就连接扫到的第一个设备
-                return mac.equals(light.getMacAddress());
+              //  LogUtils.v("zcl---------要链接的mac"+mac+"---------扫描到的mac"+light.getMacAddress());
+                return  mac.equals(light.getMacAddress());
             } else {
                 int meshAddress = params.getInt(Parameters.PARAM_AUTO_CONNECT_MESH_ADDR);
                 return meshAddress == 0 || meshAddress == light.getMeshAddress();
@@ -841,7 +876,6 @@ public class LightAdapter {
     }
 
     synchronized private void setStatus(int newStatus, boolean ignoreIdleMode, boolean ignoreStatus) {
-
         if (!ignoreIdleMode) {
             if (this.getMode() == MODE_IDLE) {
                 Log.d("Saw", "return cause MODE_IDLE");
@@ -854,7 +888,6 @@ public class LightAdapter {
                 return;
             }
         }
-
         int oldStatus = this.status.getAndSet(newStatus);
 
         if (mCallback != null)
@@ -965,34 +998,24 @@ public class LightAdapter {
             if (scanEmpty.get()) {
                 scanEmpty.set(false);
             }
-
-
             if (mCallback == null || getMode() == MODE_IDLE || getMode() == MODE_UPDATE_MESH)
                 return;
-
 //            synchronized (LightAdapter.this) {
-            if (mScannedLights.contains(device.getAddress()))
+                if (mScannedLights.contains(device.getAddress()))
                 return;
 //            }
-
             LightPeripheral light = LightAdapter.this.onLeScan(device, rssi, scanRecord);
 
             if (light == null)
                 return;
-
             // Device Name 有可能与 广播包中的MeshName不一致
-//            saveLog("Scan MeshInfo : " + light.getMeshNameStr() + "-" + light.getMacAddress());
             boolean result = onLeScanFilter(light);
 
             if (!result)
                 return;
-
             if (scanNoTarget.get()) {
                 scanNoTarget.set(false);
             }
-//            TelinkLog.e("add scan result : " + device.getAddress());
-//            saveLog("add scan result : " + device.getAddress());
-
             int mode = getMode();
 
             if (mode == MODE_SCAN_MESH) {
@@ -1236,15 +1259,68 @@ public class LightAdapter {
         }
     }
 
-    private final class GetFirmwareListener implements EventListener<Integer> {
+    private final class SetGwListener implements EventListener<Integer> {
 
+        private void onSetGwSuccess() {
+            setStatus(STATUS_SET_GW_COMPLETED, true);
+        }
+
+        private void onSetGwFailure() {
+            setStatus(STATUS_SET_GW_FAIL, true);
+        }
+
+        @Override
+        public void performed(Event<Integer> event) {
+            switch (event.getType()) {
+                case LightController.LightEvent.SET_GW_SUCCESS:
+                    setStatus(STATUS_SET_GW_SUCCESS);
+                    this.onSetGwSuccess();
+                    break;
+                case LightController.LightEvent.SET_GW_FAIL:
+                    this.onSetGwFailure();
+                    break;
+            }
+        }
+    }
+
+
+    private final class GetDeviceMacListener implements EventListener<Integer> {
+
+        private void onGetDeviceMacSuccess() {
+            int mode = getMode();
+            /*if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
+                return;*/
+            setStatus(STATUS_GET_DEVICE_MAC_COMPLETED, true);
+        }
+
+        private void onGetDeviceMacFailure() {
+            int mode = getMode();
+//            if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
+//                return;
+            setStatus(STATUS_GET_DEVICE_MAC_FAILURE, true);
+        }
+
+        @Override
+        public void performed(Event<Integer> event) {
+            switch (event.getType()) {
+                case LightController.LightEvent.GET_DEVICE_MAC_SUCCESS:
+                    this.onGetDeviceMacSuccess();
+                    break;
+                case LightController.LightEvent.GET_DEVICE_MAC_FAILURE:
+                    this.onGetDeviceMacFailure();
+                    break;
+            }
+        }
+    }
+
+
+    private final class GetFirmwareListener implements EventListener<Integer> {
         private void onGetFirmwareSuccess() {
             int mode = getMode();
             if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
                 return;
             setStatus(STATUS_GET_FIRMWARE_COMPLETED, true);
         }
-
         private void onGetFirmwareFailure() {
             int mode = getMode();
             if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
@@ -1446,25 +1522,19 @@ public class LightAdapter {
         private void autoConnect() {
             if (getState() == STATE_PENDING)
                 return;
-
             if (!startLeScan()) {
                 setMode(MODE_IDLE);
                 return;
             }
-
             //只有当没有指定mac时，需要这样做。
             boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
 //            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
-            if ((!fastestMode)) {
+            if ((!fastestMode) ) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
                 }
             }
-
-
             int count = mScannedLights.size();
-
-
             if (count <= 0) {
 //                this.checkOffLine();
                 return;

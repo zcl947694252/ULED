@@ -39,6 +39,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         public final static Property Last_authorizer_user_id = new Property(12, String.class, "last_authorizer_user_id", false, "LAST_AUTHORIZER_USER_ID");
         public final static Property ControlMeshName = new Property(13, String.class, "controlMeshName", false, "CONTROL_MESH_NAME");
         public final static Property ControlMeshPwd = new Property(14, String.class, "controlMeshPwd", false, "CONTROL_MESH_PWD");
+        public final static Property LastGenMeshAddr = new Property(15, int.class, "lastGenMeshAddr", false, "LAST_GEN_MESH_ADDR");
     }
 
 
@@ -68,7 +69,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
                 "\"LOGIN_STATE_KEY\" TEXT," + // 11: login_state_key
                 "\"LAST_AUTHORIZER_USER_ID\" TEXT," + // 12: last_authorizer_user_id
                 "\"CONTROL_MESH_NAME\" TEXT," + // 13: controlMeshName
-                "\"CONTROL_MESH_PWD\" TEXT);"); // 14: controlMeshPwd
+                "\"CONTROL_MESH_PWD\" TEXT," + // 14: controlMeshPwd
+                "\"LAST_GEN_MESH_ADDR\" INTEGER NOT NULL );"); // 15: lastGenMeshAddr
     }
 
     /** Drops the underlying database table. */
@@ -155,6 +157,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (controlMeshPwd != null) {
             stmt.bindString(15, controlMeshPwd);
         }
+        stmt.bindLong(16, entity.getLastGenMeshAddr());
     }
 
     @Override
@@ -235,6 +238,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (controlMeshPwd != null) {
             stmt.bindString(15, controlMeshPwd);
         }
+        stmt.bindLong(16, entity.getLastGenMeshAddr());
     }
 
     @Override
@@ -259,7 +263,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // login_state_key
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // last_authorizer_user_id
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // controlMeshName
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14) // controlMeshPwd
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // controlMeshPwd
+            cursor.getInt(offset + 15) // lastGenMeshAddr
         );
         return entity;
     }
@@ -281,6 +286,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         entity.setLast_authorizer_user_id(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setControlMeshName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setControlMeshPwd(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setLastGenMeshAddr(cursor.getInt(offset + 15));
      }
     
     @Override

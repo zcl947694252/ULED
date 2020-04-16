@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/eight_switch_versionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:background="@color/primary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        tools:showIn="@layout/eight_switch">
+
+    <TextView
+            android:id="@+id/bottom_version_text"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="@string/switch_version"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+    <TextView
+            android:id="@+id/bottom_version_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+</LinearLayout>
+

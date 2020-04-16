@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/eight_switch_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ico_background"
+        android:clipChildren="false"
+        android:orientation="vertical">
+
+    <ImageView
+            android:id="@+id/eight_switch_retutn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/dp_10"
+            android:paddingTop="20dp"
+            android:paddingEnd="@dimen/dp_10"
+            android:paddingBottom="@dimen/dp_10"
+            android:src="@drawable/icon_return"/>
+
+    <LinearLayout
+            android:id="@+id/eight_switch_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dp_5"
+                android:src="@drawable/change_eight_mode" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/change_mode_8k"
+                android:textColor="#FF654405"
+                android:textSize="18sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/dp_40"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+        <LinearLayout
+                android:id="@+id/eight_switch_banner_ly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+            <android.support.v4.view.ViewPager
+                    android:id="@+id/eight_switch_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="230dp"
+                    android:clipChildren="false"
+                    android:overScrollMode="never" />
+
+            <TextView
+                    android:id="@+id/eight_switch_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/group_switch"
+                    android:textColor="#FF333333"
+                    android:textSize="30sp" />
+        </LinearLayout>
+
+
+        <RelativeLayout
+                android:id="@+id/eight_switch_config"
+                android:layout_width="match_parent"
+                android:layout_height="290dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/light_background"
+                android:visibility="visible">
+
+            <TextView
+                    android:id="@+id/eight_switch_b1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginTop="25dp"
+                    android:gravity="center"
+                    android:text="@string/brightness_add"
+                    android:textColor="@color/brightness_add_color"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:id="@+id/eight_switch_b2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginEnd="40dp"
+                    android:gravity="center"
+                    android:text="@string/color_temperature_add"
+                    android:textColor="@color/brightness_add_color"
+                    android:textSize="13sp"/>
+
+            <TextView
+                    android:id="@+id/eight_switch_b3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b1"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginTop="62dp"
+                    android:gravity="center"
+                    android:text="@string/brightness_minus"
+                    android:textColor="@color/brightness_add_color"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:id="@+id/eight_switch_b4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b2"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="62dp"
+                    android:layout_marginEnd="40dp"
+                    android:gravity="center"
+                    android:text="@string/color_temperature_minus"
+                    android:textColor="@color/brightness_add_color"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:id="@+id/eight_switch_b5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b3"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginTop="41dp"
+                    android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
+                    android:text="@string/click_config"
+                    android:textColor="@color/click_config_color"
+                    android:textSize="13sp"/>
+
+            <TextView
+                    android:id="@+id/eight_switch_b6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b4"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="41dp"
+                    android:layout_marginEnd="40dp"
+                    android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
+                    android:text="@string/click_config"
+                    android:textColor="@color/click_config_color"
+                    android:textSize="13sp"/>
+
+            <TextView
+                    android:id="@+id/eight_switch_b7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b5"
+                    android:layout_marginStart="45dp"
+                    android:layout_marginTop="60dp"
+                    android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
+                    android:text="@string/click_config"
+                    android:textColor="@color/click_config_color"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:id="@+id/eight_switch_b8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eight_switch_b6"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="60dp"
+                    android:layout_marginEnd="40dp"
+                    android:gravity="center"
+                    android:minWidth="40dp"
+                    android:minHeight="@dimen/dp_15"
+                    android:text="@string/click_config"
+                    android:textColor="@color/click_config_color"
+                    android:textSize="13sp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <TextView
+            android:id="@+id/eight_switch_use_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="38dp"
+            android:layout_marginEnd="38dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/icon_button_glod"
+            android:gravity="center"
+            android:text="@string/use"
+            android:textSize="18sp" />
+
+    <include layout="@layout/bottom_version_ly" />
+</LinearLayout>

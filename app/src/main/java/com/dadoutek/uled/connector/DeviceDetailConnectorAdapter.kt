@@ -25,7 +25,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.meshAddr) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {

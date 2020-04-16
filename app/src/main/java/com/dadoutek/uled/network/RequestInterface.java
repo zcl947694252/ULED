@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network;
 
+import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
@@ -13,6 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbSensorChild;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.HttpModel.BatchRemove8kBody;
 import com.dadoutek.uled.model.HttpModel.RemoveCodeBody;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
@@ -404,15 +406,6 @@ public interface RequestInterface {
     Observable<Response<String>> deleteCurtain(@Header("token") String token,
                                                @Path("lid") int lid);
 
-    /**
-     * <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Length: 92
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Connection: keep-alive
-     * 2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: {"data":null,"errorCode":20001,"serverTime":1570865397299,"message":"20001 用户不存在"}
-     */
     @GET("app/isAvailable")
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)   todo 此处报错  用户不存在
     Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
@@ -545,4 +538,128 @@ public interface RequestInterface {
     Observable<Response<VersionBean>> haveNewVerison(@Query("currentVersion") String currentVersion
             , @Query("platform") int AndroidZero, @Query("lang") int zhOrEnglish);
 
+    /**
+     * 6、添加/更新八键开关（new） POST
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/add/{swid}
+     * firmwareVersion	否	   string	固件版本号
+     * meshAddr	    是	   int	    mesh地址
+     * name	       是	 string	   名字
+     * macAddr	      是	string	   mac地址
+     * productUUID	 是	    int	productUUID
+     * index	否	int	排序
+     * keys	是	list or string	key数组或者json格式的字符串
+     * key既可以是对象数组，也可以是json格式的字符串。
+     */
+    @FormUrlEncoded
+    @POST("switch/8ks/add/{swid}")
+    Observable<Response<String>> addSwitch8k(@Path("swid") Long swid,
+                                             @Field("firmwareVersion") String firmwareVersion, @Field("meshAddr") int meshAddr, @Field("name") String name,
+                                             @Field("macAddr") String macAddr, @Field("productUUID") int productUUID, @Field("index") int index,
+                                             @Field("keys") String keys);
+
+    /**
+     * 7、批量添加/更新八键开关（new）  POST
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/add-batch
+     * eightKeySwitches	是	list	八键开关数组
+     */
+    @FormUrlEncoded
+    @POST("switch/8ks/add-batch")
+    Observable<Response<String>> batchAdd8kSwitch(@Field("eightKeySwitches") List<DbSwitch> eightKeySwitches);
+
+    /**
+     * 8、获取八键开关列表（new） GET
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/list
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/list?isKeySerialized=true
+     * isKeySerialized	否	boolean（其实是string）	是否序列化八键开关的keys。默认true（会序列化）
+     */
+    @GET("switch/8ks/list")
+    Observable<Response<List<DbSwitch>>> getSwitch8kList(@Query("isKeySerialized") boolean isKeySerialized);
+
+    /**
+     * 9、删除一个八键开关（new）
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/remove/{swid}
+     * DELETE
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/remove/1
+     */
+    @DELETE("switch/8ks/remove/{swid}")
+    Observable<Response<String>> removeSwitch8k(@Path("swid") Long swid);
+
+    /**
+     * 10、批量删除八键开关（new）
+     * https://dev.dadoutek.com/smartlight_java/switch/8ks/remove
+     * DELETE
+     * idList	是	list	id数组
+     * 传参示例
+     * {
+     * "idList": [1, 2, 3]
+     * }
+     */
+    @HTTP(method = "DELETE", path = "switch/8ks/remove", hasBody = true)
+    Observable<Response<String>> removeSwitch8kList(@Body BatchRemove8kBody body);
+
+    /**
+     * 6、添加网关（new）
+     * 简要描述：添加一条网关信息
+     *https://dev.dadoutek.com/xxxx/gateway/add/{gatewayId}
+     * 请求方式： POST
+     * 参数：
+     * meshAddr	是	int	mesh地址
+     * name	否	string	网关名，后台默认未命名
+     * type	否	byte/number	网关类型，后台默认0
+     * macAddr	是	string	设备mac地址
+     * productUUID	是	int	设备productUUID
+     * version	否	string	版本号，后台默认空串
+     * tags	是	string	json格式字符串
+     */
+    @POST("gateway/add/{gatewayId}")
+    Observable<Response<DbGateway>> addGw(@Path("gatewayId") long gwId, @Body DbGateway dbGateway);
+
+    /**
+     * 7、网关列表（new）查询网关列表
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/list
+     * 正式服 smartlight_java 替换xxxx
+     * 测试服 smartlight_test 替换xxxx
+     * 请求方式： GET
+     */
+    @GET("gateway/list")
+    Observable<Response<List<DbGateway>>> getGWList();
+
+    /**
+     * 8、删除网关（new）删除多条网关信息
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/delete
+     * 正式服 smartlight_java 替换xxxx
+     * 测试服 smartlight_test 替换xxxx
+     * 请求方式：DELETE
+     * idlist	是	int数组	需要删除的网关id
+     */
+    @HTTP(method = "DELETE", path = "gateway/delete", hasBody = true)
+    Observable<Response<String>> deleteGw(@Body GwGattBody body);
+
+    /**
+     * 9、下发标签给网关（new）
+     * 简要描述：添加一条网关信息
+     * https://dev.dadoutek.com/xxxx/mqtt/tag/pub
+     * 请求方式：POST
+     * 参数：
+     * macAddr	是	string	mac地址
+     * cmd	是	int	指令
+     * data	是	string	data
+     */
+    @POST("mqtt/tag/pub")
+    Observable<Response<String>> sendGwToService(@Body GwGattBody body);
+    /**
+     * 10、下发控制指令让网关转发（new）
+     * 简要描述：下发一条控制指令，网关接受后转发至对应的mesh网络
+     * 请求URL： https://dev.dadoutek.com/xxxx/mqtt/control
+     * 请求方式 POST
+     * content-type : application/json
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * 参数名	必选	类型	说明
+     * data	是	string	byte[]经过Base64编码得到的字符串
+     * ser_id	是	string	会话id，推送中回传
+     * cmd	是	int	操作类型，推送中回传
+     * meshAddr	是	int	设备or组的mesh地址，推送中回传
+     */
+    @POST("mqtt/control")
+    Observable<Response<String>> sendDeviceToMqtt(@Body GwGattBody body);
 }

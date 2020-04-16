@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model.HttpModel
 
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DbModel.DbSwitchChild
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -8,8 +10,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object SwitchMdodel {
-
-
     fun add(token: String, switch: DbSwitch, id: Long, changeId: Long?): Observable<String>? {
         var dbChild=DbSwitchChild()
         dbChild.productUUID=switch.productUUID
@@ -25,6 +25,11 @@ object SwitchMdodel {
         dbChild.index=switch.index
         dbChild.controlGroupAddr=switch.controlGroupAddr
         dbChild.belongGroupId=switch.belongGroupId
+
+        dbChild.firmwareVersion = switch.version
+        dbChild.type = switch.type
+        dbChild.keys = switch.keys
+
         return NetworkFactory.getApi()
                 .addSwitch(token,dbChild,changeId!!.toInt())
                 .compose(NetworkTransformer())
@@ -50,6 +55,11 @@ object SwitchMdodel {
         dbChild.index=dbSwitch.index
         dbChild.controlGroupAddr=dbSwitch.controlGroupAddr
         dbChild.belongGroupId=dbSwitch.belongGroupId
+
+        dbChild.firmwareVersion = dbSwitch.version
+        dbChild.type = dbSwitch.type
+        dbChild.keys = dbSwitch.keys
+
         return NetworkFactory.getApi()
                 .updateSwitch(token,lid,dbChild)
                 .compose(NetworkTransformer())

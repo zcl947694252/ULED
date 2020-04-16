@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -38,12 +39,12 @@ import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_connector_device_detail.*
 import kotlinx.android.synthetic.main.empty_view.*
+import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -56,6 +57,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 蓝牙接收器列表
  */
 class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
+    private  var launch: Job? = null
     private var type: Int? = null
     private val lightsData: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
@@ -77,11 +79,12 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
     private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_connector_device_detail)
+        setContentView(R.layout.template_device_detail_list)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
@@ -130,7 +133,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                   // addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
@@ -213,13 +217,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         }
 
         installDialog?.show()
-
-        Thread {
-            Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main) {
-                //                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
     val INSTALL_NORMAL_LIGHT = 0
@@ -228,22 +225,29 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
+
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
+
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
@@ -261,6 +265,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+
             }
         }
     }
@@ -272,15 +277,17 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById<TextView>(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
         switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
         swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
+        val title = view.findViewById<TextView>(R.id.textView5)
         val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar = view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
-        val title = view.findViewById<TextView>(R.id.textView5)
+
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
             install_tip_question.visibility =  View.GONE
@@ -350,6 +357,15 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_GATEWAY -> {
+                        if (medressData <= DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -538,13 +554,15 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         mConnectDisposal?.dispose()
         canBeRefresh = false
         acitivityIsAlive = false
+        launch?.cancel()
     }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
-        GlobalScope.launch {
+        launch?.cancel()
+         launch = GlobalScope.launch {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2500)
             if (this@ConnectorDeviceDetailActivity == null ||

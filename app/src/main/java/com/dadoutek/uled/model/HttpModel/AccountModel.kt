@@ -94,7 +94,7 @@ object AccountModel {
             for (item in lights.get()) {
                 var light: DbLight = DbLight()
                 if (item.belongGroups.size > 0) {
-                    light.belongGroupId = DBUtils.getGroupByMesh(item.belongGroups.get(0)).id
+                    light.belongGroupId = DBUtils.getGroupByMeshAddr(item.belongGroups.get(0)).id
                 } else {
                     light.belongGroupId = 1
                 }
@@ -167,7 +167,7 @@ object AccountModel {
 
         //数据库有区域数据直接加载
         if (regionList.size != 0) {
-//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
+//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegionId()
             val dbRegion = DBUtils.lastRegion
             val application = getApplication() as TelinkLightApplication
             val mesh = application.mesh

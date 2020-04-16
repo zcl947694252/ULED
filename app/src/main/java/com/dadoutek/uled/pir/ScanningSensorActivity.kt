@@ -21,7 +21,6 @@ import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.AppUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -45,6 +44,7 @@ import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit
  * 人体感应器扫描新设备/已连接设备
  */
 class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
+    private var launch: Job? = null
     private var isSearchedDevice: Boolean = false
     private val SCAN_TIMEOUT_SECOND: Int = 20
     private val CONNECT_TIMEOUT_SECONDS: Int = 30
@@ -167,9 +168,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
-                    if (!AppUtils.isExynosSoc) {
+                   // if (!AppUtils.isExynosSoc)
                         params.setScanFilters(getScanFilters())
-                    }
+
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     if (isSupportInstallOldDevice) {
                         params.setMeshName(mesh.name)
@@ -204,6 +205,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun onDestroy() {
         super.onDestroy()
+        launch?.cancel()
         this.mApplication?.removeEventListener(this)
     }
 
@@ -423,9 +425,10 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
         device_stop_scan.text = getString(R.string.connecting_tip)
         scanDisposable?.dispose()
 
-        Thread {
+        launch?.cancel()
+        launch=  GlobalScope.launch {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-        }.start()
+        }
             LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
 
             connectDisposable?.dispose()    //取消掉上一个超时计时器

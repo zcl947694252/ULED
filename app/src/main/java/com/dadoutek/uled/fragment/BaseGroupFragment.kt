@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
@@ -20,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -29,7 +31,8 @@ import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
-import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -37,18 +40,19 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -60,6 +64,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
+    private var currentPosition: Int = 0
+    private var disposableTimer: Disposable? = null
+    private var currentLight: DbGroup? = null
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -123,7 +130,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
                         Thread.sleep(300)
-                        deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j],
+                        val dbGroup = deleteList[j]
+                        val lights = DBUtils.getLightByGroupID(dbGroup.id)
+                        deleteGroup(lights, dbGroup,
                                 successCallback = {
                                     isDeleteSucess = true
                                     if (j == deleteList.size - 1 && isDeleteSucess) {
@@ -183,7 +192,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
-        lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+        lin = LayoutInflater.from(activity).inflate(R.layout.gp_fragment_add_view, null)
         return view
     }
 
@@ -262,15 +271,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                     SharedPreferencesUtils.setDelete(true)
                     val intent = Intent("showPro")
                     intent.putExtra("is_delete", "true")
-                    this.activity?.let {
-                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    this.activity?.let { it1 ->
+                        LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                     }
                 } else {//先长按  选中 在长按 就会通知外面关闭了
                     isDelete = false
                     val intent = Intent("showPro")
                     intent.putExtra("is_delete", "false")
-                    this.activity?.let {
-                        LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+                    this.activity?.let { it1 ->
+                        LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                     }
                 }
                 SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, isDelete)
@@ -316,34 +325,98 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     abstract fun getGroupData(): Collection<DbGroup>
 
+
+    private fun sendToGw(isOpen: Boolean) {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                    }
+                    val low = currentLight!!.meshAddr and 0xff
+                    val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray
+                    if (isOpen) {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ON
+                    } else {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_OFF
+                    }
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentLight!!.meshAddr
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                disposableTimer?.dispose()
+                LogUtils.v("zcl-----------远程控制-------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
+            }
+        })
+    }
+
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-        var currentLight = groupList[position]
-        val dstAddr = currentLight.meshAddr
+        currentLight = groupList[position]
+        currentPosition = position
+        val dstAddr = currentLight!!.meshAddr
         val groupType = setGroupType()
         if (TelinkLightApplication.getApp().connectDevice == null) {
-            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+            // ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+
+            when (view!!.id) {
+                R.id.btn_on, R.id.tv_on -> sendToGw(true)
+                R.id.btn_off, R.id.tv_off -> sendToGw(false)
+                //不能使用group_name否则会造成长按监听无效 跳转组详情
+            }
         } else {
             when (view!!.id) {
                 R.id.btn_on, R.id.tv_on -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, true)
-                        currentLight.connectionStatus = ConnectionStatus.ON.value
-                        groupAdapter!!.notifyItemChanged(position)
-                        GlobalScope.launch {
-                            DBUtils.updateGroup(currentLight)
-                            updateLights(true, currentLight)
-                        }
+                        groupOpenSuccess(position)
                     }
                 }
                 R.id.btn_off, R.id.tv_off -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, false)
-                        currentLight.connectionStatus = ConnectionStatus.OFF.value
-                        groupAdapter!!.notifyItemChanged(position)
-                        GlobalScope.launch {
-                            DBUtils.updateGroup(currentLight)
-                            updateLights(true, currentLight)
-                        }
+                        groupCloseSuccess(position)
                     }
                 }
 
@@ -353,20 +426,20 @@ abstract class BaseGroupFragment : BaseFragment() {
                         /*  if (it.id.toString() != it.last_authorizer_user_id)
                               ToastUtils.showLong(getString(R.string.author_region_warm))
                           else {*/
-                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType)) {
+                        if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight!!.deviceType == groupType)) {
                             var num = 0
                             when (groupType) {
                                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                    num = DBUtils.getLightByGroupID(currentLight.id).size
+                                    num = DBUtils.getLightByGroupID(currentLight!!.id).size
                                 }
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                                    num = DBUtils.getLightByGroupID(currentLight.id).size
+                                    num = DBUtils.getLightByGroupID(currentLight!!.id).size
                                 }
                                 Constant.DEVICE_TYPE_CONNECTOR -> {
-                                    num = DBUtils.getConnectorByGroupID(currentLight.id).size
+                                    num = DBUtils.getConnectorByGroupID(currentLight!!.id).size
                                 }//蓝牙接收器
                                 Constant.DEVICE_TYPE_CURTAIN -> {
-                                    num = DBUtils.getCurtainByGroupID(currentLight.id).size
+                                    num = DBUtils.getCurtainByGroupID(currentLight!!.id).size
                                 }
                             }
 
@@ -422,6 +495,28 @@ abstract class BaseGroupFragment : BaseFragment() {
                     intent.putExtra("group", currentLight)
                     startActivityForResult(intent, 2)
                 }
+            }
+        }
+    }
+
+    private fun groupCloseSuccess(position: Int) {
+        currentLight?.connectionStatus = ConnectionStatus.OFF.value
+        groupAdapter?.notifyItemChanged(position)
+        GlobalScope.launch {
+            currentLight?.let {
+                DBUtils.updateGroup(currentLight!!)
+                updateLights(true, currentLight!!)
+            }
+        }
+    }
+
+    private fun groupOpenSuccess(position: Int) {
+        currentLight?.connectionStatus = ConnectionStatus.ON.value
+        groupAdapter?.notifyItemChanged(position)
+        GlobalScope.launch {
+            currentLight?.let {
+                DBUtils.updateGroup(currentLight!!)
+                updateLights(true, currentLight!!)
             }
         }
     }
@@ -513,7 +608,6 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
-
             if (lights.count() != 0) {
                 val maxRetryCount = 3
                 if (retryCount <= maxRetryCount) {
@@ -586,28 +680,20 @@ abstract class BaseGroupFragment : BaseFragment() {
         return list
     }
 
-
-    private fun syncData() {
-        mContext?.let {
-            SyncDataPutOrGetUtils.syncPutDataStart(it, object : SyncCallback {
-                override fun complete() {
-                    hideLoadingDialog()
-                    val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe { }
-                    if (compositeDisposable.isDisposed) {
-                        compositeDisposable = CompositeDisposable()
-                    }
-                    compositeDisposable.add(disposable)
-                }
-
-                override fun error(msg: String) {
-                    hideLoadingDialog()
-                    ToastUtils.showLong(R.string.backup_failed)
-                }
-
-                override fun start() {}
-            })
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ON -> {
+                LogUtils.v("zcl-----------远程控制群组开启成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                groupOpenSuccess(currentPosition)
+            }
+            Constant.SER_ID_GROUP_OFF -> {
+                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                groupCloseSuccess(currentPosition)
+            }
         }
     }
 }

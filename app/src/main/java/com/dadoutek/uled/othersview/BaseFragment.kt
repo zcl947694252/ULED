@@ -5,27 +5,52 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.group.TypeListAdapter
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
+import com.dadoutek.uled.util.PopUtil
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class BaseFragment : Fragment() {
 
+    private  var stompRecevice: StompReceiver? = null
     private lateinit var changeRecevicer: ChangeRecevicer
     private var loadDialog: Dialog? = null
+    private lateinit var dialog: Dialog
+    private var adapterType: TypeListAdapter? = null
+    private var list: MutableList<String>? = null
+    private var groupType: Long = 0L
+    private var dialogGroupName: TextView? = null
+    private var dialogGroupType: TextView? = null
+    lateinit var popMain: PopupWindow
+
 
     fun showLoadingDialog(content: String) {
         val inflater = LayoutInflater.from(activity)
@@ -48,28 +73,136 @@ open class BaseFragment : Fragment() {
         }
     }
 
+    private fun initStompReceiver() {
+        stompRecevice = StompReceiver()
+        val filter = IntentFilter()
+        filter.addAction(Constant.GW_COMMEND_CODE)
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        context?.registerReceiver(stompRecevice, filter)
+    }
+
+    inner class StompReceiver : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                    LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
+                    when (gwStompBean.cmd) {
+                        2500 -> receviedGwCmd2500(gwStompBean)
+                    }
+                }
+            }
+        }
+    }
+
+    open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
+    }
+
+    private fun makeDialog() {
+        dialog = Dialog(context)
+        list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
+        adapterType = TypeListAdapter(R.layout.item_group, list!!)
+
+        val popView = View.inflate(context, R.layout.dialog_add_group, null)
+        popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        popMain.isFocusable = true // 设置PopupWindow可获得焦点
+        popMain.isTouchable = true // 设置PopupWindow可触摸补充：
+        popMain.isOutsideTouchable = false
+
+        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = adapterType
+
+        adapterType?.bindToRecyclerView(recyclerView)
+
+        val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
+        val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
+        val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
+        dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
+        dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
+
+        dialogGroupTypeArrow.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupType?.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
+        dialogGroupOk.setOnClickListener {
+            addNewTypeGroup()
+        }
+
+        adapterType?.setOnItemClickListener { _, _, position ->
+            dialogGroupType?.text = list!![position]
+            recyclerView.visibility = View.GONE
+            when (position) {
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
+            }
+        }
+        popMain.setOnDismissListener {
+            recyclerView.visibility = View.GONE
+            dialogGroupType?.text = getString(R.string.not_type)
+            dialogGroupName?.text = ""
+            groupType = 0
+        }
+    }
+
+    open fun addNewTypeGroup() {
+        // 获取输入框的内容
+        if (StringUtils.compileExChar(dialogGroupName?.text.toString().trim { it <= ' ' })) {
+            ToastUtils.showLong(getString(R.string.rename_tip_check))
+        } else {
+            if (groupType == 0L) {
+                ToastUtils.showLong(getString(R.string.select_type))
+            } else {
+                //往DB里添加组数据
+                DBUtils.addNewGroupWithType(dialogGroupName?.text.toString().trim { it <= ' ' }, groupType)
+                refreshGroupData()
+                PopUtil.dismiss(popMain)
+            }
+        }
+    }
+
+    open fun refreshGroupData() {
+
+    }
 
     /**
      * 改变Toolbar上的图片和状态
      * @param isConnected       是否是连接状态
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
-        if (isConnected) {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-            }//meFragment 不存在toolbar 所以要拉出来
+        GlobalScope.launch(Dispatchers.Main) {
+            if (isConnected) {
+                if (toolbar != null) {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+                }//meFragment 不存在toolbar 所以要拉出来
                 setLoginChange()
-        } else {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                    val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                    dialog.show()
+            } else {
+                if (toolbar != null) {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
+                        val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
+                        dialog.show()
+                    }
                 }
-            }
                 setLoginOutChange()
+            }
         }
     }
 
@@ -92,7 +225,6 @@ open class BaseFragment : Fragment() {
             }
         }
     }
-
 
 
     fun onDeviceStatusChanged(event: DeviceEvent) {
@@ -124,9 +256,12 @@ open class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initChangeRecevicer()
+        initStompReceiver()
+        makeDialog()
     }
+
     private fun initChangeRecevicer() {
-         changeRecevicer = ChangeRecevicer()
+        changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
@@ -159,7 +294,7 @@ open class BaseFragment : Fragment() {
 
 
     open fun endCurrentGuide() {}
-    inner class ChangeRecevicer : BroadcastReceiver(){
+    inner class ChangeRecevicer : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
 //            LogUtils.e("zcl获取通知$deviceInfo")
@@ -178,6 +313,6 @@ open class BaseFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        context?.unregisterReceiver(changeRecevicer)
+        context?.unregisterReceiver(stompRecevice)
     }
 }

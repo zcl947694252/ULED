@@ -29,21 +29,21 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
 
 
     //    Context context;
-    //    List<DbGroup> list;
+    //    List<DbGroup> listTask;
     //
-    //    public GroupListAdapter(Context context, List<DbGroup> list) {
+    //    public GroupListAdapter(Context context, List<DbGroup> listTask) {
     //        this.context = context;
-    //        this.list = list;
+    //        this.listTask = listTask;
     //    }
     //
     //    @Override
     //    public int getCount() {
-    //        return list.size();
+    //        return listTask.size();
     //    }
     //
     //    @Override
     //    public Object getItem(int position) {
-    //        return list.get(position);
+    //        return listTask.get(position);
     //    }
     //
     //    @Override
@@ -55,11 +55,11 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
     //    public View getView(int position, View convertView, ViewGroup parent) {
     //        convertView = View.inflate(context, R.layout.item_group, null);
     //        TextView tvName = (TextView) convertView.findViewById(R.id.tv_group_name);
-    //        if (list.get(position).selected) {
+    //        if (listTask.get(position).selected) {
     //            convertView.setVisibility(View.GONE);
     //        } else {
     //            convertView.setVisibility(View.VISIBLE);
-    //            tvName.setText(list.get(position).getName());
+    //            tvName.setText(listTask.get(position).getName());
     //        }
     //        return convertView;
     //    }

@@ -9,11 +9,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -29,6 +32,8 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -60,13 +65,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private  var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     private var authorStompClient: Disposable? = null
-    private var pop: PopupWindow? = null
-    private var popView: View? = null
+    var pop: PopupWindow? = null
+    var popView: View? = null
     private var codeWarmDialog: AlertDialog? = null
     private var singleLogin: AlertDialog? = null
     private var payload: String? = null
@@ -82,14 +88,33 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var disposableConnectTimer: Disposable? = null
     var isScanning = false
 
+    private lateinit var dialog: Dialog
+    private var adapterType: TypeListAdapter? = null
+    private var list: MutableList<String>? = null
+    private var groupType: Long = 0L
+    private var dialogGroupName: TextView? = null
+    private var dialogGroupType: TextView? = null
+    open lateinit var popMain: PopupWindow
+
+    private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            LeBluetooth.getInstance().enable(applicationContext)
+
+        //注册网络状态监听广播
+         netWorkChangReceiver = NetWorkChangReceiver()
+        var filter = IntentFilter()
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(netWorkChangReceiver, filter)
+
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
+        makeDialog()
         initStompReceiver()
         initChangeRecevicer()
     }
@@ -123,15 +148,95 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    private fun makeDialog() {
+        dialog = Dialog(this@TelinkBaseActivity)
+        list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
+        adapterType = TypeListAdapter(R.layout.item_group, list!!)
+
+        val popView = View.inflate(this@TelinkBaseActivity, R.layout.dialog_add_group, null)
+        popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        popMain.isFocusable = true // 设置PopupWindow可获得焦点
+        popMain.isTouchable = true // 设置PopupWindow可触摸补充：
+        popMain.isOutsideTouchable = false
+
+        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(this@TelinkBaseActivity, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = adapterType
+
+        adapterType?.bindToRecyclerView(recyclerView)
+
+        val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
+        val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
+        val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
+        dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
+        dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
+
+        dialogGroupTypeArrow.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupType?.setOnClickListener {
+            if (recyclerView.visibility == View.GONE)
+                recyclerView.visibility = View.VISIBLE
+            else
+                recyclerView.visibility = View.GONE
+
+        }
+        dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
+        dialogGroupOk.setOnClickListener {
+            addNewTypeGroup()
+        }
+
+        adapterType?.setOnItemClickListener { _, _, position ->
+            dialogGroupType?.text = list!![position]
+            recyclerView.visibility = View.GONE
+            when (position) {
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
+            }
+        }
+        popMain.setOnDismissListener {
+            recyclerView.visibility = View.GONE
+            dialogGroupType?.text = getString(R.string.not_type)
+            dialogGroupName?.text = ""
+            groupType = 0
+        }
+    }
+
+    private fun addNewTypeGroup() {
+        // 获取输入框的内容
+        if (StringUtils.compileExChar(dialogGroupName?.text.toString().trim { it <= ' ' })) {
+            ToastUtils.showLong(getString(R.string.rename_tip_check))
+        } else {
+            if (groupType == 0L) {
+                ToastUtils.showLong(getString(R.string.select_type))
+            } else {
+                //往DB里添加组数据
+                DBUtils.addNewGroupWithType(dialogGroupName?.text.toString().trim { it <= ' ' }, groupType)
+                refreshGroupData()
+                PopUtil.dismiss(popMain)
+            }
+        }
+    }
+
+    open fun refreshGroupData() {
+
+
+    }
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {
         val dialogTip = AlertDialog.Builder(context)
         dialogTip.setMessage(R.string.openBluetooth)
-        dialogTip.setPositiveButton(android.R.string.ok) { dialog, which ->
+        dialogTip.setPositiveButton(android.R.string.ok) { _, _ ->
             LeBluetooth.getInstance().enable(applicationContext)
         }
-        dialogTip.setCancelable(false)
+        dialogTip.setCancelable(true)
         dialogTip.create().show()
     }
 
@@ -219,19 +324,19 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         isResume = true
-        val lightService: TelinkLightService? = TelinkLightService.Instance()
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)
+//       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
+//           TelinkLightApplication.getApp().initStompClient()
 
-        if (LeBluetooth.getInstance().isEnabled) {
-            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
-                changeDisplayImgOnToolbar(true)
-            } else {
-                changeDisplayImgOnToolbar(false)
-            }
-        } else {
-            changeDisplayImgOnToolbar(false)
-        }
+           if (LeBluetooth.getInstance().isEnabled) {
+               if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
+                   changeDisplayImgOnToolbar(true)
+               } else {
+                   changeDisplayImgOnToolbar(false)
+               }
+           } else {
+               changeDisplayImgOnToolbar(false)
+           }
+
     }
 
     override fun onDestroy() {
@@ -240,6 +345,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mConnectDisposable?.dispose()
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
+        unregisterReceiver(netWorkChangReceiver)
         SMSSDK.unregisterAllEventHandler()
     }
 
@@ -266,6 +372,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (loadDialog == null) {
             loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
+
+        if (loadDialog!!.isShowing)
+            return
+
         //loadDialog没显示才把它显示出来
         if (!loadDialog!!.isShowing && !this.isFinishing) {
             loadDialog!!.setCancelable(false)
@@ -278,8 +388,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (loadDialog != null &&loadDialog!!.isShowing&& !this@TelinkBaseActivity.isFinishing) {
-            loadDialog!!.dismiss()
+        if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
+            loadDialog?.dismiss()
         }
     }
 
@@ -333,11 +443,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
         override fun complete() {
             hideLoadingDialog()
-            val b = this@TelinkBaseActivity.isFinishing
-            val showing = singleLogin?.isShowing
-            if (!b && showing != null && !showing!!) {
-                singleLogin!!.show()
-            }
         }
 
         override fun error(msg: String) {
@@ -394,7 +499,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     PopUtil.dismiss(pop)
                     when (type) {
                         -1, 0, 2 -> { //移交的区域已被接收 账号已被接收 解除了区域%1$s的授权
-                            if (lastRegionId== rid || rid == 1) {//如果正在使用或者是区域一则退出
+                            if (lastRegionId == rid || rid == 1) {//如果正在使用或者是区域一则退出
                                 //DBUtils.deleteAllData()//删除数据
                                 restartApplication()
                                 ToastUtils.showLong(getString(R.string.cancel_authorization))
@@ -406,7 +511,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 initOnLayoutListener()
                 LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null&&isResume)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -424,6 +529,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
+        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
         filter.addAction(Constant.CANCEL_CODE)
         filter.addAction(Constant.PARSE_CODE)
@@ -435,6 +541,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                    LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
+                    when (gwStompBean.cmd) {
+                        700 -> TelinkLightApplication.getApp().offLine = false
+                        701 -> TelinkLightApplication.getApp().offLine = true
+                        2000 -> if (gwStompBean.status == 0) receviedGwCmd2000(gwStompBean.ser_id)
+                        2500 -> receviedGwCmd2500(gwStompBean)
+                    }
+
+                }
                 Constant.LOGIN_OUT -> {
                     LogUtils.e("zcl_baseMe___________收到登出消息")
                     loginOutMethod()
@@ -461,9 +578,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         }
                     }
 
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid ,cancelBean.region_name,lastRegionId?.toInt()) }//2代表解除授权信息type
-                    
-                    LogUtils.e("zcl_baseMe___________取消授权${cancelBean==null}")
+                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid, cancelBean.region_name, lastRegionId?.toInt()) }//2代表解除授权信息type
+
+                    LogUtils.e("zcl_baseMe___________取消授权${cancelBean == null}")
                 }
                 Constant.PARSE_CODE -> {
                     val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
@@ -474,8 +591,46 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+
+    }
+
+    open fun receviedGwCmd2000(serId: String) {
+
+    }
+
     open fun loginOutMethod() {
-        checkNetworkAndSync(this@TelinkBaseActivity)
+        if (!NetWorkUtils.isNetworkAvalible(this)) {
+            AlertDialog.Builder(this)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(android.R.string.ok
+                    ) { _, _ ->
+                        // 跳转到设置界面
+                        this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
+                    }.create().show()
+        } else {
+            SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                override fun start() {
+                    showLoadingDialog(getString(R.string.tip_start_sync))
+                }
+
+                override fun complete() {
+                    hideLoadingDialog()
+                    val b = this@TelinkBaseActivity.isFinishing
+                    val showing = singleLogin?.isShowing
+                    if (!b && showing != null && !showing!!) {
+                        singleLogin!!.show()
+                    }
+                }
+
+                override fun error(msg: String) {
+                    hideLoadingDialog()
+                    if (msg != null && msg != "null")
+                        ToastUtils.showLong(msg)
+                }
+            })
+        }
     }
 
 
@@ -552,11 +707,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null): Observable<DeviceInfo>? {
-        mConnectDisposable == null //代表这是第一次执行
-        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
+
+        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
-            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes)
+            return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
                     }
@@ -573,7 +728,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 it.onNext(TelinkLightApplication.getApp().connectDevice)
             }
         }
-
     }
 
     /**
@@ -583,8 +737,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     @Deprecated("use connect()")
     fun connectOld(macAddr: String?) {
         //如果支持蓝牙就打开蓝牙
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
+        // if (LeBluetooth.getInstance().isSupport(applicationContext))
+        //  LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
 
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
         if (!BleUtils.isLocationEnable(this)) {
@@ -649,6 +803,31 @@ open class TelinkBaseActivity : AppCompatActivity() {
             hideLoadingDialog()
         else
             finish()
+    }
+
+    class NetWorkChangReceiver : BroadcastReceiver() {
+        private var isHaveNetwork: Boolean = true
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            try {
+                var connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                var networkInfo = connectivityManager.activeNetworkInfo
+                if (networkInfo != null && networkInfo.isAvailable) {
+                    if (!isHaveNetwork) {
+                        val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
+                        if (connected !=true)
+                            TelinkLightApplication.getApp().initStompClient()
+                    LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
+                        isHaveNetwork = true
+                    }
+                } else {
+                    LogUtils.v("zcl-----------telinbase收到监听无网状态-------")
+                    isHaveNetwork = false
+                }
+            } catch (e: Exception) {
+                //ignore
+            }
+        }
     }
 
 }

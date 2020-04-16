@@ -8,6 +8,7 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -21,6 +22,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
@@ -66,15 +68,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
+    private lateinit var stepThreeTextSmall: TextView
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false
-    val INSTALL_NORMAL_LIGHT = 0
-    val INSTALL_RGB_LIGHT = 1
-    val INSTALL_SWITCH = 2
-    val INSTALL_SENSOR = 3
-    val INSTALL_CURTAIN = 4
-    val INSTALL_CONNECTOR = 5
     private val SCENE_MAX_COUNT = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,8 +128,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
                     batchGroup.visibility = View.GONE
                     batchGroup.setOnClickListener {
@@ -261,7 +258,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                    addNewGroup()
+                    //addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
                 }
             }
             R.id.create_scene -> {
@@ -353,21 +351,25 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         isGuide = false
         installDialog?.dismiss()
         when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+            }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -377,11 +379,13 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
+
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+
             }
         }
     }
@@ -393,6 +397,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         stepOneText = view.findViewById<TextView>(R.id.step_one)
         stepTwoText = view.findViewById<TextView>(R.id.step_two)
         stepThreeText = view.findViewById<TextView>(R.id.step_three)
+        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
         switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
         swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
@@ -409,6 +414,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
             title.visibility =  View.VISIBLE
             install_tip_question.visibility =  View.VISIBLE
         }
+
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
@@ -469,6 +475,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                   INSTALL_GATEWAY -> {
+                        if (medressData <= DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -566,10 +581,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun skipSetting() {
         var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
-        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-        intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
-        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+        intent.putExtra(TYPE_VIEW, TYPE_CURTAIN)
+        intent.putExtra(LIGHT_ARESS_KEY, currentLight)
+        intent.putExtra(CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(LIGHT_REFRESH_KEY, LIGHT_REFRESH_KEY_OK)
         Log.d("currentLight", currentLight!!.meshAddr.toString())
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }

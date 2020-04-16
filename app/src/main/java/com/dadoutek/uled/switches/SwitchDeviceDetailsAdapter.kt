@@ -1,19 +1,20 @@
 package com.dadoutek.uled.switches
 
+import android.content.Context
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.util.StringUtils
 
-class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {
+class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,internal var context: Context) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, scene: DbSwitch) {
         if (scene != null) {
             if(scene.name!=null&&scene.name!=""){
                 helper.setText(R.id.tv_device_name, scene.name)
             }else{
-               helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID)+"-"+helper.position)
+               helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID, context)+"-"+helper.position)
             }
 
             helper.setText(R.id.name, StringUtils.getSwitchName(scene))

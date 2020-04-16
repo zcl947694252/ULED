@@ -2,13 +2,18 @@ package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
 
-import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -25,16 +30,50 @@ public class NetworkFactory {
     private static OkHttpClient okHttpClient;
 
     private static OkHttpClient initHttpClient() {
+
+        final TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) { }
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) { }
+
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[]{};
+                    }
+                }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        // Create an ssl socket factory with our all-trusting manager
+        final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+       // HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(Constant.isDebug?HttpLoggingInterceptor.Level.BODY:HttpLoggingInterceptor.Level.NONE);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-        //HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
                 .writeTimeout(3, TimeUnit.MINUTES)
-                .addInterceptor(new CommonParamsInterceptor()).retryOnConnectionFailure(true);
+                .addInterceptor(new CommonParamsInterceptor())
+                .sslSocketFactory(sslSocketFactory)
+                .hostnameVerifier((hostname, session) -> true)
+                .retryOnConnectionFailure(true);
 
-        if (BuildConfig.DEBUG)
+       // if (BuildConfig.DEBUG)
             okHttpBuilder.addInterceptor(logging);
 
         return okHttpBuilder.build();

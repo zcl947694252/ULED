@@ -1,12 +1,12 @@
 package com.dadoutek.uled.switches
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -41,8 +42,8 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -53,7 +54,8 @@ import org.jetbrains.anko.design.snackbar
 
 private const val CONNECT_TIMEOUT = 20
 
-class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
+class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
+    private val requestCodes: Int = 1000
     private var version: String = ""
     private var popReNameView: View? = null
     private var renameDialog: Dialog? = null
@@ -62,7 +64,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var renameConfirm: TextView? = null
     private var renameEditText: EditText? = null
     private var newMeshAddr: Int = 0
-    private var alertDialog: android.app.AlertDialog? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SwitchSceneGroupAdapter
@@ -74,10 +75,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
     private var mConnectingSnackBar: Snackbar? = null
+    val map = mutableMapOf<Int, DbScene>()
+    private var configTag: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_switch_group)
+        setContentView(R.layout.activity_scene_switch_group)
         setSupportActionBar(toolbar)
         supportActionBar?.title = getString(R.string.scene_set)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -91,15 +94,16 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun initData() {
-        //startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-         version = intent.getStringExtra("version")
-        tvLightVersionText?.text = version
+        version = intent.getStringExtra("version")
+        scene_tvLightVersion?.text = version
+        map.clear()
 
         groupName = intent.getStringExtra("group")
         if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
+
         mSwitchList = ArrayList()
         mSwitchList.add(getString(R.string.button1))
         mSwitchList.add(getString(R.string.button2))
@@ -109,18 +113,18 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initListener() {
-        this.mApplication.removeEventListener(this)
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-
-        fab.setOnClickListener {
+        scene_one.setOnClickListener(this)
+        scene_two.setOnClickListener(this)
+        scene_three.setOnClickListener(this)
+        scene_four.setOnClickListener(this)
+        scene_use_botton.setOnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
                 }
             } else {
-                progressBar.visibility = View.VISIBLE
+                pb_ly.visibility = View.VISIBLE
                 GlobalScope.launch {
                     setSceneForSwitch()
                     newMeshAddr = MeshAddressGenerator().meshAddress
@@ -129,21 +133,43 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         mIsConfiguring = true
                         updateSwitch()
                         disconnect()
+                        ToastUtils.showShort(getString(R.string.config_success))
+                        pb_ly.visibility = View.GONE
                         if (switchDate == null)
                             switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                         showRenameDialog()
 
-                    },
-                            failedCallback = {
-                                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    progressBar.visibility = View.GONE
-                                    mIsConfiguring = false
-                                }
-                            })
+                    }, failedCallback = {
+                        mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
+                        GlobalScope.launch(Dispatchers.Main) {
+                            pb_ly.visibility = View.GONE
+                            mIsConfiguring = false
+                        }
+                    })
                 }
             }
         }
+        this.mApplication.removeEventListener(this)
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.scene_one -> {
+                configTag = 0
+            }
+            R.id.scene_two -> {
+                configTag = 1
+            }
+            R.id.scene_three -> {
+                configTag = 2
+            }
+            R.id.scene_four -> {
+                configTag = 3
+            }
+        }
+        startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
     }
 
     @SuppressLint("SetTextI18n")
@@ -152,10 +178,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
-        if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
+        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
             renameEditText?.setText(switchDate?.name)
         else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID) + "-"
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
                     + DBUtils.getAllSwitch().size)
         renameEditText?.setSelection(renameEditText?.text.toString().length)
 
@@ -186,7 +212,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (mIsConfiguring) {
             this.mApplication.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
+               // pb_ly.visibility = View.GONE
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -195,11 +221,11 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun showConfigSuccessDialog() {
-        if (version.contains("BT") || version.contains("BTL") || version.contains("BTS")||version.contains("STS")){
+        if (version.contains("BT") || version.contains("BTL") || version.contains("BTS") || version.contains("STS")) {
             TelinkLightService.Instance()?.idleMode(true)
             ToastUtils.showLong(getString(R.string.config_success))
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-        }else{
+        } else {
             try {
                 AlertDialog.Builder(this)
                         .setCancelable(false)
@@ -225,7 +251,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)+dbSwitch!!.meshAddr
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch!!.meshAddr
                 dbSwitch.controlSceneId = getControlScene()
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
@@ -250,38 +276,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
-            switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            // TODO 此处不知道为什么要设置成固定的 暂时注释 configsceneSwith也已被注释
+            //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
             switchDate!!.productUUID = mDeviceInfo.productUUID
 
             DBUtils.updateSwicth(switchDate!!)
         }
-    }
-
-    private fun saveSwitch() {
-        //确认配置成功后,添加开关到服务器
-        var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-        if (switch != null) {
-            var dbSwitch: DbSwitch? = DbSwitch()
-            dbSwitch!!.controlSceneId = getControlScene()
-            dbSwitch!!.macAddr = mDeviceInfo.macAddress
-            dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-            dbSwitch!!.productUUID = mDeviceInfo.productUUID
-            dbSwitch!!.index = switch.id.toInt()
-            dbSwitch.id = switch.id
-            DBUtils.updateSwicth(dbSwitch)
-        } else {
-            val dbSwitch = DbSwitch()
-            DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch!!.controlSceneId = getControlScene()
-            dbSwitch!!.macAddr = mDeviceInfo.macAddress
-            dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-            dbSwitch!!.productUUID = mDeviceInfo.productUUID
-            dbSwitch!!.index = dbSwitch.id.toInt()
-            DBUtils.saveSwitch(dbSwitch, false)
-            val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
-        }
-
     }
 
     private fun getControlScene(): String? {
@@ -302,7 +302,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
-                        progressBar.visibility = View.VISIBLE
+                        pb_ly.visibility = View.GONE
                         mIsDisconnecting = true
                         disconnect()
                     } else {
@@ -386,9 +386,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun showDisconnectSnackBar() {
+    private fun showDisconnectSnackBar() {//java.lang.ClassCastException: android.widget.LinearLayout cannot be cast to android.support.design.widget.CoordinatorLayout
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+        mDisconnectSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
                 .string.device_disconnected), getString(R.string.reconnect)) {
             reconnect()
         }
@@ -413,7 +413,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+        mConnectingSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
                 .string.connecting))
 
         TelinkLightService.Instance()?.autoConnect(connectParams)
@@ -425,8 +425,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
-                mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
-                progressBar.visibility = View.GONE
+                mConnectedSnackBar = snackbar(config_scene_switch, R.string.connect_success)
             }
 
 
@@ -437,14 +436,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
                         GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
-                            progressBar.visibility = View.GONE
+                            pb_ly.visibility = View.GONE
                             finish()
                         }
                     }
                     mIsConfiguring -> {
                         this.mApplication.removeEventListener(this)
                         GlobalScope.launch(Dispatchers.Main) {
-                            progressBar.visibility = View.GONE
+                            pb_ly.visibility = View.GONE
                             showConfigSuccessDialog()
                         }
                     }
@@ -475,7 +474,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum = 0
-        val map: Map<Int, DbScene> = mAdapter.sceneMap
+        val map: Map<Int, DbScene> =/* mAdapter.sceneMap*/map
         for (key in map.keys) {
             when (key) {
                 0 -> keyNum = 0x05          //左上按键
@@ -496,16 +495,16 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         makePop()
 
         if (mSceneList.isEmpty()) {
-            fab.visibility = View.GONE
-            indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
+            scene_use_botton.visibility = View.GONE
+            indefiniteSnackbar(config_scene_switch, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 TelinkLightService.Instance()?.idleMode(true)
             }
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-        mAdapter.bindToRecyclerView(recyclerView)
+//        recyclerView.layoutManager = GridLayoutManager(this, 2)
+//        mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun makePop() {
@@ -541,43 +540,26 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            if (switchDate!=null)
-            DBUtils.updateSwicth(switchDate!!)
+            if (switchDate != null)
+                DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }
     }
 
-
-    val groupAdress: Int
-        get() {
-            val list = DBUtils.swtichList
-            val idList = java.util.ArrayList<Int>()
-            for (i in list.indices.reversed()) {
-                if (list[i].meshAddr == 0xffff) {
-                    list.removeAt(i)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
+            val scene = data?.getParcelableExtra<DbScene>("data")
+            scene.let {
+                map[configTag] = scene!!
+                LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
+                when (configTag) {
+                    0 -> scene_one.text = scene.name
+                    1 -> scene_two.text = scene.name
+                    2 -> scene_three.text = scene.name
+                    3 -> scene_four.text = scene.name
                 }
             }
-
-            for (i in list.indices) {
-                idList.add(list[i].meshAddr)
-            }
-
-            var id = 0
-            for (i in 0x8001..33023) {
-                if (idList.contains(i)) {
-                    Log.d("sceneID", "getSceneId: " + "aaaaa")
-                    continue
-                } else {
-                    id = i
-                    Log.d("sceneID", "getSceneId: bbbbb$id")
-                    break
-                }
-            }
-
-            if (list.size == 0) {
-                id = 0x8001
-            }
-            return id
         }
-
+    }
 }

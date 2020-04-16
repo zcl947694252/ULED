@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model.DbModel;
 
+import androidx.annotation.Nullable;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
@@ -19,13 +21,19 @@ public class DbDataChange {
 
     private String changeType;  //数据改变操作类型  增删改查
 
-    @Generated(hash = 668824277)
-    public DbDataChange(Long id, Long changeId, String tableName,
-            String changeType) {
+    public int type = 3 ;  // 群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
+@Nullable
+    public String keys ="";
+
+    @Generated(hash = 1326895366)
+    public DbDataChange(Long id, Long changeId, String tableName, String changeType,
+            int type, String keys) {
         this.id = id;
         this.changeId = changeId;
         this.tableName = tableName;
         this.changeType = changeType;
+        this.type = type;
+        this.keys = keys;
     }
 
     @Generated(hash = 571649333)
@@ -64,13 +72,20 @@ public class DbDataChange {
         this.changeType = changeType;
     }
 
-    @Override
-    public String toString() {
-        return "DbDataChange{" +
-                "id=" + id +
-                ", changeId=" + changeId +
-                ", tableName='" + tableName + '\'' +
-                ", changeType='" + changeType + '\'' +
-                '}';
+    public int getType() {
+        return this.type;
     }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getKeys() {
+        return this.keys;
+    }
+
+    public void setKeys(String keys) {
+        this.keys = keys;
+    }
+
 }

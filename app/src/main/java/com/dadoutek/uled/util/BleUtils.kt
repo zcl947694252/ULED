@@ -1,11 +1,11 @@
 package com.dadoutek.uled.util
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.provider.Settings
 import com.blankj.utilcode.util.ActivityUtils
-import android.bluetooth.BluetoothManager
 
 
 
@@ -24,7 +24,7 @@ object BleUtils {
         val mBluetoothAdapter = manager.adapter
         //判断蓝牙是否开启，如果关闭则请求打开蓝牙
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled) {
-            mBluetoothAdapter.enable();
+            mBluetoothAdapter.enable()
         }
     }
 

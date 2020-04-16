@@ -887,7 +887,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 
@@ -956,7 +955,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun transformView() {
         disableConnectionStatusListener()
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
-            LogUtils.v("zcl---------${LightAdapter.mScannedLights}")
             startOtaAct()
         } else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -971,7 +969,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 startOtaAct() }
                             , {
                                 hideLoadingDialog()
-                                ToastUtils.showLong(R.string.connect_fail2)
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                                 LogUtils.d(it)
                             })
         }
