@@ -306,6 +306,15 @@ public interface RequestInterface {
 //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
+    /**
+     * https://dev.dadoutek.com/xxxx/auth/reset/{rid}
+     * @param regionId
+     * @return
+     */
+    @DELETE("auth/reset/{rid}")
+    Observable<Response<String>> clearUserRegionData(@Path("rid") int regionId);
+
+
     //获取下载链接
     @GET("api/ext/soybean/download/bin/{l1}/{l2}")
     Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1, @Path("l2") int l2);

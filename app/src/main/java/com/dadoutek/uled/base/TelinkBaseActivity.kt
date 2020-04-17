@@ -619,6 +619,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     hideLoadingDialog()
                     val b = this@TelinkBaseActivity.isFinishing
                     val showing = singleLogin?.isShowing
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
                     if (!b && showing != null && !showing!!) {
                         singleLogin!!.show()
                     }

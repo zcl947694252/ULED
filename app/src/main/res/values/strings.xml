@@ -1029,5 +1029,7 @@
     <string name="config_WIFI">ConfigGateWIFI</string>
     <string name="gate_way_offline">Gateway offline</string>
     <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
+    <string name="user_reset">User reset</string>
+    <string name="reset_user_success">用户复位成功</string>
 
 </resources>

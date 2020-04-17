@@ -147,7 +147,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         // detectUpdate()
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
         TelinkLightApplication.getApp().initStompClient()
-        LogUtils.v("zcl首页---oncreate")
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
 

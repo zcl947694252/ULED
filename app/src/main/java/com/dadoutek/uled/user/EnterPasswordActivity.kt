@@ -87,6 +87,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         isRunning = true
         makePop()
         initViewType()
@@ -430,7 +431,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     private fun syncComplet() {
         hideLoadingDialog()
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)

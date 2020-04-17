@@ -6,9 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/ULED.iml" filepath="$PROJECT_DIR$/ULED.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/ULED-app.iml" filepath="$PROJECT_DIR$/app/ULED-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED-library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/ULED-tbanner.iml" filepath="$PROJECT_DIR$/tbanner/ULED-tbanner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/library/ULED-tbanner-library.iml" filepath="$PROJECT_DIR$/tbanner/library/ULED-tbanner-library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/ULED_NEW-ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED_NEW-ULED-library.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" filepath="$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/guide/guide.iml" filepath="$PROJECT_DIR$/guide/guide.iml" />

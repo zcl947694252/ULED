@@ -302,7 +302,6 @@ open class BaseFragment : Fragment() {
                 LightAdapter.STATUS_LOGIN -> {
                     ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
-
                 }
                 LightAdapter.STATUS_LOGOUT -> {
                     changeDisplayImgOnToolbar(false)
@@ -313,6 +312,7 @@ open class BaseFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        TelinkLightApplication.getApp().refWatcher?.watch(this)
         context?.unregisterReceiver(stompRecevice)
     }
 }

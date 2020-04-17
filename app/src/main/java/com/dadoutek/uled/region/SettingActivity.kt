@@ -32,12 +32,14 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
@@ -94,6 +96,8 @@ class SettingActivity : BaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
         list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
+        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.user_reset)))
+
        // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
@@ -113,11 +117,34 @@ class SettingActivity : BaseActivity() {
                         0 -> emptyTheCache()
                         1 -> checkNetworkAndSyncs(this)
                         2 -> showSureResetDialogByApp()
-                        3 -> showSureResetDialogByApp()
+                        3 -> userReset()
                     }
                 }
             }
         }
+    }
+
+    private fun userReset() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.user_reset))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 1,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
+        builder.setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+            clearData()//删除本地数据
+            UserModel.clearUserData(1)?.subscribe(object : NetworkObserver<String?>() {//删除服务器数据
+                override fun onNext(t: String) {
+                    ToastUtils.showShort(getString(R.string.reset_user_success))
+                }
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    ToastUtils.showShort(e.message)
+                }
+            })
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+            ToastUtils.showShort(getString(R.string.cancel))
+        }
+        builder.show()
     }
 
     override fun initView() {
@@ -279,12 +306,6 @@ class SettingActivity : BaseActivity() {
             ToastUtils.showLong(R.string.data_empty)
             return
         }
-/*
-        val disposable = RegionModel.clearRegion()?.subscribe({
-
-        }, {
-
-        })*/
 
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {

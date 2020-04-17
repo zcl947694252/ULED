@@ -951,5 +951,7 @@
     <string name="delete_device_confim">删除后需要手动恢复该设备的出厂设置,确定删除该设备?</string>
     <string name="gateway_reset_confim">复位网关，配置的数据将会丢失,确定复位设备?</string>
     <string name="startTime">7:40</string>
+    <string name="user_reset">用户复位</string>
+    <string name="reset_user_success">用户复位成功</string>
 
 </resources>
