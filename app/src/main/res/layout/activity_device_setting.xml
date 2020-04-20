@@ -11,17 +11,20 @@
 
     <!--<include layout="@layout/fragment_device_setting"/>-->
 
-    <ImageView
-        android:id="@+id/light_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/icon_light"
-        app:layout_constraintEnd_toEndOf="@+id/include2"
-        app:layout_constraintStart_toStartOf="@+id/include2"
-        app:layout_constraintTop_toBottomOf="@+id/include2" />
 
+    <jp.co.cyberagent.android.gpuimage.GPUImageView
+            android:id="@+id/light_image"
+            android:layout_width="167dp"
+            android:layout_height="203dp"
+            android:layout_marginTop="44dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_light"
+            app:gpuimage_show_loading="false"
+            app:gpuimage_surface_type="texture_view"
+            app:layout_constraintEnd_toEndOf="@+id/include2"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="@+id/include2"
+            app:layout_constraintTop_toBottomOf="@+id/include2" />
 
     <TextView
         android:id="@+id/adjustment"
@@ -163,7 +166,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/include2"
-        app:layout_constraintStart_toStartOf="@+id/include2" />
+        app:layout_constraintStart_toStartOf="@+id/include2"/>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -192,20 +192,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
         val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
-                .subscribe(
-                        {
-                            //                            LogUtils.d("zcl--重加-----added device $it ")
-                            deviceFragment.refreshView()
-                        },
-                        {
-                            LogUtils.d(it)
-//                            LogUtils.d("zcl--重加-----added device throwable$it")
-                        },
-                        {
-                            //                            LogUtils.d("zcl--重加-----added device complete")
-//                            LogUtils.d("added mesh devices complete")
-                            //connect()
-                        })
+                .subscribe({ deviceFragment.refreshView() },
+                        { LogUtils.d(it) })
         mCompositeDisposable.add(disposable)
     }
 
@@ -770,7 +758,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightService.Instance()?.idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
-
         mDisposable.dispose()
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()

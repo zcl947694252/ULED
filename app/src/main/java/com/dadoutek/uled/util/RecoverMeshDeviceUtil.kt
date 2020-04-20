@@ -38,6 +38,8 @@ object RecoverMeshDeviceUtil {
 
     private fun getAllDeviceAddressList(): List<Int> {
         val lights = DBUtils.allLight.map { it.meshAddr }
+
+
         val curtain = DBUtils.allCurtain.map { it.meshAddr }
         val relay = DBUtils.allRely.map { it.meshAddr }
         val addressList = mutableListOf<Int>()
@@ -46,7 +48,6 @@ object RecoverMeshDeviceUtil {
         addressList.addAll(relay)
         addressList.sortBy { it }
         return addressList
-
     }
 
     fun findMeshDevice(deviceName: String?): Observable<Int> {

@@ -127,11 +127,11 @@ class SettingActivity : BaseActivity() {
     private fun userReset() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.user_reset))
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 1,
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
-        builder.setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
             clearData()//删除本地数据
-            UserModel.clearUserData(1)?.subscribe(object : NetworkObserver<String?>() {//删除服务器数据
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {//删除服务器数据
                 override fun onNext(t: String) {
                     ToastUtils.showShort(getString(R.string.reset_user_success))
                 }
@@ -141,7 +141,7 @@ class SettingActivity : BaseActivity() {
                 }
             })
         }
-        builder.setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
             ToastUtils.showShort(getString(R.string.cancel))
         }
         builder.show()

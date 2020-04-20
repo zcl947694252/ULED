@@ -311,7 +311,7 @@ public interface RequestInterface {
      * @param regionId
      * @return
      */
-    @DELETE("auth/reset/{rid}")
+    @GET("auth/reset/{rid}")
     Observable<Response<String>> clearUserRegionData(@Path("rid") int regionId);
 
 
