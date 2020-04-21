@@ -34,6 +34,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         public final static Property Index = new Property(7, int.class, "index", false, "INDEX");
         public final static Property Color = new Property(8, int.class, "color", false, "COLOR");
         public final static Property Status = new Property(9, int.class, "status", false, "STATUS");
+        public final static Property SlowUpSlowDownStatus = new Property(10, boolean.class, "slowUpSlowDownStatus", false, "SLOW_UP_SLOW_DOWN_STATUS");
+        public final static Property SlowUpSlowDownSpeed = new Property(11, int.class, "slowUpSlowDownSpeed", false, "SLOW_UP_SLOW_DOWN_SPEED");
     }
 
 
@@ -58,7 +60,9 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
                 "\"DEVICE_TYPE\" INTEGER," + // 6: deviceType
                 "\"INDEX\" INTEGER NOT NULL ," + // 7: index
                 "\"COLOR\" INTEGER NOT NULL ," + // 8: color
-                "\"STATUS\" INTEGER NOT NULL );"); // 9: status
+                "\"STATUS\" INTEGER NOT NULL ," + // 9: status
+                "\"SLOW_UP_SLOW_DOWN_STATUS\" INTEGER NOT NULL ," + // 10: slowUpSlowDownStatus
+                "\"SLOW_UP_SLOW_DOWN_SPEED\" INTEGER NOT NULL );"); // 11: slowUpSlowDownSpeed
     }
 
     /** Drops the underlying database table. */
@@ -92,6 +96,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         stmt.bindLong(8, entity.getIndex());
         stmt.bindLong(9, entity.getColor());
         stmt.bindLong(10, entity.getStatus());
+        stmt.bindLong(11, entity.getSlowUpSlowDownStatus() ? 1L: 0L);
+        stmt.bindLong(12, entity.getSlowUpSlowDownSpeed());
     }
 
     @Override
@@ -119,6 +125,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         stmt.bindLong(8, entity.getIndex());
         stmt.bindLong(9, entity.getColor());
         stmt.bindLong(10, entity.getStatus());
+        stmt.bindLong(11, entity.getSlowUpSlowDownStatus() ? 1L: 0L);
+        stmt.bindLong(12, entity.getSlowUpSlowDownSpeed());
     }
 
     @Override
@@ -138,7 +146,9 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // deviceType
             cursor.getInt(offset + 7), // index
             cursor.getInt(offset + 8), // color
-            cursor.getInt(offset + 9) // status
+            cursor.getInt(offset + 9), // status
+            cursor.getShort(offset + 10) != 0, // slowUpSlowDownStatus
+            cursor.getInt(offset + 11) // slowUpSlowDownSpeed
         );
         return entity;
     }
@@ -155,6 +165,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         entity.setIndex(cursor.getInt(offset + 7));
         entity.setColor(cursor.getInt(offset + 8));
         entity.setStatus(cursor.getInt(offset + 9));
+        entity.setSlowUpSlowDownStatus(cursor.getShort(offset + 10) != 0);
+        entity.setSlowUpSlowDownSpeed(cursor.getInt(offset + 11));
      }
     
     @Override

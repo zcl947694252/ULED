@@ -83,7 +83,6 @@ class ExtendActivity : TelinkBaseActivity(), View.OnClickListener, CompoundButto
                     LogUtils.v("zcl-----------设置模式速度fast-------")
                 }
             }
-
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0, byteArrayOf(CONFIG_EXTEND_ALL_JBSD, speedNum.toByte()))
         }
     }

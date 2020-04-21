@@ -45,7 +45,7 @@ public class DbGroup implements Serializable{
     @Transient
     public int textColor;//文字颜色
 
-    public int status = 1;//链接状态
+    public int status = 1;//开关状态
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -54,16 +54,14 @@ public class DbGroup implements Serializable{
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int deviceCount = 0;
+    public boolean slowUpSlowDownStatus = false;
+    public int slowUpSlowDownSpeed = 1; //慢中快 1-3-5
 
-
-    @Generated(hash = 1966413977)
-    public DbGroup() {
-    }
-
-    @Generated(hash = 2096192422)
+    @Generated(hash = 677692371)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, int belongRegionId, Long deviceType, int index,
-            int color, int status) {
+            int color, int status, boolean slowUpSlowDownStatus,
+            int slowUpSlowDownSpeed) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -74,6 +72,36 @@ public class DbGroup implements Serializable{
         this.index = index;
         this.color = color;
         this.status = status;
+        this.slowUpSlowDownStatus = slowUpSlowDownStatus;
+        this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
+    }
+
+    @Generated(hash = 1966413977)
+    public DbGroup() {
+    }
+
+    public boolean isCheckedInGroup() {
+        return isCheckedInGroup;
+    }
+
+    public boolean isslowUpSlowDownStatus() {
+        return slowUpSlowDownStatus;
+    }
+
+    public void setslowUpSlowDownStatus(boolean slowUpSlowDownStatus) {
+        this.slowUpSlowDownStatus = slowUpSlowDownStatus;
+    }
+
+    public int getslowUpSlowDownSpeed() {
+        return slowUpSlowDownSpeed;
+    }
+
+    public void setslowUpSlowDownSpeed(int slowUpSlowDownSpeed) {
+        this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
+    }
+
+    public void setCheckedInGroup(boolean checkedInGroup) {
+        isCheckedInGroup = checkedInGroup;
     }
 
     public static long getSerialVersionUID() {
@@ -208,6 +236,22 @@ public class DbGroup implements Serializable{
         this.deviceCount = deviceCount;
     }
 
+    public boolean isSlowUpSlowDownStatus() {
+        return slowUpSlowDownStatus;
+    }
+
+    public void setSlowUpSlowDownStatus(boolean slowUpSlowDownStatus) {
+        this.slowUpSlowDownStatus = slowUpSlowDownStatus;
+    }
+
+    public int getSlowUpSlowDownSpeed() {
+        return slowUpSlowDownSpeed;
+    }
+
+    public void setSlowUpSlowDownSpeed(int slowUpSlowDownSpeed) {
+        this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
+    }
+
     @Override
     public String toString() {
         return "DbGroup{" +
@@ -227,6 +271,13 @@ public class DbGroup implements Serializable{
                 ", status=" + status +
                 ", isSeek=" + isSeek +
                 ", deviceCount=" + deviceCount +
+                ", slowUpSlowDownStatus=" + slowUpSlowDownStatus +
+                ", slowUpSlowDownSpeed=" + slowUpSlowDownSpeed +
                 '}';
     }
+
+    public boolean getSlowUpSlowDownStatus() {
+        return this.slowUpSlowDownStatus;
+    }
+
 }

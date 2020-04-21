@@ -51,7 +51,7 @@ public class DbLight implements Serializable {
     @Transient
     public boolean isSeek = true;//选择色温还是亮度
 
-    public int status = 1;//链接状态
+    public int status = 1;//连接状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图

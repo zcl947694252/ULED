@@ -1030,6 +1030,10 @@
     <string name="gate_way_offline">Gateway offline</string>
     <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
     <string name="user_reset">User reset</string>
-    <string name="reset_user_success">用户复位成功</string>
+    <string name="reset_user_success">User reset successfully</string>
+    <string name="slow_up_slowly">Slow up slowly</string>
+    <string name="slow">slow</string>
+    <string name="mid">middle</string>
+    <string name="fast">fast</string>
 
 </resources>

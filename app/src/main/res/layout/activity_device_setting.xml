@@ -1,172 +1,257 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical">
 
     <include
-        android:id="@+id/include2"
-        layout="@layout/toolbar" />
+            android:id="@+id/include2"
+            layout="@layout/toolbar" />
 
     <!--<include layout="@layout/fragment_device_setting"/>-->
 
+    <LinearLayout
+            android:id="@+id/light_image_ly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-    <jp.co.cyberagent.android.gpuimage.GPUImageView
-            android:id="@+id/light_image"
-            android:layout_width="167dp"
-            android:layout_height="203dp"
-            android:layout_marginTop="44dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/icon_light"
-            app:gpuimage_show_loading="false"
-            app:gpuimage_surface_type="texture_view"
-            app:layout_constraintEnd_toEndOf="@+id/include2"
-            app:layout_constraintHorizontal_bias="0.501"
-            app:layout_constraintStart_toStartOf="@+id/include2"
-            app:layout_constraintTop_toBottomOf="@+id/include2" />
+
+        <jp.co.cyberagent.android.gpuimage.GPUImageView
+                android:id="@+id/light_image"
+                android:layout_width="165dp"
+                android:layout_height="165dp"
+                android:layout_marginTop="24dp"
+                android:src="@mipmap/round"
+                app:gpuimage_show_loading="false"
+                app:gpuimage_surface_type="texture_view" />
+
+        <ImageView
+                android:layout_width="64dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="-7dp"
+                android:src="@mipmap/light_seat" />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/slow_ly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_30"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:gravity="center"
+                android:text="@string/slow_up_slowly"
+                android:textColor="@color/gray_3"
+                android:textSize="15sp" />
+
+        <CheckBox
+                android:id="@+id/slow_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_15"
+                android:layout_marginTop="1dp"
+                android:button="@null"
+                android:background="@drawable/select_check"/>
+
+        <RadioGroup
+                android:id="@+id/slow_rg_ly"
+                android:layout_width="200dp"
+                android:layout_height="@dimen/dp_30"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:background="@drawable/rect_solid_radius5_e"
+                android:orientation="horizontal">
+
+            <RadioButton
+                    android:id="@+id/slow_rg_slow"
+                    android:layout_width="60dp"
+                    android:background="@drawable/select_radius5_w_e"
+                    android:layout_marginStart="@dimen/dp_5"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/slow"
+                    android:layout_height="23dp" />
+
+            <RadioButton
+                    android:id="@+id/slow_rg_middle"
+                    android:layout_width="60dp"
+                    android:layout_height="23dp"
+                    android:button="@null"
+                    android:background="@drawable/select_radius5_w_e"
+                    android:text="@string/mid"
+                    android:gravity="center"
+                    android:layout_marginStart="@dimen/dp_5"
+                    android:layout_marginEnd="@dimen/dp_5" />
+
+            <RadioButton
+                    android:id="@+id/slow_rg_fast"
+                    android:layout_width="60dp"
+                    android:layout_height="23dp"
+                    android:text="@string/fast"
+                    android:background="@drawable/select_radius5_w_e"
+                    android:gravity="center"
+                    android:button="@null"
+                    android:layout_marginEnd="@dimen/dp_5"/>
+        </RadioGroup>
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/adjustment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="36dp"
-        android:text="@string/brightness_adjustment"
-        android:textColor="@color/black_three"
-        android:textSize="15sp"
-        app:layout_constraintStart_toStartOf="@+id/include2"
-        app:layout_constraintTop_toBottomOf="@+id/light_image" />
-
+            android:id="@+id/adjustment"
+            android:layout_marginTop="@dimen/dp_30"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="@string/brightness_adjustment"
+            android:textColor="@color/black_three"
+            android:textSize="15sp" />
 
     <SeekBar
-        android:id="@+id/light_sbBrightness"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginTop="12dp"
-        android:padding="5dp"
-        android:progress="1"
-        style="@style/SeekBarStyle"
-        app:layout_constraintEnd_toEndOf="@+id/include2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adjustment" />
+            android:id="@+id/light_sbBrightness"
+            style="@style/SeekBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
+            android:padding="5dp"
+            android:progress="1" />
 
-    <ImageView
-        android:id="@+id/device_light_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_puls"
-        android:layout_marginEnd="12dp"
-        android:padding="5dp"
-        app:layout_constraintEnd_toEndOf="@+id/light_sbBrightness"
-        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+        <ImageView
+                android:id="@+id/device_light_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:padding="5dp"
+                android:src="@drawable/icon_puls"
+                app:layout_constraintEnd_toEndOf="@+id/light_sbBrightness"
+                app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
+
+        <TextView
+                android:id="@+id/tv_Brightness"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="1%"
+                android:textColor="@color/black_three"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
+                app:layout_constraintEnd_toStartOf="@+id/device_light_add"
+                app:layout_constraintTop_toTopOf="@+id/device_light_add" />
+
+        <ImageView
+                android:id="@+id/device_light_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:padding="5dp"
+                android:src="@drawable/icon_minus"
+                app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
+                app:layout_constraintEnd_toStartOf="@+id/tv_Brightness" />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+            <ImageView
+                    android:id="@+id/brightness_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_unselected" />
+
+            <TextView
+                    android:id="@+id/brightness_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/brightness"
+                    android:textColor="@color/black_nine"
+                    android:textSize="15sp" />
+        </LinearLayout>
+
+        <ImageView
+                android:id="@+id/light_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/icon_light_close" />
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+
+            <ImageView
+                    android:id="@+id/temperature_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/icon_unselected"
+                    app:layout_constraintBottom_toBottomOf="@+id/brightness_btn"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.61"
+                    app:layout_constraintStart_toEndOf="@+id/light_switch"
+                    app:layout_constraintTop_toTopOf="@+id/brightness_btn" />
+
+
+            <TextView
+                    android:id="@+id/temperature_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/color_temperature"
+                    android:textColor="@color/black_nine"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/brightness_text"
+                    app:layout_constraintEnd_toEndOf="@+id/temperature_btn"
+                    app:layout_constraintStart_toStartOf="@+id/temperature_btn"
+                    app:layout_constraintTop_toTopOf="@+id/brightness_text" />
+        </LinearLayout>
+
+    </LinearLayout>
     <TextView
-        android:id="@+id/tv_Brightness"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="1%"
-        android:textSize="15sp"
-        android:textColor="@color/black_three"
-        app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
-        app:layout_constraintEnd_toStartOf="@+id/device_light_add"
-        app:layout_constraintTop_toTopOf="@+id/device_light_add" />
+            android:id="@+id/textTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="version"
+            android:textColor="@color/black_nine"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/device_light_minus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:padding="5dp"
-        android:src="@drawable/icon_minus"
-        app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
-        app:layout_constraintEnd_toStartOf="@+id/tv_Brightness" />
-
-
-    <ImageView
-        android:id="@+id/light_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/icon_light_close"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/include2"
-        app:layout_constraintStart_toStartOf="@+id/include2"
-        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
-
-
-    <ImageView
-        android:id="@+id/brightness_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/icon_unselected"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/light_switch"
-        app:layout_constraintHorizontal_bias="0.39"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
-
-
-    <TextView
-        android:id="@+id/brightness_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/brightness"
-        android:textColor="@color/black_nine"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/light_switch"
-        app:layout_constraintEnd_toEndOf="@+id/brightness_btn"
-        app:layout_constraintStart_toStartOf="@+id/brightness_btn"
-        app:layout_constraintTop_toBottomOf="@+id/brightness_btn" />
-
-    <ImageView
-        android:id="@+id/temperature_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:src="@drawable/icon_unselected"
-        app:layout_constraintBottom_toBottomOf="@+id/brightness_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.61"
-        app:layout_constraintStart_toEndOf="@+id/light_switch"
-        app:layout_constraintTop_toTopOf="@+id/brightness_btn" />
-
-
-    <TextView
-        android:id="@+id/temperature_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/color_temperature"
-        android:textColor="@color/black_nine"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/brightness_text"
-        app:layout_constraintEnd_toEndOf="@+id/temperature_btn"
-        app:layout_constraintStart_toStartOf="@+id/temperature_btn"
-        app:layout_constraintTop_toTopOf="@+id/brightness_text" />
-
-
-    <TextView
-        android:id="@+id/textTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="10dp"
-        android:text="version"
-        android:textColor="@color/black_nine"
-        android:textSize="13sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/include2"
-        app:layout_constraintStart_toStartOf="@+id/include2"/>
-
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

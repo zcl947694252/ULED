@@ -953,5 +953,9 @@
     <string name="startTime">7:40</string>
     <string name="user_reset">用户复位</string>
     <string name="reset_user_success">用户复位成功</string>
+    <string name="slow_up_slowly">缓起缓灭:</string>
+    <string name="slow">慢</string>
+    <string name="mid">中</string>
+    <string name="fast">快</string>
 
 </resources>
