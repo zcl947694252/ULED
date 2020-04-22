@@ -957,5 +957,6 @@
     <string name="slow">慢</string>
     <string name="mid">中</string>
     <string name="fast">快</string>
+    <string name="recovery_active_equipment">找回有效设备</string>
 
 </resources>

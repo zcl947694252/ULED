@@ -3,12 +3,12 @@ package com.dadoutek.uled.model.DbModel;
 import com.google.gson.annotations.Expose;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -54,13 +54,15 @@ public class DbGroup implements Serializable{
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int deviceCount = 0;
-    public boolean slowUpSlowDownStatus = false;
+    public int slowUpSlowDownStatus = 0;//1开0关;
     public int slowUpSlowDownSpeed = 1; //慢中快 1-3-5
 
-    @Generated(hash = 677692371)
+
+
+    @Generated(hash = 1331076635)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, int belongRegionId, Long deviceType, int index,
-            int color, int status, boolean slowUpSlowDownStatus,
+            int color, int status, int slowUpSlowDownStatus,
             int slowUpSlowDownSpeed) {
         this.id = id;
         this.meshAddr = meshAddr;
@@ -80,16 +82,10 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
+
+
     public boolean isCheckedInGroup() {
         return isCheckedInGroup;
-    }
-
-    public boolean isslowUpSlowDownStatus() {
-        return slowUpSlowDownStatus;
-    }
-
-    public void setslowUpSlowDownStatus(boolean slowUpSlowDownStatus) {
-        this.slowUpSlowDownStatus = slowUpSlowDownStatus;
     }
 
     public int getslowUpSlowDownSpeed() {
@@ -236,11 +232,7 @@ public class DbGroup implements Serializable{
         this.deviceCount = deviceCount;
     }
 
-    public boolean isSlowUpSlowDownStatus() {
-        return slowUpSlowDownStatus;
-    }
-
-    public void setSlowUpSlowDownStatus(boolean slowUpSlowDownStatus) {
+    public void setSlowUpSlowDownStatus(int slowUpSlowDownStatus) {
         this.slowUpSlowDownStatus = slowUpSlowDownStatus;
     }
 
@@ -250,6 +242,10 @@ public class DbGroup implements Serializable{
 
     public void setSlowUpSlowDownSpeed(int slowUpSlowDownSpeed) {
         this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
+    }
+
+    public int getSlowUpSlowDownStatus() {
+        return slowUpSlowDownStatus;
     }
 
     @Override
@@ -274,10 +270,6 @@ public class DbGroup implements Serializable{
                 ", slowUpSlowDownStatus=" + slowUpSlowDownStatus +
                 ", slowUpSlowDownSpeed=" + slowUpSlowDownSpeed +
                 '}';
-    }
-
-    public boolean getSlowUpSlowDownStatus() {
-        return this.slowUpSlowDownStatus;
     }
 
 }

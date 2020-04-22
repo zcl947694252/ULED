@@ -48,6 +48,7 @@ object Commander : EventListener<String> {
     private var mResetSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
     private var version: String? = null
+
     //软件恢复出厂设置0xE3，指令后的参数必须是dadou，才有效果。
     //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
     private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
@@ -620,13 +621,12 @@ object Commander : EventListener<String> {
     }
 
     /**
-     *
      * 连接并且自动登录
      */
     @JvmStatic
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, autoConnect: Boolean): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
@@ -648,8 +648,9 @@ object Commander : EventListener<String> {
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
-
-                TelinkLightService.Instance()?.autoConnect(connectParams)
+                val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+                if (autoConnect && size > 0)
+                    TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {

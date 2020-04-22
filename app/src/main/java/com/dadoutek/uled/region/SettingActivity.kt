@@ -1,5 +1,6 @@
 package com.dadoutek.uled.region
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -27,10 +28,12 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -40,10 +43,9 @@ import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.NetWorkUtils
-import com.dadoutek.uled.util.PopUtil
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.util.*
+import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -71,6 +73,8 @@ class SettingActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
+    private var disposableFind: Disposable? = null
+    private var mConnectDisposal: Disposable? = null
     private var disposableInterval: Disposable? = null
     private var disposable: Disposable? = null
     private var mApplication: TelinkLightApplication? = null
@@ -97,8 +101,9 @@ class SettingActivity : BaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.user_reset)))
+        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.recovery_active_equipment)))
 
-       // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
+        // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)
@@ -118,9 +123,27 @@ class SettingActivity : BaseActivity() {
                         1 -> checkNetworkAndSyncs(this)
                         2 -> showSureResetDialogByApp()
                         3 -> userReset()
+                        4 -> startToRecoverDevices()
                     }
                 }
             }
+        }
+    }
+
+    private fun startToRecoverDevices() {
+        LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
+        showLoadingDialog(getString(R.string.please_wait))
+        disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    hideLoadingDialog()
+                },
+                        {
+                            hideLoadingDialog()
+                            LogUtils.d(it)
+                        })
+        disposableFind?.let {
+            compositeDisposable.add(it)
         }
     }
 
@@ -131,10 +154,12 @@ class SettingActivity : BaseActivity() {
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
         builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
             clearData()//删除本地数据
-            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {//删除服务器数据
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
+                //删除服务器数据
                 override fun onNext(t: String) {
                     ToastUtils.showShort(getString(R.string.reset_user_success))
                 }
+
                 override fun onError(e: Throwable) {
                     super.onError(e)
                     ToastUtils.showShort(e.message)
@@ -182,7 +207,7 @@ class SettingActivity : BaseActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = downTime -1 - it
+                    var num = downTime - 1 - it
                     if (num == 0L) {
                         setTimerZero()
                     } else {

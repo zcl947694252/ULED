@@ -1035,5 +1035,6 @@
     <string name="slow">slow</string>
     <string name="mid">middle</string>
     <string name="fast">fast</string>
+    <string name="recovery_active_equipment">Recovery of active equipment</string>
 
 </resources>

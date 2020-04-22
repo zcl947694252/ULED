@@ -629,7 +629,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
             mApplication?.startLightService(TelinkLightService::class.java)
-        startToRecoverDevices()
+        //startToRecoverDevices()
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
@@ -638,7 +638,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
-//        LogUtils.v("zcl--重加---------onPostResume")
+//      LogUtils.v("zcl--重加---------onPostResume")
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
@@ -672,6 +672,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     fun autoConnect() {
+
         //如果支持蓝牙就打开蓝牙
         // if (LeBluetooth.getInstance().isSupport(applicationContext))
         //LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
@@ -692,17 +693,20 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                                val size = DBUtils.getAllCurtains().size+DBUtils.allLight.size + DBUtils.allRely.size
+                                if (size>0){
                                 mConnectDisposal?.dispose()
                                 mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                                         ?.subscribe(
-                                                {
-                                                    RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                {//找回有效设备
+                                                    //RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                    //LogUtils.v("zcl-----------找回设备-------${it.deviceName}")
                                                     onLogin()
                                                 },
                                                 {
                                                     LogUtils.d("connect failed, reason = $it")
                                                 }
-                                        )
+                                        )}
                             }
                         }, { LogUtils.d(it) })
             } else {

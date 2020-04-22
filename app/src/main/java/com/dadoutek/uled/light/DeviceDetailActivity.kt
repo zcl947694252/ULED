@@ -1100,16 +1100,18 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
      */
     fun autoConnect() {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
-        mConnectDisposable?.dispose()
-        mConnectDisposable = connect(deviceTypes = deviceTypes,fastestMode = true ,retryTimes = 10)
-                ?.subscribe({
-                    onLogin()
-                }, {
-                    LogUtils.d("connect failed")
-                }
-                )
+        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+        if (size > 0) {
+            mConnectDisposable?.dispose()
+            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                    ?.subscribe({
+                        onLogin()
+                    }, {
+                        LogUtils.d("connect failed")
+                    }
+                    )
+        }
     }
-
     private fun onLogin() {
         LogUtils.d("connection success")
     }

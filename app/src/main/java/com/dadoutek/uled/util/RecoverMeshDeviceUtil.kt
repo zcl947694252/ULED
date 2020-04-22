@@ -58,7 +58,6 @@ object RecoverMeshDeviceUtil {
                // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
 
-
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
@@ -72,7 +71,6 @@ object RecoverMeshDeviceUtil {
                 .map { deviceInfo ->
                     createdDeviceList.add(deviceInfo)
                     deviceInfo.meshAddress
-
                 }
                 .timeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
                     LogUtils.d("findMeshDevice name complete. size = ${createdDeviceList.size}")
