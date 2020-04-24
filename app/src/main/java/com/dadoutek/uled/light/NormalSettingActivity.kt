@@ -130,8 +130,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
             brightness_btn.setImageResource(R.drawable.icon_unselected)
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = false
             if (isSwitch) {
-                isBrightness = false
                 var lightCurrent = DBUtils.getGroupByID(group!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.colorTemperature
@@ -152,8 +152,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
             brightness_btn.setImageResource(R.drawable.icon_unselected)
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = false
             if (isSwitch) {
-                isBrightness = false
                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.colorTemperature
@@ -181,8 +181,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-            if (isSwitch) {
                 isBrightness = true
+            if (isSwitch) {
                 var lightCurrent = DBUtils.getGroupByID(group!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.brightness
@@ -203,8 +203,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-            if (isSwitch) {
                 isBrightness = true
+            if (isSwitch) {
                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.brightness
@@ -1208,7 +1208,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 true
             }
 
-            device_light_minus.setOnTouchListener { v, event ->
+            device_light_minus.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     downTime = System.currentTimeMillis()
                     onBtnTouch = true
@@ -1226,7 +1226,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                         }
                     }
-
                 } else if (event.action == MotionEvent.ACTION_UP) {
                     onBtnTouch = false
                     if (thisTime - downTime < 500) {
@@ -1253,7 +1252,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             if (isBrightness)
                 filterGroup.addFilter(GPUImageBrightnessFilter(progress / 500f))
             else
-                filterGroup.addFilter(GPUImageWhiteBalanceFilter(Float.valueOf(50000f - (temperatureValue - 20) * 500), 0.0f))//2000 - 57000
+                filterGroup.addFilter(GPUImageWhiteBalanceFilter(Float.valueOf(50000f - (temperatureValue - 9) * 500), 0.0f))//2000 - 57000
         } else {
             filterGroup.addFilter(GPUImageBrightnessFilter(0f))
         }
@@ -1332,8 +1331,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
                                         this.hideLoadingDialog()
-                                        this?.setResult(Constant.RESULT_OK)
-                                        this?.finish()
+                                        this.setResult(Constant.RESULT_OK)
+                                        this.finish()
                                     },
                                     failedCallback = {
                                         this.hideLoadingDialog()

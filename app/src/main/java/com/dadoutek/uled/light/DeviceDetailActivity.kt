@@ -133,7 +133,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         scrollToPosition()
         if (TelinkLightApplication.getApp().connectDevice == null) {
             autoConnect()
-            ToastUtils.showLong(getString(R.string.connecting_tip))
+
         }
     }
 
@@ -782,7 +782,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 }
                             } else {
                                 autoConnect()
-                                ToastUtils.showLong(getString(R.string.connecting_tip))
                             }
                         }
                     } else {
@@ -1034,22 +1033,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         return lightsData
     }
 
-
-    /**
-     * 重试
-     * 先扫描到信号比较好的，再连接。
-     */
-    private fun retryConnect() {
-        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
-            retryConnectCount++
-            autoConnect()
-        } else {
-            TelinkLightService.Instance()?.idleMode(true)
-            retryConnectCount = 0
-            autoConnect()
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         if (TelinkLightService.Instance() != null)
@@ -1102,6 +1085,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
+            ToastUtils.showLong(getString(R.string.connecting_tip))
             mConnectDisposable?.dispose()
             mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                     ?.subscribe({

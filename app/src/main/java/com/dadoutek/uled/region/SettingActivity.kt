@@ -95,13 +95,17 @@ class SettingActivity : BaseActivity() {
 
     override fun initListener() {}
 
+
+
+
+
     override fun initData() {
         val list = arrayListOf<SettingItemBean>()
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
-        list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
+        //list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.user_reset)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.recovery_active_equipment)))
+        //list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.user_reset)))
+        list.add(SettingItemBean(R.drawable.icon_retrieve, getString(R.string.recovery_active_equipment)))
 
         // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
@@ -120,10 +124,10 @@ class SettingActivity : BaseActivity() {
                 else {
                     when (position) {
                         0 -> emptyTheCache()
-                        1 -> checkNetworkAndSyncs(this)
-                        2 -> showSureResetDialogByApp()
-                        3 -> userReset()
-                        4 -> startToRecoverDevices()
+                       // 1 -> checkNetworkAndSyncs(this)
+                        1 -> showSureResetDialogByApp()
+                       // 3 -> userReset()
+                        2 -> startToRecoverDevices()
                     }
                 }
             }
@@ -279,7 +283,7 @@ class SettingActivity : BaseActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    fun checkNetworkAndSyncs(activity: Activity?) {
+    private fun checkNetworkAndSyncs(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -291,26 +295,21 @@ class SettingActivity : BaseActivity() {
                     }.create().show()
         } else {
             if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
-                SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
-        }
-    }
+                SyncDataPutOrGetUtils.syncPutDataStart(activity, object : SyncCallback {
+                    override fun start() {
+                        showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
+                    }
 
-    /**
-     * 上传回调
-     */
-    internal var syncCallback: SyncCallback = object : SyncCallback {
-        override fun start() {
-            showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
-        }
+                    override fun complete() {
+                        ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
+                        hideLoadingDialog()
+                    }
 
-        override fun complete() {
-            ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
-            hideLoadingDialog()
-        }
-
-        override fun error(msg: String) {
-            ToastUtils.showLong(msg)
-            hideLoadingDialog()
+                    override fun error(msg: String) {
+                        ToastUtils.showLong(msg)
+                        hideLoadingDialog()
+                    }
+                })
         }
     }
 

@@ -95,7 +95,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupName: TextView? = null
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
-
     private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
 
     @SuppressLint("ShowToast")

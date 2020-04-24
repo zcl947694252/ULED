@@ -43,7 +43,6 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -254,7 +253,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                             ,
                             {
                                 hideLoadingDialog()
-                              runOnUiThread {   ToastUtils.showLong(R.string.connect_fail2) }
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                                 LogUtils.d(it)
                             })
         }
@@ -392,6 +391,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        light?.let {
+            switch_btn.isChecked = it.connectionStatus == ConnectionStatus.ON.value
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
         light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
@@ -401,17 +407,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         tvRename.visibility = View.GONE
         toolbar.title = light?.name
 
-        switch_btn.onCheckedChange { _, _ ->
+        switch_btn.setOnCheckedChangeListener { _, isChecked ->
             if (light != null)
-                openOrClose(light!!)
+                openOrClose(isChecked)
         }
-        if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
-            light!!.connectionStatus = ConnectionStatus.ON.value
-            switch_btn.isChecked = true
-        } else {
-            light!!.connectionStatus = ConnectionStatus.OFF.value
-            switch_btn.isChecked = false
-        }
+
+        switch_btn.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
 
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
@@ -471,6 +472,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 val itemColorPreset = ItemColorPreset()
                 itemColorPreset.color = OtherUtils.getCreateInitColor(i)
                 presetColors!!.add(itemColorPreset)
+            }
+        } else {
+            if (presetColors!!.size > 4) {
+                presetColors = presetColors!!.subList(0, 4)
+            } else if (presetColors!!.size < 4) {
+                for (i in 0 until 4) {
+                    val itemColorPreset = ItemColorPreset()
+                    itemColorPreset.color = OtherUtils.getCreateInitColor(i)
+                    if (presetColors!!.size < 5)
+                        presetColors?.add(itemColorPreset)
+                    else
+                        break
+                }
             }
         }
 
@@ -563,13 +577,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
     }
 
-    private fun openOrClose(currentLight: DbLight) {
-        if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-            Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
-            currentLight.connectionStatus = ConnectionStatus.ON.value
+    private fun openOrClose(currentLight: Boolean) {
+        if (currentLight) {
+            Commander.openOrCloseLights(light!!.meshAddr, true)//开灯
+            light!!.connectionStatus = ConnectionStatus.ON.value
         } else {
-            Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
-            currentLight.connectionStatus = ConnectionStatus.OFF.value
+            Commander.openOrCloseLights(light!!.meshAddr, false)//关灯
+            light!!.connectionStatus = ConnectionStatus.OFF.value
         }
     }
 
@@ -836,7 +850,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                 }
         }
-
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -1563,14 +1576,27 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = java.util.ArrayList()
-            for (i in 0..4) {
+            for (i in 0 until 4) {
                 val itemColorPreset = ItemColorPreset()
                 itemColorPreset.color = OtherUtils.getCreateInitColor(i)
                 presetColors?.add(itemColorPreset)
             }
+        } else {
+            if (presetColors!!.size > 4) {
+                presetColors = presetColors!!.subList(0, 4)
+            } else if (presetColors!!.size < 4) {
+                for (i in 0 until 4) {
+                    val itemColorPreset = ItemColorPreset()
+                    itemColorPreset.color = OtherUtils.getCreateInitColor(i)
+                    if (presetColors!!.size < 5)
+                        presetColors?.add(itemColorPreset)
+                    else
+                        break
+                }
+            }
         }
 
-        diy_color_recycler_list_view?.layoutManager = GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
+        diy_color_recycler_list_view?.layoutManager = GridLayoutManager(this, 4)
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener

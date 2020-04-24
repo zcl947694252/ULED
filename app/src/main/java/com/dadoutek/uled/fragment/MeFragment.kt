@@ -27,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
@@ -199,6 +200,8 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
         setting?.setOnClickListener(this)
+        updata?.setOnClickListener(this)
+        user_reset?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -268,6 +271,12 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
+            R.id.updata -> {
+                checkNetworkAndSync(activity)
+            }
+            R.id.user_reset -> {
+                userReset()
+            }
             R.id.rlRegion -> {
                 var intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
@@ -283,6 +292,30 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
     }
 
+    private fun userReset() {
+        val builder = AlertDialog.Builder(activity)
+        builder.setMessage(getString(R.string.user_reset))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
+        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
+            clearData()//删除本地数据
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
+                //删除服务器数据
+                override fun onNext(t: String) {
+                    ToastUtils.showShort(getString(R.string.reset_user_success))
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    ToastUtils.showShort(e.message)
+                }
+            })
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
+            ToastUtils.showShort(getString(R.string.cancel))
+        }
+        builder.show()
+    }
 
     // 如果没有网络，则弹出网络设置对话框
     fun checkNetworkAndSync(activity: Activity?) {

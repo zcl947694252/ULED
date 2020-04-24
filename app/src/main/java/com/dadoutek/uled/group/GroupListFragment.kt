@@ -91,6 +91,7 @@ class GroupListFragment : BaseFragment() {
     private lateinit var rgbLightFragment: RGBLightFragmentList
     private lateinit var curtianFragment: CurtainFragmentList
     private lateinit var relayFragment: RelayFragmentList
+
     //19-2-20 界面调整
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -98,6 +99,7 @@ class GroupListFragment : BaseFragment() {
 
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
+
     //是否正在引导
     private var isGuide = false
     private var isFristUserClickCheckConnect = true
@@ -461,7 +463,7 @@ class GroupListFragment : BaseFragment() {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
                         hideLoadingDialog()
-                     runOnUiThread {    ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
                     val low = allGroup!!.meshAddr and 0xff
                     val hight = (allGroup!!.meshAddr shr 8) and 0xff
@@ -520,10 +522,16 @@ class GroupListFragment : BaseFragment() {
         hidePopupMenu()
         when (it.id) {
             R.id.group_all_ly -> {
-                val intentSetting = Intent(context, NormalSettingActivity::class.java)
-                intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                intentSetting.putExtra("group",DBUtils.allGroups[0])
-                startActivityForResult(intentSetting,1)
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+                    val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                    intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                    intentSetting.putExtra("group", DBUtils.allGroups[0])
+                    startActivityForResult(intentSetting, 1)
+                } else {
+                    ToastUtils.showShort(getString(R.string.device_not_connected))
+                    val activity = activity as MainActivity
+                    activity.autoConnect()
+                }
             }
             R.id.install_device -> {
                 showInstallDeviceList()
@@ -652,14 +660,14 @@ class GroupListFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CREATE_SCENE_REQUESTCODE) {
             callbackLinkMainActAndFragment?.changeToScene()
-        }else if (requestCode ==1){
+        } else if (requestCode == 1) {
             val dbGroup = DBUtils.allGroups[0]
-            if (dbGroup.status==1){
+            if (dbGroup.status == 1) {
                 btnOn?.setBackgroundResource(R.drawable.icon_open_group)
                 btnOff?.setBackgroundResource(R.drawable.icon_down_group)
                 onText?.setTextColor(resources.getColor(R.color.white))
                 offText?.setTextColor(resources.getColor(R.color.black_nine))
-            }else{
+            } else {
                 btnOn?.setBackgroundResource(R.drawable.icon_down_group)
                 btnOff?.setBackgroundResource(R.drawable.icon_open_group)
                 onText?.setTextColor(resources.getColor(R.color.black_nine))

@@ -618,6 +618,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     fun autoConnect() {
+        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+        if ( size < 0)
+            return
         mConnectDisposal = connect()
                 ?.subscribe(
                         {

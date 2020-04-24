@@ -109,12 +109,12 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            Log.e("TAG",curtain!!.meshAddr.toString())
+            Log.e("TAG", curtain!!.meshAddr.toString())
             val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
                     .subscribe(
-                            {s ->
+                            { s ->
                                 localVersion = s
-                                if(localVersion!=""){
+                                if (localVersion != "") {
                                     if (versionText != null) {
                                         if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                                             versionText.text = resources.getString(R.string.firmware_version, localVersion)
@@ -207,10 +207,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-         DBUtils.lastUser?.let {
+        DBUtils.lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id) {
                 ToastUtils.showLong(getString(R.string.author_region_warm))
-            }else {
+            } else {
                 when (item?.itemId) {
                     R.id.toolbar_delete_group -> {
                         removeGroup()
@@ -243,7 +243,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         updateOTA()
                     }
                 }
-            }}
+            }
+        }
         true
     }
 
@@ -306,7 +307,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateGroup() {
         val intent = Intent(this, CurtainGroupingActivity::class.java)
-        if (curtain==null){
+        if (curtain == null) {
             ToastUtils.showLong(getString(R.string.please_connect_curtain))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
@@ -416,7 +417,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
         if (!currentShowGroupSetPage) {
 
-            if (curtain!!.status!= null) {
+            if (curtain!!.status != null) {
                 when {
                     curtain!!.status == 0 -> {
                         pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
@@ -444,19 +445,19 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
 
-            if(curtain!!.inverse!=null){
+            if (curtain!!.inverse != null) {
                 curtain!!.inverse = commutationBoolean
             }
 
-            if(curtain!!.closeSlowStart!=null){
+            if (curtain!!.closeSlowStart != null) {
                 curtain!!.closeSlowStart = slowBoolean
             }
 
-            if(curtain!!.closePull!=null){
+            if (curtain!!.closePull != null) {
                 curtain!!.closePull = handBoolean
             }
 
-            if(curtain!!.speed!=null){
+            if (curtain!!.speed != null) {
                 indicatorSeekBar.setProgress(curtain!!.speed.toFloat())
             }
         }
@@ -559,8 +560,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun updateOTA() {
         if (versionText.text != null && versionText.text != "") {
             checkPermission()
-        }else{
-            Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -570,7 +571,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                         disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
+                        disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
                                 .subscribe(
                                         { s ->
                                             hideLoadingDialog()
@@ -588,7 +589,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isDirectConnectDevice() {
-            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
             if (isBoolean) {
                 transformView()
@@ -602,16 +604,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(curtain!!.meshAddr,macAddress = curtain!!.macAddr)
+                        connect(curtain!!.meshAddr, macAddress = curtain!!.macAddr)
                     }
                     ?.subscribe(
                             {
                                 hideLoadingDialog()
-                                if (isBoolean) {
+                                if (isBoolean)
                                     transformView()
-                                } else {
+                                else
                                     OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
-                                }
                             }
                             ,
                             {
@@ -745,9 +746,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun onceReset() {
         if (type == Constant.TYPE_GROUP) {
-            val opcode = Opcode.KICK_OUT
 
-            Commander.resetDevice(curtain!!.meshAddr)
+            val subscribe = Commander.resetDevice(curtainGroup!!.meshAddr)
                     .subscribe(
                             {
                                 LogUtils.v("zcl-----恢复出厂成功")
@@ -759,9 +759,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             Toast.makeText(this, R.string.successful_resumption, Toast.LENGTH_LONG).show()
             finish()
         } else {
-            val opcode = Opcode.KICK_OUT
-
-            Commander.resetDevice(curtain!!.meshAddr)
+            val subscribe = Commander.resetDevice(curtain!!.meshAddr)
                     .subscribe(
                             {
                                 LogUtils.v("zcl-----恢复出厂成功")
@@ -927,7 +925,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                   //("retry delete group timeout")
+                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)

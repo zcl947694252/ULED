@@ -648,8 +648,6 @@ object Commander : EventListener<String> {
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
-                val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-                if (autoConnect && size > 0)
                     TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))

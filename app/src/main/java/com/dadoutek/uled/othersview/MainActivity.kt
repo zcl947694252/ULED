@@ -138,6 +138,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
         }
     }
+
     //记录用户首次点击返回键的时间
     private var firstTime: Long = 0
 
@@ -145,8 +146,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // detectUpdate()
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
-        TelinkLightApplication.getApp().initStompClient()
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
 
@@ -672,11 +673,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     fun autoConnect() {
-
         //如果支持蓝牙就打开蓝牙
         // if (LeBluetooth.getInstance().isSupport(applicationContext))
         //LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
-
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
         if (!BleUtils.isLocationEnable(this)) {
             showOpenLocationServiceDialog()
@@ -689,24 +688,25 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             if (TelinkLightApplication.getApp().connectDevice == null) {
-                                ToastUtils.showLong(R.string.connecting_please_wait)
 
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-                                val size = DBUtils.getAllCurtains().size+DBUtils.allLight.size + DBUtils.allRely.size
-                                if (size>0){
-                                mConnectDisposal?.dispose()
-                                mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
-                                        ?.subscribe(
-                                                {//找回有效设备
-                                                    //RecoverMeshDeviceUtil.addDevicesToDb(it)
-                                                    //LogUtils.v("zcl-----------找回设备-------${it.deviceName}")
-                                                    onLogin()
-                                                },
-                                                {
-                                                    LogUtils.d("connect failed, reason = $it")
-                                                }
-                                        )}
+                                val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+                                if (size > 0) {
+                                    ToastUtils.showLong(R.string.connecting_please_wait)
+                                    mConnectDisposal?.dispose()
+                                    mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                                            ?.subscribe(
+                                                    {//找回有效设备
+                                                        //RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                        //LogUtils.v("zcl-----------找回设备-------${it.deviceName}")
+                                                        onLogin()
+                                                    },
+                                                    {
+                                                        LogUtils.d("connect failed, reason = $it")
+                                                    }
+                                            )
+                                }
                             }
                         }, { LogUtils.d(it) })
             } else {
