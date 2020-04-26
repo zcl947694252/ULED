@@ -957,5 +957,8 @@
     <string name="mid">中</string>
     <string name="fast">快</string>
     <string name="recovery_active_equipment">找回有效设备</string>
+    <string name="left">左:</string>
+    <string name="right">右:</string>
+    <string name="single_brighress_group_switch">单调光群组开关</string>
 
 </resources>

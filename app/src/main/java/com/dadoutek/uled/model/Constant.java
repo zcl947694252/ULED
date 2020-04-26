@@ -55,7 +55,7 @@ public class Constant implements Serializable {
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
-
+    public static final String IS_FIRST_CONFIG_DOUBLE_SWITCH = "IS_FIRST_CONFIG_DOUBLE_SWITCH";
     public static String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
@@ -395,4 +395,5 @@ public class Constant implements Serializable {
     public static final int SER_ID_RELAY_OFF = 0x63;
     public static final int SER_ID_GATEWAY_ON = 0x64;
     public static final int SER_ID_GATEWAY_OFF = 0x65;
+
 }

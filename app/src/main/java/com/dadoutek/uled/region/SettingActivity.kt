@@ -46,7 +46,9 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
+import io.reactivex.Completable.timer
 import io.reactivex.Observable
+import io.reactivex.Observable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable

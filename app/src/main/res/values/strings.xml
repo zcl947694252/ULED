@@ -1035,5 +1035,8 @@
     <string name="mid">middle</string>
     <string name="fast">fast</string>
     <string name="recovery_active_equipment">Recovery of active equipment</string>
+    <string name="left">Left:</string>
+    <string name="right">Right:</string>
+    <string name="single_brighress_group_switch">Monotone light group switch</string>
 
 </resources>

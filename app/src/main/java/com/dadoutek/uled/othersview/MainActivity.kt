@@ -46,6 +46,7 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
@@ -54,6 +55,8 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
+import com.dadoutek.uled.switches.ConfigEightSwitchActivity
+import com.dadoutek.uled.switches.DoubleTouchSwitchActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -65,6 +68,7 @@ import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.event.ServiceEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils
@@ -78,6 +82,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -164,8 +169,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-            val intent = Intent(this@MainActivity, ExtendActivity::class.java)
-            startActivity(intent)
+            //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
+            startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true",  "switch" to DbSwitch(),"version" to "123")
+            //startActivity(intent)
         }
         initBottomNavigation()
 

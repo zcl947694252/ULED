@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(), View.OnClickListener{
+class MeFragment : BaseFragment(), View.OnClickListener {
 
     private var disposable: Disposable? = null
     private var cancel: Button? = null
@@ -298,10 +298,10 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
         builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
-            clearData()//删除本地数据
-            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
+            UserModel.clearUserData((DBUtils.lastUser?.last_region_id?:"0").toInt())?.subscribe(object : NetworkObserver<String?>() {
                 //删除服务器数据
                 override fun onNext(t: String) {
+                    clearData()//删除本地数据
                     ToastUtils.showShort(getString(R.string.reset_user_success))
                 }
 
@@ -404,7 +404,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
             override fun complete() {
                 hideLoadingDialog()
                 disposable?.dispose()
-                 disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {}
                 if (compositeDisposable.isDisposed) {
@@ -499,33 +499,16 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
-            override fun onNext(s: String) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                DBUtils.deleteAllData()
-                CleanUtils.cleanInternalSp()
-                CleanUtils.cleanExternalCache()
-                CleanUtils.cleanInternalFiles()
-                CleanUtils.cleanInternalCache()
-                ToastUtils.showLong(R.string.clean_tip)
-                GuideUtils.resetAllGuide(activity!!)
-                hideLoadingDialog()
+        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        DBUtils.deleteAllData()
+        CleanUtils.cleanInternalSp()
+        CleanUtils.cleanExternalCache()
+        CleanUtils.cleanInternalFiles()
+        CleanUtils.cleanInternalCache()
+        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+        GuideUtils.resetAllGuide(activity!!)
+        hideLoadingDialog()
 
-                try {
-                    Thread.sleep(300)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-
-                restartApplication()
-            }
-
-            override fun onError(e: Throwable) {
-                ToastUtils.showLong(R.string.clear_fail)
-                super.onError(e)
-                hideLoadingDialog()
-            }
-        })
     }
 
     //重启app并杀死原进程
@@ -534,7 +517,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
         com.blankj.utilcode.util.AppUtils.relaunchApp()
-}
+    }
 
     override fun setLoginChange() {
         super.setLoginChange()
@@ -548,11 +531,11 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
 
     fun refreshView() {
-        if (LeBluetooth.getInstance().isEnabled&&TelinkLightApplication.getApp().connectDevice != null) {
-                setLoginChange()
-            } else {
-                setLoginOutChange()
-            }
+        if (LeBluetooth.getInstance().isEnabled && TelinkLightApplication.getApp().connectDevice != null) {
+            setLoginChange()
+        } else {
+            setLoginOutChange()
+        }
 
     }
 }
