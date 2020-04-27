@@ -1029,7 +1029,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar?.setNavigationContentDescription(R.drawable.navigation_back_white)
+        toolbar?.setNavigationContentDescription(R.drawable.icon_top_tab_back)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

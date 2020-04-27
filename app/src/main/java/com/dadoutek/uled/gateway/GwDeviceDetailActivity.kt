@@ -151,11 +151,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbar.titleCenterName.setText(R.string.Gate_way)
     }
 
     private val onClick = View.OnClickListener {
@@ -797,7 +798,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             no_device_relativeLayout.visibility = View.VISIBLE
         }
         adaper?.notifyDataSetChanged()
-        toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbar.titleCenterName.setText(R.string.Gate_way)
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return gateWayDataList[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
@@ -825,7 +827,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun getNewData(): ArrayList<DbGateway> {
         val allGateWay = DBUtils.getAllGateWay()
-        toolbar.title = (currentGw!!.name ?: "")
+        //toolbar.title = (currentGw!!.name ?: "")
+        toolbar.titleCenterName.setText(R.string.Gate_way)
         return allGateWay
     }
 
@@ -858,7 +861,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             toolbar.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
 
 //            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
@@ -879,7 +882,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             recycleView.visibility = View.GONE
             no_device_relativeLayout.visibility = View.VISIBLE
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
@@ -895,7 +898,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 }
             }
         }
-        toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbar.titleCenterName.setText(R.string.Gate_way)
     }
 
 
