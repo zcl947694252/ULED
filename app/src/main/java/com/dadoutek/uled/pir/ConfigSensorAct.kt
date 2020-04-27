@@ -21,6 +21,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -320,7 +321,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         dbSensor.controlGroupAddr = mSelectGroupAddr.toString()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+        dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+       // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+mDeviceInfo!!.meshAddress
 

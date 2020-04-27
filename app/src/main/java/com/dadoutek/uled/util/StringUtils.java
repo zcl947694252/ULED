@@ -267,6 +267,9 @@ public class StringUtils {
             case DeviceType.SCENE_SWITCH:
                 startStr = context.getString(R.string.scene_switch);
                 break;
+                case DeviceType.DOUBLE_SWITCH:
+                startStr = context.getString(R.string.single_brighress_group_switch);
+                break;
 
             case DeviceType.SMART_CURTAIN_SWITCH:
                 startStr = context.getString(R.string.curtain_switch);

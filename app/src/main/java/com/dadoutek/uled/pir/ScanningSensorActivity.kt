@@ -21,6 +21,7 @@ import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -463,7 +464,8 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
         isSearchedDevice = false
-        val meshAddress = Constant.SWITCH_PIR_ADDRESS
+        //val meshAddress = Constant.SWITCH_PIR_ADDRESS
+        val meshAddress = MeshAddressGenerator().meshAddress
 
         if (meshAddress == -1) {
             this.doFinish()

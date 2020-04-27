@@ -3,6 +3,7 @@
     <!-- Theme Positive -->
     <color name="white">#FFFFFF</color>
     <color name="white40">#99FFFFFF</color>
+    <color name="transfer">#000000</color>
     <color name="black">#000000</color>
     <color name="blue">#0000FF</color>
     <color name="border_line">#D9D9D9</color>

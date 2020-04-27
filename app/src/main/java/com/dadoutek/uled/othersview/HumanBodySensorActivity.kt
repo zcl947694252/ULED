@@ -34,6 +34,7 @@ import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -970,7 +971,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+        dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+        //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)
 

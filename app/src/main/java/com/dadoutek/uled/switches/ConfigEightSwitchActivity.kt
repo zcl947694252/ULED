@@ -79,7 +79,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         eight_switch_mode.visibility = View.GONE
         eight_switch_config.visibility = View.GONE
         eight_switch_banner_ly.visibility = View.VISIBLE
-    /*    if (groupName != null && groupName == "true") {
+        if (groupName != null && groupName == "true") {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
@@ -129,10 +129,25 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                                 6 -> eight_switch_b7.text = name
                             }
                         }
+                        2 -> {
+                            val highMes = jOb.getInt("reserveValue_A")
+                            val lowMes = jOb.getInt("reserveValue_B")
+                            var mesAddress = (highMes shl 8) or lowMes
+                            //赋值旧的设置数据
+                            groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
+                            when (keyId) {
+                                2 -> eight_switch_b5.text = name
+                                3 -> eight_switch_b6.text = name
+                                4 -> eight_switch_b5.text = name
+                                5 -> eight_switch_b6.text = name
+                                6 -> eight_switch_b7.text = name
+                                7 -> eight_switch_b8.text = name
+                            }
+                        }
                     }
                 }
             }
-        }*/
+        }
     }
 
 
@@ -157,10 +172,54 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
                         sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
                         && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {
-                    sendSceneParms()
+                    sendSingleGroupParms()
                 } else
                     ToastUtils.showLong(getString(R.string.click_config_tip))
             }
+        }
+    }
+
+    private fun sendSingleGroupParms() {
+        showLoadingDialog(getString(R.string.setting_switch))
+       groupParamList.clear()
+        listKeysBean = JSONArray()
+
+        //11-12-13-14 11-12-13-14
+        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00)
+        listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
+        listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
+        listKeysBean.put(getKeyBean(0x02, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
+        listKeysBean.put(getKeyBean(0x03, Opcode.GROUP_CCT_MINUS.toInt()))
+
+
+        val second = mutableListOf(2, 3)
+        val third = mutableListOf(4, 5)
+        val four: MutableList<Int> = if (groupMap.size > 3)
+            mutableListOf(7, 6)
+        else
+            mutableListOf(6)
+
+        val secondParm = getGroupParm(second)
+        val thirParm = getGroupParm(third)
+        val fourParm = getGroupParm(four)
+
+        LogUtils.v("zcl獲得的keys是$listKeysBean")
+        groupParamList.add(0, firstParm)
+        groupParamList.add(1, secondParm)
+        groupParamList.add(2, thirParm)
+        groupParamList.add(3, fourParm)
+
+        GlobalScope.launch {
+            var delay = 0L
+            for (p in groupParamList) {
+                delay(delay)
+                //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+                //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
+                delay += 300
+            }
+            delay(1500)
+            updateMeshGroup(2)
         }
     }
 
@@ -439,7 +498,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 eight_switch_b8.text = getString(R.string.click_config)
 
                 eight_switch_b1.text = getString(R.string.brightness_add)
-                eight_switch_b2.text = getString(R.string.color_temperature_add)
+                eight_switch_b2.text = getString(R.string.brightness_minus)
                 eight_switch_b3.text = getString(R.string.click_config)
                 eight_switch_b4.text = getString(R.string.click_config)
                 eight_switch_b5.text = getString(R.string.click_config)
@@ -515,12 +574,12 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                     1 -> {
                         configSwitchType = 1
-                        setTextColorsAndText(R.color.click_config_color)
+                        setTextColorsAndText(p0)
                         eight_switch_title.text = getString(R.string.scene_switch)
                     }
                     2 -> {
                         configSwitchType = 2
-                        setTextColorsAndText(R.color.click_config_color)
+                        setTextColorsAndText(p0)
                         eight_switch_title.text = getString(R.string.single_brighress_group_switch)
                     }
                 }
@@ -573,9 +632,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun makePop() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -650,11 +709,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 1
             }
             R.id.eight_switch_b3 -> {
-                isCanClick = configSwitchType == 1
+                isCanClick = configSwitchType == 1||configSwitchType==2
                 configButtonTag = 2
             }
             R.id.eight_switch_b4 -> {
-                isCanClick = configSwitchType == 1
+                isCanClick = configSwitchType == 1||configSwitchType==2
                 configButtonTag = 3
             }
             /**

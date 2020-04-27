@@ -296,9 +296,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(getString(R.string.user_reset))
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
-                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
         builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
-            UserModel.clearUserData((DBUtils.lastUser?.last_region_id?:"0").toInt())?.subscribe(object : NetworkObserver<String?>() {
+            UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
                 //删除服务器数据
                 override fun onNext(t: String) {
                     clearData()//删除本地数据

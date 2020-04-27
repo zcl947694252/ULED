@@ -162,19 +162,26 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
-                                    if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                                            bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                                        startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
-                                        finish()
-                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                                        if (version.contains(DeviceType.EIGHT_SWITCH))
-                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
-                                        else
-                                            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
-                                        finish()
-                                    }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                                        startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
-                                        finish()
+                                    when (bestRSSIDevice?.productUUID) {
+                                        DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            finish()
+                                        }
+                                        DeviceType.DOUBLE_SWITCH -> {
+                                            startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            finish()
+                                        }
+                                        DeviceType.SCENE_SWITCH -> {
+                                            if (version.contains(DeviceType.EIGHT_SWITCH))
+                                                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
+                                            else
+                                                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            finish()
+                                        }
+                                        DeviceType.SMART_CURTAIN_SWITCH -> {
+                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            finish()
+                                        }
                                     }
                                 } else {
                                     ToastUtils.showLong(getString(R.string.get_version_fail))
@@ -747,6 +754,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
+                installDialog?.dismiss()
             }
             R.id.btnBack -> {
                 installDialog?.dismiss()

@@ -280,6 +280,7 @@ object DBUtils {
                 .whereOr(DbSwitchDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.DOUBLE_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
         return ArrayList(query.list())
     }

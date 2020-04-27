@@ -2,6 +2,11 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 配置单调光双组开关
+     */
+    const val CONFIG_DOUBLE_SWITCH: Byte = 0xf1.toByte()
+
+    /**
      * 扩展指令用户数据清除功能
      */
     const val CONFIG_EXTEND_ALL_CLEAR: Byte = 0x04.toByte()

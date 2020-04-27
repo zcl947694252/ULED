@@ -1,45 +1,122 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
+import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.connect
+import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.mob.tools.utils.SharePrefrenceHelper
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
+import com.dadoutek.uled.util.StringUtils
+import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
+import kotlinx.android.synthetic.main.bottom_version_ly.*
+import kotlinx.android.synthetic.main.content_switch_group.*
+import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
+import org.jetbrains.anko.design.snackbar
+import java.util.ArrayList
 
 
 /**
  * 创建者     ZCL
  * 创建时间   2020/4/26 14:54
- * 描述
+ * 描述  41-6c
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
 
-class DoubleTouchSwitchActivity : BaseActivity(), View.OnClickListener {
+class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var mConnectDisposable: Disposable? = null
+    private var popReNameView: View? = null
+    private var renameDialog: Dialog? = null
+    private var renameCancel: TextView? = null
+    private var renameConfirm: TextView? = null
+    private var renameEditText: EditText? = null
+    private var switchDate: DbSwitch? = null
+    private lateinit var localVersion: String
+    private var isRetryConfig: String? = null
+    private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var leftGroup: DbGroup
     private lateinit var rightGroup: DbGroup
     private val requestCodeNum: Int = 1000
-    private var isLeft: Boolean =false
+    private var isLeft: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_switch_double_touch)
+        initView()
+        initData()
+        initListener()
+    }
+
+    fun initData() {
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        isRetryConfig = intent.getStringExtra("group")
+        localVersion = intent.getStringExtra("version")
+        eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
+        bottom_version_number.text = localVersion
+        if (isRetryConfig != null && isRetryConfig == "true") {
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            switchDate?.let {
+                val stringToList = GsonUtil.stringToList<Int>(it.controlGroupAddrs)
+                if (stringToList.size < 2) {
+                    ToastUtils.showShort(getString(R.string.invalid_data))
+                    finish()
+                } else {
+                    leftGroup = DBUtils.getGroupByMeshAddr(stringToList[0])
+                    rightGroup = DBUtils.getGroupByMeshAddr(stringToList[1])
+                    switch_double_touch_left_tv.text = leftGroup.name
+                    switch_double_touch_right_tv.text = rightGroup.name
+                }
+            }
+
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == requestCodeNum&&resultCode==Activity.RESULT_OK){
+        if (requestCode == requestCodeNum && resultCode == Activity.RESULT_OK) {
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
-            if (isLeft)
+            if (isLeft) {
+                switch_double_touch_left_tv.text = group.name
                 leftGroup = group
-            else
+            } else {
+                switch_double_touch_right_tv.text = group.name
                 rightGroup = group
-
-            switch_double_touch_left_tv.text = group.name
+            }
         }
     }
 
@@ -49,16 +126,99 @@ class DoubleTouchSwitchActivity : BaseActivity(), View.OnClickListener {
         startActivityForResult(intent, requestCodeNum)
     }
 
+    private fun upSwitchData() {
+        //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
+        val newMeshAddr = MeshAddressGenerator().meshAddress
+        Commander.updateMeshName(newMeshAddr = newMeshAddr,
+                successCallback = {
+                    hideLoadingDialog()
+                    mDeviceInfo.meshAddress = newMeshAddr
+                    updateSwitch()
+                    disconnect()
+                    if (switchDate == null)
+                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        showRenameDialog()
+                    }
+                },
+                failedCallback = {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.group_failed))
+                })
+    }
+
+    private fun updateSwitch() {
+        if (isRetryConfig == "false") {
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if (dbSwitch != null) {
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
+                DBUtils.updateSwicth(dbSwitch)
+                switchDate = dbSwitch
+            } else {
+                var dbSwitch = DbSwitch()
+                DBUtils.saveSwitch(dbSwitch, false)
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
+                dbSwitch.macAddr = mDeviceInfo.macAddress
+                dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
+                dbSwitch.productUUID = mDeviceInfo.productUUID
+                dbSwitch.index = dbSwitch.id.toInt()
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+
+                DBUtils.saveSwitch(dbSwitch, false)
+                DBUtils.recordingChange(dbSwitch.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
+                switchDate = dbSwitch
+            }
+        } else {
+            switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress
+            DBUtils.updateSwicth(switchDate!!)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showRenameDialog() {
+        DBUtils.getAllSwitch()
+        hideLoadingDialog()
+        StringUtils.initEditTextFilter(renameEditText)
+        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
+            renameEditText?.setText(switchDate?.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
+                    + DBUtils.getAllSwitch().size)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+    }
+
+    private fun disconnect() {
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.switch_double_touch_back -> finish()
-            R.id.switch_double_touch_use_button -> finish()
+
+            R.id.switch_double_touch_use_button -> {
+                showLoadingDialog(getString(R.string.please_wait))
+                GlobalScope.launch {
+                    setGroupForSwitch()
+                    delay(800)
+                    upSwitchData()
+                }
+            }
             R.id.switch_double_touch_left -> {
-                isLeft= true
+                isLeft = true
                 skipSelectGroup()
             }
             R.id.switch_double_touch_right -> {
-                isLeft= false
+                isLeft = false
                 skipSelectGroup()
             }
             R.id.switch_double_touch_i_know -> {
@@ -69,33 +229,104 @@ class DoubleTouchSwitchActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun autoConnect() {
+        showLoadingDialog(getString(R.string.connecting))
+        mConnectDisposable = connect(meshAddr = mDeviceInfo.meshAddress, fastestMode = true, retryTimes = 10)
+                ?.subscribe({
+                    hideLoadingDialog()
+                    LogUtils.d("connection success")
+                }, {
+                    ToastUtils.showShort(getString(R.string.device_disconnected))
+                    hideLoadingDialog()
+                }
+                )
+    }
 
-    override fun initListener() {
-        switch_double_touch_back.setOnClickListener(this)
+    private fun setGroupForSwitch() {
+        val leftH = leftGroup.meshAddr.shr(8).toByte()
+        val leftL = leftGroup.meshAddr.and(0xff).toByte()
+        val rightH = rightGroup.meshAddr.shr(8).toByte()
+        val rightL = rightGroup.meshAddr.and(0xff).toByte()
+        val bytes = byteArrayOf(leftL, leftH, rightL, rightH, 0, 0, 0, 0)
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo?.meshAddress ?: 0, bytes)
+    }
+
+
+    fun initListener() {
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)
         switch_double_touch_right.setOnClickListener(this)
         switch_double_touch_i_know.setOnClickListener(this)
     }
 
-    override fun initData() {
+    private fun showConfigSuccessDialog() {
+        if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS")) {
+            TelinkLightService.Instance()?.idleMode(true)
+            ToastUtils.showLong(getString(R.string.config_success))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        } else {
+            try {
+                AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle(R.string.install_success)
+                        .setMessage(R.string.tip_config_switch_success)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            TelinkLightService.Instance()?.idleMode(true)
+                            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                        }.show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
 
     }
 
-    override fun initView() {
-        val b = SharedPreferencesHelper.getBoolean(this, Constant.IS_FIRST_CONFIG_DOUBLE_SWITCH, true)
-        if (b) {
-            switch_double_touch_mb.visibility = View.VISIBLE
-            switch_double_touch_set.visibility = View.GONE
-        } else {
-            switch_double_touch_mb.visibility = View.GONE
-            switch_double_touch_set.visibility = View.VISIBLE
+    private fun makePop() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+        renameConfirm?.setOnClickListener {
+            // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                DBUtils.updateSwicth(switchDate!!)
+                if (this != null && !this.isFinishing) {
+                    renameDialog?.dismiss()
+                }
+            }
         }
+        renameCancel?.setOnClickListener {
+            if (this != null && !this.isFinishing) {
+                renameDialog?.dismiss()
+            }
+        }
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+
+        renameDialog?.setOnDismissListener {
+            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            if (switchDate != null)
+                DBUtils.updateSwicth(switchDate!!)
+            showConfigSuccessDialog()
+        }
+    }
+
+    fun initView() {
+        switch_double_touch_mb.visibility = View.VISIBLE
+        switch_double_touch_set.visibility = View.GONE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
-    }
-
-    override fun setLayoutID(): Int {
-        return R.layout.activity_switch_double_touch
+        toolbar.title = getString(R.string.single_brighress_group_switch)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setBackgroundColor(getColor(R.color.transfer))
+        makePop()
     }
 }

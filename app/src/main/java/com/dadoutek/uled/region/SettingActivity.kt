@@ -75,6 +75,7 @@ class SettingActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
+    private var disposableTimer: Disposable? = null
     private var disposableFind: Disposable? = null
     private var mConnectDisposal: Disposable? = null
     private var disposableInterval: Disposable? = null
@@ -96,9 +97,6 @@ class SettingActivity : BaseActivity() {
     var isResetFactory = false
 
     override fun initListener() {}
-
-
-
 
 
     override fun initData() {
@@ -126,9 +124,9 @@ class SettingActivity : BaseActivity() {
                 else {
                     when (position) {
                         0 -> emptyTheCache()
-                       // 1 -> checkNetworkAndSyncs(this)
+                        // 1 -> checkNetworkAndSyncs(this)
                         1 -> showSureResetDialogByApp()
-                       // 3 -> userReset()
+                        // 3 -> userReset()
                         2 -> startToRecoverDevices()
                     }
                 }
@@ -138,16 +136,23 @@ class SettingActivity : BaseActivity() {
 
     private fun startToRecoverDevices() {
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
+        disposableTimer = Observable.timer(20, TimeUnit.SECONDS).subscribe {
+            disposableFind?.dispose()
+        }
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    disposableTimer?.dispose()
                     hideLoadingDialog()
-                },
-                        {
+                }, {
+                            disposableTimer?.dispose()
                             hideLoadingDialog()
                             LogUtils.d(it)
                         })
+        disposableTimer?.let {
+            compositeDisposable.add(it)
+        }
         disposableFind?.let {
             compositeDisposable.add(it)
         }

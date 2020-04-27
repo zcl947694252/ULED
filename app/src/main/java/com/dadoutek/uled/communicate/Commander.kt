@@ -626,7 +626,7 @@ object Commander : EventListener<String> {
     @JvmStatic
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, autoConnect: Boolean): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
