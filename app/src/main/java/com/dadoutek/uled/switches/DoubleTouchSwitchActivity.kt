@@ -6,20 +6,16 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -29,24 +25,18 @@ import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
-import org.jetbrains.anko.design.snackbar
-import java.util.ArrayList
 
 
 /**
@@ -69,8 +59,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
-    private lateinit var leftGroup: DbGroup
-    private lateinit var rightGroup: DbGroup
+    private  var leftGroup: DbGroup? = null
+    private  var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
 
@@ -92,14 +82,14 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Int>(it.controlGroupAddrs)
-                if (stringToList.size < 2) {
+                if (stringToList==null||stringToList.size < 2) {
                     ToastUtils.showShort(getString(R.string.invalid_data))
                     finish()
                 } else {
                     leftGroup = DBUtils.getGroupByMeshAddr(stringToList[0])
                     rightGroup = DBUtils.getGroupByMeshAddr(stringToList[1])
-                    switch_double_touch_left_tv.text = leftGroup.name
-                    switch_double_touch_right_tv.text = rightGroup.name
+                    switch_double_touch_left_tv.text = leftGroup?.name
+                    switch_double_touch_right_tv.text = rightGroup?.name
                 }
             }
 
@@ -152,7 +142,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
@@ -164,7 +154,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
@@ -173,7 +163,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 switchDate = dbSwitch
             }
         } else {
-            switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup.meshAddr, rightGroup.meshAddr))
+            switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
             switchDate!!.meshAddr = MeshAddressGenerator().meshAddress
             DBUtils.updateSwicth(switchDate!!)
         }
@@ -206,11 +196,15 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.switch_double_touch_use_button -> {
-                showLoadingDialog(getString(R.string.please_wait))
-                GlobalScope.launch {
-                    setGroupForSwitch()
-                    delay(800)
-                    upSwitchData()
+                if (leftGroup == null || rightGroup == null) {
+                    ToastUtils.showShort(getString(R.string.please_check_group_tip))
+                } else {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    GlobalScope.launch {
+                        setGroupForSwitch()
+                        delay(800)
+                        upSwitchData()
+                    }
                 }
             }
             R.id.switch_double_touch_left -> {
@@ -229,24 +223,11 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun autoConnect() {
-        showLoadingDialog(getString(R.string.connecting))
-        mConnectDisposable = connect(meshAddr = mDeviceInfo.meshAddress, fastestMode = true, retryTimes = 10)
-                ?.subscribe({
-                    hideLoadingDialog()
-                    LogUtils.d("connection success")
-                }, {
-                    ToastUtils.showShort(getString(R.string.device_disconnected))
-                    hideLoadingDialog()
-                }
-                )
-    }
-
     private fun setGroupForSwitch() {
-        val leftH = leftGroup.meshAddr.shr(8).toByte()
-        val leftL = leftGroup.meshAddr.and(0xff).toByte()
-        val rightH = rightGroup.meshAddr.shr(8).toByte()
-        val rightL = rightGroup.meshAddr.and(0xff).toByte()
+        val leftH =   leftGroup!!.meshAddr.shr(8).toByte()
+        val leftL =   leftGroup!!.meshAddr.and(0xff).toByte()
+        val rightH = rightGroup!!.meshAddr.shr(8).toByte()
+        val rightL = rightGroup!!.meshAddr.and(0xff).toByte()
         val bytes = byteArrayOf(leftL, leftH, rightL, rightH, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo?.meshAddress ?: 0, bytes)
     }
@@ -324,9 +305,9 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         switch_double_touch_set.visibility = View.GONE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
-        toolbar.title = getString(R.string.single_brighress_group_switch)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setBackgroundColor(getColor(R.color.transfer))
+        toolbar.title = getString(R.string.double_switch)
+        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+
         makePop()
     }
 }

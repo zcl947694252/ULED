@@ -34,7 +34,6 @@ import com.dadoutek.uled.othersview.FileSelectActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
-import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.LeBluetooth

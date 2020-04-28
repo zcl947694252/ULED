@@ -21,7 +21,7 @@
             <!--android:background="@drawable/icon_top_tab_back"-->
             <!--android:contentDescription="@null" />-->
 
-        <!--<com.dadoutek.uled.widget.AutoTextSizeEditText-->
+        <!--<com.dadoutek.com.dadoutek.uled.widget.AutoTextSizeEditText-->
             <!--android:id="@+id/edit_title"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->

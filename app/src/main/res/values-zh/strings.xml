@@ -960,5 +960,6 @@
     <string name="left">左:</string>
     <string name="right">右:</string>
     <string name="single_brighress_group_switch">单调光群组开关</string>
-
+    <string name="eight_switch">八键开关</string>
+    <string name="double_switch">双组开关</string>
 </resources>

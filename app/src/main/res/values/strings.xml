@@ -573,7 +573,7 @@
     <string name="add_gradient">Add gradient</string>
     <string name="config_night_light_select_group">Please select at least one group</string>
     <string name="net_work_error">No network available</string>
-    <string name="please_check_group_tip">Please select a group:</string>
+    <string name="please_check_group_tip">Please select a group</string>
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
     <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
     <string name="re_upgrade">Re-upgrade</string>
@@ -1037,6 +1037,7 @@
     <string name="recovery_active_equipment">Recovery of active equipment</string>
     <string name="left">Left:</string>
     <string name="right">Right:</string>
-    <string name="single_brighress_group_switch">Monotone light group switch</string>
-
+    <string name="single_brighress_group_switch">Dimmer double switch</string>
+    <string name="eight_switch">8k Switch</string>
+    <string name="double_switch">DoubleGroup Switch</string>
 </resources>

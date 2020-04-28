@@ -136,8 +136,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             //赋值旧的设置数据
                             groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
                             when (keyId) {
-                                2 -> eight_switch_b5.text = name
-                                3 -> eight_switch_b6.text = name
+                                2 -> eight_switch_b3.text = name
+                                3 -> eight_switch_b4.text = name
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
                                 6 -> eight_switch_b7.text = name
@@ -157,24 +157,29 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             0 -> {
                 if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
                     sendParms()
-                } else
+                } else{
+                    clickType = 1
                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                }
             }
             1 -> {
                 if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
                         sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
                         && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {
                     sendSceneParms()
-                } else
+                } else{
+                    clickType = 1
                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                }
             }
             2 -> {
-                if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
-                        sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
-                        && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {
+                if (groupMap.size >= 6&& groupMap.containsKey(2)&& groupMap.containsKey(3) && groupMap.containsKey(4)&&groupMap.containsKey(5)
+                        && groupMap.containsKey(6) && groupMap.containsKey(7) ) {
                     sendSingleGroupParms()
-                } else
+                } else{
+                    clickType = 1
                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                }
             }
         }
     }
@@ -188,8 +193,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00)
         listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
         listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
-        listKeysBean.put(getKeyBean(0x02, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
-        listKeysBean.put(getKeyBean(0x03, Opcode.GROUP_CCT_MINUS.toInt()))
 
 
         val second = mutableListOf(2, 3)
@@ -336,13 +339,12 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (groupName == "false") {
             var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
             if (dbEightSwitch != null) {
-                dbEightSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo?.productUUID
-                        ?: 0, this) + "-" + dbEightSwitch.meshAddr
+                dbEightSwitch.name =  getString(R.string.eight_switch) +"-" + dbEightSwitch.meshAddr
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
-                dbEightSwitch!!.keys = listKeysBean.toString()
+                dbEightSwitch.keys = listKeysBean.toString()
                 dbEightSwitch.version = version
-                DBUtils.updateSwicth(dbEightSwitch!!)
+                DBUtils.updateSwicth(dbEightSwitch)
                 switchData = dbEightSwitch
             } else {
                 var eightSwitch = DbSwitch()
@@ -513,14 +515,17 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var name: String
-            if (configSwitchType == 0) {
-                var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
-                groupMap[configButtonTag] = group
-                name = group.name
-            } else {
-                var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
-                sceneMap[configButtonTag] = scene
-                name = scene.name
+            when (configSwitchType) {
+                0 ,2-> {
+                    var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+                    groupMap[configButtonTag] = group
+                    name = group.name
+                }
+                else -> {
+                    var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                    sceneMap[configButtonTag] = scene
+                    name = scene.name
+                }
             }
 
             when (configButtonTag) {
@@ -548,10 +553,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val list = mutableListOf<View>()
         for (i in 0..2) {
             val view = layoutInflater.inflate(R.layout.item_banner, null, false)
-            if (i == 0)
-                view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.group_eight_key)
-            else
-                view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.scene_eight_key)
+            when (i) {
+                0 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.group_eight_key)
+                1 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.scene_eight_key)
+                2 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.icon_8k_single)
+            }
             list.add(view)
         }
         eight_switch_banner.adapter = MoreItemVpAdapter(list, this)
@@ -602,7 +608,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     eight_switch_banner_ly.visibility = View.GONE
                     clickType = 1
                 }
-                1->{
+                1,2->{
                     clickType = 2
                     confimCongfig()
                 }
@@ -731,7 +737,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 6
             }
             R.id.eight_switch_b8 -> {
-                isCanClick = configSwitchType == 0//是群组开关才可以点击配置 场景开关为关不允许配置
+                isCanClick = configSwitchType == 0||configSwitchType==2//是群组开关才可以点击配置 场景开关为关不允许配置
                 configButtonTag = 7
             }
         }
