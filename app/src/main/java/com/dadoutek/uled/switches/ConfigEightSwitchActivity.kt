@@ -364,8 +364,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 LogUtils.v("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
-                DBUtils.recordingChange(gotSwitchByMac?.id,
-                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD, eightSwitch.type, eightSwitch.keys)
                 switchData = eightSwitch
             }

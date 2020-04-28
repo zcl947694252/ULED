@@ -194,7 +194,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
-
             R.id.switch_double_touch_use_button -> {
                 if (leftGroup == null || rightGroup == null) {
                     ToastUtils.showShort(getString(R.string.please_check_group_tip))
@@ -309,5 +308,10 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
 
         makePop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
     }
 }

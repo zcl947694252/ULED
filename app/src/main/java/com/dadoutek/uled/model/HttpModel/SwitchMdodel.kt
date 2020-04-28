@@ -15,13 +15,15 @@ object SwitchMdodel {
         dbChild.productUUID=switch.productUUID
         dbChild.meshAddr=switch.meshAddr
         dbChild.macAddr=switch.macAddr
+        dbChild.controlGroupAddrs=switch.controlGroupAddrs
+
         if(switch.controlSceneId!=null){
             dbChild.list=switch.controlSceneId
         }else{
             dbChild.list=" "
         }
         dbChild.name=switch.name
-        dbChild.id=switch.id
+        dbChild.setId(switch.id)
         dbChild.index=switch.index
         dbChild.controlGroupAddr=switch.controlGroupAddr
         dbChild.belongGroupId=switch.belongGroupId
@@ -45,13 +47,14 @@ object SwitchMdodel {
         dbChild.productUUID=dbSwitch.productUUID
         dbChild.meshAddr=dbSwitch.meshAddr
         dbChild.macAddr=dbSwitch.macAddr
+        dbChild.controlGroupAddrs=dbSwitch.controlGroupAddrs
         if(dbSwitch.controlSceneId!=null){
             dbChild.list=dbSwitch.controlSceneId
         }else{
             dbChild.list=" "
         }
         dbChild.name=dbSwitch.name
-        dbChild.id=dbSwitch.id
+        dbChild.setId(dbSwitch.id)
         dbChild.index=dbSwitch.index
         dbChild.controlGroupAddr=dbSwitch.controlGroupAddr
         dbChild.belongGroupId=dbSwitch.belongGroupId
