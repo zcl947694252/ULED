@@ -177,16 +177,12 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        if (mWakeLock != null) {
             mWakeLock?.acquire()
-        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (mWakeLock != null) {
             mWakeLock?.release()
-        }
         compositeDisposable.dispose()
     }
 

@@ -11,29 +11,29 @@ import io.reactivex.schedulers.Schedulers
 
 object SwitchMdodel {
     fun add(token: String, switch: DbSwitch, id: Long, changeId: Long?): Observable<String>? {
-        var dbChild=DbSwitchChild()
-        dbChild.productUUID=switch.productUUID
-        dbChild.meshAddr=switch.meshAddr
-        dbChild.macAddr=switch.macAddr
-        dbChild.controlGroupAddrs=switch.controlGroupAddrs
+        var dbChild = DbSwitchChild()
+        dbChild.productUUID = switch.productUUID
+        dbChild.meshAddr = switch.meshAddr
+        dbChild.macAddr = switch.macAddr
+        dbChild.controlGroupAddrs = switch.controlGroupAddrs
 
-        if(switch.controlSceneId!=null){
-            dbChild.list=switch.controlSceneId
-        }else{
-            dbChild.list=" "
+        if (switch.controlSceneId != null) {
+            dbChild.list = switch.controlSceneId
+        } else {
+            dbChild.list = " "
         }
-        dbChild.name=switch.name
+        dbChild.name = switch.name
         dbChild.setId(switch.id)
-        dbChild.index=switch.index
-        dbChild.controlGroupAddr=switch.controlGroupAddr
-        dbChild.belongGroupId=switch.belongGroupId
+        dbChild.index = switch.index
+        dbChild.controlGroupAddr = switch.controlGroupAddr
+        dbChild.belongGroupId = switch.belongGroupId
 
         dbChild.firmwareVersion = switch.version
         dbChild.type = switch.type
         dbChild.keys = switch.keys
 
         return NetworkFactory.getApi()
-                .addSwitch(token,dbChild,changeId!!.toInt())
+                .addSwitch(token, dbChild, changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -43,28 +43,28 @@ object SwitchMdodel {
     }
 
     fun update(token: String, dbSwitch: DbSwitch, lid: Int, id: Long): Observable<String> {
-        var dbChild=DbSwitchChild()
-        dbChild.productUUID=dbSwitch.productUUID
-        dbChild.meshAddr=dbSwitch.meshAddr
-        dbChild.macAddr=dbSwitch.macAddr
-        dbChild.controlGroupAddrs=dbSwitch.controlGroupAddrs
-        if(dbSwitch.controlSceneId!=null){
-            dbChild.list=dbSwitch.controlSceneId
-        }else{
-            dbChild.list=" "
+        var dbChild = DbSwitchChild()
+        dbChild.productUUID = dbSwitch.productUUID
+        dbChild.meshAddr = dbSwitch.meshAddr
+        dbChild.macAddr = dbSwitch.macAddr
+        dbChild.controlGroupAddrs = dbSwitch.controlGroupAddrs
+        if (dbSwitch.controlSceneId != null) {
+            dbChild.list = dbSwitch.controlSceneId
+        } else {
+            dbChild.list = " "
         }
-        dbChild.name=dbSwitch.name
+        dbChild.name = dbSwitch.name
         dbChild.setId(dbSwitch.id)
-        dbChild.index=dbSwitch.index
-        dbChild.controlGroupAddr=dbSwitch.controlGroupAddr
-        dbChild.belongGroupId=dbSwitch.belongGroupId
+        dbChild.index = dbSwitch.index
+        dbChild.controlGroupAddr = dbSwitch.controlGroupAddr
+        dbChild.belongGroupId = dbSwitch.belongGroupId
 
         dbChild.firmwareVersion = dbSwitch.version
         dbChild.type = dbSwitch.type
         dbChild.keys = dbSwitch.keys
 
         return NetworkFactory.getApi()
-                .updateSwitch(token,lid,dbChild)
+                .updateSwitch(token, lid, dbChild)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -73,9 +73,9 @@ object SwitchMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun delete(token: String,  id: Long,  lid: Int): Observable<String>? {
+    fun delete(token: String, id: Long, lid: Int): Observable<String>? {
         return NetworkFactory.getApi()
-                .deleteSwitch(token,lid)
+                .deleteSwitch(token, lid)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -90,8 +90,8 @@ object SwitchMdodel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    for(item in it){
-                        DBUtils.saveSwitch(item,true)
+                    for (item in it) {
+                        DBUtils.saveSwitch(item, true)
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())

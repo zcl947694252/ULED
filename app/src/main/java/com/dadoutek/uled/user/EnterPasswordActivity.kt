@@ -122,20 +122,15 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initViewType() {
         dbUser = DbUser()
         when (type) {
-            Constant.TYPE_FORGET_PASSWORD -> {
-            }
-
+            Constant.TYPE_FORGET_PASSWORD -> {}
             Constant.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
-
             Constant.TYPE_REGISTER -> phone = intent.extras!!.getString("phone")
-
         }
         val boolean = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
 
         var user = SharedPreferencesUtils.getLastUser()
         user?.let {
             var list = it.split("-")
-            //("zcl**********************${list.size}----$list")
             if (list.size > 1 && user != "-" && !boolean) {
                 var s = list[1]
                 edit_user_password.setText(s)
@@ -353,8 +348,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
         var lastUser = DBUtils.lastUser
 
-        lastUser?.let {
-            //更新user
+        lastUser?.let { //更新user
             when (whoClick) {
                 1 -> {
                     it.last_region_id = regionBean?.id.toString()
@@ -367,10 +361,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             }
 
             PopUtil.dismiss(pop)
-
             //更新last—region-id
             DBUtils.saveUser(it)
-
             getRegioninfo()
         }
     }
@@ -393,7 +385,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
                             DBUtils.lastUser?.controlMeshName = it.controlMesh
                             DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
-
 
                             SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
                             application.setupMesh(mesh)
@@ -452,17 +443,16 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     override fun onPause() {
         super.onPause()
-        if (this.mWakeLock != null) {
+        if (this.mWakeLock != null)
             mWakeLock!!.acquire()
-        }
+
     }
 
     override fun onResume() {
         super.onResume()
         isRunning = true
-        if (mWakeLock != null) {
+        if (mWakeLock != null)
             mWakeLock!!.acquire()
-        }
     }
 
     fun showLoadingDialog(content: String) {
@@ -494,9 +484,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     fun hideLoadingDialog() {
         launch?.cancel()
          launch = GlobalScope.launch(Dispatchers.Main) {
-            if (loadDialog != null && this.isActive && isRunning) {
+            if (loadDialog != null && this.isActive && isRunning)
                 loadDialog!!.dismiss()
-            }
         }
     }
 

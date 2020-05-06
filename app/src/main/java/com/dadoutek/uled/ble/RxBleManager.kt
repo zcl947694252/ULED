@@ -63,7 +63,6 @@ object RxBleManager {
                 SharedPreferencesUtils.saveRegionNameList(list)
             }
         })
-
         return list
     }
 
@@ -71,8 +70,6 @@ object RxBleManager {
      * getVersion
      */
      fun getVersion(result: ScanResult): String {
-        val rssi: Int = result.rssi
-        val mac: String = result.bleDevice?.macAddress ?: ""
         val manuData = result.scanRecord?.manufacturerSpecificData
         var version: String = ""
         if (manuData?.valueAt(0)?.size ?: 0 > manuDataSize) {
@@ -90,7 +87,6 @@ object RxBleManager {
                     version += b.toChar()
                 }
             }
-
         }
         return version
     }
@@ -200,7 +196,6 @@ object RxBleManager {
             if (throwable is UndeliverableException && throwable.cause is BleException) {
                 return@setErrorHandler // ignore BleExceptions as they were surely delivered at least once
             }
-            // add other custom handlers if needed
             throw RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable)
         }
     }

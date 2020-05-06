@@ -1,6 +1,5 @@
 package com.dadoutek.uled.region
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -28,12 +27,11 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.light.PhysicalRecoveryActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -44,11 +42,7 @@ import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.TelinkApplication
-import io.reactivex.Completable.timer
 import io.reactivex.Observable
-import io.reactivex.Observable.timer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -75,15 +69,14 @@ class SettingActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
+    private var disposable: Disposable? = null
     private var disposableTimer: Disposable? = null
     private var disposableFind: Disposable? = null
-    private var mConnectDisposal: Disposable? = null
     private var disposableInterval: Disposable? = null
-    private var disposable: Disposable? = null
     private var mApplication: TelinkLightApplication? = null
+    private lateinit var pop: PopupWindow
     private lateinit var cancel: Button
     private lateinit var confirm: Button
-    private lateinit var pop: PopupWindow
     private var compositeDisposable = CompositeDisposable()
     lateinit var tvOne: TextView
     lateinit var tvTwo: TextView
@@ -102,36 +95,36 @@ class SettingActivity : BaseActivity() {
     override fun initData() {
         val list = arrayListOf<SettingItemBean>()
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
-        //list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
-        //list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_retrieve, getString(R.string.recovery_active_equipment)))
+        list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.physical_recovery)))
 
-        // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)
         recycleView_setting.adapter = settingAdapter
-
         settingAdapter.bindToRecyclerView(recycleView_setting)
 
         settingAdapter.setOnItemClickListener { _, _, position ->
-
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
                     ToastUtils.showLong(getString(R.string.author_region_warm))
-                else {
+                else
                     when (position) {
                         0 -> emptyTheCache()
-                        // 1 -> checkNetworkAndSyncs(this)
                         1 -> showSureResetDialogByApp()
-                        // 3 -> userReset()
                         2 -> startToRecoverDevices()
+                        3 -> physicalRecovery()
+                        //3 -> userReset()
+                        //1 -> checkNetworkAndSyncs(this)
                     }
-                }
             }
         }
+    }
+
+    private fun physicalRecovery() {
+        startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
     }
 
     private fun startToRecoverDevices() {
@@ -146,10 +139,10 @@ class SettingActivity : BaseActivity() {
                     disposableTimer?.dispose()
                     hideLoadingDialog()
                 }, {
-                            disposableTimer?.dispose()
-                            hideLoadingDialog()
-                            LogUtils.d(it)
-                        })
+                    disposableTimer?.dispose()
+                    hideLoadingDialog()
+                    LogUtils.d(it)
+                })
         disposableTimer?.let {
             compositeDisposable.add(it)
         }
@@ -234,7 +227,7 @@ class SettingActivity : BaseActivity() {
     }
 
     private fun setNormalPopSetting() {
-        confirm?.isClickable = false
+        confirm.isClickable = false
 
         tvOne.visibility = View.VISIBLE
         tvThree.visibility = View.VISIBLE
@@ -262,8 +255,6 @@ class SettingActivity : BaseActivity() {
 
         tvOne.visibility = View.INVISIBLE
         tvTwo.visibility = View.INVISIBLE
-
-
 
         if (isResetFactory) {
             hinitTwo.visibility = View.VISIBLE
@@ -407,24 +398,22 @@ class SettingActivity : BaseActivity() {
         hinitThree.text = ss
         hinitThree.movementMethod = LinkMovementMethod.getInstance()
 
-        cancel?.let {
+        cancel.let {
             it.setOnClickListener { PopUtil.dismiss(pop) }
         }
-        confirm?.setOnClickListener {
+        confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (isResetFactory) {
-                if (TelinkLightApplication.getApp().connectDevice != null) {
+            if (isResetFactory)
+                if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
-                } else {
+                else
                     ToastUtils.showLong(R.string.device_not_connected)
-                }
-            } else {
+            else
                 clearData()
-            }
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        confirm?.isClickable = false
+        confirm.isClickable = false
         pop.isOutsideTouchable = false
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
@@ -436,34 +425,31 @@ class SettingActivity : BaseActivity() {
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
-        //val lightList = allLights
+
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
 
         var meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
-            for (k in lightList.indices) {
+            for (k in lightList.indices)
                 meshAdre.add(lightList[k].meshAddr)
-            }
         }
 
         if (curtainList.isNotEmpty()) {
-            for (k in curtainList.indices) {
+            for (k in curtainList.indices)
                 meshAdre.add(curtainList[k].meshAddr)
-            }
         }
 
         if (relyList.isNotEmpty()) {
-            for (k in relyList.indices) {
+            for (k in relyList.indices)
                 meshAdre.add(relyList[k].meshAddr)
-            }
         }
 
         Commander.resetAllDevices(meshAdre, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
             syncData()
-            this@SettingActivity?.bnve?.currentItem = 0
+            this@SettingActivity.bnve?.currentItem = 0
             null
         }, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
