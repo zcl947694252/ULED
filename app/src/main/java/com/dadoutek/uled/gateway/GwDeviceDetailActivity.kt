@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -26,13 +27,10 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
-import com.dadoutek.uled.model.InstallDeviceModel
-import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -51,6 +49,7 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
@@ -82,8 +81,9 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${TODO}$
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
-
-    private var removeGw: DbGateway? = null
+    private var showDialogHardDelete: AlertDialog? = null
+    private var showDialogDelete: AlertDialog? = null
+    private var disposableFactoryTimer: Disposable? = null
     private var downloadDispoable: Disposable? = null
     private var removeBean: DbGateway? = null
     private var renameDialog: Dialog? = null
@@ -125,6 +125,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         setContentView(R.layout.template_device_detail_list)
         type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         inflater = this.layoutInflater
+
         initView()
         initData()
 
@@ -151,12 +152,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
-        toolbar.titleCenterName.setText(R.string.Gate_way)
+        toolbarTv.text = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -199,6 +199,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         super.onResume()
         inflater = this.layoutInflater
         initData()
+        this.mApp.removeEventListeners()
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
@@ -464,14 +465,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 }
 
                 adaper!!.notifyDataSetChanged()
-                /*       it.openTag = if (it.openTag == 0)
-                           1
-                       else
-                           0
-                       it.updateIcon()*/
-                // DBUtils.saveGateWay(it, false)
-
-
             } else {
                 disposableTimer?.dispose()
                 disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
@@ -496,9 +489,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
-            }
-
+            override fun onNext(t: String) {}
             override fun onError(e: Throwable) {
                 super.onError(e)
             }
@@ -544,17 +535,15 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         val configGwNet = views.findViewById<TextView>(R.id.configGwNet)
         val deleteBtnNoFactory = views.findViewById<TextView>(R.id.deleteBtnNoFactory)
 
+        reConfig.text = getString(R.string.config_gate_way)
+        restFactory.text = getString(R.string.delete_device)
+        deleteBtnNoFactory.text = getString(R.string.user_reset)
         configGwNet.visibility = View.VISIBLE
         deleteBtnNoFactory.visibility = View.VISIBLE
 
         deleteBtnNoFactory.setOnClickListener {
             popupWindow.dismiss()//删除网关
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_device_confim)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        deleteGwData()
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+            deleteGwData()
         }
 
         configGwNet.setOnClickListener {
@@ -562,9 +551,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
 
         reConfig.setOnClickListener {
-                connectGw(0)//重新配置
+            connectGw(0)//重新配置
         }
-
+        rename.visibility = View.GONE
         rename.setOnClickListener {
             showRenameDialog()
         }
@@ -574,7 +563,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
         restFactory.setOnClickListener {
             //恢复出厂设置
-            connectGw(3)
+            showDialogDelete = AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_device_tip)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        connectGw(3)
+                    }
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
         }
     }
 
@@ -673,7 +667,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting))
             disposableConnect?.dispose()
-            disposableConnect = connect(macAddress = currentGw?.macAddr,connectTimeOutTime = 15L)?.subscribe({
+            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 15L)?.subscribe({
                 disposable?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
                 when (configType) {
@@ -728,6 +722,17 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun sendGwResetFactory() {
+         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS).subscribe {
+             showDialogDelete?.dismiss()
+             showDialogHardDelete = AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_device_hard_tip)
+                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                         showDialogHardDelete?.dismiss()
+                         isRestSuccess = true
+                         deleteGwData(isRestSuccess)
+                     }
+                     .setNegativeButton(R.string.btn_cancel, null)
+                     .show()
+        }
         var labHeadPar = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr ?: 0, labHeadPar, "1")
     }
@@ -741,10 +746,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                when (event.args.status) {
+                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         if (deviceInfo.gwVoipState == GW_RESET_VOIP) {
+                            showDialogHardDelete?.dismiss()
                             LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                             isRestSuccess = true
                             deleteGwData(isRestSuccess)
@@ -798,8 +804,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             no_device_relativeLayout.visibility = View.VISIBLE
         }
         adaper?.notifyDataSetChanged()
-        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
-        toolbar.titleCenterName.setText(R.string.Gate_way)
+        toolbarTv.text = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return gateWayDataList[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
@@ -827,8 +832,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun getNewData(): ArrayList<DbGateway> {
         val allGateWay = DBUtils.getAllGateWay()
-        //toolbar.title = (currentGw!!.name ?: "")
-        toolbar.titleCenterName.setText(R.string.Gate_way)
+        toolbar.title = (currentGw!!.name ?: "")
         return allGateWay
     }
 
@@ -882,7 +886,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             recycleView.visibility = View.GONE
             no_device_relativeLayout.visibility = View.VISIBLE
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
@@ -898,8 +902,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 }
             }
         }
-        //toolbar.title = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
-        toolbar.titleCenterName.setText(R.string.Gate_way)
+        toolbarTv.text = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
     }
 
 
@@ -921,7 +924,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     override fun onDestroy() {
         super.onDestroy()
         disposableAll()
-
+        showDialogDelete?.dismiss()
+        showDialogHardDelete?.dismiss()
+        this.mApp.removeEventListeners()
         canBeRefresh = false
         acitivityIsAlive = false
         installDialog?.dismiss()
@@ -941,9 +946,9 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun makePop() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {

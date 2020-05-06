@@ -117,36 +117,39 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status ==  LightAdapter.STATUS_LOGIN -> {
+                when (event.args.status) {
+                    LightAdapter.STATUS_LOGIN -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         Log.e("zcl", "zcl***STATUS_LOGIN***")
                     }
-                    event.args.status ==   LightAdapter.STATUS_LOGOUT -> {
+                    LightAdapter.STATUS_LOGOUT -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
                         ToastUtils.showShort(getString(R.string.connecting_tip))
-                          connect(macAddress = dbGw?.macAddr, retryTimes = 10)
+                        connect(macAddress = dbGw?.macAddr, retryTimes = 10)
                                 ?.subscribe({}, { LogUtils.d("connect failed") })
                     }
+
                     //获取设备mac
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         //mac信息获取成功
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
 
                         when (deviceInfo.gwVoipState) {
                             Constant.GW_WIFI_VOIP -> {
-                                GlobalScope.launch(Dispatchers.Main) {
+                                    GlobalScope.launch(Dispatchers.Main) {
                                     disposableTimer?.dispose()
                                     hideLoadingDialog()
                                     if (deviceInfo.gwWifiState == 0) {
                                         ToastUtils.showShort(getString(R.string.config_success))
-                                        startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
-                                        finish()
-                                    }
-                                    // skipEvent()
-                                    else
+                                        val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
+                                        if (boolean) {
+                                            startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
+                                            finish()
+                                        } else
+                                            skipEvent()
+                                    } else
                                         ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
                                 }
                             }
@@ -159,14 +162,15 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                             }
                         }
                     }
+
                     //获取设备mac
-                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
+                    LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
                         //mac信息获取成功
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
                         dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
                     }
-                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
+                    LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
                         LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
                     }
                 }
@@ -180,7 +184,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                   runOnUiThread {  ToastUtils.showLong(getString(R.string.config_WIFI_FAILE)) }
+                    runOnUiThread { ToastUtils.showLong(getString(R.string.config_WIFI_FAILE)) }
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()
@@ -272,7 +276,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     private fun getParmarsList(bytes: ByteArray): MutableList<ByteArray> {
         val lastNum = bytes.size % 8
         val list = mutableListOf<ByteArray>()
-        for (index in 0 until bytes.size step 8) {
+        for (index in bytes.indices step 8) {
             var b: ByteArray
             if (index + 8 <= bytes.size) {
                 b = ByteArray(8)
@@ -288,7 +292,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        dbGw = intent.getParcelableExtra<DbGateway>("data")
+        dbGw = intent.getParcelableExtra("data")
 
         val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
         if (boolean)
@@ -306,36 +310,42 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             })
         }
+        setWIFI()
 
-
-        RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
+        val disposable = RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe({
-                        if(it)
-                        {
-                            if(NetworkUtils.isWifiAvailable() && NetworkUtils.isWifiConnected()) {
-                                var wifiManager = application.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                                if (wifiManager != null) {
-
-                                    var currentWifiName = wifiManager.connectionInfo.ssid
-                                    //删除首尾的 \"
-                                    currentWifiName = currentWifiName.substring(1,currentWifiName.length-1)
-                                    runOnUiThread { gw_login_account.setText(currentWifiName) }
-                                }
-                            }
-                        }
+                    if (it) setWIFI()
                 }, { LogUtils.d(it) })
 
         bottom_version_number.text = dbGw?.version
+
         // sendDeviceMacParmars()
+    }
+
+    private fun setWIFI() {
+        GlobalScope.launch {
+            if (NetworkUtils.isWifiAvailable() && NetworkUtils.isWifiConnected()) {
+                var wifiManager = application.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                wifiManager?.let { itw ->
+                    var currentWifiName = itw.connectionInfo.ssid
+                    //删除首尾的 \"
+                    currentWifiName = currentWifiName.substring(1, currentWifiName.length - 1)
+                    runOnUiThread {
+                        gw_login_account.setText(currentWifiName)
+                        gw_login_account.setSelection(currentWifiName.length)
+                    }
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
         disableConnectionStatusListener()
-        toolbarTv.text = getString(R.string.config_WIFI)
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.title = getString(R.string.config_WIFI)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
             finish()

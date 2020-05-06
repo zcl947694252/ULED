@@ -27,10 +27,9 @@ class WeeksItemAdapter(resId: Int, data: MutableList<WeekBean>) : BaseQuickAdapt
         else
             textView?.setTextColor(mContext.getColor(R.color.black_three))
 
-        helper?.setText(R.id.item_week_title, item?.week)
-                ?.setVisible(R.id.item_week_checked, item!!.checked)
-
-
+        helper?.setText(R.id.item_week_title, item.week )
+                ?.setChecked(R.id.item_week_checked, item.checked)
+                //?.setVisible(R.id.item_week_checked, item!!.checked)
     }
 
 }

@@ -53,15 +53,6 @@ object Commander : EventListener<String> {
     //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
     private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
 
-    init {
-        //监听事件
-//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
-//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.ERROR, this)
-    }
-
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
         mTargetGroupAddr = groupAddr

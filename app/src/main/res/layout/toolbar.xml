@@ -16,6 +16,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/ToolBarTheme"
             app:titleTextAppearance="@style/Toolbar.TitleText">
+        <EditText
+                android:id="@+id/toolbarTv_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:visibility="gone" />
 
         <TextView
                 android:id="@+id/toolbarTv"

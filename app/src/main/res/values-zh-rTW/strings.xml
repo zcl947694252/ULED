@@ -231,7 +231,7 @@
     <string name="name_or_password_error">用户名或密码错误！</string>
     <string name="phone_current">当前手机号：%1$s</string>
     <string name="select_country">选择国家</string>
-    <string name="add">添加</string>
+    <string name="add_timing_label">添加定时标签</string>
     <string name="open_location_service">请打开“位置服务”</string>
     <string name="verification">验证</string>
     <string name="send_verification">发送验证码</string>
@@ -881,7 +881,7 @@
     <string name="click_config_tip">请点击配置按钮完成配置</string>
     <string name="change_mode_8k">切换模式</string>
     <string name="times_mode">定时模式</string>
-    <string name="time_pattern_mode">时间段模式</string>
+    <string name="time_pattern_mode">循环模式</string>
     <string name="event_list">事件列表</string>
     <string name="repetition">重复</string>
     <string name="chose_time">选择时间</string>
@@ -900,8 +900,8 @@
     <string name="timer_exists">该定时时间已存在</string>
     <string name="invalid_data">无效数据</string>
     <string name="gate_way_time_max">网关定时已达最大创建数</string>
-    <string name="add_time">添加时间</string>
-    <string name="add_times">添加时间段</string>
+    <string name="add_time">添加定时任务</string>
+    <string name="add_times">添加循环任务</string>
     <string name="to">至</string>
     <string name="endTime">8:00</string>
     <string name="standing_time">停留时间</string>
@@ -964,4 +964,10 @@
     <string name="single_brighress_group_switch">单调光群组开关</string>
     <string name="eight_switch">八键开关</string>
     <string name="double_switch">双组开关</string>
+    <string name="delete_device">删除设备</string>
+    <string name="delete_device_tip">是否删除?</string>
+    <string name="delete_device_hard_tip">删除失败,是否强制删除?</string>
+    <string name="add_cycle_label">添加循环标签</string>
+    <string name="change_device_name">修改设备名称</string>
+    <string name="scene_list">场景列表</string>
 </resources>

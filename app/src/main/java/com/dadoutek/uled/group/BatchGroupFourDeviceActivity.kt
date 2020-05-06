@@ -355,7 +355,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(groupsByDeviceType?.get(position)?.name)
-        //        //设置光标默认在最后
+        //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.update_name_gp))

@@ -238,7 +238,7 @@
     <string name="phone_current">Current phone number: %1$s</string>
     <string name="select_country">Choose a country</string>
     <string name="verification">Verification</string>
-    <string name="add">Add</string>
+    <string name="add_timing_label">Add timing label</string>
     <string name="open_location_service">Please open "Location service"</string>
     <string name="send_verification">Send the verification code</string>
     <string name="VerificationCode">Verification code</string>
@@ -957,7 +957,7 @@
     <string name="click_config_tip">Click the configure button to complete the configuration</string>
     <string name="change_mode_8k">switching mode</string>
     <string name="times_mode">Timer_Mode</string>
-    <string name="time_pattern_mode">Time_pattern</string>
+    <string name="time_pattern_mode">Cyclical pattern </string>
     <string name="event_list">Even List</string>
     <string name="repetition">repetition</string>
     <string name="chose_time">Chose time</string>
@@ -976,8 +976,8 @@
     <string name="timer_exists">The timing time already exists</string>
     <string name="invalid_data">Invalid data </string>
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
-    <string name="add_time">Add Time</string>
-    <string name="add_times">Add Times</string>
+    <string name="add_time">Add timing task</string>
+    <string name="add_times">Add a loop task</string>
     <string name="to">To</string>
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
@@ -1040,4 +1040,10 @@
     <string name="single_brighress_group_switch">Dimmer double switch</string>
     <string name="eight_switch">8k Switch</string>
     <string name="double_switch">DoubleGroup Switch</string>
+    <string name="delete_device">Delete Device</string>
+    <string name="delete_device_tip">Whether or not to delete?</string>
+    <string name="delete_device_hard_tip">Delete failed, whether to force delete?</string>
+    <string name="add_cycle_label">Add a loop tag</string>
+    <string name="change_device_name">Modify device name</string>
+    <string name="scene_list">Cue List</string>
 </resources>

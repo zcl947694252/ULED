@@ -2,6 +2,7 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -12,6 +13,7 @@ import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
@@ -35,6 +37,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
@@ -81,7 +84,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     private val requestTimeCode: Int = 2000//时间段模式
     private var isCanEdite = false
     private var maxId = 0L
-    val listTask = ArrayList<GwTasksBean>()
+    private val listTask = ArrayList<GwTasksBean>()
     private val adapter = GwTaskItemAdapter(R.layout.item_gw_time_scene, listTask)
     private val function: (leftMenu: SwipeMenu, rightMenu: SwipeMenu, position: Int) -> Unit = { _, rightMenu, _ ->
         val menuItem = SwipeMenuItem(this@GwConfigTagActivity)// 创建菜单
@@ -98,9 +101,30 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
-        toolbarTv.text = getString(R.string.Gate_way)
         gate_way_repete_mode.textSize = 15F
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setOnClickListener {
+             val textGp = EditText(this)
+                         StringUtils.initEditTextFilter(textGp)
+                         val s = dbGw?.name ?: ""
+                         textGp.setText(s)
+                         textGp.setSelection(s.length)
+                         AlertDialog.Builder(this)
+                                 .setTitle(getString(R.string.change_device_name))
+                                 .setIcon(android.R.drawable.ic_dialog_info)
+                                 .setView(textGp)
+                                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                                         ToastUtils.showLong(getString(R.string.rename_tip_check))
+                                     } else {
+                                         val trim = textGp.text.toString().trim { it <= ' ' }
+                                         dbGw?.name = trim
+                                         toolbarTv.text = trim
+                                         DBUtils.saveGateWay(dbGw!!, false)
+                                     }
+                                 }
+                                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        }
         toolbar.setNavigationOnClickListener {
             val intent = Intent()
             intent.putExtra("data", dbGw)
@@ -138,7 +162,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
     @SuppressLint("SetTextI18n")
     fun initData() {//創建新tag任务
-        dbGw = intent.getParcelableExtra<DbGateway>("data")
+        dbGw = intent.getParcelableExtra("data")
         if (dbGw != null) {//拿到有效数据
             currentTagStr = if (dbGw?.type == 0) //定时
                 dbGw?.tags
@@ -182,6 +206,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
         getWeekStr()
 
+        toolbarTv.text = getString(R.string.label) + tagBean?.tagId
 
         gate_way_repete_mode.text = tagBean?.weekStr
 
@@ -220,16 +245,14 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         return sb.toString()
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.add_group_btn -> addNewTask()//创建新的task传入可用的index
 
-            R.id.gate_way_repete_mode, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
+            R.id.gate_way_repete_mode_ly, R.id.gate_way_repete_mode_arrow -> {//选择模式是否重复
                 val intent = Intent(this@GwConfigTagActivity, GwChoseModeActivity::class.java)
                 intent.putExtra("data", tagBean!!.week)
-
                 startActivityForResult(intent, requestModeCode)
             }
 
@@ -247,7 +270,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         it.productUUID = DeviceType.GATE_WAY
         val toJson = GsonUtils.toJson(listTask)//获取tasks字符串
         LogUtils.v("zcl网关---$toJson")
-        tagBean?.tagName = gate_way_lable.text.toString()
+        tagBean?.tagName = toolbarTv.text.toString()
         tagBean?.weekStr = gate_way_repete_mode.text.toString()
         tagBean?.tasks = toJson//添加tag的时间列表
         tagBean?.status = 0
@@ -305,15 +328,14 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                when (event.args.status) {
+                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         when (deviceInfo.gwVoipState) {
                             Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
                                 hideLoadingDialog()
                                 disposableTimer?.dispose()
                                 runOnUiThread { upDataDeleteUi() }
-
                             }
 
                             Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
@@ -333,7 +355,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
     private fun upDataDeleteUi() {
         listTask.remove(deleteBean)
-
         adapter.notifyDataSetChanged()
         saveOrUpdataGw(dbGw!!)
     }
@@ -529,7 +550,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     fun initListener() {
         tv_function1.setOnClickListener(this)
         gate_way_edite.setOnClickListener(this)
-        gate_way_repete_mode.setOnClickListener(this)
+        gate_way_repete_mode_ly.setOnClickListener(this)
         gate_way_repete_mode_arrow.setOnClickListener(this)
 
         adapter.setOnItemClickListener { _, _, position ->

@@ -99,8 +99,8 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                when (event.args.status) {
+                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                         when (deviceInfo.gwVoipState) {

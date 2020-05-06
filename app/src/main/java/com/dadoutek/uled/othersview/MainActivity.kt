@@ -56,7 +56,6 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.switches.ConfigEightSwitchActivity
-import com.dadoutek.uled.switches.DoubleTouchSwitchActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -260,10 +259,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         try {
             if (ev?.action == MotionEvent.ACTION_DOWN) {
-                when {
-                    bnve.currentItem == 0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
-                    bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
-                    bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+                when (bnve.currentItem) {
+                    0 -> deviceFragment.myPopViewClickPosition(ev.x, ev.y)
+                    1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
+                    2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
                 }
             }
         } catch (ex: IllegalArgumentException) {
@@ -280,16 +279,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.clickRgb = clickRgb
         val view = View.inflate(
                 this, R.layout.dialog_install_list, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
-        val install_device_recyclerView = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { v -> installDialog?.dismiss() }
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
+        val installDeviceRecyclerview = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        closeInstallList.setOnClickListener { v -> installDialog?.dismiss() }
 
         val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
 
         val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        install_device_recyclerView?.layoutManager = layoutManager
-        installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
+        installDeviceRecyclerview?.layoutManager = layoutManager
+        installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
         installDialog = AlertDialog.Builder(this)
@@ -307,14 +306,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         GlobalScope.launch {
             delay(100)
             GlobalScope.launch(Dispatchers.Main) {
-                guide3(install_device_recyclerView)
+                guide3(installDeviceRecyclerview)
             }
         }
     }
 
     private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
@@ -323,11 +322,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
-        val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
-        val search_bar = view.findViewById<Button>(R.id.search_bar)
-        close_install_list.setOnClickListener(dialogOnclick)
+        val installTipQuestion = view.findViewById<TextView>(R.id.install_tip_question)
+        val searchBar = view.findViewById<Button>(R.id.search_bar)
+        closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
-        search_bar.setOnClickListener(dialogOnclick)
+        searchBar.setOnClickListener(dialogOnclick)
 
         if (position == Constant.INSTALL_SWITCH)
             stepThreeTextSmall.visibility = View.VISIBLE
@@ -337,15 +336,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position == INSTALL_NORMAL_LIGHT) {
             title.visibility = GONE
-            install_tip_question.visibility = GONE
+            installTipQuestion.visibility = GONE
         } else {
             title.visibility = VISIBLE
-            install_tip_question.visibility = VISIBLE
+            installTipQuestion.visibility = VISIBLE
         }
 
 
-        install_tip_question.text = describe
-        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
+        installTipQuestion.text = describe
+        installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
         installDialog?.show()
