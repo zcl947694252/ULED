@@ -1,6 +1,10 @@
 package com.dadoutek.uled.gateway
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.net.Network
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,7 +13,9 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.NetworkUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.Utils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
@@ -20,6 +26,8 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.NetWorkUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Arrays
@@ -298,6 +306,27 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             })
         }
+
+
+        RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.newThread())
+                .subscribe({
+                        if(it)
+                        {
+                            if(NetworkUtils.isWifiAvailable() && NetworkUtils.isWifiConnected()) {
+                                var wifiManager = application.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                                if (wifiManager != null) {
+
+                                    var currentWifiName = wifiManager.connectionInfo.ssid
+                                    //删除首尾的 \"
+                                    currentWifiName = currentWifiName.substring(1,currentWifiName.length-1)
+                                    runOnUiThread { gw_login_account.setText(currentWifiName) }
+                                }
+                            }
+                        }
+                }, { LogUtils.d(it) })
+
         bottom_version_number.text = dbGw?.version
         // sendDeviceMacParmars()
     }
