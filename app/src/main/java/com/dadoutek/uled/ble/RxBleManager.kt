@@ -37,7 +37,7 @@ object RxBleManager {
     private val versionCodeLength = 5       //-之后的版本号长度，2.1.8 为5个byte
     private val supportVersion = "15"           //支持新恢复出厂设置的版本，XX-15
     private val supportVersionWithDot = "3.5.0"     //支持新恢复出厂设置的版本，XX-3.5.1  正式版记得改回来
-    private  var rxBleClient: RxBleClient? = null
+    private var rxBleClient: RxBleClient? = null
     private val mHmScannedDevice = hashMapOf<String, RxBleDevice>()
     private var mIsScanning = false
     private val mHmConnectObservable = hashMapOf<RxBleDevice, Observable<RxBleConnection>>()
@@ -69,7 +69,7 @@ object RxBleManager {
     /**
      * getVersion
      */
-     fun getVersion(result: ScanResult): String {
+    fun getVersion(result: ScanResult): String {
         val manuData = result.scanRecord?.manufacturerSpecificData
         var version: String = ""
         if (manuData?.valueAt(0)?.size ?: 0 > manuDataSize) {
@@ -94,7 +94,7 @@ object RxBleManager {
     /**
      * 是否支持新的物理恢复出厂设置方法
      */
-     fun isSupportHybridFactoryReset(version: String): Boolean {
+    fun isSupportHybridFactoryReset(version: String): Boolean {
         var isSupport = false
         if (version.isNotEmpty()) {
             isSupport = if (version.contains('.')) {
@@ -123,7 +123,7 @@ object RxBleManager {
                     var isMyDevice = isMyDevice(it.bleDevice.name)
                     LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
-                    version!=""&&!isMyDevice
+                    version != "" && !isMyDevice
                 }
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())
@@ -142,10 +142,11 @@ object RxBleManager {
         var b = false
         if (regionList == null) {
             b = false
-        } else
+        } else {
             for (rgName in regionList!!)
-                if (name == rgName||name== Constant.DEFAULT_MESH_FACTORY_NAME)
+                if (name == rgName || name == Constant.DEFAULT_MESH_FACTORY_NAME)
                     b = true
+        }
         return b
     }
 

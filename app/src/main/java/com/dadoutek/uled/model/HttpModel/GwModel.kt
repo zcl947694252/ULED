@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model.HttpModel
 
+import com.dadoutek.uled.gateway.bean.ClearGwBean
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
@@ -52,6 +54,14 @@ object GwModel {
     }
     fun sendDeviceToGatt(gattBody: GwGattBody): Observable<String>? {
         return NetworkFactory.getApi().sendDeviceToMqtt(gattBody)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext { }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun clearGwData(gwId:Long): Observable<ClearGwBean>? {
+        return NetworkFactory.getApi().clearGwInfo(gwId)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext { }

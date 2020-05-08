@@ -312,13 +312,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun isVisibility() {
-        constraintLayout17.visibility = View.VISIBLE
+        triggering_model.visibility = View.VISIBLE
         view15.visibility = View.VISIBLE
-        constraintLayout18.visibility = View.VISIBLE
+        trigger_after_ly.visibility = View.VISIBLE
         view16.visibility = View.VISIBLE
-        constraintLayout19.visibility = View.VISIBLE
+        overtime_ly.visibility = View.VISIBLE
         view17.visibility = View.VISIBLE
-        constraintLayout21.visibility = View.VISIBLE
+        light_brighress_mode.visibility = View.VISIBLE
         view18.visibility = View.VISIBLE
     }
 
@@ -809,9 +809,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun setFrist() {
-        for (i in showCheckListData!!.indices) {
+        for (i in showCheckListData!!.indices)
             showCheckListData!![i].checked = i == 0 //选中全部
-        }
     }
 
     private fun configDevice() {
@@ -819,14 +818,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         var num: String //N-3.1.1
         if (version.contains("N")) {
             num = version.substring(2, 3)
-            if ("" != num && num.toDouble() >= 3.0) {
+            if ("" != num && num.toDouble() >= 3.0)
                 setThreeVersionOrPr()
-            } else {
+            else
                 setBlowThreeVersion()
-            }
-        } else if (version.contains("PR")) {
+        } else if (version.contains("PR"))
             setThreeVersionOrPr()
-        }
+
     }
 
     private fun setBlowThreeVersion() {
@@ -1071,13 +1069,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         configureComplete()
                         TelinkLightService.Instance()?.idleMode(true)
                     },
-                    failedCallback = {
-
-                        this@HumanBodySensorActivity.runOnUiThread {
+                    failedCallback = { this@HumanBodySensorActivity.runOnUiThread {
                             snackbar(sensor_root, getString(R.string.pace_fail))
                             setLoadingVisbiltyOrGone()
                         }
-
                         TelinkLightService.Instance()?.idleMode(true)
                     })
 
@@ -1089,8 +1084,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     /**
      * byte数组转hex
-     * @param bytes
-     * @return
      */
     fun byteToHex(bytes: ByteArray): String {
         var strHex = ""
@@ -1113,8 +1106,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         tv_function1.visibility = View.GONE
 
         recyclerGroup.layoutManager = GridLayoutManager(this, 3)
-        this.nightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(
-                R.layout.activity_night_light_groups_item, showGroupList)
+        this.nightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
 
         nightLightGroupRecycleViewAdapter?.bindToRecyclerView(recyclerGroup)
         nightLightGroupRecycleViewAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -1138,24 +1130,20 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (showCheckListData!![0].meshAddr == 0xffff && showCheckListData!![0].checked) {//选中全部分组
                 showCheckListData!![0].isCheckedInGroup = true
 
-                if (showCheckListData!!.size > 1 && i > 0) {
+                if (showCheckListData!!.size > 1 && i > 0)
                     showCheckListData!![i].isCheckedInGroup = false
-                }
 
             } else {
                 showCheckListData!![0].isCheckedInGroup = false
-                if (showCheckListData!!.size > 1 && i > 0) {
+                if (showCheckListData!!.size > 1 && i > 0)
                     showCheckListData!![i].isCheckedInGroup = true
-                }
 
-                if (i > 0 && showCheckListData!![i].checked) {
+                if (i > 0 && showCheckListData!![i].checked)
                     isAllCanCheck = false
-                }
             }
         }
-        if (isAllCanCheck) {
+        if (isAllCanCheck)
             showCheckListData!![0].isCheckedInGroup = true
-        }
     }
 
     @SuppressLint("CheckResult")

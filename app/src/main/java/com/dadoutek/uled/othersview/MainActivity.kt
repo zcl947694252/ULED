@@ -46,6 +46,8 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
@@ -154,6 +156,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             TelinkLightApplication.getApp().initStompClient()
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
+
+        var dbGroup = DbGroup()
+        dbGroup.id = 0
+        var dbScene = DbScene()
+        dbScene.id = 0
 
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {

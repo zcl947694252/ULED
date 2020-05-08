@@ -172,10 +172,14 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                                             finish()
                                         }
                                         DeviceType.SCENE_SWITCH -> {
-                                            if (version.contains(DeviceType.EIGHT_SWITCH))
+                                            if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
                                                 startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
                                             else
                                                 startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            finish()
+                                        }
+                                        DeviceType.EIGHT_SWITCH -> {
+                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true",  "switch" to currentSwitch,"version" to version)
                                             finish()
                                         }
                                         DeviceType.SMART_CURTAIN_SWITCH -> {

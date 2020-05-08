@@ -1046,4 +1046,7 @@
     <string name="add_cycle_label">Add a loop tag</string>
     <string name="change_device_name">Modify device name</string>
     <string name="scene_list">Cue List</string>
+    <string name="user_reset_tip">Whether to perform user reset?</string>
+    <string name="gw_user_reset_switch_success">The user gateway reset succeeded</string>
+    <string name="chose_scene">Choose scene :</string>
 </resources>

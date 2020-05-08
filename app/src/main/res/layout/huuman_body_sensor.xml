@@ -24,7 +24,7 @@
             app:layout_constraintTop_toBottomOf="@+id/rvToolbar">
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout17"
+                android:id="@+id/triggering_model"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -89,10 +89,10 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout17" />
+                app:layout_constraintTop_toBottomOf="@+id/triggering_model" />
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout18"
+                android:id="@+id/trigger_after_ly"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -157,11 +157,11 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout18" />
+                app:layout_constraintTop_toBottomOf="@+id/trigger_after_ly" />
 
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout19"
+                android:id="@+id/overtime_ly"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -241,11 +241,11 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout19" />
+                app:layout_constraintTop_toBottomOf="@+id/overtime_ly" />
 
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout21"
+                android:id="@+id/light_brighress_mode"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -309,7 +309,7 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout21" />
+                app:layout_constraintTop_toBottomOf="@+id/light_brighress_mode" />
 
 
         <!--<android.support.constraint.ConstraintLayout-->

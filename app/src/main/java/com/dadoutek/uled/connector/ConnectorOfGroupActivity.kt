@@ -228,8 +228,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initParameter() {
         val get = this.intent.extras!!.get("group")
-        if (group!=null)
-        this.group = get as DbGroup
+        if (null != group)
+            this.group = get as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
     }
@@ -592,7 +592,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
                                 val params = LeScanParameters.create()
                                 //if (!com.dadoutek.uled.util.AppUtils.isExynosSoc)
-                                    params.setScanFilters(scanFilters)
+                                params.setScanFilters(scanFilters)
 
                                 params.setMeshName(account)
                                 params.setOutOfMeshName(account)

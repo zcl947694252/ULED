@@ -92,6 +92,7 @@ object Opcode {
      */
     const val SCENE_SWITCH8K: Byte = 0x05.toByte()//场景8开关
     const val GROUP_SWITCH8K: Byte = 0x7C.toByte()//單组开关
+    const val DEFAULT_SWITCH8K: Byte = 0xFF.toByte()//默认无效
     const val CLOSE: Byte = 0x03.toByte()//关  用于场景关闭按键
     const val SWITCH_ALL_GROUP: Byte = 0x7d.toByte()//全组开关
 

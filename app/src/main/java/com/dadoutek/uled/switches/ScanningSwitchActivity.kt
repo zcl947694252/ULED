@@ -113,7 +113,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
             startAnimation()
             val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                    DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH)
+                    DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.EIGHT_SWITCH)
             mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
                     retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
                     ?.subscribeOn(Schedulers.io())
@@ -155,10 +155,14 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                             startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
                                         }
                                         DeviceType.SCENE_SWITCH -> {
-                                            if (version.contains(DeviceType.EIGHT_SWITCH))
+                                            if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
                                                 startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
                                             else
                                                 startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+                                        }
+
+                                        DeviceType.EIGHT_SWITCH -> {
+                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
                                         }
                                         DeviceType.SMART_CURTAIN_SWITCH -> {
                                             startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)

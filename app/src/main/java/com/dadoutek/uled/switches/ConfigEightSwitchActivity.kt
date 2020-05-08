@@ -43,11 +43,21 @@ import org.json.JSONObject
  * 创建者     ZCL
  * 创建时间   2020/1/10 10:01
  * 描述 八键开关配置
+ *乾三连 1开天金
+ * 坤六断 8大地土
+ * 震仰盂 4东方雷木
+ * 艮覆碗 7东北齐山土
+ * 离中虚 3南离火
+ * 坎中满 6北方水
+ * 兑上缺 2西方泽金
+ * 巽下断 5东南风木
  *
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
+
+
 class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var listKeysBean: JSONArray
     private var renameDialog: Dialog? = null
@@ -71,6 +81,10 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private val sceneParamList = mutableListOf<ByteArray>()
 
     private fun initData() {
+        val groupKey = mutableListOf(4, 5, 6, 7)
+        val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6)
+        val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
+
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         bottom_version_number?.text = version
@@ -104,9 +118,12 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                         0 -> {
                             val highMes = jOb.getInt("reserveValue_A")
                             val lowMes = jOb.getInt("reserveValue_B")
+
                             var mesAddress = (highMes shl 8) or lowMes
+
                             //赋值旧的设置数据
                             groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
+                            groupKey.remove(keyId)
                             when (keyId) {
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
@@ -119,6 +136,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             var scene = DBUtils.getSceneByID(sceneId.toLong())
                             //赋值旧的设置数据
                             sceneMap[keyId] = scene!!
+                            sceneKey.remove(keyId)
                             when (keyId) {
                                 0 -> eight_switch_b1.text = name
                                 1 -> eight_switch_b2.text = name
@@ -134,6 +152,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             val lowMes = jOb.getInt("reserveValue_B")
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
+                            doubleGroupKey.remove(keyId)
                             groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
                             when (keyId) {
                                 2 -> eight_switch_b3.text = name
@@ -146,6 +165,40 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
+                when (type) {
+                    0 -> {
+                        groupKey.forEach {itKey->
+                            var dbGroup = DbGroup()
+                            dbGroup.id = 1000000L
+                            groupMap[itKey] = dbGroup
+                        }
+                    }
+                    1 -> {
+                        sceneKey.forEach {itKey->
+                            var dbScene = DbScene()
+                            dbScene.id = 1000000L
+                            sceneMap[itKey] = dbScene
+                        }
+                    }
+                    2 -> {
+                        doubleGroupKey.forEach {itKey->
+                            var dbGroup = DbGroup()
+                            dbGroup.id = 1000000L
+                            groupMap[itKey] = dbGroup
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        } else {
+            for (i in 0 until 8) {
+                var dbGroup = DbGroup()
+                dbGroup.id = 1000000L
+                groupMap[i] = dbGroup
+
+                var dbScene = DbScene()
+                dbScene.id = 1000000L
+                sceneMap[i] = dbScene
             }
         }
     }
@@ -155,38 +208,38 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         //成功后clickType = 0
         when (configSwitchType) {
             0 -> {
-                if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
-                    sendParms()
-                } else{
-                    clickType = 1
-                    ToastUtils.showLong(getString(R.string.click_config_tip))
-                }
+                // if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
+                sendParms()
+                /*  } else{
+                      clickType = 1
+                      ToastUtils.showLong(getString(R.string.click_config_tip))
+                  }*/
             }
             1 -> {
-                if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
+                /*if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
                         sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
-                        && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {
-                    sendSceneParms()
-                } else{
-                    clickType = 1
-                    ToastUtils.showLong(getString(R.string.click_config_tip))
-                }
+                        && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {*/
+                sendSceneParms()
+                /* } else{
+                     clickType = 1
+                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                 }*/
             }
             2 -> {
-                if (groupMap.size >= 6&& groupMap.containsKey(2)&& groupMap.containsKey(3) && groupMap.containsKey(4)&&groupMap.containsKey(5)
-                        && groupMap.containsKey(6) && groupMap.containsKey(7) ) {
-                    sendSingleGroupParms()
-                } else{
-                    clickType = 1
-                    ToastUtils.showLong(getString(R.string.click_config_tip))
-                }
+                /* if (groupMap.size >= 6 && groupMap.containsKey(2) && groupMap.containsKey(3) && groupMap.containsKey(4) && groupMap.containsKey(5)
+                         && groupMap.containsKey(6) && groupMap.containsKey(7)) {*/
+                sendSingleGroupParms()
+                /* } else {
+                     clickType = 1
+                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                 }*/
             }
         }
     }
 
     private fun sendSingleGroupParms() {
         showLoadingDialog(getString(R.string.setting_switch))
-       groupParamList.clear()
+        groupParamList.clear()
         listKeysBean = JSONArray()
 
         //11-12-13-14 11-12-13-14
@@ -197,10 +250,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
-        val four: MutableList<Int> = if (groupMap.size > 3)
-            mutableListOf(7, 6)
-        else
-            mutableListOf(6)
+        val four: MutableList<Int> = mutableListOf(6, 7)
+        /* val four: MutableList<Int> = if (groupMap.size > 3)
+             mutableListOf(6, 7)
+         else
+             mutableListOf(6)*/
 
         val secondParm = getGroupParm(second)
         val thirParm = getGroupParm(third)
@@ -234,11 +288,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val first = mutableListOf(0, 1)
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
-        val four: MutableList<Int> = if (sceneParamList.size > 7)
-            mutableListOf(7, 6)
-        else
-            mutableListOf(6)
-
+        val four = mutableListOf(6, 7)
+        /* val four: MutableList<Int> = if (sceneParamList.size > 7)
+             mutableListOf(6, 7)
+         else
+             mutableListOf(6)*/
         val sceneParmOne = getSceneParm(first)
         val sceneParmTwo = getSceneParm(second)
         val sceneParmThird = getSceneParm(third)
@@ -274,10 +328,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
         val third = mutableListOf(4, 5)
-        val four: MutableList<Int> = if (groupMap.size > 3)
-            mutableListOf(7, 6)
-        else
-            mutableListOf(6)
+        val four: MutableList<Int> = mutableListOf(6, 7)
+        /*  val four: MutableList<Int> = if (groupMap.size > 3)
+              mutableListOf(6, 7)
+          else
+              mutableListOf(6)*/
 
         val thirParm = getGroupParm(third)
         val fourParm = getGroupParm(four)
@@ -339,7 +394,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (groupName == "false") {
             var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
             if (dbEightSwitch != null) {
-                dbEightSwitch.name =  getString(R.string.eight_switch) +"-" + dbEightSwitch.meshAddr
+                dbEightSwitch.name = getString(R.string.eight_switch) + "-" + dbEightSwitch.meshAddr
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
                 dbEightSwitch.keys = listKeysBean.toString()
@@ -394,15 +449,30 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getSceneParm(list: MutableList<Int>): ByteArray {
+        var firstOpcode = Opcode.SCENE_SWITCH8K
+        var secondOpcode = Opcode.SCENE_SWITCH8K
+
         val firstNum = list[0]
-        val firsDbSceneId = sceneMap[firstNum]!!.id
-        listKeysBean.put(getKeyBean(firstNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+        val dbSceneFirst = sceneMap[firstNum]
+        val firsDbSceneId = if (dbSceneFirst == null) {
+            firstOpcode = Opcode.DEFAULT_SWITCH8K
+            1000000L
+        } else
+            dbSceneFirst!!.id
+
+        listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
         return if (list.size > 1) {
             val secondNum = list[1]
-            val secondDbSceneId = sceneMap[secondNum]!!.id
+            val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            listKeysBean.put(getKeyBean(secondNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
-            byteArrayOf(firstNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, secondDbSceneId.toByte())
+            val secondDbSceneId = if (dbSceneSecond == null) {
+                secondOpcode = Opcode.DEFAULT_SWITCH8K
+                1000000L
+            } else
+                dbSceneSecond!!.id
+
+            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+            byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关
             byteArrayOf(firstNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
@@ -410,36 +480,58 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun getGroupParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
-        val fiveMeshs = groupMap[firstNum]!!.meshAddr
-        val fiveH = fiveMeshs.shr(8).toByte()
-        val fiveL = fiveMeshs.and(0xff).toByte()
-        var opcodeOne = getAllGroupOpcode(fiveMeshs)
+        val dbGroup1 = groupMap[firstNum]!!
+        var opcodeOne: Byte
+        var fristL: Byte = 0
+        var fristH: Byte = 0
 
-        listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = fiveMeshs.shr(8), low8Mes = fiveMeshs.and(0xff)))
+        if (dbGroup1 == null || dbGroup1.id == 1000000L) {
+            opcodeOne = Opcode.DEFAULT_SWITCH8K
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+        } else {
+            val fristMesAddr = dbGroup1.meshAddr
+            val mesL = fristMesAddr and 0xff
+            val mesH = (fristMesAddr shr 8) and 0xff
+            fristL = mesL.toByte()
+            fristH = mesH.toByte()
+            opcodeOne = getAllGroupOpcode(fristMesAddr)
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+        }
 
         return if (list.size > 1) {
             val secondNum = list[1]
-            val sixMeshs = groupMap[secondNum]!!.meshAddr
-            val sixH = sixMeshs.shr(8).toByte()
-            val sixL = sixMeshs.and(0xff).toByte()
-            var opcodeTwo = getAllGroupOpcode(sixMeshs)
+            val dbGroup2 = groupMap[secondNum]
 
-            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = sixMeshs.shr(8), low8Mes = sixMeshs.and(0xff)))
+            var opcodeTwo: Byte
+            var secondL: Byte = 0
+            var secondH: Byte = 0
 
-            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, secondNum.toByte(), opcodeTwo, sixH, sixL)
+            if (dbGroup2 == null || dbGroup2.id == 1000000L) {
+                opcodeTwo = Opcode.DEFAULT_SWITCH8K
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            } else {
+                val secondMesAddr = dbGroup2.meshAddr
+                val mesL = secondMesAddr and 0xff
+                val mesH = (secondMesAddr shr 8) and 0xff
+                secondL = mesL.toByte()
+                secondH = mesH.toByte()
+                opcodeTwo = getAllGroupOpcode(secondMesAddr)
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+            }
+
+            byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, secondNum.toByte(), opcodeTwo, secondH, secondL)
         } else {
             //如果第八键没有配置默认为关
             listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt()))
-            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, 0x08, Opcode.CLOSE, 0x00, 0x00)
+            byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
 
     private fun getAllGroupOpcode(fiveMeshs: Int): Byte {
-        return if (fiveMeshs != 0xffff) {
+        return if (fiveMeshs != 0xffff)
             Opcode.GROUP_SWITCH8K
-        } else {
+        else
             Opcode.SWITCH_ALL_GROUP
-        }
     }
 
     /**
@@ -515,7 +607,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var name: String
             when (configSwitchType) {
-                0 ,2-> {
+                0, 2 -> {
                     var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
                     groupMap[configButtonTag] = group
                     name = group.name
@@ -599,15 +691,15 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             finishAc()
         }
         eight_switch_use_button.setOnClickListener {
-            when(clickType){
-                0->{//选择模式 显示配置界面
+            when (clickType) {
+                0 -> {//选择模式 显示配置界面
                     setTextColorsAndText(configSwitchType)
                     eight_switch_mode.visibility = View.VISIBLE
                     eight_switch_config.visibility = View.VISIBLE
                     eight_switch_banner_ly.visibility = View.GONE
                     clickType = 1
                 }
-                1,2->{
+                1, 2 -> {
                     clickType = 2
                     confimCongfig()
                 }
@@ -714,11 +806,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 1
             }
             R.id.eight_switch_b3 -> {
-                isCanClick = configSwitchType == 1||configSwitchType==2
+                isCanClick = configSwitchType == 1 || configSwitchType == 2
                 configButtonTag = 2
             }
             R.id.eight_switch_b4 -> {
-                isCanClick = configSwitchType == 1||configSwitchType==2
+                isCanClick = configSwitchType == 1 || configSwitchType == 2
                 configButtonTag = 3
             }
             /**
@@ -736,7 +828,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 6
             }
             R.id.eight_switch_b8 -> {
-                isCanClick = configSwitchType == 0||configSwitchType==2//是群组开关才可以点击配置 场景开关为关不允许配置
+                isCanClick = configSwitchType == 0 || configSwitchType == 2//是群组开关才可以点击配置 场景开关为关不允许配置
                 configButtonTag = 7
             }
         }

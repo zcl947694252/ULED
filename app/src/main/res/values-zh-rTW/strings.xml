@@ -970,4 +970,7 @@
     <string name="add_cycle_label">添加循环标签</string>
     <string name="change_device_name">修改设备名称</string>
     <string name="scene_list">场景列表</string>
+    <string name="user_reset_tip">是否进行用户复位</string>
+    <string name="gw_user_reset_switch_success">用户网关复位成功</string>
+    <string name="chose_scene"><![CDATA[选&#160;&#160;&#160;择&#160;&#160;&#160;场&#160;&#160;&#160;景&#160;&#160;&#160;&#160;:]]></string>
 </resources>
