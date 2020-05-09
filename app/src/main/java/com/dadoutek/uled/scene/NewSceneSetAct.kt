@@ -6,13 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.PopupWindow
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -20,14 +21,12 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.DbModel.DbSceneActions
+import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
 import com.dadoutek.uled.model.DeviceType.SMART_RELAY
 import com.dadoutek.uled.model.ItemGroup
+import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -43,6 +42,11 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
+    private var currentPosition: Int = 1000000
+    private lateinit var currentRgbGradient: ItemRgbGradient
+    private var rgbRecyclerView: RecyclerView? = null
+    private lateinit var diyGradientList: MutableList<DbDiyGradient>
+    private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
     private var isFirst: Boolean = true
     private var currentPageIsEdit = false
     private var scene: DbScene? = null
@@ -54,6 +58,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private val showGroupList: ArrayList<ItemGroup> = arrayListOf()
     private var showCheckListData: MutableList<DbGroup>? = null
     private val sceneGroupAdapter: SceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
+    private val rgbSceneModeAdapter: RgbSceneModeAdapter = RgbSceneModeAdapter(R.layout.scene_mode, buildInModeList)
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
@@ -64,6 +69,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
+        makePop()
         if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {
             isResult = true
             val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
@@ -79,6 +85,59 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             edit_name.setSelection(DBUtils.getDefaultNewSceneName().length)
             initOnLayoutListener()
         }
+    }
+
+    private fun makePop() {
+        getModeData()
+
+        var popView = LayoutInflater.from(this).inflate(R.layout.pop_rgb_mode_list, null)
+        rgbRecyclerView = popView.findViewById(R.id.pop_scene_mode_recycle)
+        rgbRecyclerView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rgbRecyclerView?.adapter = this.rgbSceneModeAdapter
+        rgbSceneModeAdapter.notifyDataSetChanged()
+        rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
+            currentRgbGradient = buildInModeList[position]
+            if (currentPosition != 1000000){
+                sceneGroupAdapter.data[currentPosition].gradientName = currentRgbGradient.name
+                sceneGroupAdapter.data[currentPosition].gradientId = currentRgbGradient.id
+                sceneGroupAdapter.data[currentPosition].gradientType = currentRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
+            }
+            sceneGroupAdapter.notifyDataSetChanged()
+            pop?.dismiss()
+        }
+
+        pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        pop?.let {
+            it.isFocusable = true // 设置PopupWindow可获得焦点
+            it.isTouchable = true // 设置PopupWindow可触摸补充：
+            it.isOutsideTouchable = false
+        }
+    }
+
+    private fun getModeData() {
+        buildInModeList.clear()
+        val presetGradientList = resources.getStringArray(R.array.preset_gradient)
+        for (i in 1..11) {
+            var item = ItemRgbGradient()
+            item.id = i
+            item.gradientType = 2//渐变类型 1：自定义渐变  2：内置渐变
+            item.name = presetGradientList[i - 1]
+            buildInModeList?.add(item)
+        }
+
+        diyGradientList = DBUtils.diyGradientList
+        diyGradientList.forEach {
+            var item = ItemRgbGradient()
+            item.id = it.id.toInt()
+            item.name = it.name
+            item.isDiy = true
+            item.speed = it.speed
+            item.gradientType = 1
+            item.colorNodes = it.colorNodes
+
+            buildInModeList?.add(item)
+        }
+
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -228,7 +287,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 showEditListVew()
             }
         }
-        edit_data_view_layout.setOnClickListener {  }
+        edit_data_view_layout.setOnClickListener { }
         confirm.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
@@ -266,13 +325,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        currentPosition = position
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
             R.id.dot_rgb -> changeToColorSelect(position)
             R.id.dot_one -> changeToColorSelect(position)
             R.id.rg_xx -> open(position)
             R.id.rg_yy -> close(position)
+            R.id.alg_text -> showPopMode(position)
         }
+    }
+
+    private fun showPopMode(position: Int) {
+        val itemGroup = showGroupList[position]
+        if (itemGroup.rgbType == 1)
+            buildInModeList.forEach {
+                it.isSceneModeSelect = it.id == itemGroup.gradientId
+            }
+        rgbSceneModeAdapter.notifyDataSetChanged()
+        pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
     }
 
 
@@ -349,6 +420,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             sceneGroupAdapter.bindToRecyclerView(recyclerView_group_list_view)
         } else
             sceneGroupAdapter.notifyDataSetChanged()
+
         sceneGroupAdapter.onItemChildClickListener = onItemChildClickListener
     }
 
@@ -787,8 +859,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
             } else if (type == LIGHT_RGB) {
-                params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                if (sceneGroupAdapter.getIsColorMode()) {
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                } else {
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }
             } else {
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)

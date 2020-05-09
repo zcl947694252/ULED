@@ -135,7 +135,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             val sceneId = jOb.getInt("reserveValue_B")
                             var scene = DBUtils.getSceneByID(sceneId.toLong())
                             //赋值旧的设置数据
-                            sceneMap[keyId] = scene!!
+                            sceneMap[keyId] = if (scene != null) scene else {
+                                var dbScene = DbScene()
+                                dbScene.id = 1000000L
+                                dbScene
+                            }
                             sceneKey.remove(keyId)
                             when (keyId) {
                                 0 -> eight_switch_b1.text = name
@@ -167,27 +171,28 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 when (type) {
                     0 -> {
-                        groupKey.forEach {itKey->
+                        groupKey.forEach { itKey ->
                             var dbGroup = DbGroup()
                             dbGroup.id = 1000000L
                             groupMap[itKey] = dbGroup
                         }
                     }
                     1 -> {
-                        sceneKey.forEach {itKey->
+                        sceneKey.forEach { itKey ->
                             var dbScene = DbScene()
                             dbScene.id = 1000000L
                             sceneMap[itKey] = dbScene
                         }
                     }
                     2 -> {
-                        doubleGroupKey.forEach {itKey->
+                        doubleGroupKey.forEach { itKey ->
                             var dbGroup = DbGroup()
                             dbGroup.id = 1000000L
                             groupMap[itKey] = dbGroup
                         }
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         } else {
@@ -454,24 +459,27 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
         val firstNum = list[0]
         val dbSceneFirst = sceneMap[firstNum]
-        val firsDbSceneId = if (dbSceneFirst == null) {
+        val firsDbSceneId = if (dbSceneFirst == null||dbSceneFirst.id==1000000L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             1000000L
-        } else
+        } else {
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
             dbSceneFirst!!.id
+        }
 
-        listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
         return if (list.size > 1) {
             val secondNum = list[1]
             val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            val secondDbSceneId = if (dbSceneSecond == null) {
+            val secondDbSceneId = if (dbSceneSecond == null||dbSceneSecond.id==1000000L) {
                 secondOpcode = Opcode.DEFAULT_SWITCH8K
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
                 1000000L
-            } else
-                dbSceneSecond!!.id
-
-            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+            } else {
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+                dbSceneSecond.id
+            }
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关
             byteArrayOf(firstNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)

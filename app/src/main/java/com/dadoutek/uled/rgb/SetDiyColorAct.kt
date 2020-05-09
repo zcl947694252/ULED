@@ -294,7 +294,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                this.onValueChange(seekBar, seekBar.progress, true)
+                this.onValueChange(seekBar.progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -308,7 +308,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
 
             @SuppressLint("StringFormatInvalid")
-            private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
+            private fun onValueChange(progress: Int) {
                 speed = progress
                 if (speed == 0) {
                     speed = 1
@@ -479,9 +479,8 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
 
-            if (list.size == 0) {
+            if (list.size == 0)
                 id = 1
-            }
 
             return java.lang.Long.valueOf(id.toLong())
         }

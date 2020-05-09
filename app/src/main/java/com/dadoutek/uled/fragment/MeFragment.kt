@@ -187,6 +187,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun initClick() {
+        userIcon?.setOnClickListener(this)
         chearCache?.setOnClickListener(this)
         appVersion?.setOnClickListener(this)
         exitLogin?.setOnClickListener(this)
@@ -204,7 +205,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
 
-
+        setting.visibility = View.GONE
         userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
@@ -257,6 +258,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
+
+            R.id.userIcon -> openSet()
             R.id.chearCache -> emptyTheCache()
             R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
@@ -285,6 +288,15 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, SettingActivity::class.java)
                 startActivity(intent)
             }
+        }
+    }
+
+    private fun openSet() {
+        System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+        mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+        if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+            var intent = Intent(activity, SettingActivity::class.java)
+            startActivity(intent)
         }
     }
 

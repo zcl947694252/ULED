@@ -971,4 +971,6 @@
     <string name="user_reset_tip">是否进行用户复位</string>
     <string name="gw_user_reset_switch_success">用户网关复位成功</string>
     <string name="chose_scene"><![CDATA[选&#160;&#160;&#160;择&#160;&#160;&#160;场&#160;&#160;&#160;景&#160;&#160;&#160;&#160;:]]></string>
+    <string name="select_mode">选择模式</string>
+    <string name="mode_choice">模式选择:</string>
 </resources>

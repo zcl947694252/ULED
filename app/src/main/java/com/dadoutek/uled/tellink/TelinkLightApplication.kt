@@ -76,9 +76,9 @@ class TelinkLightApplication : TelinkApplication() {
         // LeakCanary内存泄漏第二步
         // This process is dedicated to LeakCanary for heap analysis.//1
         // You should not init your app in this process.
-        val inAnalyzerProcess = LeakCanary.isInAnalyzerProcess(this)
+    /*    val inAnalyzerProcess = LeakCanary.isInAnalyzerProcess(this)
         if (!inAnalyzerProcess)
-            refWatcher = LeakCanary.install(this)
+            refWatcher = LeakCanary.install(this)*/
 
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)

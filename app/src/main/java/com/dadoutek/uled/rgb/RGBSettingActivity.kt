@@ -80,7 +80,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var clickPostion: Int = 100
     private var postionAndNum: ItemRgbGradient? = null
     private var mApplication: TelinkLightApplication? = null
-    private var retryConnectCount = 0
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
@@ -96,8 +95,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var mConnectDevice: DeviceInfo? = null
     val POSIONANDNUM = "POSIONANDNUM"
     private var currentShowGroupSetPage = true
-    private var connectMeshAddress: Int = 0
-    private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var isExitGradient = false
     private var isDiyMode = true
     private var isPresetMode = true
@@ -120,7 +117,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var redColor: Int? = null
     private var greenColor: Int? = null
     private var blueColor: Int? = null
-    private var bestRSSIDevice: DeviceInfo? = null
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
@@ -868,9 +864,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
+                    else
                         toRGBGradientView()
-                    }
                 }
             }
             R.id.normal_rgb -> toNormalView()
@@ -1528,9 +1523,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
         builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
 
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
                 .divider)))
         //添加分割线
@@ -1773,11 +1766,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             toolbar!!.title = getString(R.string.dynamic_gradient)
             dstAddress = group!!.meshAddr
             val lightList = DBUtils.getLightByGroupMesh(dstAddress)
-            if (lightList != null) {
-                if (lightList.size > 0) {
+            if (lightList != null)
+                if (lightList.size > 0)
                     firstLightAddress = lightList[0].meshAddr
-                }
-            }
+
         } else {
             toolbar.menu.setGroupVisible(0, false)
             toolbar.menu.setGroupVisible(1, false)
