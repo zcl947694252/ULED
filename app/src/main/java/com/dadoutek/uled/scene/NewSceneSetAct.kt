@@ -28,6 +28,7 @@ import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
+import com.dadoutek.uled.rgb.SelectColorGradientAct
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
@@ -347,13 +348,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun showPopMode(position: Int) {
-        val itemGroup = showGroupList[position]
-        if (itemGroup.rgbType == 1)
-            buildInModeList.forEach {
-                it.isSceneModeSelect = it.id == itemGroup.gradientId
-            }
-        rgbSceneModeAdapter.notifyDataSetChanged()
-        pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
+        // val itemGroup = showGroupList[position]
+        // if (itemGroup.rgbType == 1)
+        //     buildInModeList.forEach {
+        //         it.isSceneModeSelect = it.id == itemGroup.gradientId
+        //     }
+        // rgbSceneModeAdapter.notifyDataSetChanged()
+        // pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
+
+        startActivityForResult(Intent(this@NewSceneSetAct, SelectGradientActivity::class.java), 1000)
     }
 
 
@@ -380,12 +383,22 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            try {
-                val color = data?.getIntExtra("color", 0)
-                showGroupList!![requestCode].color = color!!
-                sceneGroupAdapter?.notifyItemChanged(requestCode)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            if (requestCode == 1000) {
+                val itemRgbGradient = data?.getSerializableExtra("data") as ItemRgbGradient
+                if (currentPosition != 1000000) {
+                    sceneGroupAdapter.data[currentPosition].gradientName = itemRgbGradient.name
+                    sceneGroupAdapter.data[currentPosition].gradientId = itemRgbGradient.id
+                    sceneGroupAdapter.data[currentPosition].gradientType = itemRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
+                }
+                sceneGroupAdapter.notifyDataSetChanged()
+            } else {
+                try {
+                    val color = data?.getIntExtra("color", 0)
+                    showGroupList!![requestCode].color = color!!
+                    sceneGroupAdapter?.notifyItemChanged(requestCode)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -763,8 +776,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x05)
                         sceneActions.isOn = itemGroups[i].isNo
                     }
-                    OtherUtils.isRGBGroup(groupByMeshAddr) ->{
-                    sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x06,i)
+                    OtherUtils.isRGBGroup(groupByMeshAddr) -> {
+                        sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x06, i)
                     }
 
                     else -> sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x04)

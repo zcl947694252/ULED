@@ -2,8 +2,9 @@ package com.dadoutek.uled.model
 
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import org.greenrobot.greendao.annotation.ToMany
+import java.io.Serializable
 
-class ItemRgbGradient {
+class ItemRgbGradient :Serializable{
     var name: String? = null
     var position: Int = 100
     var speed: Int = 0
