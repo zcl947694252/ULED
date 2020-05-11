@@ -39,6 +39,11 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property CircleTwo = new Property(9, int.class, "circleTwo", false, "CIRCLE_TWO");
         public final static Property CircleThree = new Property(10, int.class, "circleThree", false, "CIRCLE_THREE");
         public final static Property CircleFour = new Property(11, int.class, "circleFour", false, "CIRCLE_FOUR");
+        public final static Property RgbType = new Property(12, int.class, "rgbType", false, "RGB_TYPE");
+        public final static Property GradientType = new Property(13, int.class, "gradientType", false, "GRADIENT_TYPE");
+        public final static Property GradientId = new Property(14, int.class, "gradientId", false, "GRADIENT_ID");
+        public final static Property GradientSpeed = new Property(15, int.class, "gradientSpeed", false, "GRADIENT_SPEED");
+        public final static Property GradientName = new Property(16, String.class, "gradientName", false, "GRADIENT_NAME");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -66,7 +71,12 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"CIRCLE_ONE\" INTEGER NOT NULL ," + // 8: circleOne
                 "\"CIRCLE_TWO\" INTEGER NOT NULL ," + // 9: circleTwo
                 "\"CIRCLE_THREE\" INTEGER NOT NULL ," + // 10: circleThree
-                "\"CIRCLE_FOUR\" INTEGER NOT NULL );"); // 11: circleFour
+                "\"CIRCLE_FOUR\" INTEGER NOT NULL ," + // 11: circleFour
+                "\"RGB_TYPE\" INTEGER NOT NULL ," + // 12: rgbType
+                "\"GRADIENT_TYPE\" INTEGER NOT NULL ," + // 13: gradientType
+                "\"GRADIENT_ID\" INTEGER NOT NULL ," + // 14: gradientId
+                "\"GRADIENT_SPEED\" INTEGER NOT NULL ," + // 15: gradientSpeed
+                "\"GRADIENT_NAME\" TEXT);"); // 16: gradientName
     }
 
     /** Drops the underlying database table. */
@@ -94,6 +104,15 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(10, entity.getCircleTwo());
         stmt.bindLong(11, entity.getCircleThree());
         stmt.bindLong(12, entity.getCircleFour());
+        stmt.bindLong(13, entity.getRgbType());
+        stmt.bindLong(14, entity.getGradientType());
+        stmt.bindLong(15, entity.getGradientId());
+        stmt.bindLong(16, entity.getGradientSpeed());
+ 
+        String gradientName = entity.getGradientName();
+        if (gradientName != null) {
+            stmt.bindString(17, gradientName);
+        }
     }
 
     @Override
@@ -115,6 +134,15 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(10, entity.getCircleTwo());
         stmt.bindLong(11, entity.getCircleThree());
         stmt.bindLong(12, entity.getCircleFour());
+        stmt.bindLong(13, entity.getRgbType());
+        stmt.bindLong(14, entity.getGradientType());
+        stmt.bindLong(15, entity.getGradientId());
+        stmt.bindLong(16, entity.getGradientSpeed());
+ 
+        String gradientName = entity.getGradientName();
+        if (gradientName != null) {
+            stmt.bindString(17, gradientName);
+        }
     }
 
     @Override
@@ -136,7 +164,12 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getInt(offset + 8), // circleOne
             cursor.getInt(offset + 9), // circleTwo
             cursor.getInt(offset + 10), // circleThree
-            cursor.getInt(offset + 11) // circleFour
+            cursor.getInt(offset + 11), // circleFour
+            cursor.getInt(offset + 12), // rgbType
+            cursor.getInt(offset + 13), // gradientType
+            cursor.getInt(offset + 14), // gradientId
+            cursor.getInt(offset + 15), // gradientSpeed
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16) // gradientName
         );
         return entity;
     }
@@ -155,6 +188,11 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setCircleTwo(cursor.getInt(offset + 9));
         entity.setCircleThree(cursor.getInt(offset + 10));
         entity.setCircleFour(cursor.getInt(offset + 11));
+        entity.setRgbType(cursor.getInt(offset + 12));
+        entity.setGradientType(cursor.getInt(offset + 13));
+        entity.setGradientId(cursor.getInt(offset + 14));
+        entity.setGradientSpeed(cursor.getInt(offset + 15));
+        entity.setGradientName(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
      }
     
     @Override

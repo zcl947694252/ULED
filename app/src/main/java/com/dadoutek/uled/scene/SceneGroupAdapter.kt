@@ -59,7 +59,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     @SuppressLint("ClickableViewAccessibility")
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
-
         val position = helper.layoutPosition
         sbBrightnessCW = helper.getView(R.id.cw_sbBrightness)
         sbtemperature = helper.getView(R.id.temperature)
@@ -106,148 +105,137 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setProgress(R.id.sbBrightness, item.brightness)
-                helper.setProgress(R.id.sb_w_bright, item.temperature)
-                helper.setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
-                helper.setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
-                helper.setText(R.id.speed_seekbar_alg_tv, speedSeekbar!!.progress.toString() + "%")
+                        .setProgress(R.id.sb_w_bright, item.temperature)
+                        .setProgress(R.id.speed_seekbar, item.gradientSpeed)
+                        .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
+                        .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
+                        .setText(R.id.speed_seekbar_alg_tv, speedSeekbar!!.progress.toString() + "%")
                 when (item.rgbType) {
                     0 -> {
-                        when {
-                            item.brightness <= 0 -> {
-                                addBrightnessRGB!!.isEnabled = true
-                                lessBrightnessRGB!!.isEnabled = false
-                            }
-                            item.brightness >= 100 -> {
-                                addBrightnessRGB!!.isEnabled = false
-                                lessBrightnessRGB!!.isEnabled = true
-                            }
-                            else -> {
-                                addBrightnessRGB!!.isEnabled = true
-                                lessBrightnessRGB!!.isEnabled = true
-                            }
-                        }
-                        when {
-                            item.temperature <= 0 -> {
-                                addWhiteLightRGB!!.isEnabled = true
-                                lessWhiteLightRGB!!.isEnabled = false
-                            }
-                            item.temperature >= 100 -> {
-                                addWhiteLightRGB!!.isEnabled = false
-                                lessWhiteLightRGB!!.isEnabled = true
-                            }
-                            else -> {
-                                addWhiteLightRGB!!.isEnabled = true
-                                lessWhiteLightRGB!!.isEnabled = true
-                            }
-                        }
+                        visiableMode(helper, true)
+                        setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
+                        setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
+                        /* when {
+                             item.brightness <= 0 -> {
+                                 addBrightnessRGB!!.isEnabled = true
+                                 lessBrightnessRGB!!.isEnabled = false
+                             }
+                             item.brightness >= 100 -> {
+                                 addBrightnessRGB!!.isEnabled = false
+                                 lessBrightnessRGB!!.isEnabled = true
+                             }
+                             else -> {
+                                 addBrightnessRGB!!.isEnabled = true
+                                 lessBrightnessRGB!!.isEnabled = true
+                             }
+                         }
+                         when {
+                             item.temperature <= 0 -> {
+                                 addWhiteLightRGB!!.isEnabled = true
+                                 lessWhiteLightRGB!!.isEnabled = false
+                             }
+                             item.temperature >= 100 -> {
+                                 addWhiteLightRGB!!.isEnabled = false
+                                 lessWhiteLightRGB!!.isEnabled = true
+                             }
+                             else -> {
+                                 addWhiteLightRGB!!.isEnabled = true
+                                 lessWhiteLightRGB!!.isEnabled = true
+                             }
+                         }*/
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
                             algText?.text = item.gradientName
-                        when {
-                            item.gradientSpeed <= 0 -> {
-                                addAlgSpeed!!.isEnabled = true
-                                lessAlgSpeed!!.isEnabled = false
-                            }
-                            item.gradientSpeed >= 100 -> {
-                                addAlgSpeed!!.isEnabled = false
-                                lessAlgSpeed!!.isEnabled = true
-                            }
-                            else -> {
-                                addAlgSpeed!!.isEnabled = true
-                                lessAlgSpeed!!.isEnabled = true
-                            }
-                        }
+                        visiableMode(helper, false)
+                        setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
+                        /*   when {
+                               item.gradientSpeed <= 0 -> {
+                                   addAlgSpeed!!.isEnabled = true
+                                   lessAlgSpeed!!.isEnabled = false
+                               }
+                               item.gradientSpeed >= 100 -> {
+                                   addAlgSpeed!!.isEnabled = false
+                                   lessAlgSpeed!!.isEnabled = true
+                               }
+                               else -> {
+                                   addAlgSpeed!!.isEnabled = true
+                                   lessAlgSpeed!!.isEnabled = true
+                               }
+                           }*/
                     }
                 }
             }
             else -> {
                 helper.setProgress(R.id.cw_sbBrightness, item.brightness)
-                helper.setProgress(R.id.temperature, item.temperature)
-                helper.setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
-                helper.setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
-
-                when {
-                    item.brightness <= 0 -> {
-                        addBrightnessCW!!.isEnabled = true
-                        lessBrightnessCW!!.isEnabled = false
-                    }
-                    item.brightness >= 100 -> {
-                        addBrightnessCW!!.isEnabled = false
-                        lessBrightnessCW!!.isEnabled = true
-                    }
-                    else -> {
-                        addBrightnessCW!!.isEnabled = true
-                        lessBrightnessCW!!.isEnabled = true
-                    }
-                }
-
-                when {
-                    item.temperature <= 0 -> {
-                        addTemperatureCW!!.isEnabled = true
-                        lessTemperatureCW!!.isEnabled = false
-                    }
-                    item.temperature >= 100 -> {
-                        addTemperatureCW!!.isEnabled = false
-                        lessTemperatureCW!!.isEnabled = true
-                    }
-                    else -> {
-                        addTemperatureCW!!.isEnabled = true
-                        lessTemperatureCW!!.isEnabled = true
-                    }
-                }
+                        .setProgress(R.id.temperature, item.temperature)
+                        .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
+                        .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
+                setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
+                setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
+                /*  when {
+                      item.brightness <= 0 -> {
+                          addBrightnessCW!!.isEnabled = true
+                          lessBrightnessCW!!.isEnabled = false
+                      }
+                      item.brightness >= 100 -> {
+                          addBrightnessCW!!.isEnabled = false
+                          lessBrightnessCW!!.isEnabled = true
+                      }
+                      else -> {
+                          addBrightnessCW!!.isEnabled = true
+                          lessBrightnessCW!!.isEnabled = true
+                      }
+                  }
+                  when {
+                      item.temperature <= 0 -> {
+                          addTemperatureCW!!.isEnabled = true
+                          lessTemperatureCW!!.isEnabled = false
+                      }
+                      item.temperature >= 100 -> {
+                          addTemperatureCW!!.isEnabled = false
+                          lessTemperatureCW!!.isEnabled = true
+                      }
+                      else -> {
+                          addTemperatureCW!!.isEnabled = true
+                          lessTemperatureCW!!.isEnabled = true
+                      }
+                  }*/
             }
         }
-
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.cw_scene, false)
-                helper.setGone(R.id.top_rg_ly, true)
-                helper.setGone(R.id.switch_scene, false)
-                helper.setGone(R.id.scene_curtain, false)
-                helper.setGone(R.id.scene_relay, false)
-                when {
-                    isColorMode -> {
-                        helper.setGone(R.id.alg_ly, false)
-                        helper.setGone(R.id.textView7, true)
-                        helper.setGone(R.id.oval, true)
-                        helper.setGone(R.id.rgb_scene, true)
-                        algLy?.visibility = View.GONE
-                        helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
-                                .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
-                    }
-                    else -> {
-                        algLy?.visibility = View.VISIBLE
-                        helper.setGone(R.id.alg_ly, true)
-                        helper.setGone(R.id.textView7, false)
-                        helper.setGone(R.id.oval, false)
-                        helper.setGone(R.id.rgb_scene, false)
-                        helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
-                                .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
-                    }
+                        .setGone(R.id.top_rg_ly, true)
+                        .setGone(R.id.switch_scene, false)
+                        .setGone(R.id.scene_curtain, false)
+                        .setGone(R.id.scene_relay, false)
+                when (item.rgbType) {//rgb 类型 0:颜色模式 1：渐变模式
+                    0 -> visiableMode(helper, true)
+                    1 -> visiableMode(helper, false)
                 }
             }
             OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.textView7, false)
-                helper.setGone(R.id.oval, false)
-                helper.setGone(R.id.rgb_scene, false)
-                helper.setGone(R.id.top_rg_ly, false)
-                helper.setGone(R.id.alg_ly, false)
-                helper.setGone(R.id.cw_scene, true)
-                helper.setGone(R.id.switch_scene, false)
-                helper.setGone(R.id.scene_curtain, false)
-                helper.setGone(R.id.scene_relay, false)
+                        .setGone(R.id.oval, false)
+                        .setGone(R.id.rgb_scene, false)
+                        .setGone(R.id.top_rg_ly, false)
+                        .setGone(R.id.alg_ly, false)
+                        .setGone(R.id.cw_scene, true)
+                        .setGone(R.id.switch_scene, false)
+                        .setGone(R.id.scene_curtain, false)
+                        .setGone(R.id.scene_relay, false)
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.textView7, false)
-                helper.setGone(R.id.oval, false)
-                helper.setGone(R.id.rgb_scene, false)
-                helper.setGone(R.id.top_rg_ly, false)
-                helper.setGone(R.id.alg_ly, false)
-                helper.setGone(R.id.cw_scene, false)
-                helper.setGone(R.id.switch_scene, true)
-                helper.setGone(R.id.scene_curtain, false)
-                helper.setGone(R.id.scene_relay, true)
+                        .setGone(R.id.oval, false)
+                        .setGone(R.id.rgb_scene, false)
+                        .setGone(R.id.top_rg_ly, false)
+                        .setGone(R.id.alg_ly, false)
+                        .setGone(R.id.cw_scene, false)
+                        .setGone(R.id.switch_scene, true)
+                        .setGone(R.id.scene_curtain, false)
+                        .setGone(R.id.scene_relay, true)
                 if (item.isNo) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
@@ -258,14 +246,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.textView7, false)
-                helper.setGone(R.id.oval, false)
-                helper.setGone(R.id.rgb_scene, false)
-                helper.setGone(R.id.top_rg_ly, false)
-                helper.setGone(R.id.alg_ly, false)
-                helper.setGone(R.id.cw_scene, false)
-                helper.setGone(R.id.switch_scene, true)
-                helper.setGone(R.id.scene_relay, false)
-                helper.setGone(R.id.scene_curtain, true)
+                        .setGone(R.id.oval, false)
+                        .setGone(R.id.rgb_scene, false)
+                        .setGone(R.id.top_rg_ly, false)
+                        .setGone(R.id.alg_ly, false)
+                        .setGone(R.id.cw_scene, false)
+                        .setGone(R.id.switch_scene, true)
+                        .setGone(R.id.scene_relay, false)
+                        .setGone(R.id.scene_curtain, true)
                 if (item.isNo) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
@@ -276,12 +264,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             else -> {
                 helper.setGone(R.id.textView7, false)
-                helper.setGone(R.id.oval, false)
-                helper.setGone(R.id.rgb_scene, false)
-                helper.setGone(R.id.top_rg_ly, false)
-                helper.setGone(R.id.alg_ly, false)
-                helper.setGone(R.id.cw_scene, true)
-                helper.setGone(R.id.switch_scene, false)
+                        .setGone(R.id.oval, false)
+                        .setGone(R.id.rgb_scene, false)
+                        .setGone(R.id.top_rg_ly, false)
+                        .setGone(R.id.alg_ly, false)
+                        .setGone(R.id.cw_scene, true)
+                        .setGone(R.id.switch_scene, false)
             }
         }
 
@@ -295,7 +283,23 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbtemperature!!.setOnSeekBarChangeListener(this)
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
-        speedSeekbar!!.setOnSeekBarChangeListener(this)
+        speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                helper.setText(R.id.speed_seekbar_alg_tv, "$progress%")
+                data[position].gradientSpeed = progress
+                if (progress >= 100) {
+                    lessAlgSpeed?.isEnabled = true
+                    addAlgSpeed?.isEnabled = false
+                } else if (progress <= 1) {
+                    lessAlgSpeed?.isEnabled = false
+                    addAlgSpeed?.isEnabled = true
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
 
         topRgLy!!.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -306,6 +310,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     helper.setGone(R.id.oval, true)
                     helper.setGone(R.id.rgb_scene, true)
                     algLy?.visibility = View.GONE
+                    item.rgbType = 0
                     helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
                             .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
                 }
@@ -316,10 +321,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     helper.setGone(R.id.textView7, false)
                     helper.setGone(R.id.oval, false)
                     helper.setGone(R.id.rgb_scene, false)
+                    item.rgbType = 1
                     helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
                             .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
                 }
             }
+            notifyDataSetChanged()
         }
         helper.addOnClickListener(R.id.btn_delete)
                 .addOnClickListener(R.id.dot_one)
@@ -368,6 +375,75 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         lessAlgSpeed?.setOnTouchListener { _, event ->
             lessAlgSpeedNum(event, position)
             true
+        }
+    }
+
+    private fun visiableMode(helper: BaseViewHolder, isVisiable: Boolean) {
+        helper.setGone(R.id.textView7, isVisiable)
+                .setGone(R.id.oval, isVisiable)
+                .setGone(R.id.rgb_scene, isVisiable)
+                .setGone(R.id.alg_ly, !isVisiable)
+
+        if (isVisiable) {
+            algLy?.visibility = View.GONE
+            helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
+                    .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
+        } else {
+            algLy?.visibility = View.VISIBLE
+            helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
+                    .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
+        }
+    }
+
+    private fun setAlgClickAble(item: ItemGroup, addBtn: ImageView, lessBtn: ImageView, isGradient: Boolean = false) {
+        var zero = if (isGradient) 1 else 0
+
+        when {
+            item.brightness <= zero -> {
+                addBtn.isEnabled = true
+                lessBtn.isEnabled = false
+            }
+            item.brightness >= 100 -> {
+                addBtn.isEnabled = false
+                lessBtn.isEnabled = true
+            }
+            else -> {
+                addBtn.isEnabled = true
+                lessBtn.isEnabled = true
+            }
+        }
+    }
+
+    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        val currentTime = System.currentTimeMillis()
+        val position = seekBar.tag as Int
+        if (fromUser)
+            changeTextView(seekBar, progress, position)
+
+        if (currentTime - this.preTime > this.delayTime) {
+            if (fromUser) {
+                val address = data[position].groupAddress
+                val opcode: Byte
+                when (seekBar.id) {
+                    R.id.cw_sbBrightness -> {
+                        opcode = Opcode.SET_LUM
+                        GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                    R.id.temperature -> {
+                        opcode = Opcode.SET_TEMPERATURE
+                        GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                    R.id.sbBrightness -> {
+                        opcode = Opcode.SET_LUM
+                        GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                    R.id.sb_w_bright -> {
+                        opcode = Opcode.SET_W_LUM
+                        GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                }
+            }
+            this.preTime = currentTime
         }
     }
 
@@ -538,28 +614,20 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         if (event!!.action == MotionEvent.ACTION_DOWN) {
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
-                    while (onBtnTouch) {
-                        thisTime = System.currentTimeMillis()
-                        if (thisTime - downTime >= 500) {
-                            tvValue++
-                            val msg = brightnessAdd.obtainMessage()
-                            msg.arg1 = tvValue
-                            msg.arg2 = position
-                            brightnessAdd.sendMessage(msg)
-                            Log.e("TAG_TOUCH", tvValue++.toString())
-                            try {
-                                sleep(100)
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-
-                        }
+            GlobalScope.launch {
+                while (onBtnTouch) {
+                    thisTime = System.currentTimeMillis()
+                    if (thisTime - downTime >= 500) {
+                        tvValue++
+                        val msg = brightnessAdd.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        brightnessAdd.sendMessage(msg)
+                        Log.e("TAG_TOUCH", tvValue++.toString())
+                        delay(100)
                     }
                 }
             }
-            t.start()
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -829,7 +897,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
     }
 
-
     @SuppressLint("HandlerLeak")
     private val handlerTemperatureAdd = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -877,7 +944,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
         }
     }
-
 
     @SuppressLint("HandlerLeak")
     private val handlerTemperatureLess = object : Handler() {
@@ -1201,42 +1267,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
     }
 
-    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        val currentTime = System.currentTimeMillis()
-        val position = seekBar.tag as Int
-        if (fromUser)
-            changeTextView(seekBar, progress, position)
-
-        if (currentTime - this.preTime > this.delayTime) {
-            if (fromUser) {
-                val address = data[position].groupAddress
-                val opcode: Byte
-                when (seekBar.id) {
-                    R.id.speed_seekbar -> {
-                    }
-
-                    R.id.cw_sbBrightness -> {
-                        opcode = Opcode.SET_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.temperature -> {
-                        opcode = Opcode.SET_TEMPERATURE
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.sbBrightness -> {
-                        opcode = Opcode.SET_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.sb_w_bright -> {
-                        opcode = Opcode.SET_W_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                }
-            }
-            this.preTime = currentTime
-        }
-    }
-
     override fun onStartTrackingTouch(seekBar: SeekBar) {
         this.preTime = System.currentTimeMillis()
     }
@@ -1251,80 +1281,92 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         val opcode: Byte
         val itemGroup = data[pos]
-        if (seekBar.id == R.id.cw_sbBrightness) {
-            (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.cw_brightness_num)) as TextView).text = seekBar.progress.toString() + "%"
-            itemGroup.brightness = seekBar.progress
-            opcode = Opcode.SET_LUM
-            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
+        when (seekBar.id) {
+            R.id.cw_sbBrightness -> {
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.cw_brightness_num)) as TextView).text = seekBar.progress.toString() + "%"
+                itemGroup.brightness = seekBar.progress
+                opcode = Opcode.SET_LUM
+                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
 
-            when {
-                seekBar.progress <= 0 -> {
-                    addBrightnessCW!!.isEnabled = true
-                    lessBrightnessCW!!.isEnabled = false
-                }
-                seekBar.progress >= 100 -> {
-                    addBrightnessCW!!.isEnabled = false
-                    lessBrightnessCW!!.isEnabled = true
-                }
-                else -> {
-                    addBrightnessCW!!.isEnabled = true
-                    lessBrightnessCW!!.isEnabled = true
-                }
-            }
-
-        } else if (seekBar.id == R.id.temperature) {
-            (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.temperature_num)) as TextView).text = seekBar.progress.toString() + "%"
-            itemGroup.temperature = seekBar.progress
-            opcode = Opcode.SET_TEMPERATURE
-            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
-
-            if (seekBar.progress <= 0) {
-                addTemperatureCW!!.isEnabled = true
-                lessTemperatureCW!!.isEnabled = false
-            } else if (seekBar.progress >= 100) {
-                addTemperatureCW!!.isEnabled = false
-                lessTemperatureCW!!.isEnabled = true
-            } else {
-                addTemperatureCW!!.isEnabled = true
-                lessTemperatureCW!!.isEnabled = true
-            }
-
-        } else if (seekBar.id == R.id.sbBrightness) {
-            (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = seekBar.progress.toString() + "%"
-            itemGroup.brightness = seekBar.progress
-            opcode = Opcode.SET_LUM
-            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
-
-            when {
-                seekBar.progress <= 0 -> {
-                    addBrightnessRGB!!.isEnabled = true
-                    lessBrightnessRGB!!.isEnabled = false
-                }
-                seekBar.progress >= 100 -> {
-                    addBrightnessRGB!!.isEnabled = false
-                    lessBrightnessRGB!!.isEnabled = true
-                }
-                else -> {
-                    addBrightnessRGB!!.isEnabled = true
-                    lessBrightnessRGB!!.isEnabled = true
+                when {
+                    seekBar.progress <= 0 -> {
+                        addBrightnessCW!!.isEnabled = true
+                        lessBrightnessCW!!.isEnabled = false
+                    }
+                    seekBar.progress >= 100 -> {
+                        addBrightnessCW!!.isEnabled = false
+                        lessBrightnessCW!!.isEnabled = true
+                    }
+                    else -> {
+                        addBrightnessCW!!.isEnabled = true
+                        lessBrightnessCW!!.isEnabled = true
+                    }
                 }
             }
+            R.id.temperature -> {
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.temperature_num)) as TextView).text = seekBar.progress.toString() + "%"
+                itemGroup.temperature = seekBar.progress
+                opcode = Opcode.SET_TEMPERATURE
+                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
 
-        } else if (seekBar.id == R.id.sb_w_bright) {
-            (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sb_w_bright_num)) as TextView).text = seekBar.progress.toString() + "%"
-            itemGroup.temperature = seekBar.progress
-            opcode = Opcode.SET_W_LUM
-            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
+                when {
+                    seekBar.progress <= 0 -> {
+                        addTemperatureCW!!.isEnabled = true
+                        lessTemperatureCW!!.isEnabled = false
+                    }
+                    seekBar.progress >= 100 -> {
+                        addTemperatureCW!!.isEnabled = false
+                        lessTemperatureCW!!.isEnabled = true
+                    }
+                    else -> {
+                        addTemperatureCW!!.isEnabled = true
+                        lessTemperatureCW!!.isEnabled = true
+                    }
+                }
 
-            if (seekBar.progress <= 0) {
-                addWhiteLightRGB!!.isEnabled = true
-                lessWhiteLightRGB!!.isEnabled = false
-            } else if (seekBar.progress >= 100) {
-                addWhiteLightRGB!!.isEnabled = false
-                lessWhiteLightRGB!!.isEnabled = true
-            } else {
-                addWhiteLightRGB!!.isEnabled = true
-                lessWhiteLightRGB!!.isEnabled = true
+            }
+            R.id.sbBrightness -> {
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = seekBar.progress.toString() + "%"
+                itemGroup.brightness = seekBar.progress
+                opcode = Opcode.SET_LUM
+                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
+
+                when {
+                    seekBar.progress <= 0 -> {
+                        addBrightnessRGB!!.isEnabled = true
+                        lessBrightnessRGB!!.isEnabled = false
+                    }
+                    seekBar.progress >= 100 -> {
+                        addBrightnessRGB!!.isEnabled = false
+                        lessBrightnessRGB!!.isEnabled = true
+                    }
+                    else -> {
+                        addBrightnessRGB!!.isEnabled = true
+                        lessBrightnessRGB!!.isEnabled = true
+                    }
+                }
+
+            }
+            R.id.sb_w_bright -> {
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sb_w_bright_num)) as TextView).text = seekBar.progress.toString() + "%"
+                itemGroup.temperature = seekBar.progress
+                opcode = Opcode.SET_W_LUM
+                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
+
+                when {
+                    seekBar.progress <= 0 -> {
+                        addWhiteLightRGB!!.isEnabled = true
+                        lessWhiteLightRGB!!.isEnabled = false
+                    }
+                    seekBar.progress >= 100 -> {
+                        addWhiteLightRGB!!.isEnabled = false
+                        lessWhiteLightRGB!!.isEnabled = true
+                    }
+                    else -> {
+                        addWhiteLightRGB!!.isEnabled = true
+                        lessWhiteLightRGB!!.isEnabled = true
+                    }
+                }
             }
         }
         notifyItemChanged(seekBar.tag as Int)
@@ -1333,12 +1375,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("SetTextI18n")
     fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
         when (seekBar.id) {
-            R.id.speed_seekbar_alg_tv -> {
-                val algTv = getViewByPosition(position, R.id.speed_seekbar_alg_tv) as TextView?
-                if (algTv != null) {
-                    algTv?.text = "$progress%"
-                }
-            }
             R.id.cw_sbBrightness -> {
                 val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
                 if (tvBrightness != null) {
