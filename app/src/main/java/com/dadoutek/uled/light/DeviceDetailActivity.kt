@@ -316,6 +316,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun sendToGw() {
+        val gateWay = DBUtils.getAllGateWay()
+        if (gateWay.size>0)
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onNext(t: List<DbGateway>) {

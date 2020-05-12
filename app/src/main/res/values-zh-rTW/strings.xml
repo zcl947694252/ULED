@@ -901,7 +901,7 @@
     <string name="invalid_data">无效数据</string>
     <string name="gate_way_time_max">网关定时已达最大创建数</string>
     <string name="add_time">添加定时任务</string>
-    <string name="add_times">添加循环任务</string>
+    <string name="add_times">添加任务</string>
     <string name="to">至</string>
     <string name="endTime">8:00</string>
     <string name="standing_time">停留时间</string>
@@ -971,9 +971,13 @@
     <string name="change_device_name">修改设备名称</string>
     <string name="scene_list">场景列表</string>
     <string name="user_reset_tip">是否进行用户复位</string>
+    <string name="user_reset_tip2">复位失败,是否进行强制用户复位</string>
     <string name="gw_user_reset_switch_success">用户网关复位成功</string>
     <string name="chose_scene"><![CDATA[选&#160;&#160;&#160;择&#160;&#160;&#160;场&#160;&#160;&#160;景&#160;&#160;&#160;&#160;:]]></string>
     <string name="select_mode">选择模式</string>
     <string name="mode_choice">模式选择:</string>
     <string name="select_gradient">选择渐变</string>
+    <string name="save_lock">安全锁</string>
+    <string name="open">开</string>
+    <string name="save_lock1">锁定：（点击开后进行锁定，锁定完成灯会关闭）</string>
 </resources>

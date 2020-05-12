@@ -58,6 +58,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * 设置网关时间与场景传递进配config界面
  * task任务
+ * 位使用自己的 因为这个要在界面覆盖时解除监听
  */
 public class GwChoseTimeActivity extends TelinkBaseActivity implements EventListener<String> {
     private TextView toolbarTv;

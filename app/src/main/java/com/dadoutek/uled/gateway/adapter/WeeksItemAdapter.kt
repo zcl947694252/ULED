@@ -1,11 +1,14 @@
 package com.dadoutek.uled.gateway.adapter
 
 import android.annotation.SuppressLint
+import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.WeekBean
+import org.jetbrains.anko.image
 
 
 /**
@@ -21,15 +24,19 @@ class WeeksItemAdapter(resId: Int, data: MutableList<WeekBean>) : BaseQuickAdapt
     @SuppressLint("ResourceAsColor")
     override fun convert(helper: BaseViewHolder?, item: WeekBean?) {
         val textView = helper?.getView<TextView>(R.id.item_week_title)
-
-        if (item!!.checked)
+        val cb = helper?.getView<ImageView>(R.id.item_week_checked)
+        cb?.isSelected = item!!.selected
+        if (item!!.selected) {
+            cb?.setImageResource(R.drawable.icon_checkbox_selected)
             textView?.setTextColor(mContext.getColor(R.color.blue_text))
-        else
+        } else {
+            cb?.setImageResource(R.drawable.icon_checkbox_unselected)
             textView?.setTextColor(mContext.getColor(R.color.black_three))
+        }
 
-        helper?.setText(R.id.item_week_title, item.week )
-                ?.setChecked(R.id.item_week_checked, item.checked)
-                //?.setVisible(R.id.item_week_checked, item!!.checked)
+        helper?.setText(R.id.item_week_title, item.week)
+        //?.setselect(R.id.item_week_checked, item.selected)
+        //?.setVisible(R.id.item_week_checked, item!!.checked)
     }
 
 }

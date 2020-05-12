@@ -1,4 +1,4 @@
-package com.dadoutek.uled.gateway;
+package com.dadoutek.uled.gateway.bean;
 
 import com.dadoutek.uled.gateway.bean.GwTasksBean;
 

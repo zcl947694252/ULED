@@ -1,12 +1,14 @@
 package com.dadoutek.uled.gateway
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Network
+import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -15,7 +17,6 @@ import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.NetworkUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.blankj.utilcode.util.Utils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
@@ -26,10 +27,11 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.NetWorkUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.LightService
 import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
@@ -57,15 +59,74 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $
  * 更新描述
  */
-class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
+class GwLoginActivity : TelinkBaseActivity(){
+    private  var receiver: GwBrocasetReceiver? = null
     private var disposableTimer: Disposable? = null
     private var dbGw: DbGateway? = null
-    private lateinit var mApp: TelinkLightApplication
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gw_login)
+
+         receiver = GwBrocasetReceiver()
+        val filter = IntentFilter()
+        filter.addAction(LightService.ACTION_STATUS_CHANGED)
+        registerReceiver(receiver, filter)
+        receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
+            override fun loginSuccess() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+            }
+
+            @SuppressLint("CheckResult")
+            override fun loginFail() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
+                ToastUtils.showShort(getString(R.string.connecting_tip))
+                connect(macAddress = dbGw?.macAddr, retryTimes = 10)
+                        ?.subscribe({}, { LogUtils.d("connect failed") })
+            }
+
+            override fun setGwComplete(deviceInfo: DeviceInfo) { //Dadou   Dadoutek2018
+                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                when (deviceInfo.gwVoipState) {
+                    Constant.GW_WIFI_VOIP -> {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            disposableTimer?.dispose()
+                            hideLoadingDialog()
+                            if (deviceInfo.gwWifiState == 0) {
+                                ToastUtils.showShort(getString(R.string.config_success))
+                                val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
+                                if (boolean) {
+                                    startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
+                                    finish()
+                                } else
+                                    skipEvent()
+                            } else
+                                ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                        }
+                    }
+
+                    Constant.GW_TIME_ZONE_VOIP -> {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            disposableTimer?.dispose()
+                            hideLoadingDialog()
+                        }
+                    }
+                }
+            }
+
+            override fun getMacComplete(deviceInfo: DeviceInfo) {
+                //mac信息获取成功
+                LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------${deviceInfo.sixByteMacAddress}")
+                dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
+            }
+
+            override fun getMacFaile(deviceInfo: DeviceInfo) {
+                LogUtils.v("zcl--------蓝牙数据-get DeviceMAC fail------")
+            }
+        })
+
         initView()
         initData()
         initListener()
@@ -81,6 +142,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                 finish()
             }
+
         }
         gw_login.setOnClickListener {
             val account = gw_login_account.text.toString()
@@ -108,75 +170,6 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 ?: 0, params, "0")
     }
 
-    override fun performed(event: Event<String>?) {
-        if (event is DeviceEvent) {
-            this.onDeviceEvent(event)
-        }
-    }
-
-    private fun onDeviceEvent(event: DeviceEvent) {
-        when (event.type) {
-            DeviceEvent.STATUS_CHANGED -> {
-                when (event.args.status) {
-                    LightAdapter.STATUS_LOGIN -> {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                        Log.e("zcl", "zcl***STATUS_LOGIN***")
-                    }
-                    LightAdapter.STATUS_LOGOUT -> {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
-                        ToastUtils.showShort(getString(R.string.connecting_tip))
-                        connect(macAddress = dbGw?.macAddr, retryTimes = 10)
-                                ?.subscribe({}, { LogUtils.d("connect failed") })
-                    }
-
-                    //获取设备mac
-                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
-                        //mac信息获取成功
-                        val deviceInfo = event.args
-                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-
-                        when (deviceInfo.gwVoipState) {
-                            Constant.GW_WIFI_VOIP -> {
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                    disposableTimer?.dispose()
-                                    hideLoadingDialog()
-                                    if (deviceInfo.gwWifiState == 0) {
-                                        ToastUtils.showShort(getString(R.string.config_success))
-                                        val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
-                                        if (boolean) {
-                                            startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
-                                            finish()
-                                        } else
-                                            skipEvent()
-                                    } else
-                                        ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
-                                }
-                            }
-
-                            Constant.GW_TIME_ZONE_VOIP -> {
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    disposableTimer?.dispose()
-                                    hideLoadingDialog()
-                                }
-                            }
-                        }
-                    }
-
-                    //获取设备mac
-                    LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
-                        //mac信息获取成功
-                        val deviceInfo = event.args
-                        LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
-                        dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
-                    }
-                    LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
-                        LogUtils.v("zcl-----------蓝牙数据-get DeviceMAC fail------")
-                    }
-                }
-            }
-        }
-    }
 
     private fun sendWIFIParmars(account: String, pwd: String) {
         disposableTimer?.dispose()
@@ -184,7 +177,10 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    runOnUiThread { ToastUtils.showLong(getString(R.string.config_WIFI_FAILE)) }
+                    runOnUiThread {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
+                    }
                 }
         showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()
@@ -262,12 +258,10 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
 
                 if (isPwd) {
                     LogUtils.v("zcl----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
-                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr
-                            ?: 0, params, "1")
+                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr ?: 0, params, "1")
                 } else {
                     LogUtils.v("zcl----------蓝牙数据账号参数-------${Arrays.bytesToHexString(params, ",")}")
-                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr
-                            ?: 0, params, "1")
+                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr ?: 0, params, "1")
                 }
             }
         }
@@ -291,6 +285,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
         return list
     }
 
+    @SuppressLint("CheckResult")
     private fun initData() {
         dbGw = intent.getParcelableExtra("data")
 
@@ -301,7 +296,7 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
             gw_login_skip.visibility = View.VISIBLE
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {
-            val disposable = getDeviceVersion(dbGw!!.meshAddr).subscribe(
+            getDeviceVersion(dbGw!!.meshAddr).subscribe(
                     { s: String ->
                         dbGw!!.version = s
                         bottom_version_number.text = dbGw?.version
@@ -320,7 +315,6 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
                 }, { LogUtils.d(it) })
 
         bottom_version_number.text = dbGw?.version
-
         // sendDeviceMacParmars()
     }
 
@@ -344,28 +338,24 @@ class GwLoginActivity : TelinkBaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
         disableConnectionStatusListener()
-        toolbar.title = getString(R.string.config_WIFI)
+        toolbar.title = getString(R.string.config_net)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
             finish()
         }
-        this.mApp = this.application as TelinkLightApplication
-        this.mApp.removeEventListeners()
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         if (TelinkLightApplication.getApp().isConnectGwBle)
             sendTimeZoneParmars()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(receiver)
         disposableTimer?.dispose()
-        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun receviedGwCmd2000(serId: String) {
 
     }
-
-
 }
+

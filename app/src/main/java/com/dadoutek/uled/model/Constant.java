@@ -276,6 +276,10 @@ public class Constant implements Serializable {
      */
     public static final int GW_SWITCH_VOIP = 0X11;
     /**
+     * 网关用户恢复业务标识 文档上写的是恢复出厂
+     */
+    public static final int GW_RESET_USER_VOIP = 0X1C;
+    /**
      * 网关恢复出厂业务标识
      */
     public static final int GW_RESET_VOIP = 0X12;

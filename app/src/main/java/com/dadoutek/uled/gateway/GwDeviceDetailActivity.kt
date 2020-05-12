@@ -58,7 +58,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -81,6 +80,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${TODO}$
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+    private var showDialogDeleteScond: AlertDialog? = null
     private var showDialogHardDelete: AlertDialog? = null
     private var showDialogDelete: AlertDialog? = null
     private var disposableFactoryTimer: Disposable? = null
@@ -543,19 +543,24 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
         deleteBtnNoFactory.setOnClickListener {
             popupWindow.dismiss()//删除网关
+
             showDialogDelete = AlertDialog.Builder(this).setTitle(getString(R.string.user_reset)).setMessage(R.string.user_reset_tip)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        GwModel.clearGwData(currentGw!!.id)?.subscribe(object : NetworkObserver<ClearGwBean?>() {
-                            override fun onNext(t: ClearGwBean) {
-                                saveResetGwData(t)
-                                ToastUtils.showShort(getString(R.string.gw_user_reset_switch_success))
-                            }
 
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                ToastUtils.showShort(e.message)
-                            }
-                        })
+                        disposableTimer?.dispose()
+                        disposableTimer = Observable.timer(5000, TimeUnit.MILLISECONDS)
+                                .subscribe {
+                                    showDialogDeleteScond = AlertDialog.Builder(this).setTitle(getString(R.string.user_reset)).setMessage(R.string.user_reset_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                resetUserGwData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                }
+
+                        var labHeadPar = byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
+                        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr
+                                ?: 0, labHeadPar, "1")
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
@@ -587,6 +592,20 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
     }
 
+    private fun resetUserGwData() {
+        GwModel.clearGwData(currentGw!!.id)?.subscribe(object : NetworkObserver<ClearGwBean?>() {
+            override fun onNext(t: ClearGwBean) {
+                saveResetGwData(t)
+                ToastUtils.showShort(getString(R.string.gw_user_reset_switch_success))
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showShort(e.message)
+            }
+        })
+    }
+
     private fun saveResetGwData(t: ClearGwBean) {
         currentGw?.belongRegionId = t.belongRegionId
         currentGw?.id = t.id.toLong()
@@ -600,7 +619,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         currentGw?.uid = t.uid
         currentGw?.version = t.version
         currentGw?.openTag = t.openTag
-        DBUtils.saveGateWay(currentGw!!,false)
+        DBUtils.saveGateWay(currentGw!!, false)
     }
 
     @SuppressLint("CheckResult")
@@ -785,6 +804,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                             LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                             isRestSuccess = true
                             deleteGwData(isRestSuccess)
+                        } else if (deviceInfo.gwVoipState == GW_RESET_USER_VOIP) {
+                            resetUserGwData()
                         }
                     }
                 }

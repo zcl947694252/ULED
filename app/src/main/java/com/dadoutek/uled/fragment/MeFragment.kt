@@ -57,7 +57,6 @@ import java.util.concurrent.TimeUnit
  */
 
 class MeFragment : BaseFragment(), View.OnClickListener {
-
     private var disposable: Disposable? = null
     private var cancel: Button? = null
     private var confirm: Button? = null
@@ -120,9 +119,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             val groupList = DBUtils.groupList
             val lightList = ArrayList<DbLight>()
 
-            for (i in groupList.indices) {
+            for (i in groupList.indices)
                 lightList.addAll(DBUtils.getLightByGroupID(groupList[i].id!!))
-            }
+
             return lightList
         }
 
@@ -199,6 +198,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         setting?.setOnClickListener(this)
         updata?.setOnClickListener(this)
         user_reset?.setOnClickListener(this)
+        save_lock_ly?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -282,6 +282,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
             R.id.developer -> {
                 var intent = Intent(activity, DeveloperActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.save_lock_ly -> {
+                var intent = Intent(activity, SaveLockActivity::class.java)
                 startActivity(intent)
             }
             R.id.setting -> {

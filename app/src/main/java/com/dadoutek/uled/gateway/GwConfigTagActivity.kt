@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
@@ -14,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
@@ -38,10 +40,8 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.StringUtils
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
+import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.LightService
 import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
@@ -69,8 +69,9 @@ import kotlin.collections.ArrayList
  * 更新时间   $
  * 更新描述
  */
-class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
+    private  var receiver: GwBrocasetReceiver? = null
     private var deleteBean: GwTasksBean? = null
     private var connectCount: Int = 0
     private lateinit var mApp: TelinkLightApplication
@@ -106,11 +107,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
         toolbar.setOnClickListener {
              val textGp = EditText(this)
                          StringUtils.initEditTextFilter(textGp)
-                         val s = dbGw?.name ?: ""
+            tagBean?.tagName
+                         val s = tagBean?.tagName ?: ""
                          textGp.setText(s)
                          textGp.setSelection(s.length)
                          AlertDialog.Builder(this)
-                                 .setTitle(getString(R.string.change_device_name))
+                                 .setTitle(getString(R.string.update_name))
                                  .setIcon(android.R.drawable.ic_dialog_info)
                                  .setView(textGp)
                                  .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
@@ -233,7 +235,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                         WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
                 for (i in 0 until list!!.size) {
                     var weekBean = list!![i]
-                    if (weekBean.checked) {
+                    if (weekBean.selected) {
                         if (i == list!!.size - 1)
                             sb.append(weekBean.week)
                         else
@@ -307,50 +309,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
                 LogUtils.v("zcl-------网关失添加败-----------" + e.message)
             }
         })
-    }
-
-    override fun performed(event: Event<String>?) {
-        if (event is DeviceEvent) {
-            this.onDeviceEvent(event)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
-    }
-
-    private fun onDeviceEvent(event: DeviceEvent) {
-        when (event.type) {
-            DeviceEvent.STATUS_CHANGED -> {
-                when (event.args.status) {
-                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
-                        val deviceInfo = event.args
-                        when (deviceInfo.gwVoipState) {
-                            Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
-                                hideLoadingDialog()
-                                disposableTimer?.dispose()
-                                runOnUiThread { upDataDeleteUi() }
-                            }
-
-                            Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
-                                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-                                saveOrUpdataGw(dbGw!!)
-                                val intent = Intent()
-                                intent.putExtra("data", dbGw)
-                                setResult(Activity.RESULT_OK, intent)
-                                finish()
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun upDataDeleteUi() {
@@ -463,47 +421,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
             }
         }
     }
-
-    /**
-     * 定时场景标签头下发,时间段时间下发
-     */
-    /*   @RequiresApi(Build.VERSION_CODES.O)
-       private fun sendTime(tasks: GwTasksBean, meshAddress: Int) {
-           showLoadingDialog(getString(R.string.please_wait))
-           disposableTimer?.dispose()
-           disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                   .observeOn(Schedulers.io())
-                   .subscribeOn(AndroidSchedulers.mainThread())
-                   .subscribe {
-                       sendCount++
-                       if (sendCount < 3) {
-                           sendTime(tasks, meshAddress)
-                       } else {
-                           ToastUtils.showLong(getString(R.string.config_gate_way_fail))
-                       }
-                   }
-           sendLabelHeadParams()
-           if (tagBean?.isTimer() == true) {//定时场景标签头下发,时间段时间下发 挪移至时间段内部发送 定时场景时间下发
-               if (!TelinkLightApplication.getApp().isConnectGwBle) {
-                   var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_TIMER_LABLE_TIME, 0x11, 0x02,
-                           (tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
-                           tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
-
-                   val encoder = Base64.getEncoder()
-                   val s = encoder.encodeToString(labHeadPar)
-                   val gattBody = GwGattBody()
-                   gattBody.data = s
-                   gattBody.macAddr = dbGw?.macAddr
-
-                   sendToServer(gattBody)
-               } else {
-                   var params = byteArrayOf((tagBean?.tagId ?: 0).toByte(), tasks.index.toByte(),
-                           tasks.startHour.toByte(), tasks.startMins.toByte(), tasks.sceneId.toByte(), 0, 0, 0)
-                   TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_TIMER_LABLE_TIME, meshAddress, params, "1")
-               }
-           } else {//时间段场景下发 时间段场景时间下发 挪移至时间段内部发送
-           }
-       }*/
 
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
@@ -726,6 +643,43 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gate_way)
+        receiver = GwBrocasetReceiver()
+        val filter = IntentFilter()
+        filter.addAction(LightService.ACTION_STATUS_CHANGED)
+        registerReceiver(receiver, filter)
+        receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
+            override fun loginSuccess() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+            }
+
+            override fun loginFail() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+            }
+
+            override fun setGwComplete(deviceInfo: DeviceInfo) {
+                when (deviceInfo.gwVoipState) {
+                    Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
+                        hideLoadingDialog()
+                        disposableTimer?.dispose()
+                        runOnUiThread { upDataDeleteUi() }
+                    }
+
+                    Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
+                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                        saveOrUpdataGw(dbGw!!)
+                        val intent = Intent()
+                        intent.putExtra("data", dbGw)
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }
+                }
+            }
+
+            override fun getMacComplete(deviceInfo: DeviceInfo) {
+                //mac信息获取成功
+                dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
+            }
+        })
         initView()
         initData()
         initListener()
@@ -753,6 +707,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener, EventLis
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(receiver)
         disposableTimer?.dispose()
     }
 

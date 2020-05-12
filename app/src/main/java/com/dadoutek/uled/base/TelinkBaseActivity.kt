@@ -225,7 +225,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     open fun refreshGroupData() {
 
-
     }
 
     //增加全局监听蓝牙开启状态

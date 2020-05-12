@@ -54,7 +54,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
 
         for (i in 0 until list!!.size) {
             var weekBean = list!![i]
-            if (weekBean.checked) {
+            if (weekBean.selected) {
                 checkedList.add(weekBean)
             }
         }
@@ -64,12 +64,12 @@ class GwChoseModeActivity : TelinkBaseActivity() {
         template_recycleView.adapter = adapter
         adapter?.bindToRecyclerView(template_recycleView)
         adapter?.setOnItemClickListener { _, _, position ->
+            LogUtils.v("zcl-----------$position-------${checkedList.contains(list?.get(position))}")
             if (checkedList.contains(list?.get(position)!!)) {
-
-                list?.get(position)!!.checked = false
+                list?.get(position)!!.selected = false
                 checkedList.remove(list?.get(position)!!)
             } else {
-                list?.get(position)!!.checked = true
+                list?.get(position)!!.selected = true
                 checkedList.add(list?.get(position)!!)
             }
             adapter?.notifyDataSetChanged()
@@ -79,8 +79,10 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbarTv.text = getString(R.string.repetition)
-        tvRename.visibility = View.VISIBLE
-        tvRename.text = getString(R.string.btn_sure)
+
+        tv_function1.text = getString(R.string.btn_sure)
+        tv_function1.visibility = View.VISIBLE
+
         toolbar.setNavigationOnClickListener {
             finish()
         }

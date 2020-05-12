@@ -774,17 +774,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return this.sendCommand(opcode, address, params, noResponse, TAG_NORMAL_COMMAND, delay);
     }
 
-    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse,
-                               Object tag, int delay) {
+    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
         if (tag.toString() == "0")
-            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse,
-                    tag, delay);
+            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
         else if (tag.toString() == "1")
-            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag,
-                    delay);
+            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag, delay);
         else
-            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag
-                    , delay);
+            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
 
     }
 

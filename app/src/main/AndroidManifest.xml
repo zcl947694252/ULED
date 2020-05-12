@@ -116,7 +116,7 @@
                 android:screenOrientation="portrait" />
 
         <activity
-                android:name=".othersview.HumanBodySensorActivity"
+                android:name=".pir.HumanBodySensorActivity"
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan" />
         <activity

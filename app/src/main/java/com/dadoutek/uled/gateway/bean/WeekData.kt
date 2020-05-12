@@ -13,7 +13,7 @@ import android.os.Parcelable
  * 更新时间   $
  * 更新描述
  */
-class WeekBean(var week: String,var pos: Int,var checked:Boolean = false) :Parcelable{
+class WeekBean(var week: String,var pos: Int,var selected:Boolean = false) :Parcelable{
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readInt(),
@@ -22,7 +22,7 @@ class WeekBean(var week: String,var pos: Int,var checked:Boolean = false) :Parce
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(week)
         parcel.writeInt(pos)
-        parcel.writeByte(if (checked) 1 else 0)
+        parcel.writeByte(if (selected) 1 else 0)
     }
 
     override fun describeContents(): Int {

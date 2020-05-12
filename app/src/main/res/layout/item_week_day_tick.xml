@@ -24,10 +24,11 @@
                 android:textColor="@color/blue_text"
                 android:textSize="18sp" />
 <!-- android:src="@drawable/icon_tick"-->
-        <CheckBox
+        <ImageView
                 android:id="@+id/item_week_checked"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                />
 
     </LinearLayout>
 

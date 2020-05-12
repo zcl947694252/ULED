@@ -17,7 +17,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -169,24 +168,20 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
-                   // if (!AppUtils.isExynosSoc)
-                        params.setScanFilters(getScanFilters())
+                    // if (!AppUtils.isExynosSoc)
+                    params.setScanFilters(getScanFilters())
 
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     if (isSupportInstallOldDevice) {
                         params.setMeshName(mesh.name)
                         params.setOutOfMeshName(mesh.name)
                     }
-
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
 
-
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-
                     TelinkLightService.Instance()?.startScan(params)
-
                     scanDisposable?.dispose()
                     scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
                             .SECONDS)
@@ -363,39 +358,37 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         isSearchedDevice = false
 
         progressBtn.progress = 100  //进度控件显示成完成状态
-
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
-
         getVersion()
     }
 
     @SuppressLint("CheckResult")
     private fun getVersion() {
         var dstAdress: Int
-        if (TelinkApplication.getInstance().connectDevice != null&&mDeviceInfo?.meshAddress!=null) {
+        if (TelinkApplication.getInstance().connectDevice != null && mDeviceInfo?.meshAddress != null) {
             dstAdress = mDeviceInfo?.meshAddress!!
             Commander.getDeviceVersion(dstAdress)
-                     .subscribe(
-                             {
-                                 closeAnimal()
-                                 finish()
-                                 when {
-                                     mDeviceInfo?.productUUID == DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!,"version" to it)
-                                     mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0","version" to it)
-                                     else -> ToastUtils.showLong(getString(R.string.scan_end))
-                                 }
-                             },
-                             {
-                                 getVersionRetryCount++
-                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {
-                                     getVersion()
-                                 }else{
-ToastUtils.showLong(getString(R.string.get_version_fail))
-                                     finish()
-                                 }
-                                 LogUtils.e("zcl配置传感器前失败----$it")
-                             }
-                     )
+                    .subscribe(
+                            {
+                                closeAnimal()
+                                finish()
+                                when (mDeviceInfo?.productUUID) {
+                                    DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
+                                    DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+                                    else -> ToastUtils.showLong(getString(R.string.scan_end))
+                                }
+                            },
+                            {
+                                getVersionRetryCount++
+                                if (getVersionRetryCount <= getVersionRetryMaxCount) {
+                                    getVersion()
+                                } else {
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    finish()
+                                }
+                                LogUtils.e("zcl配置传感器前失败----$it")
+                            }
+                    )
 
         } else {
             ToastUtils.showLong(getString(R.string.get_version_fail))
@@ -418,7 +411,7 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
 
     private fun connect() {
         //showLoadingDialog(resources.getString(R.string.connecting_tip))
-       // closeAnimal()
+        // closeAnimal()
         mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
@@ -427,19 +420,19 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
         scanDisposable?.dispose()
 
         launch?.cancel()
-        launch=  GlobalScope.launch {
+        launch = GlobalScope.launch {
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
         }
-            LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
+        LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
 
-            connectDisposable?.dispose()    //取消掉上一个超时计时器
-            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        LogUtils.e("zcl timeout retryConnect")
-                        retryConnect()
-                    }
+        connectDisposable?.dispose()    //取消掉上一个超时计时器
+        connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    LogUtils.e("zcl timeout retryConnect")
+                    retryConnect()
+                }
     }
 
     private fun doFinish() {
@@ -466,7 +459,7 @@ ToastUtils.showLong(getString(R.string.get_version_fail))
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val meshAddress = MeshAddressGenerator().meshAddress
-
+        LogUtils.v("zcl-----------传感器扫描-------${leScanEvent.args.macAddress}")
         if (meshAddress == -1) {
             this.doFinish()
             return

@@ -977,7 +977,7 @@
     <string name="invalid_data">Invalid data </string>
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
     <string name="add_time">Add timing task</string>
-    <string name="add_times">Add a loop task</string>
+    <string name="add_times">Add  task</string>
     <string name="to">To</string>
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
@@ -1047,9 +1047,13 @@
     <string name="change_device_name">Modify device name</string>
     <string name="scene_list">Cue List</string>
     <string name="user_reset_tip">Whether to perform user reset?</string>
+    <string name="user_reset_tip2">Reset failed, whether to force user reset?</string>
     <string name="gw_user_reset_switch_success">The user gateway reset succeeded</string>
     <string name="chose_scene">Choose scene :</string>
     <string name="select_mode">select mode</string>
     <string name="mode_choice">mode selection:</string>
     <string name="select_gradient">selection gradient</string>
+    <string name="save_lock">Safe lock</string>
+    <string name="open">Open</string>
+    <string name="save_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
 </resources>
