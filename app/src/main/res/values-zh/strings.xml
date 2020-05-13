@@ -978,4 +978,7 @@
     <string name="save_lock">安全锁</string>
     <string name="open">开</string>
     <string name="save_lock1">锁定：（点击开后进行锁定，锁定完成灯会关闭）</string>
+    <string name="lock">锁定</string>
+    <string name="save_lock2">解锁：（点击关后进行解锁，解锁完成灯会开启）</string>
+    <string name="unlock">解锁</string>
 </resources>

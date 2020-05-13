@@ -1056,4 +1056,7 @@
     <string name="save_lock">Safe lock</string>
     <string name="open">Open</string>
     <string name="save_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
+    <string name="lock">Lock</string>
+    <string name="save_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
+    <string name="unlock">Unlock</string>
 </resources>
