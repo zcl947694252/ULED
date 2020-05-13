@@ -102,7 +102,7 @@ dependencies {
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 
-    /**
+    /**bugly
      * 二维码
      */
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
@@ -121,7 +121,7 @@ dependencies {
 
     implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'
 //其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
-    implementation 'com.tencent.bugly:nativecrashreport:3.6.0'
+    implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
 
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
