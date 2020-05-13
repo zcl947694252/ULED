@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -30,6 +29,7 @@ import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -74,7 +74,8 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
-
+    private lateinit var mScenes: List<DbScene>
+    private lateinit var mGroups: MutableList<DbGroup>
     private var isGroupMode: Boolean = true
     private var disposable: Disposable? = null
     private var isConfirm: Boolean = false
@@ -87,9 +88,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     //底部组适配器
     private var showGroupList: MutableList<ItemGroup>? = mutableListOf()
     private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
-    /**
-     * 显示选择分组下拉的数据 选择组适配器
-     */
+    //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.night_light_sensor_adapter, showCheckListData)
     private var modeStartUpMode = 0
@@ -104,7 +103,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val MODE_SWITCH_MODE_GRADIENT = 4
     private var retryConnectCount = 0
     private var isFinish: Boolean = false
-    val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,22 +152,42 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             when (checkedId) {
                 R.id.color_mode_rb -> {
                     isGroupMode = true
-                    //getGroupName()
-                    tvSelectGroupScene.text = getString(R.string.choose_group)
+                    getGroupName()
                     color_mode_rb.setTextColor(getColor(R.color.blue_text))
                     gradient_mode_rb.setTextColor(getColor(R.color.gray9))
+                    choose_group_tv.text = getString(R.string.choose_group)
                 }
                 R.id.gradient_mode_rb -> {
                     isGroupMode = false
-                    //getSceneName()
-                    tvSelectGroupScene.text = getString(R.string.select_scene)
+                    getSceneName()
                     color_mode_rb.setTextColor(getColor(R.color.gray9))
                     gradient_mode_rb.setTextColor(getColor(R.color.blue_text))
+                    choose_group_tv.text = getString(R.string.choose_scene_dot)
                 }
             }
         }
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
         TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    private fun getSceneName() {
+        mScenes = DBUtils.sceneAll
+      /*  mGroupScenesName?.clear()
+        for (item in mScenes)
+            mGroupScenesName!!.add(item.name)
+        groupSceneAdapter.notifyDataSetChanged()*/
+    }
+
+    private fun getGroupName() {
+        mGroups = DBUtils.allGroups
+    /*    mGroupScenesName?.clear()
+        for (item in mGroups)
+            if (item.deviceType == Constant.DEVICE_TYPE_CONNECTOR || item.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || item.deviceType
+             ==Constant.DEVICE_TYPE_LIGHT_NORMAL || item.deviceType == Constant.DEVICE_TYPE_NO) {
+                if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
+                    mGroupScenesName!!.add(item.name)
+            }
+        groupSceneAdapter.notifyDataSetChanged()*/
     }
 
     override fun onDestroy() {
@@ -740,7 +758,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 sensor_three.visibility = View.GONE
                 edit_data_view_layout.visibility = View.VISIBLE
 
-                showCheckListData?.let {
+                showCheckListData.let {
                     if (showGroupList!!.size != 0) {
                         for (i in it.indices)//0-1
                             for (j in showGroupList!!.indices)//0-1-3
@@ -760,34 +778,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     nightLightEditGroupAdapter.notifyDataSetChanged()
                 }
             }
-            R.id.choose_scene -> {
-                isFinish = true
-
-                tv_function1.visibility = View.VISIBLE
-                sensor_three.visibility = View.GONE
-                edit_data_view_layout.visibility = View.VISIBLE
-
-                showCheckListData?.let {
-                    if (showGroupList!!.size != 0) {
-                        for (i in it.indices)//0-1
-                            for (j in showGroupList!!.indices)//0-1-3
-                                if (it[i].meshAddr == showGroupList!![j].groupAddress) {
-                                    it[i].checked = true
-                                    break //j = 0-1-2   3-1=2
-                                } else if (j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAddress) {
-                                    it[i].checked = false
-                                }
-                        changeCheckedViewData()
-                    } else {
-                        for (i in it.indices) {
-                            it[i].isCheckedInGroup = true
-                            it[i].checked = i == 0
-                        }
-                    }
-                    nightLightEditGroupAdapter.notifyDataSetChanged()
-                }
-            }
-
 
             R.id.tv_function1 -> {
                 val oldResultItemList = ArrayList<ItemGroup>()

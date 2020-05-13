@@ -945,7 +945,7 @@
     <string name="curtain_switch">Curtain switch</string>
     <string name="night_light">Night light</string>
     <string name="click_config">Config</string>
-    <string name="select_scene">Select the scene</string>
+    <string name="choose_scene">Select the scene</string>
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
     <string name="select_type">Please select type</string>
     <string name="group_switch">Group switch</string>
@@ -1062,4 +1062,8 @@
     <string name="unlock">Unlock</string>
     <string name="reset_gw_faile">Gateway user reset failed</string>
     <string name="no_connect_device">No reconnectable devices!</string>
+    <string name="choose_scene_dot">Choose scene :</string>
+    <string name="open_light">Open light</string>
+    <string name="close_light">Close light</string>
+    <string name="open_blutooth_tip">Please turn on bluetooth</string>
 </resources>

@@ -48,7 +48,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
             else -> {
                 template_recycleView?.adapter = sceneAdapter
                 sceneAdapter.bindToRecyclerView(template_recycleView)
-                toolbarTv.text = getString(R.string.select_scene)
+                toolbarTv.text = getString(R.string.choose_scene)
             }
         }
     }

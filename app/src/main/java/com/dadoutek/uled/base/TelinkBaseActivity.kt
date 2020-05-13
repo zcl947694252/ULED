@@ -103,8 +103,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
         if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)
-
+            ToastUtils.showShort(getString(R.string.open_blutooth_tip))
         //注册网络状态监听广播
          netWorkChangReceiver = NetWorkChangReceiver()
         var filter = IntentFilter()

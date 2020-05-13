@@ -450,13 +450,13 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 index += 1
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
-                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.select_scene))
+                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.choose_scene))
                     bean.standingTime = tasksBean?.stayTime ?: 0
                     timesList.add(bean)
                     break
                 } else if (endTime - time >= standingNum) {
-                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.select_scene))
-                    bean.sceneName = getString(R.string.select_scene)
+                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
+                    bean.sceneName = getString(R.string.choose_scene)
                     timesList.add(bean)
                 }
             }

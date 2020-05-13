@@ -5,7 +5,14 @@ object Opcode {
      * 配置单调光双组开关
      */
     const val CONFIG_DOUBLE_SWITCH: Byte = 0xf1.toByte()
-
+    /**
+     * 扩展指令小夜灯触发场景指令
+     */
+    const val CONFIG_EXTEND_PIR_SCENE: Byte = 0x06.toByte()
+    /**
+     * 扩展指令安全锁 1打开2关闭
+     */
+    const val CONFIG_EXTEND_SAFE_LOCK: Byte = 0x05.toByte()
     /**
      * 扩展指令用户数据清除功能
      */

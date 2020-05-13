@@ -869,7 +869,7 @@
     <string name="curtain_switch">窗帘开关</string>
     <string name="night_light">小夜灯</string>
     <string name="click_config">点击配置</string>
-    <string name="select_scene">选择场景</string>
+    <string name="choose_scene">选择场景</string>
     <string name="no_found_recovery_device">未搜索到可恢复出厂设置的设备请检查重试.....</string>
     <string name="select_type">请选择类型</string>
     <string name="group_switch">群组开关</string>
@@ -984,4 +984,8 @@
     <string name="lock">锁定</string>
     <string name="safe_lock2">解锁：（点击关后进行解锁，解锁完成灯会开启）</string>
     <string name="unlock">解锁</string>
+    <string name="choose_scene_dot">选&#160;&#160;&#160;择&#160;&#160;&#160;场&#160;&#160;&#160;景&#160;&#160;&#160;&#160;:</string>
+    <string name="open_light">开灯</string>
+    <string name="close_light">关灯</string>
+    <string name="open_blutooth_tip">请打开蓝牙</string>
 </resources>

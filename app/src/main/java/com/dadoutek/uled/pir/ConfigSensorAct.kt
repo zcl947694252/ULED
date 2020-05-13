@@ -43,27 +43,21 @@ import org.jetbrains.anko.design.snackbar
  * 老版本人体感应器设置详情
  */
 class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, EventListener<String> {
-
     private lateinit var mScenes: List<DbScene>
     private var isGroupMode: Boolean = true
     private lateinit var telinkApplication: TelinkApplication
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
-
-    //private var builder:com.app.hubert.guide.core.Builder?=null
     private var mGroupScenesName: ArrayList<String>? = null
     private var mSelectGroupSceneAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-
     private var modeStartUpMode = 0
     private var modeDelayUnit = 0
     private var modeSwitchMode = 0
-
     private val MODE_START_UP_MODE_OPEN = 0
     private val MODE_DELAY_UNIT_SECONDS = 0
     private val MODE_SWITCH_MODE_MOMENT = 0
-
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
@@ -95,7 +89,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 R.id.gradient_mode_rb -> {
                     isGroupMode = false
                     getSceneName()
-                    tvSelectGroupScene.text = getString(R.string.select_scene)
+                    tvSelectGroupScene.text = getString(R.string.choose_scene)
                     color_mode_rb.setTextColor(getColor(R.color.gray9))
                     gradient_mode_rb.setTextColor(getColor(R.color.blue_text))
                 }
@@ -214,9 +208,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun getSceneName() {
         mScenes = DBUtils.sceneAll
         mGroupScenesName?.clear()
-        for (item in mScenes) {
+        for (item in mScenes)
             mGroupScenesName!!.add(item.name)
-        }
+
         groupSceneAdapter.notifyDataSetChanged()
     }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/sensor_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -525,18 +526,14 @@
                 android:background="@color/black_ee"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout31" />
 
-        <RelativeLayout
-                android:id="@+id/choose_group_scene_ly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view31">
 
             <android.support.constraint.ConstraintLayout
                     android:id="@+id/choose_group_ly"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp">
+                    android:layout_height="60dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/view31">
 
 
                 <TextView
@@ -578,53 +575,6 @@
                 </android.support.constraint.ConstraintLayout>
 
             </android.support.constraint.ConstraintLayout>
-            <android.support.constraint.ConstraintLayout
-                    android:id="@+id/choose_scene_ly"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp">
-
-
-                <TextView
-                        android:id="@+id/choose_scene_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/choose_group"
-                        android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.09"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-
-                <android.support.constraint.ConstraintLayout
-                        android:id="@+id/choose_scene"
-                        android:layout_width="190dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.84"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/select_group"
-                            android:textColor="@color/blue_background"
-                            android:textSize="15sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                </android.support.constraint.ConstraintLayout>
-            </android.support.constraint.ConstraintLayout>
-
-        </RelativeLayout>
-
 
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/constraintLayout24"
@@ -633,7 +583,7 @@
                 android:background="@color/black_ee"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/choose_group_scene_ly">
+                app:layout_constraintTop_toBottomOf="@+id/choose_group_ly">
 
 
             <TextView
@@ -695,7 +645,9 @@
                 android:layout_height="match_parent"
                 android:background="#7333"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp">
 
             <LinearLayout
                     android:layout_width="wrap_content"
@@ -703,9 +655,9 @@
                     android:layout_marginBottom="120dp"
                     android:background="@drawable/rect_five_w"
                     android:gravity="center"
-                    android:visibility="gone"
                     android:orientation="vertical"
-                    android:padding="@dimen/dp_5">
+                    android:padding="@dimen/dp_5"
+                    android:visibility="gone">
 
                 <ProgressBar
                         android:layout_width="70dp"

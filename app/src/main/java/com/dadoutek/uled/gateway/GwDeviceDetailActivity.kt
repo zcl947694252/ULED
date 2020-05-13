@@ -83,7 +83,6 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${TODO}$
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
-    private var showDialogDeleteScond: AlertDialog? = null
     private var showDialogHardDelete: AlertDialog? = null
     private var showDialogDelete: AlertDialog? = null
     private var disposableFactoryTimer: Disposable? = null
@@ -99,7 +98,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private lateinit var mApp: TelinkLightApplication
     private lateinit var popupWindow: PopupWindow
     private var disposableConnect: Disposable? = null
-    private var disposable: Disposable? = null
     private var currentGw: DbGateway? = null
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
@@ -730,7 +728,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private fun connectGw(configType: Int) {
         disposableTimer?.dispose()
         if (configType != 3) {
-            disposableTimer = Observable.timer(15, TimeUnit.SECONDS)
+            disposableTimer = Observable.timer(17, TimeUnit.SECONDS)
                     .subscribe {
                         hideLoadingDialog()
                         ToastUtils.showShort(getString(R.string.connect_fail))
@@ -741,8 +739,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting))
             disposableConnect?.dispose()
-            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 15L)?.subscribe({
-                disposable?.dispose()
+            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 8L)?.subscribe({
                 disposableTimer?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
                 when (configType) {
@@ -753,6 +750,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 }//判断进入那个开关设置界面
             }, {
                 hideLoadingDialog()
+                disposableTimer?.dispose()
                 if (configType == 0) {//重新配置为0
                     connectService()
                 } else {
@@ -765,7 +763,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun connectService() {
-        disposable?.dispose()
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightApplication.getApp().offLine = false
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
@@ -903,7 +900,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun onLogin(isConfigGw: Int) {
-        disposable?.dispose()
         hideLoadingDialog()
         var intent: Intent? = null
         if (isConfigGw == 0) {//重新配置
@@ -929,8 +925,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
             toolbar.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
-
-//            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+            //toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
@@ -975,7 +970,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private fun disposableAll() {
         mConnectDisposal?.dispose()
         disposableConnectTimer?.dispose()
-        disposable?.dispose()
         disposableTimer?.dispose()
     }
 

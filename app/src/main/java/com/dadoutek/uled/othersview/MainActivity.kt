@@ -3,6 +3,7 @@ package com.dadoutek.uled.othersview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -65,6 +66,7 @@ import com.dadoutek.uled.util.*
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
+import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.NotificationEvent
@@ -98,6 +100,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  * 首页设备
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
+    private var mApp: TelinkLightApplication? = null
     private var retryDisposable: Disposable? = null
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
@@ -106,14 +109,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
     private lateinit var sceneFragment: SceneFragment
-    open var isHaveNetwork: Boolean = true
 
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
     private var mConnectDisposal: Disposable? = null
-    private var mScanTimeoutDisposal: Disposable? = null
-
-    private var mApplication: TelinkLightApplication? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
@@ -154,8 +153,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         // detectUpdate()
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
             TelinkLightApplication.getApp().initStompClient()
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            LeBluetooth.getInstance().enable(applicationContext)
         this.setContentView(R.layout.activity_main)
-        this.mApplication = this.application as TelinkLightApplication
+        mApp = this.application as TelinkLightApplication
+
 
         var dbGroup = DbGroup()
         dbGroup.id = 0
@@ -176,7 +178,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
             //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
-            startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true",  "switch" to DbSwitch(),"version" to "123")
+            startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
             //startActivity(intent)
         }
         initBottomNavigation()
@@ -251,7 +253,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun LogOutAndExitApp() {
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
-        this.mApplication?.removeEventListeners()
+        mApp?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
         //重启app并杀死原进程
         ActivityUtils.finishAllActivities(true)
@@ -624,7 +626,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onPause()
         disableConnectionStatusListener()
         mCompositeDisposable.clear()
-        mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
         progressBar.visibility = GONE
         try {
@@ -641,7 +642,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
-            mApplication?.startLightService(TelinkLightService::class.java)
+            mApp?.startLightService(TelinkLightService::class.java)
         //startToRecoverDevices()
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -669,14 +670,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun onLogin() {
-        mScanTimeoutDisposal?.dispose()
         GlobalScope.launch(Dispatchers.Main) {
             stopConnectTimer()
             if (progressBar?.visibility != GONE)
                 progressBar?.visibility = GONE
         }
 
-        val connectDevice = this.mApplication?.connectDevice
+        val connectDevice = mApp?.connectDevice
         if (connectDevice != null) {
             this.connectMeshAddress = connectDevice.meshAddress
         }
@@ -700,8 +700,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             if (TelinkLightApplication.getApp().connectDevice == null) {
-                                val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
-                                        DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                                val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                                        DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
                                 if (size > 0) {
                                     ToastUtils.showLong(R.string.connecting_please_wait)
@@ -710,29 +710,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                             ?.subscribe(
                                                     {//找回有效设备
                                                         //RecoverMeshDeviceUtil.addDevicesToDb(it)
-                                                        //LogUtils.v("zcl-----------找回设备-------${it.deviceName}")
                                                         onLogin()
                                                     },
                                                     {
                                                         LogUtils.d("connect failed, reason = $it")
                                                     }
                                             )
-                                }else{
+                                } else {
                                     ToastUtils.showShort(getString(R.string.no_connect_device))
                                 }
                             }
                         }, { LogUtils.d(it) })
             } else {
-                this.mApplication?.startLightService(TelinkLightService::class.java)
+                mApp?.startLightService(TelinkLightService::class.java)
                 autoConnect()
             }
         }
 
-        val deviceInfo = this.mApplication?.connectDevice
-        if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
-                    ?: 0x00) and 0xFF
-        }
+        val deviceInfo = mApp?.connectDevice
+        if (deviceInfo != null)
+            this.connectMeshAddress = (mApp?.connectDevice?.meshAddress ?: 0x00) and 0xFF
+
     }
 
     private fun stopConnectTimer() {

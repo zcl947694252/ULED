@@ -290,12 +290,12 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                 index += 1
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
-                    var bean = GwTimePeriodsBean(index, time, endTimeNum, getString(R.string.select_scene))
+                    var bean = GwTimePeriodsBean(index, time, endTimeNum, getString(R.string.choose_scene))
                     timesList.add(bean)
                     break
                 } else if (endTimeNum - time >= standingNum) {
-                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.select_scene))
-                    bean.sceneName = getString(R.string.select_scene)
+                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
+                    bean.sceneName = getString(R.string.choose_scene)
                     timesList.add(bean)
                 }
             }
