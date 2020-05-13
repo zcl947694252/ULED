@@ -712,6 +712,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun connectGw(configType: Int) {
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(15,TimeUnit.SECONDS)
+                .subscribe {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
         popupWindow.dismiss()
         if (currentGw != null) {
             TelinkLightService.Instance()?.idleMode(true)
@@ -719,6 +725,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             disposableConnect?.dispose()
             disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 15L)?.subscribe({
                 disposable?.dispose()
+                disposableTimer?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
                 when (configType) {
                     0 -> onLogin(configType)
