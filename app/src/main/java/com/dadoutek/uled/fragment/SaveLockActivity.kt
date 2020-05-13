@@ -3,6 +3,7 @@ package com.dadoutek.uled.fragment
 import android.os.Bundle
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import kotlinx.android.synthetic.main.activity_save_lock.*
 
 
 /**
@@ -24,7 +25,7 @@ class SaveLockActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
-
+        safe_open
     }
 
     private fun initData() {
