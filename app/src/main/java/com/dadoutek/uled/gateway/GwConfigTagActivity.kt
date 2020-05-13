@@ -71,6 +71,7 @@ import kotlin.collections.ArrayList
  */
 class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
+    private lateinit var filter: IntentFilter
     private  var receiver: GwBrocasetReceiver? = null
     private var deleteBean: GwTasksBean? = null
     private var connectCount: Int = 0
@@ -120,9 +121,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                                          ToastUtils.showLong(getString(R.string.rename_tip_check))
                                      } else {
                                          val trim = textGp.text.toString().trim { it <= ' ' }
-                                         dbGw?.name = trim
+                                         tagBean?.tagName = trim
                                          toolbarTv.text = trim
-                                         DBUtils.saveGateWay(dbGw!!, false)
                                      }
                                  }
                                  .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
@@ -215,7 +215,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         if (tagBean?.getIsTimer() != false)
             add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_time)
         else
-            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times)
+            add_group_btn?.findViewById<TextView>(R.id.add_group_btn_tv)?.text = getString(R.string.add_times2)
     }
 
     private fun getWeekStr(): String {
@@ -644,9 +644,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gate_way)
         receiver = GwBrocasetReceiver()
-        val filter = IntentFilter()
+         filter = IntentFilter()
         filter.addAction(LightService.ACTION_STATUS_CHANGED)
-        registerReceiver(receiver, filter)
         receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
             override fun loginSuccess() {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
@@ -680,11 +679,21 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                 dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
             }
         })
+        registerReceiver(receiver, filter)
         initView()
         initData()
         initListener()
     }
 
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(receiver)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(receiver, filter)
+    }
     override fun receviedGwCmd2000(serId: String) {
         when (serId?.toInt()) {
             Constant.GW_GATT_DELETE_LABEL_TASK -> {
@@ -707,7 +716,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
         disposableTimer?.dispose()
     }
 

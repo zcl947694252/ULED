@@ -100,6 +100,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
+        add_group_btn_tv.text = getString(R.string.add_timing_label)
     }
 
 
@@ -162,7 +163,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     intent = Intent(this, GwDeviceDetailActivity::class.java)
                     startActivity(intent)
                     DBUtils.saveGateWay(dbGw!!, true)
-                    finish()
+                  //  finish()
                 }
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)

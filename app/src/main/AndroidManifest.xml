@@ -75,6 +75,9 @@
                 android:enabled="true" />
 
         <activity
+                android:name=".fragment.SafeLockActivity"
+                android:screenOrientation="portrait" />
+        <activity
                 android:name=".scene.SelectGradientActivity"
                 android:screenOrientation="portrait" />
                 <activity

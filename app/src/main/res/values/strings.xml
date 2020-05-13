@@ -978,6 +978,7 @@
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
     <string name="add_time">Add timing task</string>
     <string name="add_times">Add  task</string>
+    <string name="add_times2">Add a loop task</string>
     <string name="to">To</string>
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
@@ -987,7 +988,7 @@
     <string name="no_get_device_info">Device information not obtained, please try again</string>
     <string name="have_time_task">The response task already exists in this time period, please select another time</string>
     <string name="please_chose_right_time">The start time cannot be greater than the end time, please choose again</string>
-    <string name="timer_period_set">Time period setting</string>
+    <string name="timer_period_set">Task list </string>
     <string name="please_select_standing_time">Please select your stay time</string>
     <string name="please_setting_least_one">Please configure the scene for at least one time period</string>
     <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
@@ -1053,10 +1054,12 @@
     <string name="select_mode">select mode</string>
     <string name="mode_choice">mode selection:</string>
     <string name="select_gradient">selection gradient</string>
-    <string name="save_lock">Safe lock</string>
+    <string name="safe_lock">Safe lock</string>
     <string name="open">Open</string>
-    <string name="save_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
+    <string name="safe_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
     <string name="lock">Lock</string>
-    <string name="save_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
+    <string name="safe_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
     <string name="unlock">Unlock</string>
+    <string name="reset_gw_faile">Gateway user reset failed</string>
+    <string name="no_connect_device">No reconnectable devices!</string>
 </resources>

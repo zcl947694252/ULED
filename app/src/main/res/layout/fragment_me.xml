@@ -513,7 +513,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="38dp"
-                    android:text="@string/save_lock"
+                    android:text="@string/safe_lock"
                     android:textColor="@color/black_e"
                     android:textSize="13sp" />
 

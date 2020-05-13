@@ -338,7 +338,7 @@ class GwLoginActivity : TelinkBaseActivity(){
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
         disableConnectionStatusListener()
-        toolbar.title = getString(R.string.config_net)
+        toolbarTv.text = getString(R.string.config_net)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))

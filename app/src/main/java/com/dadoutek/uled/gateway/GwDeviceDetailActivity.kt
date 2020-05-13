@@ -42,6 +42,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.squareup.haha.perflib.Main
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
@@ -49,7 +50,9 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -546,16 +549,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
             showDialogDelete = AlertDialog.Builder(this).setTitle(getString(R.string.user_reset)).setMessage(R.string.user_reset_tip)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(5000, TimeUnit.MILLISECONDS)
+                        disposableFactoryTimer?.dispose()
+                        disposableFactoryTimer = Observable.timer(10000, TimeUnit.MILLISECONDS)
                                 .subscribe {
-                                    showDialogDeleteScond = AlertDialog.Builder(this).setTitle(getString(R.string.user_reset)).setMessage(R.string.user_reset_tip)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                resetUserGwData()
-                                            }
-                                            .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
+                                    ToastUtils.showShort(getString(R.string.reset_gw_faile))
                                 }
 
                         var labHeadPar = byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
@@ -585,6 +582,25 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             //恢复出厂设置
             showDialogDelete = AlertDialog.Builder(this).setMessage(R.string.delete_device_tip)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        disposableFactoryTimer?.dispose()
+                        disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    hideLoadingDialog()
+                                    showDialogDelete?.dismiss()
+                                    showDialogHardDelete = AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                GlobalScope.launch(Dispatchers.Main) {
+                                                    showLoadingDialog(getString(R.string.please_wait))
+                                                }
+                                                showDialogHardDelete?.dismiss()
+                                                isRestSuccess = true
+                                                deleteGwData(isRestSuccess)
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                }
                         connectGw(3)
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -713,11 +729,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun connectGw(configType: Int) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(15,TimeUnit.SECONDS)
-                .subscribe {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.connect_fail))
-                }
+        if (configType != 3) {
+            disposableTimer = Observable.timer(15, TimeUnit.SECONDS)
+                    .subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                    }
+        }
         popupWindow.dismiss()
         if (currentGw != null) {
             TelinkLightService.Instance()?.idleMode(true)
@@ -779,17 +797,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun sendGwResetFactory() {
-        disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS).subscribe {
-            showDialogDelete?.dismiss()
-            showDialogHardDelete = AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_device_hard_tip)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        showDialogHardDelete?.dismiss()
-                        isRestSuccess = true
-                        deleteGwData(isRestSuccess)
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
-        }
         var labHeadPar = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr ?: 0, labHeadPar, "1")
     }
@@ -808,10 +815,12 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                         val deviceInfo = event.args
                         if (deviceInfo.gwVoipState == GW_RESET_VOIP) {
                             showDialogHardDelete?.dismiss()
+                            disposableFactoryTimer?.dispose()
                             LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                             isRestSuccess = true
                             deleteGwData(isRestSuccess)
                         } else if (deviceInfo.gwVoipState == GW_RESET_USER_VOIP) {
+                            disposableFactoryTimer?.dispose()
                             resetUserGwData()
                         }
                     }
@@ -890,9 +899,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun getNewData(): ArrayList<DbGateway> {
-        val allGateWay = DBUtils.getAllGateWay()
-        toolbar.title = (currentGw!!.name ?: "")
-        return allGateWay
+        return DBUtils.getAllGateWay()
     }
 
     private fun onLogin(isConfigGw: Int) {
@@ -1069,6 +1076,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 hidePopupMenu()
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        hideLoadingDialog()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

@@ -285,7 +285,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.save_lock_ly -> {
-                var intent = Intent(activity, SaveLockActivity::class.java)
+                var intent = Intent(activity, SafeLockActivity::class.java)
                 startActivity(intent)
             }
             R.id.setting -> {

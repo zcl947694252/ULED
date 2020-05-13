@@ -902,6 +902,7 @@
     <string name="gate_way_time_max">网关定时已达最大创建数</string>
     <string name="add_time">添加定时任务</string>
     <string name="add_times">添加任务</string>
+    <string name="add_times2">添加循环任务</string>
     <string name="to">至</string>
     <string name="endTime">8:00</string>
     <string name="standing_time">停留时间</string>
@@ -910,7 +911,7 @@
     <string name="no_get_device_info">未获取到设备信息,请重试</string>
     <string name="have_time_task">该时间段已存在响应任务,请选择其他时间</string>
     <string name="please_chose_right_time">开始时间不能大于结束时间,请重新选择</string>
-    <string name="timer_period_set">时间段设置</string>
+    <string name="timer_period_set">任务列表</string>
     <string name="please_select_standing_time">请选择停留时间</string>
     <string name="please_setting_least_one">请至少配置一个时间段的场景</string>
     <string name="open_gps_tip">为扫描到设备，检测到定位未开启，是否打开定位？</string>
@@ -977,10 +978,10 @@
     <string name="select_mode">选择模式</string>
     <string name="mode_choice">模式选择:</string>
     <string name="select_gradient">选择渐变</string>
-    <string name="save_lock">安全锁</string>
+    <string name="safe_lock">安全锁</string>
     <string name="open">开</string>
-    <string name="save_lock1">锁定：（点击开后进行锁定，锁定完成灯会关闭）</string>
+    <string name="safe_lock1">锁定：（点击开后进行锁定，锁定完成灯会关闭）</string>
     <string name="lock">锁定</string>
-    <string name="save_lock2">解锁：（点击关后进行解锁，解锁完成灯会开启）</string>
+    <string name="safe_lock2">解锁：（点击关后进行解锁，解锁完成灯会开启）</string>
     <string name="unlock">解锁</string>
 </resources>

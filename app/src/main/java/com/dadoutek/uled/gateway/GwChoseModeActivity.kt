@@ -31,7 +31,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     private var week: Int = 0
     private val checkedList = ArrayList<WeekBean>()
     fun initListener() {
-        tvRename.setOnClickListener {
+        tv_function1.setOnClickListener {
             setWeekResult()
         }
     }

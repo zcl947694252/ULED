@@ -700,7 +700,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             if (TelinkLightApplication.getApp().connectDevice == null) {
-
                                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB,
                                         DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
@@ -718,6 +717,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                         LogUtils.d("connect failed, reason = $it")
                                                     }
                                             )
+                                }else{
+                                    ToastUtils.showShort(getString(R.string.no_connect_device))
                                 }
                             }
                         }, { LogUtils.d(it) })
