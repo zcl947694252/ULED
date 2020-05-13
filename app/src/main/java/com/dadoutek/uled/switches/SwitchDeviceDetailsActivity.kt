@@ -306,7 +306,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             if (currentSwitch != null) {
                 TelinkLightService.Instance()?.idleMode(true)
                 showLoadingDialog(getString(R.string.connecting))
-                connect(macAddress = currentLight?.macAddr, retryTimes = 3)
+                connect(macAddress = currentLight?.macAddr, retryTimes = 1)
                         ?.subscribe(
                                 {
                                     onLogin(it)//判断进入那个开关设置界面

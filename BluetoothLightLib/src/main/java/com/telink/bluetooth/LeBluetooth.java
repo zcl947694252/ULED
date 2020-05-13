@@ -349,7 +349,7 @@ public final class LeBluetooth {
             return false;
         if (mAdapter.isEnabled())
             return true;
-        return mAdapter.enable();
+        return mAdapter.isEnabled();
     }
 
     public BluetoothAdapter getAdapter(Context context) {

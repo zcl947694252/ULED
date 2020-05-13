@@ -65,7 +65,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
-    private  var netWorkChangReceiver: NetWorkChangReceiver? = null
+    private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
@@ -102,10 +102,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
+        if (!LeBluetooth.getInstance().isEnabled)
             ToastUtils.showShort(getString(R.string.open_blutooth_tip))
         //注册网络状态监听广播
-         netWorkChangReceiver = NetWorkChangReceiver()
+        netWorkChangReceiver = NetWorkChangReceiver()
         var filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
@@ -292,7 +292,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 //if (!isScanning)
-                   // RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
+                // RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
 //              LogUtils.v("zcl---baseactivity收到登出广播")
@@ -324,15 +324,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()
 
-           if (LeBluetooth.getInstance().isEnabled) {
-               if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
-                   changeDisplayImgOnToolbar(true)
-               } else {
-                   changeDisplayImgOnToolbar(false)
-               }
-           } else {
-               changeDisplayImgOnToolbar(false)
-           }
+        if (LeBluetooth.getInstance().isEnabled) {
+            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
+                changeDisplayImgOnToolbar(true)
+            } else {
+                changeDisplayImgOnToolbar(false)
+            }
+        } else {
+            changeDisplayImgOnToolbar(false)
+        }
 
     }
 
@@ -705,7 +705,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20,isAutoConnect:Boolean=true): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
@@ -813,9 +813,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 if (networkInfo != null && networkInfo.isAvailable) {
                     if (!isHaveNetwork) {
                         val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
-                        if (connected !=true)
+                        if (connected != true)
                             TelinkLightApplication.getApp().initStompClient()
-                    LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
+                        LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
                         isHaveNetwork = true
                     }
                 } else {

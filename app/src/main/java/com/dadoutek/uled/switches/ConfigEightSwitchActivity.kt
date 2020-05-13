@@ -203,7 +203,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 var dbScene = DbScene()
                 dbScene.id = 1000000L
-                sceneMap[i] = dbScene
+                if (7 != i)
+                    sceneMap[i] = dbScene
             }
         }
     }
@@ -293,11 +294,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val first = mutableListOf(0, 1)
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
-        val four = mutableListOf(6, 7)
-        /* val four: MutableList<Int> = if (sceneParamList.size > 7)
-             mutableListOf(6, 7)
-         else
-             mutableListOf(6)*/
+        //val four = mutableListOf(6, 7)
+        val four: MutableList<Int> = if (sceneParamList.size > 7)
+            mutableListOf(6/*, 7*/)
+        else
+            mutableListOf(6)
         val sceneParmOne = getSceneParm(first)
         val sceneParmTwo = getSceneParm(second)
         val sceneParmThird = getSceneParm(third)
@@ -459,7 +460,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
         val firstNum = list[0]
         val dbSceneFirst = sceneMap[firstNum]
-        val firsDbSceneId = if (dbSceneFirst == null||dbSceneFirst.id==1000000L) {
+        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 1000000L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             1000000L
@@ -472,7 +473,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             val secondNum = list[1]
             val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            val secondDbSceneId = if (dbSceneSecond == null||dbSceneSecond.id==1000000L) {
+            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 1000000L) {
                 secondOpcode = Opcode.DEFAULT_SWITCH8K
                 listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
                 1000000L
