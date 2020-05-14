@@ -142,7 +142,7 @@ class TelinkLightApplication : TelinkApplication() {
                     LogUtils.e("zcl单点登录 It's time to cancel $it")
 
                     val boolean = SharedPreferencesHelper.getBoolean(getApp(), Constant.IS_LOGIN, false)
-                    LogUtils.e("zcl单点登录 It's time to cancel----$boolean------ $it------------${DBUtils.lastUser?.login_state_key}")
+                    //LogUtils.e("zcl单点登录 It's time to cancel----$boolean------ $it------------${DBUtils.lastUser?.login_state_key}")
                     if (it != DBUtils.lastUser?.login_state_key && boolean) {//确保登录时成功的
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT

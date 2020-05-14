@@ -88,9 +88,7 @@ class SettingActivity : BaseActivity() {
     lateinit var cancelConfirmLy: LinearLayout
     lateinit var cancelConfirmVertical: View
     var isResetFactory = false
-
     override fun initListener() {}
-
 
     override fun initData() {
         val list = arrayListOf<SettingItemBean>()
@@ -98,7 +96,6 @@ class SettingActivity : BaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
         list.add(SettingItemBean(R.drawable.icon_retrieve, getString(R.string.recovery_active_equipment)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.physical_recovery)))
-
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)
@@ -129,14 +126,17 @@ class SettingActivity : BaseActivity() {
 
     private fun startToRecoverDevices() {
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
-        disposableTimer = Observable.timer(20, TimeUnit.SECONDS).subscribe {
+        disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
+            hideLoadingDialog()
             disposableFind?.dispose()
+            ToastUtils.showShort(getString(R.string.find_device_num)+0)
         }
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     disposableTimer?.dispose()
+                    ToastUtils.showShort(getString(R.string.find_device_num)+it)
                     hideLoadingDialog()
                 }, {
                     disposableTimer?.dispose()

@@ -129,7 +129,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
         initView()
         initData()
-
     }
 
     private fun initView() {
@@ -544,15 +543,16 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
         deleteBtnNoFactory.setOnClickListener {
             popupWindow.dismiss()//删除网关
-
-            showDialogDelete = AlertDialog.Builder(this).setTitle(getString(R.string.user_reset)).setMessage(R.string.user_reset_tip)
+            showDialogDelete = AlertDialog.Builder(this).setMessage(R.string.user_reset_tip)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         disposableFactoryTimer?.dispose()
                         disposableFactoryTimer = Observable.timer(10000, TimeUnit.MILLISECONDS)
                                 .subscribe {
                                     ToastUtils.showShort(getString(R.string.reset_gw_faile))
                                 }
-
+                        GlobalScope.launch(Dispatchers.Main) {
+                            showLoadingDialog(getString(R.string.please_wait))
+                        }
                         var labHeadPar = byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
                         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr
                                 ?: 0, labHeadPar, "1")

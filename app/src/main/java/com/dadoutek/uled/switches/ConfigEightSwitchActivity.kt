@@ -84,7 +84,10 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val groupKey = mutableListOf(4, 5, 6, 7)
         val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6)
         val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
+        //先进行填充默认数据
+        setDefaultData()
 
+        //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         bottom_version_number?.text = version
@@ -106,7 +109,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configSwitchType = type//赋值选择的模式
                 clickType = 1//代表跳过选择模式
 
-
                 setTextColorsAndText(type)
 
                 for (i in 0 until listKeysBean.length()) {
@@ -120,10 +122,13 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             val lowMes = jOb.getInt("reserveValue_B")
 
                             var mesAddress = (highMes shl 8) or lowMes
-
                             //赋值旧的设置数据
-                            groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
-                            groupKey.remove(keyId)
+                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+
+                            if (groupByMeshAddr != null) {
+                                groupMap[keyId] = groupByMeshAddr
+                                groupKey.remove(keyId)
+                            }
                             when (keyId) {
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
@@ -156,8 +161,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                             val lowMes = jOb.getInt("reserveValue_B")
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            doubleGroupKey.remove(keyId)
-                            groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
+                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+                            if (groupByMeshAddr != null) {
+                                groupMap[keyId] = groupByMeshAddr
+                                doubleGroupKey.remove(keyId)
+                            }
                             when (keyId) {
                                 2 -> eight_switch_b3.text = name
                                 3 -> eight_switch_b4.text = name
@@ -169,7 +177,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
-                when (type) {
+               /* when (type) {
                     0 -> {
                         groupKey.forEach { itKey ->
                             var dbGroup = DbGroup()
@@ -193,19 +201,22 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                     else -> {
                     }
-                }
+                }*/
             }
-        } else {
-            for (i in 0 until 8) {
-                var dbGroup = DbGroup()
-                dbGroup.id = 1000000L
-                groupMap[i] = dbGroup
+        }
+    }
 
-                var dbScene = DbScene()
-                dbScene.id = 1000000L
-                if (7 != i)
-                    sceneMap[i] = dbScene
-            }
+    private fun setDefaultData() {
+        groupMap.clear()
+        sceneMap.clear()
+        for (i in 0 until 8) {
+            var dbGroup = DbGroup()
+            dbGroup.id = 1000000L
+            groupMap[i] = dbGroup
+
+            var dbScene = DbScene()
+            dbScene.id = 1000000L
+            sceneMap[i] = dbScene
         }
     }
 
@@ -662,7 +673,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
         eight_switch_banner.adapter = MoreItemVpAdapter(list, this)
         eight_switch_banner.offscreenPageLimit = 3
-        eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f, this))
+        eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f))
         eight_switch_banner.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(p0: Int) {}
 
@@ -670,8 +681,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
             override fun onPageSelected(p0: Int) {
                 configSwitchType = p0
-                groupMap.clear()
-                sceneMap.clear()
+
+                setDefaultData()
                 when (p0) {
                     0 -> {
                         configSwitchType = 0
@@ -716,11 +727,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         eight_switch_mode.setOnClickListener {//清除数据并且清除模式
-            sceneMap.clear()
-            groupMap.clear()
+            setDefaultData()
             eight_switch_mode.visibility = View.GONE
             eight_switch_config.visibility = View.GONE
             eight_switch_banner_ly.visibility = View.VISIBLE
+            eight_switch_banner.currentItem = 0
             clickType = 0//代表没有选择模式
             configSwitchType = 0//默认选中的是群组八键开关
             eight_switch_title.text = getString(R.string.group_switch)

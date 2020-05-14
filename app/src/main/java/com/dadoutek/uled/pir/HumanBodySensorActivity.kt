@@ -1,9 +1,10 @@
-package com.dadoutek.uled.pir
+package com.dadoutek.uled.othersview
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -29,10 +30,8 @@ import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -50,11 +49,8 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
-import kotlinx.android.synthetic.main.huuman_body_sensor.tvPSVersion
 import kotlinx.android.synthetic.main.template_loading_progress.*
-import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -74,23 +70,22 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
-    private lateinit var mScenes: List<DbScene>
-    private lateinit var mGroups: MutableList<DbGroup>
-    private var isGroupMode: Boolean = true
+
     private var disposable: Disposable? = null
     private var isConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
+    private var nightLightGroupRecycleViewAdapter: NightLightGroupRecycleViewAdapter? = null
+    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter? = null
     private val CMD_OPEN_LIGHT = 0X01
     private val CMD_CLOSE_LIGHT = 0X00
     private val CMD_CONTROL_GROUP = 0X02
     private var switchMode = 0X01
     private var selectTime = 10
-    //底部组适配器
-    private var showGroupList: MutableList<ItemGroup>? = mutableListOf()
-    private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
-    //显示选择分组下拉的数据 选择组适配器
-    private var showCheckListData: MutableList<DbGroup> = mutableListOf()
-    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.night_light_sensor_adapter, showCheckListData)
+    private var showGroupList: MutableList<ItemGroup>? = null
+    /**
+     * 显示选择分组下拉的数据
+     */
+    private var showCheckListData: MutableList<DbGroup>? = null
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
     private var modeSwitchMode = 0
@@ -103,6 +98,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val MODE_SWITCH_MODE_GRADIENT = 4
     private var retryConnectCount = 0
     private var isFinish: Boolean = false
+    val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,84 +106,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
-        setAdapters()
         initData()
         initView()
         initListener()
     }
 
-    private fun setAdapters() {
-        recyclerView_select_group_list_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        recyclerView_select_group_list_view.addItemDecoration(decoration)
-        nightLightEditGroupAdapter.bindToRecyclerView(recyclerView_select_group_list_view)
-
-        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
-        nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
-        nightLightEditGroupAdapter.onItemClickListener = OnItemClickListener { adapter, _, position ->
-            val item = showCheckListData[position]
-            if (item.checked) {//t状态
-                item.checked = !item.checked
-            } else {//f状态下
-                if (position == 0 && item.meshAddr == 0xffff) {//65535
-                    setFrist()
-                } else {
-                    item.checked = true
-                    if (position != 0)
-                        showCheckListData[0].checked = false
-                     else
-                        setFrist()
-                }
-            }
-            adapter?.notifyDataSetChanged()
-        }
-    }
-
     private fun initListener() {
-        nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-            if (view.id == R.id.imgDelete) delete(adapter, position)
-        }
-        top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.color_mode_rb -> {
-                    isGroupMode = true
-                    getGroupName()
-                    color_mode_rb.setTextColor(getColor(R.color.blue_text))
-                    gradient_mode_rb.setTextColor(getColor(R.color.gray9))
-                    choose_group_tv.text = getString(R.string.choose_group)
-                }
-                R.id.gradient_mode_rb -> {
-                    isGroupMode = false
-                    getSceneName()
-                    color_mode_rb.setTextColor(getColor(R.color.gray9))
-                    gradient_mode_rb.setTextColor(getColor(R.color.blue_text))
-                    choose_group_tv.text = getString(R.string.choose_scene_dot)
-                }
-            }
-        }
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
         TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-    private fun getSceneName() {
-        mScenes = DBUtils.sceneAll
-      /*  mGroupScenesName?.clear()
-        for (item in mScenes)
-            mGroupScenesName!!.add(item.name)
-        groupSceneAdapter.notifyDataSetChanged()*/
-    }
-
-    private fun getGroupName() {
-        mGroups = DBUtils.allGroups
-    /*    mGroupScenesName?.clear()
-        for (item in mGroups)
-            if (item.deviceType == Constant.DEVICE_TYPE_CONNECTOR || item.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || item.deviceType
-             ==Constant.DEVICE_TYPE_LIGHT_NORMAL || item.deviceType == Constant.DEVICE_TYPE_NO) {
-                if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
-                    mGroupScenesName!!.add(item.name)
-            }
-        groupSceneAdapter.notifyDataSetChanged()*/
     }
 
     override fun onDestroy() {
@@ -201,7 +127,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val deviceEvent = event as DeviceEvent
         val deviceInfo = deviceEvent.args
 
-        if (event.type == ErrorReportEvent.ERROR_REPORT) {
+        if (event.type ==   ErrorReportEvent.ERROR_REPORT){
             val info = (event as ErrorReportEvent).args
             onErrorReport(info)
         }
@@ -213,7 +139,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
 
             LightAdapter.STATUS_LOGOUT -> {
-                autoConnectSensor()
+               autoConnectSensor()
+
+              //autoConnect()
                 image_bluetooth.setImageResource(R.drawable.bluetooth_no)
             }
         }
@@ -224,23 +152,41 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> LogUtils.e("蓝牙未开启")
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> LogUtils.e("无法收到广播包以及响应包")
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> LogUtils.e("未扫到目标设备")
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+
+                        LogUtils.e("蓝牙未开启")
+                }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        LogUtils.e("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        LogUtils.e("未扫到目标设备")
+                    }
                 }
 
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> LogUtils.e("未读到att表")
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> LogUtils.e("未建立物理连接")
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        LogUtils.e("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        LogUtils.e("未建立物理连接")
+
+                    }
                 }
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> LogUtils.e("value check失败： 密码错误")
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> LogUtils.e("read login data 没有收到response")
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> LogUtils.e("write login data 没有收到response")
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        LogUtils.e("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        LogUtils.e("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        LogUtils.e("write login data 没有收到response")
+                    }
                 }
                 LogUtils.e("onError login")
             }
@@ -252,10 +198,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
+
         showCheckListData = DBUtils.allGroups
+
         var lightGroup = DBUtils.allGroups
 
-        showCheckListData.clear()
+        showCheckListData!!.clear()
 
         for (i in lightGroup.indices) {
             when (lightGroup[i].deviceType) {
@@ -322,6 +270,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initView() {
+        temp_rg.visibility = View.GONE
         tv_function1.text = getString(R.string.btn_sure)
         tv_function1.setOnClickListener(this)
         triggering_conditions.setOnClickListener(this)
@@ -476,7 +425,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                     return@setPositiveButton
                                 }
                                 if (brin > 100) {
-                                    ToastUtils.showShort(getString(R.string.brightness_cannot_be_greater_than))
+                                    ToastUtils.showShort( getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
                                 trigger_time_text.text = textGp.text.toString() + "%"
@@ -758,7 +707,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 sensor_three.visibility = View.GONE
                 edit_data_view_layout.visibility = View.VISIBLE
 
-                showCheckListData.let {
+                showCheckListData?.let {
                     if (showGroupList!!.size != 0) {
                         for (i in it.indices)//0-1
                             for (j in showGroupList!!.indices)//0-1-3
@@ -775,9 +724,36 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                             it[i].checked = i == 0
                         }
                     }
-                    nightLightEditGroupAdapter.notifyDataSetChanged()
+
+                    recyclerView_select_group_list_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+                    nightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.night_light_sensor_adapter, it)
+                    //添加分割线
+                    val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+                    decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+                    recyclerView_select_group_list_view.addItemDecoration(decoration)
+
+                    nightLightEditGroupAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
+                    nightLightEditGroupAdapter?.onItemClickListener = OnItemClickListener { adapter, _, position ->
+                        val item = it[position]
+                        if (item.checked) {//t状态
+                            item.checked = !item.checked
+                        } else {//f状态下
+                            if (position == 0 && item.meshAddr == 0xffff) {//65535
+                                setFrist()
+                            } else {
+                                item.checked = true
+                                if (position != 0) {
+                                    it[0].checked = false
+                                } else {
+                                    setFrist()
+                                }
+                            }
+                        }
+                        adapter?.notifyDataSetChanged()
+                    }
                 }
             }
+
 
             R.id.tv_function1 -> {
                 val oldResultItemList = ArrayList<ItemGroup>()
@@ -858,27 +834,27 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             return
         }
         val device = TelinkLightApplication.getApp().connectDevice
-        if (device != null && device.macAddress == mDeviceInfo.macAddress) {
-            Thread {
-                GlobalScope.launch(Dispatchers.Main) {
-                    setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
-                }
-                LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
-                configLightlight()
-                Thread.sleep(300)
-                Commander.updateMeshName(
-                        successCallback = {
-                            setLoadingVisbiltyOrGone()
-                            configureComplete()
-                        },
-                        failedCallback = {
-                            snackbar(sensor_root, getString(R.string.pace_fail))
-                            setLoadingVisbiltyOrGone()
-                            TelinkLightService.Instance()?.idleMode(true)
-                        })
+        if (device != null&&device.macAddress==mDeviceInfo.macAddress){
+        Thread {
+            GlobalScope.launch(Dispatchers.Main) {
+                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
+            }
+            LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
+            configLightlight()
+            Thread.sleep(300)
+            Commander.updateMeshName(
+                    successCallback = {
+                        setLoadingVisbiltyOrGone()
+                        configureComplete()
+                    },
+                    failedCallback = {
+                        snackbar(sensor_root, getString(R.string.pace_fail))
+                        setLoadingVisbiltyOrGone()
+                        TelinkLightService.Instance()?.idleMode(true)
+                    })
 
-            }.start()
-        } else {
+        }.start()
+        }else{
             ToastUtils.showLong(getString(R.string.connect_fail))
             autoConnectSensor()
         }
@@ -901,7 +877,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         if (time_type_text.text.toString() == getString(R.string.second)) {
             if (time.toInt() < 10) {
-                ToastUtils.showShort(getString(R.string.timeout_time_less_ten))
+                ToastUtils.showShort( getString(R.string.timeout_time_less_ten))
                 return
             }
 
@@ -911,7 +887,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
         } else if (time_type_text.text.toString() == getString(R.string.minute)) {
             if (time.toInt() < 1) {
-                ToastUtils.showShort(getString(R.string.timeout_1m))
+                ToastUtils.showShort( getString(R.string.timeout_1m))
                 return
             }
 
@@ -1067,7 +1043,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
         }
         val device = TelinkLightApplication.getApp().connectDevice
-        if (device != null && device.macAddress == mDeviceInfo.macAddress) {
+        if (device != null&&device.macAddress==mDeviceInfo.macAddress) {
             GlobalScope.launch(Dispatchers.Main) {
                 setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
             }
@@ -1094,8 +1070,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         configureComplete()
                         TelinkLightService.Instance()?.idleMode(true)
                     },
-                    failedCallback = {
-                        this@HumanBodySensorActivity.runOnUiThread {
+                    failedCallback = { this@HumanBodySensorActivity.runOnUiThread {
                             snackbar(sensor_root, getString(R.string.pace_fail))
                             setLoadingVisbiltyOrGone()
                         }
@@ -1130,6 +1105,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         sensor_three.visibility = View.VISIBLE
         edit_data_view_layout.visibility = View.GONE
         tv_function1.visibility = View.GONE
+
+        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
+        this.nightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
+
+        nightLightGroupRecycleViewAdapter?.bindToRecyclerView(recyclerGroup)
+        nightLightGroupRecycleViewAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+            when (view.id) {
+                R.id.imgDelete -> delete(adapter, position)
+            }
+        }
     }
 
     private fun delete(adapter: BaseQuickAdapter<Any, BaseViewHolder>, position: Int) {
@@ -1168,10 +1153,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         setLoadingVisbiltyOrGone(View.VISIBLE, getString(R.string.connecting_tip))
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
-        val name: String? = if (isConfirm)
-            DBUtils.lastUser?.controlMeshName
-        else
-            Constant.DEFAULT_MESH_FACTORY_NAME
+            val name: String? = if (isConfirm)
+                DBUtils.lastUser?.controlMeshName
+            else
+                Constant.DEFAULT_MESH_FACTORY_NAME
         connectParams?.setMeshName(name)
 
         connectParams?.setConnectMac(mDeviceInfo.macAddress)

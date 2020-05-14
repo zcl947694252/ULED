@@ -1066,4 +1066,5 @@
     <string name="open_light">Open light</string>
     <string name="close_light">Close light</string>
     <string name="open_blutooth_tip">Please turn on bluetooth</string>
+    <string name="find_device_num">Number of recovered devices:</string>
 </resources>

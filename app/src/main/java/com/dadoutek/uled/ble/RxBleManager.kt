@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.regionAll
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkObserver
@@ -23,6 +25,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -49,21 +52,24 @@ object RxBleManager {
     }
 
     fun initData() {
-        //regionList = SharedPreferencesUtils.getRegionNameList()
-        regionList = getRegionList()  //不能使用包i装的response
+        getLocalRegionName()
+        getRegionList()  //不能使用包i装的response
     }
 
     @SuppressLint("CheckResult")
-    private fun getRegionList(): MutableList<String> {
-        var list = mutableListOf<String>()
+    private fun getRegionList() {
         RegionModel.getRegionName().subscribe(object : NetworkObserver<Response<MutableList<String>>?>() {
             override fun onNext(t: Response<MutableList<String>>) {
-                list = t.t
+                regionList = t.t
                 LogUtils.v("zcl获取区域contromes名列表-------------$t")
-                SharedPreferencesUtils.saveRegionNameList(list)
             }
         })
-        return list
+    }
+
+    private fun getLocalRegionName() {
+        regionAll.forEach {
+            regionList?.add(it.name)
+        }
     }
 
     /**
@@ -121,9 +127,13 @@ object RxBleManager {
                     val b = isSupportHybridFactoryReset(version)
                     //返回true  说明是自己区域下的设备或者为恢复出厂的设备
                     var isMyDevice = isMyDevice(it.bleDevice.name)
-                    LogUtils.v("zcl物理搜索设备名$b==============${it.bleDevice.name}-----------------${it.bleDevice.macAddress}")
 
-                    version != "" && !isMyDevice
+                    LogUtils.v("zcl物理搜索设备名=${regionList}=${it.bleDevice.name}---------$version--------${it.bleDevice.macAddress}----${version == "" && !isMyDevice}")
+
+                    if (version == "")
+                        false
+                    else
+                        version != "" && !isMyDevice
                 }
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())

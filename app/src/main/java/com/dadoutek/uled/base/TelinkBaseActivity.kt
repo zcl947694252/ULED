@@ -102,8 +102,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
-        if (!LeBluetooth.getInstance().isEnabled)
-            ToastUtils.showShort(getString(R.string.open_blutooth_tip))
         //注册网络状态监听广播
         netWorkChangReceiver = NetWorkChangReceiver()
         var filter = IntentFilter()
@@ -320,6 +318,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!LeBluetooth.getInstance().enable(applicationContext))
+            TmtUtils.midToastLong(this, getString(R.string.get_server_version_fail))
         isResume = true
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()

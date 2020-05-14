@@ -59,8 +59,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
-    private  var leftGroup: DbGroup? = null
-    private  var rightGroup: DbGroup? = null
+    private var leftGroup: DbGroup? = null
+    private var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
 
@@ -81,15 +81,23 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (isRetryConfig != null && isRetryConfig == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
             switchDate?.let {
-                val stringToList = GsonUtil.stringToList<Int>(it.controlGroupAddrs)
-                if (stringToList==null||stringToList.size < 2) {
+                val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
+                if (stringToList == null || stringToList.size < 2) {
                     ToastUtils.showShort(getString(R.string.invalid_data))
                     finish()
                 } else {
-                    leftGroup = DBUtils.getGroupByMeshAddr(stringToList[0])
-                    rightGroup = DBUtils.getGroupByMeshAddr(stringToList[1])
-                    switch_double_touch_left_tv.text = leftGroup?.name
-                    switch_double_touch_right_tv.text = rightGroup?.name
+                    if (stringToList.size >= 2) {
+                        val meshL = stringToList[0]
+                        if (meshL != null && meshL.toInt() != 1000000) {
+                            leftGroup = DBUtils.getGroupByMeshAddr(meshL.toInt())
+                            switch_double_touch_left_tv.text = leftGroup?.name
+                        }
+                        val meshR = stringToList[1]
+                        if (meshR != null && meshR.toInt() != 1000000) {
+                            rightGroup = DBUtils.getGroupByMeshAddr(meshR.toInt())
+                            switch_double_touch_right_tv.text = rightGroup?.name
+                        }
+                    }
                 }
             }
 
@@ -142,7 +150,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr
+                        ?: 1000000))
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
@@ -154,7 +163,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr
+                        ?: 1000000))
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
@@ -195,8 +205,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.switch_double_touch_use_button -> {
-                if (leftGroup == null || rightGroup == null) {
-                    ToastUtils.showShort(getString(R.string.please_check_group_tip))
+                if (leftGroup == null && rightGroup == null) {
+                    ToastUtils.showShort(getString(R.string.config_night_light_select_group))
                 } else {
                     showLoadingDialog(getString(R.string.please_wait))
                     GlobalScope.launch {
@@ -223,10 +233,26 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun setGroupForSwitch() {
-        val leftH =   leftGroup!!.meshAddr.shr(8).toByte()
-        val leftL =   leftGroup!!.meshAddr.and(0xff).toByte()
-        val rightH = rightGroup!!.meshAddr.shr(8).toByte()
-        val rightL = rightGroup!!.meshAddr.and(0xff).toByte()
+        val leftH: Byte
+        val leftL: Byte
+        val rightH: Byte
+        val rightL: Byte
+        if (leftGroup != null) {
+            leftH = leftGroup!!.meshAddr.shr(8).toByte()
+            leftL = leftGroup!!.meshAddr.and(0xff).toByte()
+        } else {
+            leftH = 0
+            leftL = 0
+        }
+
+        if (rightGroup != null) {
+            rightH = rightGroup!!.meshAddr.shr(8).toByte()
+            rightL = rightGroup!!.meshAddr.and(0xff).toByte()
+        } else {
+            rightH = 0
+            rightL = 0
+        }
+
         val bytes = byteArrayOf(leftL, leftH, rightL, rightH, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo?.meshAddress ?: 0, bytes)
     }

@@ -38,7 +38,7 @@ object Opcode {
      */
     const val CONFIG_GW_SWITCH: Byte = 0xd0.toByte()
     /**
-     * 网关默认恢复出厂
+     * 网关默认恢复出厂 0XF0
      */
     const val CONFIG_GW_REST_FACTORY: Byte = 0xf0.toByte()
     /**

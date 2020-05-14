@@ -17,6 +17,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -58,9 +59,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private var isSearchedDevice: Boolean = false
     private val SCAN_TIMEOUT_SECOND: Int = 20
     private val CONNECT_TIMEOUT_SECONDS: Int = 30
-    private val MAX_RETRY_CONNECT_TIME = 3
+    private val MAX_RETRY_CONNECT_TIME = 1
     private var mRetryConnectCount: Int = 0
-    private var getVersionRetryMaxCount = 2
+    private var getVersionRetryMaxCount = 1
     private var getVersionRetryCount = 0
     private var mDeviceInfo: DeviceInfo? = null
     private var connectDisposable: Disposable? = null
@@ -322,7 +323,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {//3
                 connectDisposable?.dispose()
                 onLogin()
-
             }
 
             LightAdapter.STATUS_LOGOUT -> {//4
@@ -340,12 +340,12 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun login() {
         LogUtils.e("zcl**********************进入登录$")
         val mesh = TelinkLightApplication.getApp().mesh
-        val pwd: String
-        pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
+        val pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
-        } else {
+           // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
+        else
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
-        }
+
         LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}-----------$pwd---------${DBUtils.lastUser?.controlMeshName}")
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
@@ -383,6 +383,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                     getVersion()
                                 } else {
+                                    closeAnimal()
                                     ToastUtils.showLong(getString(R.string.get_version_fail))
                                     finish()
                                 }

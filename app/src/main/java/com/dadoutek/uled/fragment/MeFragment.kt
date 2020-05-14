@@ -20,12 +20,14 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -48,6 +50,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -57,6 +62,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class MeFragment : BaseFragment(), View.OnClickListener {
+    private var mConnectDisposal: Disposable? = null
     private var disposable: Disposable? = null
     private var cancel: Button? = null
     private var confirm: Button? = null
@@ -176,12 +182,12 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-            mWakeLock?.acquire()
+        mWakeLock?.acquire()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-            mWakeLock?.release()
+        mWakeLock?.release()
         compositeDisposable.dispose()
     }
 
@@ -274,7 +280,27 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 checkNetworkAndSync(activity)
             }
             R.id.user_reset -> {
-                userReset()
+                if (TelinkLightApplication.getApp().connectDevice != null)
+                    userReset()
+                else {
+                    val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                            DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                    val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+                    if (size > 0) {
+                        ToastUtils.showLong(R.string.connecting_please_wait)
+                        mConnectDisposal?.dispose()
+                        mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                                ?.subscribe({//找回有效设备
+                                            mConnectDisposal?.dispose()
+                                        },
+                                        {
+                                            LogUtils.d("connect failed, reason = $it")
+                                        }
+                                )
+                    } else {
+                        ToastUtils.showShort(getString(R.string.no_connect_device))
+                    }
+                }
             }
             R.id.rlRegion -> {
                 var intent = Intent(activity, NetworkActivity::class.java)
@@ -295,6 +321,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+
     private fun openSet() {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
@@ -307,12 +334,13 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private fun userReset() {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(getString(R.string.user_reset))
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xff,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
         builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
             UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
                 //删除服务器数据
                 override fun onNext(t: String) {
+
                     clearData()//删除本地数据
                     ToastUtils.showShort(getString(R.string.reset_user_success))
                 }

@@ -41,17 +41,17 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     private var disposableConnectWaitTimer: Disposable? = null
     private val scanMinTime: Long = 10000
     private val scanMaxTime: Long = 25000
+    private var macAddress: String? = null
+    private var disposableScan: Disposable? = null
     private var disposableWrite: Disposable? = null
     private var disposableFiveTimer: Disposable? = null
-    private var macAddress: String? = null
-    private var disposableShowResultDelay: Disposable? = null
-    private val fiveDownTime: Long = 5L
+    private var disposableScanTimer: Disposable? = null
     private var disposableConnectTimer: Disposable? = null
+    private var disposableShowResultDelay: Disposable? = null
+    private var disposableConnectOffTimer: Disposable? = null
+    private val fiveDownTime: Long = 5L
     private val powerOffTimer: Long = 30
     private val connectTimeOut: Long = 30
-    private var disposableConnectOffTimer: Disposable? = null
-    private var disposableScanTimer: Disposable? = null
-    private var disposableScan: Disposable? = null
     private var isConnection = false
     private var countConnection = 0
     private var disposableConnect: Disposable? = null
@@ -101,7 +101,6 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                         LogUtils.e("zcl物理恢复----------------------${it.bleDevice.macAddress == macAddress}---------${it.bleDevice.macAddress}---------$macAddress")
                     }, {
                         LogUtils.v("zcl------------物理恢复扫描错误信息$it-------------------连接状态$allStateTag")
-                        disposableScan?.dispose()
                         disposableFiveTimer?.dispose()
                         disposableConnectOffTimer?.dispose()
                         disposableConnectTimer?.dispose()
@@ -426,6 +425,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
         physical_recovery_ready_ly.visibility = ready
         physical_recovery_rly.visibility = state
         physical_recovery_success_ly.visibility = success
+
         physical_recovery_fail_ly.visibility = fail
         physical_recovery_old_ly.visibility = old
         if (fail == View.VISIBLE)
@@ -440,12 +440,11 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
     private fun setAllDispose() {
         disposableScan?.dispose()
-        disposableScanTimer?.dispose()
         disposableConnect?.dispose()
-
-        disposableConnectWaitTimer?.dispose()
+        disposableScanTimer?.dispose()
         disposableShowResultDelay?.dispose()
-        compositeDisposable.dispose()
+        disposableConnectOffTimer?.dispose()
+        disposableConnectWaitTimer?.dispose()
     }
 
     private fun isZh(context: Context): Boolean {
