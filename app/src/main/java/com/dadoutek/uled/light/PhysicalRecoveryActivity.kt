@@ -346,7 +346,6 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
                     physical_recovery_state_warm.textColor = getColor(R.color.gray_3)
                     changePowerDownTimerColor(number)
-
                 }
     }
 

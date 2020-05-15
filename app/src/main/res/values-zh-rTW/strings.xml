@@ -994,4 +994,5 @@
     <string name="user_reset_all3">如有其它问题,请查看APP使用说明.</string>
     <string name="physical_recovery_one">此操作不会复位本帐户下的灯。</string>
     <string name="physical_recovery_two">此操作会复位与APP进行上下电交互操作的设备所属区域内所有通电的设备（开关，传感器除外）</string>
+    <string name="reset_gw_faile">用户复位失败</string>
 </resources>
