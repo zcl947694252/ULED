@@ -153,7 +153,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         mApp = this.application as TelinkLightApplication
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (LeBluetooth.getInstance().isSupport(applicationContext)&&mBluetoothAdapter?.isEnabled==false)
+        if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
 
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
@@ -194,7 +194,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode==Activity.RESULT_OK&&requestCode==REQUEST_ENABLE_BT)
+        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT)
             ToastUtils.showShort("打开蓝牙")
     }
 
@@ -775,6 +775,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         installDialog?.dismiss()
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -787,7 +788,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
         mConnectDisposal?.dispose()
-        mBluetoothAdapter?.disable();
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 
@@ -862,7 +862,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     LogUtils.d("activity stack size = ${ActivityUtils.getActivityList()}")
                     setResult(Activity.RESULT_FIRST_USER)
                     TelinkLightApplication.getApp().releseStomp()
-                    ActivityUtils.finishAllActivities(true)
+                    //ActivityUtils.finishAllActivities(true)
                     TelinkApplication.getInstance().removeEventListeners()
                     //TelinkLightApplication.getApp().doDestroy()
                     finish()

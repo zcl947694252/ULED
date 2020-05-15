@@ -630,7 +630,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
         GuideUtils.resetAllGuide(activity!!)
         hideLoadingDialog()
-
     }
 
     //重启app并杀死原进程
@@ -638,9 +637,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
-       // com.blankj.utilcode.util.AppUtils.relaunchApp()
-        val intent = Intent(activity, LoginActivity::class.java)
-        startActivity(intent)
+        com.blankj.utilcode.util.AppUtils.relaunchApp()
     }
 
     override fun setLoginChange() {

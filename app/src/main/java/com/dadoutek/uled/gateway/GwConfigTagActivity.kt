@@ -103,7 +103,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
-        gate_way_repete_mode.textSize = 15F
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setOnClickListener {
              val textGp = EditText(this)

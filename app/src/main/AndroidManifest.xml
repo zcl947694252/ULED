@@ -215,7 +215,6 @@
         <activity
                 android:name=".switches.ConfigEightSwitchActivity"
                 android:screenOrientation="portrait">
-
         </activity>
 
         <activity

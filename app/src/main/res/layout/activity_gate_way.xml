@@ -24,7 +24,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/tag1"
                 android:textColor="@color/black_three"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
 
         <TextView
                 android:id="@+id/gate_way_edite"
