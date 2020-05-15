@@ -819,6 +819,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             LogUtils.v("zcl是否选中$isChecked")
         }
         batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
+            setDeviceStopBlink(deviceType)
             checkedNoGrouped = checkedId == batch_four_no_group.id
             switchNoGroupOrGroupedAndSetEmpty()
             changeTitleChecked()
@@ -1542,7 +1543,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyDataSetChanged()
                 }
-
             }
         }
     }
