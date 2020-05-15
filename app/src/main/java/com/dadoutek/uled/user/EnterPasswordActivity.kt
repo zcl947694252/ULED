@@ -177,7 +177,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                     Constant.TYPE_FORGET_PASSWORD -> forgetPassword()
                 }
             }
-            R.id.image_return_password -> finish()
+            R.id.image_return_password ->{startActivity(Intent(this@EnterPasswordActivity, LoginActivity::class.java))
+            finish()}
 
             R.id.forget_password -> {
                 var intent = Intent(this, ForgetPassWordActivity::class.java)
@@ -367,7 +368,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         }
     }
 
-
     @SuppressLint("CheckResult")
     private fun getRegioninfo(){//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
         NetworkFactory.getApi()
@@ -423,8 +423,10 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun syncComplet() {
         hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-        ActivityUtils.finishAllActivities(true)
-        ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
+        startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
+        finish()
+       // ActivityUtils.finishAllActivities(true)
+        //ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

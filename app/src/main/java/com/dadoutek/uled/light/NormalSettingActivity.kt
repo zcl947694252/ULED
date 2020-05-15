@@ -181,7 +181,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-                isBrightness = true
+            isBrightness = true
             if (isSwitch) {
                 var lightCurrent = DBUtils.getGroupByID(group!!.id)
                 if (lightCurrent != null) {
@@ -203,7 +203,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-                isBrightness = true
+            isBrightness = true
             if (isSwitch) {
                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                 if (lightCurrent != null) {
@@ -1046,13 +1046,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        slow_rg_view.setOnClickListener {  }
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
             initDataGroup()
             initViewGroup()
         } else {
-
-
             slow_ly.visibility = GONE
             currentShowPageGroup = false
             initToolbarLight()
@@ -1075,6 +1074,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             if (isChecked) { //开 关 上电 场景 1是打开 0 是关闭
                 val currentGroup = DBUtils.getGroupByID(group!!.id)
                 currentGroup?.slowUpSlowDownStatus = 1
+                slow_rg_view.visibility = GONE
                 DBUtils.updateGroup(currentGroup!!)
                 TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
                         ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
@@ -1083,7 +1083,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             } else {
                 val currentGroup = DBUtils.getGroupByID(group!!.id)
                 currentGroup?.slowUpSlowDownStatus = 0
-
+                slow_rg_view.visibility = VISIBLE
                 DBUtils.updateGroup(currentGroup!!)
                 TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
                         ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
@@ -1094,24 +1094,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         slow_rg_ly.setOnCheckedChangeListener { _, checkedId ->
             LogUtils.v("zcl-----------${slow_rg_slow.id}---${slow_rg_middle.id}----${slow_rg_fast.id}")
             val currentGroup = DBUtils.getGroupByID(group!!.id)
-            when (checkedId) {
-                R.id.slow_rg_slow -> {
-                    currentGroup?.slowUpSlowDownSpeed = 5
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                            ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 5))
+            if (currentGroup?.slowUpSlowDownStatus == 1) {
+                when (checkedId) {
+                    R.id.slow_rg_slow -> currentGroup?.slowUpSlowDownSpeed = 5
+                    R.id.slow_rg_middle -> currentGroup?.slowUpSlowDownSpeed = 3
+                    R.id.slow_rg_fast -> currentGroup?.slowUpSlowDownSpeed = 1
                 }
-                R.id.slow_rg_middle -> {
-                    currentGroup?.slowUpSlowDownSpeed = 3
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                            ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 3))
-                }
-                R.id.slow_rg_fast -> {
-                    currentGroup?.slowUpSlowDownSpeed = 1
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                            ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
-                }
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
+                DBUtils.updateGroup(currentGroup!!)
             }
-            DBUtils.updateGroup(currentGroup!!)
         }
         btn_remove_group?.setOnClickListener(clickListener)
         btn_rename?.setOnClickListener(clickListener)

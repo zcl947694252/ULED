@@ -49,6 +49,8 @@ import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
+import com.dadoutek.uled.user.InputPwdActivity
+import com.dadoutek.uled.user.LoginActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -588,7 +590,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n")
     private fun emptyTheCache() {
-
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
@@ -637,7 +638,9 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
-        com.blankj.utilcode.util.AppUtils.relaunchApp()
+       // com.blankj.utilcode.util.AppUtils.relaunchApp()
+        val intent = Intent(activity, LoginActivity::class.java)
+        startActivity(intent)
     }
 
     override fun setLoginChange() {

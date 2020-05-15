@@ -153,7 +153,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         mApp = this.application as TelinkLightApplication
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
+        if (LeBluetooth.getInstance().isSupport(applicationContext)&&mBluetoothAdapter?.isEnabled==false)
             mBluetoothAdapter?.enable()
 
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
