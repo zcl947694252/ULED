@@ -3,7 +3,6 @@ package com.dadoutek.uled.othersview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -100,6 +99,8 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  * 首页设备
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
+    private val REQUEST_ENABLE_BT: Int = 1200
+    private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
     private var retryDisposable: Disposable? = null
     private val mCompositeDisposable = CompositeDisposable()
@@ -150,14 +151,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // detectUpdate()
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)
         this.setContentView(R.layout.activity_main)
         mApp = this.application as TelinkLightApplication
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            mBluetoothAdapter?.enable()
 
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
 
         var dbGroup = DbGroup()
         dbGroup.id = 0
@@ -177,15 +178,25 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
+            //如果没打开蓝牙，就提示用户打开
             //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
-            startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
+            // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
             //startActivity(intent)
+            installId++
+            mBluetoothAdapter?.enable()
+
+            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
         initBottomNavigation()
-
         checkVersionAvailable()
-
         getRegionList()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode==Activity.RESULT_OK&&requestCode==REQUEST_ENABLE_BT)
+            ToastUtils.showShort("打开蓝牙")
     }
 
     @SuppressLint("CheckResult")
@@ -777,7 +788,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
         mConnectDisposal?.dispose()
-
+        mBluetoothAdapter?.disable();
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 

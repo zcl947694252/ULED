@@ -548,6 +548,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                         disposableFactoryTimer?.dispose()
                         disposableFactoryTimer = Observable.timer(10000, TimeUnit.MILLISECONDS)
                                 .subscribe {
+                                    hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.reset_gw_faile))
                                 }
                         GlobalScope.launch(Dispatchers.Main) {
@@ -727,13 +728,14 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun connectGw(configType: Int) {
         disposableTimer?.dispose()
-        if (configType != 3) {
+
             disposableTimer = Observable.timer(17, TimeUnit.SECONDS)
                     .subscribe {
                         hideLoadingDialog()
+                        if (configType != 3)
                         ToastUtils.showShort(getString(R.string.connect_fail))
                     }
-        }
+
         popupWindow.dismiss()
         if (currentGw != null) {
             TelinkLightService.Instance()?.idleMode(true)

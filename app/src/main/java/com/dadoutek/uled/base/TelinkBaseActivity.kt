@@ -319,7 +319,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (!LeBluetooth.getInstance().enable(applicationContext))
-            TmtUtils.midToastLong(this, getString(R.string.get_server_version_fail))
+            TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()
