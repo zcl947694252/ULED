@@ -87,7 +87,7 @@ class SettingActivity : BaseActivity() {
     lateinit var readTimer: TextView
     lateinit var cancelConfirmLy: LinearLayout
     lateinit var cancelConfirmVertical: View
-    var isResetFactory = false
+    var isResetFactory = 0
     override fun initListener() {}
 
     override fun initData() {
@@ -121,7 +121,9 @@ class SettingActivity : BaseActivity() {
     }
 
     private fun physicalRecovery() {
-        startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+        isResetFactory = 3;
+        setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,
+                R.string.user_reset_all3, isResetFactory)
     }
 
     private fun startToRecoverDevices() {
@@ -186,16 +188,16 @@ class SettingActivity : BaseActivity() {
 
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun showSureResetDialogByApp() {
-        isResetFactory = true
+        isResetFactory = 2
         setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
                 , R.string.have_question_look_notice, isResetFactory)
     }
 
     @SuppressLint("CheckResult", "StringFormatMatches")
-    private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Boolean) {
+    private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Int) {
         setNormalPopSetting()
 
-        if (isShowThree) {
+        if (isShowThree==2||isShowThree==3) {
             tvThree.visibility = View.VISIBLE
             hinitThree.visibility = View.VISIBLE
         } else {
@@ -205,7 +207,7 @@ class SettingActivity : BaseActivity() {
 
         hinitOne.text = getString(pleaseSureAllDevicePowerOn)
         hinitTwo.text = getString(resetFactoryAllDevice)
-        hinitThree.text = getString(haveQuestionLookNotice)
+        //hinitThree.text = getString(haveQuestionLookNotice)
         disposableInterval?.dispose()
         disposableInterval = Observable.intervalRange(0, downTime, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
@@ -256,20 +258,33 @@ class SettingActivity : BaseActivity() {
         tvOne.visibility = View.INVISIBLE
         tvTwo.visibility = View.INVISIBLE
 
-        if (isResetFactory) {
-            hinitTwo.visibility = View.VISIBLE
-            hinitOne.text = getString(R.string.tip_reset_sure)
-            hinitTwo.setTextColor(resources.getColor(R.color.red))
-        } else {
-            hinitTwo.visibility = View.GONE
-            hinitOne.text = getString(R.string.empty_cache_tip)
+        when (isResetFactory) {
+            1 -> {
+                hinitTwo.visibility = View.VISIBLE
+                hinitOne.text = getString(R.string.tip_reset_sure)
+                hinitTwo.setTextColor(resources.getColor(R.color.red))
+                hinitTwo.textSize = 13F
+                hinitTwo.text = getString(R.string.reset_warm_red)
+                tvThree.visibility = View.GONE
+                hinitThree.visibility = View.GONE
+            }
+            2 -> {
+                hinitTwo.visibility = View.GONE
+                hinitOne.text = getString(R.string.empty_cache_tip)
+                hinitTwo.textSize = 13F
+                hinitTwo.text = getString(R.string.reset_warm_red)
+                tvThree.visibility = View.GONE
+                hinitThree.visibility = View.GONE
+            }
+            else -> {
+                tvOne.visibility = View.VISIBLE
+                tvTwo.visibility = View.VISIBLE
+                tvThree.visibility = View.VISIBLE
+                readTimer.visibility = View.GONE
+                cancelConfirmLy.visibility = View.VISIBLE
+                cancelConfirmVertical.backgroundColor = resources.getColor(R.color.gray)
+            }
         }
-
-        hinitTwo.textSize = 13F
-        hinitTwo.text = getString(R.string.reset_warm_red)
-
-        tvThree.visibility = View.GONE
-        hinitThree.visibility = View.GONE
 
         cancel.text = getString(R.string.cancel)
         confirm.text = getString(R.string.btn_sure)
@@ -314,8 +329,9 @@ class SettingActivity : BaseActivity() {
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun emptyTheCache() {
-        isResetFactory = false
-        setFirstePopAndShow(R.string.clear_one, R.string.clear_two, R.string.clear_one, isResetFactory)
+        isResetFactory = 1
+        setFirstePopAndShow(R.string.clear_one, R.string.clear_two,
+                R.string.clear_one, isResetFactory)
     }
 
     /**
@@ -404,13 +420,14 @@ class SettingActivity : BaseActivity() {
         confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (isResetFactory)
-                if (TelinkLightApplication.getApp().connectDevice != null)
+            when (isResetFactory){
+                1 -> clearData()
+                3 ->  startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                2 -> if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
                 else
                     ToastUtils.showLong(R.string.device_not_connected)
-            else
-                clearData()
+            }
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         confirm.isClickable = false

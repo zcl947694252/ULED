@@ -6,15 +6,24 @@ import android.app.AlertDialog
 import android.content.Context.POWER_SERVICE
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.LinearGradient
 import android.os.*
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -53,6 +62,8 @@ import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.db.NULL
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -61,7 +72,15 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(), View.OnClickListener {
+class MeFragment() : BaseFragment(), View.OnClickListener {
+    private var disposableInterval: Disposable? = null
+    private var popUser: PopupWindow? = null
+    private var cancelConfirmVertical: View? = null
+    private var cancelConfirmLy: LinearLayout? = null
+    private var readTimer: TextView? = null
+    private var hinitOne: TextView? = null
+    private var hinitTwo: TextView? = null
+    private var hinitThree: TextView? = null
     private var mConnectDisposal: Disposable? = null
     private var disposable: Disposable? = null
     private var cancel: Button? = null
@@ -75,7 +94,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private var mWakeLock: PowerManager.WakeLock? = null
     var b: Boolean = false
     private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
-
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -118,8 +136,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
-
-
     private val allLights: List<DbLight>
         get() {
             val groupList = DBUtils.groupList
@@ -142,7 +158,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             return lightList
         }
 
-
     private val allRely: List<DbConnector>
         get() {
             val groupList = DBUtils.groupList
@@ -158,12 +173,14 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sleepTime = if (Build.BRAND.contains("Huawei")) {
+        sleepTime = if (Build.BRAND.contains("Huawei"))
             500
-        } else {
+        else
             200
-        }
+
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
+
+        makePop()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -217,6 +234,56 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         isVisableDeveloper()
 
         makePop()
+        makePop2()
+    }
+
+    private fun makePop2() {
+        var popView: View = LayoutInflater.from(activity).inflate(R.layout.pop_time_cancel, null)
+        hinitOne = popView.findViewById(R.id.hinit_one)
+        hinitTwo = popView.findViewById(R.id.hinit_two)
+        hinitThree = popView.findViewById(R.id.hinit_three)
+        readTimer = popView.findViewById(R.id.read_timer)
+        cancel = popView.findViewById(R.id.btn_cancel)
+        confirm = popView.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+
+        hinitOne?.text = getString(R.string.user_reset_all1)
+        hinitTwo?.text = getString(R.string.user_reset_all2)
+        hinitThree?.text = getString(R.string.user_reset_all3)
+
+        var cs: ClickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.BLUE//设置超链接的颜色
+                ds.isUnderlineText = true
+            }
+        }
+
+        val str = getString(R.string.have_question_look_notice)
+        var ss = SpannableString(str)
+        val start: Int = if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
+        val end = str.length
+        ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        hinitThree?.text = ss
+        hinitThree?.movementMethod = LinkMovementMethod.getInstance()
+
+        cancel?.setOnClickListener { popUser?.dismiss() }
+        confirm?.setOnClickListener {
+            popUser?.dismiss()
+            //用户复位
+            userReset()
+        }
+        popUser = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        confirm?.isClickable = false
+        pop.isOutsideTouchable = false
+        pop.isFocusable = true // 设置PopupWindow可获得焦点
+        pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
     private fun makePop() {
@@ -262,9 +329,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
 
+    @SuppressLint("StringFormatMatches")
     override fun onClick(v: View?) {
         when (v?.id) {
-
             R.id.userIcon -> openSet()
             R.id.chearCache -> emptyTheCache()
             R.id.appVersion -> developerMode()
@@ -280,9 +347,25 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 checkNetworkAndSync(activity)
             }
             R.id.user_reset -> {
-                if (TelinkLightApplication.getApp().connectDevice != null)
-                    userReset()
-                else {
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+
+                    disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                var num = Constant.downTime - 1 - it
+                                if (num == 0L) {
+                                    setTimerZero()
+                                } else {
+                                    cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.white)
+                                    cancel?.isClickable = false
+                                    confirm?.isClickable = false
+                                    readTimer?.visibility =View.VISIBLE
+                                    readTimer?.text = getString(R.string.please_read_carefully, num)
+                                }
+                            }
+                    popUser?.showAtLocation(activity?.window?.decorView, Gravity.CENTER, 0, 0)
+                } else {
                     val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
                             DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                     val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
@@ -291,8 +374,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         mConnectDisposal?.dispose()
                         mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                                 ?.subscribe({//找回有效设备
-                                            mConnectDisposal?.dispose()
-                                        },
+                                    mConnectDisposal?.dispose()
+                                },
                                         {
                                             LogUtils.d("connect failed, reason = $it")
                                         }
@@ -321,6 +404,16 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    private fun setTimerZero() {
+        readTimer?.visibility = View.GONE
+        cancelConfirmLy?.visibility = View.VISIBLE
+        cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.gray)
+        cancel?.text = getString(R.string.cancel)
+        confirm?.text = getString(R.string.btn_sure)
+        cancel?.isClickable = true
+        confirm?.isClickable = true
+    }
+
 
     private fun openSet() {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
@@ -332,29 +425,18 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun userReset() {
-        val builder = AlertDialog.Builder(activity)
-        builder.setMessage(getString(R.string.user_reset))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
+        UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {  //删除服务器数据
+                clearData()//删除本地数据
+                ToastUtils.showShort(getString(R.string.reset_user_success))
+            }
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 0, 0, 0, 0, 0, 0, 0))
-
-        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
-            UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
-                //删除服务器数据
-                override fun onNext(t: String) {
-                    clearData()//删除本地数据
-                    ToastUtils.showShort(getString(R.string.reset_user_success))
-                }
-
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    ToastUtils.showShort(e.message)
-                }
-            })
-        }
-        builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
-            ToastUtils.showShort(getString(R.string.cancel))
-        }
-        builder.show()
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showShort(e.message)
+            }
+        })
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -394,7 +476,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
-
     }
 
 

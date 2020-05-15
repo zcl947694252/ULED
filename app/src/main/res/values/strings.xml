@@ -1067,4 +1067,9 @@
     <string name="close_light">Close light</string>
     <string name="open_blutooth_tip">Please turn on bluetooth</string>
     <string name="find_device_num">Number of recovered devices:</string>
+    <string name="user_reset_all1">The user reset clears the configured grouping and scenario information。</string>
+    <string name="user_reset_all2">Local and cloud data will be erased and unrecoverable!</string>
+    <string name="user_reset_all3">If you have any other questions, please check the APP instructions.</string>
+    <string name="physical_recovery_one">This operation does not reset the light under this account.</string>
+    <string name="physical_recovery_two">This operation will reset all energized devices (switch, except sensor) in the region of the device that interacts with the APP.</string>
 </resources>

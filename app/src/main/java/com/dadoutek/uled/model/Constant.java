@@ -26,7 +26,7 @@ public class Constant implements Serializable {
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
      */
-    public static final long downTime = isDebug ? 2 : 11;
+    public static final long downTime = isDebug ? 3 : 11;
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
