@@ -441,7 +441,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendOpenOrCloseGw(isBleConnect: Boolean) {
+    private fun sendOpenOrCloseGw(isBleConnect: Boolean) {//TODO 4.3.7记得去掉点击图片开关的回调 因为直连灯的时候拿不到回调
         //第是一位0x01代表开 默认开 0x00代表关
         currentGw?.let { it ->
             if (isBleConnect) {

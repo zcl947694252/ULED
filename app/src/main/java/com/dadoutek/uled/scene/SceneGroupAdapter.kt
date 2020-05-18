@@ -115,54 +115,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
-                        /* when {
-                             item.brightness <= 0 -> {
-                                 addBrightnessRGB!!.isEnabled = true
-                                 lessBrightnessRGB!!.isEnabled = false
-                             }
-                             item.brightness >= 100 -> {
-                                 addBrightnessRGB!!.isEnabled = false
-                                 lessBrightnessRGB!!.isEnabled = true
-                             }
-                             else -> {
-                                 addBrightnessRGB!!.isEnabled = true
-                                 lessBrightnessRGB!!.isEnabled = true
-                             }
-                         }
-                         when {
-                             item.temperature <= 0 -> {
-                                 addWhiteLightRGB!!.isEnabled = true
-                                 lessWhiteLightRGB!!.isEnabled = false
-                             }
-                             item.temperature >= 100 -> {
-                                 addWhiteLightRGB!!.isEnabled = false
-                                 lessWhiteLightRGB!!.isEnabled = true
-                             }
-                             else -> {
-                                 addWhiteLightRGB!!.isEnabled = true
-                                 lessWhiteLightRGB!!.isEnabled = true
-                             }
-                         }*/
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
                             algText?.text = item.gradientName
                         visiableMode(helper, false)
                         setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
-                        /*   when {
-                               item.gradientSpeed <= 0 -> {
-                                   addAlgSpeed!!.isEnabled = true
-                                   lessAlgSpeed!!.isEnabled = false
-                               }
-                               item.gradientSpeed >= 100 -> {
-                                   addAlgSpeed!!.isEnabled = false
-                                   lessAlgSpeed!!.isEnabled = true
-                               }
-                               else -> {
-                                   addAlgSpeed!!.isEnabled = true
-                                   lessAlgSpeed!!.isEnabled = true
-                               }
-                           }*/
                     }
                 }
             }
@@ -173,34 +131,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
-                /*  when {
-                      item.brightness <= 0 -> {
-                          addBrightnessCW!!.isEnabled = true
-                          lessBrightnessCW!!.isEnabled = false
-                      }
-                      item.brightness >= 100 -> {
-                          addBrightnessCW!!.isEnabled = false
-                          lessBrightnessCW!!.isEnabled = true
-                      }
-                      else -> {
-                          addBrightnessCW!!.isEnabled = true
-                          lessBrightnessCW!!.isEnabled = true
-                      }
-                  }
-                  when {
-                      item.temperature <= 0 -> {
-                          addTemperatureCW!!.isEnabled = true
-                          lessTemperatureCW!!.isEnabled = false
-                      }
-                      item.temperature >= 100 -> {
-                          addTemperatureCW!!.isEnabled = false
-                          lessTemperatureCW!!.isEnabled = true
-                      }
-                      else -> {
-                          addTemperatureCW!!.isEnabled = true
-                          lessTemperatureCW!!.isEnabled = true
-                      }
-                  }*/
             }
         }
         when {

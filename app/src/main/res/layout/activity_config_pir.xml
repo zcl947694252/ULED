@@ -1,220 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/configPirRoot"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".pir.ConfigSensorAct">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/configPirRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".pir.ConfigSensorAct">
 
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <include
-            android:id="@+id/include3"
-            layout="@layout/toolbar"/>
+                android:id="@+id/include3"
+                layout="@layout/toolbar" />
+
+        <include
+                layout="@layout/template_radiogroup"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                app:layout_constraintTop_toBottomOf="@+id/include3"
+                tools:layout_editor_absoluteX="-20dp" />
 
         <TextView
-            android:id="@+id/tvSelectStartupMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="32dp"
-            android:text="@string/trigger_mode"
-            android:textSize="18sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
-            app:layout_constraintTop_toBottomOf="@id/include3" />
+                android:id="@+id/tvSelectStartupMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/trigger_mode"
+                android:textSize="18sp"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
+                app:layout_constraintTop_toBottomOf="@+id/top_rg_ly" />
 
         <Spinner
-            android:id="@+id/spSelectStartupMode"
-            android:layout_width="148dp"
-            android:layout_height="wrap_content"
-            android:entries="@array/startup_mode"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
-            app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tvSelectStartupMode"
-            app:layout_constraintTop_toTopOf="@+id/tvSelectStartupMode" />
+                android:id="@+id/spSelectStartupMode"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/startup_mode"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvSelectStartupMode"
+                app:layout_constraintTop_toTopOf="@+id/tvSelectStartupMode" />
 
         <TextView
-            android:id="@+id/tvSwitchMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/switch_mode"
-            android:textSize="18sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/tvSelectStartupMode"
-            app:layout_constraintTop_toBottomOf="@+id/tvSelectStartupMode" />
+                android:id="@+id/tvSwitchMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/switch_mode"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/tvSelectStartupMode"
+                app:layout_constraintTop_toBottomOf="@+id/tvSelectStartupMode" />
 
         <Spinner
-            android:id="@+id/spSwitchMode"
-            android:layout_width="148dp"
-            android:layout_height="wrap_content"
-            android:entries="@array/switch_mode"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSwitchMode"
-            app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tvSwitchMode"
-            app:layout_constraintTop_toTopOf="@+id/tvSwitchMode" />
+                android:id="@+id/spSwitchMode"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/switch_mode"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/tvSwitchMode"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvSwitchMode"
+                app:layout_constraintTop_toTopOf="@+id/tvSwitchMode" />
 
         <TextView
-            android:id="@+id/tvDelayUnit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/delay_unit"
-            android:textSize="18sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/tvSwitchMode"
-            app:layout_constraintTop_toBottomOf="@+id/tvSwitchMode" />
+                android:id="@+id/tvDelayUnit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/delay_unit"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/tvSwitchMode"
+                app:layout_constraintTop_toBottomOf="@+id/tvSwitchMode" />
 
         <Spinner
-            android:id="@+id/spDelayUnit"
-            android:layout_width="148dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:entries="@array/delay_unit"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/tvDelayUnit"
-            app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tvDelayUnit"
-            app:layout_constraintTop_toTopOf="@+id/tvDelayUnit" />
+                android:id="@+id/spDelayUnit"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:entries="@array/delay_unit"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/tvDelayUnit"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvDelayUnit"
+                app:layout_constraintTop_toTopOf="@+id/tvDelayUnit" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/tilDelay"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginRight="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spDelayUnit">
+                android:id="@+id/tilDelay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginRight="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spDelayUnit">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/tietDelay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/delay_seconds"
-                android:inputType="number"
-                android:maxLength="2" />
+                    android:id="@+id/tietDelay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/delay_seconds"
+                    android:inputType="number"
+                    android:maxLength="2" />
         </android.support.design.widget.TextInputLayout>
 
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/tilMinimumBrightness"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:layout_constraintEnd_toEndOf="@+id/tilDelay"
-            app:layout_constraintStart_toStartOf="@+id/tilDelay"
-            app:layout_constraintTop_toBottomOf="@+id/tilDelay">
+                android:id="@+id/tilMinimumBrightness"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintEnd_toEndOf="@+id/tilDelay"
+                app:layout_constraintStart_toStartOf="@+id/tilDelay"
+                app:layout_constraintTop_toBottomOf="@+id/tilDelay">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/tietMinimumBrightness"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/minimum_brightness_percentage"
-                android:inputType="number"
-                android:maxLength="2"
-                />
+                    android:id="@+id/tietMinimumBrightness"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/minimum_brightness_percentage"
+                    android:inputType="number"
+                    android:maxLength="2" />
         </android.support.design.widget.TextInputLayout>
 
         <TextView
-            android:id="@+id/tvTriggerLux"
-            android:layout_width="140dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="32dp"
-            android:text="@string/trigger_lux"
-            android:textSize="18sp"
-            app:autoSizeMaxTextSize="18sp"
-            app:autoSizeTextType="uniform"
-            app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
-            app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
+                android:id="@+id/tvTriggerLux"
+                android:layout_width="140dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/trigger_lux"
+                android:textSize="18sp"
+                app:autoSizeMaxTextSize="18sp"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
+                app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
 
         <Spinner
-            android:id="@+id/spTriggerLux"
-            android:layout_width="148dp"
-            android:layout_height="wrap_content"
-            android:entries="@array/trigger_lux_array"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTriggerLux"
-            app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tvTriggerLux"
-            app:layout_constraintTop_toTopOf="@+id/tvTriggerLux" />
+                android:id="@+id/spTriggerLux"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/trigger_lux_array"
+                app:layout_constraintBottom_toBottomOf="@+id/tvTriggerLux"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvTriggerLux"
+                app:layout_constraintTop_toTopOf="@+id/tvTriggerLux" />
 
         <TextView
-            android:id="@+id/tvSelectGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="32dp"
-            android:text="@string/select_group"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
-            app:layout_constraintTop_toBottomOf="@+id/tvTriggerLux" />
+                android:id="@+id/tvSelectGroupScene"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/select_group"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
+                app:layout_constraintTop_toBottomOf="@+id/tvTriggerLux" />
 
         <Spinner
-            android:id="@+id/spSelectGroup"
-            android:layout_width="148dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/tvSelectGroup"
-            app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tvSelectGroup"
-            app:layout_constraintTop_toTopOf="@+id/tvSelectGroup" />
+                android:id="@+id/spSelectGroupScene"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/tvSelectGroupScene"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvSelectGroupScene"
+                app:layout_constraintTop_toTopOf="@+id/tvSelectGroupScene" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabConfirm"
-            style="@style/Widget.Design.FloatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_done_white_48dp" />
+                android:id="@+id/fabConfirm"
+                style="@style/Widget.Design.FloatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/ic_done_white_48dp" />
 
 
         <LinearLayout
-            android:id="@+id/versionLayoutPS"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="0dp"
-            android:background="@color/primary"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fabConfirm">
+                android:id="@+id/versionLayoutPS"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="0dp"
+                android:background="@color/primary"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fabConfirm">
 
             <TextView
-                android:id="@+id/tvLightVersionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/switch_version"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
+                    android:id="@+id/tvLightVersionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/switch_version"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tvPSVersion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:text="1.0.0"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
+                    android:id="@+id/tvPSVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="1dp"
+                    android:text="1.0.0"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
 

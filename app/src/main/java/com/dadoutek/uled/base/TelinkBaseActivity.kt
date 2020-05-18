@@ -506,9 +506,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
 
                 initOnLayoutListener()
-                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
+                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}&&---$isResume")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && isResume)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -617,14 +617,14 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     val b = this@TelinkBaseActivity.isFinishing
                     val showing = singleLogin?.isShowing
                     SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
-                    if (!b && showing != null && !showing!!) {
+                    if (!b && showing != null && !showing) {
                         singleLogin!!.show()
                     }
                 }
 
                 override fun error(msg: String) {
                     hideLoadingDialog()
-                    if (msg != null && msg != "null")
+                    if (msg != "null")
                         ToastUtils.showLong(msg)
                 }
             })

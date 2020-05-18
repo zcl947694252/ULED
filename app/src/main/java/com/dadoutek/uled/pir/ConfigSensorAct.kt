@@ -16,6 +16,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
@@ -34,6 +35,7 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
+import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
@@ -41,28 +43,25 @@ import org.jetbrains.anko.design.snackbar
  * 老版本人体感应器设置详情
  */
 class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, EventListener<String> {
-
+    private lateinit var mScenes: List<DbScene>
+    private var isGroupMode: Boolean = true
     private lateinit var telinkApplication: TelinkApplication
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
-    //    private var builder:com.app.hubert.guide.core.Builder?=null
-    private var mGroupsName: ArrayList<String>? = null
-    private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
+    private var mGroupScenesName: ArrayList<String>? = null
+    private var mSelectGroupSceneAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-
     private var modeStartUpMode = 0
     private var modeDelayUnit = 0
     private var modeSwitchMode = 0
-
     private val MODE_START_UP_MODE_OPEN = 0
     private val MODE_DELAY_UNIT_SECONDS = 0
     private val MODE_SWITCH_MODE_MOMENT = 0
-
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
-
+    private val groupSceneAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupScenesName)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_pir)
@@ -78,6 +77,24 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun initListener() {
+        top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.color_mode_rb -> {
+                    isGroupMode = true
+                    getGroupName()
+                    tvSelectGroupScene.text = getString(R.string.choose_group)
+                    color_mode_rb.setTextColor(getColor(R.color.blue_text))
+                    gradient_mode_rb.setTextColor(getColor(R.color.gray9))
+                }
+                R.id.gradient_mode_rb -> {
+                    isGroupMode = false
+                    getSceneName()
+                    tvSelectGroupScene.text = getString(R.string.choose_scene)
+                    color_mode_rb.setTextColor(getColor(R.color.gray9))
+                    gradient_mode_rb.setTextColor(getColor(R.color.blue_text))
+                }
+            }
+        }
         fabConfirm.setOnClickListener(this)
         telinkApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         telinkApplication.addEventListener(LeScanEvent.LE_SCAN, this)//扫描jt
@@ -130,14 +147,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
 
     private fun initView() {
-        val groupsAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupsName)
-        spSelectGroup.adapter = groupsAdapter
-        spSelectGroup.onItemSelectedListener = this
+        spSelectGroupScene.adapter = groupSceneAdapter
+        spSelectGroupScene.onItemSelectedListener = this
         spSelectStartupMode.onItemSelectedListener = this
         spDelayUnit.onItemSelectedListener = this
         spSwitchMode.onItemSelectedListener = this
     }
-
 
     private fun autoConnectSensor() {
         //自动重连参数
@@ -157,7 +172,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
         showLoadingDialog(getString(R.string.connecting))
     }
-
 
     private fun getVersion(version: String) {
         val versionNum = Integer.parseInt(StringUtils.versionResolution(version, 1))
@@ -183,39 +197,59 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         toolbar.title = getString(R.string.sensor_title)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { doFinish() }
-
     }
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        mGroupScenesName = ArrayList()
+        getGroupName()
+    }
+
+    private fun getSceneName() {
+        mScenes = DBUtils.sceneAll
+        mGroupScenesName?.clear()
+        for (item in mScenes)
+            mGroupScenesName!!.add(item.name)
+
+        groupSceneAdapter.notifyDataSetChanged()
+    }
+
+    private fun getGroupName() {
         mGroups = DBUtils.allGroups
-        mGroupsName = ArrayList()
+        mGroupScenesName?.clear()
         for (item in mGroups) {
             when (item.deviceType) {
                 Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
                 Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
-                    if (item.deviceCount>0||item.deviceType==Constant.DEVICE_TYPE_NO)
-                        mGroupsName!!.add(item.name)
+                    if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
+                        mGroupScenesName!!.add(item.name)
                 }
             }
         }
+        groupSceneAdapter.notifyDataSetChanged()
     }
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
-        val paramBytes = byteArrayOf(0x01, groupH, groupL,
-                delayTime.toByte(), minBrightness.toByte(), triggerValue.toByte(), mode.toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_PIR,
-                mDeviceInfo.meshAddress, paramBytes)
+        val paramBytes = if (isGroupMode)
+            byteArrayOf(0x01, groupH, groupL, delayTime.toByte(), minBrightness.toByte(), triggerValue.toByte(), mode.toByte())
+        else
+            byteArrayOf(0x01, groupH, groupL, delayTime.toByte(), minBrightness.toByte(), triggerValue.toByte(), mode.toByte())
+
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_PIR, mDeviceInfo.meshAddress, paramBytes)
         Thread.sleep(300)
     }
 
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
-            R.id.spSelectGroup -> {
-                mSelectGroupAddr = mGroups[position].meshAddr
+            R.id.spSelectGroupScene -> {
+                mSelectGroupSceneAddr = if (isGroupMode)
+                    mGroups[position].meshAddr
+                else
+                    mScenes[position].id.toInt()
+
             }
             R.id.spSelectStartupMode -> {
                 if (position == 0) {//开灯
@@ -246,17 +280,17 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        mSelectGroupAddr = 0xFF
+        mSelectGroupSceneAddr = 0xFF
     }
 
     private fun doFinish() {
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
-            finish()
+        finish()
     }
 
     private fun configureComplete() {
-      doFinish()
+        doFinish()
     }
 
     override fun onBackPressed() {
@@ -278,7 +312,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     Thread {
                         val mode = getModeValue()
 
-                        configPir(mSelectGroupAddr,
+                        configPir(mSelectGroupSceneAddr,
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
                                 spTriggerLux.selectedItem.toString().toInt(), mode)
@@ -319,12 +353,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         }
 
 
-        dbSensor.controlGroupAddr = mSelectGroupAddr.toString()
+        dbSensor.controlGroupAddr = mSelectGroupSceneAddr.toString()
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = MeshAddressGenerator().meshAddress
-       // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+        // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+mDeviceInfo!!.meshAddress
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + mDeviceInfo!!.meshAddress
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

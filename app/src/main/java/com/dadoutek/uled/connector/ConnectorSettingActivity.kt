@@ -68,7 +68,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
 
     private var localVersion: String? = null
-    private var light: DbConnector? =null
+    private var light: DbConnector? = null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
@@ -82,6 +82,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
+
     //    private var stopTracking = false
     private var connectTimes = 0
     private var currentShowPageGroup = true
@@ -166,7 +167,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                         }
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     fun remove() {
@@ -228,7 +229,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         intent.putExtra("uuid", light!!.productUUID)
         Log.d("窗帘升级点击的设备Light", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
-        this!!.finish()
+        this.finish()
     }
 
 
@@ -254,7 +255,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组
                                     DBUtils.deleteGroupOnly(group)
-                                    this?.runOnUiThread {
+                                    this.runOnUiThread {
                                         successCallback.invoke()
                                     }
                                 } else {
@@ -276,7 +277,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
-                this?.runOnUiThread {
+                this.runOnUiThread {
                     successCallback.invoke()
                 }
             }
@@ -591,8 +592,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
         val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
-        if (get!=null)
-        this.light = get as DbConnector
+        if (get != null)
+            this.light = get as DbConnector
 
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
@@ -680,9 +681,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-          val disposable =  Commander.getDeviceVersion(light!!.meshAddr)
+            val disposable = Commander.getDeviceVersion(light!!.meshAddr)
                     .subscribe(
-                            {s ->
+                            { s ->
                                 localVersion = s
                                 if (txtTitle != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {

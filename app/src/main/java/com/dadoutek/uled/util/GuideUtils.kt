@@ -112,10 +112,10 @@ object GuideUtils {
         val builder=AlertDialog.Builder(context)
         var alertDialog:AlertDialog?=null
         builder.setMessage(context.getString(R.string.jump_out_guide_tip))
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which ->
+        builder.setNegativeButton(R.string.btn_cancel) { _, _ ->
             alertDialog?.dismiss()
         }
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+        builder.setPositiveButton(android.R.string.ok) { _, _ ->
             controller.remove()
             when (jumpViewContent) {
                 END_GROUPLIST_KEY -> {

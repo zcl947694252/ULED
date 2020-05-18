@@ -906,7 +906,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组
                                     DBUtils.deleteGroupOnly(group)
-                                    this?.runOnUiThread {
+                                    this.runOnUiThread {
                                         successCallback.invoke()
                                     }
                                 } else {
@@ -922,14 +922,14 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                         failedCallback = failedCallback)
                             })
                 } else {    //超过了重试次数
-                    this?.runOnUiThread {
+                    this.runOnUiThread {
                         failedCallback.invoke()
                     }
                     //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
-                this?.runOnUiThread {
+                this.runOnUiThread {
                     successCallback.invoke()
                 }
             }

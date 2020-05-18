@@ -260,9 +260,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         listKeysBean = JSONArray()
 
         //11-12-13-14 11-12-13-14
-        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00)
-        listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
-        listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
+        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00)
+        listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
+        listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
 
 
         val second = mutableListOf(2, 3)

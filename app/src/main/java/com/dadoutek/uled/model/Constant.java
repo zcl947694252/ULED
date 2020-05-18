@@ -20,7 +20,7 @@ public class Constant implements Serializable {
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
 
-    public static Boolean isDebug = false;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -60,6 +60,7 @@ public class Constant implements Serializable {
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
+
     public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";
     public static final String GROUP_ARESS_KEY = "GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";

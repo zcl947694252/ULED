@@ -123,7 +123,7 @@ class DeviceFragment : BaseFragment() {
                                     isRgbClick = true
                                 }
                                 val tvJump = view.findViewById<TextView>(R.id.jump_out)
-                                tvJump.setOnClickListener { v ->
+                                tvJump.setOnClickListener {
                                     GuideUtils.showExitGuideDialog(activity!!, controller, GuideUtils.END_GROUPLIST_KEY)
                                 }
                             })
@@ -331,7 +331,7 @@ class DeviceFragment : BaseFragment() {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
@@ -342,7 +342,7 @@ class DeviceFragment : BaseFragment() {
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {

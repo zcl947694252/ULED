@@ -36,18 +36,16 @@ object DialogUtils {
         tvContent.text = content
 
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing()) {
-            loadDialog!!.setCancelable(false)
-            loadDialog!!.setCanceledOnTouchOutside(false)
-            loadDialog!!.setContentView(layout)
-            loadDialog!!.show()
+        if (!loadDialog.isShowing) {
+            loadDialog.setCancelable(false)
+            loadDialog.setCanceledOnTouchOutside(false)
+            loadDialog.setContentView(layout)
+            loadDialog.show()
         }
     }
 
     fun hideLoadingDialog(loadDialog: Dialog) {
-        if (loadDialog != null) {
-            loadDialog!!.dismiss()
-        }
+        loadDialog.dismiss()
     }
 
 }
