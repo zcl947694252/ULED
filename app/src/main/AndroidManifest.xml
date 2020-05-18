@@ -225,6 +225,10 @@
                 android:windowSoftInputMode="adjustPan" />
 
         <activity
+                android:name=".pir.PirConfigActivity"
+                android:screenOrientation="portrait" />
+
+        <activity
                 android:name=".light.NormalSettingActivity"
                 android:screenOrientation="portrait" />
         <activity

@@ -53,6 +53,7 @@ import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
@@ -178,14 +179,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
             //如果没打开蓝牙，就提示用户打开
-            //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
+            val intent = Intent(this@MainActivity, PirConfigActivity::class.java)
             // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
-            //startActivity(intent)
-            installId++
-            mBluetoothAdapter?.enable()
-
-            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            startActivity(intent)
         }
         initBottomNavigation()
         checkVersionAvailable()

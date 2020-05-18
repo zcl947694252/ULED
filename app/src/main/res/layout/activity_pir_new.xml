@@ -34,13 +34,12 @@
                 android:orientation="vertical">
             <!--触发条件-->
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/triggering_model"
+                    android:id="@+id/pir_config_triggering_model"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:visibility="visible">
 
                 <TextView
-                        android:id="@+id/textView25"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/triggering_conditions"
@@ -89,7 +88,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <View
-                    android:id="@+id/view15"
+                    android:id="@+id/triggering_model_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
@@ -97,7 +96,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/triggering_model" />
             <!--触发后-->
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/trigger_after_ly"
+                    android:id="@+id/pir_config_trigger_after_ly"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:visibility="visible">
@@ -153,7 +152,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <View
-                    android:id="@+id/view16"
+                    android:id="@+id/trigger_after_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
@@ -162,7 +161,7 @@
 
             <!--持续时间 超时时间-->
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/overtime_ly"
+                    android:id="@+id/pir_config_overtime_ly"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:visibility="visible">
@@ -170,7 +169,7 @@
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/overtime_time"
+                        android:text="@string/duration_time"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -240,7 +239,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/overtime_ly" />
             <!--延时时间单位-->
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraintLayout30"
+                    android:id="@+id/pir_config_time_type"
                     android:layout_width="match_parent"
                     android:layout_height="60dp">
 
@@ -302,16 +301,15 @@
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout30" />
 
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraintLayout31"
+                    android:id="@+id/pir_config_choose_scene_ly"
                     android:layout_width="match_parent"
                     android:layout_height="60dp">
 
 
                 <TextView
-                        android:id="@+id/textView41"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/trigger_mode_text"
+                        android:text="@string/choose_scene_dot"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -364,7 +362,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout31" />
 
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/choose_group_ly"
+                    android:id="@+id/pir_config_choose_group_ly"
                     android:layout_width="match_parent"
                     android:layout_height="60dp">
 
@@ -422,13 +420,13 @@
                     android:textSize="15sp" />
 
             <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerGroup"
+                    android:id="@+id/pir_config_recyclerGroup"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
             <Button
-                    android:id="@+id/sensor_update"
+                    android:id="@+id/pir_config_btn"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginLeft="38dp"

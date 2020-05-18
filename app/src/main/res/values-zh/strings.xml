@@ -703,7 +703,7 @@
     <string name="target_brightness">请输入目标亮度</string>
     <string name="triggering_conditions">触&#160;&#160;&#160;发&#160;&#160;&#160;条&#160;&#160;&#160;件&#160;&#160;&#160;:</string>
     <string name="trigger_after">触&#160;&#160;&#160;&#160;&#160;发&#160;&#160;&#160;&#160;&#160;后&#160;&#160;&#160;&#160;&#160;&#160;:</string>
-    <string name="overtime_time">超&#160;&#160;&#160;时&#160;&#160;&#160;时&#160;&#160;&#160;间&#160;&#160;&#160;:</string>
+    <string name="duration_time">持&#160;&#160;&#160;续&#160;&#160;&#160;时&#160;&#160;&#160;间&#160;&#160;&#160;:</string>
     <string name="light_open_mode">亮度变化方式&#160;&#160;&#160;&#160;:</string>
     <string name="choose_group">选&#160;&#160;&#160;择&#160;&#160;&#160;分&#160;&#160;&#160;组&#160;&#160;&#160;&#160;:</string>
     <string name="brightness_cannot">亮度不能为0</string>
@@ -972,7 +972,6 @@
     <string name="user_reset_tip">是否进行用户复位</string>
     <string name="user_reset_tip2">复位失败,是否进行强制用户复位</string>
     <string name="gw_user_reset_switch_success">用户网关复位成功</string>
-    <string name="chose_scene">选&#160;&#160;&#160;择&#160;&#160;&#160;场&#160;&#160;&#160;景&#160;&#160;&#160;&#160;:</string>
     <string name="select_mode">选择模式</string>
     <string name="mode_choice">模式选择:</string>
     <string name="select_gradient">选择渐变</string>
@@ -993,4 +992,6 @@
     <string name="physical_recovery_one">此操作不会复位本帐户下的灯。</string>
     <string name="physical_recovery_two">此操作会复位与APP进行上下电交互操作的设备所属区域内所有通电的设备（开关，传感器除外）</string>
     <string name="reset_gw_faile">用户复位失败</string>
+    <string name="group_mode">群组模式</string>
+    <string name="scene_mode">场景模式</string>
 </resources>
