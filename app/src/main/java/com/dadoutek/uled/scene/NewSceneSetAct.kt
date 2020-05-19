@@ -336,16 +336,18 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentPosition = position
-        when (view.id) {
-            R.id.btn_delete -> delete(adapter, position)
-            R.id.dot_rgb -> changeToColorSelect(position)
-            R.id.dot_one -> changeToColorSelect(position)
-            R.id.rg_xx -> open(position)
-            R.id.rg_yy -> close(position)
-            R.id.alg_text -> showPopMode(position)
-            R.id.cb_total -> switchTotal(position)
-            R.id.cb_bright -> switchBright(position)
-            R.id.cb_white_light -> switchWhiteLight(position)
+        if (DebouncedClickPredictor.shouldDoClick(view)) {
+            when (view.id) {
+                R.id.btn_delete -> delete(adapter, position)
+                R.id.dot_rgb -> changeToColorSelect(position)
+                R.id.dot_one -> changeToColorSelect(position)
+                R.id.rg_xx -> open(position)
+                R.id.rg_yy -> close(position)
+                R.id.alg_text -> showPopMode(position)
+                R.id.cb_total -> switchTotal(position)
+                R.id.cb_bright -> switchBright(position)
+                R.id.cb_white_light -> switchWhiteLight(position)
+            }
         }
     }
 

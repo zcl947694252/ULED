@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        package="com.dadoutek.uled">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.dadoutek.uled">
     <!-- 蓝牙权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -17,405 +17,406 @@
     <uses-permission android:name="com.xiaomi.market.sdk.UPDATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-            tools:ignore="ProtectedPermissions" />
-
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
+    
     <uses-permission
-            android:name="android.permission.DEVICE_POWER"
-            tools:ignore="ProtectedPermissions" />
-
+        android:name="android.permission.DEVICE_POWER"
+        tools:ignore="ProtectedPermissions" />
+    
     <uses-feature
-            android:name="android.hardware.bluetooth_le"
-            android:required="true" />
-
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    
     <application
-            android:name=".tellink.TelinkLightApplication"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme"
-            android:usesCleartextTraffic="true"
-            tools:ignore="GoogleAppIndexingWarning"
-            tools:targetApi="m">
-
-
+        android:name=".tellink.TelinkLightApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="m">
+        
+        
         <meta-data
-                android:name="Mob-AppKey"
-                android:value="260b846a2a8f8" />
+            android:name="Mob-AppKey"
+            android:value="260b846a2a8f8" />
         <meta-data
-                android:name="Mob-AppSecret"
-                android:value="886a329e066cc1fba6db79e0d5a299bf" />
-
+            android:name="Mob-AppSecret"
+            android:value="886a329e066cc1fba6db79e0d5a299bf" />
+        
         <meta-data
-                android:name="android.max_aspect"
-                android:value="2.1" />
-
+            android:name="android.max_aspect"
+            android:value="2.1" />
+        
         <uses-library
-                android:name="org.apache.http.legacy"
-                android:required="false" />
-
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+        
         <provider
-                android:name="android.support.v4.content.FileProvider"
-                android:authorities="${applicationId}.fileProvider"
-                android:exported="false"
-                android:grantUriPermissions="true">
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
-                    android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/provider_paths" />
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
         </provider>
-
+        
         <service
-                android:name=".tellink.TelinkLightService"
-                android:enabled="true" />
+            android:name=".tellink.TelinkLightService"
+            android:enabled="true" />
         <service
-                android:name=".service.SendLightsInfo"
-                android:enabled="true" />
-
+            android:name=".service.SendLightsInfo"
+            android:enabled="true" />
+        
         <activity
-                android:name=".fragment.SafeLockActivity"
-                android:screenOrientation="portrait" />
+            android:name=".fragment.SafeLockActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".scene.SelectGradientActivity"
-                android:screenOrientation="portrait" />
-                <activity
-                android:name=".othersview.ExtendActivity"
-                android:screenOrientation="portrait" />
+            android:name=".scene.SelectGradientActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"/>
         <activity
-                android:name=".gateway.GwLoginActivity"
-                android:screenOrientation="portrait" />
+            android:name=".othersview.ExtendActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.DoubleTouchSwitchActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwLoginActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwTimerPeriodListActivity"
-                android:screenOrientation="portrait" />
+            android:name=".switches.DoubleTouchSwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwTimerPeriodListActivity2"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwTimerPeriodListActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwSelectStandingTimeActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".gateway.GwTimerPeriodListActivity2"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwDeviceDetailActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwSelectStandingTimeActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".gateway.GwConfigTagActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwDeviceDetailActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwChoseTimeActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwConfigTagActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwChoseTimePeriodActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwChoseTimeActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwChoseModeActivity"
-                android:screenOrientation="portrait" />
+            android:name=".gateway.GwChoseTimePeriodActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".gateway.GwEventListActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".gateway.GwChoseModeActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".othersview.HumanBodySensorActivity"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan" />
+            android:name=".gateway.GwEventListActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".user.EnterConfirmationCodeActivity"
-                android:configChanges="orientation|keyboardHidden|screenSize"
-                android:launchMode="singleTop"
-                android:screenOrientation="portrait" />
+            android:name=".othersview.HumanBodySensorActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".region.NetworkActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".user.EnterConfirmationCodeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.EnterPasswordActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".region.NetworkActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".user.AgainEnterPasswordActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.EnterPasswordActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".othersview.InstructionsForUsActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.AgainEnterPasswordActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.VerificationCodeActivity"
-                android:screenOrientation="portrait" />
+            android:name=".othersview.InstructionsForUsActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.OTASwitchActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.VerificationCodeActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".connector.ConnectorBatchGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".switches.OTASwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".curtains.CurtainBatchGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".connector.ConnectorBatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".rgb.RgbBatchGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".curtains.CurtainBatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".ota.OTAConnectorActivity"
-                android:screenOrientation="portrait" />
+            android:name=".rgb.RgbBatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".connector.ConnectorGroupingActivity"
-                android:screenOrientation="portrait" />
+            android:name=".ota.OTAConnectorActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.SwitchSettingActivity"
-                android:screenOrientation="portrait" />
+            android:name=".connector.ConnectorGroupingActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".ota.OTAUpdateCurtuinActivity"
-                android:screenOrientation="portrait" />
+            android:name=".switches.SwitchSettingActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".group.BatchGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".ota.OTAUpdateCurtuinActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".connector.ConnectorOfGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".group.BatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".connector.ConnectorSettingActivity"
-                android:theme="@style/FullHeightDialogNew" />
+            android:name=".connector.ConnectorOfGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".connector.ConnectorDeviceDetailActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".connector.ConnectorSettingActivity"
+            android:theme="@style/FullHeightDialogNew" />
         <activity
-                android:name=".scene.SensorDeviceDetailsActivity"
-                android:screenOrientation="portrait" />
+            android:name=".connector.ConnectorDeviceDetailActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".curtains.CurtainsDeviceDetailsActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".scene.SensorDeviceDetailsActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.SwitchDeviceDetailsActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".curtains.CurtainsDeviceDetailsActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".group.BatchGroupFourDeviceActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".switches.SwitchDeviceDetailsActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".light.PhysicalRecoveryActivity"
-                android:screenOrientation="portrait" />
-
-
+            android:name=".group.BatchGroupFourDeviceActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".othersview.SplashActivity"
-                android:label="@string/app_name"
-                android:screenOrientation="nosensor">
+            android:name=".light.PhysicalRecoveryActivity"
+            android:screenOrientation="portrait" />
+        
+        
+        <activity
+            android:name=".othersview.SplashActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        
         <activity
-                android:name=".switches.ConfigEightSwitchActivity"
-                android:screenOrientation="portrait">
-        </activity>
-
+            android:name=".switches.ConfigEightSwitchActivity"
+            android:screenOrientation="portrait"></activity>
+        
         <activity
-                android:name=".othersview.MainActivity"
-                android:label="@string/app_name"
-                android:launchMode="singleTop"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan" />
-
+            android:name=".othersview.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        
         <activity
-                android:name=".light.NormalSettingActivity"
-                android:screenOrientation="portrait" />
+            android:name=".light.NormalSettingActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.ChooseGroupOrSceneActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".switches.ChooseGroupOrSceneActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".othersview.DeviceBatchScanningActivity"
-                android:label="@string/activity_device_scanning_label"
-                android:screenOrientation="portrait" />
-
+            android:name=".othersview.DeviceBatchScanningActivity"
+            android:label="@string/activity_device_scanning_label"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".group.ChooseGroupForDevice"
-                android:label="@string/activity_device_grouping"
-                android:screenOrientation="portrait" />
-
+            android:name=".group.ChooseGroupForDevice"
+            android:label="@string/activity_device_grouping"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".ota.OtaActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".ota.OtaActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".ota.OTAUpdateSwitchActivity"
-                android:screenOrientation="portrait" />
+            android:name=".ota.OTAUpdateSwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".ota.OTAUpdateActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".ota.OTAUpdateActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".othersview.FileSelectActivity"
-                android:screenOrientation="portrait" /> <!-- <activity -->
+            android:name=".othersview.FileSelectActivity"
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
         <!-- android:label="@string/activity_device_scanning_label" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- /> -->
         <activity
-                android:name=".qrcode.QRCodeScanActivity"
-                android:screenOrientation="portrait" />
+            android:name=".qrcode.QRCodeScanActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".qrcode.QRCodeShareActivity"
-                android:screenOrientation="portrait" />
+            android:name=".qrcode.QRCodeShareActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".group.RenameActivity"
-                android:screenOrientation="portrait" />
+            android:name=".group.RenameActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".light.RenameLightActivity"
-                android:screenOrientation="portrait" />
+            android:name=".light.RenameLightActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".othersview.SelectDeviceTypeActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".othersview.SelectDeviceTypeActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".switches.ScanningSwitchActivity"
-                android:screenOrientation="portrait" />
+            android:name=".switches.ScanningSwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.ConfigNormalSwitchActivity"
-                android:label="@string/title_activity_switch_group"
-                android:screenOrientation="portrait" />
+            android:name=".switches.ConfigNormalSwitchActivity"
+            android:label="@string/title_activity_switch_group"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".light.LightsOfGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".light.LightsOfGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.ConfigSceneSwitchActivity"
-                android:screenOrientation="portrait" />
+            android:name=".switches.ConfigSceneSwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.LoginActivity"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustResize" />
+            android:name=".user.LoginActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
-                android:name=".user.RegisterActivity"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustResize" />
+            android:name=".user.RegisterActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
-                android:name=".user.PhoneVerificationActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.PhoneVerificationActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.ForgetPassWordActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.ForgetPassWordActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".light.DeviceScanningNewActivity"
-                android:screenOrientation="portrait" />
+            android:name=".light.DeviceScanningNewActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".light.EmptyAddActivity"
-                android:screenOrientation="portrait" /> <!-- <activity -->
+            android:name=".light.EmptyAddActivity"
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".scene.SetSceneAct" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
-                android:name=".user.ManagerVerificationActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.ManagerVerificationActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".pir.ConfigSensorAct"
-                android:screenOrientation="portrait" />
+            android:name=".pir.ConfigSensorAct"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".othersview.AboutSomeQuestionsActivity"
-                android:screenOrientation="portrait" />
+            android:name=".othersview.AboutSomeQuestionsActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".pir.ScanningSensorActivity"
-                android:screenOrientation="portrait" />
+            android:name=".pir.ScanningSensorActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".rgb.RGBSettingActivity"
-                android:screenOrientation="portrait" />
+            android:name=".rgb.RGBSettingActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".rgb.RGBGradientActivity"
-                android:screenOrientation="portrait" /> <!-- <activity -->
+            android:name=".rgb.RGBGradientActivity"
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".scene.ChangeSceneAct" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
-                android:name=".scene.NewSceneSetAct"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:name=".scene.NewSceneSetAct"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-                android:name=".othersview.SelectColorAct"
-                android:theme="@style/MyDialogStyleBottom" />
+            android:name=".othersview.SelectColorAct"
+            android:theme="@style/MyDialogStyleBottom" />
         <activity
-                android:name=".rgb.SetDiyColorAct"
-                android:screenOrientation="portrait" />
+            android:name=".rgb.SetDiyColorAct"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".light.DeviceDetailAct"
-                android:screenOrientation="portrait" />
+            android:name=".light.DeviceDetailAct"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.ConfigCurtainSwitchActivity"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:name=".switches.ConfigCurtainSwitchActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
-                android:name=".group.CurtainGroupingActivity"
-                android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:name=".group.CurtainGroupingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <!-- <activity -->
         <!-- android:name=".rgb.SelectColorActivity" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
-                android:name=".rgb.SelectColorGradientAct"
-                android:screenOrientation="portrait" />
-
+            android:name=".rgb.SelectColorGradientAct"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".base.TelinkBaseActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".base.TelinkBaseActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".curtains.WindowCurtainsActivity"
-                android:screenOrientation="portrait" />
-
+            android:name=".curtains.WindowCurtainsActivity"
+            android:screenOrientation="portrait" />
+        
         <activity
-                android:name=".curtain.CurtainOfGroupActivity"
-                android:screenOrientation="portrait" />
+            android:name=".curtain.CurtainOfGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.InputPwdActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.InputPwdActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".user.DeveloperActivity"
-                android:screenOrientation="portrait" />
+            android:name=".user.DeveloperActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".region.SettingActivity"
-                android:screenOrientation="portrait" />
+            android:name=".region.SettingActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".region.UnbindMeNetActivity"
-                android:screenOrientation="portrait" />
+            android:name=".region.UnbindMeNetActivity"
+            android:screenOrientation="portrait" />
         <activity
-                android:name=".switches.SelectSceneListActivity"
-                android:screenOrientation="fullSensor" />
-
-
+            android:name=".switches.SelectSceneListActivity"
+            android:screenOrientation="fullSensor" />
+        
+        
         <meta-data
-                android:name="Mob-AppKey"
-                android:value="260b846a2a8f8" />
+            android:name="Mob-AppKey"
+            android:value="260b846a2a8f8" />
         <meta-data
-                android:name="Mob-AppSecret"
-                android:value="886a329e066cc1fba6db79e0d5a299bf" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
+            android:name="Mob-AppSecret"
+            android:value="886a329e066cc1fba6db79e0d5a299bf" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- /> -->
         <meta-data
-                android:name="android.max_aspect"
-                android:value="2.1" />
-
+            android:name="android.max_aspect"
+            android:value="2.1" />
+        
         <service
-                android:name=".tellink.TelinkLightService"
-                android:enabled="true" />
+            android:name=".tellink.TelinkLightService"
+            android:enabled="true" />
         <service
-                android:name=".service.SendLightsInfo"
-                android:enabled="true" />
-
+            android:name=".service.SendLightsInfo"
+            android:enabled="true" />
+        
         <uses-library
-                android:name="org.apache.http.legacy"
-                android:required="false" />
-
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+        
         <!--        bugly升级sdk用的-->
         <activity
-                android:name="com.tencent.bugly.beta.ui.BetaActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize|locale"
-                android:theme="@android:style/Theme.Translucent" />
-
-
+            android:name="com.tencent.bugly.beta.ui.BetaActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|locale"
+            android:theme="@android:style/Theme.Translucent" />
+    
+    
     </application>
 
 </manifest>
