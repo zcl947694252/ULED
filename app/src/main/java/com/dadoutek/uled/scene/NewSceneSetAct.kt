@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -28,11 +27,11 @@ import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
-import com.dadoutek.uled.rgb.SelectColorGradientAct
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
+import kotlinx.android.synthetic.main.scene_adapter_layout.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -106,7 +105,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 sceneGroupAdapter.data[currentPosition].gradientId = currentRgbGradient.id
                 sceneGroupAdapter.data[currentPosition].gradientType = currentRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
             }
-            // this.showGroupList[position].isNo = false//该group设备是开还是关
+            // this.showGroupList[position].isOn = false//该group设备是开还是关
             sceneGroupAdapter.notifyItemChanged(currentPosition)
             pop?.dismiss()
         }
@@ -260,25 +259,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
                 val itemGroup = ItemGroup()
-                if (item != null) {
-                    itemGroup.gpName = item.name
-                    itemGroup.enableCheck = false
-                    itemGroup.groupAddress = actions[i].groupAddr
-                    itemGroup.brightness = actions[i].brightness
-                    itemGroup.temperature = actions[i].colorTemperature
-                    itemGroup.color = actions[i].color
-                    itemGroup.isNo = actions[i].isOn
-                    item.checked = true
-                    itemGroup.rgbType = actions[i].rgbType
-                    itemGroup.gradientId = actions[i].gradientId
-                    itemGroup.gradientType = actions[i].gradientType
-                    itemGroup.gradientName = actions[i].gradientName
-                    itemGroup.gradientSpeed = actions[i].gradientSpeed
+                itemGroup.gpName = item.name
+                itemGroup.enableCheck = false
+                itemGroup.groupAddress = actions[i].groupAddr
+                itemGroup.brightness = actions[i].brightness
+                itemGroup.temperature = actions[i].colorTemperature
+                itemGroup.color = actions[i].color
+                itemGroup.isOn = actions[i].isOn
+                itemGroup.isEnableBright = actions[i].isEnableBright()
+                itemGroup.isEnableWhiteLight = actions[i].isEnableWhiteBright()
+                item.checked = true
+                itemGroup.rgbType = actions[i].rgbType
+                itemGroup.gradientId = actions[i].gradientId
+                itemGroup.gradientType = actions[i].gradientType
+                itemGroup.gradientName = actions[i].gradientName
+                itemGroup.gradientSpeed = actions[i].gradientSpeed
 
-                    showGroupList!!.add(itemGroup)
-                    groupMeshAddrArrayList.add(item.meshAddr)
-                    sceneGroupAdapter.notifyDataSetChanged()
-                }
+                showGroupList.add(itemGroup)
+                groupMeshAddrArrayList.add(item.meshAddr)
+                sceneGroupAdapter.notifyDataSetChanged()
             }
         }
 
@@ -344,6 +343,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             R.id.rg_xx -> open(position)
             R.id.rg_yy -> close(position)
             R.id.alg_text -> showPopMode(position)
+            R.id.cb_total -> switchTotal(position)
+            R.id.cb_bright -> switchBright(position)
+            R.id.cb_white_light -> switchWhiteLight(position)
         }
     }
 
@@ -359,15 +361,91 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         startActivityForResult(Intent(this@NewSceneSetAct, SelectGradientActivity::class.java), 1000)
     }
 
+    private fun switchTotal(position: Int) {
+        //LogUtils.e("switchTotal" + showGroupList[position].toString())
+        if (showGroupList[position].isOn) {
+            showGroupList[position].isOn = false
+            showGroupList[position].isEnableBright = false
+            showGroupList[position].isEnableWhiteLight = false
+            cb_bright.isChecked = false
+            cb_bright.isEnabled = false
+            cb_white_light.isChecked = false
+            cb_white_light.isEnabled = false
+            dot_rgb.isEnabled = false
+        } else {
+            showGroupList[position].isOn = true
+            showGroupList[position].isEnableBright = true
+            showGroupList[position].isEnableWhiteLight = true
+            cb_bright.isChecked = true
+            cb_bright.isEnabled = true
+            cb_white_light.isChecked = true
+            cb_white_light.isEnabled = true
+            dot_rgb.isEnabled = true
+        }
+        Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+        sceneGroupAdapter.notifyItemChanged(position)
+    }
+
+    private fun switchBright(position: Int) {
+        //LogUtils.e("switchBright")
+
+        val brightness: Int
+        if (showGroupList[position].isEnableBright) {
+            showGroupList[position].isEnableBright = false
+            brightness = 0
+//            enableBright(false)
+        } else {
+            showGroupList[position].isEnableBright = true
+            brightness = sbBrightness.progress
+//            enableBright(true)
+        }
+        val addr = showGroupList[position].groupAddress
+        val params: ByteArray = byteArrayOf(brightness.toByte())
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
+        sceneGroupAdapter.notifyItemChanged(position)
+    }
+
+    private fun switchWhiteLight(position: Int) {
+        //LogUtils.e("switchWhiteLight :" + cb_white_light.isChecked)
+        val whiteLight: Int
+        if (showGroupList[position].isEnableWhiteLight) {
+            whiteLight = 0
+//            enableWhiteLight(false)
+            showGroupList[position].isEnableWhiteLight = false
+
+        } else {
+            whiteLight = sb_w_bright.progress
+//            enableWhiteLight(true)
+            showGroupList[position].isEnableWhiteLight = true
+        }
+
+        val addr = showGroupList[position].groupAddress
+        val params: ByteArray = byteArrayOf(whiteLight.toByte())
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+        sceneGroupAdapter.notifyItemChanged(position)
+    }
+
+    private fun enableWhiteLight(enable: Boolean) {
+        sb_w_bright.isEnabled = enable
+        sb_w_bright_add.isEnabled = enable
+        sb_w_bright_less.isEnabled = enable
+    }
+
+    private fun enableBright(enable: Boolean) {
+        sbBrightness.isEnabled = enable
+        sbBrightness_add.isEnabled = enable
+        sbBrightness_less.isEnabled = enable
+    }
+
 
     private fun close(position: Int) {
-        this.showGroupList[position].isNo = false
+        this.showGroupList[position].isOn = false
         sceneGroupAdapter.notifyItemChanged(position)
         Commander.openOrCloseLights(showGroupList[position].groupAddress, false)
     }
 
     private fun open(position: Int) {
-        this.showGroupList[position].isNo = true
+        this.showGroupList[position].isOn = true
         sceneGroupAdapter.notifyItemChanged(position)
         Commander.openOrCloseLights(showGroupList[position].groupAddress, true)
 
@@ -616,17 +694,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 when {
                     OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x10)
-                        sceneActions.isOn = item.isNo
+                        sceneActions.setIsOn(item.isOn)
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x05)
-                        sceneActions.isOn = item.isNo
+                        sceneActions.setIsOn(item.isOn)
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x06, i)
-
+                        sceneActions.setIsOn(item.isOn)
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     else -> {
@@ -648,6 +726,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         sceneActions.deviceType = deviceType
         sceneActions.groupAddr = item.groupAddress
 
+        ///LogUtils.e("rgbType" + item.rgbType)
+        //LogUtils.e("deviceType" + deviceType)
+        //LogUtils.e(item.toString())
+
         if (1 == item.rgbType && deviceType == 0x06) {//是彩灯并且是渐变模式
             if (position != 1000000) {
                 val itemGroup = showGroupList[position]
@@ -658,6 +740,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 sceneActions.gradientName = itemGroup.gradientName
             }
         } else {
+            sceneActions.isOn = item.isOn
+            sceneActions.setIsEnableBright(item.isEnableBright)
+            sceneActions.setIsEnableWhiteBright(item.isEnableWhiteLight)
             sceneActions.brightness = item.brightness
             sceneActions.colorTemperature = item.temperature
             sceneActions.setColor(item.color)
@@ -770,11 +855,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 when {
                     OtherUtils.isCurtain(groupByMeshAddr) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x10)
-                        sceneActions.isOn = itemGroups[i].isNo
+                        sceneActions.isOn = itemGroups[i].isOn
                     }
                     OtherUtils.isConnector(groupByMeshAddr) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x05)
-                        sceneActions.isOn = itemGroups[i].isNo
+                        sceneActions.isOn = itemGroups[i].isOn
                     }
                     OtherUtils.isRGBGroup(groupByMeshAddr) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, itemGroups[i], 0x06, i)
