@@ -149,7 +149,7 @@
     <string name="rename_the_group">Rename the group</string>
     <string name="input_rename_text_tip">Please enter a new group name:</string>
     <string name="hint_input">Please enter. . .</string>
-    <string name="btn_sure">OK</string>
+    <string name="confirm">OK</string>
     <string name="group_name_setting">Group name setting</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="successfully_modified">Successfully modified!</string>
@@ -757,9 +757,9 @@
     <string name="close_mode">close</string>
     <string name="password_cannot">Password cannot be empty</string>
 
-    <string name="any_environment">All day</string>
-    <string name="dark_environment">Daytime</string>
-    <string name="very_dark_environment">Night</string>
+    <string name="all_day">All day</string>
+    <string name="day_time">Daytime</string>
+    <string name="night">Night</string>
 
     <string name="light_on">Turn on </string>
     <string name="light_off">Turn off </string>
@@ -1073,4 +1073,7 @@
     <string name="physical_recovery_two">This operation will reset all energized devices (switch, except sensor) in the region of the device that interacts with the APP.</string>
     <string name="group_mode">Group mode</string>
     <string name="scene_mode">Scene mode</string>
+    <string name="on_off">Switch</string>
+    <string name="see_help">See the help</string>
+    <string name="group_max">最大支持7个组</string>
 </resources>

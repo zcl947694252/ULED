@@ -12,7 +12,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-         helper.setText(R.id.group_name,item.name)
+         helper.setText(R.id.item_more_group_name,item.name)
         if (item.isChecked) {
             helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_selected)
         } else {

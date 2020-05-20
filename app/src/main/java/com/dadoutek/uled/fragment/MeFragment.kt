@@ -7,7 +7,6 @@ import android.content.Context.POWER_SERVICE
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.os.*
 import android.provider.Settings
 import android.text.SpannableString
@@ -49,8 +48,6 @@ import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
-import com.dadoutek.uled.user.InputPwdActivity
-import com.dadoutek.uled.user.LoginActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -61,11 +58,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.db.NULL
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -411,7 +404,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         cancelConfirmLy?.visibility = View.VISIBLE
         cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.gray)
         cancel?.text = getString(R.string.cancel)
-        confirm?.text = getString(R.string.btn_sure)
+        confirm?.text = getString(R.string.confirm)
         cancel?.isClickable = true
         confirm?.isClickable = true
     }
@@ -471,10 +464,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                         //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
-                            confirm?.text = getString(R.string.btn_sure)
+                            confirm?.text = getString(R.string.confirm)
                         } else {
                             confirm?.isClickable = false
-                            confirm?.text = getString(R.string.btn_sure) + "(" + num + "s)"
+                            confirm?.text = getString(R.string.confirm) + "(" + num + "s)"
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)

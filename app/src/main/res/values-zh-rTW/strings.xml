@@ -142,7 +142,7 @@
     <string name="rename_the_group">重命名分组</string>
     <string name="input_rename_text_tip">请输入新的组名:</string>
     <string name="hint_input">请输入……</string>
-    <string name="btn_sure">确定</string>
+    <string name="confirm">确定</string>
     <string name="group_name_setting">组名设置</string>
     <string name="rename_tip_check">不允许输入特殊符号！</string>
     <string name="successfully_modified">修改成功！</string>
@@ -690,9 +690,9 @@
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
-    <string name="any_environment">全天</string>
-    <string name="dark_environment">白天</string>
-    <string name="very_dark_environment">夜晚</string>
+    <string name="all_day">全天</string>
+    <string name="day_time">白天</string>
+    <string name="night">夜晚</string>
     <string name="light_on">触发时开灯</string>
     <string name="light_off">触发时关灯</string>
     <string name="startMinute">分钟</string>
@@ -996,4 +996,7 @@
     <string name="reset_gw_faile">用户复位失败</string>
     <string name="group_mode">群组模式</string>
     <string name="scene_mode">场景模式</string>
+    <string name="on_off">开关</string>
+    <string name="see_help">查看帮助</string>
+    <string name="group_max">最大支持7个组</string>
 </resources>

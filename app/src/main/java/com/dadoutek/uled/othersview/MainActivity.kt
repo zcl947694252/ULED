@@ -57,7 +57,6 @@ import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.switches.ConfigEightSwitchActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -179,9 +178,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
             //如果没打开蓝牙，就提示用户打开
+            startActivity<PirConfigActivity>("deviceInfo" to DeviceInfo(), "update" to "0", "version" to "it")
             val intent = Intent(this@MainActivity, PirConfigActivity::class.java)
             // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
-            startActivity(intent)
+           // startActivity(intent)
         }
         initBottomNavigation()
         checkVersionAvailable()
