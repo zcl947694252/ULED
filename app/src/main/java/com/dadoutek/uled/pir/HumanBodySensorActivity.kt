@@ -50,9 +50,11 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.activity_pir_new.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.human_progress_tv
+import kotlinx.android.synthetic.main.huuman_body_sensor.recyclerView_select_group_list_view
 import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_root
 import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_three
 import kotlinx.android.synthetic.main.huuman_body_sensor.trigger_time_text
@@ -88,9 +90,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private var switchMode = 0X01
     private var selectTime = 10
     //底部组适配器
-    private var showGroupList: MutableList<ItemGroup> = mutableListOf()
-    private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item,
-            showGroupList)
+    private var showGroupList: MutableList<ItemGroup>? = null
+    private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
@@ -123,7 +124,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         recyclerView_select_group_list_view.adapter = nightLightEditGroupAdapter
         nightLightEditGroupAdapter.bindToRecyclerView(recyclerView_select_group_list_view)
 
-        nightLightEditGroupAdapter.onItemClickListener = OnItemClickListener { adapter, _, position ->
+        nightLightEditGroupAdapter.setOnItemClickListener { adapter, view, position ->
             val item = showCheckListData[position]
             when {
                 item.checked -> {//t状态
@@ -143,7 +144,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
             adapter?.notifyDataSetChanged()
         }
-
 
         recyclerGroup.layoutManager = GridLayoutManager(this, 3)
         recyclerGroup.adapter = nightLightGroupGrideAdapter
@@ -196,22 +196,25 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun performed(event: Event<String>?) {
         val deviceEvent = event as DeviceEvent
-        val deviceInfo = deviceEvent.args
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                val deviceInfo = deviceEvent.args
+                when (deviceInfo.status) {
+                    LightAdapter.STATUS_LOGIN -> {
+                        disposable?.dispose()
+                        setLoadingVisbiltyOrGone()
+                        image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+                    }
 
-        if (event.type == ErrorReportEvent.ERROR_REPORT) {
-            val info = (event as ErrorReportEvent).args
-            onErrorReport(info)
-        }
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                disposable?.dispose()
-                setLoadingVisbiltyOrGone()
-                image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+                    LightAdapter.STATUS_LOGOUT -> {
+                        autoConnectSensor()
+                        image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    }
+                }
             }
-
-            LightAdapter.STATUS_LOGOUT -> {
-                autoConnectSensor()
-                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+            ErrorReportEvent.ERROR_REPORT->{
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
             }
         }
     }
@@ -264,7 +267,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         }
         nightLightEditGroupAdapter.notifyDataSetChanged()
 
-        showGroupList.clear()
+        showGroupList = ArrayList()
 
         for (i in showCheckListData!!.indices) {
             val dbGroup = showCheckListData!![i]
@@ -272,7 +275,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (dbGroup.checked) {
                 toolbar.title = dbGroup.name
                 showGroupList.let {
-                    if (it.size == 0) {
+                    if (it?.size == 0) {
                         val newItemGroup = ItemGroup()
                         newItemGroup.brightness = 50
                         newItemGroup.temperature = 50
@@ -287,7 +290,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 }
             }
         }
-            nightLightGroupGrideAdapter.notifyDataSetChanged()
     }
 
     private fun initToolbar() {
@@ -775,7 +777,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
                 for (i in showCheckListData.indices) {
                     if (showCheckListData[i].checked) {
-                        if (showGroupList.size == 0) {
+                        if (showGroupList!!.size == 0) {
                             val newItemGroup = ItemGroup()
                             newItemGroup.brightness = 50
                             newItemGroup.temperature = 50
@@ -806,11 +808,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     }
                 }
 
-                showGroupList.clear()
-                showGroupList.addAll(oldResultItemList)
-                showGroupList.addAll(newResultItemList)
+                showGroupList?.clear()
+                showGroupList?.addAll(oldResultItemList)
+                showGroupList?.addAll(newResultItemList)
 
-                if (showGroupList.size > 8) {
+                if (showGroupList!!.size > 8) {
                     ToastUtils.showLong(getString(R.string.tip_night_light_group_limite_tip))
                 } else {
                     showDataListView()
@@ -1112,6 +1114,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         return sb.toString().trim { it <= ' ' }
     }
 
+  /*  private fun showDataListView() {
+        isFinish = false
+        toolbar.title = getString(R.string.human_body)
+        sensor_three.visibility = View.VISIBLE
+        recyclerView_select_group_list_view.visibility = View.GONE
+        tv_function1.visibility = View.GONE
+    }*/
     /**
      * 显示已选中分组
      */
@@ -1121,7 +1130,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         sensor_three.visibility = View.VISIBLE
         recyclerView_select_group_list_view.visibility = View.GONE
         tv_function1.visibility = View.GONE
+
+        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
+        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(
+                R.layout.activity_night_light_groups_item, showGroupList)
+
+        nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
+        nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+            when (view.id) {
+                R.id.imgDelete -> delete(adapter, position)
+            }
+        }
     }
+
 
     private fun delete(adapter: BaseQuickAdapter<Any, BaseViewHolder>, position: Int) {
         adapter.remove(position)

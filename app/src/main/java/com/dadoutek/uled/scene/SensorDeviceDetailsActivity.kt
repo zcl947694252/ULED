@@ -138,9 +138,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     override fun onResume() {
         super.onResume()
-        if (compositeDisposable.isDisposed) {
+        if (compositeDisposable.isDisposed)
             compositeDisposable = CompositeDisposable()
-        }
+
         initData()
         initView()
         popupWindow?.dismiss()
@@ -672,12 +672,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
             DeviceEvent.STATUS_CHANGED -> {
                 var status = (event as DeviceEvent).args.status
-//                LogUtils.e("zcl", "zcl******STATUS_CHANGED$status")
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {//3
                         progressBar_sensor.visibility = View.GONE
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-//                        LogUtils.e("zcl", "zcl***STATUS_LOGIN***$isClick")
                         when (isClick) {//重新配置
                             RECOVER_SENSOR -> {
                                 disposable?.dispose()
@@ -771,10 +769,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             doFinish()
                                         }
                                         isClick = SENSOR_FINISH
+                                    }else{
+                                        hideLoadingDialog()
+                                        ToastUtils.showLong(getString(R.string.get_version_fail))
                                     }
                                 },
                                 {
                                     hideLoadingDialog()
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                 }
                         )
             } else {

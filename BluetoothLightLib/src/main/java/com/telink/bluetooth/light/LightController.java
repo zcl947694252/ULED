@@ -781,7 +781,6 @@ public final class LightController extends EventBus<Integer> implements LightPer
             return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag, delay);
         else
             return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
-
     }
 
     /********************************************************************************

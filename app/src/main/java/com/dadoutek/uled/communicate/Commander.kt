@@ -656,6 +656,7 @@ object Commander : EventListener<String> {
     }
 
     fun getDeviceVersion(dstAddr: Int, retryTimes: Long = 1): Observable<String> {
+        TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         return Observable.create<String> {
             mGetVersionObservable = it
             mDstAddr = dstAddr
@@ -679,7 +680,7 @@ object Commander : EventListener<String> {
                     it.onError(Throwable("get version failed"))
                 }
                 .doOnSubscribe {
-                    TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+//                    TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
                 }
                 .doFinally {
                     TelinkLightApplication.getApp().removeEventListener(NotificationEvent.GET_DEVICE_STATE, this)
