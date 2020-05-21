@@ -17,6 +17,7 @@ public class ItemGroup implements Serializable {
     public int deviceType;
     public boolean isNo=true;
 
+    public long sceneId= 1000000;
     public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
     public int gradientId = 0  ; //渐变id

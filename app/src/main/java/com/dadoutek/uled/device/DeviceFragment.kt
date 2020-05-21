@@ -269,7 +269,7 @@ class DeviceFragment : BaseFragment() {
 
         deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), DBUtils.getAllGateWay().size, DeviceType.GATE_WAY))
 
-
+        deviceAdapter.notifyDataSetChanged()
     }
 
 

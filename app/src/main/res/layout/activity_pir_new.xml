@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
             <!--开关-->
-            <android.support.constraint.ConstraintLayout
+            <!--<android.support.constraint.ConstraintLayout
                     android:id="@+id/pir_config_switch_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
@@ -83,7 +83,7 @@
                             android:text="@string/close" />
 
                 </RadioGroup>
-            </android.support.constraint.ConstraintLayout>
+            </android.support.constraint.ConstraintLayout>-->
 
             <View
                     android:layout_width="match_parent"
@@ -444,6 +444,7 @@
                     android:background="@color/black_ee" />
 
             <TextView
+                    android:id="@+id/pir_config_select_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/black_ee"
@@ -520,7 +521,7 @@
                         android:layout_marginTop="@dimen/dp_10" />
 
                 <TextView
-                        android:id="@+id/human_progress_tv"
+                        android:id="@+id/pir_config_human_progress_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"

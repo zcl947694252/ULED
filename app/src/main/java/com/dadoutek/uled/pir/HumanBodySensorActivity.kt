@@ -167,26 +167,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
-    private fun getSceneName() {
-        mScenes = DBUtils.sceneAll
-      /*  mGroupScenesName?.clear()
-        for (item in mScenes)
-            mGroupScenesName!!.add(item.name)
-        groupSceneAdapter.notifyDataSetChanged()*/
-    }
-
-    private fun getGroupName() {
-        mGroups = DBUtils.allGroups
-    /*    mGroupScenesName?.clear()
-        for (item in mGroups)
-            if (item.deviceType == Constant.DEVICE_TYPE_CONNECTOR || item.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || item.deviceType
-             ==Constant.DEVICE_TYPE_LIGHT_NORMAL || item.deviceType == Constant.DEVICE_TYPE_NO) {
-                if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
-                    mGroupScenesName!!.add(item.name)
-            }
-        groupSceneAdapter.notifyDataSetChanged()*/
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         TelinkLightApplication.getApp().removeEventListener(this)
@@ -195,9 +175,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     override fun performed(event: Event<String>?) {
-        val deviceEvent = event as DeviceEvent
-        when (event.type) {
+        when (event?.type) {
             DeviceEvent.STATUS_CHANGED -> {
+                val deviceEvent = event as DeviceEvent
                 val deviceInfo = deviceEvent.args
                 when (deviceInfo.status) {
                     LightAdapter.STATUS_LOGIN -> {
@@ -859,7 +839,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
                 configLightlight()
                 Thread.sleep(300)
-                Commander.updateMeshName(
+                Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()
                             configureComplete()
@@ -969,16 +949,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun saveSensor() {
         var dbSensor = DbSensor()
+
         val allSensor = DBUtils.getAllSensor()
         LogUtils.e("zcl---$allSensor")
         if (isConfirm) {
             dbSensor.index = mDeviceInfo.id.toInt()
-
             if ("none" != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
-            val allSensor = DBUtils.getAllSensor()
-            LogUtils.e("zcl---$allSensor")
             DBUtils.saveSensor(dbSensor, isConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
@@ -987,10 +965,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+        //dbSensor.meshAddr = MeshAddressGenerator().meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)
+        dbSensor.name = getString(R.string.sensor)+dbSensor.meshAddr
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v7.app.AlertDialog
@@ -19,28 +18,44 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
-import androidx.annotation.RequiresApi
+import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.saveSensor
 import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.ItemGroup
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.TmtUtils
+import com.squareup.haha.perflib.Main
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_pir_new.*
+import kotlinx.android.synthetic.main.activity_pir_new.sensor_root
 import kotlinx.android.synthetic.main.activity_pir_new.trigger_time_text
+import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.design.snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 /**
@@ -53,17 +68,16 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
-    private val REQUEST_CODE_CHOOSE: Int = 1000
-    private var isConfirm: Boolean = false
-    private var mDeviceInfo: DeviceInfo? = null
+    private var timeDispsable: Disposable? = null
+    private var connectDisposable: Disposable? = null
 
     /**
-     * 1 代表分 0代表秒
+     * 0 代表分 1代表秒
      */
-    private var timeUnitType: Int = 1
+    private var timeUnitType: Int = 0
 
     /**
-     * 0 开 1关 2自定义
+     * 1 开 0关 2自定义
      */
     private var triggerAfterShow: Int = 0
 
@@ -71,11 +85,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
      * 0全天    1白天   2夜晚
      */
     private var triggerKey: Int = 0
+    private var customBrightnessNum: Int = 0
+    private var currentScene: DbScene? = null
+    private val REQUEST_CODE_CHOOSE: Int = 1000
+    private var isConfirm: Boolean = false
+    private var mDeviceInfo: DeviceInfo? = null
     private var popupWindow: PopupWindow? = null
     private var popAdapter: PopupWindowAdapter? = null
     private var isGroupMode = true
     private var showGroupList: MutableList<ItemGroup> = mutableListOf()
-    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
+    private var showBottomList: MutableList<ItemGroup> = mutableListOf()
+    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showBottomList)
     private val popDataList = mutableListOf<ItemCheckBean>()
     private val listTriggerTimes = mutableListOf<ItemCheckBean>()
     private val listTriggerAfterShow = mutableListOf<ItemCheckBean>()
@@ -102,14 +122,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
         }
-        pir_config_switch.setOnCheckedChangeListener { _, checkedId ->
-            val byteArrayOf = if (checkedId == R.id.pir_config_switch_open)
-                byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0打开
-            else
-                byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1关闭
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    mDeviceInfo!!.meshAddress, byteArrayOf)
-        }
         pir_config_see_help.setOnClickListener(this)
         pir_config_trigger_conditions.setOnClickListener(this)
         pir_config_trigger_after.setOnClickListener(this)
@@ -117,67 +129,43 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         //pir_config_overtime_down_time.setOnClickListener(this)
         pir_config_choose_scene.setOnClickListener(this)
         pir_config_choose_group.setOnClickListener(this)
+        pir_config_btn.setOnClickListener(this)
         bottomGvAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
             if (view.id == R.id.imgDelete) adapter.remove(position)
         }
     }
 
     private fun changeGroupType(b: Boolean) {
+        showBottomList.clear()
         if (b) {
             pir_config_choose_group_ly.visibility = View.VISIBLE
             pir_config_choose_scene_ly.visibility = View.GONE
             pir_config_trigger_after_ly.visibility = View.VISIBLE
             pir_config_trigger_after_view.visibility = View.VISIBLE
+            pir_config_select_title.text = getString(R.string.select_group)
+            showBottomList.addAll(showGroupList)
         } else {
             pir_config_choose_group_ly.visibility = View.GONE
             pir_config_choose_scene_ly.visibility = View.VISIBLE
             pir_config_trigger_after_ly.visibility = View.GONE
             pir_config_trigger_after_view.visibility = View.GONE
+            pir_config_select_title.text = getString(R.string.choose_scene)
+            setItemScene()
         }
+        bottomGvAdapter.notifyDataSetChanged()
     }
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         val version = intent.getStringExtra("version")
-        isNewPir(version)
         pir_confir_tvPSVersion.text = version
         isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
-        var lightGroup = DBUtils.allGroups
-
-        for (i in lightGroup!!.indices) {
-            val element = ItemGroup()
-            element.gpName = "组i"
-            showGroupList.add(element)
-        }
-
-        bottomGvAdapter?.notifyDataSetChanged()
+        color_mode_rb.isChecked = true
 
         getTriggerTimeProide()
         getTriggerAfterShow()
         getTimeUnite()
         getSelectTimes()
-    }
-
-    private fun isNewPir(version: String?) {
-        /* if (TelinkApplication.getInstance().connectDevice != null) {
-             pir_confir_progress_ly.visibility = View.GONE
-             pir_confir_tvPSVersion.text = version
-             var version = pir_confir_tvPSVersion.text.toString()
-             var num: String //N-3.1.1
-             if (version.contains("N")) {
-                 num = version.substring(2, 3)
-                 if ("" != num && num != "-" && num.toDouble() >= 3.0) {
-                     isGone()
-                     isVisibility()//显示3.0新的人体感应器
-                 }
-             } else if (version.contains("PR")) {
-                 isGone()
-                 isVisibility()//显示3.0新的人体感应器
-             }
-         } else {
-             LogUtils.d("device isn't connected, auto connect it")
-             autoConnectSensor()
-         }*/
     }
 
     private fun getSelectTimes() {
@@ -199,8 +187,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getTriggerAfterShow() {
-        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_on), true))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
+        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_on), true))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.custom_brightness), false))
     }
 
@@ -219,6 +207,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         color_mode_rb.text = getString(R.string.group_mode)
         gradient_mode_rb.text = getString(R.string.scene_mode)
         color_mode_rb.isChecked = true
+        pir_config_overtime_tv.requestFocus()
+        pir_config_overtime_tv.isFocusable = true
+        pir_config_overtime_tv.isFocusableInTouchMode = true
         makePopView()
         changeGroupType(true)
         makeGrideView()
@@ -227,7 +218,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == Activity.RESULT_OK) {
+
+            showBottomList.clear()
             if (isGroupMode) {
+                showGroupList.clear()
                 val arrayList = data?.getParcelableArrayListExtra<Parcelable>("data") as ArrayList<CheckItemBean>
                 arrayList.forEach {
                     val gp = DBUtils.getGroupByID(it.id)
@@ -242,31 +236,29 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         newItemGroup.groupAddress = itGp.meshAddr
                         showGroupList.add(newItemGroup)
                     }
-
                 }
+                showBottomList.addAll(showGroupList)
             } else {
-                val arrayList = data?.getParcelableArrayListExtra<Parcelable>("data") as ArrayList<DbScene>
-                arrayList.forEach {
-                    val scene = DBUtils.getSceneByID(it.id)
-                    scene?.let { itscene ->
-                        val newItemGroup = ItemGroup()
-                        newItemGroup.brightness = 50
-                        newItemGroup.temperature = 50
-                        newItemGroup.color = R.color.white
-                        newItemGroup.checked = true
-                        newItemGroup.enableCheck = true
-                        newItemGroup.gpName = itscene.name
-                        showGroupList.add(newItemGroup)
-                    }
-
-                }
+                currentScene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                setItemScene()
             }
             bottomGvAdapter.notifyDataSetChanged()
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.CUPCAKE)
-    @SuppressLint("SetTextI18n")
+    private fun setItemScene() {
+        val newItemGroup = ItemGroup()
+        newItemGroup.brightness = 50
+        newItemGroup.temperature = 50
+        newItemGroup.color = R.color.white
+        newItemGroup.checked = true
+        newItemGroup.enableCheck = true
+        newItemGroup.gpName = currentScene?.name
+        newItemGroup.sceneId = currentScene?.id ?: 0
+        if (currentScene != null)
+            showBottomList.add(newItemGroup)
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.pir_config_trigger_conditions -> {//触发条件
@@ -291,7 +283,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     popupWindow?.dismiss()
                     when (position) {
                         0, 1 -> {
-                            pir_config_triggering_conditions_text.text = popDataList[position].title
+                            trigger_time_text.text = popDataList[position].title
+                            customBrightnessNum = 0
                             changeTriggerTimeChecked(position, 1)
                         }
                         2 -> setBrightness()
@@ -312,29 +305,16 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 popupWindow?.showAsDropDown(pir_config_time_type)
             }
 
-            /*  R.id.pir_config_overtime_down_time -> {
-                  popDataList.clear()
-                  popDataList.addAll(listSelectTimes)
-                  popAdapter?.notifyDataSetChanged()
-                  popAdapter?.setOnItemClickListener { _, _, position ->
-                      popupWindow?.dismiss()
-                      val title = popDataList[position].title
-                      pir_config_overtime_down_time_tv.text = title
-                      selectTime = (title.replace("s", "")).toInt()
-                      LogUtils.v("zcl-----------传感器配置选择时间-------$selectTime")
-                  }
-                  popupWindow?.showAsDropDown(pir_config_overtime_down_time)
-              }*/
-
-            R.id.pir_config_choose_group, R.id.pir_config_choose_scene -> {
+            R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
-                if (v.id == R.id.pir_config_choose_group)
-                    intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
-                else
-                    intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 1)
+                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
-
+            R.id.pir_config_choose_scene -> {
+                val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
+                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 1)
+                startActivityForResult(intent, REQUEST_CODE_CHOOSE)
+            }
             R.id.pir_config_see_help -> {
                 var intent = Intent(this@PirConfigActivity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
@@ -350,54 +330,177 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         var time = pir_config_overtime_tv.text.toString()
         when {
             TextUtils.isEmpty(time) -> {
-                ToastUtils.showShort(getString(R.string.timeout_period_is_empty))
+                TmtUtils.midToast(this, getString(R.string.timeout_period_is_empty))
+                return
             }
-            timeUnitType == 1 -> {//0 代表分 1代表秒
-                when {
-                    time.toInt() < 10 -> {
-                        ToastUtils.showShort(getString(R.string.timeout_time_less_ten))
-                        return
-                    }
-                    time.toInt() > 255 -> {
-                        ToastUtils.showShort(getString(R.string.timeout_255))
-                        return
-                    }
-                }
+            timeUnitType == 1 && time.toInt() < 10 -> {//0 代表分 1代表秒
+                TmtUtils.midToast(this, getString(R.string.timeout_time_less_ten))
+                return
             }
-            timeUnitType == 0 -> {
-                when {
-                    time.toInt() < 1 -> {
-                        ToastUtils.showShort(getString(R.string.timeout_1m))
-                        return
-                    }
-                    time.toInt() > 255 -> {
-                        ToastUtils.showShort(getString(R.string.timeout_255_big))
-                        return
-                    }
-                }
+            timeUnitType == 1 && time.toInt() > 255 -> {
+                TmtUtils.midToast(this, getString(R.string.timeout_255))
+                return
+            }
+            timeUnitType == 0 && time.toInt() < 1 -> {
+                TmtUtils.midToast(this, getString(R.string.timeout_1m))
+                return
+            }
+            timeUnitType == 0 && time.toInt() > 255 -> {
+                TmtUtils.midToast(this, getString(R.string.timeout_255_big))
+                return
             }
             showGroupList.size == 0 -> {
-                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+                TmtUtils.midToast(this, getString(R.string.config_night_light_select_group))
+                return
             }
             else -> {//符合所有条件
-                if (isGroupMode) {
-                    //组地址选择功能
-                    val paramsSetGroup = byteArrayOf(1, 2, 0, 0, 0, 0, 0, 0, 0)//1关闭 最多支持七个
-                    showGroupList.forEach {
-                        val lowAdd = it.groupAddress or 0xff
-                        paramsSetGroup[paramsSetGroup.lastIndex] = lowAdd.toByte()
-                    }
-                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
-                    //11固定1 12-13保留 14 持续时间 15最终亮度 16触发照度(条件) 17触发设置 最低位1是开 0是关 与开关命令反了 次低 1 分钟 0 秒
-                    var triggerSetNum =0
-                    when (triggerAfterShow){
+
+                val device = TelinkLightApplication.getApp().connectDevice
+                if (device != null && device.macAddress == mDeviceInfo?.macAddress) {
+                    GlobalScope.launch {
+                        setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
+                        sendCommandOpcode(time.toInt())
+                        delay(300)
+                        Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
+                                successCallback = {
+                                    setLoadingVisbiltyOrGone()
+                                    configureComplete()
+                                },
+                                failedCallback = {
+                                    snackbar(sensor_root, getString(R.string.pace_fail))
+                                    setLoadingVisbiltyOrGone()
+                                    TelinkLightService.Instance()?.idleMode(true)
+                                })
 
                     }
-                    //byteArrayOf(1,0,0,time.toInt().toByte(),50,triggerKey.toByte(),)
                 } else {
-
+                    ToastUtils.showLong(getString(R.string.connect_fail))
+                    autoConnect()
+                    timeDispsable = Observable.timer(10, TimeUnit.SECONDS).subscribe {
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gate_way_offline))
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    private fun configureComplete() {
+        saveSensor()
+        allDispoables()
+        TelinkLightService.Instance()?.idleMode(true)
+        if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
+            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        else {
+            finish()
+        }
+    }
+
+    private fun allDispoables() {
+        connectDisposable?.dispose()
+        timeDispsable?.dispose()
+    }
+
+    private fun saveSensor() {
+        var dbSensor = DbSensor()
+
+        if (isConfirm) {
+            dbSensor.index = mDeviceInfo!!.id.toInt()
+            if ("none" != mDeviceInfo!!.id)
+                dbSensor.id = mDeviceInfo!!.id.toLong()
+        } else {//如果不是重新配置就保存进服务器
+            saveSensor(dbSensor, isConfirm)
+            dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
+        }
+
+        dbSensor.controlGroupAddr = getControlGroup()
+        dbSensor.macAddr = mDeviceInfo!!.macAddress
+        dbSensor.productUUID = mDeviceInfo!!.productUUID
+        dbSensor.meshAddr = mDeviceInfo!!.meshAddress
+        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
+
+        saveSensor(dbSensor, isConfirm)//保存进服务器
+
+        dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
+        DBUtils.recordingChange(dbSensor.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_ADD)
+    }
+
+    private fun getControlGroup(): String? {
+        var controlGroupListStr = ""
+        for (j in showGroupList!!.indices) {
+            if (j == 0) {
+                controlGroupListStr = showGroupList!![j].groupAddress.toString()
+            } else {
+                controlGroupListStr += "," + showGroupList!![j].groupAddress.toString()
+            }
+        }
+        return controlGroupListStr
+    }
+
+    fun autoConnect() {
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+        if (size > 0) {
+            ToastUtils.showLong(getString(R.string.connecting_tip))
+            connectDisposable?.dispose()
+            connectDisposable = connect(meshAddress = mDeviceInfo!!.meshAddress, fastestMode = true, retryTimes = 2)
+                    ?.subscribe({
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            TmtUtils.midToast(this, getString(R.string.connect_success))
+                        }
+                        LogUtils.d("connect success")
+                    }, {
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            TmtUtils.midToast(this, getString(R.string.connect_fail))
+                        }
+                        LogUtils.d("connect failed")
+                    }
+                    )
+        }
+    }
+
+    private fun sendCommandOpcode(durationTime: Int) {
+        if (isGroupMode) {
+            //组地址选择功能
+            val paramsSetGroup = byteArrayOf(0x24, 2, 0, 0, 0, 0, 0, 0, 0)//1关闭 最多支持七个
+            for (i in 0 until showGroupList.size) {
+                val lowAdd = showGroupList[i].groupAddress and 0xff
+                paramsSetGroup[i + 2] = lowAdd.toByte()
+            }
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
+
+            //11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
+            // 16触发照度(条件 全天) 17触发设置 最低位1 开 0关  次低 1 分钟 0 秒
+            //3、 触发设置，最低位，1是开，0是关，次低位 1是分钟，0是秒钟    1开0关2自定义 0分钟 1秒钟
+            //例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
+            //触发功能选择功能
+            var triggerSet = if (triggerAfterShow == 2)
+                0
+            else
+                (timeUnitType shl 1) or 0x01
+
+            val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(),
+                    triggerKey.toByte(), triggerSet.toByte(), 0)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetSHow)
+        } else {
+            //11位固定为3。 12位的时间是纯数字时间，如果定时60分钟，就发送60 13场景ID 14 持续时间单位1是分钟，0是秒 15触发条件
+            //4、 触发照度：0是任意，1是白天，2是黑夜
+            val paramsSetSHow = byteArrayOf(3, durationTime.toByte(), currentScene!!.id.toByte(), timeUnitType.toByte(), triggerKey.toByte(), 0, 0, 0)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetSHow)
+        }
+    }
+
+
+    private fun setLoadingVisbiltyOrGone(visiablity: Int = View.GONE, text: String = "") {
+        GlobalScope.launch(Dispatchers.Main) {
+            pir_confir_progress_ly.visibility = visiablity
+            pir_config_human_progress_tv.text = text
         }
     }
 
@@ -423,7 +526,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showShort(getString(R.string.brightness_cannot_be_greater_than))
                         return@setPositiveButton
                     }
-                    trigger_time_text.text = textGp.text.toString() + "%"
+                    val time = textGp.text.toString()
+                    customBrightnessNum = time.toInt()
+                    trigger_time_text.text = "$time%"
                     dialog.dismiss()
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
@@ -472,4 +577,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         popAdapter?.bindToRecyclerView(recycleView)
         popupWindow?.isFocusable = true
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        allDispoables()
+    }
+    /*  pir_config_switch.setOnCheckedChangeListener { _, checkedId ->
+       val byteArrayOf = if (checkedId == R.id.pir_config_switch_open)
+           byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0打开
+       else
+           byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1关闭
+       TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+               mDeviceInfo!!.meshAddress, byteArrayOf)
+   }*/
 }

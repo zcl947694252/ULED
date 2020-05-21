@@ -91,14 +91,14 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
         if (type == 0 || type == 2) {
-            if (groupDatumms.filter { it.checked }.size==6 && !groupDatumms[position].checked){
+            if (groupDatumms.filter { it.checked }.size==7 && !groupDatumms[position].checked){
                 ToastUtils.showShort(getString(R.string.group_max))
             }else{
                 groupDatumms[position].checked = !groupDatumms[position].checked
                 groupAdapter.notifyDataSetChanged()
             }
         } else {
-            if (sceneDatumms.filter { it.checked }.size==6 && !sceneDatumms[position].checked){
+            if (sceneDatumms.filter { it.checked }.size==7 && !sceneDatumms[position].checked){
                 ToastUtils.showShort(getString(R.string.group_max))
             }else{
                 sceneDatumms[position].checked = !sceneDatumms[position].checked
