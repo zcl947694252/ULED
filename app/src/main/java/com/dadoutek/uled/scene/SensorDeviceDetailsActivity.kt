@@ -678,8 +678,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
-        if (currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
-
+        if (currentLightm!!.version!=null&&currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
             val byteArrayOf = if (currentLightm!!.openTag == 1) {
                 sendCloseIcon(position)
                 byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
@@ -1052,6 +1051,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             SER_ID_SENSOR_ON -> sendOpenIcon(positionCurrent)
             SER_ID_SENSOR_OFF -> sendCloseIcon(positionCurrent)
         }
+        adapter?.notifyDataSetChanged()
     }
 
 }
