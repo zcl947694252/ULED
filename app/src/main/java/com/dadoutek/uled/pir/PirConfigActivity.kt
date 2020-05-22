@@ -66,19 +66,19 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var version: String=""
+    private var version: String = ""
     private var timeDispsable: Disposable? = null
     private var connectDisposable: Disposable? = null
 
     /**
-     * 0 代表分 1代表秒
+     * 1 代表分 0代表秒
      */
-    private var timeUnitType: Int = 0
+    private var timeUnitType: Int = 1
 
     /**
      * 1 开 0关 2自定义
      */
-    private var triggerAfterShow: Int = 0
+    private var triggerAfterShow: Int = 1
 
     /**
      * 0全天    1白天   2夜晚
@@ -114,11 +114,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             changeGroupType(checkedId == R.id.color_mode_rb)
             when (checkedId) {
                 R.id.color_mode_rb -> {
-                    isGroupMode  = true
+                    isGroupMode = true
                     changeGroupType(true)
                 }
                 R.id.gradient_mode_rb -> {
-                    isGroupMode  = false
+                    isGroupMode = false
                     changeGroupType(false)
                 }
             }
@@ -158,7 +158,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-         version = intent.getStringExtra("version")
+        version = intent.getStringExtra("version")
         pir_confir_tvPSVersion.text = version
         isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
         color_mode_rb.isChecked = true
@@ -350,10 +350,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 TmtUtils.midToast(this, getString(R.string.timeout_255_big))
                 return
             }
-            isGroupMode&&showGroupList.size == 0 -> {
+            isGroupMode && showGroupList.size == 0 -> {
                 TmtUtils.midToast(this, getString(R.string.config_night_light_select_group))
                 return
-            }  !isGroupMode&&currentScene == null -> {
+            }
+            !isGroupMode && currentScene == null -> {
                 TmtUtils.midToast(this, getString(R.string.please_select_scene))
                 return
             }
@@ -363,6 +364,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (device != null && device.macAddress == mDeviceInfo?.macAddress) {
                     GlobalScope.launch {
                         setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
+                        sendCommandOpcode(time.toInt())
                         delay(300)
                         if (!isConfirm)//不是冲洗创建 更新mesh
                             mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
@@ -370,7 +372,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                 successCallback = {
                                     setLoadingVisbiltyOrGone()
                                     GlobalScope.launch {
-                                        sendCommandOpcode(time.toInt())
                                         delay(timeMillis = 500)
                                         configureComplete()
                                     }
@@ -426,9 +427,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo!!.macAddress
+        dbSensor.version = version
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
-        dbSensor.name = getString(R.string.sensor_describe) + dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensoR) + dbSensor.meshAddr
 
         saveSensor(dbSensor, isConfirm)//保存进服务器
 
@@ -484,6 +486,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
 
+
             //11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
             // 16触发照度(条件 全天) 17触发设置 最低位1 开 0关  次低 1 分钟 0 秒
             //3、 触发设置，最低位，1是开，0是关，次低位 1是分钟，0是秒钟    1开0关2自定义 0分钟 1秒钟
@@ -492,7 +495,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             var triggerSet = if (triggerAfterShow == 2)
                 0
             else
-                (timeUnitType shl 1) or 0x01
+                (timeUnitType shl 1) or triggerAfterShow
 
             val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(),
                     triggerKey.toByte(), triggerSet.toByte(), 0)

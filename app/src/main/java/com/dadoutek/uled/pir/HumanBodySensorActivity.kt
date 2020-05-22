@@ -73,7 +73,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
-    private var version: String=""
+    private var version: String = ""
     private lateinit var mScenes: List<DbScene>
     private lateinit var mGroups: MutableList<DbGroup>
     private var disposable: Disposable? = null
@@ -226,7 +226,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-         version = intent.getStringExtra("version")
+        version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
         // showCheckListData = DBUtils.allGroups
@@ -834,18 +834,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
                 }
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
-
+                configLightlight()
                 Thread.sleep(300)
                 if (!isConfirm)//新创建进行更新
                     mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()
-                            GlobalScope.launch {
-                                configLightlight()
-                                delay(500)
-                                configureComplete()
-                            }
+                            configureComplete()
                         },
                         failedCallback = {
                             snackbar(sensor_root, getString(R.string.pace_fail))
