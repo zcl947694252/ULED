@@ -98,7 +98,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="@string/btn_sure"
+                    android:text="@string/confirm"
                     android:textColor="@color/gray_3"
                     android:textSize="18sp" />
         </LinearLayout>

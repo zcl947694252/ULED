@@ -158,7 +158,7 @@ class SettingActivity : BaseActivity() {
         builder.setMessage(getString(R.string.user_reset))
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
-        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.confirm)) { _, _ ->
             clearData()//删除本地数据
             UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
                 //删除服务器数据
@@ -287,7 +287,7 @@ class SettingActivity : BaseActivity() {
         }
 
         cancel.text = getString(R.string.cancel)
-        confirm.text = getString(R.string.btn_sure)
+        confirm.text = getString(R.string.confirm)
         cancel.isClickable = true
         confirm.isClickable = true
     }

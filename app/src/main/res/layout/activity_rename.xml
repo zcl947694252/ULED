@@ -70,7 +70,7 @@
         android:layout_height="46dp"
         android:layout_margin="10dp"
         android:background="@drawable/click_btn"
-        android:text="@string/btn_sure"
+        android:text="@string/confirm"
         android:visibility="visible"
         android:textColor="@android:color/white" />
 

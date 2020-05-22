@@ -54,7 +54,7 @@
                 android:background="@color/blue_text"
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
-                android:text="@string/btn_sure"
+                android:text="@string/confirm"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>

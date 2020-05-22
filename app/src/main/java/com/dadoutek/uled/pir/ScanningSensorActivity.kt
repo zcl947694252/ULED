@@ -341,7 +341,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
-           // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
+        // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         else
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
 
@@ -372,8 +372,15 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                 closeAnimal()
                                 finish()
                                 when (mDeviceInfo?.productUUID) {
-                                    DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
-                                    DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+                                    DeviceType.SENSOR -> {
+                                        startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
+                                    }
+                                    DeviceType.NIGHT_LIGHT -> {
+                                        if (it.contains("NPR"))
+                                            startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)
+                                        else
+                                            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+                                    }
                                     else -> ToastUtils.showLong(getString(R.string.scan_end))
                                 }
                             },
@@ -472,6 +479,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
+
                     isSearchedDevice = true
                     connect()
                 } else {

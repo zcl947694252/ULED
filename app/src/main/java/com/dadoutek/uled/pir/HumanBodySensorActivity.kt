@@ -50,11 +50,16 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_config_pir.*
+import kotlinx.android.synthetic.main.activity_config_light_light.*
+import kotlinx.android.synthetic.main.activity_pir_new.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
+import kotlinx.android.synthetic.main.huuman_body_sensor.human_progress_tv
+import kotlinx.android.synthetic.main.huuman_body_sensor.recyclerView_select_group_list_view
+import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_root
+import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_three
+import kotlinx.android.synthetic.main.huuman_body_sensor.trigger_time_text
 import kotlinx.android.synthetic.main.huuman_body_sensor.tvPSVersion
 import kotlinx.android.synthetic.main.template_loading_progress.*
-import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -76,7 +81,6 @@ import java.util.concurrent.TimeUnit
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
     private lateinit var mScenes: List<DbScene>
     private lateinit var mGroups: MutableList<DbGroup>
-    private var isGroupMode: Boolean = true
     private var disposable: Disposable? = null
     private var isConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
@@ -85,12 +89,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val CMD_CONTROL_GROUP = 0X02
     private var switchMode = 0X01
     private var selectTime = 10
+
     //底部组适配器
-    private var showGroupList: MutableList<ItemGroup>? = mutableListOf()
-    private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
+    private var showGroupList: MutableList<ItemGroup>? = null
+    private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
+
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
-    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.night_light_sensor_adapter, showCheckListData)
+    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
     private var modeSwitchMode = 0
@@ -110,84 +116,57 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
-        setAdapters()
-        initData()
         initView()
+        initData()
         initListener()
     }
 
     private fun setAdapters() {
         recyclerView_select_group_list_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        recyclerView_select_group_list_view.addItemDecoration(decoration)
+        recyclerView_select_group_list_view.adapter = nightLightEditGroupAdapter
         nightLightEditGroupAdapter.bindToRecyclerView(recyclerView_select_group_list_view)
 
-        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
-        nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
-        nightLightEditGroupAdapter.onItemClickListener = OnItemClickListener { adapter, _, position ->
+        nightLightEditGroupAdapter.setOnItemClickListener { adapter, view, position ->
             val item = showCheckListData[position]
-            if (item.checked) {//t状态
-                item.checked = !item.checked
-            } else {//f状态下
-                if (position == 0 && item.meshAddr == 0xffff) {//65535
-                    setFrist()
-                } else {
-                    item.checked = true
-                    if (position != 0)
-                        showCheckListData[0].checked = false
-                     else
+            when {
+                item.checked -> {//t状态
+                    item.checked = !item.checked
+                }
+                else -> {//f状态下
+                    if (position == 0 && item.meshAddr == 0xffff) {//65535
                         setFrist()
+                    } else {
+                        item.checked = true
+                        if (position != 0)
+                            showCheckListData[0].checked = false
+                        else
+                            setFrist()
+                    }
                 }
             }
             adapter?.notifyDataSetChanged()
         }
-    }
 
-    private fun initListener() {
+        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
+        recyclerGroup.adapter = nightLightGroupGrideAdapter
+        nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
         nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
             if (view.id == R.id.imgDelete) delete(adapter, position)
         }
-        top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.color_mode_rb -> {
-                    isGroupMode = true
-                    getGroupName()
-                    color_mode_rb.setTextColor(getColor(R.color.blue_text))
-                    gradient_mode_rb.setTextColor(getColor(R.color.gray9))
-                    choose_group_tv.text = getString(R.string.choose_group)
-                }
-                R.id.gradient_mode_rb -> {
-                    isGroupMode = false
-                    getSceneName()
-                    color_mode_rb.setTextColor(getColor(R.color.gray9))
-                    gradient_mode_rb.setTextColor(getColor(R.color.blue_text))
-                    choose_group_tv.text = getString(R.string.choose_scene_dot)
-                }
-            }
-        }
+    }
+
+    private fun initListener() {
+        tv_function1.setOnClickListener(this)
+        triggering_conditions.setOnClickListener(this)
+        trigger_time.setOnClickListener(this)
+        time_type.setOnClickListener(this)
+        brightness_change.setOnClickListener(this)
+        choose_group.setOnClickListener(this)
+        sensor_update.setOnClickListener(this)
+        time.setOnClickListener(this)
+        trigger_mode.setOnClickListener(this)
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
         TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-    private fun getSceneName() {
-        mScenes = DBUtils.sceneAll
-      /*  mGroupScenesName?.clear()
-        for (item in mScenes)
-            mGroupScenesName!!.add(item.name)
-        groupSceneAdapter.notifyDataSetChanged()*/
-    }
-
-    private fun getGroupName() {
-        mGroups = DBUtils.allGroups
-    /*    mGroupScenesName?.clear()
-        for (item in mGroups)
-            if (item.deviceType == Constant.DEVICE_TYPE_CONNECTOR || item.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || item.deviceType
-             ==Constant.DEVICE_TYPE_LIGHT_NORMAL || item.deviceType == Constant.DEVICE_TYPE_NO) {
-                if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
-                    mGroupScenesName!!.add(item.name)
-            }
-        groupSceneAdapter.notifyDataSetChanged()*/
     }
 
     override fun onDestroy() {
@@ -198,23 +177,26 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     override fun performed(event: Event<String>?) {
-        val deviceEvent = event as DeviceEvent
-        val deviceInfo = deviceEvent.args
+        when (event?.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                val deviceEvent = event as DeviceEvent
+                val deviceInfo = deviceEvent.args
+                when (deviceInfo.status) {
+                    LightAdapter.STATUS_LOGIN -> {
+                        disposable?.dispose()
+                        setLoadingVisbiltyOrGone()
+                        image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+                    }
 
-        if (event.type == ErrorReportEvent.ERROR_REPORT) {
-            val info = (event as ErrorReportEvent).args
-            onErrorReport(info)
-        }
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                disposable?.dispose()
-                setLoadingVisbiltyOrGone()
-                image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+                    LightAdapter.STATUS_LOGOUT -> {
+                        autoConnectSensor()
+                        image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    }
+                }
             }
-
-            LightAdapter.STATUS_LOGOUT -> {
-                autoConnectSensor()
-                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
             }
         }
     }
@@ -252,20 +234,20 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
-        showCheckListData = DBUtils.allGroups
+        // showCheckListData = DBUtils.allGroups
         var lightGroup = DBUtils.allGroups
 
         showCheckListData.clear()
 
         for (i in lightGroup.indices) {
             when (lightGroup[i].deviceType) {
-                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
-                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
                     if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constant.DEVICE_TYPE_NO)
                         showCheckListData!!.add(lightGroup[i])
                 }
             }
         }
+        nightLightEditGroupAdapter.notifyDataSetChanged()
 
         showGroupList = ArrayList()
 
@@ -274,8 +256,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             dbGroup.checked = i == 0 && dbGroup.meshAddr == 0xffff
             if (dbGroup.checked) {
                 toolbar.title = dbGroup.name
-                showGroupList?.let {
-                    if (it!!.size == 0) {
+                showGroupList.let {
+                    if (it?.size == 0) {
                         val newItemGroup = ItemGroup()
                         newItemGroup.brightness = 50
                         newItemGroup.temperature = 50
@@ -298,7 +280,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         toolbar.setNavigationOnClickListener {
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE
-                edit_data_view_layout.visibility = View.GONE
+                recyclerView_select_group_list_view.visibility = View.GONE
                 toolbar.title = getString(R.string.human_body)
                 tv_function1.visibility = View.GONE
                 isFinish = false
@@ -322,16 +304,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initView() {
-        tv_function1.text = getString(R.string.btn_sure)
-        tv_function1.setOnClickListener(this)
-        triggering_conditions.setOnClickListener(this)
-        trigger_time.setOnClickListener(this)
-        time_type.setOnClickListener(this)
-        brightness_change.setOnClickListener(this)
-        choose_group.setOnClickListener(this)
-        sensor_update.setOnClickListener(this)
-        time.setOnClickListener(this)
-        trigger_mode.setOnClickListener(this)
+        tv_function1.text = getString(R.string.confirm)
+        setAdapters()
     }
 
     private fun getVersion(version: String) {
@@ -390,31 +364,31 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var veryDark = views.findViewById<ConstraintLayout>(R.id.very_dark_environment)
 
                 when {
-                    triggering_conditions_text.text.toString() == getString(R.string.any_environment) -> {
+                    triggering_conditions_text.text.toString() == getString(R.string.all_day) -> {
                         any.setBackgroundResource(R.color.blue_background)
                     }
-                    triggering_conditions_text.text.toString() == getString(R.string.dark_environment) -> {
+                    triggering_conditions_text.text.toString() == getString(R.string.day_time) -> {
                         darker.setBackgroundResource(R.color.blue_background)
                     }
-                    triggering_conditions_text.text.toString() == getString(R.string.very_dark_environment) -> {
+                    triggering_conditions_text.text.toString() == getString(R.string.night) -> {
                         veryDark.setBackgroundResource(R.color.blue_background)
                     }
                 }
 
                 any.setOnClickListener {
-                    triggering_conditions_text.text = getString(R.string.any_environment)
+                    triggering_conditions_text.text = getString(R.string.all_day)
                     modeTriggerCondition = 0
                     popupWindow.dismiss()
                 }
 
                 darker.setOnClickListener {
-                    triggering_conditions_text.text = getString(R.string.dark_environment)
+                    triggering_conditions_text.text = getString(R.string.day_time)
                     modeTriggerCondition = 1
                     popupWindow.dismiss()
                 }
 
                 veryDark.setOnClickListener {
-                    triggering_conditions_text.text = getString(R.string.very_dark_environment)
+                    triggering_conditions_text.text = getString(R.string.night)
                     modeTriggerCondition = 2
                     popupWindow.dismiss()
                 }
@@ -756,7 +730,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
                 tv_function1.visibility = View.VISIBLE
                 sensor_three.visibility = View.GONE
-                edit_data_view_layout.visibility = View.VISIBLE
+                recyclerView_select_group_list_view.visibility = View.VISIBLE
 
                 showCheckListData.let {
                     if (showGroupList!!.size != 0) {
@@ -783,8 +757,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 val oldResultItemList = ArrayList<ItemGroup>()
                 val newResultItemList = ArrayList<ItemGroup>()
 
-                for (i in showCheckListData!!.indices) {
-                    if (showCheckListData!![i].checked) {
+                for (i in showCheckListData.indices) {
+                    if (showCheckListData[i].checked) {
                         if (showGroupList!!.size == 0) {
                             val newItemGroup = ItemGroup()
                             newItemGroup.brightness = 50
@@ -825,6 +799,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 } else {
                     showDataListView()
                 }
+
             }
 
             R.id.sensor_update -> {
@@ -864,12 +839,18 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
                 }
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
-                configLightlight()
+
                 Thread.sleep(300)
-                Commander.updateMeshName(
+                if (!isConfirm)//新创建进行更新
+                    mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
+                Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()
-                            configureComplete()
+                            GlobalScope.launch {
+                                configLightlight()
+                                delay(500)
+                                configureComplete()
+                            }
                         },
                         failedCallback = {
                             snackbar(sensor_root, getString(R.string.pace_fail))
@@ -976,16 +957,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun saveSensor() {
         var dbSensor = DbSensor()
+
         val allSensor = DBUtils.getAllSensor()
         LogUtils.e("zcl---$allSensor")
         if (isConfirm) {
             dbSensor.index = mDeviceInfo.id.toInt()
-
             if ("none" != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
-            val allSensor = DBUtils.getAllSensor()
-            LogUtils.e("zcl---$allSensor")
             DBUtils.saveSensor(dbSensor, isConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
@@ -994,10 +973,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+        //dbSensor.meshAddr = MeshAddressGenerator().meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)
+        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 
@@ -1121,6 +1100,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         return sb.toString().trim { it <= ' ' }
     }
 
+    /*  private fun showDataListView() {
+          isFinish = false
+          toolbar.title = getString(R.string.human_body)
+          sensor_three.visibility = View.VISIBLE
+          recyclerView_select_group_list_view.visibility = View.GONE
+          tv_function1.visibility = View.GONE
+      }*/
     /**
      * 显示已选中分组
      */
@@ -1128,9 +1114,21 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         isFinish = false
         toolbar.title = getString(R.string.human_body)
         sensor_three.visibility = View.VISIBLE
-        edit_data_view_layout.visibility = View.GONE
+        recyclerView_select_group_list_view.visibility = View.GONE
         tv_function1.visibility = View.GONE
+
+        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
+        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(
+                R.layout.activity_night_light_groups_item, showGroupList)
+
+        nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
+        nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+            when (view.id) {
+                R.id.imgDelete -> delete(adapter, position)
+            }
+        }
     }
+
 
     private fun delete(adapter: BaseQuickAdapter<Any, BaseViewHolder>, position: Int) {
         adapter.remove(position)

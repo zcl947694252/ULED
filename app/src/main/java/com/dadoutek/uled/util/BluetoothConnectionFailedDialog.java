@@ -102,7 +102,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
             new Builder(mContenxt)
                     .setTitle(R.string.network_tip_title)
                     .setMessage(R.string.net_disconnect_tip_message)
-                    .setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+                    .setPositiveButton(R.string.confirm, (dialog, which) -> {
                         Intent intents = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                         mContenxt.startActivity(intents);
                     }).show();
@@ -141,7 +141,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                 new Builder(mContenxt)
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+                        .setPositiveButton(R.string.confirm, (dialog, which) -> {
                             SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
                             TelinkLightService instance = TelinkLightService.Instance();
                             if (instance!=null)

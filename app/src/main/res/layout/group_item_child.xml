@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/group_name"
+        android:id="@+id/item_more_group_name"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginEnd="8dp"

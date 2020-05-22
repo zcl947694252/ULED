@@ -268,7 +268,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
         val four: MutableList<Int> = mutableListOf(6, 7)
-        /* val four: MutableList<Int> = if (groupMap.size > 3)
+        /* val four: MutableList<Int> = if (groupMap.size > 3)+
              mutableListOf(6, 7)
          else
              mutableListOf(6)*/
@@ -584,11 +584,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
 
-                eight_switch_b5.text = getString(R.string.click_config)
-                eight_switch_b6.text = getString(R.string.click_config)
-                eight_switch_b7.text = getString(R.string.click_config)
-                eight_switch_b8.text = getString(R.string.click_config)
-
                 eight_switch_b1.text = getString(R.string.click_config)
                 eight_switch_b2.text = getString(R.string.click_config)
                 eight_switch_b3.text = getString(R.string.click_config)
@@ -605,13 +600,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
 
-                eight_switch_b5.text = getString(R.string.click_config)
-                eight_switch_b6.text = getString(R.string.click_config)
-                eight_switch_b7.text = getString(R.string.click_config)
-                eight_switch_b8.text = getString(R.string.click_config)
-
-                eight_switch_b1.text = getString(R.string.brightness_add)
-                eight_switch_b2.text = getString(R.string.brightness_minus)
+                eight_switch_b1.text = getString(R.string.brightness_minus)
+                eight_switch_b2.text = getString(R.string.brightness_add)
                 eight_switch_b3.text = getString(R.string.click_config)
                 eight_switch_b4.text = getString(R.string.click_config)
                 eight_switch_b5.text = getString(R.string.click_config)
