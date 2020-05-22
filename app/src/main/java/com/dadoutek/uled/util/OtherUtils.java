@@ -134,7 +134,7 @@ public class OtherUtils {
         InstallDeviceModel installDeviceModel1=new InstallDeviceModel(context.getString(R.string.normal_light),context.getString(R.string.normal_light_describe));
         InstallDeviceModel installDeviceModel2=new InstallDeviceModel(context.getString(R.string.rgb_light),context.getString(R.string.rgb_light_describe));
         InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
-        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
+        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensoR),context.getString(R.string.sensor_describe));
         InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
         InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.relay),context.getString(R.string.for_connector));
         InstallDeviceModel installDeviceModel7=new InstallDeviceModel(context.getString(R.string.Gate_way),context.getString(R.string.for_connector));

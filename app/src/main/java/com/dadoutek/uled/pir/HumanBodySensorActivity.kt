@@ -2,12 +2,9 @@ package com.dadoutek.uled.pir
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.InputType
@@ -19,7 +16,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -50,8 +46,6 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_config_light_light.*
-import kotlinx.android.synthetic.main.activity_pir_new.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.human_progress_tv
 import kotlinx.android.synthetic.main.huuman_body_sensor.recyclerView_select_group_list_view
@@ -79,6 +73,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+    private var version: String=""
     private lateinit var mScenes: List<DbScene>
     private lateinit var mGroups: MutableList<DbGroup>
     private var disposable: Disposable? = null
@@ -231,7 +226,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        val version = intent.getStringExtra("version")
+         version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
         // showCheckListData = DBUtils.allGroups
@@ -973,10 +968,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        //dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+        dbSensor.version = version
+        dbSensor.meshAddr = mDeviceInfo.meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensoR) + dbSensor.meshAddr
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

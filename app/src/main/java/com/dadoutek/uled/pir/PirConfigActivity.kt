@@ -39,14 +39,12 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
-import com.squareup.haha.perflib.Main
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_pir_new.*
 import kotlinx.android.synthetic.main.activity_pir_new.sensor_root
 import kotlinx.android.synthetic.main.activity_pir_new.trigger_time_text
-import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +52,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -69,6 +66,7 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var version: String=""
     private var timeDispsable: Disposable? = null
     private var connectDisposable: Disposable? = null
 
@@ -158,7 +156,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        val version = intent.getStringExtra("version")
+         version = intent.getStringExtra("version")
         pir_confir_tvPSVersion.text = version
         isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
         color_mode_rb.isChecked = true
@@ -428,7 +426,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor.macAddr = mDeviceInfo!!.macAddress
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
-        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensor_describe) + dbSensor.meshAddr
 
         saveSensor(dbSensor, isConfirm)//保存进服务器
 

@@ -31,7 +31,7 @@ class InstallDeviceListAdapter(layoutResId: Int, data: List<InstallDeviceModel>?
                 helper.setText(R.id.device_name,item.deviceType)
                         .setText(R.id.device_describe,item.deviceDescribeTion)
             }
-            item.deviceType==TelinkLightApplication.getApp().getString(R.string.sensor) -> {
+            item.deviceType==TelinkLightApplication.getApp().getString(R.string.sensoR) -> {
                 helper.setImageResource(R.id.add_device_image,R.drawable.icon_sensor_device)
                 helper.setText(R.id.device_name,item.deviceType)
                         .setText(R.id.device_describe,item.deviceDescribeTion)

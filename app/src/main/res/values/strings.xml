@@ -587,7 +587,7 @@
     <string name="rgb_light_describe">RGB lights, RGBW lights</string>
     <string name="switch_name">Switch </string>
     <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
-    <string name="sensor">Sensor </string>
+    <string name="sensoR">Sensor </string>
     <string name="sensor_describe">Night light, PIR</string>
     <string name="add_device">Add device </string>
     <string name="update_name_gp"> modify the group name </string>

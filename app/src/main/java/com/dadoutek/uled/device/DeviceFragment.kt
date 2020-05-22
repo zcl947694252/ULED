@@ -261,7 +261,7 @@ class DeviceFragment : BaseFragment() {
 
         deviceTypeList.add(DeviceItem(getString(R.string.switch_name), DBUtils.getAllSwitch().size, DeviceType.NORMAL_SWITCH))
 
-        deviceTypeList.add(DeviceItem(getString(R.string.sensor), DBUtils.getAllSensor().size, DeviceType.SENSOR))
+        deviceTypeList.add(DeviceItem(getString(R.string.sensoR), DBUtils.getAllSensor().size, DeviceType.SENSOR))
 
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN))
 

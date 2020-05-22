@@ -34,9 +34,9 @@ public class DaoMaster extends AbstractDaoMaster {
         DbRegionDao.createTable(db, ifNotExists);
         DbSceneDao.createTable(db, ifNotExists);
         DbSceneActionsDao.createTable(db, ifNotExists);
-        DbSensorDao.createTable(db, ifNotExists);
         DbSwitchDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
+        DbSensorDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -54,9 +54,9 @@ public class DaoMaster extends AbstractDaoMaster {
         DbRegionDao.dropTable(db, ifExists);
         DbSceneDao.dropTable(db, ifExists);
         DbSceneActionsDao.dropTable(db, ifExists);
-        DbSensorDao.dropTable(db, ifExists);
         DbSwitchDao.dropTable(db, ifExists);
         DbUserDao.dropTable(db, ifExists);
+        DbSensorDao.dropTable(db, ifExists);
     }
 
     /**
@@ -88,9 +88,9 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbRegionDao.class);
         registerDaoClass(DbSceneDao.class);
         registerDaoClass(DbSceneActionsDao.class);
-        registerDaoClass(DbSensorDao.class);
         registerDaoClass(DbSwitchDao.class);
         registerDaoClass(DbUserDao.class);
+        registerDaoClass(DbSensorDao.class);
     }
 
     public DaoSession newSession() {

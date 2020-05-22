@@ -535,7 +535,7 @@
     <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>
     <string name="switch_name">开关</string>
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
-    <string name="sensor">传感器</string>
+    <string name="sensoR">传感器</string>
     <string name="sensor_describe">例如：人体感应器,PIR</string>
     <string name="add_device">添加设备</string>
     <string name="update_name_gp">修改组名</string>
