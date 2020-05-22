@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -44,12 +45,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private var sbBrightnessCW: SeekBar? = null
     private var sbtemperature: SeekBar? = null
 
-    private var sbBrightnessRGB: SeekBar? = null
-    private var sbWhiteLightRGB: SeekBar? = null
-    private var addBrightnessRGB: ImageView? = null
-    private var lessBrightnessRGB: ImageView? = null
-    private var addWhiteLightRGB: ImageView? = null
-    private var lessWhiteLightRGB: ImageView? = null
+    private lateinit var sbBrightnessRGB: SeekBar
+    private lateinit var sbWhiteLightRGB: SeekBar
+    private lateinit var addBrightnessRGB: ImageView
+    private lateinit var lessBrightnessRGB: ImageView
+    private lateinit var addWhiteLightRGB: ImageView
+    private lateinit var lessWhiteLightRGB: ImageView
     private var isColorMode: Boolean = true
 
     internal var downTime: Long = 0//Button被按下时的时间
@@ -73,9 +74,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
 
         sbBrightnessRGB = helper.getView(R.id.sbBrightness)
-        sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
         addBrightnessRGB = helper.getView(R.id.sbBrightness_add)
         lessBrightnessRGB = helper.getView(R.id.sbBrightness_less)
+        sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
         addWhiteLightRGB = helper.getView(R.id.sb_w_bright_add)
         lessWhiteLightRGB = helper.getView(R.id.sb_w_bright_less)
 
@@ -84,6 +85,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         topRgLy = helper.getView(R.id.top_rg_ly)
         algLy = helper.getView(R.id.alg_ly)
+
+        val cb_total = helper.getView<CheckBox>(R.id.cb_total)
+        val cb_bright = helper.getView<CheckBox>(R.id.cb_bright)
+        val cb_white_light = helper.getView<CheckBox>(R.id.cb_white_light)
+
+        cb_total.isChecked = item.isOn
+        cb_bright.isChecked = item.isEnableBright
+        cb_white_light.isChecked = item.isEnableWhiteLight
 
 
         //0x4FFFE0
@@ -102,6 +111,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         helper.setText(R.id.name_gp, item.gpName)
 
+
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setProgress(R.id.sbBrightness, item.brightness)
@@ -114,13 +124,77 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     0 -> {
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
-                        setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
+
+                        //LogUtils.e(item.toString())
+
+                        if (item.isEnableBright) {
+                            sbBrightnessRGB.isEnabled = true
+                            addBrightnessRGB.isEnabled = true
+                            lessBrightnessRGB.isEnabled = true
+                        } else {
+                            sbBrightnessRGB.isEnabled = false
+                            addBrightnessRGB.isEnabled = false
+                            lessBrightnessRGB.isEnabled = false
+                        }
+
+                        if (item.isEnableWhiteLight) {
+                            sbWhiteLightRGB.isEnabled = true
+                            addWhiteLightRGB.isEnabled = true
+                            lessWhiteLightRGB.isEnabled = true
+                        } else {
+                            sbWhiteLightRGB.isEnabled = false
+                            addWhiteLightRGB.isEnabled = false
+                            lessWhiteLightRGB.isEnabled = false
+                        }
+
+                        /* when {
+                             item.brightness <= 0 -> {
+                                 addBrightnessRGB!!.isEnabled = true
+                                 lessBrightnessRGB!!.isEnabled = false
+                             }
+                             item.brightness >= 100 -> {
+                                 addBrightnessRGB!!.isEnabled = false
+                                 lessBrightnessRGB!!.isEnabled = true
+                             }
+                             else -> {
+                                 addBrightnessRGB!!.isEnabled = true
+                                 lessBrightnessRGB!!.isEnabled = true
+                             }
+                         }
+                         when {
+                             item.temperature <= 0 -> {
+                                 addWhiteLightRGB!!.isEnabled = true
+                                 lessWhiteLightRGB!!.isEnabled = false
+                             }
+                             item.temperature >= 100 -> {
+                                 addWhiteLightRGB!!.isEnabled = false
+                                 lessWhiteLightRGB!!.isEnabled = true
+                             }
+                             else -> {
+                                 addWhiteLightRGB!!.isEnabled = true
+                                 lessWhiteLightRGB!!.isEnabled = true
+                             }
+                         }*/
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
                             algText?.text = item.gradientName
                         visiableMode(helper, false)
                         setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
+                        /*   when {
+                               item.gradientSpeed <= 0 -> {
+                                   addAlgSpeed!!.isEnabled = true
+                                   lessAlgSpeed!!.isEnabled = false
+                               }
+                               item.gradientSpeed >= 100 -> {
+                                   addAlgSpeed!!.isEnabled = false
+                                   lessAlgSpeed!!.isEnabled = true
+                               }
+                               else -> {
+                                   addAlgSpeed!!.isEnabled = true
+                                   lessAlgSpeed!!.isEnabled = true
+                               }
+                           }*/
                     }
                 }
             }
@@ -131,6 +205,34 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
+                /*  when {
+                      item.brightness <= 0 -> {
+                          addBrightnessCW!!.isEnabled = true
+                          lessBrightnessCW!!.isEnabled = false
+                      }
+                      item.brightness >= 100 -> {
+                          addBrightnessCW!!.isEnabled = false
+                          lessBrightnessCW!!.isEnabled = true
+                      }
+                      else -> {
+                          addBrightnessCW!!.isEnabled = true
+                          lessBrightnessCW!!.isEnabled = true
+                      }
+                  }
+                  when {
+                      item.temperature <= 0 -> {
+                          addTemperatureCW!!.isEnabled = true
+                          lessTemperatureCW!!.isEnabled = false
+                      }
+                      item.temperature >= 100 -> {
+                          addTemperatureCW!!.isEnabled = false
+                          lessTemperatureCW!!.isEnabled = true
+                      }
+                      else -> {
+                          addTemperatureCW!!.isEnabled = true
+                          lessTemperatureCW!!.isEnabled = true
+                      }
+                  }*/
             }
         }
         when {
@@ -146,8 +248,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.textView7, false)
-                        .setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -157,8 +258,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.scene_relay, false)
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.textView7, false)
-                        .setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -166,7 +266,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
-                if (item.isNo) {
+                if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
                 } else {
@@ -175,8 +275,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.textView7, false)
-                        .setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -184,7 +283,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_relay, false)
                         .setGone(R.id.scene_curtain, true)
-                if (item.isNo) {
+                if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
                 } else {
@@ -193,8 +292,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             else -> {
-                helper.setGone(R.id.textView7, false)
-                        .setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -236,7 +334,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 R.id.color_mode_rb -> {
                     isColorMode = true
                     helper.setGone(R.id.alg_ly, false)
-                    helper.setGone(R.id.textView7, true)
                     helper.setGone(R.id.oval, true)
                     helper.setGone(R.id.rgb_scene, true)
                     algLy?.visibility = View.GONE
@@ -248,7 +345,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     isColorMode = false
                     algLy?.visibility = View.VISIBLE
                     helper.setGone(R.id.alg_ly, true)
-                    helper.setGone(R.id.textView7, false)
                     helper.setGone(R.id.oval, false)
                     helper.setGone(R.id.rgb_scene, false)
                     item.rgbType = 1
@@ -265,6 +361,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .addOnClickListener(R.id.rg_xx)
                 .addOnClickListener(R.id.rg_yy)
                 .addOnClickListener(R.id.alg_text)
+                .addOnClickListener(R.id.cb_bright)
+                .addOnClickListener(R.id.cb_total)
+                .addOnClickListener(R.id.cb_white_light)
 
         addTemperatureCW!!.setOnTouchListener { v, event ->
             addTemperature(event, position)
@@ -309,8 +408,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     private fun visiableMode(helper: BaseViewHolder, isVisiable: Boolean) {
-        helper.setGone(R.id.textView7, isVisiable)
-                .setGone(R.id.oval, isVisiable)
+        helper.setGone(R.id.oval, isVisiable)
                 .setGone(R.id.rgb_scene, isVisiable)
                 .setGone(R.id.alg_ly, !isVisiable)
 

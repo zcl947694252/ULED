@@ -625,7 +625,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     }
 
                     R.id.add_new_scene -> {
-
                         val nowSize = DBUtils.sceneList.size
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
