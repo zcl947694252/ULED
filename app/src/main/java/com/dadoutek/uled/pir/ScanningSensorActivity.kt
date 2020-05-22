@@ -377,7 +377,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                                     }
                                     DeviceType.NIGHT_LIGHT -> {
                                         if (it.contains("NPR"))
-                                            startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to "it")
+                                            startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)
                                         else
                                             startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
                                     }
