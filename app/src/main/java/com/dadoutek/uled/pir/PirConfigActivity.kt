@@ -110,13 +110,15 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initListener() {
         top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-            isGroupMode = checkedId == color_mode_rb.id
+
             changeGroupType(checkedId == R.id.color_mode_rb)
             when (checkedId) {
                 R.id.color_mode_rb -> {
+                    isGroupMode  = true
                     changeGroupType(true)
                 }
                 R.id.gradient_mode_rb -> {
+                    isGroupMode  = false
                     changeGroupType(false)
                 }
             }

@@ -237,7 +237,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.cw_scene, false)
+                helper.setGone(R.id.cw_scene, true)
                         .setGone(R.id.top_rg_ly, true)
                         .setGone(R.id.switch_scene, false)
                         .setGone(R.id.scene_curtain, false)
@@ -248,7 +248,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, true)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -258,7 +258,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.scene_relay, false)
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, true)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -275,7 +275,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                helper.setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, true)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -292,7 +292,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             else -> {
-                helper.setGone(R.id.oval, false)
+                helper.setGone(R.id.oval, true)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)

@@ -400,5 +400,7 @@ public class Constant implements Serializable {
     public static final int SER_ID_RELAY_OFF = 0x63;
     public static final int SER_ID_GATEWAY_ON = 0x64;
     public static final int SER_ID_GATEWAY_OFF = 0x65;
+    public static final int SER_ID_SENSOR_ON = 0x66;
+    public static final int SER_ID_SENSOR_OFF = 0x67;
 
 }

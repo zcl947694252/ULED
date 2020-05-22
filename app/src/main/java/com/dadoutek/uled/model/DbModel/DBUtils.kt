@@ -314,7 +314,8 @@ object DBUtils {
     }
 
     fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
-        val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
+        val eq = DbSceneActionsDao.Properties.BelongSceneId.eq(id)
+        val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(eq).build()
         return ArrayList(query.list())
     }
 

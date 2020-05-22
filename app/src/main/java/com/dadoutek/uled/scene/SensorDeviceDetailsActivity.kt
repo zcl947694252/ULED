@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -19,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -26,6 +28,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -33,6 +37,8 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
@@ -82,6 +88,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var disposableTimer: Disposable? = null
     private var connectTimer: Disposable? = null
     private var disposable: Disposable? = null
     private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
@@ -575,25 +582,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         }
                     }
                     R.id.img_light -> {
-
-
                         isClick = OPEN_CLOSE
-                        if (TelinkApplication.getInstance().connectDevice==null||TelinkApplication.getInstance().connectDevice.meshAddress != currentLightm!!.meshAddr){
-                            progressBar_sensor.visibility = View.VISIBLE
-                            TelinkLightService.Instance()?.idleMode(true)
-                            connectTimer?.dispose()
-                            connectTimer = Observable.timer(10000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        progressBar_sensor.visibility = View.GONE
-                                        ToastUtils.showShort(getString(R.string.connect_fail))
-                                    }
-                            compositeDisposable.add(connectTimer!!)
-                            connect(meshAddress = currentLightm!!.meshAddr)?.subscribe({
-                                setOPenOrClose(position)
-                            }, {
-                                ToastUtils.showShort(getString(R.string.device_disconnected))
-                            })
-                        }else{
+                        if (TelinkApplication.getInstance().connectDevice == null && DBUtils.getAllGateWay().size > 0) {
+                            sendToGw()
+                        } else {
                             setOPenOrClose(position)
                         }
                     }
@@ -602,6 +594,70 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 }
             }
         }
+    }
+
+    private fun sendToGw() {
+        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: List<DbGateway>) {
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                t.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                    }
+                    val low = currentLightm!!.meshAddr and 0xff
+                    val hight = (currentLightm!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray
+                    if (currentLightm!!.openTag == 1) {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
+                                0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                        gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
+                    } else {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
+                                0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
+                        gattBody.ser_id = SER_ID_SENSOR_ON
+                    }
+
+                    val encoder = Base64.getEncoder()
+                    val s = encoder.encodeToString(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentLightm!!.meshAddr
+                    sendToServer(gattBody)
+                } else {
+                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        })
+    }
+
+    private fun sendToServer(gattBody: GwGattBody) {
+        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl---发送服务器返回----------$t")
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                LogUtils.e("zcl-------发送服务器返回-----------${e.message}")
+            }
+        })
     }
 
     @SuppressLint("CheckResult")
@@ -616,14 +672,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                     if (s.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
 
                                         val byteArrayOf = if (currentLightm!!.openTag == 1) {
-                                            sensorDatummms[position].openTag = 0
-                                            sensorDatummms[position].updateIcon()
-                                            ToastUtils.showShort(getString(R.string.close))
+                                            sendCloseIcon(position)
                                             byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
                                         } else {
-                                            sensorDatummms[position].openTag = 1
-                                            sensorDatummms[position].updateIcon()
-                                            ToastUtils.showShort(getString(R.string.open))
+                                            sendOpenIcon(position)
                                             byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
                                         }
                                         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm!!.meshAddr, byteArrayOf)
@@ -646,6 +698,18 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         } else {
             ToastUtils.showLong(getString(R.string.get_version_fail))
         }
+    }
+
+    private fun sendOpenIcon(position: Int) {
+        sensorDatummms[position].openTag = 1
+        sensorDatummms[position].updateIcon()
+        ToastUtils.showShort(getString(R.string.open))
+    }
+
+    private fun sendCloseIcon(position: Int) {
+        sensorDatummms[position].openTag = 0
+        sensorDatummms[position].updateIcon()
+        ToastUtils.showShort(getString(R.string.close))
     }
 
 
@@ -982,6 +1046,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()
         finish()
+    }
+
+    override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        disposableTimer?.dispose()
+        when (gwStompBean.ser_id.toInt()) {
+            SER_ID_SENSOR_ON -> sendOpenIcon(positionCurrent)
+            SER_ID_SENSOR_OFF -> sendCloseIcon(positionCurrent)
+        }
     }
 
 }
