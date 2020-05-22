@@ -59,6 +59,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import top.defaults.colorpicker.ColorObserver
+import top.defaults.colorpicker.ColorPickerView
+import top.defaults.colorpicker.ColorWheelView
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -398,6 +400,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
+        //LogUtils.e("kevin init view")
         light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
@@ -582,28 +585,37 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun openOrClose(currentLight: Boolean) {
+        LogUtils.e("currentLight" + currentLight)
 
+        var addr = 0
         if (currentLight) {
             enableAllUI(true)
             if (type == Constant.TYPE_GROUP) {
-                Commander.openOrCloseLights(group!!.meshAddr, true)//开灯
+                addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-                Commander.openOrCloseLights(light!!.meshAddr, true)//开灯
+                addr = light!!.meshAddr
                 light!!.connectionStatus = ConnectionStatus.ON.value
             }
 
         } else {
             enableAllUI(false)
             if (type == Constant.TYPE_GROUP) {
-                Commander.openOrCloseLights(group!!.meshAddr, false)//开灯
+                addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.OFF.value
             } else {
-                Commander.openOrCloseLights(light!!.meshAddr, false)//关灯
+                addr = light!!.meshAddr
                 light!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
         }
+
+        Thread {
+            //Thread.sleep(300) // 延时3S  防止通信失败
+            Commander.openOrCloseLights(addr, currentLight)
+        }.start()
+
+
     }
 
     private val cbOnClickListener = OnClickListener {
@@ -658,9 +670,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         if (isEnabled) {
             colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
             colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
+            color_picker.isDispatchTouchEvent = true
+
         } else {
             colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = null
             colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = null
+            color_picker.isDispatchTouchEvent = false
         }
 
         val paint = Paint()
@@ -2194,7 +2209,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
-
             if (isOnceSet) {
                 delay(50)
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)

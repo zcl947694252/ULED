@@ -87,7 +87,7 @@
         app:layout_constraintTop_toBottomOf="@+id/view1">
         
         
-        <top.defaults.colorpicker.ColorPickerView
+        <com.dadoutek.uled.widget.MyColorPickerView
             android:id="@+id/color_picker"
             android:layout_width="0dp"
             android:layout_height="0dp"
