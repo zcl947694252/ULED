@@ -1075,5 +1075,6 @@
     <string name="scene_mode">Scene mode</string>
     <string name="on_off">Switch</string>
     <string name="see_help">See the help</string>
-    <string name="group_max">最大支持7个组</string>
+    <string name="group_max">Maximum 7 groups are supported</string>
+    <string name="dissupport">This batch of equipment does not support switching function</string>
 </resources>

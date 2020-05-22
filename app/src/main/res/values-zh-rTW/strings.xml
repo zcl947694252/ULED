@@ -999,4 +999,5 @@
     <string name="on_off">开关</string>
     <string name="see_help">查看帮助</string>
     <string name="group_max">最大支持7个组</string>
+    <string name="dissupport">该批次设备不支持开关功能</string>
 </resources>

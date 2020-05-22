@@ -89,9 +89,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val CMD_CONTROL_GROUP = 0X02
     private var switchMode = 0X01
     private var selectTime = 10
+
     //底部组适配器
     private var showGroupList: MutableList<ItemGroup>? = null
     private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
+
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
@@ -192,7 +194,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     }
                 }
             }
-            ErrorReportEvent.ERROR_REPORT->{
+            ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
             }
@@ -232,7 +234,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
-       // showCheckListData = DBUtils.allGroups
+        // showCheckListData = DBUtils.allGroups
         var lightGroup = DBUtils.allGroups
 
         showCheckListData.clear()
@@ -837,12 +839,18 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
                 }
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
-                configLightlight()
+
                 Thread.sleep(300)
+                if (!isConfirm)//新创建进行更新
+                    mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()
-                            configureComplete()
+                            GlobalScope.launch {
+                                configLightlight()
+                                delay(500)
+                                configureComplete()
+                            }
                         },
                         failedCallback = {
                             snackbar(sensor_root, getString(R.string.pace_fail))
@@ -968,7 +976,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         //dbSensor.meshAddr = MeshAddressGenerator().meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = getString(R.string.sensor)+dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 
@@ -1092,13 +1100,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         return sb.toString().trim { it <= ' ' }
     }
 
-  /*  private fun showDataListView() {
-        isFinish = false
-        toolbar.title = getString(R.string.human_body)
-        sensor_three.visibility = View.VISIBLE
-        recyclerView_select_group_list_view.visibility = View.GONE
-        tv_function1.visibility = View.GONE
-    }*/
+    /*  private fun showDataListView() {
+          isFinish = false
+          toolbar.title = getString(R.string.human_body)
+          sensor_three.visibility = View.VISIBLE
+          recyclerView_select_group_list_view.visibility = View.GONE
+          tv_function1.visibility = View.GONE
+      }*/
     /**
      * 显示已选中分组
      */

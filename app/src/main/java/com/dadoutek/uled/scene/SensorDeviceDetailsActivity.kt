@@ -40,6 +40,7 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
+import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -65,12 +66,14 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
+import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -82,6 +85,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var connectTimer: Disposable? = null
     private var disposable: Disposable? = null
     private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
 
@@ -93,11 +97,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private var ota: TextView? = null
     private var rename: TextView? = null
     private var views: View? = null
-    private var isClick: Int = 10//
+    private var isClick: Int = 5//
     private var settingType: Int = 0 //0是正常连接 1是点击修改 2是点击删除
     private val NORMAL_SENSOR: Int = 0 //0是正常连接 1是点击修改 2是点击删除
     private val RECOVER_SENSOR: Int = 1 //0是正常连接 1是点击修改 2是点击删除
     private val RESET_SENSOR: Int = 2 //0是正常连接 1是点击修改 2是点击删除
+    private val OPEN_CLOSE: Int = 5 //
     private val OTA_SENSOR: Int = 3//3是oat
     private val SENSOR_FINISH: Int = 4//4代表操作完成
 
@@ -150,6 +155,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     override fun onPause() {
         super.onPause()
         compositeDisposable.dispose()
+        isClick = 5
         LogUtils.d("connectSensorTimeoutDisposable?.dispose()")
         connectSensorTimeoutDisposable?.dispose()
     }
@@ -160,6 +166,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         if (popupWindow != null && popupWindow!!.isShowing)
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
+        isClick = 5
         this.mApplication?.removeEventListener(this)
     }
 
@@ -571,18 +578,76 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         }
                     }
                     R.id.img_light -> {
-                        val byteArrayOf = if (currentLight!!.openTag==0)
-                            byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                        else
-                            byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
-                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLight!!.meshAddr, byteArrayOf)
+                        isClick = OPEN_CLOSE
+                        if (TelinkApplication.getInstance().connectDevice==null||TelinkApplication.getInstance().connectDevice.meshAddress != currentLight!!.meshAddr){
+                            progressBar_sensor.visibility = View.VISIBLE
+                            TelinkLightService.Instance()?.idleMode(true)
+                            connectTimer?.dispose()
+                            connectTimer = Observable.timer(10000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe {
+                                        progressBar_sensor.visibility = View.GONE
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                    }
+                            compositeDisposable.add(connectTimer!!)
+                            connect(meshAddress = currentLight!!.meshAddr)?.subscribe({
+                                setOPenOrClose(position)
+                            }, {
+                                ToastUtils.showShort(getString(R.string.device_disconnected))
+                            })
+                        }else{
+                            setOPenOrClose(position)
+                        }
                     }
-                    else->{}
+                    else -> {
+                    }
                 }
             }
         }
     }
 
+    @SuppressLint("CheckResult")
+    private fun setOPenOrClose(position: Int) {
+        if (currentLight?.meshAddr != null) {
+            Commander.getDeviceVersion(currentLight!!.meshAddr)
+                    .subscribe(
+                            { s ->
+                                connectTimer?.dispose()
+                                hideLoadingDialog()
+                                if ("" != s) {
+                                    if (s.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
+
+                                        val byteArrayOf = if (currentLight!!.openTag == 1) {
+                                            sensorData[position].openTag = 0
+                                            sensorData[position].updateIcon()
+                                            ToastUtils.showShort(getString(R.string.close))
+                                            byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                                        } else {
+                                            sensorData[position].openTag = 1
+                                            sensorData[position].updateIcon()
+                                            ToastUtils.showShort(getString(R.string.open))
+                                            byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+                                        }
+                                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLight!!.meshAddr, byteArrayOf)
+                                        DBUtils.saveSensor(sensorData[position], true)
+                                        adapter?.notifyDataSetChanged()
+                                    } else {
+                                        ToastUtils.showShort(getString(R.string.dissupport))
+                                    }
+                                } else {
+                                    hideLoadingDialog()
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                }
+                            },
+                            {
+                                connectTimer?.dispose()
+                                hideLoadingDialog()
+                                ToastUtils.showLong(getString(R.string.get_version_fail))
+                            }
+                    )
+        } else {
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        }
+    }
 
 
     @SuppressLint("CheckResult")
@@ -685,6 +750,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                      * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
+                        if (isClick == OPEN_CLOSE)
+                            return
                         if (isClick != RESET_SENSOR && isClick != SENSOR_FINISH)//恢复
                             retryConnect()
 
@@ -729,8 +796,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         if (TelinkApplication.getInstance().connectDevice != null) {
             progressBar_sensor.visibility = View.GONE
             connectSensorTimeoutDisposable?.dispose()
-            if (TelinkApplication.getInstance().connectDevice != null && currentLight?.meshAddr != null) {
-
+            if (currentLight?.meshAddr != null) {
                 Commander.getDeviceVersion(currentLight!!.meshAddr)
                         .subscribe(
                                 { s ->
@@ -753,15 +819,16 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
                                                 startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                                             } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-                                                startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
+                                                if (s.contains("NPR"))
+                                                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                                                else
+                                                    startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo!!, "update" to "0", "version" to s)
                                             }
                                             doFinish()
                                         }
                                         isClick = SENSOR_FINISH
                                     } else {
                                         hideLoadingDialog()
-
-
                                         ToastUtils.showLong(getString(R.string.get_version_fail))
                                     }
                                 },

@@ -1,9 +1,13 @@
 package com.dadoutek.uled.model.DbModel;
 
+import com.dadoutek.uled.R;
+import com.telink.bluetooth.light.ConnectionStatus;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
@@ -27,6 +31,10 @@ public class DbSensor implements Serializable {
     private int openTag = 1; //1代表开 0代表关
     private int setType = 1; //0代表群组模式 1代表场景模式
     private int sceneId = 0; //场景id
+    @Transient
+    public int icon = R.drawable.icon_sensor;//灯状态显示图
+
+
 
 
     @Generated(hash = 29991029)
@@ -52,6 +60,26 @@ public class DbSensor implements Serializable {
     public DbSensor() {
     }
 
+
+
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public void updateIcon() {
+        if (this.openTag == ConnectionStatus.OFFLINE.getValue()) {
+            this.icon = R.drawable.icon_sensor;
+        } else if (this.openTag == ConnectionStatus.OFF.getValue()) {
+            this.icon = R.drawable.icon_light;
+        } else if (this.openTag == ConnectionStatus.ON.getValue()) {
+            this.icon = R.drawable.icon_sensor;
+        }
+    }
 
     public int getOpenTag() {
         return openTag;
@@ -134,8 +162,14 @@ public class DbSensor implements Serializable {
                 ", index=" + index +
                 ", belongGroupId=" + belongGroupId +
                 ", version='" + version + '\'' +
+                ", rssi=" + rssi +
+                ", openTag=" + openTag +
+                ", setType=" + setType +
+                ", sceneId=" + sceneId +
+                ", icon=" + icon +
                 '}';
     }
+
     public int getRssi() {
         return this.rssi;
     }

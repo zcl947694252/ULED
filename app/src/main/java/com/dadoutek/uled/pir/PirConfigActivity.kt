@@ -36,6 +36,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
 import com.squareup.haha.perflib.Main
@@ -349,8 +350,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 TmtUtils.midToast(this, getString(R.string.timeout_255_big))
                 return
             }
-            showGroupList.size == 0 -> {
+            isGroupMode&&showGroupList.size == 0 -> {
                 TmtUtils.midToast(this, getString(R.string.config_night_light_select_group))
+                return
+            }  !isGroupMode&&currentScene == null -> {
+                TmtUtils.midToast(this, getString(R.string.please_select_scene))
                 return
             }
             else -> {//符合所有条件
@@ -359,12 +363,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 if (device != null && device.macAddress == mDeviceInfo?.macAddress) {
                     GlobalScope.launch {
                         setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
-                        sendCommandOpcode(time.toInt())
                         delay(300)
+                        if (!isConfirm)//不是冲洗创建 更新mesh
+                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
                                     setLoadingVisbiltyOrGone()
-                                    configureComplete()
+                                    GlobalScope.launch {
+                                        sendCommandOpcode(time.toInt())
+                                        delay(timeMillis = 500)
+                                        configureComplete()
+                                    }
                                 },
                                 failedCallback = {
                                     snackbar(sensor_root, getString(R.string.pace_fail))
@@ -376,10 +385,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 } else {
                     ToastUtils.showLong(getString(R.string.connect_fail))
                     autoConnect()
-                    timeDispsable = Observable.timer(10, TimeUnit.SECONDS).subscribe {
+                    timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
                         runOnUiThread {
                             hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.gate_way_offline))
+                            ToastUtils.showShort(getString(R.string.connect_fail))
                         }
                     }
                 }
