@@ -506,6 +506,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                         popupWindow!!.contentView = views
                         popupWindow!!.isFocusable = true
+
                         popupWindow!!.showAsDropDown(set, 40, -15)
                         group?.setOnClickListener {
                             settingType = RECOVER_SENSOR
@@ -614,6 +615,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         hideLoadingDialog()
                         runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
+                    showLoadingDialog(getString(R.string.please_wait))
                     val low = currentLightm!!.meshAddr and 0xff
                     val hight = (currentLightm!!.meshAddr shr 8) and 0xff
                     val gattBody = GwGattBody()
@@ -648,55 +650,47 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
-                LogUtils.v("zcl---发送服务器返回----------$t")
+                disposableTimer?.dispose()
+                if (currentLightm!!.openTag == 1) {
+                    sendCloseIcon(positionCurrent)
+                    byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                } else {
+                    sendOpenIcon(positionCurrent)
+                    byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+                }
+                hideLoadingDialog()
+
+                disposableTimer?.dispose()
             }
 
             override fun onError(e: Throwable) {
                 super.onError(e)
-                LogUtils.e("zcl-------发送服务器返回-----------${e.message}")
+                disposableTimer?.dispose()
+                ToastUtils.showShort(e.message)
+                hideLoadingDialog()
+                        LogUtils.v("zcl-----------远程控制-------${e.message}")
             }
         })
     }
 
+
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
-        if (currentLightm?.meshAddr != null) {
-            Commander.getDeviceVersion(currentLightm!!.meshAddr)
-                    .subscribe(
-                            { s ->
-                                connectTimer?.dispose()
-                                hideLoadingDialog()
-                                if ("" != s) {
-                                    if (s.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
-
-                                        val byteArrayOf = if (currentLightm!!.openTag == 1) {
-                                            sendCloseIcon(position)
-                                            byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                                        } else {
-                                            sendOpenIcon(position)
-                                            byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
-                                        }
-                                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm!!.meshAddr, byteArrayOf)
-                                        DBUtils.saveSensor(sensorDatummms[position], true)
-                                        adapter?.notifyDataSetChanged()
-                                    } else {
-                                        ToastUtils.showShort(getString(R.string.dissupport))
-                                    }
-                                } else {
-                                    hideLoadingDialog()
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
-                                }
-                            },
-                            {
-                                connectTimer?.dispose()
-                                hideLoadingDialog()
-                                ToastUtils.showLong(getString(R.string.get_version_fail))
-                            }
-                    )
+        if (currentLightm!!.version!=null&&currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
+            val byteArrayOf = if (currentLightm!!.openTag == 1) {
+                sendCloseIcon(position)
+                byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+            } else {
+                sendOpenIcon(position)
+                byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+            }
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm!!.meshAddr, byteArrayOf)
+            DBUtils.saveSensor(sensorDatummms[position], true)
+            adapter?.notifyDataSetChanged()
         } else {
-            ToastUtils.showLong(getString(R.string.get_version_fail))
+            ToastUtils.showShort(getString(R.string.dissupport))
         }
     }
 
@@ -865,6 +859,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 { s ->
                                     hideLoadingDialog()
                                     if ("" != s) {
+                                        currentLightm!!.version = s
+                                        DBUtils.saveSensor(currentLightm!!,true)
                                         if (isOTA) {
                                             currentLightm!!.version = s
                                             var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
@@ -880,6 +876,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                             }
                                         } else {
                                             if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                                                currentLightm!!.version = s
                                                 startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                                             } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
                                                 if (s.contains("NPR"))
@@ -1054,6 +1051,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             SER_ID_SENSOR_ON -> sendOpenIcon(positionCurrent)
             SER_ID_SENSOR_OFF -> sendCloseIcon(positionCurrent)
         }
+        adapter?.notifyDataSetChanged()
     }
 
 }
