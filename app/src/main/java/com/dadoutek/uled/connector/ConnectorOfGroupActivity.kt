@@ -228,7 +228,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initParameter() {
         val get = this.intent.extras!!.get("group")
-        if (null != group)
+        if (null != get)
             this.group = get as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
