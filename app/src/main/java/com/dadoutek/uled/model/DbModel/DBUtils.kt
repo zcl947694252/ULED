@@ -28,7 +28,10 @@ object DBUtils {
     val lastRegion: DbRegion
         get() {
             val list = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().orderDesc(DbRegionDao.Properties.Id).list()
-            return list[0]
+            return when {
+                list.size>0 -> list[0]
+                else -> DbRegion()
+            }
         }
 
     val allLight: List<DbLight>

@@ -6,6 +6,8 @@ package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 
+import static java.lang.String.valueOf;
+
 /**
  * 默认的广播过滤器
  * <p>根据VendorId识别设备.
@@ -62,6 +64,8 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
                     int productUUID = (scanRecord[position++] & 0xFF) + ((scanRecord[position++] & 0xFF) << 8);
                     int status = scanRecord[position++] & 0xFF;
                     int meshAddress = (scanRecord[position++] & 0xFF) + ((scanRecord[position] & 0xFF) << 8);
+                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
+                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
                     String one = Integer.toHexString(scanRecord[20]);
                     String two = Integer.toHexString(scanRecord[21]);
                     String three = Integer.toHexString(scanRecord[22]);
@@ -72,7 +76,7 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
                     four = formatHex(four);
                     String mac4Byte = one + ":" + two + ":" + three + ":" + four;
                 //    LogUtils.v("zcl-----------要链接的mac3D扫描到的-------" + mac4Byte);
-                    LightPeripheral light = new LightPeripheral(device, scanRecord, rssi, meshName, meshAddress);
+                    LightPeripheral light = new LightPeripheral(device, scanRecord, rssi, meshName, meshAddress,version);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_NAME, meshName);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_ADDRESS, meshAddress);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_UUID, meshUUID);

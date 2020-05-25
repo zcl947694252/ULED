@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.String.valueOf;
+
 /**
  * 蓝牙发送数据相关类
  * 蓝牙操作类
@@ -68,6 +70,16 @@ public class Peripheral extends BluetoothGattCallback {
     protected byte[] scanRecord;
     protected String name;
     protected String mac;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    protected String version;
     protected String sixByteMac;
     protected byte[] macBytes;
     protected int type;
@@ -103,7 +115,7 @@ public class Peripheral extends BluetoothGattCallback {
         long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
 
         String mac = strArray[5]+":"+strArray[4]+":"+strArray[3]+":"+strArray[2];
-         return String.valueOf(mac4Byte);
+         return valueOf(mac4Byte);
     }
 
     public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
@@ -113,6 +125,7 @@ public class Peripheral extends BluetoothGattCallback {
         this.name = device.getName();
         this.type = device.getType(); //ble
        // this.mac = get4ByteMac2(scanRecord);
+        this.version = getVersion(scanRecord);
         this.mac = get4ByteMac(device.getAddress());
         this.sixByteMac = device.getAddress();
     }
@@ -998,6 +1011,13 @@ public class Peripheral extends BluetoothGattCallback {
     public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
         super.onReliableWriteCompleted(gatt, status);
     }
+
+    public String getVersion(byte[] scanRecord) {
+        String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
+                + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
+        return version;
+    }
+
 
     private final class CommandContext {
 

@@ -76,9 +76,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var timeUnitType: Int = 1
 
     /**
-     * 1 开 0关 2自定义
+     * 0 开 1关 2自定义
      */
-    private var triggerAfterShow: Int = 1
+    private var triggerAfterShow: Int = 0
 
     /**
      * 0全天    1白天   2夜晚
@@ -188,8 +188,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getTriggerAfterShow() {
-        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_on), true))
+        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.custom_brightness), false))
     }
 
@@ -366,7 +366,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
                         sendCommandOpcode(time.toInt())
                         delay(300)
-                        if (!isConfirm)//不是冲洗创建 更新mesh
+                        //if (!isConfirm)//不是冲洗创建 更新mesh
                             mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
