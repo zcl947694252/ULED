@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by hejiajun on 2018/3/22.
  */
 
-public class Constant implements Serializable {
+public class Constants implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
     public static String WS_HOST = "/smartlight";
