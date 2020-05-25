@@ -14,7 +14,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -50,7 +50,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
+        colorNode = intent.getSerializableExtra(Constants.COLOR_NODE_KEY) as? DbColorNode
     }
 
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
@@ -255,11 +255,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
             try {
 
-                if (w!! > Constant.MAX_VALUE) {
-                    w = Constant.MAX_VALUE
+                if (w!! > Constants.MAX_VALUE) {
+                    w = Constants.MAX_VALUE
                 }
-                if (ws > Constant.MAX_VALUE) {
-                    ws = Constant.MAX_VALUE
+                if (ws > Constants.MAX_VALUE) {
+                    ws = Constants.MAX_VALUE
                 }
                 if (ws == -1) {
                     ws = 0
@@ -336,7 +336,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true

@@ -10,7 +10,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.adapter.WeeksItemAdapter
 import com.dadoutek.uled.gateway.bean.WeekBean
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -41,16 +41,16 @@ class GwChoseModeActivity : TelinkBaseActivity() {
         LogUtils.e(week)
         var tmpWeek = week
         if (week  == 0b10000000)
-            tmpWeek = Constant.SATURDAY or Constant.FRIDAY or Constant.THURSDAY or Constant.WEDNESDAY or Constant.TUESDAY or Constant.MONDAY or Constant.SUNDAY //每一天
+            tmpWeek = Constants.SATURDAY or Constants.FRIDAY or Constants.THURSDAY or Constants.WEDNESDAY or Constants.TUESDAY or Constants.MONDAY or Constants.SUNDAY //每一天
 
         list = mutableListOf(
-                WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
-                WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
-                WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
-                WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
-                WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
-                WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
-                WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+                WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
+                WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
+                WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
+                WeekBean(getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
+                WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
+                WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
 
         for (i in 0 until list!!.size) {
             var weekBean = list!![i]

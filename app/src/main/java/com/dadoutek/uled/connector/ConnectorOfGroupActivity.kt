@@ -30,7 +30,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -134,7 +134,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     else {
                         if (DBUtils.getAllRelay().size == 0) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivityForResult(intent, 0)
                         } else {
                             addDevice()
@@ -149,8 +149,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun addDevice() {
         val intent = Intent(this,
                 ConnectorBatchGroupActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
         intent.putExtra("relayType", "group_relay")
         intent.putExtra("relay_group_name", group.name)
         startActivity(intent)
@@ -228,7 +228,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initParameter() {
         val get = this.intent.extras!!.get("group")
-        this.group = get as DbGroup
+        if (null != get)
+            this.group = get as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
     }
@@ -277,8 +278,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             batchGroup.visibility = View.GONE
             batchGroup.setOnClickListener {
                 val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
                 intent.putExtra("relayType", "relayGroup")
                 intent.putExtra("group", group.id.toInt())
                 startActivity(intent)
@@ -417,11 +418,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                             var intent = Intent(this@ConnectorOfGroupActivity, ConnectorSettingActivity::class.java)
                             if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                                 intent = Intent(this@ConnectorOfGroupActivity, RGBSettingActivity::class.java)
-                                intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                                intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
                             }
-                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                            intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                            intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
+                            intent.putExtra(Constants.GROUP_ARESS_KEY, group.meshAddr)
+                            intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         } else {
                             ToastUtils.showLong(R.string.reconnecting)
@@ -551,7 +552,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 

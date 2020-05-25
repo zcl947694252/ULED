@@ -3,13 +3,11 @@ package com.dadoutek.uledtest.ble
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils.regionAll
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -25,7 +23,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
-import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -154,7 +151,7 @@ object RxBleManager {
             b = false
         } else {
             for (rgName in regionList!!)
-                if (name == rgName || name == Constant.DEFAULT_MESH_FACTORY_NAME)
+                if (name == rgName || name == Constants.DEFAULT_MESH_FACTORY_NAME)
                     b = true
         }
         return b

@@ -20,7 +20,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
@@ -55,10 +55,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        isChange = intent.getBooleanExtra(Constant.IS_CHANGE_COLOR, false)
-        dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
+        isChange = intent.getBooleanExtra(Constants.IS_CHANGE_COLOR, false)
+        dstAddress = intent.getIntExtra(Constants.TYPE_VIEW_ADDRESS, 0)
         if (isChange) {
-            diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
+            diyGradient = intent.getParcelableExtra(Constants.GRADIENT_KEY) as? DbDiyGradient
             colorNodeList = DBUtils.getColorNodeListByDynamicModeId(diyGradient!!.id)
         } else {
             creatNewData()
@@ -497,7 +497,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, view, position ->
             val intent = Intent(this, SelectColorGradientAct::class.java)
             colorNodeList!![position].dstAddress = dstAddress
-            intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])
+            intent.putExtra(Constants.COLOR_NODE_KEY, colorNodeList!![position])
             startActivityForResult(intent, position)
         }
 

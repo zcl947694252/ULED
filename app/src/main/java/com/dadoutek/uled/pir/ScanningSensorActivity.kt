@@ -13,7 +13,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
@@ -66,7 +66,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private var connectDisposable: Disposable? = null
     private lateinit var mApplication: TelinkLightApplication
     private var scanDisposable: Disposable? = null
-    private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
+    private var mDeviceMeshName: String = Constants.PIR_SWITCH_MESH_NAME
     private var isSupportInstallOldDevice = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,12 +138,12 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun getScanFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
         scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(Constant.VENDOR_ID,
+                .setManufacturerData(Constants.VENDOR_ID,
                         byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SENSOR.toByte()),
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
         scanFilters.add(ScanFilter.Builder()
-                .setManufacturerData(Constant.VENDOR_ID,
+                .setManufacturerData(Constants.VENDOR_ID,
                         byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NIGHT_LIGHT.toByte()),
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
@@ -164,7 +164,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     val params = LeScanParameters.create()
 
                     if (BuildConfig.DEBUG) {
-                        params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                        params.setMeshName(Constants.PIR_SWITCH_MESH_NAME)
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
@@ -339,7 +339,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun login() {
         LogUtils.e("zcl**********************进入登录$")
         val mesh = TelinkLightApplication.getApp().mesh
-        val pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME)
+        val pwd = if (mDeviceMeshName == Constants.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
         // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         else

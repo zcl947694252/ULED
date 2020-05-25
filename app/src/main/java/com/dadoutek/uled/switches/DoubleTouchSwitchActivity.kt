@@ -17,7 +17,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -107,7 +107,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == requestCodeNum && resultCode == Activity.RESULT_OK) {
-            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
             if (isLeft) {
                 switch_double_touch_left_tv.text = group.name
                 leftGroup = group
@@ -120,7 +120,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun skipSelectGroup() {
         val intent = Intent(this@DoubleTouchSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
         startActivityForResult(intent, requestCodeNum)
     }
 
@@ -169,7 +169,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constants.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -227,7 +227,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.switch_double_touch_i_know -> {
                 switch_double_touch_mb.visibility = View.GONE
                 switch_double_touch_set.visibility = View.VISIBLE
-                SharedPreferencesHelper.putBoolean(this, Constant.IS_FIRST_CONFIG_DOUBLE_SWITCH, false)
+                SharedPreferencesHelper.putBoolean(this, Constants.IS_FIRST_CONFIG_DOUBLE_SWITCH, false)
             }
         }
     }

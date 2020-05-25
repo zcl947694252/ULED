@@ -20,7 +20,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
@@ -270,7 +270,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 DBUtils.recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constants.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -401,7 +401,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
@@ -458,14 +458,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+            params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
 
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constants.USER_TYPE, Constants.USER_TYPE_OLD) == Constants.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
             params.setNewPassword(mesh?.password)

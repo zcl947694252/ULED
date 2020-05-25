@@ -16,7 +16,6 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uledtest.ble.RxBleManager
 import com.google.gson.Gson
 import com.mob.MobSDK
-import com.squareup.leakcanary.LeakCanary
 import com.squareup.leakcanary.RefWatcher
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -61,8 +60,8 @@ class TelinkLightApplication : TelinkApplication() {
 
     var mesh: Mesh = Mesh()
         get() {
-            field.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
-            field.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+            field.factoryName = Constants.DEFAULT_MESH_FACTORY_NAME
+            field.factoryPassword = Constants.DEFAULT_MESH_FACTORY_PASSWORD
             return field
         }
 
@@ -107,8 +106,8 @@ class TelinkLightApplication : TelinkApplication() {
                 mesh = Mesh()
                 mesh.name = name
                 mesh.password = name
-                mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
-                mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+                mesh.factoryName = Constants.DEFAULT_MESH_FACTORY_NAME
+                mesh.factoryPassword = Constants.DEFAULT_MESH_FACTORY_PASSWORD
                 setupMesh(mesh)
             }
         }
@@ -129,7 +128,7 @@ class TelinkLightApplication : TelinkApplication() {
     @SuppressLint("CheckResult")
     fun initStompClient() {
         GlobalScope.launch {
-            if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
+            if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constants.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()
                 mStompManager?.initStompClient()
 
@@ -141,12 +140,12 @@ class TelinkLightApplication : TelinkApplication() {
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     LogUtils.e("zcl单点登录 It's time to cancel $it")
 
-                    val boolean = SharedPreferencesHelper.getBoolean(getApp(), Constant.IS_LOGIN, false)
+                    val boolean = SharedPreferencesHelper.getBoolean(getApp(), Constants.IS_LOGIN, false)
                     //LogUtils.e("zcl单点登录 It's time to cancel----$boolean------ $it------------${DBUtils.lastUser?.login_state_key}")
                     if (it != DBUtils.lastUser?.login_state_key && boolean) {//确保登录时成功的
                         val intent = Intent()
-                        intent.action = Constant.LOGIN_OUT
-                        intent.putExtra(Constant.LOGIN_OUT, it)
+                        intent.action = Constants.LOGIN_OUT
+                        intent.putExtra(Constants.LOGIN_OUT, it)
                         sendBroadcast(intent)
                     }
                 }, {})
@@ -156,8 +155,8 @@ class TelinkLightApplication : TelinkApplication() {
                     val msg = Gson().fromJson(it, GwStompBean::class.java)
                     LogUtils.e("zcl长连接网关接收 $it")
                     val intent = Intent()
-                    intent.action = Constant.GW_COMMEND_CODE
-                    intent.putExtra(Constant.GW_COMMEND_CODE, msg)
+                    intent.action = Constants.GW_COMMEND_CODE
+                    intent.putExtra(Constants.GW_COMMEND_CODE, msg)
                     sendBroadcast(intent)
                 }, {})
 
@@ -166,16 +165,16 @@ class TelinkLightApplication : TelinkApplication() {
                     paserCodedisposable = mStompManager?.parseQRCodeTopic()?.subscribe({
                         LogUtils.e("zcl解析 It's time to parse $it")
                         val intent = Intent()
-                        intent.action = Constant.PARSE_CODE
-                        intent.putExtra(Constant.PARSE_CODE, it)
+                        intent.action = Constants.PARSE_CODE
+                        intent.putExtra(Constants.PARSE_CODE, it)
                         sendBroadcast(intent)
                     }, {})
                 if (DBUtils.lastUser?.id != null)
                     mCancelAuthorTopicDisposable = mStompManager?.cancelAuthorization()?.subscribe({
                         LogUtils.e("zcl取消授权 It's time to cancel $it")
                         val intent = Intent()
-                        intent.action = Constant.CANCEL_CODE
-                        intent.putExtra(Constant.CANCEL_CODE, it)
+                        intent.action = Constants.CANCEL_CODE
+                        intent.putExtra(Constants.CANCEL_CODE, it)
                         sendBroadcast(intent)
                     }, {})
 

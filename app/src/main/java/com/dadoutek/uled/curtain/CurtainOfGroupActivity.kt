@@ -29,7 +29,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -155,7 +155,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     else {
                         if(DBUtils.getAllCurtains().size ==0){
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         }else{
                             addDevice()
@@ -172,8 +172,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //        intent.putExtra("curtain_name",group.name)
         val intent = Intent(this,
                 CurtainBatchGroupActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
         intent.putExtra("curtain","group_curtain")
         intent.putExtra("curtain_group_name",group.name)
         startActivity(intent)
@@ -284,8 +284,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             batchGroup.setOnClickListener {
                 val intent = Intent(this,
                         CurtainBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
                 intent.putExtra("curtain", "curtain_group")
                 intent.putExtra("group",group.id.toInt())
                 startActivity(intent)
@@ -396,13 +396,13 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 //判断是否为rgb灯
                 if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
                     intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_CURTAIN)
+                    intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_CURTAIN)
                 }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
-                intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
+                intent.putExtra(Constants.LIGHT_ARESS_KEY, currentCurtain)
+                intent.putExtra(Constants.GROUP_ARESS_KEY, group.meshAddr)
+                intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                intent.putExtra(Constants.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
+                intent.putExtra(Constants.CURTAINS_KEY, currentCurtain!!.productUUID)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
                 ToastUtils.showLong(R.string.reconnecting)
@@ -492,7 +492,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     } else {
                          GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 

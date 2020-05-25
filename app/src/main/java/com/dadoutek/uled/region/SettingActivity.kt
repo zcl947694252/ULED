@@ -29,8 +29,8 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.PhysicalRecoveryActivity
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.downTime
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constants.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.Opcode
@@ -349,7 +349,7 @@ class SettingActivity : BaseActivity() {
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
             override fun onNext(s: String) {
                 LogUtils.e("zcl-----------$s")
-                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.IS_LOGIN, false)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
                 CleanUtils.cleanExternalCache()
@@ -441,7 +441,7 @@ class SettingActivity : BaseActivity() {
      */
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
+        SharedPreferencesHelper.putBoolean(this, Constants.DELETEING, true)
 
         val lightList = allLights
         val curtainList = allCutain
@@ -464,12 +464,12 @@ class SettingActivity : BaseActivity() {
         }
 
         Commander.resetAllDevices(meshAdre, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.DELETEING, false)
             syncData()
             this@SettingActivity.bnve?.currentItem = 0
             null
         }, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.DELETEING, false)
             null
         })
         if (meshAdre.isEmpty()) {

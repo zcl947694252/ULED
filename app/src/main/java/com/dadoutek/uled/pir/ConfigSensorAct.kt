@@ -12,7 +12,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -221,9 +221,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mGroupScenesName?.clear()
         for (item in mGroups) {
             when (item.deviceType) {
-                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
-                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
-                    if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
+                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB,
+                Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
+                    if (item.deviceCount > 0 || item.deviceType == Constants.DEVICE_TYPE_NO)
                         mGroupScenesName!!.add(item.name)
                 }
             }
@@ -368,7 +368,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         DBUtils.recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+                Constants.DB_ADD)
     }
 
 

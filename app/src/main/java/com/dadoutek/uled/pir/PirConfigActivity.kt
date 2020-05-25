@@ -240,7 +240,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 showBottomList.addAll(showGroupList)
             } else {
-                currentScene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                currentScene = data?.getParcelableExtra(Constants.EIGHT_SWITCH_TYPE) as DbScene
                 setItemScene()
             }
             bottomGvAdapter.notifyDataSetChanged()
@@ -308,12 +308,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+                intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 0)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {
                 val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 1)
+                intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 1)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_see_help -> {
@@ -437,7 +437,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
         DBUtils.recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+                Constants.DB_ADD)
     }
 
     private fun getControlGroup(): String? {

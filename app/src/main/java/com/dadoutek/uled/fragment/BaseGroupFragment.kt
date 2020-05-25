@@ -35,7 +35,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -282,7 +282,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                     }
                 }
-                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, isDelete)
+                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_DELETE, isDelete)
                 groupAdapter?.changeState(isDelete)
                 groupList[postion].isSelected = isDelete
                 refreshData()
@@ -297,16 +297,16 @@ abstract class BaseGroupFragment : BaseFragment() {
         //以下是检索组里有多少设备的代码
         for (group in groupList) {
             when (group.deviceType) {
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
                 }
-                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                Constants.DEVICE_TYPE_LIGHT_RGB -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CONNECTOR -> {
+                Constants.DEVICE_TYPE_CONNECTOR -> {
                     group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CURTAIN -> {
+                Constants.DEVICE_TYPE_CURTAIN -> {
                     group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
                 }
             }
@@ -352,17 +352,17 @@ abstract class BaseGroupFragment : BaseFragment() {
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_ON
+                        gattBody.ser_id = Constants.SER_ID_GROUP_ON
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_OFF
+                        gattBody.ser_id = Constants.SER_ID_GROUP_OFF
                     }
 
                     val encoder = Base64.getEncoder()
                     val s = encoder.encodeToString(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentLight!!.meshAddr
                     sendToServer(gattBody)
                 } else {
@@ -410,13 +410,13 @@ abstract class BaseGroupFragment : BaseFragment() {
         } else {
             when (view!!.id) {
                 R.id.btn_on, R.id.tv_on -> {
-                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight!!.deviceType != Constants.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, true)
                         groupOpenSuccess(position)
                     }
                 }
                 R.id.btn_off, R.id.tv_off -> {
-                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight!!.deviceType != Constants.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, false)
                         groupCloseSuccess(position)
                     }
@@ -428,19 +428,19 @@ abstract class BaseGroupFragment : BaseFragment() {
                         /*  if (it.id.toString() != it.last_authorizer_user_id)
                               ToastUtils.showLong(getString(R.string.author_region_warm))
                           else {*/
-                        if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight!!.deviceType == groupType)) {
+                        if (currentLight!!.deviceType != Constants.DEVICE_TYPE_DEFAULT_ALL && (currentLight!!.deviceType == groupType)) {
                             var num = 0
                             when (groupType) {
-                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                                     num = DBUtils.getLightByGroupID(currentLight!!.id).size
                                 }
-                                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                Constants.DEVICE_TYPE_LIGHT_RGB -> {
                                     num = DBUtils.getLightByGroupID(currentLight!!.id).size
                                 }
-                                Constant.DEVICE_TYPE_CONNECTOR -> {
+                                Constants.DEVICE_TYPE_CONNECTOR -> {
                                     num = DBUtils.getConnectorByGroupID(currentLight!!.id).size
                                 }//蓝牙接收器
-                                Constant.DEVICE_TYPE_CURTAIN -> {
+                                Constants.DEVICE_TYPE_CURTAIN -> {
                                     num = DBUtils.getCurtainByGroupID(currentLight!!.id).size
                                 }
                             }
@@ -449,20 +449,20 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 var intent: Intent? = null
 
                                 when (groupType) {
-                                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                    Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                                         intent = Intent(mContext, NormalSettingActivity::class.java)
                                     }
-                                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                    Constants.DEVICE_TYPE_LIGHT_RGB -> {
                                         intent = Intent(mContext, RGBSettingActivity::class.java)
                                     }
-                                    Constant.DEVICE_TYPE_CONNECTOR -> {//蓝牙接收器
+                                    Constants.DEVICE_TYPE_CONNECTOR -> {//蓝牙接收器
                                         intent = Intent(mContext, ConnectorSettingActivity::class.java)
                                     }
-                                    Constant.DEVICE_TYPE_CURTAIN -> {
+                                    Constants.DEVICE_TYPE_CURTAIN -> {
                                         intent = Intent(mContext, WindowCurtainsActivity::class.java)
                                     }
                                 }
-                                intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intent?.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
                                 intent?.putExtra("group", currentLight)
                                 startActivityForResult(intent, 2)
                             }
@@ -479,18 +479,18 @@ abstract class BaseGroupFragment : BaseFragment() {
                 R.id.item_layout -> {
                     var intent = Intent()
                     when (groupType) {
-                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                        Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                             intent = Intent(mContext, LightsOfGroupActivity::class.java)
                             intent.putExtra("light", "cw_light")
                         }
-                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                        Constants.DEVICE_TYPE_LIGHT_RGB -> {
                             intent = Intent(mContext, LightsOfGroupActivity::class.java)
                             intent.putExtra("light", "rgb_light")
                         }//蓝牙接收器
-                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                        Constants.DEVICE_TYPE_CONNECTOR -> {
                             intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
                         }
-                        Constant.DEVICE_TYPE_CURTAIN -> {
+                        Constants.DEVICE_TYPE_CURTAIN -> {
                             intent = Intent(mContext, CurtainOfGroupActivity::class.java)
                         }
                     }
@@ -684,13 +684,13 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ON -> {
+            Constants.SER_ID_GROUP_ON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 groupOpenSuccess(currentPosition)
             }
-            Constant.SER_ID_GROUP_OFF -> {
+            Constants.SER_ID_GROUP_OFF -> {
                 LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()

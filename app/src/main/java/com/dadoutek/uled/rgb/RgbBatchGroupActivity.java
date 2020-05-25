@@ -39,7 +39,7 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -722,7 +722,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 ToastUtils.showLong(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_RGB);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constants.DEVICE_TYPE_LIGHT_RGB);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -765,7 +765,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
@@ -783,7 +783,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    Constants.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
 
@@ -1059,7 +1059,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         LogUtils.e("zcl--"+groups.toString());
 
         Intent intent = getIntent();
-        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        scanCURTAIN = intent.getBooleanExtra(Constants.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
         //冷暖灯传递的all light
         if(lightType.equals("rgb_light")){
@@ -1093,7 +1093,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;
                     }
@@ -1110,7 +1110,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;
                     }

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
@@ -58,7 +58,7 @@ public class EmptyAddActivity extends TelinkBaseActivity {
     }
 
     private void exitLogin() {
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false);
+        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false);
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance!=null)
             instance.idleMode(true);

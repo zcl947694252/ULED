@@ -27,7 +27,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.*
+import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody

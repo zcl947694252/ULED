@@ -8,11 +8,10 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
@@ -37,7 +36,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private var algLy: LinearLayout? = null
     private var topRgLy: RadioGroup? = null
     private var preTime: Long = 0
-    private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
+    private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
     private var addBrightnessCW: ImageView? = null
     private var lessBrightnessCW: ImageView? = null
     private var lessTemperatureCW: ImageView? = null
@@ -1440,8 +1439,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     fun sendCmd(opcode: Byte, address: Int, progress: Int) {
         var progressCmd = progress
-        if (progress > Constant.MAX_VALUE)
-            progressCmd = Constant.MAX_VALUE
+        if (progress > Constants.MAX_VALUE)
+            progressCmd = Constants.MAX_VALUE
 
         var params: ByteArray
         params = when (opcode) {

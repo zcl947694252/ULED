@@ -39,7 +39,7 @@ import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -737,7 +737,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showLong(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_NORMAL);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constants.DEVICE_TYPE_LIGHT_NORMAL);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) BatchGroupActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -780,7 +780,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
@@ -798,7 +798,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    Constants.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
 
@@ -1079,7 +1079,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void initData() {
         Intent intent = getIntent();
-        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        scanCURTAIN = intent.getBooleanExtra(Constants.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
         if ("cw_light".equals(lightType)) {
             groupLight = intent.getStringExtra("cw_light_group_name");
@@ -1115,7 +1115,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }
@@ -1139,7 +1139,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }
@@ -1154,7 +1154,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }

@@ -80,15 +80,15 @@ object AccountModel {
 
             //原有数据转化完成清空本地数据
             SharedPreferencesHelper.putObject(TelinkLightApplication.getApp(),
-                    name + pwd + Constant.LIGHTS_KEY, null)
+                    name + pwd + Constants.LIGHTS_KEY, null)
             SharedPreferencesHelper.putObject(TelinkLightApplication.getApp(),
-                    name + pwd + Constant.GROUPS_KEY, null)
+                    name + pwd + Constants.GROUPS_KEY, null)
         }
     }
 
     private fun oldDataConvertToNewDataLight(name: String, pwd: String) {
         val lights = SharedPreferencesHelper.getObject(TelinkLightApplication.getApp(),
-                name + pwd + Constant.LIGHTS_KEY) as? Lights
+                name + pwd + Constants.LIGHTS_KEY) as? Lights
 
         if (lights!!.get() != null && lights.get().size > 0) {
             for (item in lights.get()) {
@@ -118,7 +118,7 @@ object AccountModel {
 
     private fun oldDataConvertToNewDataGroup(name: String, pwd: String) {
         val groups = SharedPreferencesHelper.getObject(TelinkLightApplication.getApp(),
-                name + pwd + Constant.GROUPS_KEY) as? Groups
+                name + pwd + Constants.GROUPS_KEY) as? Groups
 
         val dbRegion = DBUtils.lastRegion
 
@@ -141,7 +141,7 @@ object AccountModel {
 
     fun initDatBase(user: DbUser) {
         //首先保存当前数据库名
-        SharedPreferencesHelper.putString(TelinkLightApplication.getApp(), Constant.DB_NAME_KEY, user.account)
+        SharedPreferencesHelper.putString(TelinkLightApplication.getApp(), Constants.DB_NAME_KEY, user.account)
 
         //数据库分库
         DaoSessionInstance.destroySession()

@@ -23,7 +23,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
@@ -176,8 +176,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_compatible_mode.isChecked = true
         isCompatible = true
 
-        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
-        scanningList = intent.getParcelableArrayListExtra(Constant.DEVICE_NUM)
+        deviceType = intent.getIntExtra(Constants.DEVICE_TYPE, 100)
+        scanningList = intent.getParcelableArrayListExtra(Constants.DEVICE_NUM)
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
         swipe_refresh_ly.setProgressViewOffset(true, -0, 100)
@@ -1401,12 +1401,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
+                        var groupType = Constants.DEVICE_TYPE_DEFAULT_ALL
                         when (deviceType) {
-                            DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                            DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
-                            DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
+                            DeviceType.LIGHT_NORMAL -> groupType = Constants.DEVICE_TYPE_LIGHT_NORMAL
+                            DeviceType.LIGHT_RGB -> groupType = Constants.DEVICE_TYPE_LIGHT_RGB
+                            DeviceType.SMART_CURTAIN -> groupType = Constants.DEVICE_TYPE_CURTAIN
+                            DeviceType.SMART_RELAY -> groupType = Constants.DEVICE_TYPE_CONNECTOR
                         }
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, groupType)
                         setGroupData()
@@ -1424,16 +1424,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         //以下是检索组里有多少设备的代码
         for (group in groupList) {
             when (group.deviceType) {
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
                 }
-                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                Constants.DEVICE_TYPE_LIGHT_RGB -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CONNECTOR -> {
+                Constants.DEVICE_TYPE_CONNECTOR -> {
                     group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CURTAIN -> {
+                Constants.DEVICE_TYPE_CURTAIN -> {
                     group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
                 }
             }
@@ -1759,7 +1759,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
 
         val scanFilter = ScanFilter.Builder()
-                .setManufacturerData(Constant.VENDOR_ID, manuData, manuDataMask)
+                .setManufacturerData(Constants.VENDOR_ID, manuData, manuDataMask)
                 .build()
         scanFilters.add(scanFilter)
         return scanFilters
