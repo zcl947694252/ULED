@@ -365,6 +365,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun switchTotal(position: Int) {
         //LogUtils.e("switchTotal" + showGroupList[position].toString())
+
+        var brightness = showGroupList[position].brightness
+        var temperature = showGroupList[position].temperature
         if (showGroupList[position].isOn) {
             showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
@@ -374,6 +377,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             cb_white_light.isChecked = false
             cb_white_light.isEnabled = false
             dot_rgb.isEnabled = false
+            brightness = 0
+            temperature = 0
         } else {
             showGroupList[position].isOn = true
             showGroupList[position].isEnableBright = true
@@ -383,8 +388,20 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             cb_white_light.isChecked = true
             cb_white_light.isEnabled = true
             dot_rgb.isEnabled = true
+
         }
-        Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+//        Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+        val addr = showGroupList[position].groupAddress
+        Thread {
+            kotlin.run {
+                Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+                Thread.sleep(300)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
+                Thread.sleep(300)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)
+            }
+        }.start()
+
         sceneGroupAdapter.notifyItemChanged(position)
     }
 
@@ -763,12 +780,26 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             do {
                 count++
                 Thread.sleep(300)
-                var temperature = list[i].colorTemperature.toByte()
-                if (temperature > 99)
+                var temperature: Byte
+                if (list[i].getIsEnableWhiteBright()) {
+                    temperature = list[i].colorTemperature.toByte()
+                } else {
+                    temperature = 0
+                }
+                if (temperature > 99) {
                     temperature = 99
-                var light = list[i].brightness.toByte()
-                if (light > 99)
+                }
+
+                var light: Byte
+                if (list[i].isOn && list[i].getIsEnableBright()) {
+                    light = list[i].brightness.toByte()
+                } else {
+                    light = 0
+                }
+                if (light > 99) {
                     light = 99
+                }
+
                 val meshAddress = TelinkApplication.getInstance().connectDevice.meshAddress
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
@@ -891,12 +922,26 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         var params: ByteArray
         for (i in list.indices) {
             Thread.sleep(100)
-            var temperature = list[i].colorTemperature.toByte()
-            if (temperature > 99)
+            var temperature: Byte
+            if (list[i].getIsEnableWhiteBright()) {
+                temperature = list[i].colorTemperature.toByte()
+            } else {
+                temperature = 0
+            }
+            if (temperature > 99) {
                 temperature = 99
-            var light = list[i].brightness.toByte()
-            if (light > 99)
+            }
+
+            var light: Byte
+            if (list[i].isOn && list[i].getIsEnableBright()) {
+                light = list[i].brightness.toByte()
+            } else {
+                light = 0
+            }
+            if (light > 99) {
                 light = 99
+            }
+
             val color = list[i].getColor()
             var red = color and 0xff0000 shr 16
             var green = color and 0x00ff00 shr 8
@@ -927,7 +972,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 }
                 LIGHT_RGB -> {
                     params = if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
-                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
                     else//11:新增场景1添 加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
                         byteArrayOf(0x01, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(),
                                 0, list[i].gradientType.toByte())
