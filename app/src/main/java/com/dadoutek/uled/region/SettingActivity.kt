@@ -122,16 +122,17 @@ class SettingActivity : BaseActivity() {
                     }
             }
         }
-        setting_masking.setOnClickListener {  }
+        setting_masking.setOnClickListener { }
     }
 
     override fun onResume() {
         super.onResume()
-        GlobalScope.launch (Dispatchers.Main){
+        GlobalScope.launch(Dispatchers.Main) {
             delay(500)
             setting_masking.visibility = View.GONE
         }
     }
+
     private fun physicalRecovery() {
         isResetFactory = 3;
         setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,
@@ -143,14 +144,14 @@ class SettingActivity : BaseActivity() {
         disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
             hideLoadingDialog()
             disposableFind?.dispose()
-            ToastUtils.showShort(getString(R.string.find_device_num)+0)
+            ToastUtils.showShort(getString(R.string.find_device_num) + 0)
         }
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     disposableTimer?.dispose()
-                    ToastUtils.showShort(getString(R.string.find_device_num)+it)
+                    ToastUtils.showShort(getString(R.string.find_device_num) + it)
                     hideLoadingDialog()
                 }, {
                     disposableTimer?.dispose()
@@ -209,7 +210,7 @@ class SettingActivity : BaseActivity() {
     private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Int) {
         setNormalPopSetting()
 
-        if (isShowThree==2||isShowThree==3) {
+        if (isShowThree == 2 || isShowThree == 3) {
             tvThree.visibility = View.VISIBLE
             hinitThree.visibility = View.VISIBLE
         } else {
@@ -370,12 +371,10 @@ class SettingActivity : BaseActivity() {
                 ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
-                try {
-                    Thread.sleep(300)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(300)
+                    restartApplication()
                 }
-                restartApplication()
             }
 
             override fun onError(e: Throwable) {
@@ -432,9 +431,9 @@ class SettingActivity : BaseActivity() {
         confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            when (isResetFactory){
+            when (isResetFactory) {
                 1 -> clearData()
-                3 ->  startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
                 2 -> if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
                 else

@@ -520,6 +520,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         downloadDispoable?.dispose()
         mConnectDeviceDisposable?.toString()
         acitivityIsAlive = false
+        TelinkLightService.Instance()?.idleMode(true)
         //移除事件
     }
 

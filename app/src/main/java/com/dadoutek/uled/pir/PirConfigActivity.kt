@@ -595,6 +595,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         allDispoables()
+        TelinkLightService.Instance()?.idleMode(true)
     }
     /*  pir_config_switch.setOnCheckedChangeListener { _, checkedId ->
        val byteArrayOf = if (checkedId == R.id.pir_config_switch_open)

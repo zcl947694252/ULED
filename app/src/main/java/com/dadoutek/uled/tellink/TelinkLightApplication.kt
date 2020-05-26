@@ -13,7 +13,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uledtest.ble.RxBleManager
+import com.dadoutek.uled.ble.RxBleManager
 import com.google.gson.Gson
 import com.mob.MobSDK
 import com.squareup.leakcanary.RefWatcher

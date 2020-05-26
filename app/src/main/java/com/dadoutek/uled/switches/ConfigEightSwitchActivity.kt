@@ -853,4 +853,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             startActivityForResult(intent, requestCodeNum)
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightService.Instance()?.idleMode(true)
+    }
 }

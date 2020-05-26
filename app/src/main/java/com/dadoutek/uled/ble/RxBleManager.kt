@@ -1,4 +1,4 @@
-package com.dadoutek.uledtest.ble
+package com.dadoutek.uled.ble
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -125,7 +125,7 @@ object RxBleManager {
                     //返回true  说明是自己区域下的设备或者为恢复出厂的设备
                     var isMyDevice = isMyDevice(it.bleDevice.name)
 
-                    LogUtils.v("zcl物理搜索设备名=${regionList}=${it.bleDevice.name}---------$version--------${it.bleDevice.macAddress}----${version == "" && !isMyDevice}")
+                    LogUtils.v("zcl物理搜索设备名=$regionList=${it.bleDevice.name}---------$version--------${it.bleDevice.macAddress}----${version == "" && !isMyDevice}")
 
                     if (version == "")
                         false

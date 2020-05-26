@@ -89,6 +89,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var isLogin: Boolean = false
     private var factory: TextView? = null
     private var disposableTimer: Disposable? = null
     private var connectTimer: Disposable? = null
@@ -173,6 +174,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
         isClick = 5
+        if (isLogin)
+            TelinkLightService.Instance()?.idleMode(true)
         this.mApplication?.removeEventListener(this)
     }
 
@@ -820,6 +823,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 var status = (event as DeviceEvent).args.status
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {//3
+                        isLogin = true
                         progressBar_sensor.visibility = View.GONE
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         when (isClick) {//重新配置
@@ -843,6 +847,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                      * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
+                        isLogin = false
                         if (isClick == OPEN_CLOSE)
                             return
                         if (isClick != RESET_SENSOR && isClick != SENSOR_FINISH)//恢复
