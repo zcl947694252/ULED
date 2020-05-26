@@ -178,6 +178,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         val versionNum = Integer.parseInt(StringUtils.versionResolution(version, 1))
         versionLayoutPS.visibility = View.VISIBLE
         tvPSVersion.text = version
+        this.version = version
         isSupportModeSelect = (version).contains("PS")
 
         if (isSupportModeSelect) {
@@ -203,6 +204,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
+        if (version==null)
+            version = mDeviceInfo.firmwareRevision
         mGroupScenesName = ArrayList()
         getGroupName()
     }

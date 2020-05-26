@@ -897,45 +897,51 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                     if ("" != s) {
                                         currentLightm!!.version = s
                                         DBUtils.saveSensor(currentLightm!!, true)
-                                        if (isOTA) {
-                                            currentLightm!!.version = s
-                                            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-                                            if (isBoolean) {
-                                                transformView()
-                                            } else {
-                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
-                                                } else {
-                                                    ToastUtils.showLong(getString(R.string.version_disabled))
-                                                    hideLoadingDialog()
-                                                }
-                                            }
-                                        } else {
-                                            if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
-                                                currentLightm!!.version = s
-                                                startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
-                                            } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-                                                if (s.contains("NPR"))
-                                                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
-                                                else
-                                                    startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo!!, "update" to "0", "version" to s)
-                                            }
-                                            doFinish()
-                                        }
+                                        skipeDevice(isOTA, s)
                                         isClick = SENSOR_FINISH
                                     } else {
+                                        skipeDevice(isOTA, currentLightm!!.version)
                                         hideLoadingDialog()
-                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                        //ToastUtils.showLong(getString(R.string.get_version_fail))
                                     }
                                 },
                                 {
                                     hideLoadingDialog()
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    skipeDevice(isOTA, currentLightm!!.version)
+                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
                                 }
                         )
             } else {
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             }
+        }
+    }
+
+    private fun SensorDeviceDetailsActivity.skipeDevice(isOTA: Boolean, s: String) {
+        if (isOTA) {
+            currentLightm!!.version = s
+            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+            if (isBoolean) {
+                transformView()
+            } else {
+                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
+                } else {
+                    ToastUtils.showLong(getString(R.string.version_disabled))
+                    hideLoadingDialog()
+                }
+            }
+        } else {
+            if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                currentLightm!!.version = s
+                startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+            } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+                if (s.contains("NPR"))
+                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                else
+                    startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
+            }
+            doFinish()
         }
     }
 

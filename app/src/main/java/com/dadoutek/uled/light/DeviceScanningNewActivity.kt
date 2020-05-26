@@ -617,6 +617,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.meshUUID = item.deviceInfo.meshUUID
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.isSelected = item.isSelected
+                dbItem.version = item.firmwareRevision
                 dbItem.rssi = item.rssi
                 DBUtils.saveLight(dbItem, false)
             }
@@ -629,6 +630,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.belongGroupId = item.belongGroupId
                 dbItem.macAddr = item.deviceInfo.macAddress
                 dbItem.productUUID = item.deviceInfo.productUUID
+                dbItem.version = item.firmwareRevision
                 dbItem.rssi = item.rssi
                 DBUtils.saveSensor(dbItem, false)
             }
@@ -639,6 +641,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbItem.textColor = this.resources.getColor(R.color.black)
                 dbItem.belongGroupId = item.belongGroupId
                 dbItem.macAddr = item.deviceInfo.macAddress
+                dbItem.version = item.firmwareRevision
                 dbItem.meshUUID = item.deviceInfo.meshUUID
                 dbItem.productUUID = item.deviceInfo.productUUID
                 dbItem.isSelected = item.isSelected
@@ -650,6 +653,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 val dbItem = DbCurtain()
                 dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
+                dbItem.version = item.firmwareRevision
                 dbItem.textColor = this.resources.getColor(R.color.black)
                 dbItem.belongGroupId = item.belongGroupId
                 dbItem.macAddr = item.deviceInfo.macAddress
@@ -664,7 +668,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbGw.macAddr = item.deviceInfo.macAddress
                 dbGw.meshAddr = item.deviceInfo.meshAddress
                 dbGw.productUUID = item.deviceInfo.productUUID
-                dbGw.version = item.deviceInfo.firmwareRevision
+                dbGw.version = item.firmwareRevision
                 dbGw.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
                 dbGw.name = getString(R.string.Gate_way) + dbGw.meshAddr
                 dbGw.tags = ""
@@ -1185,7 +1189,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         ToastUtils.showLong(R.string.restart_bluetooth)
     }
 
-
     /**
      * 扫描不到任何设备了
      * （扫描结束）
@@ -1437,7 +1440,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             LightAdapter.STATUS_LOGIN -> {
 
             }
-
         }
     }
 
@@ -1496,7 +1498,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
         intent.putExtra("data", dbGw)
         SharedPreferencesHelper.putBoolean(this, Constants.IS_GW_CONFIG_WIFI, false)
-
         startActivity(intent)
         finish()
     }

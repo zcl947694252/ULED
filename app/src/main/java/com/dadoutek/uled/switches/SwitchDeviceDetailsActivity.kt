@@ -383,8 +383,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun getDeviceVersion(deviceInfo: DeviceInfo) {
         if (TelinkApplication.getInstance().connectDevice != null) {
              downloadDispoable = Commander.getDeviceVersion(deviceInfo.meshAddress)
-                    .subscribe(
-                            { s ->
+                    .subscribe({ s ->
                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                     currentLight!!.version = s
                                     isDirectConnectDevice()
@@ -400,7 +399,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     )
 
         }
-
         isclickOTA = false
     }
 

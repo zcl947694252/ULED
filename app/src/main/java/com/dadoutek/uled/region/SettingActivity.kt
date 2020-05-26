@@ -50,6 +50,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -118,8 +122,16 @@ class SettingActivity : BaseActivity() {
                     }
             }
         }
+        setting_masking.setOnClickListener {  }
     }
 
+    override fun onResume() {
+        super.onResume()
+        GlobalScope.launch (Dispatchers.Main){
+            delay(500)
+            setting_masking.visibility = View.GONE
+        }
+    }
     private fun physicalRecovery() {
         isResetFactory = 3;
         setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,

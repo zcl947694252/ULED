@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -24,11 +23,6 @@ import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val MAX_RETRY_CONNECT_TIME = 1
-
 /**
  * 描述	      ${搜索连接开关}$
  *
@@ -37,7 +31,6 @@ private const val MAX_RETRY_CONNECT_TIME = 1
  * 更新描述   ${为类添加标识}$
  */
 class ScanningSwitchActivity : TelinkBaseActivity() {
-
     private var isSeachedDevice: Boolean = false
     private lateinit var mApplication: TelinkLightApplication
     private var mRxPermission: RxPermissions? = null
@@ -86,7 +79,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             else
                 ToastUtils.showLong(getString(R.string.connecting_tip))
         }
-
     }
 
     //扫描失败处理方法
@@ -110,7 +102,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private fun startScan() {
         TelinkLightService.Instance()?.idleMode(true)
-
             startAnimation()
             val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
                     DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.EIGHT_SWITCH)
@@ -120,11 +111,9 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                     ?.observeOn(AndroidSchedulers.mainThread())
                     ?.subscribe({
                         bestRSSIDevice = it
-                        LogUtils.d("onLogin")
                         onLogin()
                     }, {
                         scanFail()
-                        LogUtils.d(it)
                     })
     }
 
@@ -147,42 +136,47 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
-                                    when (bestRSSIDevice?.productUUID) {
-                                        DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                        }
-                                        DeviceType.DOUBLE_SWITCH -> {
-                                            startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                        }
-                                        DeviceType.SCENE_SWITCH -> {
-                                            if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
-                                                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                            else
-                                                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                        }
-
-                                        DeviceType.EIGHT_SWITCH -> {
-                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                        }
-                                        DeviceType.SMART_CURTAIN_SWITCH -> {
-                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
-                                        }
-                                    }
+                                    skipSwitch(version)
                                     finish()
                                 } else {
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    skipSwitch(bestRSSIDevice!!.firmwareRevision)
+                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
                                     finish()
                                 }
                                 closeAnimation()
                             }
                             ,
                             {
-                                showToast(getString(R.string.get_version_fail))
+                                //showToast(getString(R.string.get_version_fail))
                                 closeAnimation()
-                                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to "")
-                                //finish()
+                                skipSwitch(bestRSSIDevice!!.firmwareRevision)
+                                finish()
                             })
 
+        }
+    }
+
+    private fun skipSwitch(version: String) {
+        when (bestRSSIDevice?.productUUID) {
+            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+            }
+            DeviceType.DOUBLE_SWITCH -> {
+                startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+            }
+            DeviceType.SCENE_SWITCH -> {
+                if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
+                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+                else
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+            }
+
+            DeviceType.EIGHT_SWITCH -> {
+                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+            }
+            DeviceType.SMART_CURTAIN_SWITCH -> {
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "false", "version" to version)
+            }
         }
     }
 

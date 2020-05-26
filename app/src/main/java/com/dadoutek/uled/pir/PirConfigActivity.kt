@@ -427,6 +427,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo!!.macAddress
+        if (TextUtils.isEmpty(version))
+            version = mDeviceInfo!!.firmwareRevision
         dbSensor.version = version
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress

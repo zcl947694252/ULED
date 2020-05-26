@@ -6,8 +6,6 @@ package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 
-import static java.lang.String.valueOf;
-
 /**
  * 默认的广播过滤器
  * <p>根据VendorId识别设备.
@@ -63,9 +61,25 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
                     position += 4;
                     int productUUID = (scanRecord[position++] & 0xFF) + ((scanRecord[position++] & 0xFF) << 8);
                     int status = scanRecord[position++] & 0xFF;
-                    int meshAddress = (scanRecord[position++] & 0xFF) + ((scanRecord[position] & 0xFF) << 8);
-                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
-                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
+                    int meshAddress = (scanRecord[position++] & 0xFF) + ((scanRecord[position++] & 0xFF) << 8);
+//                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
+//                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
+                    String version = "";
+                    int revType = scanRecord[position++] & 0xFF; //0XDD为版本号标识
+                    final int VERSION_MARK = 0xDD;
+                    //0xDD 后面15个Byte 为版本号
+                    if(revType == VERSION_MARK)
+                    {
+                        for(int i = position; i<position+15; i++)
+                        {
+                            if(scanRecord[i] != 0)
+                            {
+                                version += (char) scanRecord[i];
+                            }
+                        }
+                    }
+
+
                     String one = Integer.toHexString(scanRecord[20]);
                     String two = Integer.toHexString(scanRecord[21]);
                     String three = Integer.toHexString(scanRecord[22]);
