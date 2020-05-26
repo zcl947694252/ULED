@@ -266,7 +266,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.rename)
-                .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
