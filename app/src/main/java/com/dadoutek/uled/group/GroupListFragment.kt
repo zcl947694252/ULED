@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
@@ -63,12 +64,14 @@ import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
+    private var groupAllLy: ConstraintLayout? = null
     private var disposableTimer: Disposable? = null
     private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
@@ -88,6 +91,7 @@ class GroupListFragment : BaseFragment() {
     private lateinit var rgbLightFragment: RGBLightFragmentList
     private lateinit var curtianFragment: CurtainFragmentList
     private lateinit var relayFragment: RelayFragmentList
+
     //19-2-20 界面调整
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -95,6 +99,7 @@ class GroupListFragment : BaseFragment() {
 
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
+
     //是否正在引导
     private var isGuide = false
     private var isFristUserClickCheckConnect = true
@@ -207,6 +212,7 @@ class GroupListFragment : BaseFragment() {
         viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
         viewPager = viewContent.findViewById(R.id.list_groups)
+        groupAllLy = viewContent.findViewById(R.id.group_all_ly)
 
         toolbar = viewContent.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
@@ -255,7 +261,7 @@ class GroupListFragment : BaseFragment() {
         offText?.setOnClickListener(onClick)
         btnDelete.setOnClickListener(onClick)
         allLightText?.setOnClickListener(onClick)
-
+        groupAllLy?.setOnClickListener(onClick)
         return viewContent
     }
 
@@ -443,6 +449,8 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun sendToGw(isOpen: Boolean) {
+        val gateWay = DBUtils.getAllGateWay()
+        if (gateWay.size>0)
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onNext(t: List<DbGateway>) {
@@ -457,7 +465,7 @@ class GroupListFragment : BaseFragment() {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
                         hideLoadingDialog()
-                     runOnUiThread {    ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
                     val low = allGroup!!.meshAddr and 0xff
                     val hight = (allGroup!!.meshAddr shr 8) and 0xff
@@ -515,6 +523,18 @@ class GroupListFragment : BaseFragment() {
         //点击任何一个选项跳转页面都隐藏引导
         hidePopupMenu()
         when (it.id) {
+            R.id.group_all_ly -> {
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+                    val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                    intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                    intentSetting.putExtra("group", DBUtils.allGroups[0])
+                    startActivityForResult(intentSetting, 1)
+                } else {
+                    ToastUtils.showShort(getString(R.string.device_not_connected))
+                    val activity = activity as MainActivity
+                    activity.autoConnect()
+                }
+            }
             R.id.install_device -> {
                 showInstallDeviceList()
             }
@@ -642,6 +662,19 @@ class GroupListFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CREATE_SCENE_REQUESTCODE) {
             callbackLinkMainActAndFragment?.changeToScene()
+        } else if (requestCode == 1) {
+            val dbGroup = DBUtils.allGroups[0]
+            if (dbGroup.status == 1) {
+                btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+                btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                onText?.setTextColor(resources.getColor(R.color.white))
+                offText?.setTextColor(resources.getColor(R.color.black_nine))
+            } else {
+                btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+                onText?.setTextColor(resources.getColor(R.color.black_nine))
+                offText?.setTextColor(resources.getColor(R.color.white))
+            }
         }
     }
 

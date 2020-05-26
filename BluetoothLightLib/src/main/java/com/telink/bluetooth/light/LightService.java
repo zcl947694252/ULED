@@ -488,10 +488,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
 //            TelinkLog.d("onLeScanResult2："+deviceInfo.macAddress);
         }
-
-
-        LocalBroadcastManager.getInstance(LightService.this)
-                .sendBroadcast(intent);
+        sendBroadcast(intent);//使用系统广播来操作网关回调 下面时灵时不灵
+        LocalBroadcastManager.getInstance(LightService.this).sendBroadcast(intent);
     }
 
     @Override

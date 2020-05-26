@@ -19,11 +19,12 @@
     <EditText
             android:id="@+id/gw_login_account"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/dp_40"
             android:layout_marginStart="@dimen/dp_40"
             android:layout_marginTop="8dp"
             android:singleLine="true"
             android:layout_marginEnd="@dimen/dp_40"
+            android:background="@null"
             android:hint="@string/wifi_account_hinit"
             android:textColor="@color/gray_3"
             android:textSize="@dimen/sp_14" />
@@ -42,12 +43,14 @@
     <EditText
             android:id="@+id/gw_login_pwd"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/dp_40"
             android:layout_marginStart="@dimen/dp_40"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/dp_40"
+            android:background="@null"
             android:hint="@string/wifi_pwd_hinit"
             android:textColor="@color/gray_3"
+            android:singleLine="true"
             android:textSize="@dimen/sp_14" />
 
     <Button

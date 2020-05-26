@@ -13,6 +13,7 @@ public class DbSwitchChild implements Serializable {
     private int meshAddr;
     private String name;
     private int controlGroupAddr;
+    private String controlGroupAddrs;
     private String macAddr;
     private int productUUID;
     private String list;
@@ -25,6 +26,45 @@ public class DbSwitchChild implements Serializable {
     public String keys;
     public int type; // 群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getControlGroupAddrs() {
+        return controlGroupAddrs;
+    }
+
+    public void setControlGroupAddrs(String controlGroupAddrs) {
+        this.controlGroupAddrs = controlGroupAddrs;
+    }
+
+    public String getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    public void setFirmwareVersion(String firmwareVersion) {
+        this.firmwareVersion = firmwareVersion;
+    }
+
+    public String getKeys() {
+        return keys;
+    }
+
+    public void setKeys(String keys) {
+        this.keys = keys;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public Long getId() {
         return this.id;

@@ -3,21 +3,19 @@ package com.dadoutek.uled.model.DbModel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.ToMany;
-
-import java.io.Serializable;
-import java.util.List;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
-import org.greenrobot.greendao.annotation.Transient;
-
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbDiyGradientDao;
 import com.google.gson.annotations.Expose;
+
+import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.Transient;
+
+import java.util.List;
 
 @Entity
 public class DbDiyGradient implements Parcelable {

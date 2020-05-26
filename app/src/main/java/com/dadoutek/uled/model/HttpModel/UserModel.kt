@@ -15,4 +15,12 @@ object UserModel {
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    fun clearUserData(regionId: Int): Observable<String>? {
+        return NetworkFactory.getApi()
+                .clearUserRegionData(regionId)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

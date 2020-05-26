@@ -43,11 +43,21 @@ import org.json.JSONObject
  * 创建者     ZCL
  * 创建时间   2020/1/10 10:01
  * 描述 八键开关配置
+ *乾三连 1开天金
+ * 坤六断 8大地土
+ * 震仰盂 4东方雷木
+ * 艮覆碗 7东北齐山土
+ * 离中虚 3南离火
+ * 坎中满 6北方水
+ * 兑上缺 2西方泽金
+ * 巽下断 5东南风木
  *
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
+
+
 class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private lateinit var listKeysBean: JSONArray
     private var renameDialog: Dialog? = null
@@ -59,7 +69,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private var switchData: DbSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
-    private  var mDeviceInfo: DeviceInfo? = null
+    private var mDeviceInfo: DeviceInfo? = null
     private var configSwitchType = 0
     private var configButtonTag = 0
     private val requestCodeNum = 100
@@ -71,6 +81,13 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private val sceneParamList = mutableListOf<ByteArray>()
 
     private fun initData() {
+        val groupKey = mutableListOf(4, 5, 6, 7)
+        val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6)
+        val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
+        //先进行填充默认数据
+        setDefaultData()
+
+        //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         bottom_version_number?.text = version
@@ -82,7 +99,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         if (groupName != null && groupName == "true") {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
             switchData?.keys?.let {
-                listKeysBean= JSONArray(it)
+                listKeysBean = JSONArray(it)
 
                 eight_switch_mode.visibility = View.VISIBLE
                 eight_switch_config.visibility = View.VISIBLE
@@ -92,21 +109,26 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configSwitchType = type//赋值选择的模式
                 clickType = 1//代表跳过选择模式
 
-
                 setTextColorsAndText(type)
 
-                for (i in 0 until listKeysBean.length()){
+                for (i in 0 until listKeysBean.length()) {
                     //int keyId;  int featureId;   int reserveValue_A;  int reserveValue_B;  String name;
                     val jOb = listKeysBean.getJSONObject(i)
                     val keyId = jOb.getInt("keyId")
                     val name = jOb.getString("name")
-                    when(type){
-                        0->{
+                    when (type) {
+                        0 -> {
                             val highMes = jOb.getInt("reserveValue_A")
                             val lowMes = jOb.getInt("reserveValue_B")
-                            var mesAddress = (highMes shl  8)or lowMes
+
+                            var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            groupMap[keyId] = DBUtils.getGroupByMeshAddr(mesAddress)
+                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+
+                            if (groupByMeshAddr != null) {
+                                groupMap[keyId] = groupByMeshAddr
+                                groupKey.remove(keyId)
+                            }
                             when (keyId) {
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
@@ -114,42 +136,164 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                                 7 -> eight_switch_b8.text = name
                             }
                         }
-                        1->{
+                        1 -> {
                             val sceneId = jOb.getInt("reserveValue_B")
                             var scene = DBUtils.getSceneByID(sceneId.toLong())
                             //赋值旧的设置数据
-                            sceneMap[keyId] = scene!!
+                            sceneMap[keyId] = if (scene != null) scene else {
+                                var dbScene = DbScene()
+                                dbScene.id = 1000000L
+                                dbScene
+                            }
+                            sceneKey.remove(keyId)
                             when (keyId) {
-                                0->eight_switch_b1.text = name
-                                1->eight_switch_b2.text = name
-                                2->eight_switch_b3.text = name
-                                3->eight_switch_b4.text = name
+                                0 -> eight_switch_b1.text = name
+                                1 -> eight_switch_b2.text = name
+                                2 -> eight_switch_b3.text = name
+                                3 -> eight_switch_b4.text = name
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
                                 6 -> eight_switch_b7.text = name
                             }
                         }
+                        2 -> {
+                            val highMes = jOb.getInt("reserveValue_A")
+                            val lowMes = jOb.getInt("reserveValue_B")
+                            var mesAddress = (highMes shl 8) or lowMes
+                            //赋值旧的设置数据
+                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+                            if (groupByMeshAddr != null) {
+                                groupMap[keyId] = groupByMeshAddr
+                                doubleGroupKey.remove(keyId)
+                            }
+                            when (keyId) {
+                                2 -> eight_switch_b3.text = name
+                                3 -> eight_switch_b4.text = name
+                                4 -> eight_switch_b5.text = name
+                                5 -> eight_switch_b6.text = name
+                                6 -> eight_switch_b7.text = name
+                                7 -> eight_switch_b8.text = name
+                            }
+                        }
                     }
                 }
+               /* when (type) {
+                    0 -> {
+                        groupKey.forEach { itKey ->
+                            var dbGroup = DbGroup()
+                            dbGroup.id = 1000000L
+                            groupMap[itKey] = dbGroup
+                        }
+                    }
+                    1 -> {
+                        sceneKey.forEach { itKey ->
+                            var dbScene = DbScene()
+                            dbScene.id = 1000000L
+                            sceneMap[itKey] = dbScene
+                        }
+                    }
+                    2 -> {
+                        doubleGroupKey.forEach { itKey ->
+                            var dbGroup = DbGroup()
+                            dbGroup.id = 1000000L
+                            groupMap[itKey] = dbGroup
+                        }
+                    }
+                    else -> {
+                    }
+                }*/
             }
+        }
+    }
+
+    private fun setDefaultData() {
+        groupMap.clear()
+        sceneMap.clear()
+        for (i in 0 until 8) {
+            var dbGroup = DbGroup()
+            dbGroup.id = 1000000L
+            groupMap[i] = dbGroup
+
+            var dbScene = DbScene()
+            dbScene.id = 1000000L
+            sceneMap[i] = dbScene
         }
     }
 
 
     private fun confimCongfig() {
         //成功后clickType = 0
-        if (configSwitchType == 0) {
-            if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
+        when (configSwitchType) {
+            0 -> {
+                // if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
                 sendParms()
-            } else
-                ToastUtils.showLong(getString(R.string.click_config_tip))
-        } else if (configSwitchType == 1) {
-            if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
-                    sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
-                    && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {
+                /*  } else{
+                      clickType = 1
+                      ToastUtils.showLong(getString(R.string.click_config_tip))
+                  }*/
+            }
+            1 -> {
+                /*if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
+                        sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
+                        && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {*/
                 sendSceneParms()
-            } else
-                ToastUtils.showLong(getString(R.string.click_config_tip))
+                /* } else{
+                     clickType = 1
+                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                 }*/
+            }
+            2 -> {
+                /* if (groupMap.size >= 6 && groupMap.containsKey(2) && groupMap.containsKey(3) && groupMap.containsKey(4) && groupMap.containsKey(5)
+                         && groupMap.containsKey(6) && groupMap.containsKey(7)) {*/
+                sendSingleGroupParms()
+                /* } else {
+                     clickType = 1
+                     ToastUtils.showLong(getString(R.string.click_config_tip))
+                 }*/
+            }
+        }
+    }
+
+    private fun sendSingleGroupParms() {
+        showLoadingDialog(getString(R.string.setting_switch))
+        groupParamList.clear()
+        listKeysBean = JSONArray()
+
+        //11-12-13-14 11-12-13-14
+        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00)
+        listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
+        listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
+
+
+        val second = mutableListOf(2, 3)
+        val third = mutableListOf(4, 5)
+        val four: MutableList<Int> = mutableListOf(6, 7)
+        /* val four: MutableList<Int> = if (groupMap.size > 3)+
+             mutableListOf(6, 7)
+         else
+             mutableListOf(6)*/
+
+        val secondParm = getGroupParm(second)
+        val thirParm = getGroupParm(third)
+        val fourParm = getGroupParm(four)
+
+        LogUtils.v("zcl獲得的keys是$listKeysBean")
+        groupParamList.add(0, firstParm)
+        groupParamList.add(1, secondParm)
+        groupParamList.add(2, thirParm)
+        groupParamList.add(3, fourParm)
+
+        GlobalScope.launch {
+            var delay = 0L
+            for (p in groupParamList) {
+                delay(delay)
+                //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+                //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
+                delay += 300
+            }
+            delay(1500)
+            updateMeshGroup(2)
         }
     }
 
@@ -161,11 +305,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         val first = mutableListOf(0, 1)
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
+        //val four = mutableListOf(6, 7)
         val four: MutableList<Int> = if (sceneParamList.size > 7)
-            mutableListOf(7, 6)
+            mutableListOf(6/*, 7*/)
         else
             mutableListOf(6)
-
         val sceneParmOne = getSceneParm(first)
         val sceneParmTwo = getSceneParm(second)
         val sceneParmThird = getSceneParm(third)
@@ -178,7 +322,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         GlobalScope.launch {
             for (p in sceneParamList) {
                 delay(delay)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress?:0, p)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
                 delay += 300
             }
             delay(1500)
@@ -201,10 +345,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
         val third = mutableListOf(4, 5)
-        val four: MutableList<Int> = if (groupMap.size > 3)
-            mutableListOf(7, 6)
-        else
-            mutableListOf(6)
+        val four: MutableList<Int> = mutableListOf(6, 7)
+        /*  val four: MutableList<Int> = if (groupMap.size > 3)
+              mutableListOf(6, 7)
+          else
+              mutableListOf(6)*/
 
         val thirParm = getGroupParm(third)
         val fourParm = getGroupParm(four)
@@ -221,7 +366,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 delay(delay)
                 //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
                 //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress?:0, p)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
                 delay += 300
             }
             delay(1500)
@@ -264,14 +409,14 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateSwitch(configGroup: Int) {
         if (groupName == "false") {
-            var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")
+            var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
             if (dbEightSwitch != null) {
-                dbEightSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo?.productUUID?:0, this) + "-" + dbEightSwitch.meshAddr
+                dbEightSwitch.name = getString(R.string.eight_switch) + "-" + dbEightSwitch.meshAddr
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
-                dbEightSwitch!!.keys = listKeysBean.toString()
+                dbEightSwitch.keys = listKeysBean.toString()
                 dbEightSwitch.version = version
-                DBUtils.updateSwicth(dbEightSwitch!!)
+                DBUtils.updateSwicth(dbEightSwitch)
                 switchData = dbEightSwitch
             } else {
                 var eightSwitch = DbSwitch()
@@ -279,8 +424,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 eightSwitch = setGroupIdsOrSceneIds(configGroup == 0, eightSwitch)
                 eightSwitch.type = configGroup
                 eightSwitch.macAddr = mDeviceInfo?.macAddress
-                eightSwitch.meshAddr = mDeviceInfo?.meshAddress?:0
-                eightSwitch.productUUID = mDeviceInfo?.productUUID?:0
+                eightSwitch.meshAddr = mDeviceInfo?.meshAddress ?: 0
+                eightSwitch.productUUID = mDeviceInfo?.productUUID ?: 0
                 eightSwitch.index = eightSwitch.id.toInt()
                 eightSwitch.version = version
 
@@ -290,9 +435,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveSwitch(eightSwitch, isFromServer = false, type = eightSwitch.type, keys = eightSwitch.keys)
 
                 LogUtils.v("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
-                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")
-                DBUtils.recordingChange(gotSwitchByMac?.id,
-                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
+                DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD, eightSwitch.type, eightSwitch.keys)
                 switchData = eightSwitch
             }
@@ -322,112 +466,167 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getSceneParm(list: MutableList<Int>): ByteArray {
+        var firstOpcode = Opcode.SCENE_SWITCH8K
+        var secondOpcode = Opcode.SCENE_SWITCH8K
+
         val firstNum = list[0]
-        val firsDbSceneId = sceneMap[firstNum]!!.id
-        listKeysBean.put(getKeyBean(firstNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+        val dbSceneFirst = sceneMap[firstNum]
+        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 1000000L) {
+            firstOpcode = Opcode.DEFAULT_SWITCH8K
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            1000000L
+        } else {
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
+            dbSceneFirst!!.id
+        }
+
         return if (list.size > 1) {
             val secondNum = list[1]
-            val secondDbSceneId = sceneMap[secondNum]!!.id
+            val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            listKeysBean.put(getKeyBean(secondNum, Opcode.SCENE_SWITCH8K.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
-            byteArrayOf(firstNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), secondNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, secondDbSceneId.toByte())
+            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 1000000L) {
+                secondOpcode = Opcode.DEFAULT_SWITCH8K
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+                1000000L
+            } else {
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+                dbSceneSecond.id
+            }
+            byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关
-            byteArrayOf(firstNum.toByte(),  Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
+            byteArrayOf(firstNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
 
     private fun getGroupParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
-        val fiveMeshs = groupMap[firstNum]!!.meshAddr
-        val fiveH = fiveMeshs.shr(8).toByte()
-        val fiveL = fiveMeshs.and(0xff).toByte()
-        var opcodeOne = getAllGroupOpcode(fiveMeshs)
+        val dbGroup1 = groupMap[firstNum]!!
+        var opcodeOne: Byte
+        var fristL: Byte = 0
+        var fristH: Byte = 0
 
-        listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = fiveMeshs.shr(8), low8Mes = fiveMeshs.and(0xff)))
+        if (dbGroup1 == null || dbGroup1.id == 1000000L) {
+            opcodeOne = Opcode.DEFAULT_SWITCH8K
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+        } else {
+            val fristMesAddr = dbGroup1.meshAddr
+            val mesL = fristMesAddr and 0xff
+            val mesH = (fristMesAddr shr 8) and 0xff
+            fristL = mesL.toByte()
+            fristH = mesH.toByte()
+            opcodeOne = getAllGroupOpcode(fristMesAddr)
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+        }
 
         return if (list.size > 1) {
             val secondNum = list[1]
-            val sixMeshs = groupMap[secondNum]!!.meshAddr
-            val sixH = sixMeshs.shr(8).toByte()
-            val sixL = sixMeshs.and(0xff).toByte()
-            var opcodeTwo = getAllGroupOpcode(sixMeshs)
+            val dbGroup2 = groupMap[secondNum]
 
-            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = sixMeshs.shr(8), low8Mes = sixMeshs.and(0xff)))
+            var opcodeTwo: Byte
+            var secondL: Byte = 0
+            var secondH: Byte = 0
 
-            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, secondNum.toByte(), opcodeTwo, sixH, sixL)
+            if (dbGroup2 == null || dbGroup2.id == 1000000L) {
+                opcodeTwo = Opcode.DEFAULT_SWITCH8K
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            } else {
+                val secondMesAddr = dbGroup2.meshAddr
+                val mesL = secondMesAddr and 0xff
+                val mesH = (secondMesAddr shr 8) and 0xff
+                secondL = mesL.toByte()
+                secondH = mesH.toByte()
+                opcodeTwo = getAllGroupOpcode(secondMesAddr)
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+            }
+
+            byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, secondNum.toByte(), opcodeTwo, secondH, secondL)
         } else {
             //如果第八键没有配置默认为关
             listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt()))
-            byteArrayOf(firstNum.toByte(), opcodeOne, fiveH, fiveL, 0x08, Opcode.CLOSE, 0x00, 0x00)
+            byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
 
     private fun getAllGroupOpcode(fiveMeshs: Int): Byte {
-        return if (fiveMeshs != 0xffff) {
+        return if (fiveMeshs != 0xffff)
             Opcode.GROUP_SWITCH8K
-        } else {
+        else
             Opcode.SWITCH_ALL_GROUP
-        }
     }
 
     /**
      * 创建pop并添加按钮监听
      */
     @SuppressLint("SetTextI18n")
-
     private fun setTextColorsAndText(type: Int) {
-        if (type == 0) {
-            eight_switch_b1.setTextColor(getColor(R.color.brightness_add_color))
-            eight_switch_b2.setTextColor(getColor(R.color.brightness_add_color))
-            eight_switch_b3.setTextColor(getColor(R.color.brightness_add_color))
-            eight_switch_b4.setTextColor(getColor(R.color.brightness_add_color))
-            eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
+        when (type) {
+            0 -> {
+                eight_switch_b1.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b2.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b3.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b4.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
 
-            eight_switch_b1.text = getString(R.string.brightness_add)
-            eight_switch_b2.text = getString(R.string.color_temperature_add)
-            eight_switch_b3.text = getString(R.string.brightness_minus)
-            eight_switch_b4.text = getString(R.string.color_temperature_minus)
-            eight_switch_b5.text = getString(R.string.click_config)
-            eight_switch_b6.text = getString(R.string.click_config)
-            eight_switch_b7.text = getString(R.string.click_config)
-            eight_switch_b8.text = getString(R.string.click_config)
+                eight_switch_b1.text = getString(R.string.brightness_add)
+                eight_switch_b2.text = getString(R.string.color_temperature_add)
+                eight_switch_b3.text = getString(R.string.brightness_minus)
+                eight_switch_b4.text = getString(R.string.color_temperature_minus)
+                eight_switch_b5.text = getString(R.string.click_config)
+                eight_switch_b6.text = getString(R.string.click_config)
+                eight_switch_b7.text = getString(R.string.click_config)
+                eight_switch_b8.text = getString(R.string.click_config)
 
-        } else {
-            eight_switch_b1.setTextColor(getColor(R.color.click_config_color))
-            eight_switch_b2.setTextColor(getColor(R.color.click_config_color))
-            eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
-            eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
-            eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
+            }
+            1 -> {
+                eight_switch_b1.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b2.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
 
-            eight_switch_b5.text = getString(R.string.click_config)
-            eight_switch_b6.text = getString(R.string.click_config)
-            eight_switch_b7.text = getString(R.string.click_config)
-            eight_switch_b8.text = getString(R.string.click_config)
+                eight_switch_b1.text = getString(R.string.click_config)
+                eight_switch_b2.text = getString(R.string.click_config)
+                eight_switch_b3.text = getString(R.string.click_config)
+                eight_switch_b4.text = getString(R.string.click_config)
+                eight_switch_b5.text = getString(R.string.click_config)
+                eight_switch_b6.text = getString(R.string.click_config)
+                eight_switch_b7.text = getString(R.string.click_config)
+                eight_switch_b8.text = getString(R.string.close)
+            }
+            2 -> {
+                eight_switch_b1.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b2.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
+                eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
 
-            eight_switch_b1.text = getString(R.string.click_config)
-            eight_switch_b2.text = getString(R.string.click_config)
-            eight_switch_b3.text = getString(R.string.click_config)
-            eight_switch_b4.text = getString(R.string.click_config)
-            eight_switch_b5.text = getString(R.string.click_config)
-            eight_switch_b6.text = getString(R.string.click_config)
-            eight_switch_b7.text = getString(R.string.click_config)
-            eight_switch_b8.text = getString(R.string.close)
+                eight_switch_b1.text = getString(R.string.brightness_minus)
+                eight_switch_b2.text = getString(R.string.brightness_add)
+                eight_switch_b3.text = getString(R.string.click_config)
+                eight_switch_b4.text = getString(R.string.click_config)
+                eight_switch_b5.text = getString(R.string.click_config)
+                eight_switch_b6.text = getString(R.string.click_config)
+                eight_switch_b7.text = getString(R.string.click_config)
+                eight_switch_b8.text = getString(R.string.click_config)
+            }
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var name: String
-            if (configSwitchType == 0) {
-                var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
-                groupMap[configButtonTag] = group
-                name = group.name
-            } else {
-                var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
-                sceneMap[configButtonTag] = scene
-                name = scene.name
+            when (configSwitchType) {
+                0, 2 -> {
+                    var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+                    groupMap[configButtonTag] = group
+                    name = group.name
+                }
+                else -> {
+                    var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                    sceneMap[configButtonTag] = scene
+                    name = scene.name
+                }
             }
 
             when (configButtonTag) {
@@ -453,17 +652,18 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initView() {
         val list = mutableListOf<View>()
-        for (i in 0..1) {
+        for (i in 0..2) {
             val view = layoutInflater.inflate(R.layout.item_banner, null, false)
-            if (i == 0)
-                view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.group_eight_key)
-            else
-                view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.scene_eight_key)
+            when (i) {
+                0 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.group_eight_key)
+                1 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.scene_eight_key)
+                2 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.icon_8k_single)
+            }
             list.add(view)
         }
         eight_switch_banner.adapter = MoreItemVpAdapter(list, this)
-        eight_switch_banner.offscreenPageLimit = 2
-        eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f, this))
+        eight_switch_banner.offscreenPageLimit = 3
+        eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f))
         eight_switch_banner.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(p0: Int) {}
 
@@ -471,19 +671,28 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
             override fun onPageSelected(p0: Int) {
                 configSwitchType = p0
-                groupMap.clear()
-                sceneMap.clear()
-                if (p0 == 0) {
-                    configSwitchType = 0
-                    setTextColorsAndText(p0)
-                    eight_switch_title.text = getString(R.string.group_switch)
-                } else {
-                    configSwitchType = 1
-                    setTextColorsAndText(R.color.click_config_color)
-                    eight_switch_title.text = getString(R.string.scene_switch)
+
+                setDefaultData()
+                when (p0) {
+                    0 -> {
+                        configSwitchType = 0
+                        setTextColorsAndText(p0)
+                        eight_switch_title.text = getString(R.string.group_switch)
+                    }
+                    1 -> {
+                        configSwitchType = 1
+                        setTextColorsAndText(p0)
+                        eight_switch_title.text = getString(R.string.scene_switch)
+                    }
+                    2 -> {
+                        configSwitchType = 2
+                        setTextColorsAndText(p0)
+                        eight_switch_title.text = getString(R.string.single_brighress_group_switch)
+                    }
                 }
             }
         })
+
         makePop()
     }
 
@@ -492,24 +701,27 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             finishAc()
         }
         eight_switch_use_button.setOnClickListener {
-            if (clickType < 1) {//选择模式
-                setTextColorsAndText(configSwitchType)
-                eight_switch_mode.visibility = View.VISIBLE
-                eight_switch_config.visibility = View.VISIBLE
-                eight_switch_banner_ly.visibility = View.GONE
-                clickType = 1
-            } else {
-                clickType = 2
-                confimCongfig()
+            when (clickType) {
+                0 -> {//选择模式 显示配置界面
+                    setTextColorsAndText(configSwitchType)
+                    eight_switch_mode.visibility = View.VISIBLE
+                    eight_switch_config.visibility = View.VISIBLE
+                    eight_switch_banner_ly.visibility = View.GONE
+                    clickType = 1
+                }
+                1, 2 -> {
+                    clickType = 2
+                    confimCongfig()
+                }
             }
         }
 
         eight_switch_mode.setOnClickListener {//清除数据并且清除模式
-            sceneMap.clear()
-            groupMap.clear()
+            setDefaultData()
             eight_switch_mode.visibility = View.GONE
             eight_switch_config.visibility = View.GONE
             eight_switch_banner_ly.visibility = View.VISIBLE
+            eight_switch_banner.currentItem = 0
             clickType = 0//代表没有选择模式
             configSwitchType = 0//默认选中的是群组八键开关
             eight_switch_title.text = getString(R.string.group_switch)
@@ -527,9 +739,9 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun makePop() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -537,7 +749,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 switchData?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 if (switchData == null)
-                    switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress?:0)
+                    switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
                 if (switchData != null)
                     DBUtils.updateSwicth(switchData!!)
                 else
@@ -545,7 +757,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
-                LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress?:0)?.name}")
+                LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)?.name}")
             }
         }
         renameCancel?.setOnClickListener {
@@ -577,7 +789,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             renameEditText?.setText(switchData?.name)
         else {
             var text = eight_switch_title.text.toString()
-            renameEditText?.setText(text + "*" + DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress?:"")?.meshAddr)
+            renameEditText?.setText(text + "*" + DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")?.meshAddr)
         }
         renameEditText?.setSelection(renameEditText?.text.toString().length)
         if (this != null && !this.isFinishing) {
@@ -604,11 +816,11 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 1
             }
             R.id.eight_switch_b3 -> {
-                isCanClick = configSwitchType == 1
+                isCanClick = configSwitchType == 1 || configSwitchType == 2
                 configButtonTag = 2
             }
             R.id.eight_switch_b4 -> {
-                isCanClick = configSwitchType == 1
+                isCanClick = configSwitchType == 1 || configSwitchType == 2
                 configButtonTag = 3
             }
             /**
@@ -626,7 +838,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 configButtonTag = 6
             }
             R.id.eight_switch_b8 -> {
-                isCanClick = configSwitchType == 0//是群组开关才可以点击配置 场景开关为关不允许配置
+                isCanClick = configSwitchType == 0 || configSwitchType == 2//是群组开关才可以点击配置 场景开关为关不允许配置
                 configButtonTag = 7
             }
         }

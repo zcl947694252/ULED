@@ -355,7 +355,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(groupsByDeviceType?.get(position)?.name)
-        //        //设置光标默认在最后
+        //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.update_name_gp))
@@ -819,6 +819,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             LogUtils.v("zcl是否选中$isChecked")
         }
         batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
+            setDeviceStopBlink(deviceType)
             checkedNoGrouped = checkedId == batch_four_no_group.id
             switchNoGroupOrGroupedAndSetEmpty()
             changeTitleChecked()
@@ -895,7 +896,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun changeGroupingCompleteState(selectSize: Int, noGroupSize: Int) {
-
         if (selectSize > 0 && currentGroup != null) {//选中分组并且有选中设备的情况下
             grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
             isComplete = false
@@ -911,7 +911,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             } else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
                 isComplete = true
                 grouping_completed.isClickable = true
-                grouping_completed.setBackgroundResource(R.drawable.btn_rec_black_bt)
+                grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
                 grouping_completed.text = getString(R.string.complete)
             }
         }
@@ -931,7 +931,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
                                 deviceDataLightAll.filter { it.isSelected }.size.toString()))
-
                     }
                     DeviceType.SMART_CURTAIN -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
@@ -940,7 +939,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.SMART_RELAY -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
                                 deviceDataRelayAll.filter { it.isSelected }.size.toString()))
-
                     }
                 }
                 //将灯列表的灯循环设置分组
@@ -1542,7 +1540,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyDataSetChanged()
                 }
-
             }
         }
     }

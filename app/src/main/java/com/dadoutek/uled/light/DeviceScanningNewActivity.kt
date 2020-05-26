@@ -95,25 +95,31 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var testId: DbGroup? = null
     private var mApplication: TelinkLightApplication? = null
     private var mRxPermission: RxPermissions? = null
+
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
+
     //分组所含灯的缓存
     private var nowDeviceList: MutableList<ScannedDeviceItem> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var grouping: Boolean = false
     internal var isFirtst = true
     private var lastMyRegion = lastRegion
+
     //标记登录状态
     private lateinit var groupsRecyclerViewAdapter: GroupsRecyclerViewAdapter
     private var groups: MutableList<DbGroup> = ArrayList()
     private var mTimer: Disposable? = null
     private var mUpdateMeshRetryCount = 0
     private var mConnectRetryCount = 0
+
     //当前所选组index
     private var currentGroupIndex = -1
     private var updateList: MutableList<ScannedDeviceItem> = ArrayList()
+
     //对一个灯重复分组时记录上一次分组
     private val mGroupingDisposable: Disposable? = null
+
     //灯的mesh地址
     private var mConnectTimer: Disposable? = null
     private val mBlinkDisposables = SparseArray<Disposable>()
@@ -660,7 +666,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dbGw.productUUID = item.deviceInfo.productUUID
                 dbGw.version = item.deviceInfo.firmwareRevision
                 dbGw.sixByteMacAddr = item.deviceInfo.sixByteMacAddress
-                dbGw.name = getString(R.string.device_name) + dbGw.meshAddr
+                dbGw.name = getString(R.string.Gate_way) + dbGw.meshAddr
                 dbGw.tags = ""
                 dbGw.timePeriodTags = ""
                 dbGw.uid = (lastUser?.id ?: 0).toInt()
@@ -819,8 +825,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
 
-
-
     private fun refreshView() {
         currentGroupIndex = groups!!.size - 1
         for (i in groups!!.indices.reversed()) {
@@ -854,8 +858,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.connect_fail))
                         LogUtils.d(it)
-                    }
-                    )
+                    })
         else
             mAutoConnectDisposable = connect(deviceTypes = elements, retryTimes = 2)
                     ?.subscribe(
@@ -940,6 +943,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         btn_start_scan.setOnClickListener {
             initVisiable()
+            toolbar.setTitle(getString(R.string.scanning))
             startScan()
         }
         add_group_layout.setOnClickListener {
@@ -1025,7 +1029,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar?.setNavigationContentDescription(R.drawable.navigation_back_white)
+        toolbar?.setNavigationContentDescription(R.drawable.icon_top_tab_back)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -1176,7 +1180,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
         }
     }
-
 
     private fun onMeshEvent() {
         ToastUtils.showLong(R.string.restart_bluetooth)
@@ -1369,7 +1372,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         connectBestRssiDevice()
     }
 
-
     private fun updateMesh(deviceInfo: DeviceInfo, meshAddress: Int, mesh: Mesh) {
         bestRssiDevice = null
         //更新参数
@@ -1388,7 +1390,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         LogUtils.d("updateMesh: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
-
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args

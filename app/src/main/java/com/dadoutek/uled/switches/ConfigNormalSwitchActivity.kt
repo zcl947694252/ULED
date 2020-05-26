@@ -30,6 +30,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -60,7 +61,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private var renameCancel: TextView? = null
     private var renameConfirm: TextView? = null
     private var renameEditText: EditText? = null
-    private var alertDialog: android.app.AlertDialog? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
@@ -242,7 +242,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     Thread(Runnable {
                         setGroupForSwitch()
                         Thread.sleep(800)
-                        val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
+                        //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
+                        val newMeshAddr = MeshAddressGenerator().meshAddress
                         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                                 successCallback = {
                                     mDeviceInfo.meshAddress = newMeshAddr

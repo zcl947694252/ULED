@@ -212,9 +212,10 @@ public final class LightController extends EventBus<Integer> implements LightPer
         }
 
         byte[] plaintext = new byte[16];
-        if (meshName != null && password != null) for (int i = 0; i < 16; i++) {
-            plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
-        }
+        if (meshName != null && password != null)
+            for (int i = 0; i < 16; i++) {
+                plaintext[i] = (byte) (this.meshName[i] ^ this.password[i]);
+            }
 
         byte[] randm = this.generateRandom(this.loginRandm);
         byte[] sk = new byte[16];
@@ -285,7 +286,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         this.newLongTermKey = longTermKey;
 
-        if (this.resetDeviceAddress()) return;
+        if (this.resetDeviceAddress())
+            return;
 
         this.mDelayHandler.removeCallbacksAndMessages(null);
 
@@ -348,7 +350,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         TelinkLog.d("mesh address -->" + newAddress + " : " + oldAddress);
 
-        if (newAddress == oldAddress) return false;
+        if (newAddress == oldAddress)
+            return false;
 
         this.enableNotification(this.notifyCallback, TAG_RESET_MESH_ADDRESS_NOTIFY_DATA);
         byte opcode = (byte) 0xE0;
@@ -375,7 +378,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get()) return;
+        if (!this.isLogin.get())
+            return;
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.NOTIFY);
@@ -399,7 +403,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get()) return;
+        if (!this.isLogin.get())
+            return;
 
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
@@ -420,7 +425,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (!this.isLogin)
                 return;
         }*/
-        if (!this.isLogin.get()) return;
+        if (!this.isLogin.get())
+            return;
 
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
@@ -768,17 +774,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return this.sendCommand(opcode, address, params, noResponse, TAG_NORMAL_COMMAND, delay);
     }
 
-    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse,
-                               Object tag, int delay) {
+    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
         if (tag.toString() == "0")
-            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse,
-                    tag, delay);
+            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
         else if (tag.toString() == "1")
-            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag,
-                    delay);
+            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag, delay);
         else
-            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag
-                    , delay);
+            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
 
     }
 
@@ -877,7 +879,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         System.arraycopy(encrypted, 8, result, 8, 8);
         Arrays.reverse(result, 8, 15);
 
-        if (!Arrays.equals(result, sk)) return null;
+        if (!Arrays.equals(result, sk))
+            return null;
 
         System.arraycopy(randm, 0, key, 0, randm.length);
         System.arraycopy(rands, 0, key, 8, rands.length);
@@ -998,12 +1001,12 @@ public final class LightController extends EventBus<Integer> implements LightPer
                 LogUtils.v("zcl----蓝牙数据切割mac--------" + s + "------" + sixByteMacAddress);
                 light.setSixByteMacAddress(sixByteMacAddress);
                 this.dispatchEvent(new LightEvent(LightEvent.GET_DEVICE_MAC_SUCCESS));
-            } else if (cmd == 0xEA) {
+            } else if (cmd == 0xEA) {//设置返回标识
                 int voipStatus = result[10] & 0xFF;
                 light.setGwVoipState(voipStatus);
                 if (voipStatus == 0X10)//0x10代表连接业务标识 11位是业务标识
                     light.setGwWifiState(result[11]);//通过此处的peripheral设置数据
-//                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------" + result[11]);
+                //                LogUtils.v("zcl-----------蓝牙数据设置状态notify-------" + result[11]);
                 this.dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
             }
         }
@@ -1011,24 +1014,29 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
     private void onDeviceAddressNotify(byte[] data, Object tag) {
 
-        if (!tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_DATA)) return;
+        if (!tag.equals(TAG_RESET_MESH_ADDRESS_NOTIFY_DATA))
+            return;
 
         int length = data.length;
         int minLength = 20;
         int position = 7;
 
-        if (length < minLength) return;
+        if (length < minLength)
+            return;
 
         int opcode = data[position++] & 0xFF;
         int vendorId = ((data[position++] & 0xFF) << 8) + (data[position++] & 0xFF);
 
-        if (vendorId != Manufacture.getDefault().getVendorId()) return;
+        if (vendorId != Manufacture.getDefault().getVendorId())
+            return;
 
-        if (opcode != 0xE1) return;
+        if (opcode != 0xE1)
+            return;
 
         int meshAddress = (data[10] & 0xFF) + (data[11] << 8);
 
-        if (meshAddress == light.getMeshAddress()) return;
+        if (meshAddress == light.getMeshAddress())
+            return;
 
         light.setMeshAddress(meshAddress);
 
@@ -1132,7 +1140,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         @Override
         public void success(Peripheral peripheral, Command command, Object response) {
 
-            if (!command.tag.equals(TAG_LOGIN_READ)) return;
+            if (!command.tag.equals(TAG_LOGIN_READ))
+                return;
 
             byte[] data = (byte[]) response;
 
@@ -1231,7 +1240,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         @Override
         public void success(Peripheral peripheral, Command command, Object response) {
 
-            if (!command.tag.equals(TAG_RESET_MESH_CHECK)) return;
+            if (!command.tag.equals(TAG_RESET_MESH_CHECK))
+                return;
 
             byte[] data = (byte[]) response;
 
@@ -1366,7 +1376,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void success(Peripheral peripheral, Command command, Object object) {
-            if (!command.tag.equals(TAG_DELETE_READ)) return;
+            if (!command.tag.equals(TAG_DELETE_READ))
+                return;
             dispatchEvent(new LightEvent(LightEvent.DELETE_SUCCESS));
         }
 
@@ -1388,7 +1399,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
             if (command.tag.equals(TAG_OTA_WRITE)) {
                 int delay = Manufacture.getDefault().getOtaDelay();
                 if (delay <= 0) {
-                    if (!validateOta()) sendNextOtaPacketCommand();
+                    if (!validateOta())
+                        sendNextOtaPacketCommand();
                 } else {
                     mDelayHandler.postDelayed(otaTask, delay);
                 }
@@ -1456,7 +1468,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
             light.putCharacteristicValue(command.characteristicUUID, (byte[]) obj);
             String s = Arrays.bytesToHexString((byte[]) obj, ",");
-//            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
+            //            LogUtils.v("zcl-------蓝牙数据SUCCESS回调数据-----------" + s);
             // dispatchEvent(new LightEvent(LightEvent.SET_GW_SUCCESS));
         }
 
@@ -1539,7 +1551,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         @Override
         public void run() {
-            if (!validateOta()) sendNextOtaPacketCommand();
+            if (!validateOta())
+                sendNextOtaPacketCommand();
         }
     }
 
@@ -1676,7 +1689,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
             int progress = (int) Math.floor((a / b * 100));
 
-            if (progress == this.progress) return false;
+            if (progress == this.progress)
+                return false;
 
             this.progress = progress;
 

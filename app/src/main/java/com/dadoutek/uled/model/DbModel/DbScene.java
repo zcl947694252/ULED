@@ -204,13 +204,6 @@ public class DbScene implements Parcelable{
         myDao.update(this);
     }
 
-    /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 1398896232)
-    public void __setDaoSession(DaoSession daoSession) {
-        this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
-    }
-
     public int getIndex() {
         return this.index;
     }
@@ -247,5 +240,12 @@ public class DbScene implements Parcelable{
 
     public void setTimes(String times) {
         this.times = times;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1398896232)
+    public void __setDaoSession(DaoSession daoSession) {
+        this.daoSession = daoSession;
+        myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
     }
 }

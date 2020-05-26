@@ -54,8 +54,8 @@ object GuideUtils {
     var END_ADD_SCENE_KEY = "END_ADD_SCENE_KEY"
     var END_ADD_SCENE_SET_KEY = "END_ADD_SCENE_SET_KEY"
 
-    fun addGuidePage(guideTargetView: View,
-                     res: Int, describeRes: String, onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage {
+    fun addGuidePage(guideTargetView: View, res: Int, describeRes: String, onClickListener: View.OnClickListener,
+                     jumpViewContent: String,context: Context): GuidePage {
         val guide = GuidePage.newInstance()
                 .setLayoutRes(res)
                 .setEverywhereCancelable(false)
@@ -64,10 +64,10 @@ object GuideUtils {
                     tvGuide.text = describeRes
 
                     val known = view.findViewById<TextView>(R.id.kown)
-                    known.setOnClickListener { v -> controller.remove() }
+                    known.setOnClickListener { controller.remove() }
 
                     val tvJump = view.findViewById<TextView>(R.id.jump_out)
-                    tvJump.setOnClickListener { v ->
+                    tvJump.setOnClickListener {
                         showExitGuideDialog(context,controller,jumpViewContent)
                     }
                 }
@@ -112,21 +112,27 @@ object GuideUtils {
         val builder=AlertDialog.Builder(context)
         var alertDialog:AlertDialog?=null
         builder.setMessage(context.getString(R.string.jump_out_guide_tip))
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which ->
+        builder.setNegativeButton(R.string.btn_cancel) { _, _ ->
             alertDialog?.dismiss()
         }
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+        builder.setPositiveButton(android.R.string.ok) { _, _ ->
             controller.remove()
-            if(jumpViewContent== END_GROUPLIST_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_GROUPLIST_KEY,true)
-            }else if(jumpViewContent== END_INSTALL_LIGHT_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_INSTALL_LIGHT_KEY,true)
-            }else if(jumpViewContent== END_ADD_SCENE_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_KEY,true)
-            }else if(jumpViewContent== END_MAIN_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_MAIN_KEY,true)
-            }else if(jumpViewContent== END_ADD_SCENE_SET_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_SET_KEY,true)
+            when (jumpViewContent) {
+                END_GROUPLIST_KEY -> {
+                    changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_GROUPLIST_KEY,true)
+                }
+                END_INSTALL_LIGHT_KEY -> {
+                    changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_INSTALL_LIGHT_KEY,true)
+                }
+                END_ADD_SCENE_KEY -> {
+                    changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_KEY,true)
+                }
+                END_MAIN_KEY -> {
+                    changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_MAIN_KEY,true)
+                }
+                END_ADD_SCENE_SET_KEY -> {
+                    changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_SET_KEY,true)
+                }
             }
             alertDialog?.dismiss()
         }
@@ -137,8 +143,6 @@ object GuideUtils {
 
     fun addGuidePage(guideTargetView: View,
                      res: Int, describeRes: String): GuidePage {
-
-
         return GuidePage.newInstance()
                 .addHighLight(guideTargetView)
                 .setLayoutRes(res)

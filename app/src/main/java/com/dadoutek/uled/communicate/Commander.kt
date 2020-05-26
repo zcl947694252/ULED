@@ -48,18 +48,10 @@ object Commander : EventListener<String> {
     private var mResetSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
     private var version: String? = null
+
     //软件恢复出厂设置0xE3，指令后的参数必须是dadou，才有效果。
     //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
     private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
-
-    init {
-        //监听事件
-//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
-//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.ERROR, this)
-    }
 
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
@@ -620,7 +612,6 @@ object Commander : EventListener<String> {
     }
 
     /**
-     *
      * 连接并且自动登录
      */
     @JvmStatic
@@ -648,8 +639,7 @@ object Commander : EventListener<String> {
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
-
-                TelinkLightService.Instance()?.autoConnect(connectParams)
+                    TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {

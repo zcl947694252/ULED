@@ -29,12 +29,14 @@ public class DbSwitch implements Serializable {
     private String controlSceneId;
     private int index;
     private Long belongGroupId;
+
     public int rssi =1000;
     private String keys = "";
     @Nullable
     public String groupIds;
     @Nullable
     public String sceneIds;
+    public  String controlGroupAddrs;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -58,14 +60,16 @@ public class DbSwitch implements Serializable {
      * 是否是配置八鍵群組開關
      * 0 八鍵群組開關
      * 1八鍵場景開關
+     * 2八键单调光
      */
     public int type;
 
-    @Generated(hash = 1964613481)
+
+    @Generated(hash = 994557125)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
-            String sceneIds, int type) {
+            String sceneIds, String controlGroupAddrs, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -79,12 +83,27 @@ public class DbSwitch implements Serializable {
         this.keys = keys;
         this.groupIds = groupIds;
         this.sceneIds = sceneIds;
+        this.controlGroupAddrs = controlGroupAddrs;
         this.type = type;
     }
+
     @Generated(hash = 1179115222)
     public DbSwitch() {
     }
-    
+
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getControlGroupAddrs() {
+        return controlGroupAddrs;
+    }
+
+    public void setControlGroupAddrs(String controlGroupAddrs) {
+        this.controlGroupAddrs = controlGroupAddrs;
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -210,14 +229,21 @@ public class DbSwitch implements Serializable {
                 ", controlSceneId='" + controlSceneId + '\'' +
                 ", index=" + index +
                 ", belongGroupId=" + belongGroupId +
+                ", rssi=" + rssi +
+                ", keys='" + keys + '\'' +
+                ", groupIds='" + groupIds + '\'' +
+                ", sceneIds='" + sceneIds + '\'' +
+                ", controlGroupAddrs='" + controlGroupAddrs + '\'' +
                 ", selected=" + selected +
                 ", version='" + version + '\'' +
                 ", hasGroup=" + hasGroup +
                 ", textColor=" + textColor +
                 ", icon=" + icon +
                 ", connectionStatus=" + connectionStatus +
+                ", type=" + type +
                 '}';
     }
+
     public int getRssi() {
         return this.rssi;
     }

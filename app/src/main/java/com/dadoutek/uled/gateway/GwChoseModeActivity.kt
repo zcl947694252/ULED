@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -30,22 +31,17 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     private var week: Int = 0
     private val checkedList = ArrayList<WeekBean>()
     fun initListener() {
-
+        tv_function1.setOnClickListener {
+            setWeekResult()
+        }
     }
 
     fun initData() {
         week = intent.getIntExtra("data", 0);
         LogUtils.e(week)
-        var tmpWeek = week;
+        var tmpWeek = week
         if (week  == 0b10000000)
             tmpWeek = Constant.SATURDAY or Constant.FRIDAY or Constant.THURSDAY or Constant.WEDNESDAY or Constant.TUESDAY or Constant.MONDAY or Constant.SUNDAY //每一天
-
-//仅一次的，暂不做转换
-//        else if (week == 0) //仅一次
-//        {
-//            var dayOfWeek = Calendar.getInstance().get(java.util.Calendar.DAY_OF_WEEK) - 1
-//            tmpWeek = 1 shl dayOfWeek
-//        }
 
         list = mutableListOf(
                 WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
@@ -58,7 +54,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
 
         for (i in 0 until list!!.size) {
             var weekBean = list!![i]
-            if (weekBean.checked) {
+            if (weekBean.selected) {
                 checkedList.add(weekBean)
             }
         }
@@ -68,12 +64,12 @@ class GwChoseModeActivity : TelinkBaseActivity() {
         template_recycleView.adapter = adapter
         adapter?.bindToRecyclerView(template_recycleView)
         adapter?.setOnItemClickListener { _, _, position ->
+            LogUtils.v("zcl-----------$position-------${checkedList.contains(list?.get(position))}")
             if (checkedList.contains(list?.get(position)!!)) {
-
-                list?.get(position)!!.checked = false
+                list?.get(position)!!.selected = false
                 checkedList.remove(list?.get(position)!!)
             } else {
-                list?.get(position)!!.checked = true
+                list?.get(position)!!.selected = true
                 checkedList.add(list?.get(position)!!)
             }
             adapter?.notifyDataSetChanged()
@@ -83,29 +79,36 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
         toolbarTv.text = getString(R.string.repetition)
-        toolbar.setNavigationOnClickListener {
-            var intent = Intent()
-            var sb = StringBuilder()
-            when {
-                checkedList.size == 0 -> sb.append(getString(R.string.only_one))
 
-                checkedList.size == 7 -> sb.append(getString(R.string.every_day))
-                else -> {
-                    checkedList.sortBy { it.pos }
-                    for (i in 0 until checkedList.size) {//until 不包含 尾部 ..包含
-                        if (i == checkedList.size - 1)
-                            sb.append(checkedList[i].week)
-                        else
-                            sb.append(checkedList[i].week).append(",")
-                        if (checkedList.size == 6)
-                            sb.append("6")
-                    }
-                }
-            }
-            intent.putExtra("data", sb.toString())
-            setResult(Activity.RESULT_OK, intent)
+        tv_function1.text = getString(R.string.btn_sure)
+        tv_function1.visibility = View.VISIBLE
+
+        toolbar.setNavigationOnClickListener {
             finish()
         }
+    }
+
+    private fun setWeekResult() {
+        var intent = Intent()
+        var sb = StringBuilder()
+        when (checkedList.size) {
+            0 -> sb.append(getString(R.string.only_one))
+            7 -> sb.append(getString(R.string.every_day))
+            else -> {
+                checkedList.sortBy { it.pos }
+                for (i in 0 until checkedList.size) {//until 不包含 尾部 ..包含
+                    if (i == checkedList.size - 1)
+                        sb.append(checkedList[i].week)
+                    else
+                        sb.append(checkedList[i].week).append(",")
+                    if (checkedList.size == 6)
+                        sb.append("6")
+                }
+            }
+        }
+        intent.putExtra("data", sb.toString())
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

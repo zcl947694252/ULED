@@ -447,7 +447,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         } else {
             switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
-            switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -459,7 +460,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+mDeviceInfo.meshAddress
             dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
-            dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress
+           // dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch!!.index = switch.id.toInt()
             dbSwitch.id = switch.id
@@ -469,7 +471,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
-            dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress
+            //dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch.index = dbSwitch.id.toInt()
 

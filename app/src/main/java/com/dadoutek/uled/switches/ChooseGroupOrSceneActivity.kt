@@ -39,14 +39,17 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     private fun initData() {
         template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
-        if (type == 0) {
-            template_recycleView?.adapter = groupAdapter
-            groupAdapter.bindToRecyclerView(template_recycleView)
-            toolbarTv.text = getString(R.string.select_group)
-        } else {
-            template_recycleView?.adapter = sceneAdapter
-            sceneAdapter.bindToRecyclerView(template_recycleView)
-            toolbarTv.text = getString(R.string.select_scene)
+        when (type) {
+            0, 2 -> {
+                template_recycleView?.adapter = groupAdapter
+                groupAdapter.bindToRecyclerView(template_recycleView)
+                toolbarTv.text = getString(R.string.select_group)
+            }
+            else -> {
+                template_recycleView?.adapter = sceneAdapter
+                sceneAdapter.bindToRecyclerView(template_recycleView)
+                toolbarTv.text = getString(R.string.choose_scene)
+            }
         }
     }
 
@@ -62,7 +65,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
-        if (type == 0)
+        if (type == 0 || type == 2)
             setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, allGroups[position]))
         else
             setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[position]))

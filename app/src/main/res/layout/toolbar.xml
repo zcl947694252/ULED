@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar_ly"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -15,6 +16,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/ToolBarTheme"
             app:titleTextAppearance="@style/Toolbar.TitleText">
+        <EditText
+                android:id="@+id/toolbarTv_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:visibility="gone" />
 
         <TextView
                 android:id="@+id/toolbarTv"

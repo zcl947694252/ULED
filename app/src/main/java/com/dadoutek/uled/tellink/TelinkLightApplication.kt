@@ -16,6 +16,8 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uledtest.ble.RxBleManager
 import com.google.gson.Gson
 import com.mob.MobSDK
+import com.squareup.leakcanary.LeakCanary
+import com.squareup.leakcanary.RefWatcher
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
 import com.tencent.bugly.Bugly
@@ -36,11 +38,12 @@ class TelinkLightApplication : TelinkApplication() {
         }
     }
 
+    open var refWatcher: RefWatcher? = null
     var currentGwTagBean: GwTagBean? = null
-    var isConnectGwBle: Boolean =false
+    var isConnectGwBle: Boolean = false
     private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
-    var listTask: ArrayList<GwTasksBean> =ArrayList()
+    var listTask: ArrayList<GwTasksBean> = ArrayList()
     val useIndex = mutableListOf<Int>()
     val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
@@ -70,6 +73,13 @@ class TelinkLightApplication : TelinkApplication() {
         super.onCreate()
         app = this
         super.doInit()
+        // LeakCanary内存泄漏第二步
+        // This process is dedicated to LeakCanary for heap analysis.//1
+        // You should not init your app in this process.
+    /*    val inAnalyzerProcess = LeakCanary.isInAnalyzerProcess(this)
+        if (!inAnalyzerProcess)
+            refWatcher = LeakCanary.install(this)*/
+
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
@@ -130,7 +140,10 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     LogUtils.e("zcl单点登录 It's time to cancel $it")
-                    if (it != DBUtils.lastUser?.login_state_key) {//确保登录时成功的
+
+                    val boolean = SharedPreferencesHelper.getBoolean(getApp(), Constant.IS_LOGIN, false)
+                    //LogUtils.e("zcl单点登录 It's time to cancel----$boolean------ $it------------${DBUtils.lastUser?.login_state_key}")
+                    if (it != DBUtils.lastUser?.login_state_key && boolean) {//确保登录时成功的
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT
                         intent.putExtra(Constant.LOGIN_OUT, it)

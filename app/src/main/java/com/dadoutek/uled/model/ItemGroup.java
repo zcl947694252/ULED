@@ -17,6 +17,12 @@ public class ItemGroup implements Serializable {
     public int deviceType;
     public boolean isNo=true;
 
+    public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
+    public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
+    public int gradientId = 0  ; //渐变id
+    public int gradientSpeed = 0 ;//渐变速度
+    public String gradientName  ;//渐变速度
+
     @Override
     public String toString() {
         return "ItemGroup{" +
@@ -25,10 +31,15 @@ public class ItemGroup implements Serializable {
                 ", temperature=" + temperature +
                 ", color=" + color +
                 ", gpName='" + gpName + '\'' +
-                ", isCheckedInGroup=" + enableCheck +
+                ", enableCheck=" + enableCheck +
                 ", checked=" + checked +
                 ", deviceType=" + deviceType +
                 ", isNo=" + isNo +
+                ", rgbType=" + rgbType +
+                ", gradientType=" + gradientType +
+                ", gradientId=" + gradientId +
+                ", gradientSpeed=" + gradientSpeed +
+                ", gradientName='" + gradientName + '\'' +
                 '}';
     }
 }

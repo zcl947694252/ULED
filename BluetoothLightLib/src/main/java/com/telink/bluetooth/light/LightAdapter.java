@@ -884,15 +884,13 @@ public class LightAdapter {
         }
 
         if (!ignoreStatus) {
-            if (this.status.get() == newStatus) {
+            if (this.status.get() == newStatus)
                 return;
-            }
         }
         int oldStatus = this.status.getAndSet(newStatus);
 
         if (mCallback != null)
-            mCallback.onStatusChanged(this.mLightCtrl,
-                    this.getMode(), oldStatus, newStatus);
+            mCallback.onStatusChanged(this.mLightCtrl, this.getMode(), oldStatus, newStatus);
     }
 
     private void setStatus(int newStatus, boolean ignoreIdleMode) {

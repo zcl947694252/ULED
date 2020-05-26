@@ -69,7 +69,7 @@
             android:layout_marginEnd="@dimen/dp_10"
             android:layout_toStartOf="@id/item_gw_timer_arr"
             android:gravity="center"
-            android:text="@string/select_scene"
+            android:text="@string/choose_scene"
             android:textColor="@color/black_six"
             android:textSize="15sp" />
 </RelativeLayout>

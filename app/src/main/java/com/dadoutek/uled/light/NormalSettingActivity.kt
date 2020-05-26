@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -14,7 +15,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
-import android.view.View.OnClickListener
+import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -44,22 +45,28 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import jp.co.cyberagent.android.gpuimage.filter.GPUImageBrightnessFilter
+import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilterGroup
+import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var type: String? = null
+    private var openNum: Int = 0
+    private var isAllGroup: Boolean = false
     private var downloadDispoable: Disposable? = null
     private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
@@ -77,35 +84,20 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var isRenameState = false
     private var group: DbGroup? = null
     private var currentShowPageGroup = true
-    private var isBrightness = true
-
-    internal var downTime: Long = 0//Button被按下时的时间
-    internal var thisTime: Long = 0//while每次循环时的时间
-    internal var onBtnTouch = false//Button是否被按下
-    internal var tvValue = 0//TextView中的值
-
+    private var isBrightness = true//是否是亮度
+    var downTime: Long = 0//Button被按下时的时间
+    var thisTime: Long = 0//while每次循环时的时间
+    var onBtnTouch = false//Button是否被按下
+    var tvValue = 0//TextView中的值
     private var isProcessChange = 0
-
     private var isSwitch: Boolean = false
 
     private val clickListener = OnClickListener { v ->
         when (v.id) {
-            R.id.tvOta -> {
-                if (isRenameState) {
-                    saveName()
-                } else {
-                    checkPermission()
-                }
-            }
-            R.id.btnRename -> {
-                renameGp()
-            }
-            R.id.updateGroup -> {
-                updateGroup()
-            }
-            R.id.btnRemove -> {
-                remove()
-            }
+            R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
+            R.id.btnRename -> renameGp()
+            R.id.updateGroup -> updateGroup()
+            R.id.btnRemove -> remove()
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
@@ -124,11 +116,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGroup()
-
             R.id.light_switch -> lightSwitch()
-
             R.id.brightness_btn -> setBrightness()
-
             R.id.temperature_btn -> setTemperature()
         }
     }
@@ -141,13 +130,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
             brightness_btn.setImageResource(R.drawable.icon_unselected)
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = false
             if (isSwitch) {
-                isBrightness = false
                 var lightCurrent = DBUtils.getGroupByID(group!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.colorTemperature
                     lightCurrent.isSeek = false
                     tv_Brightness.text = lightCurrent.colorTemperature.toString() + "%"
+                    setLightGUIImg(temperatureValue = lightCurrent.colorTemperature)
                     Log.e("TAG_SET_C", lightCurrent.colorTemperature.toString())
                     if (lightCurrent!!.connectionStatus == ConnectionStatus.OFF.value) {
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -162,11 +152,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
             brightness_btn.setImageResource(R.drawable.icon_unselected)
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = false
             if (isSwitch) {
-                isBrightness = false
                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.colorTemperature
+                    setLightGUIImg(temperatureValue = lightCurrent.colorTemperature)
                     lightCurrent.isSeek = false
                     tv_Brightness.text = lightCurrent.colorTemperature.toString() + "%"
                     Log.e("TAG_SET_C", lightCurrent.colorTemperature.toString())
@@ -190,13 +181,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = true
             if (isSwitch) {
-                isBrightness = true
                 var lightCurrent = DBUtils.getGroupByID(group!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.brightness
                     lightCurrent.isSeek = true
                     tv_Brightness.text = "${lightCurrent.brightness}%"
+                    setLightGUIImg(progress = lightCurrent.brightness)
                     Log.e("TAG_SET_B", lightCurrent.brightness.toString())
                     if (lightCurrent!!.connectionStatus == ConnectionStatus.OFF.value) {
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -211,13 +203,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+            isBrightness = true
             if (isSwitch) {
-                isBrightness = true
                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                 if (lightCurrent != null) {
                     light_sbBrightness?.progress = lightCurrent.brightness
                     lightCurrent.isSeek = true
                     tv_Brightness.text = "${lightCurrent.brightness}%"
+                    setLightGUIImg(progress = lightCurrent.brightness)
                     Log.e("TAG_SET_B", lightCurrent.brightness.toString())
                     if (lightCurrent!!.connectionStatus == ConnectionStatus.OFF.value) {
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -259,28 +252,32 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     @SuppressLint("ClickableViewAccessibility")
     private fun lightSwitch() {
         if (currentShowPageGroup) {
-            var light_current = DBUtils.getGroupByID(group!!.id)
+            var currentGroup = DBUtils.getGroupByID(group!!.id)
             if (group!!.id.toInt() == 1) {
                 SharedPreferencesUtils.setAllLightModel(true)
             } else {
                 SharedPreferencesUtils.setAllLightModel(false)
             }
-            if (light_current != null) {
-                if (light_current.connectionStatus == ConnectionStatus.OFF.value) {
-                    Commander.openOrCloseLights(light_current.meshAddr, true)
+            if (currentGroup != null) {
+                if (currentGroup.connectionStatus == ConnectionStatus.OFF.value) {
+                    Commander.openOrCloseLights(currentGroup.meshAddr, true)
                     isSwitch = true
                     light_switch.setImageResource(R.drawable.icon_light_open)
-                    light_image.setImageResource(R.drawable.icon_light)
-                    light_current.connectionStatus = ConnectionStatus.ON.value
-                    light_sbBrightness!!.setOnTouchListener { v, event -> false }
+                    // light_image.setImageResource(R.drawable.icon_light)
+                    if (isBrightness)
+                        setLightGUIImg(progress = currentGroup.brightness)
+                    else
+                        setLightGUIImg(temperatureValue = currentGroup.colorTemperature)
+                    currentGroup.connectionStatus = ConnectionStatus.ON.value
+                    light_sbBrightness!!.setOnTouchListener { _, _ -> false }
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
                         when {
-                            light_current!!.brightness <= 0 -> {
+                            currentGroup!!.brightness <= 0 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
-                            light_current.brightness >= 100 -> {
+                            currentGroup.brightness >= 100 -> {
                                 device_light_add.setImageResource(R.drawable.icon_puls_no)
                                 device_light_minus.setImageResource(R.drawable.icon_minus)
                             }
@@ -291,11 +288,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     } else {
                         when {
-                            light_current!!.colorTemperature <= 0 -> {
+                            currentGroup!!.colorTemperature <= 0 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
-                            light_current.colorTemperature >= 100 -> {
+                            currentGroup.colorTemperature >= 100 -> {
                                 device_light_add.setImageResource(R.drawable.icon_puls_no)
                                 device_light_minus.setImageResource(R.drawable.icon_minus)
                             }
@@ -305,8 +302,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                         }
                     }
-                    DBUtils.updateGroup(light_current)
-                    updateLights(true, light_current)
+                    DBUtils.updateGroup(currentGroup)
+                    updateLights(true, currentGroup)
 
                     device_light_add.setOnTouchListener { v, event ->
                         if (event.action == MotionEvent.ACTION_DOWN) {
@@ -374,10 +371,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         true
                     }
                 } else {
-                    Commander.openOrCloseLights(light_current.meshAddr, false)
-                    light_current.connectionStatus = ConnectionStatus.OFF.value
+                    Commander.openOrCloseLights(currentGroup.meshAddr, false)
+                    currentGroup.connectionStatus = ConnectionStatus.OFF.value
                     light_switch.setImageResource(R.drawable.icon_light_close)
-                    light_image.setImageResource(R.drawable.light_close)
+                    //light_image.setImageResource()
+                    setLightGUIImg(isClose = true)
                     light_sbBrightness!!.setOnTouchListener { v, event -> true }
                     light_sbBrightness.isEnabled = false
                     device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -385,8 +383,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     device_light_add.setOnTouchListener { v, event -> false }
                     device_light_minus.setOnTouchListener { v, event -> false }
                     isSwitch = false
-                    DBUtils.updateGroup(light_current)
-                    updateLights(false, light_current)
+                    DBUtils.updateGroup(currentGroup)
+                    updateLights(false, currentGroup)
                 }
             }
         } else {
@@ -396,9 +394,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     isSwitch = true
                     Commander.openOrCloseLights(light_current.meshAddr, true)
                     light_switch.setImageResource(R.drawable.icon_light_open)
-                    light_image.setImageResource(R.drawable.icon_light)
+                    //light_image.setImageResource(R.drawable.icon_light)
+                    if (isBrightness)
+                        setLightGUIImg(progress = light_current.brightness)
+                    else
+                        setLightGUIImg(temperatureValue = light_current.colorTemperature)
                     light_current.connectionStatus = ConnectionStatus.ON.value
-                    light_sbBrightness!!.setOnTouchListener { v, event -> false }
+                    light_sbBrightness!!.setOnTouchListener { v, _ -> false }
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
                         when {
@@ -498,7 +500,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     Commander.openOrCloseLights(light_current.meshAddr, false)
                     light_current.connectionStatus = ConnectionStatus.OFF.value
                     light_switch.setImageResource(R.drawable.icon_light_close)
-                    light_image.setImageResource(R.drawable.light_close)
+                    //light_image.setImageResource()
+                    setLightGUIImg(isClose = true)
                     light_sbBrightness!!.setOnTouchListener { v, event -> true }
                     light_sbBrightness.isEnabled = false
                     device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -729,8 +732,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)
@@ -777,7 +778,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
-
 
     /**
      * 删除组，并且把组里的灯的组也都删除。
@@ -963,15 +963,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light.meshAddr,true)
+                        connect(light.meshAddr, true)
                     }?.subscribe({
-                                hideLoadingDialog()
-                                startOtaAct() }
+                        hideLoadingDialog()
+                        startOtaAct()
+                    }
                             , {
-                                hideLoadingDialog()
-                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
-                                LogUtils.d(it)
-                            })
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                        LogUtils.d(it)
+                    })
         }
 
 
@@ -986,22 +987,22 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 localVersion = s
                                 if (textTitle != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        textTitle!!.visibility = View.VISIBLE
+                                        textTitle!!.visibility = VISIBLE
                                         textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
                                     } else {
-                                        textTitle!!.visibility = View.VISIBLE
+                                        textTitle!!.visibility = VISIBLE
                                         textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
-                                        tvOta!!.visibility = View.GONE
+                                        tvOta!!.visibility = GONE
                                     }
                                 }
 
                             },
                             {
                                 if (textTitle != null) {
-                                    textTitle!!.visibility = View.GONE
-                                    tvOta!!.visibility = View.GONE
+                                    textTitle!!.visibility = GONE
+                                    tvOta!!.visibility = GONE
                                 }
                                 LogUtils.d(it)
                             })
@@ -1017,18 +1018,41 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.mApplication = this.application as TelinkLightApplication
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (type == Constant.TYPE_GROUP) {
+            val dbGroup = DBUtils.getGroupByID(group!!.id)
+
+            if (group?.status == 1) {
+                setLightGUIImg(progress = dbGroup?.brightness ?: 0, temperatureValue = dbGroup?.colorTemperature ?: 0)
+                light_switch.setImageResource(R.drawable.icon_light_open)
+            } else
+                light_switch.setImageResource(R.drawable.icon_light_close)
+        } else {
+            val light = DBUtils.getLightByID(light!!.id)
+            if (light?.status == 1) {
+                setLightGUIImg(progress = light.brightness, temperatureValue = light.colorTemperature)
+                light_switch.setImageResource(R.drawable.icon_light_open)
+            } else
+                light_switch.setImageResource(R.drawable.icon_light_close)
+        }
+    }
+
 
     private fun initType() {
-        val type = intent.getStringExtra(Constant.TYPE_VIEW)
+        LogUtils.v("zcl------打开次数-----$openNum-------")
+        type = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        slow_rg_view.setOnClickListener {  }
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
             initDataGroup()
             initViewGroup()
         } else {
+            slow_ly.visibility = GONE
             currentShowPageGroup = false
             initToolbarLight()
             initViewLight()
@@ -1044,11 +1068,45 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
         }
 
-        btn_remove_group?.setOnClickListener(clickListener)
-        btn_rename?.setOnClickListener(clickListener)
-
         checkGroupIsSystemGroup()
 
+        slow_switch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) { //开 关 上电 场景 1是打开 0 是关闭
+                val currentGroup = DBUtils.getGroupByID(group!!.id)
+                currentGroup?.slowUpSlowDownStatus = 1
+                slow_rg_view.visibility = GONE
+                DBUtils.updateGroup(currentGroup!!)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
+                        byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1))//1是开 2是关
+            } else {
+                val currentGroup = DBUtils.getGroupByID(group!!.id)
+                currentGroup?.slowUpSlowDownStatus = 0
+                slow_rg_view.visibility = VISIBLE
+                DBUtils.updateGroup(currentGroup!!)
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
+                        byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 2, 2, 2, 2, 0, 0, 0))
+            }
+        }
+        slow_rg_ly.setOnCheckedChangeListener { _, checkedId ->
+            LogUtils.v("zcl-----------${slow_rg_slow.id}---${slow_rg_middle.id}----${slow_rg_fast.id}")
+            val currentGroup = DBUtils.getGroupByID(group!!.id)
+            if (currentGroup?.slowUpSlowDownStatus == 1) {
+                when (checkedId) {
+                    R.id.slow_rg_slow -> currentGroup?.slowUpSlowDownSpeed = 5
+                    R.id.slow_rg_middle -> currentGroup?.slowUpSlowDownSpeed = 3
+                    R.id.slow_rg_fast -> currentGroup?.slowUpSlowDownSpeed = 1
+                }
+                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
+                DBUtils.updateGroup(currentGroup!!)
+            }
+        }
+        btn_remove_group?.setOnClickListener(clickListener)
+        btn_rename?.setOnClickListener(clickListener)
         brightness_btn.setOnClickListener(this.clickListener)
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
@@ -1079,7 +1137,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
         this.light_sbBrightness?.max = 100
         if (group!!.connectionStatus == ConnectionStatus.OFF.value) {
-            light_image.setImageResource(R.drawable.light_close)
+            // light_image.setImageResource()
+            setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_close)
             light_sbBrightness!!.setOnTouchListener { v, event -> true }
             light_sbBrightness.isEnabled = false
@@ -1089,7 +1148,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             device_light_add.setOnTouchListener { v, event -> false }
             device_light_minus.setOnTouchListener { v, event -> false }
         } else {
-            light_image.setImageResource(R.drawable.icon_light)
+            //light_image.setImageResource(R.drawable.icon_light)
+            setLightGUIImg()
+
             light_switch.setImageResource(R.drawable.icon_light_open)
             light_sbBrightness!!.setOnTouchListener { v, event -> false }
             light_sbBrightness.isEnabled = true
@@ -1139,7 +1200,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 true
             }
 
-            device_light_minus.setOnTouchListener { v, event ->
+            device_light_minus.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     downTime = System.currentTimeMillis()
                     onBtnTouch = true
@@ -1157,7 +1218,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                         }
                     }
-
                 } else if (event.action == MotionEvent.ACTION_UP) {
                     onBtnTouch = false
                     if (thisTime - downTime < 500) {
@@ -1173,6 +1233,22 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
         }
         this.light_sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
+    }
+
+    private fun setLightGUIImg(iconLight: Int = R.mipmap.round, progress: Int = 0, temperatureValue: Int = 0, isClose: Boolean = false) {
+        var bitmap = BitmapFactory.decodeResource(resources, iconLight)
+        light_image.setImage(bitmap)
+
+        val filterGroup = GPUImageFilterGroup()
+        if (!isClose) {
+            if (isBrightness)
+                filterGroup.addFilter(GPUImageBrightnessFilter(progress / 500f))
+            else
+                filterGroup.addFilter(GPUImageWhiteBalanceFilter(Float.valueOf(50000f - (temperatureValue - 9) * 500), 0.0f))//2000 - 57000
+        } else {
+            filterGroup.addFilter(GPUImageBrightnessFilter(0f))
+        }
+        light_image.filter = filterGroup
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
@@ -1197,6 +1273,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         val groupString = this.intent.extras!!.get("group")
         groupString ?: return
         this.group = groupString as DbGroup
+        isAllGroup = 1 == (group?.id ?: 0).toInt()
+        if (isAllGroup) {
+            slow_switch.isChecked = (group?.slowUpSlowDownStatus ?: 0) == 1
+
+            when (group?.slowUpSlowDownSpeed) {
+                1 -> slow_rg_slow.isChecked = true
+                3 -> slow_rg_middle.isChecked = true
+                5 -> slow_rg_fast.isChecked = true
+            }
+
+            slow_ly.visibility = VISIBLE
+        } else
+            slow_ly.visibility = GONE
     }
 
     private fun initToolbarLight() {
@@ -1234,8 +1323,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
                                         this.hideLoadingDialog()
-                                        this?.setResult(Constant.RESULT_OK)
-                                        this?.finish()
+                                        this.setResult(Constant.RESULT_OK)
+                                        this.finish()
                                     },
                                     failedCallback = {
                                         this.hideLoadingDialog()
@@ -1289,6 +1378,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
 
+        if (light?.status == 1)
+            light_switch.setImageResource(R.drawable.icon_light_open)
+        else
+            light_switch.setImageResource(R.drawable.icon_light_close)
+
         if (light!!.isSeek) {
             adjustment.text = getString(R.string.brightness_adjustment)
             brightness_btn.setImageResource(R.drawable.icon_btn)
@@ -1296,7 +1390,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
 
-            val brightnes = if (light!!.brightness<1) 1 else light!!.brightness
+            val brightnes = if (light!!.brightness < 1) 1 else light!!.brightness
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
 
@@ -1308,7 +1402,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             brightness_btn.setImageResource(R.drawable.icon_unselected)
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
 
-            val brightnes = if (light!!.colorTemperature<1) 1 else light!!.colorTemperature
+            val brightnes = if (light!!.colorTemperature < 1) 1 else light!!.colorTemperature
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
 
@@ -1317,7 +1411,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
         this.light_sbBrightness?.max = 100
         if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
-            light_image.setImageResource(R.drawable.light_close)
+            //light_image.setImageResource()
+            setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_close)
             light_sbBrightness!!.setOnTouchListener { _, _ -> true }
             device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -1328,7 +1423,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             isSwitch = false
         } else {
             isSwitch = true
-            light_image.setImageResource(R.drawable.icon_light)
+            //light_image.setImageResource(R.drawable.icon_light)
+            setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_open)
             light_sbBrightness!!.setOnTouchListener { _, _ -> false }
             light_sbBrightness.isEnabled = true
@@ -1396,6 +1492,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     } else if (event.action == MotionEvent.ACTION_CANCEL) {
                         onBtnTouch = false
                     }
+
+
                 true
             }
         }
@@ -1440,7 +1538,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             EditorInfo.IME_ACTION_NONE -> {
                 saveName()
                 if (currentShowPageGroup) {
-                    tvRename.visibility = View.GONE
+                    tvRename.visibility = GONE
                 }
             }
         }
@@ -1465,8 +1563,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
 
-            editTitle.visibility = View.GONE
-            titleCenterName.visibility = View.VISIBLE
+            editTitle.visibility = GONE
+            titleCenterName.visibility = VISIBLE
             titleCenterName.text = group?.name
         } else {
             var canSave = true
@@ -1480,8 +1578,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
 
             if (canSave) {
-                editTitle.visibility = View.GONE
-                titleCenterName.visibility = View.VISIBLE
+                editTitle.visibility = GONE
+                titleCenterName.visibility = VISIBLE
                 titleCenterName.text = name
                 group?.name = name
                 DBUtils.updateGroup(group!!)
@@ -1493,12 +1591,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-            editTitle.visibility = View.GONE
-            titleCenterName.visibility = View.VISIBLE
+            editTitle.visibility = GONE
+            titleCenterName.visibility = VISIBLE
             titleCenterName.text = light?.name
         } else {
-            editTitle.visibility = View.GONE
-            titleCenterName.visibility = View.VISIBLE
+            editTitle.visibility = GONE
+            titleCenterName.visibility = VISIBLE
             titleCenterName.text = name
             light?.name = name
             DBUtils.updateLight(light!!)
@@ -1555,8 +1653,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             if (group?.brightness != progress) {
                                 if (progress > Constant.MAX_VALUE) {
                                     params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                    setLightGUIImg(progress = Constant.MAX_VALUE)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
+                                    setLightGUIImg(progress = progress)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 }
                             }
@@ -1564,8 +1664,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             if (light?.brightness != progress) {
                                 if (progress > Constant.MAX_VALUE) {
                                     params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                    setLightGUIImg(progress = Constant.MAX_VALUE)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
+                                    setLightGUIImg(progress = progress)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 }
                             }
@@ -1616,11 +1718,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         if (currentShowPageGroup) {
                             if (group?.colorTemperature != progress) {
                                 Log.e("TAG", progress.toString())
+                                setLightGUIImg(temperatureValue = progress)
                                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                             }
                         } else {
                             if (light?.colorTemperature != progress) {
                                 Log.e("TAG", progress.toString())
+                                setLightGUIImg(temperatureValue = progress)
                                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                             }
                         }
@@ -1647,7 +1751,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             } else {
                                 var lightCurrent = DBUtils.getLightByID(light!!.id)
                                 if (lightCurrent != null) {
-                                    lightCurrent.colorTemperature =  light!!.colorTemperature
+                                    lightCurrent.colorTemperature = light!!.colorTemperature
                                     tv_Brightness.text = lightCurrent.colorTemperature.toString() + "%"
                                     DBUtils.updateLight(lightCurrent)
                                     isProcessChange = 0

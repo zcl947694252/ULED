@@ -75,10 +75,19 @@
                 android:enabled="true" />
 
         <activity
+                android:name=".fragment.SafeLockActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".scene.SelectGradientActivity"
+                android:screenOrientation="portrait" />
+                <activity
                 android:name=".othersview.ExtendActivity"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".gateway.GwLoginActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".switches.DoubleTouchSwitchActivity"
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".gateway.GwTimerPeriodListActivity"
@@ -206,7 +215,6 @@
         <activity
                 android:name=".switches.ConfigEightSwitchActivity"
                 android:screenOrientation="portrait">
-
         </activity>
 
         <activity
@@ -215,6 +223,10 @@
                 android:launchMode="singleTop"
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan" />
+
+        <activity
+                android:name=".pir.PirConfigActivity"
+                android:screenOrientation="portrait" />
 
         <activity
                 android:name=".light.NormalSettingActivity"
@@ -375,7 +387,7 @@
                 android:screenOrientation="portrait" />
         <activity
                 android:name=".switches.SelectSceneListActivity"
-                android:screenOrientation="portrait" />
+                android:screenOrientation="fullSensor" />
 
 
         <meta-data

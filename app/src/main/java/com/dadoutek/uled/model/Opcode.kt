@@ -2,6 +2,18 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 配置单调光双组开关
+     */
+    const val CONFIG_DOUBLE_SWITCH: Byte = 0xf1.toByte()
+    /**
+     * 扩展指令小夜灯触发场景指令
+     */
+    const val CONFIG_EXTEND_PIR_SCENE: Byte = 0x06.toByte()
+    /**
+     * 扩展指令安全锁 1打开2关闭
+     */
+    const val CONFIG_EXTEND_SAFE_LOCK: Byte = 0x05.toByte()
+    /**
      * 扩展指令用户数据清除功能
      */
     const val CONFIG_EXTEND_ALL_CLEAR: Byte = 0x04.toByte()
@@ -26,7 +38,7 @@ object Opcode {
      */
     const val CONFIG_GW_SWITCH: Byte = 0xd0.toByte()
     /**
-     * 网关默认恢复出厂
+     * 网关默认恢复出厂 0XF0
      */
     const val CONFIG_GW_REST_FACTORY: Byte = 0xf0.toByte()
     /**
@@ -87,6 +99,7 @@ object Opcode {
      */
     const val SCENE_SWITCH8K: Byte = 0x05.toByte()//场景8开关
     const val GROUP_SWITCH8K: Byte = 0x7C.toByte()//單组开关
+    const val DEFAULT_SWITCH8K: Byte = 0xFF.toByte()//默认无效
     const val CLOSE: Byte = 0x03.toByte()//关  用于场景关闭按键
     const val SWITCH_ALL_GROUP: Byte = 0x7d.toByte()//全组开关
 

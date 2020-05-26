@@ -28,20 +28,20 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.light.PhysicalRecoveryActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.NetWorkUtils
-import com.dadoutek.uled.util.PopUtil
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -69,12 +69,14 @@ class SettingActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
-    private var disposableInterval: Disposable? = null
     private var disposable: Disposable? = null
+    private var disposableTimer: Disposable? = null
+    private var disposableFind: Disposable? = null
+    private var disposableInterval: Disposable? = null
     private var mApplication: TelinkLightApplication? = null
+    private lateinit var pop: PopupWindow
     private lateinit var cancel: Button
     private lateinit var confirm: Button
-    private lateinit var pop: PopupWindow
     private var compositeDisposable = CompositeDisposable()
     lateinit var tvOne: TextView
     lateinit var tvTwo: TextView
@@ -85,39 +87,95 @@ class SettingActivity : BaseActivity() {
     lateinit var readTimer: TextView
     lateinit var cancelConfirmLy: LinearLayout
     lateinit var cancelConfirmVertical: View
-    var isResetFactory = false
-
+    var isResetFactory = 0
     override fun initListener() {}
 
     override fun initData() {
         val list = arrayListOf<SettingItemBean>()
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
-        list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.one_click_reset)))
-       // listTask.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.physical_recovery)))
+        list.add(SettingItemBean(R.drawable.icon_retrieve, getString(R.string.recovery_active_equipment)))
+        list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.physical_recovery)))
 
         recycleView_setting.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         val settingAdapter = SettingAdapter(R.layout.item_setting, list)
         recycleView_setting.adapter = settingAdapter
-
         settingAdapter.bindToRecyclerView(recycleView_setting)
 
         settingAdapter.setOnItemClickListener { _, _, position ->
-
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
                     ToastUtils.showLong(getString(R.string.author_region_warm))
-                else {
+                else
                     when (position) {
                         0 -> emptyTheCache()
-                        1 -> checkNetworkAndSyncs(this)
-                        2 -> showSureResetDialogByApp()
-                        3 -> showSureResetDialogByApp()
+                        1 -> showSureResetDialogByApp()
+                        2 -> startToRecoverDevices()
+                        3 -> physicalRecovery()
+                        //3 -> userReset()
+                        //1 -> checkNetworkAndSyncs(this)
                     }
-                }
             }
         }
+    }
+
+    private fun physicalRecovery() {
+        isResetFactory = 3;
+        setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,
+                R.string.user_reset_all3, isResetFactory)
+    }
+
+    private fun startToRecoverDevices() {
+        LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
+        disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
+            hideLoadingDialog()
+            disposableFind?.dispose()
+            ToastUtils.showShort(getString(R.string.find_device_num)+0)
+        }
+        showLoadingDialog(getString(R.string.please_wait))
+        disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    disposableTimer?.dispose()
+                    ToastUtils.showShort(getString(R.string.find_device_num)+it)
+                    hideLoadingDialog()
+                }, {
+                    disposableTimer?.dispose()
+                    hideLoadingDialog()
+                    LogUtils.d(it)
+                })
+        disposableTimer?.let {
+            compositeDisposable.add(it)
+        }
+        disposableFind?.let {
+            compositeDisposable.add(it)
+        }
+    }
+
+    private fun userReset() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.user_reset))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
+        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
+            clearData()//删除本地数据
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
+                //删除服务器数据
+                override fun onNext(t: String) {
+                    ToastUtils.showShort(getString(R.string.reset_user_success))
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    ToastUtils.showShort(e.message)
+                }
+            })
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
+            ToastUtils.showShort(getString(R.string.cancel))
+        }
+        builder.show()
     }
 
     override fun initView() {
@@ -130,16 +188,16 @@ class SettingActivity : BaseActivity() {
 
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun showSureResetDialogByApp() {
-        isResetFactory = true
+        isResetFactory = 2
         setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
                 , R.string.have_question_look_notice, isResetFactory)
     }
 
     @SuppressLint("CheckResult", "StringFormatMatches")
-    private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Boolean) {
+    private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Int) {
         setNormalPopSetting()
 
-        if (isShowThree) {
+        if (isShowThree==2||isShowThree==3) {
             tvThree.visibility = View.VISIBLE
             hinitThree.visibility = View.VISIBLE
         } else {
@@ -149,13 +207,13 @@ class SettingActivity : BaseActivity() {
 
         hinitOne.text = getString(pleaseSureAllDevicePowerOn)
         hinitTwo.text = getString(resetFactoryAllDevice)
-        hinitThree.text = getString(haveQuestionLookNotice)
+        //hinitThree.text = getString(haveQuestionLookNotice)
         disposableInterval?.dispose()
         disposableInterval = Observable.intervalRange(0, downTime, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = downTime -1 - it
+                    var num = downTime - 1 - it
                     if (num == 0L) {
                         setTimerZero()
                     } else {
@@ -171,7 +229,7 @@ class SettingActivity : BaseActivity() {
     }
 
     private fun setNormalPopSetting() {
-        confirm?.isClickable = false
+        confirm.isClickable = false
 
         tvOne.visibility = View.VISIBLE
         tvThree.visibility = View.VISIBLE
@@ -200,22 +258,33 @@ class SettingActivity : BaseActivity() {
         tvOne.visibility = View.INVISIBLE
         tvTwo.visibility = View.INVISIBLE
 
-
-
-        if (isResetFactory) {
-            hinitTwo.visibility = View.VISIBLE
-            hinitOne.text = getString(R.string.tip_reset_sure)
-            hinitTwo.setTextColor(resources.getColor(R.color.red))
-        } else {
-            hinitTwo.visibility = View.GONE
-            hinitOne.text = getString(R.string.empty_cache_tip)
+        when (isResetFactory) {
+            1 -> {
+                hinitTwo.visibility = View.VISIBLE
+                hinitOne.text = getString(R.string.tip_reset_sure)
+                hinitTwo.setTextColor(resources.getColor(R.color.red))
+                hinitTwo.textSize = 13F
+                hinitTwo.text = getString(R.string.reset_warm_red)
+                tvThree.visibility = View.GONE
+                hinitThree.visibility = View.GONE
+            }
+            2 -> {
+                hinitTwo.visibility = View.GONE
+                hinitOne.text = getString(R.string.empty_cache_tip)
+                hinitTwo.textSize = 13F
+                hinitTwo.text = getString(R.string.reset_warm_red)
+                tvThree.visibility = View.GONE
+                hinitThree.visibility = View.GONE
+            }
+            else -> {
+                tvOne.visibility = View.VISIBLE
+                tvTwo.visibility = View.VISIBLE
+                tvThree.visibility = View.VISIBLE
+                readTimer.visibility = View.GONE
+                cancelConfirmLy.visibility = View.VISIBLE
+                cancelConfirmVertical.backgroundColor = resources.getColor(R.color.gray)
+            }
         }
-
-        hinitTwo.textSize = 13F
-        hinitTwo.text = getString(R.string.reset_warm_red)
-
-        tvThree.visibility = View.GONE
-        hinitThree.visibility = View.GONE
 
         cancel.text = getString(R.string.cancel)
         confirm.text = getString(R.string.btn_sure)
@@ -227,7 +296,7 @@ class SettingActivity : BaseActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    fun checkNetworkAndSyncs(activity: Activity?) {
+    private fun checkNetworkAndSyncs(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -239,34 +308,30 @@ class SettingActivity : BaseActivity() {
                     }.create().show()
         } else {
             if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
-                SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
-        }
-    }
+                SyncDataPutOrGetUtils.syncPutDataStart(activity, object : SyncCallback {
+                    override fun start() {
+                        showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
+                    }
 
-    /**
-     * 上传回调
-     */
-    internal var syncCallback: SyncCallback = object : SyncCallback {
-        override fun start() {
-            showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
-        }
+                    override fun complete() {
+                        ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
+                        hideLoadingDialog()
+                    }
 
-        override fun complete() {
-            ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
-            hideLoadingDialog()
-        }
-
-        override fun error(msg: String) {
-            ToastUtils.showLong(msg)
-            hideLoadingDialog()
+                    override fun error(msg: String) {
+                        ToastUtils.showLong(msg)
+                        hideLoadingDialog()
+                    }
+                })
         }
     }
 
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
     private fun emptyTheCache() {
-        isResetFactory = false
-        setFirstePopAndShow(R.string.clear_one, R.string.clear_two, R.string.clear_one, isResetFactory)
+        isResetFactory = 1
+        setFirstePopAndShow(R.string.clear_one, R.string.clear_two,
+                R.string.clear_one, isResetFactory)
     }
 
     /**
@@ -279,12 +344,6 @@ class SettingActivity : BaseActivity() {
             ToastUtils.showLong(R.string.data_empty)
             return
         }
-/*
-        val disposable = RegionModel.clearRegion()?.subscribe({
-
-        }, {
-
-        })*/
 
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
@@ -355,24 +414,23 @@ class SettingActivity : BaseActivity() {
         hinitThree.text = ss
         hinitThree.movementMethod = LinkMovementMethod.getInstance()
 
-        cancel?.let {
+        cancel.let {
             it.setOnClickListener { PopUtil.dismiss(pop) }
         }
-        confirm?.setOnClickListener {
+        confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (isResetFactory) {
-                if (TelinkLightApplication.getApp().connectDevice != null) {
+            when (isResetFactory){
+                1 -> clearData()
+                3 ->  startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                2 -> if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
-                } else {
+                else
                     ToastUtils.showLong(R.string.device_not_connected)
-                }
-            } else {
-                clearData()
             }
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        confirm?.isClickable = false
+        confirm.isClickable = false
         pop.isOutsideTouchable = false
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
@@ -384,34 +442,31 @@ class SettingActivity : BaseActivity() {
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
-        //val lightList = allLights
+
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
 
         var meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
-            for (k in lightList.indices) {
+            for (k in lightList.indices)
                 meshAdre.add(lightList[k].meshAddr)
-            }
         }
 
         if (curtainList.isNotEmpty()) {
-            for (k in curtainList.indices) {
+            for (k in curtainList.indices)
                 meshAdre.add(curtainList[k].meshAddr)
-            }
         }
 
         if (relyList.isNotEmpty()) {
-            for (k in relyList.indices) {
+            for (k in relyList.indices)
                 meshAdre.add(relyList[k].meshAddr)
-            }
         }
 
         Commander.resetAllDevices(meshAdre, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
             syncData()
-            this@SettingActivity?.bnve?.currentItem = 0
+            this@SettingActivity.bnve?.currentItem = 0
             null
         }, {
             SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)

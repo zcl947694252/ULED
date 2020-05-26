@@ -1,286 +1,299 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_50"
-        android:background="@color/primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
-        app:popupTheme="@style/ToolBarTheme">
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:background="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ToolBarTheme"
+            app:titleTextAppearance="@style/Toolbar.TitleText">
 
         <TextView
-            android:id="@+id/toolbarTv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:visibility="visible" />
+                android:id="@+id/toolbarTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:visibility="visible" />
 
 
         <ImageView
-            android:id="@+id/img_function1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:paddingEnd="14dp"
-            android:padding="5dp"
-            android:src="@drawable/add"
-            android:visibility="gone" />
+                android:id="@+id/img_function1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:padding="5dp"
+                android:paddingEnd="14dp"
+                android:src="@drawable/add"
+                android:visibility="gone" />
 
         <TextView
-            android:id="@+id/tv_function1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
-            android:padding="5dp"
-            android:text="@string/install_device"
-            android:textColor="@color/white"
-            android:visibility="gone"/>
+                android:id="@+id/tv_function1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="5dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp"
+                android:text="@string/install_device"
+                android:textColor="@color/white"
+                android:visibility="gone" />
 
         <ImageView
-            android:id="@+id/image_bluetooth"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingTop="@dimen/dp_10"
-            android:layout_gravity="end"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:paddingBottom="@dimen/dp_10"
-            android:paddingEnd="@dimen/dp_10"
-            android:src="@drawable/bluetooth_no" />
+                android:id="@+id/image_bluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingTop="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_10"
+                android:src="@drawable/bluetooth_no" />
 
         <CheckBox
-            android:id="@+id/batch_four_compatible_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:layout_gravity="end"
-            android:textColor="@color/white"
-            android:layout_marginEnd="@dimen/dp_10"
-            android:button="@null"
-            android:background="@drawable/select_compatiable_bg"
-            android:text="@string/compatible_mode"/>
+                android:id="@+id/batch_four_compatible_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:background="@drawable/select_compatiable_bg"
+                android:button="@null"
+                android:text="@string/compatible_mode"
+                android:textColor="@color/white" />
 
     </android.support.v7.widget.Toolbar>
-<android.support.v4.widget.SwipeRefreshLayout
-    android:id="@+id/swipe_refresh_ly"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
 
-
-    <LinearLayout
-        android:id="@+id/batch_four_device_ly"
-        android:layout_width="match_parent"
-        android:layout_height="78dp"
-        android:gravity="center"
-        android:orientation="vertical">
+    <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_ly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="33dp"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:background="@color/gray_e"
-                android:gravity="center_vertical"
-                android:paddingStart="@dimen/dp_10"
-                android:text="@string/choose_device"
-                android:textColor="@color/gray_6"
-                android:textSize="13sp" />
-            <TextView
-                android:id="@+id/batch_four_device_all"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/gray_e"
-                android:gravity="center_vertical|end"
-                android:paddingLeft="@dimen/dp_10"
-                android:paddingStart="10dp"
-                android:paddingEnd="@dimen/dp_10"
-                android:text="@string/select_all"
-                android:textColor="@color/black_three"
-                android:textSize="15sp" />
-        </LinearLayout>
+                android:orientation="vertical">
 
-        <RadioGroup
-            android:id="@+id/batch_four_group_rg"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:paddingTop="2dp"
-            android:orientation="horizontal">
-                <RadioButton
-                    android:id="@+id/batch_four_no_group"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:button="@null"
+
+            <LinearLayout
+                    android:id="@+id/batch_four_device_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="78dp"
                     android:gravity="center"
-                    android:checked="true"
-                    android:text="@string/no_group_device_num"
-                    android:textColor="@color/selector_batch_group_color"
-                    android:textSize="18sp" />
+                    android:orientation="vertical">
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/gray_e" />
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="33dp"
+                        android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/batch_four_grouped"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:button="@null"
-                android:gravity="center"
-                android:text="@string/grouped_num"
-                android:textColor="@color/selector_batch_group_color"
-                android:textSize="15sp" />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:background="@color/gray_e"
+                            android:gravity="center_vertical"
+                            android:paddingStart="@dimen/dp_10"
+                            android:text="@string/choose_device"
+                            android:textColor="@color/gray_6"
+                            android:textSize="13sp" />
 
-        </RadioGroup>
+                    <TextView
+                            android:id="@+id/batch_four_device_all"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@color/gray_e"
+                            android:gravity="center_vertical|end"
+                            android:paddingStart="10dp"
+                            android:paddingLeft="@dimen/dp_10"
+                            android:paddingEnd="@dimen/dp_10"
+                            android:text="@string/select_all"
+                            android:textColor="@color/black_three"
+                            android:textSize="15sp" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:id="@+id/batch_four_no_group_line_ly"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:gravity="center">
+                <RadioGroup
+                        android:id="@+id/batch_four_group_rg"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:orientation="horizontal"
+                        android:paddingTop="2dp">
 
-            <View
-                android:id="@+id/batch_four_no_group_line"
-                android:layout_width="25dp"
-                android:layout_height="2dp"
-                android:layout_marginBottom="3dp"
-                android:scaleType="fitXY"
-                android:background="@drawable/rectangle"/>
-            </LinearLayout>
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/gray_e" />
-            <LinearLayout
-                android:id="@+id/batch_four_grouped_line_ly"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center">
+                    <RadioButton
+                            android:id="@+id/batch_four_no_group"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="3"
+                            android:button="@null"
+                            android:checked="true"
+                            android:gravity="center"
+                            android:text="@string/no_group_device_num"
+                            android:textColor="@color/selector_batch_group_color"
+                            android:textSize="18sp" />
+
+                    <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/gray_e" />
+
+                    <RadioButton
+                            android:id="@+id/batch_four_grouped"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="2"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/grouped_num"
+                            android:textColor="@color/selector_batch_group_color"
+                            android:textSize="15sp" />
+
+                </RadioGroup>
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                    <LinearLayout
+                            android:id="@+id/batch_four_no_group_line_ly"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="2"
+                            android:gravity="center">
+
+                        <View
+                                android:id="@+id/batch_four_no_group_line"
+                                android:layout_width="25dp"
+                                android:layout_height="2dp"
+                                android:layout_marginBottom="3dp"
+                                android:background="@drawable/rectangle"
+                                android:scaleType="fitXY" />
+                    </LinearLayout>
+
+                    <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/gray_e" />
+
+                    <LinearLayout
+                            android:id="@+id/batch_four_grouped_line_ly"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                        <View
+                                android:id="@+id/batch_four_grouped_line"
+                                android:layout_width="25dp"
+                                android:layout_height="2dp"
+                                android:layout_marginBottom="3dp"
+                                android:background="@drawable/rectangle"
+                                android:scaleType="fitXY"
+                                android:visibility="invisible" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <View
-                    android:id="@+id/batch_four_grouped_line"
-                    android:layout_width="25dp"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="3dp"
-                    android:scaleType="fitXY"
-                    android:visibility="invisible"
-                    android:background="@drawable/rectangle"/>
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/gray_e" />
             </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/batch_four_device_empety_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/batch_four_device_recycle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/batch_four_device_recycle_grouped"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                <TextView
+                        android:id="@+id/image_no_device"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:drawableTop="@drawable/no_device"
+                        android:drawablePadding="10dp"
+                        android:gravity="center"
+                        android:text="@string/no_device"
+                        android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/batch_four_group_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/batch_four_group_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="33dp"
+                        android:background="@color/gray_e"
+                        android:gravity="center_vertical"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="@dimen/dp_10"
+                        android:text="@string/choose_group_change"
+                        android:textColor="@color/gray_6"
+                        android:textSize="13sp" />
+
+                <TextView
+                        android:id="@+id/batch_four_group_add_group"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/gray_e"
+                        android:gravity="center_vertical|end"
+                        android:paddingStart="10dp"
+                        android:paddingLeft="@dimen/dp_10"
+                        android:paddingEnd="@dimen/dp_10"
+                        android:text="@string/add_groups"
+                        android:textColor="@color/black_three"
+                        android:textSize="15sp" />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/batch_four_group_recycle"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    android:minHeight="150dp" />
+
+            <Button
+                    android:id="@+id/grouping_completed"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/btn_rec_black_bt"
+                    android:clickable="false"
+                    android:text="@string/set_group"
+                    android:textColor="@android:color/white"
+                    android:visibility="visible" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/gray_e" />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/batch_four_device_empety_ly"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/batch_four_device_recycle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/batch_four_device_recycle_grouped"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <TextView
-            android:id="@+id/image_no_device"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableTop="@drawable/no_device"
-            android:text="@string/no_device"
-            android:drawablePadding="10dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/batch_four_group_ly"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:orientation="horizontal">
-    <TextView
-        android:id="@+id/batch_four_group_title"
-        android:layout_width="wrap_content"
-        android:layout_height="33dp"
-        android:background="@color/gray_e"
-        android:gravity="center_vertical"
-        android:paddingStart="10dp"
-        android:paddingEnd="@dimen/dp_10"
-        android:text="@string/choose_group_change"
-        android:textColor="@color/gray_6"
-        android:textSize="13sp"/>
-    <TextView
-        android:id="@+id/batch_four_group_add_group"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/gray_e"
-        android:gravity="center_vertical|end"
-        android:paddingLeft="@dimen/dp_10"
-        android:paddingStart="10dp"
-        android:paddingEnd="@dimen/dp_10"
-        android:text="@string/add_groups"
-        android:textColor="@color/black_three"
-        android:textSize="15sp" />
-    </LinearLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/batch_four_group_recycle"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/white"
-        android:minHeight="150dp"/>
-
-    <Button
-        android:id="@+id/grouping_completed"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/btn_rec_black_bt"
-        android:clickable="false"
-        android:text="@string/set_group"
-        android:textColor="@android:color/white"
-        android:visibility="visible" />
-</LinearLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

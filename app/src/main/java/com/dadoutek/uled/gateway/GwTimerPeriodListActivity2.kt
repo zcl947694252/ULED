@@ -87,6 +87,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private var adapter = GwTpItemAdapter(R.layout.item_gw_time_scene2, timesNowList)
     private val requestCodes: Int = 1000
     private var selectPosition: Int = 1000
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun performed(event: Event<String>?) {
         if (event is DeviceEvent) {
@@ -99,8 +100,8 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                when (event.args.status) {
+                    LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                         when (deviceInfo.gwVoipState) {
@@ -213,10 +214,13 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
     override fun initData() {
         gwTagBean = TelinkLightApplication.getApp().currentGwTagBean
-        tasksBean = intent.getParcelableExtra<GwTasksBean>("data")
-        getTimerPeriods()
+        tasksBean = intent.getParcelableExtra("data")
+        getTimerPeriods()//计算出的
 
-        val tpList = tasksBean?.timingPeriods//ArrayList<GwTimePeriodsBean>
+        val tpList = if (tasksBean?.timingPeriods?.size ?: 0 > 20)
+            tasksBean?.timingPeriods?.subList(0, 20)
+        else
+            tasksBean?.timingPeriods//真是数据
         tpList?.let {
             tpList.forEach { it1 ->
                 it1.standingTime = tasksBean?.stayTime ?: 0
@@ -228,7 +232,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 if (i < timesList.size)
                     timesList.removeAt(i)
 
-            if (timesList.size > 0 || timesNowList.size < 20) {
+            if (/*timesList.size > 0 ||*/ timesNowList.size < 20) {
                 add_group_btn?.visibility = View.VISIBLE
             } else {
                 add_group_btn?.visibility = View.GONE
@@ -337,7 +341,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
                 .subscribe {
                     hideLoadingDialog()
-                   runOnUiThread {  ToastUtils.showLong(getString(R.string.config_gate_way_tp_task_fail)) }
+                    runOnUiThread { ToastUtils.showLong(getString(R.string.config_gate_way_tp_task_fail)) }
                 }
     }
 
@@ -446,19 +450,18 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 index += 1
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
-                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.select_scene))
+                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.choose_scene))
                     bean.standingTime = tasksBean?.stayTime ?: 0
                     timesList.add(bean)
                     break
                 } else if (endTime - time >= standingNum) {
-                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.select_scene))
-                    bean.sceneName = getString(R.string.select_scene)
+                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
+                    bean.sceneName = getString(R.string.choose_scene)
                     timesList.add(bean)
                 }
             }
-            if (timesList.size > 20) {
+            if (timesList.size > 20)
                 timesList.subList(0, 20)
-            }
         }
     }
 }

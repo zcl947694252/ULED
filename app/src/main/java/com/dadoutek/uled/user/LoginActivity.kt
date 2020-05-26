@@ -478,7 +478,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
                                         intent.putExtra("phone", phone)
                                         returnView()
-                                        startActivityForResult(intent, 0)
+                                        startActivity(intent)
+                                        finish()
                                     }
                                 }
 

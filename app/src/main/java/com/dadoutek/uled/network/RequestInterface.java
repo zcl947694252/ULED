@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network;
 
+import com.dadoutek.uled.gateway.bean.ClearGwBean;
 import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
@@ -305,6 +306,15 @@ public interface RequestInterface {
     @DELETE("auth/clear")
 //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
+
+    /**
+     * https://dev.dadoutek.com/xxxx/auth/reset/{rid}
+     * @param regionId
+     * @return
+     */
+    @GET("auth/reset/{rid}")
+    Observable<Response<String>> clearUserRegionData(@Path("rid") int regionId);
+
 
     //获取下载链接
     @GET("api/ext/soybean/download/bin/{l1}/{l2}")
@@ -662,4 +672,17 @@ public interface RequestInterface {
      */
     @POST("mqtt/control")
     Observable<Response<String>> sendDeviceToMqtt(@Body GwGattBody body);
+
+    /**
+     * 12、网关数据复位（new）
+     * 请求URL： https://dev.dadoutek.com/xxxx/gateway/reset/{gid}
+     * GET  content-type : application/json
+     * (从该接口开始未注明这条信息的接口不需要加region-id和authorizer-user-id)
+     * region-id : 80(例)
+     * authorizer-user-id : 300460(例)
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * https://dev.dadoutek.com/smartlight_test/gateway/reset/102
+     */
+    @GET("gateway/reset/{gid}")
+    Observable<Response<ClearGwBean>> clearGwInfo(@Path("gid") long gwId);
 }

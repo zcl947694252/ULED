@@ -19,13 +19,13 @@ import com.blankj.utilcode.util.LogUtils
  * 更新时间   $
  * 更新描述
  */
-class ScalePageTransformer(private var minScale: Float, private var context: Context) : ViewPager.PageTransformer {
+class ScalePageTransformer(private var minScale: Float) : ViewPager.PageTransformer {
     override fun transformPage(page: View, position: Float) {
         LogUtils.v("zcl--滑动$position----------移动x轴${ page.translationX}")
         if (position == 0.8f) {//必須滿足條件才能進入
-            page.translationX = -77f//調節後面的界面的左間距  paddingstart25  -80    paddingstart75 則爲-270完全居中 負值能否再小 看兩邊的多出部分是否對稱 負值負移動間距與後面的圖片
+            page.translationX = -25f//調節後面的界面的左間距  paddingstart25  -80    paddingstart75 則爲-270完全居中 負值能否再小 看兩邊的多出部分是否對稱 負值負移動間距與後面的圖片
         } else if (position == 0.2f){
-            page.translationX = -77f//調節固定間距時兩圖之間的空白距離 paddingstart變大這個就要變小*/
+            page.translationX = -25f//調節固定間距時兩圖之間的空白距離 paddingstart變大這個就要變小*/
         }
 
         val size = when {

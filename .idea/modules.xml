@@ -2,20 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" filepath="$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ULED.iml" filepath="$PROJECT_DIR$/ULED.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/ULED-app.iml" filepath="$PROJECT_DIR$/app/ULED-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED-library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/ULED-tbanner.iml" filepath="$PROJECT_DIR$/tbanner/ULED-tbanner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/library/ULED-tbanner-library.iml" filepath="$PROJECT_DIR$/tbanner/library/ULED-tbanner-library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/ULED_NEW-ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED_NEW-ULED-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" filepath="$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" group="ULED/BluetoothLightLib" />
+      <module fileurl="file://$PROJECT_DIR$/uled.iml" filepath="$PROJECT_DIR$/uled.iml" group="ULED" />
+      <module fileurl="file://$PROJECT_DIR$/app/uled-app.iml" filepath="$PROJECT_DIR$/app/uled-app.iml" group="ULED/app" />
+      <module fileurl="file://$PROJECT_DIR$/library/ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED-library.iml" group="ULED/library" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" filepath="$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" />
-      <module fileurl="file://$PROJECT_DIR$/guide/guide.iml" filepath="$PROJECT_DIR$/guide/guide.iml" />
-      <module fileurl="file://$PROJECT_DIR$/stomplib/stomplib.iml" filepath="$PROJECT_DIR$/stomplib/stomplib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/tbanner.iml" filepath="$PROJECT_DIR$/tbanner/tbanner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tbanner/library/tbanner-library.iml" filepath="$PROJECT_DIR$/tbanner/library/tbanner-library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wheelview/wheelview.iml" filepath="$PROJECT_DIR$/wheelview/wheelview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" filepath="$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" group="ULED/bannerlibrary" />
+      <module fileurl="file://$PROJECT_DIR$/guide/guide.iml" filepath="$PROJECT_DIR$/guide/guide.iml" group="ULED/guide" />
+      <module fileurl="file://$PROJECT_DIR$/stomplib/stomplib.iml" filepath="$PROJECT_DIR$/stomplib/stomplib.iml" group="ULED/stomplib" />
+      <module fileurl="file://$PROJECT_DIR$/tbanner/tbanner.iml" filepath="$PROJECT_DIR$/tbanner/tbanner.iml" group="ULED/tbanner" />
+      <module fileurl="file://$PROJECT_DIR$/tbanner/library/tbanner-library.iml" filepath="$PROJECT_DIR$/tbanner/library/tbanner-library.iml" group="ULED/tbanner/library" />
     </modules>
   </component>
 </project>

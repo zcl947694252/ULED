@@ -129,7 +129,6 @@
     <string name="me">Me</string>
     <string name="fragment_name_me">Me</string>
     <string name="grouping_wait_tip">There are currently %1$s lights grouping, please wait!</string>
-    <string name="rescan">Rescan</string>
     <string name="start_group_bt">Start grouping</string>
     <string name="have_lamp_no_group_tip">There are no lights grouping, please complete the grouping operation</string>
     <string name="sure_group">Confirm Grouping</string>
@@ -239,7 +238,7 @@
     <string name="phone_current">Current phone number: %1$s</string>
     <string name="select_country">Choose a country</string>
     <string name="verification">Verification</string>
-    <string name="add">Add</string>
+    <string name="add_timing_label">Add timing label</string>
     <string name="open_location_service">Please open "Location service"</string>
     <string name="send_verification">Send the verification code</string>
     <string name="VerificationCode">Verification code</string>
@@ -574,7 +573,7 @@
     <string name="add_gradient">Add gradient</string>
     <string name="config_night_light_select_group">Please select at least one group</string>
     <string name="net_work_error">No network available</string>
-    <string name="please_check_group_tip">Please select a group:</string>
+    <string name="please_check_group_tip">Please select a group</string>
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
     <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
     <string name="re_upgrade">Re-upgrade</string>
@@ -779,7 +778,7 @@
 
     <string name="triggering_conditions">Triggering conditions :</string>
     <string name="trigger_after">Trigger after :</string>
-    <string name="overtime_time">Overtime time :</string>
+    <string name="duration_time">Duration time :</string>
     <string name="light_open_mode">Light-open mode :</string>
     <string name="choose_group">Choose group :</string>
     <string name="brightness_cannot">Brightness cannot be zero</string>
@@ -946,7 +945,7 @@
     <string name="curtain_switch">Curtain switch</string>
     <string name="night_light">Night light</string>
     <string name="click_config">Config</string>
-    <string name="select_scene">Select the scene</string>
+    <string name="choose_scene">Select the scene</string>
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
     <string name="select_type">Please select type</string>
     <string name="group_switch">Group switch</string>
@@ -958,7 +957,7 @@
     <string name="click_config_tip">Click the configure button to complete the configuration</string>
     <string name="change_mode_8k">switching mode</string>
     <string name="times_mode">Timer_Mode</string>
-    <string name="time_pattern_mode">Time_pattern</string>
+    <string name="time_pattern_mode">Cyclical pattern </string>
     <string name="event_list">Even List</string>
     <string name="repetition">repetition</string>
     <string name="chose_time">Chose time</string>
@@ -977,8 +976,9 @@
     <string name="timer_exists">The timing time already exists</string>
     <string name="invalid_data">Invalid data </string>
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
-    <string name="add_time">Add Time</string>
-    <string name="add_times">Add Times</string>
+    <string name="add_time">Add timing task</string>
+    <string name="add_times">Add  task</string>
+    <string name="add_times2">Add a loop task</string>
     <string name="to">To</string>
     <string name="startTime">7:40</string>
     <string name="endTime">8:00</string>
@@ -988,7 +988,7 @@
     <string name="no_get_device_info">Device information not obtained, please try again</string>
     <string name="have_time_task">The response task already exists in this time period, please select another time</string>
     <string name="please_chose_right_time">The start time cannot be greater than the end time, please choose again</string>
-    <string name="timer_period_set">Time period setting</string>
+    <string name="timer_period_set">Task list </string>
     <string name="please_select_standing_time">Please select your stay time</string>
     <string name="please_setting_least_one">Please configure the scene for at least one time period</string>
     <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
@@ -1029,5 +1029,48 @@
     <string name="config_WIFI">ConfigGateWIFI</string>
     <string name="gate_way_offline">Gateway offline</string>
     <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
-
+    <string name="user_reset">User reset</string>
+    <string name="reset_user_success">User reset successfully</string>
+    <string name="slow_up_slowly">Slow up slowly</string>
+    <string name="slow">slow</string>
+    <string name="mid">middle</string>
+    <string name="fast">fast</string>
+    <string name="recovery_active_equipment">Recovery of active equipment</string>
+    <string name="left">Left:</string>
+    <string name="right">Right:</string>
+    <string name="single_brighress_group_switch">Dimmer double switch</string>
+    <string name="eight_switch">8k Switch</string>
+    <string name="double_switch">DoubleGroup Switch</string>
+    <string name="delete_device">Delete Device</string>
+    <string name="delete_device_tip">Whether or not to delete?</string>
+    <string name="delete_device_hard_tip">Delete failed, whether to force delete?</string>
+    <string name="add_cycle_label">Add a loop tag</string>
+    <string name="change_device_name">Modify device name</string>
+    <string name="scene_list">Cue List</string>
+    <string name="user_reset_tip">Whether to perform user reset?</string>
+    <string name="user_reset_tip2">Reset failed, whether to force user reset?</string>
+    <string name="gw_user_reset_switch_success">The user gateway reset succeeded</string>
+    <string name="select_mode">select mode</string>
+    <string name="mode_choice">mode selection:</string>
+    <string name="select_gradient">selection gradient</string>
+    <string name="safe_lock">Safe lock</string>
+    <string name="open">Open</string>
+    <string name="safe_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
+    <string name="lock">Lock</string>
+    <string name="safe_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
+    <string name="unlock">Unlock</string>
+    <string name="reset_gw_faile">Gateway user reset failed</string>
+    <string name="no_connect_device">No reconnectable devices!</string>
+    <string name="choose_scene_dot">Choose scene :</string>
+    <string name="open_light">Open light</string>
+    <string name="close_light">Close light</string>
+    <string name="open_blutooth_tip">Please turn on bluetooth</string>
+    <string name="find_device_num">Number of recovered devices:</string>
+    <string name="user_reset_all1">The user reset clears the configured grouping and scenario information。</string>
+    <string name="user_reset_all2">Local and cloud data will be erased and unrecoverable!</string>
+    <string name="user_reset_all3">If you have any other questions, please check the APP instructions.</string>
+    <string name="physical_recovery_one">This operation does not reset the light under this account.</string>
+    <string name="physical_recovery_two">This operation will reset all energized devices (switch, except sensor) in the region of the device that interacts with the APP.</string>
+    <string name="group_mode">Group mode</string>
+    <string name="scene_mode">Scene mode</string>
 </resources>

@@ -14,6 +14,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+    <include
+            android:id="@+id/temp_rg"
+            layout="@layout/template_radiogroup"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvToolbar"/>
 
     <android.support.constraint.ConstraintLayout
             android:id="@+id/sensor_three"
@@ -22,10 +30,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rvToolbar">
+            app:layout_constraintTop_toBottomOf="@+id/temp_rg">
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout17"
+                android:id="@+id/triggering_model"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -90,10 +98,10 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout17" />
+                app:layout_constraintTop_toBottomOf="@+id/triggering_model" />
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout18"
+                android:id="@+id/trigger_after_ly"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -158,11 +166,11 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout18" />
+                app:layout_constraintTop_toBottomOf="@+id/trigger_after_ly" />
 
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout19"
+                android:id="@+id/overtime_ly"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -175,7 +183,7 @@
                     android:id="@+id/textView27"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/overtime_time"
+                    android:text="@string/duration_time"
                     android:textColor="@color/black_three"
                     android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -242,11 +250,11 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout19" />
+                app:layout_constraintTop_toBottomOf="@+id/overtime_ly" />
 
 
         <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout21"
+                android:id="@+id/light_brighress_mode"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:visibility="gone"
@@ -310,7 +318,7 @@
                 android:layout_height="1dp"
                 android:background="@color/black_ee"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout21" />
+                app:layout_constraintTop_toBottomOf="@+id/light_brighress_mode" />
 
 
         <!--<android.support.constraint.ConstraintLayout-->
@@ -518,55 +526,55 @@
                 android:background="@color/black_ee"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout31" />
 
-        <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraintLayout23"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view31">
-
-
-            <TextView
-                    android:id="@+id/textView30"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/choose_group"
-                    android:textColor="@color/black_three"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.09"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
 
             <android.support.constraint.ConstraintLayout
-                    android:id="@+id/choose_group"
-                    android:layout_width="190dp"
-                    android:layout_height="30dp"
-                    android:background="@drawable/human_body_sensor"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:id="@+id/choose_group_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.84"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@+id/view31">
+
 
                 <TextView
+                        android:id="@+id/choose_group_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/select_group"
-                        android:textColor="@color/blue_background"
+                        android:text="@string/choose_group"
+                        android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.09"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+
+                <android.support.constraint.ConstraintLayout
+                        android:id="@+id/choose_group"
+                        android:layout_width="190dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/human_body_sensor"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.84"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/select_group"
+                            android:textColor="@color/blue_background"
+                            android:textSize="15sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+
             </android.support.constraint.ConstraintLayout>
-
-        </android.support.constraint.ConstraintLayout>
-
 
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/constraintLayout24"
@@ -575,7 +583,7 @@
                 android:background="@color/black_ee"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout23">
+                app:layout_constraintTop_toBottomOf="@+id/choose_group_ly">
 
 
             <TextView
@@ -604,21 +612,20 @@
                 app:layout_constraintVertical_bias="0.0" />
 
         <Button
-            android:id="@+id/sensor_update"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginLeft="38dp"
-            android:layout_marginRight="38dp"
-            android:layout_marginBottom="36dp"
-            android:background="@drawable/btn_rec_blue_bt"
-            android:elevation="10dp"
-            android:text="@string/btn_sure"
-            android:textColor="@color/black_three"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
+                android:id="@+id/sensor_update"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginLeft="38dp"
+                android:layout_marginRight="38dp"
+                android:layout_marginBottom="36dp"
+                android:background="@drawable/btn_rec_blue_bt"
+                android:elevation="10dp"
+                android:text="@string/btn_sure"
+                android:textColor="@color/black_three"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
 
         <TextView
@@ -638,31 +645,36 @@
                 android:layout_height="match_parent"
                 android:background="#7333"
                 android:gravity="center"
-                android:orientation="vertical">
-<LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@drawable/rect_five_w"
-        android:layout_marginBottom="120dp"
-        android:padding="@dimen/dp_5"
-    android:orientation="vertical">
-    <ProgressBar
-            android:layout_width="70dp"
-            android:layout_marginTop="@dimen/dp_10"
-            android:layout_height="80dp"/>
+                android:orientation="vertical"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp">
 
-    <TextView
-            android:id="@+id/human_progress_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="120dp"
+                    android:background="@drawable/rect_five_w"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/dp_5"
+                    android:visibility="gone">
 
-            android:gravity="center"
-            android:paddingTop="20dp"
-            android:text="@string/please_wait"
-            android:textColor="@color/gray_3"
-            android:textSize="20sp" />
-</LinearLayout>
+                <ProgressBar
+                        android:layout_width="70dp"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="@dimen/dp_10" />
+
+                <TextView
+                        android:id="@+id/human_progress_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+                        android:paddingTop="20dp"
+                        android:text="@string/please_wait"
+                        android:textColor="@color/gray_3"
+                        android:textSize="20sp" />
+            </LinearLayout>
 
         </LinearLayout>
 

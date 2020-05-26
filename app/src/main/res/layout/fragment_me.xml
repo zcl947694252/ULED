@@ -7,7 +7,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="185dp"
         android:background="@drawable/top_back">
 
         <ImageView
@@ -242,6 +242,122 @@
         </RelativeLayout>
 
         <RelativeLayout
+                android:id="@+id/updata"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@color/white"
+                android:foreground="?android:attr/selectableItemBackground">
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="11dp"
+                    android:src="@drawable/icon_local_data" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="38dp"
+                    android:text="@string/upload_data"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/background_color" />
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="23dp"
+                    android:src="@drawable/icon_arrow" />
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:id="@+id/user_reset"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@color/white"
+                android:foreground="?android:attr/selectableItemBackground">
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="11dp"
+                    android:src="@drawable/icon_reset" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="38dp"
+                    android:text="@string/user_reset"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/background_color" />
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="23dp"
+                    android:src="@drawable/icon_arrow" />
+
+        </RelativeLayout>
+        <RelativeLayout
+                android:id="@+id/save_lock_ly"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@color/white"
+                android:foreground="?android:attr/selectableItemBackground">
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="11dp"
+                    android:src="@drawable/icon_lock" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="38dp"
+                    android:text="@string/safe_lock"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/background_color" />
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="23dp"
+                    android:src="@drawable/icon_arrow" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
             android:id="@+id/instructions"
             android:layout_width="match_parent"
             android:layout_height="42dp"
@@ -416,7 +532,6 @@
                 android:layout_marginRight="23dp"
                 android:src="@drawable/icon_arrow" />
         </RelativeLayout>
-
         <RelativeLayout
             android:id="@+id/setting"
             android:layout_width="match_parent"

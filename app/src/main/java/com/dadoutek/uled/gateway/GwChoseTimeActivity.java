@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,11 +58,12 @@ import io.reactivex.disposables.Disposable;
 /**
  * 设置网关时间与场景传递进配config界面
  * task任务
+ * 位使用自己的 因为这个要在界面覆盖时解除监听
  */
 public class GwChoseTimeActivity extends TelinkBaseActivity implements EventListener<String> {
     private TextView toolbarTv;
     private Unbinder unbinder;
-    private TextView toolbarCancel;
+    private ImageView toolbarCancel;
     private TextView timerTitle;
     private TextView toolbarConfirm;
     private TextView timerScene;
@@ -101,25 +103,22 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void initLisenter() {
         toolbarCancel.setOnClickListener(v -> finish());
-        toolbarConfirm.setOnClickListener(v -> {
-
-            handlerm.postDelayed(() -> {
-                if (scene == null)
-                    Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene),
-                            Toast.LENGTH_SHORT).show();
-                else {
-                    if (isTimeHave()) {//如果已有该时间
-                        if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !tasksBean.isCreateNew()) {//并且是当前的task的时间 返回结果
-                            setForResult();
-                        } else {
-                            TmtUtils.midToastLong(this, getString(R.string.have_time_task));
-                        }
-                    } else {//没有此时间task返回结果
+        toolbarConfirm.setOnClickListener(v -> handlerm.postDelayed(() -> {
+            if (scene == null)
+                Toast.makeText(getApplicationContext(), getString(R.string.please_select_scene),
+                        Toast.LENGTH_SHORT).show();
+            else {
+                if (isTimeHave()) {//如果已有该时间
+                    if (tasksBean.getStartHour() == hourTime && tasksBean.getStartMins() == minuteTime && !tasksBean.isCreateNew()) {//并且是当前的task的时间 返回结果
                         setForResult();
+                    } else {
+                        TmtUtils.midToastLong(this, getString(R.string.have_time_task));
                     }
+                } else {//没有此时间task返回结果
+                    setForResult();
                 }
-            },500);
-        });
+            }
+        },500));
         timerLy.setOnClickListener(v -> startActivityForResult(new Intent(this,
                 SelectSceneListActivity.class), requestCodes));
     }

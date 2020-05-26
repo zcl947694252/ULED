@@ -20,13 +20,13 @@ public class Constant implements Serializable {
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
 
-    public static Boolean isDebug = true;
+    public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
      */
-    public static final long downTime = isDebug ? 2 : 11;
+    public static final long downTime = isDebug ? 3 : 11;
     public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
@@ -55,11 +55,12 @@ public class Constant implements Serializable {
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
     public static final String OUT_OF_MESH_NAME = "out_of_mesh";
-
+    public static final String IS_FIRST_CONFIG_DOUBLE_SWITCH = "IS_FIRST_CONFIG_DOUBLE_SWITCH";
     public static String PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME;
     //public static final String PIR_SWITCH_MESH_NAME = "dadourd";
 
     public static final int RESULT_OK = 1;
+
     public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";
     public static final String GROUP_ARESS_KEY = "GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";
@@ -276,6 +277,10 @@ public class Constant implements Serializable {
      */
     public static final int GW_SWITCH_VOIP = 0X11;
     /**
+     * 网关用户恢复业务标识 文档上写的是恢复出厂
+     */
+    public static final int GW_RESET_USER_VOIP = 0X1C;
+    /**
      * 网关恢复出厂业务标识
      */
     public static final int GW_RESET_VOIP = 0X12;
@@ -395,4 +400,5 @@ public class Constant implements Serializable {
     public static final int SER_ID_RELAY_OFF = 0x63;
     public static final int SER_ID_GATEWAY_ON = 0x64;
     public static final int SER_ID_GATEWAY_OFF = 0x65;
+
 }

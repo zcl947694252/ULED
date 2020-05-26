@@ -29,7 +29,8 @@ public class StringUtils {
 
     public static boolean compileExChar(String str) {
 
-//        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        //        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\]
+        //        .<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         String limitEx = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？]";
 
         Pattern pattern = Pattern.compile(limitEx);
@@ -67,7 +68,8 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter, new InputFilter.LengthFilter(50)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,
+                new InputFilter.LengthFilter(50)});
     }
 
     public static void initEditTextFilterForRegister(EditText editText) {
@@ -95,7 +97,8 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter, new InputFilter.LengthFilter(50)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,
+                new InputFilter.LengthFilter(50)});
     }
 
     /**
@@ -123,12 +126,12 @@ public class StringUtils {
         switch (content) {
             case 0:
                 return versionContent[0];
-//                String type=versionContent[0];
-//                if(type.equals("L")){
-//                    return Constant.FIRMWARE_TYPE_LIGHT;
-//                }else if(type.equals("C")){
-//                    return Constant.FIRMWARE_TYPE_CONTROLLER;
-//                }
+            //                String type=versionContent[0];
+            //                if(type.equals("L")){
+            //                    return Constant.FIRMWARE_TYPE_LIGHT;
+            //                }else if(type.equals("C")){
+            //                    return Constant.FIRMWARE_TYPE_CONTROLLER;
+            //                }
             case 1:
                 String numVersion = versionContent[1].replaceAll("\\.", "").replaceAll("bin", "");
                 if (isNumeric(numVersion)) {
@@ -157,7 +160,8 @@ public class StringUtils {
      * @return 返回分离后的每一个对象值
      */
     public static String[] shift(String str, String sp) {
-        if (str == null) return null;
+        if (str == null)
+            return null;
         String chs1[] = str.split(sp);
         return chs1;
     }
@@ -169,7 +173,8 @@ public class StringUtils {
      * @return 返回分离后的每一个对象值
      */
     public static String shift(String str, String sp, int i) {
-        if (str == null) return "";
+        if (str == null)
+            return "";
         String chs1[] = str.split(sp);
         return chs1[i];
     }
@@ -213,11 +218,12 @@ public class StringUtils {
             return DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getName();
         }
     }
+
     public static String getSwitchName(DbSwitch dbSwitch) {
-         Long belongGroupId = dbSwitch.getBelongGroupId();
-        if (belongGroupId==null||DBUtils.INSTANCE.getGroupByID(belongGroupId) == null) {
-                return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
-            }
+        Long belongGroupId = dbSwitch.getBelongGroupId();
+        if (belongGroupId == null || DBUtils.INSTANCE.getGroupByID(belongGroupId) == null) {
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
+        }
 
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()).getMeshAddr() == 0xffff) {
@@ -226,6 +232,7 @@ public class StringUtils {
             return DBUtils.INSTANCE.getGroupByID(dbSwitch.getBelongGroupId()).getName();
         }
     }
+
     public static String getSensorName(DbSensor dbSensor) {
         if (DBUtils.INSTANCE.getGroupByID(dbSensor.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
@@ -251,13 +258,13 @@ public class StringUtils {
                 return context.getString(R.string.guide_tip_reset_curtain);
             case Constant.INSTALL_CONNECTOR:
                 return context.getString(R.string.guide_tip_reset_relay);
-                case Constant.INSTALL_GATEWAY:
+            case Constant.INSTALL_GATEWAY:
                 return context.getString(R.string.guide_tip_reset_relay);
         }
         return "";
     }
 
-    public static  String getSwitchPirDefaultName(int productUUID, Context context) {
+    public static String getSwitchPirDefaultName(int productUUID, Context context) {
         String startStr = "";
         switch (productUUID) {
             case DeviceType.NORMAL_SWITCH:
@@ -267,6 +274,9 @@ public class StringUtils {
             case DeviceType.SCENE_SWITCH:
                 startStr = context.getString(R.string.scene_switch);
                 break;
+            case DeviceType.DOUBLE_SWITCH:
+                startStr = context.getString(R.string.double_switch);
+                break;
 
             case DeviceType.SMART_CURTAIN_SWITCH:
                 startStr = context.getString(R.string.curtain_switch);
@@ -275,7 +285,7 @@ public class StringUtils {
                 startStr = context.getString(R.string.night_light);
                 break;
             case DeviceType.SENSOR:
-                startStr =  context.getString(R.string.sensor);
+                startStr = context.getString(R.string.sensor);
                 break;
         }
 

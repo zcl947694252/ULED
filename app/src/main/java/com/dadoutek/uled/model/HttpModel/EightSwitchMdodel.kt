@@ -82,7 +82,7 @@ object EightSwitchMdodel {
 
         return NetworkFactory.getApi()
                 // .addSwitch8k(token,dbChild,changeId!!.toInt())
-                .addSwitch8k(switch.id, DeviceType.EIGHT_SWITCH, switch.meshAddr, switch.name, switch.macAddr, DeviceType.SCENE_SWITCH, 1, switch.keys)
+                .addSwitch8k(switch.id, DeviceType.EIGHT_SWITCH_VERSION, switch.meshAddr, switch.name, switch.macAddr, DeviceType.SCENE_SWITCH, 1, switch.keys)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

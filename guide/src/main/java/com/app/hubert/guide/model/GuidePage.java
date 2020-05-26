@@ -7,11 +7,9 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.animation.Animation;
 
-import com.app.hubert.guide.listener.OnHighlightDrewListener;
 import com.app.hubert.guide.listener.OnLayoutInflatedListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,8 +27,9 @@ public class GuidePage {
     private int layoutResId;
     private int[] clickToDismissIds;
     private OnLayoutInflatedListener onLayoutInflatedListener;
-    private OnHighlightDrewListener onHighlightDrewListener;
     private Animation enterAnimation, exitAnimation;
+
+    public GuidePage() {}
 
     public static GuidePage newInstance() {
         return new GuidePage();

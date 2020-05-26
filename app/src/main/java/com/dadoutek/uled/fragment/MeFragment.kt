@@ -6,27 +6,39 @@ import android.app.AlertDialog
 import android.content.Context.POWER_SERVICE
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.LinearGradient
 import android.os.*
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
@@ -37,6 +49,8 @@ import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
+import com.dadoutek.uled.user.InputPwdActivity
+import com.dadoutek.uled.user.LoginActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -47,6 +61,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.db.NULL
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -55,8 +74,16 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(), View.OnClickListener{
-
+class MeFragment() : BaseFragment(), View.OnClickListener {
+    private var disposableInterval: Disposable? = null
+    private var popUser: PopupWindow? = null
+    private var cancelConfirmVertical: View? = null
+    private var cancelConfirmLy: LinearLayout? = null
+    private var readTimer: TextView? = null
+    private var hinitOne: TextView? = null
+    private var hinitTwo: TextView? = null
+    private var hinitThree: TextView? = null
+    private var mConnectDisposal: Disposable? = null
     private var disposable: Disposable? = null
     private var cancel: Button? = null
     private var confirm: Button? = null
@@ -69,7 +96,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     private var mWakeLock: PowerManager.WakeLock? = null
     var b: Boolean = false
     private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
-
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -112,16 +138,14 @@ class MeFragment : BaseFragment(), View.OnClickListener{
             }
         }
     }
-
-
     private val allLights: List<DbLight>
         get() {
             val groupList = DBUtils.groupList
             val lightList = ArrayList<DbLight>()
 
-            for (i in groupList.indices) {
+            for (i in groupList.indices)
                 lightList.addAll(DBUtils.getLightByGroupID(groupList[i].id!!))
-            }
+
             return lightList
         }
 
@@ -135,7 +159,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
             }
             return lightList
         }
-
 
     private val allRely: List<DbConnector>
         get() {
@@ -152,12 +175,14 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sleepTime = if (Build.BRAND.contains("Huawei")) {
+        sleepTime = if (Build.BRAND.contains("Huawei"))
             500
-        } else {
+        else
             200
-        }
+
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
+
+        makePop()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -176,20 +201,17 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
     override fun onResume() {
         super.onResume()
-        if (mWakeLock != null) {
-            mWakeLock?.acquire()
-        }
+        mWakeLock?.acquire()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (mWakeLock != null) {
-            mWakeLock?.release()
-        }
+        mWakeLock?.release()
         compositeDisposable.dispose()
     }
 
     private fun initClick() {
+        userIcon?.setOnClickListener(this)
         chearCache?.setOnClickListener(this)
         appVersion?.setOnClickListener(this)
         exitLogin?.setOnClickListener(this)
@@ -199,18 +221,71 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
         setting?.setOnClickListener(this)
+        updata?.setOnClickListener(this)
+        user_reset?.setOnClickListener(this)
+        save_lock_ly?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
 
-
+        setting.visibility = View.GONE
         userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
 
         makePop()
+        makePop2()
+    }
+
+    private fun makePop2() {
+        var popView: View = LayoutInflater.from(activity).inflate(R.layout.pop_time_cancel, null)
+        hinitOne = popView.findViewById(R.id.hinit_one)
+        hinitTwo = popView.findViewById(R.id.hinit_two)
+        hinitThree = popView.findViewById(R.id.hinit_three)
+        readTimer = popView.findViewById(R.id.read_timer)
+        cancel = popView.findViewById(R.id.btn_cancel)
+        confirm = popView.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+
+        hinitOne?.text = getString(R.string.user_reset_all1)
+        hinitTwo?.text = getString(R.string.user_reset_all2)
+        hinitThree?.text = getString(R.string.user_reset_all3)
+
+        var cs: ClickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.BLUE//设置超链接的颜色
+                ds.isUnderlineText = true
+            }
+        }
+
+        val str = getString(R.string.have_question_look_notice)
+        var ss = SpannableString(str)
+        val start: Int = if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
+        val end = str.length
+        ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        hinitThree?.text = ss
+        hinitThree?.movementMethod = LinkMovementMethod.getInstance()
+
+        cancel?.setOnClickListener { popUser?.dismiss() }
+        confirm?.setOnClickListener {
+            popUser?.dismiss()
+            //用户复位
+            userReset()
+        }
+        popUser = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        confirm?.isClickable = false
+        pop.isOutsideTouchable = false
+        pop.isFocusable = true // 设置PopupWindow可获得焦点
+        pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
     private fun makePop() {
@@ -256,8 +331,10 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     }
 
 
+    @SuppressLint("StringFormatMatches")
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.userIcon -> openSet()
             R.id.chearCache -> emptyTheCache()
             R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
@@ -268,12 +345,58 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
+            R.id.updata -> {
+                checkNetworkAndSync(activity)
+            }
+            R.id.user_reset -> {
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+
+                    disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                var num = Constant.downTime - 1 - it
+                                if (num == 0L) {
+                                    setTimerZero()
+                                } else {
+                                    cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.white)
+                                    cancel?.isClickable = false
+                                    confirm?.isClickable = false
+                                    readTimer?.visibility =View.VISIBLE
+                                    readTimer?.text = getString(R.string.please_read_carefully, num)
+                                }
+                            }
+                    popUser?.showAtLocation(activity?.window?.decorView, Gravity.CENTER, 0, 0)
+                } else {
+                    val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                            DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                    val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+                    if (size > 0) {
+                        ToastUtils.showLong(R.string.connecting_please_wait)
+                        mConnectDisposal?.dispose()
+                        mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                                ?.subscribe({//找回有效设备
+                                    mConnectDisposal?.dispose()
+                                },
+                                        {
+                                            LogUtils.d("connect failed, reason = $it")
+                                        }
+                                )
+                    } else {
+                        ToastUtils.showShort(getString(R.string.no_connect_device))
+                    }
+                }
+            }
             R.id.rlRegion -> {
                 var intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
             }
             R.id.developer -> {
                 var intent = Intent(activity, DeveloperActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.save_lock_ly -> {
+                var intent = Intent(activity, SafeLockActivity::class.java)
                 startActivity(intent)
             }
             R.id.setting -> {
@@ -283,6 +406,40 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
     }
 
+    private fun setTimerZero() {
+        readTimer?.visibility = View.GONE
+        cancelConfirmLy?.visibility = View.VISIBLE
+        cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.gray)
+        cancel?.text = getString(R.string.cancel)
+        confirm?.text = getString(R.string.btn_sure)
+        cancel?.isClickable = true
+        confirm?.isClickable = true
+    }
+
+
+    private fun openSet() {
+        System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+        mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+        if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+            var intent = Intent(activity, SettingActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun userReset() {
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
+        UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {  //删除服务器数据
+                clearData()//删除本地数据
+                ToastUtils.showShort(getString(R.string.reset_user_success))
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showShort(e.message)
+            }
+        })
+    }
 
     // 如果没有网络，则弹出网络设置对话框
     fun checkNetworkAndSync(activity: Activity?) {
@@ -321,7 +478,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
-
     }
 
 
@@ -371,7 +527,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
             override fun complete() {
                 hideLoadingDialog()
                 disposable?.dispose()
-                 disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {}
                 if (compositeDisposable.isDisposed) {
@@ -434,7 +590,6 @@ class MeFragment : BaseFragment(), View.OnClickListener{
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n")
     private fun emptyTheCache() {
-
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
@@ -466,33 +621,15 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
-            override fun onNext(s: String) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                DBUtils.deleteAllData()
-                CleanUtils.cleanInternalSp()
-                CleanUtils.cleanExternalCache()
-                CleanUtils.cleanInternalFiles()
-                CleanUtils.cleanInternalCache()
-                ToastUtils.showLong(R.string.clean_tip)
-                GuideUtils.resetAllGuide(activity!!)
-                hideLoadingDialog()
-
-                try {
-                    Thread.sleep(300)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-
-                restartApplication()
-            }
-
-            override fun onError(e: Throwable) {
-                ToastUtils.showLong(R.string.clear_fail)
-                super.onError(e)
-                hideLoadingDialog()
-            }
-        })
+        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        DBUtils.deleteAllData()
+        CleanUtils.cleanInternalSp()
+        CleanUtils.cleanExternalCache()
+        CleanUtils.cleanInternalFiles()
+        CleanUtils.cleanInternalCache()
+        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+        GuideUtils.resetAllGuide(activity!!)
+        hideLoadingDialog()
     }
 
     //重启app并杀死原进程
@@ -501,7 +638,7 @@ class MeFragment : BaseFragment(), View.OnClickListener{
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
         com.blankj.utilcode.util.AppUtils.relaunchApp()
-}
+    }
 
     override fun setLoginChange() {
         super.setLoginChange()
@@ -515,11 +652,11 @@ class MeFragment : BaseFragment(), View.OnClickListener{
 
 
     fun refreshView() {
-        if (LeBluetooth.getInstance().isEnabled&&TelinkLightApplication.getApp().connectDevice != null) {
-                setLoginChange()
-            } else {
-                setLoginOutChange()
-            }
+        if (LeBluetooth.getInstance().isEnabled && TelinkLightApplication.getApp().connectDevice != null) {
+            setLoginChange()
+        } else {
+            setLoginOutChange()
+        }
 
     }
 }

@@ -78,6 +78,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (position < adapter.data.size) {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+
                     sendToGw(scenesListData!![position])
                 } else {
                     setScene(scenesListData!![position].id!!)
@@ -133,6 +134,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun sendToGw(dbScene: DbScene) {
+        val gateWay = DBUtils.getAllGateWay()
+        if (gateWay.size>0)
         GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onNext(t: List<DbGateway>) {
@@ -143,6 +146,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     if (db.state == 1)
                         TelinkLightApplication.getApp().offLine = false
                 }
+
                 if (!TelinkLightApplication.getApp().offLine) {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {

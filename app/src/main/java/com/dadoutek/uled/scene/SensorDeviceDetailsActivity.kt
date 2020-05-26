@@ -37,8 +37,8 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
+import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -216,7 +216,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     //addNewGroup()
-                    popMain.showAtLocation(window.decorView,Gravity.CENTER,0,0)
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -309,7 +309,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this),position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
@@ -359,12 +359,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         search_bar.setOnClickListener(dialogOnclick)
 
         val title = view.findViewById<TextView>(R.id.textView5)
-        if (position==INSTALL_NORMAL_LIGHT){
-            title.visibility =  View.GONE
-            install_tip_question.visibility =  View.GONE
-        }else{
-            title.visibility =  View.VISIBLE
-            install_tip_question.visibility =  View.VISIBLE
+        if (position == INSTALL_NORMAL_LIGHT) {
+            title.visibility = View.GONE
+            install_tip_question.visibility = View.GONE
+        } else {
+            title.visibility = View.VISIBLE
+            install_tip_question.visibility = View.VISIBLE
         }
 
         install_tip_question.text = describe
@@ -505,7 +505,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 .subscribe {
                                     autoConnectSensor(true)//如果是断开状态直接重连不是就断开再重连
                                 }
-                         compositeDisposable.add(disposable!!)
+                        compositeDisposable.add(disposable!!)
                         popupWindow?.dismiss()
                     }
 
@@ -644,12 +644,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val opcode = Opcode.KICK_OUT//发送恢复出厂命令
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
         val list = arrayListOf<Int>()
-        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress,true)
+        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress, true)
                 .subscribe(
                         {
                             LogUtils.v("zcl-----恢复出厂成功")
                         }, {
-                            LogUtils.v("zcl-----恢复出厂失败")
+                    LogUtils.v("zcl-----恢复出厂失败")
                 }
                 )
 
@@ -699,7 +699,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                      * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
-                        if (isClick != RESET_SENSOR&&isClick!=SENSOR_FINISH )//恢复
+                        if (isClick != RESET_SENSOR && isClick != SENSOR_FINISH)//恢复
                             retryConnect()
 
 //                        LogUtils.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
@@ -738,45 +738,48 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun getVersion(isOTA: Boolean) {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            LogUtils.e("TAG", currentLight!!.meshAddr.toString())
             progressBar_sensor.visibility = View.GONE
             connectSensorTimeoutDisposable?.dispose()
-
-            val disposable = Commander.getDeviceVersion(currentLight!!.meshAddr)
-                    .subscribe(
-                            { s ->
-                                hideLoadingDialog()
-                                if ("" != s){
-                                    if (isOTA) {
-                                        currentLight!!.version = s
-                                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                                        if (isBoolean) {
-                                            transformView()
-                                        } else {
-                                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
+            if (TelinkApplication.getInstance().connectDevice != null && currentLight?.meshAddr != null) {
+                Commander.getDeviceVersion(currentLight!!.meshAddr)
+                        .subscribe(
+                                { s ->
+                                    hideLoadingDialog()
+                                    if ("" != s) {
+                                        if (isOTA) {
+                                            currentLight!!.version = s
+                                            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                                            if (isBoolean) {
+                                                transformView()
                                             } else {
-                                                ToastUtils.showLong(getString(R.string.version_disabled))
-                                                hideLoadingDialog()
+                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
+                                                } else {
+                                                    ToastUtils.showLong(getString(R.string.version_disabled))
+                                                    hideLoadingDialog()
+                                                }
                                             }
+                                        } else {
+                                            if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                                                startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                                            } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+                                                startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
+                                            }
+                                            doFinish()
                                         }
-                                    } else {
-                                        if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
-                                            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
-                                        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-                                            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1", "version" to s)
-                                        }
-                                        doFinish()
+                                        isClick = SENSOR_FINISH
                                     }
-                                    isClick = SENSOR_FINISH
+                                },
+                                {
+                                    hideLoadingDialog()
                                 }
-                            },
-                            {
-                                hideLoadingDialog()
-                            }
-                    )
+                        )
+            } else {
+                ToastUtils.showLong(getString(R.string.get_version_fail))
+            }
         }
     }
 
@@ -915,6 +918,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         toolbar.title = (currentLight!!.name ?: "")
         return sensorData
     }
+
     private fun doFinish() {
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()

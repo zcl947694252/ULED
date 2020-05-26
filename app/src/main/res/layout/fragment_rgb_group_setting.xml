@@ -5,68 +5,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
-
+    
     <!--<ScrollView-->
-        <!--android:id="@+id/scroll_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:background="@color/white"-->
-        <!--android:scrollbars="none"-->
-        <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
-        <!--app:layout_constraintTop_toTopOf="parent">-->
-
-
+    <!--android:id="@+id/scroll_view"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:background="@color/white"-->
+    <!--android:scrollbars="none"-->
+    <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
+    <!--app:layout_constraintTop_toTopOf="parent">-->
+    
+    
     <!--<android.support.constraint.ConstraintLayout-->
-        <!--android:id="@+id/bottomBar"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="40dp"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent">-->
-
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1px"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--android:background="@color/divider"/>-->
-        <!--<TextView-->
-        <!--android:id="@+id/normal_rgb"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_weight="1"-->
-        <!--android:gravity="center"-->
-        <!--android:text="@string/color_mode"-->
-        <!--android:textColor="@android:color/holo_blue_light"-->
-        <!--android:textSize="16sp"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--<View-->
-            <!--android:layout_width="1dp"-->
-            <!--android:layout_height="42dp"-->
-            <!--android:background="#eeeeee"-->
-            <!--app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"-->
-            <!--app:layout_constraintStart_toStartOf="@+id/normal_rgb"-->
-            <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/dynamic_rgb"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_weight="1"-->
-        <!--android:gravity="center"-->
-        <!--android:text="@string/gradient_mode"-->
-        <!--android:textColor="@android:color/darker_gray"-->
-        <!--android:textSize="16sp"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintStart_toEndOf="@id/normal_rgb"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
-
+    <!--android:id="@+id/bottomBar"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent">-->
+    
+    <!--<TextView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1px"-->
+    <!--app:layout_constraintTop_toTopOf="parent"-->
+    <!--android:background="@color/divider"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/normal_rgb"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/color_mode"-->
+    <!--android:textColor="@android:color/holo_blue_light"-->
+    <!--android:textSize="16sp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent" />-->
+    
+    <!--<View-->
+    <!--android:layout_width="1dp"-->
+    <!--android:layout_height="42dp"-->
+    <!--android:background="#eeeeee"-->
+    <!--app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"-->
+    <!--app:layout_constraintStart_toStartOf="@+id/normal_rgb"-->
+    <!--app:layout_constraintTop_toTopOf="parent" />-->
+    
+    <!--<TextView-->
+    <!--android:id="@+id/dynamic_rgb"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/gradient_mode"-->
+    <!--android:textColor="@android:color/darker_gray"-->
+    <!--android:textSize="16sp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintStart_toEndOf="@id/normal_rgb"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent" />-->
+    
     <!--</android.support.constraint.ConstraintLayout>-->
-
+    
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
@@ -75,8 +75,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
+    
+    
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout6"
         android:layout_width="match_parent"
@@ -84,34 +84,36 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view1">
-
-
+        app:layout_constraintTop_toBottomOf="@+id/view1"
+        >
+    
+    
         <top.defaults.colorpicker.ColorPickerView
             android:id="@+id/color_picker"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
+            android:enabled="false"
             android:gravity="center"
             app:enableBrightness="false"
             app:layout_constraintBottom_toTopOf="@+id/brightness"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
-
-        </top.defaults.colorpicker.ColorPickerView>
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+    
         <CheckBox
-            android:id="@+id/switch_btn"
-            android:layout_width="wrap_content"
+            android:id="@+id/cb_total"
+            android:layout_width="60dp"
             android:layout_height="35dp"
             android:background="@drawable/select_check"
             android:layout_marginTop="@dimen/dp_5"
             android:layout_marginEnd="@dimen/dp_15"
             android:button="@null"
             app:layout_constraintEnd_toEndOf="@+id/brightness"
-            app:layout_constraintTop_toTopOf="parent"/>
-
+            app:layout_constraintTop_toTopOf="parent" />
+        
         <TextView
             android:id="@+id/switch_bt_text"
             android:layout_width="wrap_content"
@@ -123,8 +125,9 @@
             android:layout_marginEnd="@dimen/dp_30"
             android:layout_marginTop="@dimen/dp_40"
             app:layout_constraintEnd_toEndOf="@+id/brightness"
-            app:layout_constraintStart_toStartOf="@+id/switch_btn"
+            app:layout_constraintStart_toStartOf="@+id/cb_total"
             app:layout_constraintTop_toTopOf="parent" />
+        
         <LinearLayout
             android:id="@+id/ll_r"
             android:layout_width="wrap_content"
@@ -134,7 +137,7 @@
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
+            
             <TextView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -142,7 +145,7 @@
                 android:gravity="center"
                 android:text="R"
                 android:textColor="@color/white" />
-
+            
             <TextView
                 android:id="@+id/color_r"
                 android:layout_width="40dp"
@@ -151,7 +154,7 @@
                 android:text="100"
                 android:textColor="@color/white" />
         </LinearLayout>
-
+        
         <LinearLayout
             android:id="@+id/ll_g"
             android:layout_width="wrap_content"
@@ -159,7 +162,7 @@
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="@id/ll_r"
             app:layout_constraintTop_toBottomOf="@id/ll_r">
-
+            
             <TextView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -167,7 +170,7 @@
                 android:gravity="center"
                 android:text="G"
                 android:textColor="@color/white" />
-
+            
             <TextView
                 android:id="@+id/color_g"
                 android:layout_width="40dp"
@@ -176,7 +179,7 @@
                 android:text="100"
                 android:textColor="@color/white" />
         </LinearLayout>
-
+        
         <LinearLayout
             android:id="@+id/ll_b"
             android:layout_width="wrap_content"
@@ -184,7 +187,7 @@
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="@id/ll_r"
             app:layout_constraintTop_toBottomOf="@id/ll_g">
-
+            
             <TextView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
@@ -192,7 +195,7 @@
                 android:gravity="center"
                 android:text="B"
                 android:textColor="@color/white" />
-
+            
             <TextView
                 android:id="@+id/color_b"
                 android:layout_width="40dp"
@@ -201,43 +204,100 @@
                 android:text="100"
                 android:textColor="@color/white" />
         </LinearLayout>
-
+        
         <LinearLayout
             android:id="@+id/brightness"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="vertical"
             android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/tip"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/tip">
-
-            <TextView
-                android:id="@+id/tv_brightness_w"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent">
+            
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:textSize="15sp"
-                android:textColor="@color/black_three"
-                android:text="@string/white_light_regulation" />
-
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+                
+                <TextView
+                    android:id="@+id/tv_brightness_w"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/white_light_regulation"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp" />
+                
+                <CheckBox
+                    android:id="@+id/cb_brightness_enable"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/select_check"
+                    android:button="@null"
+                    android:gravity="center" />
+            
+            </LinearLayout>
+            
+            
             <SeekBar
-                android:layout_marginTop="2dp"
                 android:id="@+id/sb_w_bright"
                 style="@style/SeekBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="25dp"
+                android:layout_marginTop="2dp"
+                android:max="100"
+                android:min="1"
                 android:paddingEnd="25dp"
-                android:min ="1"
-                android:max="100" />
+                android:paddingStart="25dp" />
+            
 
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+                
+                <TextView
+                    android:id="@+id/tv_brightness_rgb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bright_regulation"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp" />
+                
+                <CheckBox
+                    android:id="@+id/cb_brightness_rgb_enable"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/select_check"
+                    android:button="@null"
+                    android:gravity="center" />
+            
+            </LinearLayout>
+            
+            <SeekBar
+                android:id="@+id/sbBrightness"
+                style="@style/SeekBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:max="100"
+                android:paddingEnd="25dp"
+                android:paddingStart="25dp"
+                android:progress="100" />
+            
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 app:layout_constraintStart_toStartOf="parent">
-
+                
                 <ImageView
                     android:id="@+id/sb_w_bright_add"
                     android:layout_width="wrap_content"
@@ -247,7 +307,17 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
+                
+                <ImageView
+                    android:id="@+id/sb_w_bright_less"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="100dp"
+                    android:background="@drawable/less_enabled"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                
                 <TextView
                     android:id="@+id/sb_w_bright_num"
                     android:layout_width="wrap_content"
@@ -259,46 +329,15 @@
                     app:layout_constraintEnd_toStartOf="@+id/sb_w_bright_add"
                     app:layout_constraintStart_toEndOf="@+id/sb_w_bright_less"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/sb_w_bright_less"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/less_enabled"
-                    android:layout_marginRight="100dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
+            
+            
             </android.support.constraint.ConstraintLayout>
-
-            <TextView
-                android:layout_marginTop="6dp"
-                android:id="@+id/tv_brightness_rgb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:textSize="15sp"
-                android:textColor="@color/black_three"
-                android:text="@string/bright_regulation" />
-
-            <SeekBar
-                android:layout_marginTop="2dp"
-                android:id="@+id/sbBrightness"
-                style="@style/SeekBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="25dp"
-                android:paddingEnd="25dp"
-                android:max="100"
-                android:progress="100" />
-
+            
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 app:layout_constraintStart_toStartOf="parent">
-
+                
                 <ImageView
                     android:id="@+id/sbBrightness_add"
                     android:layout_width="wrap_content"
@@ -308,7 +347,17 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
+                
+                <ImageView
+                    android:id="@+id/sbBrightness_less"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="100dp"
+                    android:background="@drawable/less_enabled"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                
                 <TextView
                     android:id="@+id/sbBrightness_num"
                     android:layout_width="wrap_content"
@@ -320,25 +369,15 @@
                     app:layout_constraintEnd_toStartOf="@+id/sbBrightness_add"
                     app:layout_constraintStart_toEndOf="@+id/sbBrightness_less"
                     app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/sbBrightness_less"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="100dp"
-                    android:background="@drawable/less_enabled"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
+            
+            
             </android.support.constraint.ConstraintLayout>
-
+        
         </LinearLayout>
-
+        
         <LinearLayout
-            android:layout_marginTop="4dp"
             android:id="@+id/tip"
+            android:layout_marginTop="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -348,24 +387,24 @@
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/lightVersion"
             app:layout_constraintStart_toStartOf="parent">
-
+            
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/long_click_select_color_tip"
                 android:textColor="@color/black_three"
                 android:textSize="15dp" />
-
+            
             <android.support.v7.widget.RecyclerView
                 android:layout_marginTop="8dp"
                 android:id="@+id/diy_color_recycler_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_gravity="center" />
-
+        
         </LinearLayout>
-
-
+        
+        
         <TextView
             android:id="@+id/lightVersion"
             android:layout_width="wrap_content"
@@ -376,7 +415,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="11sp"
             app:layout_constraintStart_toStartOf="parent" />
-
+    
     </android.support.constraint.ConstraintLayout>
     <!--</ScrollView>-->
 

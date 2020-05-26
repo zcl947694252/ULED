@@ -65,7 +65,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 open class TelinkBaseActivity : AppCompatActivity() {
-    private  var netWorkChangReceiver: NetWorkChangReceiver? = null
+    private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
@@ -95,7 +95,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupName: TextView? = null
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
-
     private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
 
     @SuppressLint("ShowToast")
@@ -103,11 +102,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
-        if (LeBluetooth.getInstance().isSupport(applicationContext))
-            LeBluetooth.getInstance().enable(applicationContext)
-
         //注册网络状态监听广播
-         netWorkChangReceiver = NetWorkChangReceiver()
+        netWorkChangReceiver = NetWorkChangReceiver()
         var filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
@@ -226,7 +222,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     open fun refreshGroupData() {
 
-
     }
 
     //增加全局监听蓝牙开启状态
@@ -294,8 +289,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 afterLogin()
                 val connectDevice = this.mApplication?.connectDevice
                 LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
-                if (!isScanning)
-                    RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
+                //if (!isScanning)
+                // RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
 //              LogUtils.v("zcl---baseactivity收到登出广播")
@@ -323,19 +318,21 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!LeBluetooth.getInstance().enable(applicationContext))
+            TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()
 
-           if (LeBluetooth.getInstance().isEnabled) {
-               if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
-                   changeDisplayImgOnToolbar(true)
-               } else {
-                   changeDisplayImgOnToolbar(false)
-               }
-           } else {
-               changeDisplayImgOnToolbar(false)
-           }
+        if (LeBluetooth.getInstance().isEnabled) {
+            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
+                changeDisplayImgOnToolbar(true)
+            } else {
+                changeDisplayImgOnToolbar(false)
+            }
+        } else {
+            changeDisplayImgOnToolbar(false)
+        }
 
     }
 
@@ -509,9 +506,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
 
                 initOnLayoutListener()
-                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${window.decorView != null}&&---$isResume")
+                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}&&---$isResume")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && window.decorView != null && isResume)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && isResume)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -619,14 +616,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     hideLoadingDialog()
                     val b = this@TelinkBaseActivity.isFinishing
                     val showing = singleLogin?.isShowing
-                    if (!b && showing != null && !showing!!) {
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+                    if (!b && showing != null && !showing) {
                         singleLogin!!.show()
                     }
                 }
 
                 override fun error(msg: String) {
                     hideLoadingDialog()
-                    if (msg != null && msg != "null")
+                    if (msg != "null")
                         ToastUtils.showLong(msg)
                 }
             })
@@ -707,7 +705,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
@@ -815,9 +813,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 if (networkInfo != null && networkInfo.isAvailable) {
                     if (!isHaveNetwork) {
                         val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
-                        if (connected !=true)
+                        if (connected != true)
                             TelinkLightApplication.getApp().initStompClient()
-                    LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
+                        LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
                         isHaveNetwork = true
                     }
                 } else {

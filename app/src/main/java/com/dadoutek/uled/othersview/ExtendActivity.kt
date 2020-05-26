@@ -48,23 +48,23 @@ class ExtendActivity : TelinkBaseActivity(), View.OnClickListener, CompoundButto
     override fun onClick(v: View?) {
         var address = 0
         when (v?.id) {
-            R.id.tv_jbzl -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, address,
+            R.id.tv_jbzl -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, address,
                     byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL,isOpenTag.toByte(),iscloseTag.toByte(),ispowerOnTag.toByte(),issceneTag.toByte()))
-            R.id.tv_jbsd -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, address,
+            R.id.tv_jbsd -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, address,
                     byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD))
-            R.id.tv_pwm -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, address,
+            R.id.tv_pwm -> TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, address,
                     byteArrayOf(Opcode.CONFIG_EXTEND_ALL_PWM))
         }
     }
 
     private fun initListener() {
+        tv_pwm.setOnClickListener(this)
         tv_jbzl.setOnClickListener(this)
         tv_jbsd.setOnClickListener(this)
-        tv_pwm.setOnClickListener(this)
         cb_light_open_switch.setOnCheckedChangeListener(this)
         cb_light_close_switch.setOnCheckedChangeListener(this)
-        cb_light_power_on_switch.setOnCheckedChangeListener(this)
         cb_light_sence_switch.setOnCheckedChangeListener(this)
+        cb_light_power_on_switch.setOnCheckedChangeListener(this)
 
         rg_ly.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -83,7 +83,6 @@ class ExtendActivity : TelinkBaseActivity(), View.OnClickListener, CompoundButto
                     LogUtils.v("zcl-----------设置模式速度fast-------")
                 }
             }
-
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0, byteArrayOf(CONFIG_EXTEND_ALL_JBSD, speedNum.toByte()))
         }
     }

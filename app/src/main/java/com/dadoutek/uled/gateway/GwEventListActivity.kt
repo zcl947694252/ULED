@@ -2,15 +2,17 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
@@ -23,6 +25,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
+import com.dadoutek.uled.gateway.bean.GwTimeAndDataBean
 import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant.*
@@ -34,12 +37,10 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
-import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
+import com.telink.bluetooth.light.LightService
 import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
@@ -69,18 +70,17 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $
  * 更新描述
  */
-class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemChildClickListener {
+class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener {
+    private var receiver: GwBrocasetReceiver? = null
     private lateinit var currentGwTag: GwTagBean
-    private var addBtn2: Button? = null
     private var deleteBean: GwTagBean? = null
-    private var connectCount: Int = 0
+    private var connectCount: Int = 1
     private var disposableTimer: Disposable? = null
     private lateinit var mApp: TelinkLightApplication
     private var listOne = mutableListOf<GwTagBean>()
     private var listTwo = mutableListOf<GwTagBean>()
     private var checkedIdType: Int = 0
     private var dbGw: DbGateway? = null
-    private var addBtn: Button? = null
     private var lastTime: Long = 0
     val adapter = GwEventItemAdapter(R.layout.event_item, listOne)
     val adapter2 = GwEventItemAdapter(R.layout.event_item, listTwo)
@@ -91,87 +91,18 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         menuItem.textSize = 20
         menuItem.setBackgroundColor(getColor(R.color.red))
         menuItem.setText(R.string.delete)
+
         rightMenu.addMenuItem(menuItem)//添加进右侧菜单
     }
 
     fun initView() {
-        disableConnectionStatusListener()
-        toolbarTv.text = getString(R.string.event_list)
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
-        this.mApp = this.application as TelinkLightApplication
-
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
-
-        add_group_btn_tv.text = getString(R.string.add)
-        var emptyView = View.inflate(this, R.layout.empty_view, null)
-        addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
-        addBtn?.text = getString(R.string.add)
-
-        var emptyView2 = View.inflate(this, R.layout.empty_view, null)
-        addBtn2 = emptyView2.findViewById<Button>(R.id.add_device_btn)
-        addBtn2?.text = getString(R.string.add)
-
-        adapter.emptyView = emptyView
-        adapter2.emptyView = emptyView2
+        add_group_btn_tv.text = getString(R.string.add_timing_label)
     }
 
-    override fun onResume() {
-        super.onResume()
-        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
-    }
-
-    override fun performed(event: Event<String>?) {
-        if (event is DeviceEvent) {
-            this.onDeviceEvent(event)
-        }
-    }
-
-    private fun onDeviceEvent(event: DeviceEvent) {
-        when (event.type) {
-            DeviceEvent.STATUS_CHANGED -> {
-                when {
-                    event.args.status == LightAdapter.STATUS_LOGIN -> {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                    }
-                    event.args.status == LightAdapter.STATUS_LOGOUT -> {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                        retryConnect()
-                    }
-                    event.args.status == LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
-                        val deviceInfo = event.args
-                        when (deviceInfo.gwVoipState) {
-                            GW_TIME_ZONE_VOIP, GW_CONFIG_TIMER_LABEL_VOIP, GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
-                                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-                                disposableTimer?.dispose()
-                                hideLoadingDialog()
-                            }
-                            GW_DELETE_TIMER_LABEL_VOIP, GW_DELETE_TIME_PERIVODE_LABEL_VOIP -> {
-                                LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
-                                hideLoadingDialog()
-                                runOnUiThread { deleteSuceess() }
-                            }
-                        }
-                    }
-                    //获取设备mac
-                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
-                        //mac信息获取成功
-                        val deviceInfo = event.args
-                        LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
-                        dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
-                    }
-                    event.args.status == LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
-                    }
-                }
-            }
-        }
-    }
 
     private fun retryConnect() {
         connect(macAddress = dbGw!!.macAddr, fastestMode = true)?.subscribe(
@@ -232,7 +163,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                     intent = Intent(this, GwDeviceDetailActivity::class.java)
                     startActivity(intent)
                     DBUtils.saveGateWay(dbGw!!, true)
-                    finish()
+                  //  finish()
                 }
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)
@@ -269,13 +200,15 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     @SuppressLint("SetTextI18n")
     fun initData() {
         checkedIdType = event_timer_mode.id
-        dbGw = intent.getParcelableExtra<DbGateway>("data")
+        dbGw = intent.getParcelableExtra("data")
         if (dbGw == null) {
             TmtUtils.midToast(this@GwEventListActivity, getString(R.string.no_get_device_info))
             intent = Intent(this, GwDeviceDetailActivity::class.java)
             startActivity(intent)
             finish()
         }
+
+        toolbarTv.text = dbGw?.name
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
             val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
@@ -288,8 +221,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             })
         }
         bottom_version_number.text = dbGw?.version
-
-        toolbarTv.text = getString(R.string.device_name) + dbGw?.name
 
         swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
@@ -332,7 +263,8 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                 it.weekStr = getWeekStr(it.week)
             }
             val list = listOne.filter { it.status == 1 }
-            if (list.isNotEmpty()) {
+            if (list.isEmpty()) {
+                add_group_btn.visibility = View.VISIBLE
                 changeRecycleView()
             }
 
@@ -351,7 +283,8 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
 
             val list = listTwo.filter { it.status == 1 }
 
-            if (list.isNotEmpty()) {
+            if (list.isEmpty()) {
+                add_group_btn.visibility = View.VISIBLE
                 changeRecycleView()
             }
             if (dbGw?.type == 1) {
@@ -362,7 +295,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     }
 
     private fun isShowAdd(list: MutableList<GwTagBean>) {
-        if (list.size > 0)
+        if (list.size >= 0)
             add_group_btn?.visibility = View.VISIBLE
         else
             add_group_btn?.visibility = View.GONE
@@ -376,19 +309,42 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
             startActivity(intent)
             finish()
         }
-        addBtn?.setOnClickListener { addNewTag() }
-        addBtn2?.setOnClickListener { addNewTag() }
+        toolbar.setOnClickListener {
+            val textGp = EditText(this)
+            StringUtils.initEditTextFilter(textGp)
+            val s = dbGw?.name ?: ""
+            textGp.setText(s)
+            textGp.setSelection(s.length)
+            AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.update_name))
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setView(textGp)
+                    .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                            ToastUtils.showLong(getString(R.string.rename_tip_check))
+                        } else {
+                            val trim = textGp.text.toString().trim { it <= ' ' }
+                            dbGw?.name = trim
+                            toolbarTv.text = trim
+                            DBUtils.saveGateWay(dbGw!!, false)
+                        }
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        }
+
         add_group_btn?.setOnClickListener { addNewTag() }
 
         event_timer_mode.setOnClickListener {
             changeRecycleView()
             dbGw?.type = 0///网关模式 0定时 1循环
+            add_group_btn_tv.text = getString(R.string.add_timing_label)
             isShowAdd(listOne)
         }
 
         event_time_pattern_mode.setOnClickListener {
             changeRecycleView2()
             dbGw?.type = 1///网关模式 0定时 1循环
+            add_group_btn_tv.text = getString(R.string.add_cycle_label)
             isShowAdd(listTwo)
         }
 
@@ -436,6 +392,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         swipe_recycleView2.visibility = View.VISIBLE
         event_timer_mode.setTextColor(getColor(R.color.gray9))
         event_time_pattern_mode.setTextColor(getColor(R.color.blue_text))
+        add_group_btn_tv.text = getString(R.string.add_cycle_label)
         adapter2.notifyDataSetChanged()
     }
 
@@ -444,6 +401,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
         swipe_recycleView2.visibility = View.GONE
         event_timer_mode.setTextColor(getColor(R.color.blue_text))
         event_time_pattern_mode.setTextColor(getColor(R.color.gray9))
+        add_group_btn_tv.text = getString(R.string.add_timing_label)
         adapter.notifyDataSetChanged()
     }
 
@@ -607,7 +565,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
                         WeekBean(getString(R.string.sunday), 7, (tmpWeek and SUNDAY) != 0))
                 for (i in 0 until list!!.size) {
                     var weekBean = list!![i]
-                    if (weekBean.checked) {
+                    if (weekBean.selected) {
                         if (i == list!!.size - 1)
                             sb.append(weekBean.week)
                         else
@@ -637,7 +595,7 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     private fun sendOpenOrCloseGw(dbGwTag: GwTagBean, isMutex: Boolean) {
         disposableTimer?.dispose()
         connectCount++
-        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(20000, TimeUnit.MILLISECONDS)
                 .subscribe {
                     if (connectCount < 3)
                         sendOpenOrCloseGw(dbGwTag, isMutex)
@@ -763,7 +721,6 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     }
 
     private fun addNewTag() {
-
         var list = if (dbGw?.type == 0)
             listOne
         else
@@ -782,6 +739,39 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_list)
+        receiver = GwBrocasetReceiver()
+        val filter = IntentFilter()
+        filter.addAction(LightService.ACTION_STATUS_CHANGED)
+        registerReceiver(receiver, filter)
+        receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
+            override fun loginSuccess() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+            }
+
+            override fun loginFail() {
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                retryConnect()
+            }
+
+            override fun setGwComplete(deviceInfo: DeviceInfo) {
+                when (deviceInfo.gwVoipState) {
+                    GW_TIME_ZONE_VOIP, GW_CONFIG_TIMER_LABEL_VOIP, GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
+                        disposableTimer?.dispose()
+                        hideLoadingDialog()
+                    }
+                    GW_DELETE_TIMER_LABEL_VOIP, GW_DELETE_TIME_PERIVODE_LABEL_VOIP -> {
+                        hideLoadingDialog()
+                        runOnUiThread { deleteSuceess() }
+                    }
+                }
+            }
+
+            override fun getMacComplete(deviceInfo: DeviceInfo) {
+                //mac信息获取成功
+                dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
+            }
+        })
+
         initView()
         initData()
         initListener()
@@ -790,13 +780,14 @@ class GwEventListActivity : TelinkBaseActivity(), EventListener<String>, BaseQui
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 1000) {
-            dbGw = data?.getParcelableExtra<DbGateway>("data")
+            dbGw = data?.getParcelableExtra("data")
             getNewData()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(receiver)
         disposableTimer?.dispose()
         //定时
         if (checkedIdType == R.id.event_timer_mode) {//定時模式  0定时 1循环
