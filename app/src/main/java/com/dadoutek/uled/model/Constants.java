@@ -1,11 +1,9 @@
 package com.dadoutek.uled.model;
-
 import java.io.Serializable;
 
 /**
  * Created by hejiajun on 2018/3/22.
  */
-
 public class Constants implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
@@ -19,8 +17,7 @@ public class Constants implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-
-    public static Boolean isDebug = false;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
