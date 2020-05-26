@@ -355,8 +355,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         DBUtils.deleteSwitch(deleteSwitch)
                         notifyData()
 
-
-
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -520,7 +518,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         downloadDispoable?.dispose()
         mConnectDeviceDisposable?.toString()
         acitivityIsAlive = false
-        TelinkLightService.Instance()?.idleMode(true)
         //移除事件
     }
 

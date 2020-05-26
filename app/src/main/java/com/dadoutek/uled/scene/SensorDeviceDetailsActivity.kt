@@ -174,8 +174,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
         isClick = 5
-        if (isLogin)
-            TelinkLightService.Instance()?.idleMode(true)
+
         this.mApplication?.removeEventListener(this)
     }
 
@@ -481,22 +480,26 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             no_device_relativeLayout.visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         } else {
-            recycleView.visibility = View.GONE
-            no_device_relativeLayout.visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (dialog_pir?.visibility == View.GONE) {
-                            dialog_pir?.visibility = View.VISIBLE//showPopupMenu
-                        }
+            setEmpty()
+        }
+    }
+
+    private fun setEmpty() {
+        recycleView.visibility = View.GONE
+        no_device_relativeLayout.visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
+                else {
+                    if (dialog_pir?.visibility == View.GONE) {
+                        dialog_pir?.visibility = View.VISIBLE//showPopupMenu
                     }
                 }
-
             }
+
         }
     }
 
@@ -798,6 +801,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             sensorDatummms.remove(currentLightm!!)
                             toolbar.title = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
                             adapter?.notifyDataSetChanged()
+                            if (sensorDatummms.size<=0)
+                                setEmpty()
+                             if (isLogin)
+                             TelinkLightService.Instance()?.idleMode(true)
                         }, {
                     hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.reset_factory_fail))
