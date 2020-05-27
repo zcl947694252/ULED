@@ -3,14 +3,13 @@ package com.dadoutek.uled.pir
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils.groupList
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
 import com.dadoutek.uled.switches.SceneMoreItemAdapter
@@ -51,7 +50,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
         }
 
         template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+        type = intent.getIntExtra(Constants.EIGHT_SWITCH_TYPE, 0)
         when (type) {
             0, 2 -> {//选群组
                 template_recycleView?.adapter = groupAdapter

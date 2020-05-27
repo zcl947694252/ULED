@@ -7,6 +7,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.Settings
 import android.support.constraint.ConstraintLayout
@@ -23,7 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.DbModel.DbRegion
@@ -71,6 +72,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${
  */
 class NetworkActivity : BaseActivity(), View.OnClickListener {
+    private var mBitmap: Bitmap? = null
     private var transferRegionCode: String = ""
     private var transferCode: String = ""
     private var authorizeCode: String = ""
@@ -159,7 +161,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             viewAdd!!.findViewById<EditText>(R.id.pop_region_name).hint = getString(R.string.input_region_name)
             popAdd?.let { it1 -> showPop(it1, Gravity.CENTER) }
         }
-
+        pop?.setOnDismissListener {
+            recycleBitmap()
+        }
         image_bluetooth.setOnClickListener {
             openScan()
         }
@@ -194,9 +198,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun recycleBitmap() {
+        if (mBitmap?.isRecycled!=true)
+            mBitmap?.recycle()
+    }
+
     private fun addRegion(text: Editable) {
         val dbRegion = DbRegion()
-        dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
+        dbRegion.installMesh = Constants.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
         if (isAddRegion) {
@@ -486,7 +495,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 when (isShowType) {
                     1 -> {
                         val intent = Intent(this@NetworkActivity, UnbindMeNetActivity::class.java)
-                        intent.putExtra(Constant.SHARE_PERSON, regionBean)
+                        intent.putExtra(Constants.SHARE_PERSON, regionBean)
                         startActivity(intent)
                         PopUtil.dismiss(pop)
                     }
@@ -768,8 +777,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
 
     private fun setQR(it: String) {
-        var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px(231f), ConvertUtils.dp2px(231f), null)
+         mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px(231f), ConvertUtils.dp2px(231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
+        //mBitmap.recycle()
     }
 
     @SuppressLint("SetTextI18n")
@@ -1144,6 +1154,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onDestroy()
         PopUtil.dismiss(pop)
         PopUtil.dismiss(popAdd)
+        recycleBitmap()
         disposableEnsure?.dispose()
         disposableRequest?.dispose()
         mCompositeDisposable.dispose()

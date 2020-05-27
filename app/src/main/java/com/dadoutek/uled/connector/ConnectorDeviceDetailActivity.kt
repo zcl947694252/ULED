@@ -23,7 +23,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
@@ -85,7 +85,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.template_device_detail_list)
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
         initView()
@@ -147,7 +147,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -172,7 +172,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }
@@ -325,7 +325,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -334,7 +334,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -343,7 +343,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_CURTAIN -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -356,7 +356,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_CONNECTOR -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -365,7 +365,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_GATEWAY -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -397,7 +397,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun addDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
         startActivityForResult(intent, 0)
     }
 
@@ -448,11 +448,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                             var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
                             if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                                 intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
-                                intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                                intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
                             }
-                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                            intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
+                            intent.putExtra(Constants.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                            intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         }
                     }
@@ -511,7 +511,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                             ToastUtils.showLong(getString(R.string.author_region_warm))
                         else {
                             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivity(intent)
                         }
                     }

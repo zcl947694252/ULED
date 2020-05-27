@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -19,7 +20,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
@@ -92,8 +93,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = mDeviceInfo.firmwareRevision
+
         tvLightVersion.text = localVersion
-        if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS")||localVersion.contains("STS"))
+        if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
             isGlassSwitch = true
 
         if (groupName != null && groupName == "true") {
@@ -130,7 +134,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
-            }  else {
+            } else {
                 switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
                 if (switchDate != null)
                     DBUtils.updateSwicth(switchDate!!)
@@ -153,7 +157,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         renameDialog?.setOnDismissListener {
 
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            if (switchDate!=null)
+            if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }
@@ -167,7 +171,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (switchDate != null && switchDate?.name != "")
             renameEditText?.setText(switchDate?.name)
         else {
-            if (switchDate != null && switchDate?.name != ""&&switchDate != null && switchDate?.name != null)
+            if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
                 renameEditText?.setText(switchDate?.name)
             else
                 renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
@@ -425,10 +429,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+dbSwitch.meshAddr
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
-
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 //Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
@@ -439,6 +443,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 dbSwitch.index = dbSwitch.id.toInt()
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
 
@@ -449,7 +454,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constants.DB_ADD)
                 switchDate = dbSwitch
             }
 
@@ -471,7 +476,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName).substring(0, 16)

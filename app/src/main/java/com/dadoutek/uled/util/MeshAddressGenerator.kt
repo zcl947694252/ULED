@@ -24,15 +24,27 @@ class MeshAddressGenerator {
         val lights = DBUtils.allLight.map { it.meshAddr }
         val curtain = DBUtils.allCurtain.map { it.meshAddr }
         val relay = DBUtils.allRely.map { it.meshAddr }
+        val switch = DBUtils.getAllSwitch().map { it.meshAddr }
+        val sensor = DBUtils.getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()
         addressList.addAll(lights)
         addressList.addAll(curtain)
         addressList.addAll(relay)
+        addressList.addAll(switch)
+        addressList.addAll(sensor)
         addressList.sortBy { it }
         meshAddress = when {
             addressList.isEmpty() -> MeshUtils.DEVICE_ADDRESS_MIN
             else -> {
-                addressList.last()
+                var  meshAddressNum = addressList.last()
+                for (i in 0..5000){
+                    if (!addressList.contains(i)){
+                        meshAddressNum=i
+                        break;
+                    }
+                }
+                meshAddressNum
+                //addressList.last()
             }
         }
     }

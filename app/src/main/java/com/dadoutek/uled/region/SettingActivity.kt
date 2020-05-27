@@ -29,8 +29,8 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.PhysicalRecoveryActivity
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.downTime
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constants.downTime
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.Opcode
@@ -50,6 +50,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -118,6 +122,15 @@ class SettingActivity : BaseActivity() {
                     }
             }
         }
+        setting_masking.setOnClickListener { }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(500)
+            setting_masking.visibility = View.GONE
+        }
     }
 
     private fun physicalRecovery() {
@@ -131,14 +144,14 @@ class SettingActivity : BaseActivity() {
         disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
             hideLoadingDialog()
             disposableFind?.dispose()
-            ToastUtils.showShort(getString(R.string.find_device_num)+0)
+            ToastUtils.showShort(getString(R.string.find_device_num) + 0)
         }
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     disposableTimer?.dispose()
-                    ToastUtils.showShort(getString(R.string.find_device_num)+it)
+                    ToastUtils.showShort(getString(R.string.find_device_num) + it)
                     hideLoadingDialog()
                 }, {
                     disposableTimer?.dispose()
@@ -197,7 +210,7 @@ class SettingActivity : BaseActivity() {
     private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Int) {
         setNormalPopSetting()
 
-        if (isShowThree==2||isShowThree==3) {
+        if (isShowThree == 2 || isShowThree == 3) {
             tvThree.visibility = View.VISIBLE
             hinitThree.visibility = View.VISIBLE
         } else {
@@ -349,7 +362,7 @@ class SettingActivity : BaseActivity() {
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
             override fun onNext(s: String) {
                 LogUtils.e("zcl-----------$s")
-                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.IS_LOGIN, false)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
                 CleanUtils.cleanExternalCache()
@@ -358,12 +371,10 @@ class SettingActivity : BaseActivity() {
                 ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
-                try {
-                    Thread.sleep(300)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(300)
+                    restartApplication()
                 }
-                restartApplication()
             }
 
             override fun onError(e: Throwable) {
@@ -420,9 +431,9 @@ class SettingActivity : BaseActivity() {
         confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            when (isResetFactory){
+            when (isResetFactory) {
                 1 -> clearData()
-                3 ->  startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
                 2 -> if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
                 else
@@ -441,7 +452,7 @@ class SettingActivity : BaseActivity() {
      */
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
+        SharedPreferencesHelper.putBoolean(this, Constants.DELETEING, true)
 
         val lightList = allLights
         val curtainList = allCutain
@@ -464,12 +475,12 @@ class SettingActivity : BaseActivity() {
         }
 
         Commander.resetAllDevices(meshAdre, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.DELETEING, false)
             syncData()
             this@SettingActivity.bnve?.currentItem = 0
             null
         }, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constants.DELETEING, false)
             null
         })
         if (meshAdre.isEmpty()) {

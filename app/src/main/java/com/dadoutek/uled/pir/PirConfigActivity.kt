@@ -76,9 +76,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var timeUnitType: Int = 1
 
     /**
-     * 1 开 0关 2自定义
+     * 0 开 1关 2自定义
      */
-    private var triggerAfterShow: Int = 1
+    private var triggerAfterShow: Int = 0
 
     /**
      * 0全天    1白天   2夜晚
@@ -188,8 +188,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getTriggerAfterShow() {
-        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_on), true))
+        listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.custom_brightness), false))
     }
 
@@ -240,7 +240,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 showBottomList.addAll(showGroupList)
             } else {
-                currentScene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                currentScene = data?.getParcelableExtra(Constants.EIGHT_SWITCH_TYPE) as DbScene
                 setItemScene()
             }
             bottomGvAdapter.notifyDataSetChanged()
@@ -308,12 +308,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+                intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 0)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {
                 val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 1)
+                intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 1)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_see_help -> {
@@ -366,7 +366,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
                         sendCommandOpcode(time.toInt())
                         delay(300)
-                        if (!isConfirm)//不是冲洗创建 更新mesh
+                        //if (!isConfirm)//不是冲洗创建 更新mesh
                             mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
@@ -427,6 +427,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo!!.macAddress
+        if (TextUtils.isEmpty(version))
+            version = mDeviceInfo!!.firmwareRevision
         dbSensor.version = version
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
@@ -437,7 +439,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
         DBUtils.recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+                Constants.DB_ADD)
     }
 
     private fun getControlGroup(): String? {
@@ -593,6 +595,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         allDispoables()
+        TelinkLightService.Instance()?.idleMode(true)
     }
     /*  pir_config_switch.setOnCheckedChangeListener { _, checkedId ->
        val byteArrayOf = if (checkedId == R.id.pir_config_switch_open)

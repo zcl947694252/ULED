@@ -29,7 +29,7 @@ import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
@@ -225,13 +225,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
                 var list = mutableListOf(
-                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
-                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
-                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
-                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
-                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
-                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
-                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
+                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
+                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
+                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
+                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
+                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
                 for (i in 0 until list!!.size) {
                     var weekBean = list!![i]
                     if (weekBean.selected) {
@@ -342,7 +342,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             val encoder = Base64.getEncoder()
             val s = encoder.encodeToString(labHeadPar)
             val gattBody = GwGattBody()
-            gattBody.ser_id = Constant.GW_GATT_DELETE_LABEL_TASK
+            gattBody.ser_id = Constants.GW_GATT_DELETE_LABEL_TASK
             gattBody.data = s
             gattBody.macAddr = dbGw?.macAddr
             sendToServer(gattBody)
@@ -406,7 +406,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                 val s = encoder.encodeToString(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
-                gattBody.ser_id = Constant.GW_GATT_SAVE_LABEL_HEAD
+                gattBody.ser_id = Constants.GW_GATT_SAVE_LABEL_HEAD
                 gattBody.macAddr = dbGw?.macAddr
                 gattBody.tagName = it.tagName
                 sendToServer(gattBody)
@@ -656,13 +656,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
             override fun setGwComplete(deviceInfo: DeviceInfo) {
                 when (deviceInfo.gwVoipState) {
-                    Constant.GW_DELETE_TIMER_TASK_VOIP, Constant.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
+                    Constants.GW_DELETE_TIMER_TASK_VOIP, Constants.GW_DELETE_TIME_PERIVODE_TASK_VOIP -> {//删除task回调 收到一定是成功
                         hideLoadingDialog()
                         disposableTimer?.dispose()
                         runOnUiThread { upDataDeleteUi() }
                     }
 
-                    Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
+                    Constants.GW_CONFIG_TIMER_LABEL_VOIP, Constants.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                         saveOrUpdataGw(dbGw!!)
                         val intent = Intent()
@@ -695,13 +695,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     }
     override fun receviedGwCmd2000(serId: String) {
         when (serId?.toInt()) {
-            Constant.GW_GATT_DELETE_LABEL_TASK -> {
+            Constants.GW_GATT_DELETE_LABEL_TASK -> {
                 //删除标签task时间任务 不成功定时会将数据还原
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 upDataDeleteUi()
             }
-            Constant.GW_GATT_SAVE_LABEL_HEAD -> {
+            Constants.GW_GATT_SAVE_LABEL_HEAD -> {
                 //保存标签头信息  保存成功发送数据会上一页 不成功不做操作
                 disposableTimer?.dispose()
                 saveOrUpdataGw(dbGw!!)

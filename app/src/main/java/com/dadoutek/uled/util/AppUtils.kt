@@ -20,7 +20,7 @@ class AppUtils private constructor() {
     companion object {
 
         /**
-         * [获取应用程序版本名称信息]
+         * 获取应用程序版本名称信息
          *
          * @param context
          * @return 当前应用的版本名称

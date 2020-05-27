@@ -244,6 +244,7 @@
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="4"
+                        android:text="10"
                         android:textColor="@color/blue_background"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"

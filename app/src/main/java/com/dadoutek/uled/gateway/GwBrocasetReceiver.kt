@@ -3,14 +3,9 @@ package com.dadoutek.uled.gateway
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.ImageView
-import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.LightService
-import kotlinx.android.synthetic.main.toolbar.*
 
 class GwBrocasetReceiver : BroadcastReceiver() {
     private var gwStateChangeListerner: GwStateChangeListerner? = null

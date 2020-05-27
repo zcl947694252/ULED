@@ -34,7 +34,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.*
+import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.model.HttpModel.GwModel
@@ -52,6 +52,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -88,6 +89,8 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var isLogin: Boolean = false
+    private var factory: TextView? = null
     private var disposableTimer: Disposable? = null
     private var connectTimer: Disposable? = null
     private var disposable: Disposable? = null
@@ -171,6 +174,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
         isClick = 5
+
         this.mApplication?.removeEventListener(this)
     }
 
@@ -191,11 +195,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
         group = views?.findViewById<TextView>(R.id.switch_group)
         ota = views?.findViewById<TextView>(R.id.ota)
-        delete = views?.findViewById<TextView>(R.id.deleteBtn)
+        factory = views?.findViewById<TextView>(R.id.deleteBtn)
+        delete = views?.findViewById<TextView>(R.id.deleteBtnNoFactory)
         rename = views?.findViewById<TextView>(R.id.rename)
-        delete?.text = getString(R.string.delete)
 
-        rename?.visibility = View.GONE
+
+
+        rename?.visibility = View.VISIBLE
+        delete?.visibility = View.VISIBLE
         ota?.visibility = View.VISIBLE
         group?.visibility = View.VISIBLE
         group?.text = getString(R.string.relocation)
@@ -241,7 +248,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                         connectSensorTimeoutDisposable?.dispose()
                         disposable?.dispose()
@@ -251,28 +258,28 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }
     }
 
-    private fun addNewGroup() {
+    private fun renameSesor() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
-        textGp.setText(DBUtils.getDefaultNewGroupName())
+        textGp.setText(currentLightm?.name)
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
+                .setTitle(R.string.rename)
                 .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
-                        //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                        currentLightm?.name = textGp.text.toString()
+                        DBUtils.saveSensor(currentLightm!!, true)
+                        sensorDatummms[positionCurrent].name = textGp.text.toString()
+                        adapter?.notifyDataSetChanged()
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     private fun showInstallDeviceList() {
@@ -405,7 +412,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -414,7 +421,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -423,7 +430,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_CURTAIN -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -439,7 +446,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_CONNECTOR -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -448,7 +455,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_GATEWAY -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -472,22 +479,26 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             no_device_relativeLayout.visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         } else {
-            recycleView.visibility = View.GONE
-            no_device_relativeLayout.visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (dialog_pir?.visibility == View.GONE) {
-                            dialog_pir?.visibility = View.VISIBLE//showPopupMenu
-                        }
+            setEmpty()
+        }
+    }
+
+    private fun setEmpty() {
+        recycleView.visibility = View.GONE
+        no_device_relativeLayout.visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
+                else {
+                    if (dialog_pir?.visibility == View.GONE) {
+                        dialog_pir?.visibility = View.VISIBLE//showPopupMenu
                     }
                 }
-
             }
+
         }
     }
 
@@ -521,10 +532,38 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             compositeDisposable.add(disposable!!)
                             popupWindow?.dismiss()
                         }
-
-                        delete?.setOnClickListener {
+                        factory?.setOnClickListener {
                             //添加恢复出厂设置
-                            //showResetConfirmDialog()
+                            isClick = RESET_SENSOR
+                            var textView = TextView(this)
+                            textView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                            textView.gravity = Gravity.CENTER
+                            textView.text = getString(R.string.delete_light_confirm)
+                            AlertDialog.Builder(this)
+                                    .setTitle(R.string.factory_reset)
+                                    .setView(textView)
+                                    .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                                        popupWindow!!.dismiss()
+                                        val instance = TelinkLightService.Instance()
+                                        instance?.idleMode(true)
+                                        progressBar_sensor.visibility = View.GONE
+                                        disposableConnectTimer?.dispose()
+                                        disposableConnectTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe {
+                                                    autoConnectSensor(true)
+                                                }
+                                    }
+                                    .setNegativeButton(getString(R.string.btn_cancel)) { _, _ ->
+                                        popupWindow!!.dismiss()
+                                    }.show()
+                        }
+                        rename?.setOnClickListener {
+                            renameSesor()
+                            PopUtil.dismiss(popupWindow)
+                        }
+                        delete?.setOnClickListener {
+                            //删除设备
                             popupWindow?.dismiss()
                             var deleteSensor = sensorDatummms[position]
                             AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
@@ -623,7 +662,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     if (currentLightm!!.openTag == 1) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                                 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                        gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
+                        gattBody.ser_id = Constants.SER_ID_SENSOR_OFF
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                                 0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
@@ -633,7 +672,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     val encoder = Base64.getEncoder()
                     val s = encoder.encodeToString(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentLightm!!.meshAddr
                     sendToServer(gattBody)
                 } else {
@@ -670,7 +709,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 disposableTimer?.dispose()
                 ToastUtils.showShort(e.message)
                 hideLoadingDialog()
-                        LogUtils.v("zcl-----------远程控制-------${e.message}")
+                LogUtils.v("zcl-----------远程控制-------${e.message}")
             }
         })
     }
@@ -678,7 +717,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
-        if (currentLightm!!.version!=null&&currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
+        if (currentLightm!!.version != null && currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
             val byteArrayOf = if (currentLightm!!.openTag == 1) {
                 sendCloseIcon(position)
                 byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
@@ -751,19 +790,25 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
      */
     private fun resetSensor() {
         isClick = SENSOR_FINISH
-        val opcode = Opcode.KICK_OUT//发送恢复出厂命令
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        val list = arrayListOf<Int>()
-        val disposableReset = Commander.resetDevice(deviceInfo.meshAddress, true)
+        val disposableReset = Commander.resetDevice(currentLightm!!.meshAddr, true)
                 .subscribe(
                         {
-                            LogUtils.v("zcl-----恢复出厂成功")
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.reset_factory_success))
+                            DBUtils.deleteSensor(currentLightm!!)
+                            sensorDatummms.remove(currentLightm!!)
+                            toolbar.title = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
+                            adapter?.notifyDataSetChanged()
+                            if (sensorDatummms.size<=0)
+                                setEmpty()
+                             if (isLogin)
+                             TelinkLightService.Instance()?.idleMode(true)
                         }, {
-                    LogUtils.v("zcl-----恢复出厂失败")
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
                 }
                 )
-
-        LogUtils.e("zcl", "zcl******重启人体")
         connectSensorTimeoutDisposable?.dispose()
     }
 
@@ -784,6 +829,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 var status = (event as DeviceEvent).args.status
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {//3
+                        isLogin = true
                         progressBar_sensor.visibility = View.GONE
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         when (isClick) {//重新配置
@@ -807,6 +853,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                      * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
+                        isLogin = false
                         if (isClick == OPEN_CLOSE)
                             return
                         if (isClick != RESET_SENSOR && isClick != SENSOR_FINISH)//恢复
@@ -860,46 +907,52 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                     hideLoadingDialog()
                                     if ("" != s) {
                                         currentLightm!!.version = s
-                                        DBUtils.saveSensor(currentLightm!!,true)
-                                        if (isOTA) {
-                                            currentLightm!!.version = s
-                                            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                                            if (isBoolean) {
-                                                transformView()
-                                            } else {
-                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
-                                                } else {
-                                                    ToastUtils.showLong(getString(R.string.version_disabled))
-                                                    hideLoadingDialog()
-                                                }
-                                            }
-                                        } else {
-                                            if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
-                                                currentLightm!!.version = s
-                                                startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
-                                            } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
-                                                if (s.contains("NPR"))
-                                                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
-                                                else
-                                                    startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo!!, "update" to "0", "version" to s)
-                                            }
-                                            doFinish()
-                                        }
+                                        DBUtils.saveSensor(currentLightm!!, true)
+                                        skipeDevice(isOTA, s)
                                         isClick = SENSOR_FINISH
                                     } else {
+                                        skipeDevice(isOTA, currentLightm!!.version)
                                         hideLoadingDialog()
-                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                        //ToastUtils.showLong(getString(R.string.get_version_fail))
                                     }
                                 },
                                 {
                                     hideLoadingDialog()
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    skipeDevice(isOTA, currentLightm!!.version)
+                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
                                 }
                         )
             } else {
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             }
+        }
+    }
+
+    private fun SensorDeviceDetailsActivity.skipeDevice(isOTA: Boolean, s: String) {
+        if (isOTA) {
+            currentLightm!!.version = s
+            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+            if (isBoolean) {
+                transformView()
+            } else {
+                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
+                } else {
+                    ToastUtils.showLong(getString(R.string.version_disabled))
+                    hideLoadingDialog()
+                }
+            }
+        } else {
+            if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
+                currentLightm!!.version = s
+                startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+            } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+                if (s.contains("NPR"))
+                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                else
+                    startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
+            }
+            doFinish()
         }
     }
 
@@ -938,10 +991,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()
         val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, currentLightm?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, currentLightm?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, currentLightm?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        intent.putExtra(Constants.OTA_MAC, currentLightm?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, currentLightm?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, currentLightm?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }

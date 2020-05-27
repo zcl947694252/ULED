@@ -25,7 +25,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -229,7 +229,7 @@ abstract class BaseActivity : AppCompatActivity() {
     //重启app并杀死原进程
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
         AppUtils.relaunchApp()
     }
@@ -308,10 +308,10 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
-        filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
+        filter.addAction(Constants.GW_COMMEND_CODE)
+        filter.addAction(Constants.LOGIN_OUT)
+        filter.addAction(Constants.CANCEL_CODE)
+        filter.addAction(Constants.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
@@ -319,8 +319,8 @@ abstract class BaseActivity : AppCompatActivity() {
     inner class StompReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Constant.GW_COMMEND_CODE -> {
-                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                Constants.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constants.GW_COMMEND_CODE) as GwStompBean
                     when (gwStompBean.cmd) {
                         700 -> TelinkLightApplication.getApp().offLine = false
                         701 -> TelinkLightApplication.getApp().offLine = true
@@ -328,12 +328,12 @@ abstract class BaseActivity : AppCompatActivity() {
                         2500 -> receviedGwCmd2500(gwStompBean)
                     }
                 }
-                Constant.LOGIN_OUT -> {
+                Constants.LOGIN_OUT -> {
                     checkNetworkAndSync(this@BaseActivity)
-                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
+                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constants.LOGIN_OUT, false)}")
                 }
-                Constant.CANCEL_CODE -> {
-                    val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
+                Constants.CANCEL_CODE -> {
+                    val extra = intent.getSerializableExtra(Constants.CANCEL_CODE)
                     var cancelBean: CancelAuthorMsg? = null
                     if (extra != null)
                         cancelBean = extra as CancelAuthorMsg
@@ -356,8 +356,8 @@ abstract class BaseActivity : AppCompatActivity() {
                     cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
 
                 }
-                Constant.PARSE_CODE -> {
-                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
+                Constants.PARSE_CODE -> {
+                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constants.PARSE_CODE) as QrCodeTopicMsg
 //                    LogUtils.e("zcl_baseMe___________解析二维码")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
                 }

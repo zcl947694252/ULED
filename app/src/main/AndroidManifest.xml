@@ -36,6 +36,7 @@
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
+            android:largeHeap="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning"
@@ -267,18 +268,7 @@
         <!-- android:label="@string/activity_device_scanning_label" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- /> -->
-        <activity
-                android:name=".qrcode.QRCodeScanActivity"
-                android:screenOrientation="portrait" />
-        <activity
-                android:name=".qrcode.QRCodeShareActivity"
-                android:screenOrientation="portrait" />
-        <activity
-                android:name=".group.RenameActivity"
-                android:screenOrientation="portrait" />
-        <activity
-                android:name=".light.RenameLightActivity"
-                android:screenOrientation="portrait" />
+
         <activity
                 android:name=".othersview.SelectDeviceTypeActivity"
                 android:screenOrientation="portrait" />
@@ -313,9 +303,7 @@
         <activity
                 android:name=".light.DeviceScanningNewActivity"
                 android:screenOrientation="portrait" />
-        <activity
-                android:name=".light.EmptyAddActivity"
-                android:screenOrientation="portrait" /> <!-- <activity -->
+   <!-- <activity -->
         <!-- android:name=".scene.SetSceneAct" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity

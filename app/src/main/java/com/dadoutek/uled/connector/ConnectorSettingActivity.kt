@@ -27,7 +27,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -112,7 +112,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                         deleteGroup(DBUtils.getConnectorByGroupID(group!!.id), group!!,
                                 successCallback = {
                                     (this).hideLoadingDialog()
-                                    this?.setResult(Constant.RESULT_OK)
+                                    this?.setResult(Constants.RESULT_OK)
                                     this?.finish()
                                 },
                                 failedCallback = {
@@ -223,7 +223,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             TelinkLightService.Instance()?.disconnect()
             return
         }
-        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+        intent.putExtra(Constants.TYPE_VIEW, Constants.LIGHT_KEY)
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
         intent.putExtra("uuid", light!!.productUUID)
@@ -355,7 +355,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
                         } else {
@@ -402,7 +402,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     private fun transformView() {
         val intent = Intent(this@ConnectorSettingActivity, OTAConnectorActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constants.UPDATE_LIGHT, light)
         startActivity(intent)
         finish()
     }
@@ -558,8 +558,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun initType() {
-        val type = intent.getStringExtra(Constant.TYPE_VIEW)
-        if (type == Constant.TYPE_GROUP) {
+        val type = intent.getStringExtra(Constants.TYPE_VIEW)
+        if (type == Constants.TYPE_GROUP) {
             currentShowPageGroup = true
             show_light_btn.visibility = View.GONE
             show_group_btn.visibility = View.VISIBLE
@@ -591,12 +591,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
+        val get = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY)
         if (get != null)
             this.light = get as DbConnector
 
-        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
-        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
+        this.fromWhere = this.intent.getStringExtra(Constants.LIGHT_REFRESH_KEY)
+        this.gpAddress = this.intent.getIntExtra(Constants.GROUP_ARESS_KEY, 0)
         // intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
         //intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
         //intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
@@ -758,7 +758,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         return if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setResult(Constant.RESULT_OK)
+            setResult(Constants.RESULT_OK)
             finish()
             false
         } else {

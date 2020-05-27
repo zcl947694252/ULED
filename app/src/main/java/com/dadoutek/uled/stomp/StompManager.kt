@@ -2,7 +2,7 @@ package com.dadoutek.uled.stomp
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.base.CancelAuthorMsg
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.google.gson.Gson
@@ -44,11 +44,11 @@ class StompManager private constructor() {
     fun initStompClient() {
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
-        headers.add(StompHeader("host", Constant.WS_HOST))
+        headers.add(StompHeader("host", Constants.WS_HOST))
 
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
-            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_STOMP_URL)
+            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constants.WS_STOMP_URL)
 
             mStompClient?.connect(headers)
             mStompClient?.withClientHeartbeat(5000)

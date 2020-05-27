@@ -59,8 +59,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import top.defaults.colorpicker.ColorObserver
-import top.defaults.colorpicker.ColorPickerView
-import top.defaults.colorpicker.ColorWheelView
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -106,7 +104,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var isDelete = false
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
-    var type: String = Constant.TYPE_GROUP
+    var type: String = Constants.TYPE_GROUP
     var speed = 50
     var positionState = 0
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
@@ -136,7 +134,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                             successCallback = {
                                 this.hideLoadingDialog()
-                                this.setResult(Constant.RESULT_OK)
+                                this.setResult(Constants.RESULT_OK)
                                 LogUtils.e("zcl删除组后" + DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
                                 this.finish()
                             },
@@ -204,7 +202,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         }
 
         light?.let {
-            intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+            intent.putExtra(Constants.TYPE_VIEW, Constants.LIGHT_KEY)
             intent.putExtra("uuid", it.productUUID)
             intent.putExtra("gpAddress", it.meshAddr)
             Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
@@ -221,7 +219,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
-        var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
             if (granted!!) {
                 if (isBoolean) {
@@ -319,11 +317,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private fun transformView() {
         mConnectDeviceDisposable?.dispose()
         val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
-        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, light?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.LIGHT_RGB)
+        intent.putExtra(Constants.UPDATE_LIGHT, light)
+        intent.putExtra(Constants.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, light?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.LIGHT_RGB)
         startActivity(intent)
         finish()
     }
@@ -346,8 +344,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun initType() {
-        type = intent.getStringExtra(Constant.TYPE_VIEW)
-        if (type == Constant.TYPE_GROUP) {
+        type = intent.getStringExtra(Constants.TYPE_VIEW)
+        if (type == Constants.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
             initDataGroup()
@@ -401,9 +399,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
         //LogUtils.e("kevin init view")
-        light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
-        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
-        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
+        light = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbLight
+        this.fromWhere = this.intent.getStringExtra(Constants.LIGHT_REFRESH_KEY)
+        this.gpAddress = this.intent.getIntExtra(Constants.GROUP_ARESS_KEY, 0)
         dataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
         tvRename.visibility = View.GONE
         toolbar.title = light?.name
@@ -471,7 +469,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
-        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(this, Constants.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = ArrayList()
             for (i in 0..4) {
@@ -590,7 +588,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         var addr = 0
         if (currentLight) {
             enableAllUI(true)
-            if (type == Constant.TYPE_GROUP) {
+            if (type == Constants.TYPE_GROUP) {
                 addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.ON.value
             } else {
@@ -600,7 +598,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
         } else {
             enableAllUI(false)
-            if (type == Constant.TYPE_GROUP) {
+            if (type == Constants.TYPE_GROUP) {
                 addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.OFF.value
             } else {
@@ -1244,9 +1242,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
             R.id.diy_mode_set -> {
                 val intent = Intent(this, SetDiyColorAct::class.java)
-                intent.putExtra(Constant.IS_CHANGE_COLOR, true)
-                intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
-                intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
+                intent.putExtra(Constants.IS_CHANGE_COLOR, true)
+                intent.putExtra(Constants.GRADIENT_KEY, diyGradientList!![position])
+                intent.putExtra(Constants.TYPE_VIEW_ADDRESS, dstAddress)
                 startActivityForResult(intent, 0)
             }
 
@@ -1323,8 +1321,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         if (currentShowGroupSetPage) {
             if (DBUtils.diyGradientList.size < 6) {
                 val intent = Intent(this, SetDiyColorAct::class.java)
-                intent.putExtra(Constant.IS_CHANGE_COLOR, false)
-                intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group!!.meshAddr)
+                intent.putExtra(Constants.IS_CHANGE_COLOR, false)
+                intent.putExtra(Constants.TYPE_VIEW_ADDRESS, group!!.meshAddr)
                 startActivityForResult(intent, 0)
             } else {
                 ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -1332,8 +1330,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         } else {
             if (DBUtils.diyGradientList.size < 6) {
                 val intent = Intent(this, SetDiyColorAct::class.java)
-                intent.putExtra(Constant.IS_CHANGE_COLOR, false)
-                intent.putExtra(Constant.TYPE_VIEW_ADDRESS, light!!.meshAddr)
+                intent.putExtra(Constants.IS_CHANGE_COLOR, false)
+                intent.putExtra(Constants.TYPE_VIEW_ADDRESS, light!!.meshAddr)
                 startActivityForResult(intent, 0)
             } else {
                 ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -1434,11 +1432,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         GlobalScope.launch {
             // 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程
             try {
-                if (w > Constant.MAX_VALUE)
-                    w = Constant.MAX_VALUE
+                if (w > Constants.MAX_VALUE)
+                    w = Constants.MAX_VALUE
 
-                if (ws > Constant.MAX_VALUE)
-                    ws = Constant.MAX_VALUE
+                if (ws > Constants.MAX_VALUE)
+                    ws = Constants.MAX_VALUE
 
                 if (ws == -1) {
                     ws = 1
@@ -1685,7 +1683,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         }
 
 
-        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(this, Constants.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = java.util.ArrayList()
             for (i in 0 until 4) {
@@ -1784,11 +1782,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
         GlobalScope.launch {
             try {
-                if (brightness!! > Constant.MAX_VALUE) {
-                    brightness = Constant.MAX_VALUE
+                if (brightness!! > Constants.MAX_VALUE) {
+                    brightness = Constants.MAX_VALUE
                 }
-                if (w > Constant.MAX_VALUE) {
-                    w = Constant.MAX_VALUE
+                if (w > Constants.MAX_VALUE) {
+                    w = Constants.MAX_VALUE
                 }
                 if (w == -1 || w < 1) {
                     w = 1
@@ -1858,14 +1856,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         if (currentShowGroupSetPage) {
             try {
                 textView?.setChecked(true, 0xff000000.toInt() or group!!.color)
-                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+                SharedPreferencesHelper.putObject(this, Constants.PRESET_COLOR, presetColors)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         } else {
             try {
                 textView?.setChecked(true, 0xff000000.toInt() or light!!.color)
-                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+                SharedPreferencesHelper.putObject(this, Constants.PRESET_COLOR, presetColors)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -1932,7 +1930,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
                 toolbar!!.title = getString(R.string.dynamic_gradient)
             } else {
-                setResult(Constant.RESULT_OK)
+                setResult(Constants.RESULT_OK)
                 finish()
             }
             return false
@@ -1944,7 +1942,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
         private var preTime: Long = 0
-        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
@@ -2005,8 +2003,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             var brightness = 1
             var w = 1
             if (view == sbBrightness) {
-                brightness = if (progress > Constant.MAX_VALUE) {
-                    Constant.MAX_VALUE
+                brightness = if (progress > Constants.MAX_VALUE) {
+                    Constants.MAX_VALUE
                 } else {
                     /*if (progress>0) */progress /*else 1*/
                 }
@@ -2058,8 +2056,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 }
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
-                w = if (progress > Constant.MAX_VALUE) {
-                    Constant.MAX_VALUE
+                w = if (progress > Constants.MAX_VALUE) {
+                    Constants.MAX_VALUE
                 } else {
                     /* if (progress>0) */progress /*else 1*/
                 }

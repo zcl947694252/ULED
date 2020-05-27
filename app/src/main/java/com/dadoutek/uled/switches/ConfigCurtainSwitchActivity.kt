@@ -18,7 +18,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
@@ -426,6 +426,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
                 dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
             } else {
@@ -436,12 +437,13 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 dbSwitch.index = dbSwitch.id.toInt()
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constants.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -480,7 +482,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             recordingChange(gotSwitchByMac?.id,
                     DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD)
+                    Constants.DB_ADD)
         }
     }
 
@@ -493,7 +495,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
@@ -516,7 +518,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+            params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }

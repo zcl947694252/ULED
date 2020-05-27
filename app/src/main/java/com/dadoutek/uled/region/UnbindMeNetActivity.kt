@@ -7,7 +7,7 @@ import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.region.adapter.UnbindNetWorkAdapter
@@ -33,7 +33,7 @@ class UnbindMeNetActivity : BaseActivity() {
     }
 
     override fun initData() {
-        regionbBean = intent.getSerializableExtra(Constant.SHARE_PERSON) as RegionBean
+        regionbBean = intent.getSerializableExtra(Constants.SHARE_PERSON) as RegionBean
         recycleview_title_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         list = regionbBean?.ref_users
         setData()

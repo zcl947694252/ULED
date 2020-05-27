@@ -8,7 +8,7 @@ import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils.allGroups
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
 import kotlinx.android.synthetic.main.template_recycleview.*
@@ -38,7 +38,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
     private fun initData() {
         template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+        type = intent.getIntExtra(Constants.EIGHT_SWITCH_TYPE, 0)
         when (type) {
             0, 2 -> {
                 template_recycleView?.adapter = groupAdapter
@@ -66,9 +66,9 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
         if (type == 0 || type == 2)
-            setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, allGroups[position]))
+            setResult(Activity.RESULT_OK, Intent().putExtra(Constants.EIGHT_SWITCH_TYPE, allGroups[position]))
         else
-            setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[position]))
+            setResult(Activity.RESULT_OK, Intent().putExtra(Constants.EIGHT_SWITCH_TYPE, sceneList[position]))
         finish()
     }
 }

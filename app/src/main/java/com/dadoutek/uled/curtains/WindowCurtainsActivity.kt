@@ -20,7 +20,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.CurtainGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -36,7 +36,6 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
@@ -84,8 +83,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initViewType() {
-        this.type = this.intent.extras!!.getString(Constant.TYPE_VIEW)
-        if (type == Constant.TYPE_GROUP) {
+        this.type = this.intent.extras!!.getString(Constants.TYPE_VIEW)
+        if (type == Constants.TYPE_GROUP) {
             initGroupData()
             initViewGroup()
             initToolGroupBar()
@@ -150,8 +149,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initMeshDresData() {
-        this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
-        this.curtain = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbCurtain
+        this.ctAdress = this.intent.getIntExtra(Constants.CURTAINS_ARESS_KEY, 0)
+        this.curtain = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbCurtain
         versionText.text = ""
         toolbar.title = curtain?.name
     }
@@ -293,7 +292,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
                             successCallback = {
                                 this.hideLoadingDialog()
-                                this.setResult(Constant.RESULT_OK)
+                                this.setResult(Constants.RESULT_OK)
                                 this.finish()
                             },
                             failedCallback = {
@@ -314,7 +313,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             return
         }
         intent.putExtra("curtain", curtain)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
+        intent.putExtra(Constants.TYPE_VIEW, Constants.CURTAINS_KEY)
         intent.putExtra("gpAddress", ctAdress)
         intent.putExtra("uuid", curtain!!.productUUID)
         startActivity(intent)
@@ -464,7 +463,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun setSpeed() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
                 override fun onSeeking(seekParams: SeekParams) {
                     val i = seekParams.progress
@@ -590,7 +589,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun isDirectConnectDevice() {
 
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
             if (isBoolean) {
                 transformView()
@@ -658,16 +657,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         mConnectDeviceDisposable?.dispose()
         disposable?.dispose()
         val intent = Intent(this@WindowCurtainsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, curtain?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, curtain?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, curtain?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.SMART_CURTAIN)
+        intent.putExtra(Constants.OTA_MAC, curtain?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, curtain?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, curtain?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.SMART_CURTAIN)
         startActivity(intent)
         finish()
     }
 
     private fun slowUp() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             slowBoolean = if (slowBoolean) {
                 val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
                 val opcode = Opcode.CURTAIN_ON_OFF
@@ -700,7 +699,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun sofwareRestart() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -713,7 +712,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun handRecovery() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             if (handBoolean) {
                 val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
                 val opcode = Opcode.CURTAIN_ON_OFF
@@ -745,7 +744,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun onceReset() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
 
             val subscribe = Commander.resetDevice(curtainGroup!!.meshAddr)
                     .subscribe(
@@ -774,7 +773,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun electricCommutation() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             if (commutationBoolean) {
                 val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
                 val opcode = Opcode.CURTAIN_ON_OFF
@@ -808,7 +807,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun pauseWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -833,7 +832,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun offWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -859,7 +858,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun openWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (type == Constants.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)

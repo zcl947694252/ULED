@@ -36,7 +36,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
@@ -118,7 +118,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_detail)
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         this.mApplication = this.application as TelinkLightApplication
         lightsData = arrayListOf()
@@ -212,11 +212,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             openOrClose(currentLight!!)
 
                             when (type) {
-                                Constant.INSTALL_NORMAL_LIGHT -> {
+                                Constants.INSTALL_NORMAL_LIGHT -> {
                                     currentLight!!.updateIcon()
                                 }
 
-                                Constant.INSTALL_RGB_LIGHT -> {
+                                Constants.INSTALL_RGB_LIGHT -> {
                                     currentLight!!.updateRgbIcon()
                                 }
                             }
@@ -243,24 +243,24 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                 lightsData.size
 
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> {
+            Constants.INSTALL_NORMAL_LIGHT -> {
                 toolbar.title = getString(R.string.normal_light_title) + " (" + size + ")"
                 for (i in lightsData.indices) {
                     lightsData[i].updateIcon()
                 }
             }
-            Constant.INSTALL_RGB_LIGHT -> {
+            Constants.INSTALL_RGB_LIGHT -> {
                 toolbar.title = getString(R.string.rgb_light) + " (" + size + ")"
                 for (i in lightsData.indices) {
                     lightsData[i].updateRgbIcon()
                 }
             }
-            Constant.INSTALL_LIGHT_OF_CW -> {
+            Constants.INSTALL_LIGHT_OF_CW -> {
                 for (i in lightsData?.indices) {
                     lightsData[i].updateIcon()
                 }
             }
-            Constant.INSTALL_LIGHT_OF_RGB -> {
+            Constants.INSTALL_LIGHT_OF_RGB -> {
                 for (i in lightsData?.indices) {
                     lightsData[i].updateRgbIcon()
                 }
@@ -341,21 +341,21 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
                             gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                     0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                            gattBody.ser_id = Constants.SER_ID_LIGHT_ON
                         }
                     } else {
                         if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
                                 || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
                             gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                     0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                            gattBody.ser_id = Constants.SER_ID_LIGHT_OFF
                         }
                     }
 
                     val encoder = Base64.getEncoder()
                     val s = encoder.encodeToString(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentLight!!.meshAddr
                     sendToServer(gattBody)
                 } else {
@@ -396,13 +396,13 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun setTopLightState() {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT, Constant.INSTALL_LIGHT_OF_CW -> {
+            Constants.INSTALL_NORMAL_LIGHT, Constants.INSTALL_LIGHT_OF_CW -> {
                 if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
                     device_detail_direct_icon.setImageResource(R.drawable.icon_device_down)
                 else if (directLight?.status == ConnectionStatus.ON.value)
                     device_detail_direct_icon.setImageResource(R.drawable.icon_device_open)
             }
-            Constant.INSTALL_RGB_LIGHT, Constant.INSTALL_LIGHT_OF_RGB -> {
+            Constants.INSTALL_RGB_LIGHT, Constants.INSTALL_LIGHT_OF_RGB -> {
                 if (directLight?.status == ConnectionStatus.OFFLINE.value || directLight?.status == ConnectionStatus.OFF.value)
                     device_detail_direct_icon.setImageResource(R.drawable.icon_rgblight_down)
                 else if (directLight?.status == ConnectionStatus.ON.value)
@@ -415,11 +415,11 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
         if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
             intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+            intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
         }
-        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+        intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
+        intent.putExtra(Constants.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }
 
@@ -469,7 +469,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -623,7 +623,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -632,7 +632,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -641,7 +641,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_CURTAIN -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -657,7 +657,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_CONNECTOR -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -666,7 +666,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     INSTALL_GATEWAY -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -698,7 +698,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
 //                        callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
@@ -724,16 +724,16 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun addDeviceLight() {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> {
+            Constants.INSTALL_NORMAL_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, false)
+                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                 startActivityForResult(intent, 0)
             }
-            Constant.INSTALL_RGB_LIGHT -> {
+            Constants.INSTALL_RGB_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                 startActivityForResult(intent, 0)
             }
         }
@@ -745,7 +745,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             lightsData = ArrayList()
             directLight = null
             when (type) {
-                Constant.INSTALL_NORMAL_LIGHT -> {//普通灯列表
+                Constants.INSTALL_NORMAL_LIGHT -> {//普通灯列表
                     allLightData = DBUtils.getAllNormalLight()
                     if (allLightData.size > 0) {
                         for (i in allLightData.indices) {
@@ -774,7 +774,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                     else {
                                         if (dialog_device?.visibility == View.GONE) {
                                             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                                             startActivity(intent)
                                         }
                                     }
@@ -787,7 +787,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         changeNoDeviceView()
                     }
                 }
-                Constant.INSTALL_RGB_LIGHT -> {//全彩灯
+                Constants.INSTALL_RGB_LIGHT -> {//全彩灯
                     allLightData = DBUtils.getAllRGBLight()
                     lightsData.clear()
                     if (allLightData.size > 0) {
@@ -817,7 +817,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                 else {
                                     if (dialog_device?.visibility == View.GONE) {
                                         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                                        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                                         startActivity(intent)
                                     }
                                 }
@@ -827,7 +827,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         changeNoDeviceView()
                     }
                 }
-                Constant.INSTALL_LIGHT_OF_CW -> {
+                Constants.INSTALL_LIGHT_OF_CW -> {
                     var allLightData = DBUtils.getAllNormalLight()
                     if (allLightData.size > 0) {
                         var listGroup: ArrayList<DbLight> = ArrayList()
@@ -861,9 +861,9 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                         ToastUtils.showLong(getString(R.string.author_region_warm))
                                     else {
                                         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                                        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
+                                        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
                                         intent.putExtra("lightType", "cw_light")
                                         intent.putExtra("cw_light_group_name", cwLightGroup)
                                         startActivity(intent)
@@ -879,7 +879,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         changeNoDeviceView()
                     }
                 }
-                Constant.INSTALL_LIGHT_OF_RGB -> {
+                Constants.INSTALL_LIGHT_OF_RGB -> {
                     var allLightData = DBUtils.getAllRGBLight()
                     if (allLightData.size > 0) {
                         var listGroup: ArrayList<DbLight> = ArrayList()
@@ -914,7 +914,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                                         intent.putExtra("lightType", "rgb_light")
                                         intent.putExtra("rgb_light_group_name", rgbLightGroup)*/
                             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivity(intent)
                         }
                     } else {
@@ -1013,10 +1013,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             adaper?.let { diffResult.dispatchUpdatesTo(it) }
             lightsData = mNewDatas!!
             when (type) {
-                Constant.INSTALL_NORMAL_LIGHT -> {
+                Constants.INSTALL_NORMAL_LIGHT -> {
                     toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
                 }
-                Constant.INSTALL_RGB_LIGHT -> {
+                Constants.INSTALL_RGB_LIGHT -> {
                     toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
                 }
             }
@@ -1026,8 +1026,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun getNewData(): ArrayList<DbLight> {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> lightsData = DBUtils.getAllNormalLight()
-            Constant.INSTALL_RGB_LIGHT -> lightsData = DBUtils.getAllRGBLight()
+            Constants.INSTALL_NORMAL_LIGHT -> lightsData = DBUtils.getAllNormalLight()
+            Constants.INSTALL_RGB_LIGHT -> lightsData = DBUtils.getAllRGBLight()
         }
         return lightsData
     }
@@ -1136,14 +1136,14 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when(gwStompBean.ser_id.toInt()){
-            Constant.SER_ID_LIGHT_ON->{
+            Constants.SER_ID_LIGHT_ON->{
                 LogUtils.v("zcl-----------远程控制开灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
                 lightsData[positionCurrent].updateIcon()
                 adaper?.notifyDataSetChanged()
             }
-            Constant.SER_ID_LIGHT_OFF->{
+            Constants.SER_ID_LIGHT_OFF->{
                 LogUtils.v("zcl-----------远程控制关灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
