@@ -249,8 +249,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.oval, true)
-//                        .setGone(R.id.tv_select_color, false)
-//                        .setGone(R.id.dot_rgb, false)
+                        .setGone(R.id.tv_select_color, false)
+                        .setGone(R.id.dot_rgb, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
