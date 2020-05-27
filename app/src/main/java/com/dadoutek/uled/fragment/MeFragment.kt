@@ -30,7 +30,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -99,7 +99,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         override fun complete() {
             hideLoadingDialog()
             if (isClickExlogin) {
-                SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance()?.disconnect()
                 TelinkLightService.Instance()?.idleMode(true)
 
@@ -117,7 +117,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                            SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
+                            SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                             TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
@@ -344,11 +344,11 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             R.id.user_reset -> {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
 
-                    disposableInterval = Observable.intervalRange(0, Constants.downTime, 0, 1, TimeUnit.SECONDS)
+                    disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                var num = Constants.downTime - 1 - it
+                                var num = Constant.downTime - 1 - it
                                 if (num == 0L) {
                                     setTimerZero()
                                 } else {
@@ -476,7 +476,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     private fun resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(activity, Constants.DELETEING, true)
+        SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, true)
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
@@ -501,12 +501,12 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
         if (meshAdre.size > 0) {
             Commander.resetAllDevices(meshAdre, {
-                SharedPreferencesHelper.putBoolean(activity, Constants.DELETEING, false)
+                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
                 activity?.bnve?.currentItem = 0
                 null
             }, {
-                SharedPreferencesHelper.putBoolean(activity, Constants.DELETEING, false)
+                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 null
             })
         }
@@ -614,7 +614,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()
@@ -628,7 +628,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     //重启app并杀死原进程
     private fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
         com.blankj.utilcode.util.AppUtils.relaunchApp()
     }

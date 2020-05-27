@@ -17,7 +17,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.DeviceGroupingAdapter
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -227,7 +227,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 //            this.light = this.intent.extras?.get("light") as DbLight
 //        }
 
-        this.type=this.intent.getStringExtra(Constants.TYPE_VIEW)
+        this.type=this.intent.getStringExtra(Constant.TYPE_VIEW)
 //        this.productUuid=this.intent.getIntExtra("uuid",0)
 //        this.address=this.intent.getIntExtra("gpAddress",0)
 //        this.beLongId=this.intent.getLongExtra("belongId",0)
@@ -363,7 +363,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         refreshView()
                         dialog.dismiss()
                     }

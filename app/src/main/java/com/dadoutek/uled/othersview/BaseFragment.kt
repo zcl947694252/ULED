@@ -23,7 +23,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
@@ -76,7 +76,7 @@ open class BaseFragment : Fragment() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constants.GW_COMMEND_CODE)
+        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         context?.registerReceiver(stompRecevice, filter)
     }
@@ -85,8 +85,8 @@ open class BaseFragment : Fragment() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Constants.GW_COMMEND_CODE -> {
-                    val gwStompBean = intent.getSerializableExtra(Constants.GW_COMMEND_CODE) as GwStompBean
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
                     when (gwStompBean.cmd) {
                         2500 -> receviedGwCmd2500(gwStompBean)
@@ -146,10 +146,10 @@ open class BaseFragment : Fragment() {
             dialogGroupType?.text = list!![position]
             recyclerView.visibility = View.GONE
             when (position) {
-                0 -> groupType = Constants.DEVICE_TYPE_LIGHT_NORMAL
-                1 -> groupType = Constants.DEVICE_TYPE_LIGHT_RGB
-                2 -> groupType = Constants.DEVICE_TYPE_CURTAIN
-                3 -> groupType = Constants.DEVICE_TYPE_CONNECTOR
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
             }
         }
         popMain.setOnDismissListener {

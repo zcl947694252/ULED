@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -44,7 +44,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);
-        mIsLogging = SharedPreferencesHelper.getBoolean(SplashActivity.this, Constants.IS_LOGIN, false);
+        mIsLogging = SharedPreferencesHelper.getBoolean(SplashActivity.this, Constant.IS_LOGIN, false);
 
 
         if (mIsLogging) {

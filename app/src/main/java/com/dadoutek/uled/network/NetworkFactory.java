@@ -2,7 +2,7 @@ package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
 
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.security.KeyManagementException;
@@ -90,7 +90,7 @@ public class NetworkFactory {
         if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-                    .baseUrl(Constants.BASE_URL)
+                    .baseUrl(Constant.BASE_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();

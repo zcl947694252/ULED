@@ -35,7 +35,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
     private static DaoMaster daoMaster;
     private static DaoSession daoSession;
     public static final String DBNAME = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
-            Constants.DB_NAME_KEY, "uled") + ".db";
+            Constant.DB_NAME_KEY, "uled") + ".db";
 
     MyOpenHelper(Context context, String name) {
         super(context, name);
@@ -80,9 +80,9 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                         for (int i = 0; i < groups.size(); i++) {
                             DbGroup group = groups.get(i);
                             if (group.getMeshAddr() == 0xffff) {
-                                group.setDeviceType(Constants.DEVICE_TYPE_DEFAULT_ALL);
+                                group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT_ALL);
                             } else {
-                                group.setDeviceType(Constants.DEVICE_TYPE_DEFAULT);
+                                group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT);
                             }
 
                             DBUtils.INSTANCE.updateGroup(group);

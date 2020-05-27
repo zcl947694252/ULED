@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
@@ -93,8 +93,8 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_ota);
         this.meshAddress = this.getIntent().getIntExtra("meshAddress", 0);
-        macAddress = getIntent().getStringExtra(Constants.OTA_MAC);
-        version = getIntent().getStringExtra(Constants.OTA_VERSION);
+        macAddress = getIntent().getStringExtra(Constant.OTA_MAC);
+        version = getIntent().getStringExtra(Constant.OTA_VERSION);
         this.mApp = (TelinkLightApplication) this.getApplication();
 
         //监听事件

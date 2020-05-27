@@ -44,7 +44,7 @@ import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constants.DEFAULT_MESH_FACTORY_NAME
+import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
@@ -161,13 +161,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         var dbScene = DbScene()
         dbScene.id = 0
 
-        if (Constants.isDebug) {//如果是debug模式可以切换 并且显示
-            when (SharedPreferencesHelper.getInt(this, Constants.IS_TECK, 0)) {
+        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
+            when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
                 1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
                 2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
             }
-            Constants.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
+            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
             main_toast.visibility = VISIBLE
         } else {
             main_toast.visibility = GONE
@@ -259,7 +259,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun LogOutAndExitApp() {
-        SharedPreferencesHelper.putBoolean(this@MainActivity, Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
         mApp?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
         //重启app并杀死原进程
@@ -344,7 +344,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         btnBack.setOnClickListener(dialogOnclick)
         searchBar.setOnClickListener(dialogOnclick)
 
-        if (position == Constants.INSTALL_SWITCH)
+        if (position == Constant.INSTALL_SWITCH)
             stepThreeTextSmall.visibility = VISIBLE
         else
             stepThreeTextSmall.visibility = GONE
@@ -383,7 +383,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -392,7 +392,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -401,7 +401,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     INSTALL_CURTAIN -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -419,7 +419,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     INSTALL_CONNECTOR -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -429,7 +429,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     INSTALL_GATEWAY -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -843,7 +843,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DELETE, false)
+            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, false)
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")

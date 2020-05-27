@@ -40,7 +40,7 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
@@ -726,7 +726,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showLong(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constants.DEVICE_TYPE_CURTAIN);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_CURTAIN);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -768,7 +768,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
@@ -786,7 +786,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                    Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
 
@@ -1080,7 +1080,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void initData() {
         Intent intent = getIntent();
-        scanCURTAIN = intent.getBooleanExtra(Constants.IS_SCAN_CURTAIN, false);
+        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         curtainType = intent.getStringExtra("curtain");
         if (curtainType.equals("group_curtain")) {
             groupCurtain = intent.getStringExtra("curtain_group_name");
@@ -1114,7 +1114,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }
@@ -1131,7 +1131,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }

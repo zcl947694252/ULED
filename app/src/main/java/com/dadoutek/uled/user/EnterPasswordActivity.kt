@@ -27,7 +27,7 @@ import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.DbModel.DbUser
@@ -87,7 +87,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         isRunning = true
         makePop()
         initViewType()
@@ -122,11 +122,11 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun initViewType() {
         dbUser = DbUser()
         when (type) {
-            Constants.TYPE_FORGET_PASSWORD -> {}
-            Constants.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
-            Constants.TYPE_REGISTER -> phone = intent.extras!!.getString("phone")
+            Constant.TYPE_FORGET_PASSWORD -> {}
+            Constant.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
+            Constant.TYPE_REGISTER -> phone = intent.extras!!.getString("phone")
         }
-        val boolean = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance(), Constants.NOT_SHOW, true)
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
 
         var user = SharedPreferencesUtils.getLastUser()
         user?.let {
@@ -167,14 +167,14 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
             R.id.btn_login -> {
                 when (type) {
-                    Constants.TYPE_LOGIN -> {
+                    Constant.TYPE_LOGIN -> {
                         if (TextUtils.isEmpty(edit_user_password.editableText.toString())) {
                             toast(getString(R.string.please_password))
                             return
                         }
                         login()
                     }
-                    Constants.TYPE_FORGET_PASSWORD -> forgetPassword()
+                    Constant.TYPE_FORGET_PASSWORD -> forgetPassword()
                 }
             }
             R.id.image_return_password ->{startActivity(Intent(this@EnterPasswordActivity, LoginActivity::class.java))
@@ -248,7 +248,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         @SuppressLint("CheckResult")
         override fun error(msg: String) {
             val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance()
-                    .mContext, Constants.IS_SHOW_REGION_DIALOG, false)
+                    .mContext, Constant.IS_SHOW_REGION_DIALOG, false)
             LogUtils.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----$msg")
 
             if (ishowRegionDialog) {
@@ -258,7 +258,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             }
             isSuccess = false
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         }
     }
 
@@ -402,8 +402,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
 
                             SharedPreferencesUtils.setUserLogin(true)
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, true)
-
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
                             hideLoadingDialog()
                             ActivityUtils.finishAllActivities(true)
                             ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
@@ -422,9 +421,11 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     private fun syncComplet() {
         hideLoadingDialog()
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, true)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         finish()
+
+        TelinkLightApplication.getApp().lastMeshAddress = DBUtils.getlastDeviceMesh()
        // ActivityUtils.finishAllActivities(true)
         //ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
     }

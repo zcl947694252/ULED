@@ -55,7 +55,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        itemGroup = intent.getSerializableExtra(Constants.GROUPS_KEY) as? ItemGroup
+        itemGroup = intent.getSerializableExtra(Constant.GROUPS_KEY) as? ItemGroup
         num = intent.getIntExtra("circle", 0)
     }
 
@@ -72,7 +72,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         ll_b.setOnClickListener(this)
         ll_g.setOnClickListener(this)
 
-        presetColors = SharedPreferencesHelper.getObject(this, Constants.PRESET_COLOR) as? MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = ArrayList()
             for (i in 0..4) {
@@ -184,11 +184,11 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         GlobalScope.launch {
             try {
-                if (w!! > Constants.MAX_VALUE)
-                    w = Constants.MAX_VALUE
+                if (w!! > Constant.MAX_VALUE)
+                    w = Constant.MAX_VALUE
 
-                if (ws > Constants.MAX_VALUE)
-                    ws = Constants.MAX_VALUE
+                if (ws > Constant.MAX_VALUE)
+                    ws = Constant.MAX_VALUE
 
                 if (ws == -1)
                     ws = 0
@@ -301,14 +301,14 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         textView?.setChecked(true, 0xff000000.toInt() or itemGroup!!.color)
         Log.e("TAG_COLOR", itemGroup!!.color.toString())
 //        textView?.text = ""
-        SharedPreferencesHelper.putObject(this, Constants.PRESET_COLOR, presetColors)
+        SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
         false
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true

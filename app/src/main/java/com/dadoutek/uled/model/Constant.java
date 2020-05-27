@@ -4,13 +4,14 @@ import java.io.Serializable;
 /**
  * Created by hejiajun on 2018/3/22.
  */
-public class Constants implements Serializable {
+public class Constant implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
     public static String WS_HOST = "/smartlight";
     //网络请求服务器java域名地址
     public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
     //网络请求服务器测试地址
+
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
@@ -400,4 +401,5 @@ public class Constants implements Serializable {
     public static final int SER_ID_SENSOR_ON = 0x66;
     public static final int SER_ID_SENSOR_OFF = 0x67;
 
+    public static final String LAST_MESS_ADDR="LAST_MESS_ADDR";
 }

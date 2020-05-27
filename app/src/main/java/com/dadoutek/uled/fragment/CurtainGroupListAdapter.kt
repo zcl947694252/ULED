@@ -6,7 +6,7 @@ import android.widget.CheckBox
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -43,9 +43,9 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 //                }
             }
 
-            if (group.deviceType == Constants.DEVICE_TYPE_LIGHT_NORMAL && num == 0) {
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0) {
                 gpSet.setBackgroundResource(R.drawable.btn_rec_black)
-            }else if(group.deviceType == Constants.DEVICE_TYPE_DEFAULT_ALL){
+            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
                 gpSet.setBackgroundResource(R.drawable.btn_rec_black)
             }
             else {

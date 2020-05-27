@@ -3,7 +3,7 @@ package com.dadoutek.uled.network
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkStatusCode.ERROR_CANCEL_AUHORIZE
@@ -21,11 +21,11 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
             }
         } else {
             var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
-            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constants.IS_SHOW_REGION_DIALOG, b)
+            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
 
-            if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constants.IS_LOGIN, false)
+            if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
                     && response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT) {
-                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constants.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
                 ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
                 AppUtils.relaunchApp()
             } else if ( response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT) {

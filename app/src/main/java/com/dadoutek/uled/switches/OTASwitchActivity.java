@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
@@ -250,7 +250,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void initData() {
-        dbLight = (DbSwitch) getIntent().getSerializableExtra(Constants.UPDATE_LIGHT);
+        dbLight = (DbSwitch) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
         log("current-light-mesh" + dbLight.getMeshAddr());
 
         onlineLights = new ArrayList<>();

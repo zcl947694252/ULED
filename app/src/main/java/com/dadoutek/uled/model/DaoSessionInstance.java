@@ -21,7 +21,7 @@ public class DaoSessionInstance {
     public static DaoSession getInstance() {
         if (name == null) {
             name = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
-                    Constants.DB_NAME_KEY, "uled") + ".db";
+                    Constant.DB_NAME_KEY, "uled") + ".db";
         }
 
         if (session == null) {
@@ -44,7 +44,7 @@ public class DaoSessionInstance {
 
     public static void checkAndUpdateDatabase() {
         name = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
-                Constants.DB_NAME_KEY, "uled") + ".db";
+                Constant.DB_NAME_KEY, "uled") + ".db";
 
         //创建数据库shop.db"
         try {

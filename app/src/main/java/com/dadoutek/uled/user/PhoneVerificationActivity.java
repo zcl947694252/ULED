@@ -13,7 +13,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.hbb20.CountryCodePicker;
 
 import java.util.concurrent.TimeUnit;
@@ -99,7 +99,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 finish();
                 break;
             case R.id.btn_send_verification:
-                if (Constants.TEST_REGISTER) {
+                if (Constant.TEST_REGISTER) {
                     testRegister();
                 } else {
                     String phoneNum = editPhoneNumber.getEditText().getText().toString().trim();

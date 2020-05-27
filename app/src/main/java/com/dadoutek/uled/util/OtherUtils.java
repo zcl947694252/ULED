@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -38,7 +38,7 @@ public class OtherUtils {
     }
 
     public static boolean isCurtain(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_CURTAIN.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_CURTAIN.intValue()){
             return true;
         }else{
             return false;
@@ -46,7 +46,7 @@ public class OtherUtils {
     }
 
     public static boolean  isConnector(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_CONNECTOR.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_CONNECTOR.intValue()){
             return true;
         }else{
             return false;
@@ -54,7 +54,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_LIGHT_RGB.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
             return true;
         }else{
             return false;
@@ -62,7 +62,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
             return true;
         }else{
             return false;
@@ -70,7 +70,7 @@ public class OtherUtils {
     }
 
     public static boolean isAllRightGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_NO.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_NO.intValue()){
             return true;
         }else{
             return false;
@@ -78,7 +78,7 @@ public class OtherUtils {
     }
 
     public static boolean isDefaultGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constants.DEVICE_TYPE_DEFAULT_ALL.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_DEFAULT_ALL.intValue()){
             return true;
         }else{
             return false;

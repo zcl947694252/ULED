@@ -20,7 +20,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -105,8 +105,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 if (strLight == "cw_light") {
                     if (DBUtils.getAllNormalLight().size == 0) {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, false)
-                        intent.putExtra(Constants.TYPE_VIEW, Constants.LIGHT_KEY)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
                         startActivityForResult(intent, 0)
                     } else {
                         addDevice()
@@ -114,8 +114,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 } else if (strLight == "rgb_light") {
                     if (DBUtils.getAllRGBLight().size == 0) {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constants.TYPE_VIEW, Constants.RGB_LIGHT_KEY)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
                         startActivityForResult(intent, 0)
                     } else {
                         addDevice()
@@ -129,16 +129,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         if (strLight == "cw_light") {
             val intent = Intent(this,
                     BatchGroupActivity::class.java)
-            intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-            intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
             intent.putExtra("lightType", "cw_light")
             intent.putExtra("cw_light_group_name", group?.name)
             startActivity(intent)
         } else if (strLight == "rgb_light") {
             val intent = Intent(this,
                     RgbBatchGroupActivity::class.java)
-            intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-            intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
             intent.putExtra("lightType", "rgb_light")
             intent.putExtra("rgb_light_group_name", group?.name)
 //            startActivity(intent)
@@ -267,8 +267,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 batchGroup.setOnClickListener {
                     val intent = Intent(this,
                             BatchGroupActivity::class.java)
-                    intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                     intent.putExtra("lightType", "cw_light_group")
                     intent.putExtra("group", group?.id?.toInt())
                     startActivity(intent)
@@ -281,8 +281,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 batchGroup.setOnClickListener {
                     val intent = Intent(this,
                             BatchGroupActivity::class.java)
-                    intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                     intent.putExtra("lightType", "rgb_light_group")
                     intent.putExtra("group", group?.id?:0)
                     startActivity(intent)
@@ -441,11 +441,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
                     if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                         intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
-                        intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
                     }
-                    intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
-                    intent.putExtra(Constants.GROUP_ARESS_KEY, group?.meshAddr)
-                    intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, group?.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 } else {
                     ToastUtils.showLong(R.string.reconnecting)

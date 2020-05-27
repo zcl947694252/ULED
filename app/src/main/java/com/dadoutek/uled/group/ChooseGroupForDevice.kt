@@ -14,7 +14,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -126,7 +126,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        this.type = this.intent.getStringExtra(Constants.TYPE_VIEW)
+        this.type = this.intent.getStringExtra(Constant.TYPE_VIEW)
         this.mLight = this.intent.extras?.get("light") as DbLight
         mGroupList.clear()
         mGroupList.addAll(DBUtils.getGroupsByDeviceType(mLight.productUUID))
@@ -241,7 +241,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         refreshView()
                         dialog.dismiss()
                     }

@@ -20,7 +20,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -85,13 +85,13 @@ class GwLoginActivity : TelinkBaseActivity(){
             override fun setGwComplete(deviceInfo: DeviceInfo) { //Dadou   Dadoutek2018
                 LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                 when (deviceInfo.gwVoipState) {
-                    Constants.GW_WIFI_VOIP -> {
+                    Constant.GW_WIFI_VOIP -> {
                         GlobalScope.launch(Dispatchers.Main) {
                             disposableTimer?.dispose()
                             hideLoadingDialog()
                             if (deviceInfo.gwWifiState == 0) {
                                 ToastUtils.showShort(getString(R.string.config_success))
-                                val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constants.IS_GW_CONFIG_WIFI, false)
+                                val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
                                 if (boolean) {
                                     startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                                     finish()
@@ -102,7 +102,7 @@ class GwLoginActivity : TelinkBaseActivity(){
                         }
                     }
 
-                    Constants.GW_TIME_ZONE_VOIP -> {
+                    Constant.GW_TIME_ZONE_VOIP -> {
                         GlobalScope.launch(Dispatchers.Main) {
                             disposableTimer?.dispose()
                             hideLoadingDialog()
@@ -284,7 +284,7 @@ class GwLoginActivity : TelinkBaseActivity(){
     private fun initData() {
         dbGw = intent.getParcelableExtra("data")
 
-        val boolean = SharedPreferencesHelper.getBoolean(this, Constants.IS_GW_CONFIG_WIFI, false)
+        val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
         if (boolean)
             gw_login_skip.visibility = View.GONE
         else

@@ -35,7 +35,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -190,10 +190,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
             dialogGroupType?.text = list!![position]
             recyclerView.visibility = View.GONE
             when (position) {
-                0 -> groupType = Constants.DEVICE_TYPE_LIGHT_NORMAL
-                1 -> groupType = Constants.DEVICE_TYPE_LIGHT_RGB
-                2 -> groupType = Constants.DEVICE_TYPE_CURTAIN
-                3 -> groupType = Constants.DEVICE_TYPE_CONNECTOR
+                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
             }
         }
         popMain.setOnDismissListener {
@@ -452,7 +452,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     //重启app并杀死原进程
     open fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
         TelinkLightApplication.getApp().releseStomp()
         AppUtils.relaunchApp()
     }
@@ -526,10 +526,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constants.GW_COMMEND_CODE)
-        filter.addAction(Constants.LOGIN_OUT)
-        filter.addAction(Constants.CANCEL_CODE)
-        filter.addAction(Constants.PARSE_CODE)
+        filter.addAction(Constant.GW_COMMEND_CODE)
+        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constant.CANCEL_CODE)
+        filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
@@ -538,8 +538,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Constants.GW_COMMEND_CODE -> {
-                    val gwStompBean = intent.getSerializableExtra(Constants.GW_COMMEND_CODE) as GwStompBean
+                Constant.GW_COMMEND_CODE -> {
+                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
                     when (gwStompBean.cmd) {
                         700 -> TelinkLightApplication.getApp().offLine = false
@@ -549,12 +549,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
 
                 }
-                Constants.LOGIN_OUT -> {
+                Constant.LOGIN_OUT -> {
                     LogUtils.e("zcl_baseMe___________收到登出消息")
                     loginOutMethod()
                 }
-                Constants.CANCEL_CODE -> {
-                    val extra = intent.getSerializableExtra(Constants.CANCEL_CODE)
+                Constant.CANCEL_CODE -> {
+                    val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
                     var cancelBean: CancelAuthorMsg? = null
                     if (extra != null)
                         cancelBean = extra as CancelAuthorMsg
@@ -579,8 +579,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                     LogUtils.e("zcl_baseMe___________取消授权${cancelBean == null}")
                 }
-                Constants.PARSE_CODE -> {
-                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constants.PARSE_CODE) as QrCodeTopicMsg
+                Constant.PARSE_CODE -> {
+                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
 //                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
                 }
@@ -616,7 +616,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     hideLoadingDialog()
                     val b = this@TelinkBaseActivity.isFinishing
                     val showing = singleLogin?.isShowing
-                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
                     if (!b && showing != null && !showing) {
                         singleLogin!!.show()
                     }

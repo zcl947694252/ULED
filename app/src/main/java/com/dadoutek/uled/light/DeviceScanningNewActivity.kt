@@ -32,7 +32,7 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constants.VENDOR_ID
+import com.dadoutek.uled.model.Constant.VENDOR_ID
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DbModel.DBUtils.lastRegion
 import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
@@ -151,6 +151,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         setContentView(R.layout.activity_device_scanning)
 
         TelinkLightService.Instance()?.idleMode(true)
+
         initData()
         initView()
         initClick()
@@ -201,7 +202,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         groupsRecyclerViewAdapter.notifyDataSetChanged()
         SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                Constants.DEFAULT_GROUP_ID, currentGroupIndex)
+                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
     private val onClick = View.OnClickListener {
@@ -839,7 +840,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         recycler_view_groups?.smoothScrollToPosition(groups!!.size - 1)
         groupsRecyclerViewAdapter.notifyDataSetChanged()
         SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                Constants.DEFAULT_GROUP_ID, currentGroupIndex)
+                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
     private fun updateData(position: Int, checkStateChange: Boolean) {
@@ -1045,7 +1046,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun initData() {
         val intent = intent
-        mAddDeviceType = intent.getIntExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+        mAddDeviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
 
         LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
 
@@ -1067,7 +1068,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     groups[i].checked = true
                     currentGroupIndex = i
                     SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                            Constants.DEFAULT_GROUP_ID, currentGroupIndex)
+                            Constant.DEFAULT_GROUP_ID, currentGroupIndex)
                 } else {
                     groups[i].checked = false
                 }
@@ -1252,7 +1253,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             params.setScanFilters(getFilters())
 
                     params.setMeshName(mesh.factoryName)
-                    params.setOutOfMeshName(Constants.OUT_OF_MESH_NAME)
+                    params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(true)
                     TelinkLightService.Instance()?.startScan(params)
@@ -1379,6 +1380,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         bestRssiDevice = null
         //更新参数
         updateMeshStatus = UPDATE_MESH_STATUS.UPDATING_MESH
+
         deviceInfo.meshAddress = meshAddress
         val params = Parameters.createUpdateParameters()
         params.setOldMeshName(mesh.factoryName)
@@ -1484,9 +1486,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
 
             lastMyRegion.lastGenMeshAddr = meshAddress
-            intent.putParcelableArrayListExtra(Constants.DEVICE_NUM, mAddedDevicesInfos)
+            intent.putParcelableArrayListExtra(Constant.DEVICE_NUM, mAddedDevicesInfos)
 
-            intent.putExtra(Constants.DEVICE_TYPE, mAddDeviceType)
+            intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
             startActivity(intent)
             finish()
             LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
@@ -1497,7 +1499,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightApplication.getApp().isConnectGwBle = true
         val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
         intent.putExtra("data", dbGw)
-        SharedPreferencesHelper.putBoolean(this, Constants.IS_GW_CONFIG_WIFI, false)
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
         startActivity(intent)
         finish()
     }

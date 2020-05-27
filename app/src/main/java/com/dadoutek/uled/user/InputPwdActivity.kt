@@ -13,7 +13,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
@@ -42,17 +42,17 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_pwd)
         phone = intent.getStringExtra("phone")
-        type = intent.getStringExtra(Constants.USER_TYPE)
+        type = intent.getStringExtra(Constant.USER_TYPE)
         initView()
         initListener()
     }
 
     private fun initView() {
-        if (type == Constants.TYPE_REGISTER) {
+        if (type == Constant.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
             pwd_btn.text = getString(R.string.register)
-        } else if (type == Constants.TYPE_FORGET_PASSWORD) {
+        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
             pwd_title.text = getString(R.string.forget_password)
             pwd_btn.text = getString(R.string.next)

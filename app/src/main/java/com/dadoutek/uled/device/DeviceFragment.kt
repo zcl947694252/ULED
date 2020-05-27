@@ -24,7 +24,7 @@ import com.dadoutek.uled.gateway.GwDeviceDetailActivity
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
@@ -217,33 +217,33 @@ class DeviceFragment : BaseFragment() {
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent: Intent? = null
         when (position) {
-            Constants.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
+            Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_NORMAL_LIGHT)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }
-            Constants.INSTALL_RGB_LIGHT -> {//跳转多彩灯
+            Constant.INSTALL_RGB_LIGHT -> {//跳转多彩灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_RGB_LIGHT)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
             }
-            Constants.INSTALL_SWITCH -> {
+            Constant.INSTALL_SWITCH -> {
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
-                 intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SWITCH)
+                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
             }
-            Constants.INSTALL_SENSOR -> {
+            Constant.INSTALL_SENSOR -> {
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SENSOR)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
             }
-            Constants.INSTALL_CURTAIN -> {
+            Constant.INSTALL_CURTAIN -> {
                 intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_CURTAIN)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
             }
-            Constants.INSTALL_CONNECTOR -> {
+            Constant.INSTALL_CONNECTOR -> {
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_CONNECTOR)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
-            Constants.INSTALL_GATEWAY -> {
+            Constant.INSTALL_GATEWAY -> {
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
-                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_GATEWAY)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
@@ -312,7 +312,7 @@ class DeviceFragment : BaseFragment() {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
                     }
                 }
@@ -337,7 +337,7 @@ class DeviceFragment : BaseFragment() {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
@@ -409,12 +409,12 @@ class DeviceFragment : BaseFragment() {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when(gwStompBean.ser_id.toInt()){
-            Constants.SER_ID_GROUP_ALLON->{
+            Constant.SER_ID_GROUP_ALLON->{
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
 
             }
-            Constants.SER_ID_GROUP_ALLOFF->{
+            Constant.SER_ID_GROUP_ALLOFF->{
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
             }

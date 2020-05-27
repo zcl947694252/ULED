@@ -18,7 +18,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
@@ -250,9 +250,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initScene() {
         val intent = intent
-        isChangeScene = intent.extras!!.get(Constants.IS_CHANGE_SCENE) as Boolean
+        isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
         if (isChangeScene && !isResult) {
-            scene = intent.extras!!.get(Constants.CURRENT_SELECT_SCENE) as DbScene
+            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(scene?.name)
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
@@ -472,7 +472,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun changeToColorSelect(position: Int) {
         val intent = Intent(this, SelectColorAct::class.java)
-        intent.putExtra(Constants.GROUPS_KEY, showGroupList[position])
+        intent.putExtra(Constant.GROUPS_KEY, showGroupList[position])
         startActivityForResult(intent, position)
     }
 
@@ -690,7 +690,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         } else {
             saveNewScene()
         }
-        setResult(Constants.RESULT_OK)
+        setResult(Constant.RESULT_OK)
     }
 
 

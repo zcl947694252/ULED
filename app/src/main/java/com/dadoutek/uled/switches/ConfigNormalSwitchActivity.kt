@@ -20,7 +20,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
@@ -454,7 +454,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
                 switchDate = dbSwitch
             }
 
@@ -476,7 +476,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName).substring(0, 16)

@@ -30,7 +30,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -105,7 +105,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                 successCallback = {
                                     this.hideLoadingDialog()
-                                    this?.setResult(Constants.RESULT_OK)
+                                    this?.setResult(Constant.RESULT_OK)
                                     this?.finish()
                                 },
                                 failedCallback = {
@@ -858,7 +858,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this, ChooseGroupForDevice::class.java)
-        intent.putExtra(Constants.TYPE_VIEW, Constants.LIGHT_KEY)
+        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
 
         if (light == null) {
             ToastUtils.showLong(getString(R.string.please_connect_normal_light))
@@ -871,7 +871,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         intent.putExtra("uuid", light!!.productUUID)
         Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
-        this?.setResult(Constants.RESULT_OK)
+        this?.setResult(Constant.RESULT_OK)
         this.finish()
 
     }
@@ -912,7 +912,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
                     if (it!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
                                     .subscribe(
@@ -942,11 +942,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun startOtaAct() {
         val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.UPDATE_LIGHT, light)
-        intent.putExtra(Constants.OTA_MES_Add, light?.meshAddr)
-        intent.putExtra(Constants.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constants.OTA_VERSION, light?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.LIGHT_NORMAL)
+        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.LIGHT_NORMAL)
 
         startActivity(intent)
         finish()
@@ -1020,7 +1020,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onResume() {
         super.onResume()
-        if (type == Constants.TYPE_GROUP) {
+        if (type == Constant.TYPE_GROUP) {
             val dbGroup = DBUtils.getGroupByID(group!!.id)
 
             if (group?.status == 1) {
@@ -1041,13 +1041,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun initType() {
         LogUtils.v("zcl------打开次数-----$openNum-------")
-        type = intent.getStringExtra(Constants.TYPE_VIEW)
+        type = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
         }
         slow_rg_view.setOnClickListener {  }
-        if (type == Constants.TYPE_GROUP) {
+        if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
             initDataGroup()
             initViewGroup()
@@ -1323,7 +1323,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
                                         this.hideLoadingDialog()
-                                        this.setResult(Constants.RESULT_OK)
+                                        this.setResult(Constant.RESULT_OK)
                                         this.finish()
                                     },
                                     failedCallback = {
@@ -1368,9 +1368,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        this.light = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbLight
-        this.fromWhere = this.intent.getStringExtra(Constants.LIGHT_REFRESH_KEY)
-        this.gpAddress = this.intent.getIntExtra(Constants.GROUP_ARESS_KEY, 0)
+        this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
+        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
+        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         toolbar.title = light?.name
 
         mRxPermission = RxPermissions(this)
@@ -1606,7 +1606,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             this.onValueChange(seekBar, seekBar.progress, true)
@@ -1651,9 +1651,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                         if (currentShowPageGroup) {
                             if (group?.brightness != progress) {
-                                if (progress > Constants.MAX_VALUE) {
-                                    params = byteArrayOf(Constants.MAX_VALUE.toByte())
-                                    setLightGUIImg(progress = Constants.MAX_VALUE)
+                                if (progress > Constant.MAX_VALUE) {
+                                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                    setLightGUIImg(progress = Constant.MAX_VALUE)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
                                     setLightGUIImg(progress = progress)
@@ -1662,9 +1662,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                         } else {
                             if (light?.brightness != progress) {
-                                if (progress > Constants.MAX_VALUE) {
-                                    params = byteArrayOf(Constants.MAX_VALUE.toByte())
-                                    setLightGUIImg(progress = Constants.MAX_VALUE)
+                                if (progress > Constant.MAX_VALUE) {
+                                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                    setLightGUIImg(progress = Constant.MAX_VALUE)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
                                     setLightGUIImg(progress = progress)
@@ -1854,7 +1854,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onBackPressed() {
         super.onBackPressed()
-        setResult(Constants.RESULT_OK)
+        setResult(Constant.RESULT_OK)
         finish()
     }
 }

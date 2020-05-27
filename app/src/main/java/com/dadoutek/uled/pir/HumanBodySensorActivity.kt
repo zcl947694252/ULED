@@ -236,8 +236,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         for (i in lightGroup.indices) {
             when (lightGroup[i].deviceType) {
-                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB, Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
-                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constants.DEVICE_TYPE_NO)
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constant.DEVICE_TYPE_NO)
                         showCheckListData!!.add(lightGroup[i])
                 }
             }
@@ -978,7 +978,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         DBUtils.recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constants.DB_ADD)
+                Constant.DB_ADD)
     }
 
     private fun getControlGroup(): String? {
@@ -1161,14 +1161,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val name: String? = if (isConfirm)
             DBUtils.lastUser?.controlMeshName
         else
-            Constants.DEFAULT_MESH_FACTORY_NAME
+            Constant.DEFAULT_MESH_FACTORY_NAME
         connectParams?.setMeshName(name)
 
         connectParams?.setConnectMac(mDeviceInfo.macAddress)
         val substring: String = if (isConfirm)
             NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16)
         else
-            Constants.DEFAULT_MESH_FACTORY_PASSWORD
+            Constant.DEFAULT_MESH_FACTORY_PASSWORD
 
         connectParams?.setPassword(substring)
         LogUtils.d("zcl开始连接${mDeviceInfo.macAddress}-----------$substring---------$name----")

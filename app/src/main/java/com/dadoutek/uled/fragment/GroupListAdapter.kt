@@ -5,7 +5,7 @@ import android.widget.CheckBox
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -34,8 +34,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                     .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
                     .addOnClickListener(R.id.selected_group)
 
-            val isSuportOpenOrClose = (group.deviceType == Constants.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constants.DEVICE_TYPE_LIGHT_RGB
-                    || group.deviceType == Constants.DEVICE_TYPE_CONNECTOR || group.deviceType == Constants.DEVICE_TYPE_DEFAULT_ALL)
+            val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                    || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
 
             if (isSuportOpenOrClose) {//支持点击 使用设置开关三个图标 将其显示 不支持设置按钮图标使其隐藏
                 if (num > 0) {

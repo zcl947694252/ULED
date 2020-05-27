@@ -1,6 +1,6 @@
 package com.dadoutek.uled.fragment
 
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -11,7 +11,7 @@ class RGBLightFragmentList : BaseGroupFragment() {
     }
 
     override fun setGroupType(): Long {
-        return Constants.DEVICE_TYPE_LIGHT_RGB
+        return Constant.DEVICE_TYPE_LIGHT_RGB
     }
 
     override fun getGroupData(): Collection<DbGroup> {

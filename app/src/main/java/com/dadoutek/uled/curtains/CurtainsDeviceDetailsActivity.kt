@@ -21,8 +21,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
@@ -78,7 +78,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_curtains_device_details)
-        type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initView()
         initData()
@@ -99,7 +99,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         var all_light_data = DBUtils.getAllCurtains()
 
         when (type) {
-            Constants.INSTALL_CURTAIN -> {
+            Constant.INSTALL_CURTAIN -> {
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbCurtain> = ArrayList()
                     var no_group: ArrayList<DbCurtain> = ArrayList()
@@ -134,8 +134,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     batchGroup.visibility = View.GONE
                     batchGroup.setOnClickListener {
                         val intent = Intent(this, CurtainBatchGroupActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("curtain", "all_curtain")
                         startActivity(intent)
                     }
@@ -151,7 +151,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 }
             }
-            Constants.INSTALL_CURTAIN_OF -> {
+            Constant.INSTALL_CURTAIN_OF -> {
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbCurtain> = ArrayList()
                     var no_group: ArrayList<DbCurtain> = ArrayList()
@@ -185,8 +185,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     batchGroup.setOnClickListener {
                         val intent = Intent(this,
                                 CurtainBatchGroupActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("curtain", "group_curtain")
                         intent.putExtra("curtain_group_name", cwLightGroup)
                         startActivity(intent)
@@ -272,7 +272,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -297,7 +297,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }
@@ -440,7 +440,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -449,7 +449,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -458,7 +458,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_CURTAIN -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -474,7 +474,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     INSTALL_CONNECTOR -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -483,7 +483,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                    INSTALL_GATEWAY -> {
                         if (medressData <= DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -515,7 +515,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun addCurtainDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
         startActivityForResult(intent, 0)
     }
 

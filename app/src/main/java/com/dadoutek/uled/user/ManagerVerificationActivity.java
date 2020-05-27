@@ -13,7 +13,7 @@ import android.widget.PopupWindow;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.hbb20.CountryCodePicker;
 
@@ -76,7 +76,7 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
         editPhoneNumber.getEditText().setText(phone);
 
         Intent intent = getIntent();
-        function = intent.getExtras().getString(Constants.ME_FUNCTION);
+        function = intent.getExtras().getString(Constant.ME_FUNCTION);
     }
 
     private void initToolbar() {
@@ -197,7 +197,7 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
     private void tranformView() {
         ToastUtils.showLong(R.string.successful_verification);
         Intent intent = new Intent();
-        intent.putExtra(Constants.ME_FUNCTION, function);
+        intent.putExtra(Constant.ME_FUNCTION, function);
         setResult(RESULT_OK, intent);
         finish();
     }

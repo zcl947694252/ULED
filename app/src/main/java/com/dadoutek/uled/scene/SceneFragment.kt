@@ -26,7 +26,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.HttpModel.GwModel
@@ -105,8 +105,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 Log.e("zcl场景", "zcl场景******scene_edit")
                                 val scene = scenesListData!![position]
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.CURRENT_SELECT_SCENE, scene)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, true)
+                                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, true)
                                 startActivityForResult(intent, 3)
                             }
                         }
@@ -154,13 +154,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                         val gattBody = GwGattBody()
-                        gattBody.ser_id = Constants.SER_ID_SCENE_ON
+                        gattBody.ser_id = Constant.SER_ID_SCENE_ON
 
                         val encoder = Base64.getEncoder()
                         val s = encoder.encodeToString(gattPar)
                         gattBody.data = s
-                        gattBody.cmd = Constants.CMD_MQTT_CONTROL
-                        gattBody.meshAddr = Constants.SER_ID_SCENE_ON
+                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                        gattBody.meshAddr = Constant.SER_ID_SCENE_ON
                         sendToServer(gattBody)
                     } else {
                         ToastUtils.showShort(getString(R.string.gw_not_online))
@@ -239,7 +239,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivityForResult(intent, 3)
                     }
                 }
@@ -264,7 +264,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
@@ -474,7 +474,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-        builder = GuideUtils.guideBuilder(this, Constants.TAG_SceneFragment)
+        builder = GuideUtils.guideBuilder(this, Constant.TAG_SceneFragment)
         if (isVisibleToUser) {
             refreshAllData()
             refreshView()
@@ -573,7 +573,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     ToastUtils.showLong(R.string.scene_16_tip)
                 } else {
                     val intent = Intent(activity, NewSceneSetAct::class.java)
-                    intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                    intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                     startActivityForResult(intent, 3)
                 }
             }
@@ -615,7 +615,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 ToastUtils.showLong(R.string.scene_16_tip)
                             } else {
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                                 startActivityForResult(intent, 3)
                             }
                         }
@@ -630,7 +630,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 ToastUtils.showLong(R.string.scene_16_tip)
                             } else {
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                                 startActivityForResult(intent, 3)
                             }
                         }
@@ -691,7 +691,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constants.SER_ID_SCENE_ON -> {
+            Constant.SER_ID_SCENE_ON -> {
                 LogUtils.v("zcl-----------远程控制场景开启成功-------")
                 ToastUtils.showShort(getString(R.string.scene_apply_success))
                 disposableTimer?.dispose()

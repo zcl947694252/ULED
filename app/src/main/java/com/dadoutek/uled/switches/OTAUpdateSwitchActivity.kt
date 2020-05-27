@@ -23,7 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DbModel.DbUser
@@ -251,7 +251,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
     }
 
     private fun initData() {
-        dbSwitch = intent.getSerializableExtra(Constants.UPDATE_LIGHT) as DbSwitch
+        dbSwitch = intent.getSerializableExtra(Constant.UPDATE_LIGHT) as DbSwitch
         log("current-light-mesh" + dbSwitch!!.meshAddr)
         onlineLights = ArrayList()
         onlineLights!!.add(dbSwitch!!)

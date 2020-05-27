@@ -34,7 +34,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.model.HttpModel.GwModel
@@ -248,7 +248,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                         connectSensorTimeoutDisposable?.dispose()
                         disposable?.dispose()
@@ -412,7 +412,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_NORMAL_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -421,7 +421,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_RGB_LIGHT -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -430,7 +430,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_CURTAIN -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -446,7 +446,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_CONNECTOR -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -455,7 +455,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_GATEWAY -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -662,7 +662,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     if (currentLightm!!.openTag == 1) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                                 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                        gattBody.ser_id = Constants.SER_ID_SENSOR_OFF
+                        gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                                 0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
@@ -672,7 +672,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     val encoder = Base64.getEncoder()
                     val s = encoder.encodeToString(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentLightm!!.meshAddr
                     sendToServer(gattBody)
                 } else {
@@ -991,10 +991,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()
         val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MAC, currentLightm?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, currentLightm?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, currentLightm?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+        intent.putExtra(Constant.OTA_MAC, currentLightm?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, currentLightm?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, currentLightm?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }

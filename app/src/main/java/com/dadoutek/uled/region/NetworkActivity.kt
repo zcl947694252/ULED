@@ -24,7 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.DbModel.DbRegion
@@ -205,7 +205,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun addRegion(text: Editable) {
         val dbRegion = DbRegion()
-        dbRegion.installMesh = Constants.PIR_SWITCH_MESH_NAME
+        dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
         if (isAddRegion) {
@@ -495,7 +495,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 when (isShowType) {
                     1 -> {
                         val intent = Intent(this@NetworkActivity, UnbindMeNetActivity::class.java)
-                        intent.putExtra(Constants.SHARE_PERSON, regionBean)
+                        intent.putExtra(Constant.SHARE_PERSON, regionBean)
                         startActivity(intent)
                         PopUtil.dismiss(pop)
                     }
