@@ -77,14 +77,14 @@ import java.util.concurrent.TimeUnit
  * 创建者     zcl
  * 创建时间   2019/8/28 18:37
  * 描述	      ${搜索 冷暖灯 全彩灯  窗帘 Connector蓝牙接收器设备}$
- *
+
  * 更新者     $Author$
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
     private var disposableFind: Disposable? = null
     private var disposableTimer: Disposable? = null
-    private var mesList: MutableList<Int> = mutableListOf()
+    private var meshList: MutableList<Int> = mutableListOf()
     private lateinit var dbGw: DbGateway
     private var mConnectDisposal: Disposable? = null
     private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为6次
@@ -152,7 +152,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //设置屏幕常亮
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_device_scanning)
-        mesList.clear()
+        meshList.clear()
         TelinkLightService.Instance()?.idleMode(true)
 
         initData()
@@ -198,8 +198,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
 
         groupsRecyclerViewAdapter.notifyDataSetChanged()
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
+        SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(), Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
     private val onClick = View.OnClickListener {
@@ -338,7 +337,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             mUpdateMeshRetryCount++
             Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
             stopScanTimer()
-            mesList.clear()
+            meshList.clear()
             this.startScan()
         } else {
             Log.d("ScanningTest", "update mesh failed , do not retry")
@@ -943,7 +942,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         btn_start_scan.setOnClickListener {
             initVisiable()
             toolbar.title = getString(R.string.scanning)
-            mesList.clear()
+            meshList.clear()
             startScan()
         }
         add_group_layout.setOnClickListener {
@@ -1283,7 +1282,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (list.size == 0) {
             id = 1
         } else {
-            for (i in 1..10000) {
+            for (i in 1..100000) {
                 if (idList.contains(i)) {
                     Log.d("gwID", "getGwId: " + "aaaaa")
                     continue
@@ -1296,6 +1295,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
         return java.lang.Long.valueOf(id.toLong())
     }
+
 
     private fun getFilters(): ArrayList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
@@ -1378,7 +1378,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         updateMeshStatus = UPDATE_MESH_STATUS.UPDATING_MESH
 
         deviceInfo.meshAddress = meshAddress
-        mesList.add(meshAddress)
+        meshList.add(meshAddress)
         val params = Parameters.createUpdateParameters()
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
@@ -1445,8 +1445,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun onLogin() {
         //进入分组
         hideLoadingDialog()
-        if (mesList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
-            mesList.removeAll(mAddedDevices.map { it.meshAddress })
+        if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
+            meshList.removeAll(mAddedDevices.map { it.meshAddress })
             startToRecoverDevices()
         } else {
             skipeType()
@@ -1465,7 +1465,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             DeviceType.GATE_WAY -> if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
                 val disposable = Commander.getDeviceVersion(dbGw.meshAddr).subscribe({ s: String ->
                     dbGw.version = s
-                    DBUtils.saveGateWay(dbGw!!, true)
+                    DBUtils.saveGateWay(dbGw, true)
                     skipeGw()
                 }, {
                     skipeGw()
@@ -1491,7 +1491,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     data
                 }
                 .filter {
-                    RecoverMeshDeviceUtil.addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
+                   addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
                 }
                 .map { deviceInfo ->
                     mAddedDevices.add(ScannedDeviceItem(deviceInfo, deviceInfo.deviceName))
@@ -1505,6 +1505,98 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }, {
                     skipeAndDisposable()
                 })
+    }
+    private fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
+            var isExist: Boolean = true//默认存在与服务器不添加
+        if (meshList.contains(deviceInfo.meshAddress)) {
+            val productUUID = deviceInfo.productUUID
+            isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
+            if (!isExist) {
+                meshList.remove(deviceInfo.meshAddress)
+                when (productUUID) {
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
+                        val dbLightNew = DbLight()
+                        dbLightNew.productUUID = productUUID
+                        dbLightNew.connectionStatus = 0
+                        dbLightNew.updateIcon()
+                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                        dbLightNew.color = 0
+                        dbLightNew.colorTemperature = 0
+                        dbLightNew.meshAddr = deviceInfo.meshAddress
+                        dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.device_name) + dbLightNew.meshAddr
+                        dbLightNew.macAddr = deviceInfo.macAddress
+                        DBUtils.saveLight(dbLightNew, false)
+                        LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回------找回----------${RecoverMeshDeviceUtil.count}----普通灯$dbLightNew---")
+                    }
+                    DeviceType.SMART_RELAY -> {
+                        val relay = DbConnector()
+                        relay.productUUID = productUUID
+                        relay.connectionStatus = 0
+                        relay.updateIcon()
+                        relay.belongGroupId = DBUtils.groupNull?.id
+                        relay.color = 0
+                        relay.meshAddr = deviceInfo.meshAddress
+                        relay.name = TelinkLightApplication.getApp().getString(R.string.device_name) + relay.meshAddr
+                        relay.macAddr = deviceInfo.macAddress
+                        DBUtils.saveConnector(relay, false)
+                        LogUtils.d("create = $relay  " + relay.meshAddr)
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回-------------${RecoverMeshDeviceUtil.count}-------relay----")
+                    }
+
+                    DeviceType.SMART_CURTAIN -> {
+                        val curtain = DbCurtain()
+                        curtain.productUUID = productUUID
+                        curtain.connectionStatus = 0
+                        curtain.updateIcon()
+                        curtain.belongGroupId = DBUtils.groupNull?.id
+                        curtain.meshAddr = deviceInfo.meshAddress
+                        curtain.name = TelinkLightApplication.getApp().getString(R.string.device_name) + curtain.meshAddr
+                        curtain.macAddr = deviceInfo.macAddress
+                        DBUtils.saveCurtain(curtain, false)
+                        LogUtils.d("create = $curtain  " + curtain.meshAddr)
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回------------${RecoverMeshDeviceUtil.count}--------curtain---")
+                    }
+             /*       DeviceType.NIGHT_LIGHT, DeviceType.SENSOR -> {
+                        val sensor = DbSensor()
+                        sensor.productUUID = productUUID
+                        sensor.belongGroupId = DBUtils.groupNull?.id
+                        sensor.meshAddr = deviceInfo.meshAddress
+                        sensor.name = TelinkLightApplication.getApp().getString(R.string.device_name) + sensor.meshAddr
+                        sensor.macAddr = deviceInfo.macAddress
+                        DBUtils.saveSensor(sensor, false)
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回--------------${RecoverMeshDeviceUtil.count}------sensor---")
+                    }
+                    DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH
+                        , DeviceType.NORMAL_SWITCH2 -> {
+                        val switch = DbSwitch()
+                        switch.productUUID = productUUID
+                        switch.belongGroupId = DBUtils.groupNull?.id
+                        switch.meshAddr = deviceInfo.meshAddress
+                        switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
+                        switch.macAddr = deviceInfo.macAddress
+                        DBUtils.saveSwitch(switch, false)
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回------------${RecoverMeshDeviceUtil.count}-------普通-switch-")
+                    }
+                    DeviceType.EIGHT_SWITCH -> {
+                        val switch = DbEightSwitch()
+                        switch.productUUID = productUUID
+                        switch.meshAddr = deviceInfo.meshAddress
+                        switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
+                        switch.macAddr = deviceInfo.macAddress
+                        DBUtils.saveEightSwitch(switch, false)
+                        RecoverMeshDeviceUtil.count++
+                        LogUtils.v("zcl找回-----------${RecoverMeshDeviceUtil.count}--------8k-switch--")
+                    }*/
+                }
+            }
+        }
+        return !isExist
     }
 
     private fun skipeAndDisposable() {
