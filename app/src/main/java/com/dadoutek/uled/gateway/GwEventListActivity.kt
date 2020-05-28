@@ -39,8 +39,12 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
+import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.LightService
+import com.telink.util.Event
+import com.telink.util.EventListener
 import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
@@ -70,7 +74,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $
  * 更新描述
  */
-class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener {
+class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener, EventListener<String> {
     private var receiver: GwBrocasetReceiver? = null
     private lateinit var currentGwTag: GwTagBean
     private var deleteBean: GwTagBean? = null
@@ -103,7 +107,15 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         add_group_btn_tv.text = getString(R.string.add_timing_label)
     }
 
+    override fun onResume() {
+        super.onResume()
+        this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+    }
 
+    override fun onPause() {
+        super.onPause()
+        this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
+    }
     private fun retryConnect() {
         connect(macAddress = dbGw!!.macAddr, fastestMode = true)?.subscribe(
                 object : NetworkObserver<DeviceInfo?>() {
@@ -115,8 +127,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     override fun onError(e: Throwable) {
                         super.onError(e)
                         TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
-                        var intent = Intent(this@GwEventListActivity, GwDeviceDetailActivity::class.java)
-                        startActivity(intent)
                         DBUtils.saveGateWay(dbGw!!, true)
                         finish()
                     }
@@ -160,10 +170,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 .subscribe {
                     hideLoadingDialog()
                     runOnUiThread { ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
-                    intent = Intent(this, GwDeviceDetailActivity::class.java)
-                    startActivity(intent)
                     DBUtils.saveGateWay(dbGw!!, true)
-                  //  finish()
+                   finish()
                 }
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)
@@ -203,8 +211,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         dbGw = intent.getParcelableExtra("data")
         if (dbGw == null) {
             TmtUtils.midToast(this@GwEventListActivity, getString(R.string.no_get_device_info))
-            intent = Intent(this, GwDeviceDetailActivity::class.java)
-            startActivity(intent)
             finish()
         }
 
@@ -306,8 +312,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     @SuppressLint("SetTextI18n")
     fun initListener() {
         toolbar.setNavigationOnClickListener {
-            intent = Intent(this, GwDeviceDetailActivity::class.java)
-            startActivity(intent)
             finish()
         }
         toolbar.setOnClickListener {
@@ -772,7 +776,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
             }
         })
-
+        mApp = (this.application as TelinkLightApplication)
         initView()
         initData()
         initListener()
@@ -807,6 +811,51 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             disposableTimer?.dispose()
         } else if (GW_GATT_DELETE_LABEL == serId?.toInt()) {
             runOnUiThread { deleteSuceess() }
+        }
+    }
+
+    override fun performed(event: Event<String>?) {
+        if (event is DeviceEvent) {
+            this.onDeviceEvent(event)
+        }
+    }
+
+    private fun onDeviceEvent(event: DeviceEvent) {
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> when (event.args.status) {
+                LightAdapter.STATUS_LOGIN -> {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                }
+                LightAdapter.STATUS_LOGOUT -> {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                    retryConnect()
+                }
+                LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                    val deviceInfo = event.args
+                    when (deviceInfo.gwVoipState) {
+                        GW_TIME_ZONE_VOIP, GW_CONFIG_TIMER_LABEL_VOIP, GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
+                            LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                            disposableTimer?.dispose()
+                            hideLoadingDialog()
+                        }
+                        GW_DELETE_TIMER_LABEL_VOIP, GW_DELETE_TIME_PERIVODE_LABEL_VOIP -> {
+                            LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                            hideLoadingDialog()
+                            runOnUiThread { deleteSuceess() }
+                        }
+                    }
+                }
+
+                //获取设备mac
+                LightAdapter.STATUS_GET_DEVICE_MAC_COMPLETED -> {
+                    //mac信息获取成功
+                    val deviceInfo = event.args
+                    LogUtils.v("zcl-----------蓝牙数据获取设备的macaddress-------$deviceInfo--------------${deviceInfo.sixByteMacAddress}")
+                    dbGw?.sixByteMacAddr = deviceInfo.sixByteMacAddress
+                }
+                LightAdapter.STATUS_GET_DEVICE_MAC_FAILURE -> {
+                }
+            }
         }
     }
 

@@ -93,7 +93,6 @@ class GwLoginActivity : TelinkBaseActivity(){
                                 ToastUtils.showShort(getString(R.string.config_success))
                                 val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
                                 if (boolean) {
-                                    startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                                     finish()
                                 } else
                                     skipEvent()
@@ -134,7 +133,6 @@ class GwLoginActivity : TelinkBaseActivity(){
                 skipEvent()
             } else {
                 ToastUtils.showShort(getString(R.string.device_disconnected))
-                startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                 finish()
             }
 
@@ -336,7 +334,6 @@ class GwLoginActivity : TelinkBaseActivity(){
         toolbarTv.text = getString(R.string.config_net)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
-            startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
             finish()
         }
         if (TelinkLightApplication.getApp().isConnectGwBle)
