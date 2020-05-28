@@ -75,10 +75,8 @@ public class DbSensor implements Serializable {
         if (this.openTag == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_sensor;
         } else if (this.openTag == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_device_down;
+            this.icon = R.drawable.icon_sensor_close;
         } else if (this.openTag == ConnectionStatus.ON.getValue()) {
-
-
             this.icon = R.drawable.icon_sensor;
         }
     }
