@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.ClickableSpan
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -327,6 +328,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                 style.setSpan(ForegroundColorSpan1(getColor(R.color.blue_text)), style.length - 3, style.length - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             else
                 style.setSpan(ForegroundColorSpan1(getColor(R.color.blue_text)), style.length - 2, style.length - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         physical_recovery_state_warm.text = style
     }
 

@@ -76,10 +76,32 @@
         app:inputNum="6"
         app:inputTxtColor="@color/blue_background"
         app:inputTxtSize="8sp"
+            android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codePhone" />
-
+    <com.maning.pswedittextlibrary.MNPasswordEditText
+            android:id="@+id/verCodeInputView_line"
+            android:layout_width="match_parent"
+            android:layout_marginStart="@dimen/dp_30"
+            android:layout_marginEnd="@dimen/dp_30"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="57dp"
+            android:focusableInTouchMode="true"
+            android:inputType="number"
+            android:maxLength="6"
+            android:textSize="20sp"
+            app:mnPsw_border_color="#c9c9c9"
+            app:mnPsw_border_selected_color="@color/blue_text"
+            app:mnPsw_border_width="2dp"
+            app:mnPsw_item_margin="10dp"
+            app:mnPsw_mode="OriginalText"
+            app:mnPsw_style="StyleUnderLine"
+            app:mnPsw_text_color="#393939"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/codePhone"/>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/refresh_code"

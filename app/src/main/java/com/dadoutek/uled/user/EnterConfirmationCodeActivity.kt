@@ -1,6 +1,7 @@
 package com.dadoutek.uled.user
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -31,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -81,10 +83,17 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun initView() {
         verCodeInputView.setOnCompleteListener { verificationLogin() }
-        verCodeInputView.setOnCompleteListener {
+        verCodeInputView.setOnCompleteListener { it ->
             var code = it
-            submitCode(countryCode
-                    ?: "", phone!!, code.toString().trim { it <= ' ' })
+            submitCode(countryCode ?: "", phone!!, code.toString().trim { it <= ' ' })
+        }
+        verCodeInputView_line.setOnTextChangeListener { s, b ->
+            codePhone.text = s
+
+            if (s.length>=6){
+                submitCode(countryCode ?: "", phone!!, s)
+               // verificationLogin()
+            }
         }
         refresh_code.setOnClickListener(this)
         image_return.setOnClickListener(this)
@@ -146,7 +155,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                                 val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                                 intent.putExtra("phone", phone)
                                 intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
-                                startActivity(intent)
+                                startActivityForResult(intent,0)
                                 finish()
                             }
                             Constant.TYPE_FORGET_PASSWORD -> {
@@ -265,7 +274,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0 && resultCode == Activity.RESULT_FIRST_USER) {
+            finish()
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         SMSSDK.unregisterEventHandler(eventHandler)

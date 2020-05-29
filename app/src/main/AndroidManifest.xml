@@ -78,6 +78,11 @@
         <activity
                 android:name=".fragment.SafeLockActivity"
                 android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".othersview.CountryActivity"
+                android:screenOrientation="portrait" />
+
         <activity
                 android:name=".scene.SelectGradientActivity"
                 android:screenOrientation="portrait" />
@@ -291,7 +296,7 @@
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustResize" />
         <activity
-                android:name=".user.RegisterActivity"
+                android:name=".othersview.RegisterActivity"
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustResize" />
         <activity

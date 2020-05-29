@@ -126,6 +126,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                                 //("logging" + stringResponse.errorCode + "更改成功")
                                 ToastUtils.showLong(R.string.tip_update_password_success)
                                 startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
+                                setResult(RESULT_FIRST_USER)
                                 finish()
                             } else {
                                 //ToastUtils.showLong(R.string.tip_update_password_fail)
@@ -191,6 +192,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun complete() {
             hideLoadingDialog()
+            setResult(RESULT_FIRST_USER)
             startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
             finish()
         }

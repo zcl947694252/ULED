@@ -22,9 +22,6 @@ import com.dadoutek.uled.util.StringUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_forget_password.*
-import kotlinx.android.synthetic.main.activity_register.ccp
-import kotlinx.android.synthetic.main.activity_register.edit_user_phone
-import kotlinx.android.synthetic.main.activity_register.register_completed
 import org.jetbrains.anko.toast
 import java.util.*
 

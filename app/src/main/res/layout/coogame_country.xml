@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_color"
+        android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <FrameLayout
+            android:id="@+id/layoutContainer"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip"
+            android:padding="2dp">
+
+        <EditText
+                android:id="@+id/country_et_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/text_field"
+                android:drawableStart="@drawable/icon_search"
+                android:drawablePadding="4dp"
+                android:hint="@string/search"
+                android:paddingStart="10dp"
+                android:paddingEnd="40dp"
+                android:singleLine="true"
+                android:textSize="14sp" />
+
+        <ImageView
+                android:id="@+id/country_iv_cleartext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:padding="4dp"
+                android:src="@drawable/clear_button"
+                android:visibility="invisible" />
+    </FrameLayout>
+
+    <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        <ListView
+                android:id="@+id/country_lv_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:cacheColorHint="#000000"
+                android:divider="#e3e3e3"
+                android:layout_marginEnd="50dp"
+                android:dividerHeight="1.0dp"
+                android:fadingEdge="none"
+                android:scrollbars="none"
+                android:scrollingCache="false"
+                android:visibility="visible" />
+
+        <com.dadoutek.uled.tools.SideBar
+                android:id="@+id/country_sidebar"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|center"
+                android:background="@color/white"
+                android:layout_marginBottom="5dip" />
+    </FrameLayout>
+
+</LinearLayout>

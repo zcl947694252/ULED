@@ -1077,4 +1077,11 @@
     <string name="see_help">See the help</string>
     <string name="group_max">Maximum 7 groups are supported</string>
     <string name="dissupport">This batch of equipment does not support switching function</string>
+    <string name="china_code">China+86</string>
+    <string name="select_country_area">Country code selection</string>
+    <string name="have_account">Existing account login</string>
+    <string name="create_account">Create new account</string>
+    <string name="privacy_statement">Privacy statement</string>
+    <string name="privacy_statement_content">Uled smart platform understands the importance of your privacy to you and fully respects it.The mobile phone number registered on Uled platform is only used for the operation of Uled smart products.Without your consent, we will not access or process your content data for any purpose except as required by applicable laws and regulations.</string>
+    <string name="user_agreement_context">《User agreement and privacy notes》have been agreed.</string>
 </resources>

@@ -23,6 +23,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.RegisterActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

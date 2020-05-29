@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
-    >
+    android:background="#ffffff">
 
     <ProgressBar
         android:id="@+id/regist_frist_progress"
@@ -77,60 +76,89 @@
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <com.hbb20.CountryCodePicker
-        android:id="@+id/ccp"
-        android:layout_width="70dp"
-        android:layout_height="40dp"
-        app:ccpDialog_showCloseIcon="true"
-        app:ccpDialog_showTitle="false"
-        app:ccp_autoDetectLanguage="true"
-        app:ccp_defaultNameCode="CN"
-        app:ccp_showFlag="false"
-        app:ccp_showNameCode="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/return_image"
-        app:layout_constraintVertical_bias="0.22000003" />
-<LinearLayout
-    android:id="@+id/edit_user_phone_ly"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="@+id/ccp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toEndOf="@+id/ccp"
-    app:layout_constraintTop_toTopOf="@+id/ccp"
-    app:layout_constraintVertical_bias="0.07999998"
-    android:orientation="vertical">
 
-    <EditText
-    android:id="@+id/edit_user_phone"
-    android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="32dp"
-    android:layout_marginBottom="8dp"
-    android:hint="@string/please_phone_number"
-    android:inputType="phone"
-    android:maxLength="16"
-        android:background="@null"
-    android:maxLines="1"
-    android:textColor="@color/black_three"
-    android:textColorHint="@color/black_ee"
-    android:textSize="16sp" />
+    <TextView
+            android:id="@+id/ccp_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="27dp"
+            android:gravity="center"
+            android:text="@string/china_code"
+            android:textColor="@color/gray_3"
+            android:textSize="@dimen/sp_15"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/country_code_arrow"
+            app:layout_constraintHorizontal_bias="0.081"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/return_image"
+            app:layout_constraintVertical_bias="0.237" />
+
     <ImageView
-        android:id="@+id/register_phone_line"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="32dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/line_gray"
-         />
-</LinearLayout>
+            android:id="@+id/country_code_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:padding="@dimen/dp_15"
+            android:src="@drawable/icon_arrow"
+            android:layout_marginTop="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.292" />
 
+    <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="76dp"
+            android:gravity="center"
+            android:text="@string/edit_phone"
+            android:textColor="@color/gray9"
+            android:textSize="@dimen/sp_15"
+            app:layout_constraintBottom_toTopOf="@+id/register_completed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ccp"
+            app:layout_constraintVertical_bias="0.0" />
+
+    <LinearLayout
+            android:id="@+id/edit_user_phone_ly"
+            android:layout_width="267dp"
+            android:layout_height="38dp"
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/dp_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/textView8"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.391">
+
+        <EditText
+                android:id="@+id/edit_user_phone"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="8dp"
+                android:hint="@string/please_phone_number"
+                android:inputType="phone"
+                android:maxLength="16"
+                android:maxLines="1"
+                android:textColor="@color/black_three"
+                android:textColorHint="@color/black_ee"
+                android:textSize="16sp" />
+
+        <ImageView
+                android:id="@+id/register_phone_line_b"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/line_gray" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/edit_verification"
@@ -220,18 +248,18 @@
 
 
     <Button
-        android:id="@+id/register_completed"
-        android:layout_width="300dp"
-        android:layout_height="44dp"
-        android:layout_marginLeft="38dp"
-        android:layout_marginTop="68dp"
-        android:layout_marginRight="38dp"
-        android:background="@drawable/btn_rec_black_bt"
-        android:text="@string/next"
-        android:textColor="@color/black_three"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.481"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone_ly"/>
+            android:id="@+id/register_completed"
+            android:layout_width="300dp"
+            android:layout_height="44dp"
+            android:layout_marginLeft="38dp"
+            android:layout_marginTop="68dp"
+            android:layout_marginRight="38dp"
+            android:background="@drawable/btn_rec_black_bt"
+            android:text="@string/next"
+            android:textColor="@color/black_three"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.675"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_user_phone_ly" />
 </android.support.constraint.ConstraintLayout>
