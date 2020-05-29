@@ -12,7 +12,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uledtest.ble.RxBleManager
+import com.dadoutek.uled.ble.RxBleManager
 import com.polidea.rxandroidble2.RxBleDevice
 import com.polidea.rxandroidble2.scan.ScanResult
 import io.reactivex.Observable

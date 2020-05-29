@@ -38,7 +38,7 @@ public class OtherUtils {
     }
 
     public static boolean isCurtain(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_CURTAIN.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_CURTAIN.intValue()){
             return true;
         }else{
             return false;
@@ -46,7 +46,7 @@ public class OtherUtils {
     }
 
     public static boolean  isConnector(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_CONNECTOR.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_CONNECTOR.intValue()){
             return true;
         }else{
             return false;
@@ -54,7 +54,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
             return true;
         }else{
             return false;
@@ -62,7 +62,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
             return true;
         }else{
             return false;
@@ -70,7 +70,7 @@ public class OtherUtils {
     }
 
     public static boolean isAllRightGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_NO.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_NO.intValue()){
             return true;
         }else{
             return false;
@@ -78,7 +78,7 @@ public class OtherUtils {
     }
 
     public static boolean isDefaultGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT_ALL.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()== Constant.DEVICE_TYPE_DEFAULT_ALL.intValue()){
             return true;
         }else{
             return false;
@@ -134,7 +134,7 @@ public class OtherUtils {
         InstallDeviceModel installDeviceModel1=new InstallDeviceModel(context.getString(R.string.normal_light),context.getString(R.string.normal_light_describe));
         InstallDeviceModel installDeviceModel2=new InstallDeviceModel(context.getString(R.string.rgb_light),context.getString(R.string.rgb_light_describe));
         InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
-        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
+        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensoR),context.getString(R.string.sensor_describe));
         InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
         InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.relay),context.getString(R.string.for_connector));
         InstallDeviceModel installDeviceModel7=new InstallDeviceModel(context.getString(R.string.Gate_way),context.getString(R.string.for_connector));

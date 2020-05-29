@@ -75,7 +75,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         if (isChangePwd) {
             dbUser = DbUser()
-            register_completed.setText(R.string.btn_sure)
+            register_completed.setText(R.string.confirm)
         }
     }
 

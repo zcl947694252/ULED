@@ -7,6 +7,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.Settings
 import android.support.constraint.ConstraintLayout
@@ -71,6 +72,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${
  */
 class NetworkActivity : BaseActivity(), View.OnClickListener {
+    private var mBitmap: Bitmap? = null
     private var transferRegionCode: String = ""
     private var transferCode: String = ""
     private var authorizeCode: String = ""
@@ -159,7 +161,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             viewAdd!!.findViewById<EditText>(R.id.pop_region_name).hint = getString(R.string.input_region_name)
             popAdd?.let { it1 -> showPop(it1, Gravity.CENTER) }
         }
-
+        pop?.setOnDismissListener {
+            recycleBitmap()
+        }
         image_bluetooth.setOnClickListener {
             openScan()
         }
@@ -192,6 +196,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 }
             })
         }
+    }
+
+    private fun recycleBitmap() {
+        if (mBitmap?.isRecycled!=true)
+            mBitmap?.recycle()
     }
 
     private fun addRegion(text: Editable) {
@@ -446,7 +455,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         mBuild?.let {
             it.setMessage(message)
-            it.setNegativeButton(getString(R.string.btn_sure)) { dialog, _ ->
+            it.setNegativeButton(getString(R.string.confirm)) { dialog, _ ->
                 changeRegion()
                 dialog.dismiss()
             }
@@ -768,8 +777,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
 
     private fun setQR(it: String) {
-        var mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px(231f), ConvertUtils.dp2px(231f), null)
+         mBitmap = CodeUtils.createImage(it, ConvertUtils.dp2px(231f), ConvertUtils.dp2px(231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
+        //mBitmap.recycle()
     }
 
     @SuppressLint("SetTextI18n")
@@ -1100,7 +1110,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun showUnbindDialog() {
         val builder = android.support.v7.app.AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.warm_unbind_authorize_config, regionBeanAuthorize!!.name))
-        builder.setNegativeButton(getString(R.string.btn_sure)) { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.confirm)) { dialog, _ ->
             //解除授权
             //authorizer_id授权用户id  rid区域id
             RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)
@@ -1144,6 +1154,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onDestroy()
         PopUtil.dismiss(pop)
         PopUtil.dismiss(popAdd)
+        recycleBitmap()
         disposableEnsure?.dispose()
         disposableRequest?.dispose()
         mCompositeDisposable.dispose()

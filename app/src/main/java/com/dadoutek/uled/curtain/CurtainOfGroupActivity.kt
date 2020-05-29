@@ -396,7 +396,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 //判断是否为rgb灯
                 if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
                     intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_CURTAIN)
+                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)

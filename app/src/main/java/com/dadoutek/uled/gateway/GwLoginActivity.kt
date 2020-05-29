@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.LocalBroadcastManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -28,13 +27,9 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.LightService
 import com.telink.util.Arrays
-import com.telink.util.Event
-import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -98,7 +93,6 @@ class GwLoginActivity : TelinkBaseActivity(){
                                 ToastUtils.showShort(getString(R.string.config_success))
                                 val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
                                 if (boolean) {
-                                    startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                                     finish()
                                 } else
                                     skipEvent()
@@ -139,7 +133,6 @@ class GwLoginActivity : TelinkBaseActivity(){
                 skipEvent()
             } else {
                 ToastUtils.showShort(getString(R.string.device_disconnected))
-                startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
                 finish()
             }
 
@@ -341,7 +334,6 @@ class GwLoginActivity : TelinkBaseActivity(){
         toolbarTv.text = getString(R.string.config_net)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
-            startActivity(Intent(this@GwLoginActivity, GwDeviceDetailActivity::class.java))
             finish()
         }
         if (TelinkLightApplication.getApp().isConnectGwBle)

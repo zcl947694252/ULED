@@ -44,6 +44,7 @@ import org.jetbrains.anko.design.snackbar
  */
 class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, EventListener<String> {
     private lateinit var mScenes: List<DbScene>
+    private var version: String=""
     private var isGroupMode: Boolean = true
     private lateinit var telinkApplication: TelinkApplication
     private lateinit var mDeviceInfo: DeviceInfo
@@ -177,6 +178,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         val versionNum = Integer.parseInt(StringUtils.versionResolution(version, 1))
         versionLayoutPS.visibility = View.VISIBLE
         tvPSVersion.text = version
+        this.version = version
         isSupportModeSelect = (version).contains("PS")
 
         if (isSupportModeSelect) {
@@ -201,6 +203,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        version = intent.getStringExtra("version")
+        if (version==null)
+            version = mDeviceInfo.firmwareRevision
         mGroupScenesName = ArrayList()
         getGroupName()
     }
@@ -317,9 +322,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 tietMinimumBrightness.text.toString().toInt(),
                                 spTriggerLux.selectedItem.toString().toInt(), mode)
                         Thread.sleep(300)
-
-
-                        Commander.updateMeshName(
+                       mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
+                        Commander.updateMeshName(newMeshAddr =  mDeviceInfo.meshAddress,
                                 successCallback = {
                                     hideLoadingDialog()
                                     saveSensor()
@@ -355,7 +359,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         dbSensor.controlGroupAddr = mSelectGroupSceneAddr.toString()
         dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = MeshAddressGenerator().meshAddress
+        dbSensor.version = version
+        dbSensor.meshAddr = mDeviceInfo.meshAddress
         // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + mDeviceInfo!!.meshAddress

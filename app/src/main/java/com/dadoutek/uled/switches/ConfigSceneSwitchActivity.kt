@@ -256,6 +256,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
             } else {
@@ -265,6 +266,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress
                 dbSwitch!!.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch!!.productUUID = mDeviceInfo.productUUID
+                dbSwitch.version = mDeviceInfo.firmwareRevision
                 dbSwitch!!.index = dbSwitch.id.toInt()
                 DBUtils.saveSwitch(dbSwitch, false)
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)

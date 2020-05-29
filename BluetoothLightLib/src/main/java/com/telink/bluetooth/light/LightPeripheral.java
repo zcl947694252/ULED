@@ -38,11 +38,12 @@ public class LightPeripheral extends Peripheral {
     private int retry = 0;
 
     public LightPeripheral(BluetoothDevice device, byte[] scanRecord, int rssi,
-                           byte[] meshName, int meshAddress) {
+                           byte[] meshName, int meshAddress, String version) {
         super(device, scanRecord, rssi);
 
         this.setMeshName(meshName);
         this.setMeshAddress(meshAddress);
+        this.setVersion(version);
     }
 
     public byte[] getMeshName() {

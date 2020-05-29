@@ -341,7 +341,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
-           // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
+        // NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         else
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
 
@@ -367,24 +367,20 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         if (TelinkApplication.getInstance().connectDevice != null && mDeviceInfo?.meshAddress != null) {
             dstAdress = mDeviceInfo?.meshAddress!!
             Commander.getDeviceVersion(dstAdress)
-                    .subscribe(
-                            {
+                    .subscribe({
                                 closeAnimal()
                                 finish()
-                                when (mDeviceInfo?.productUUID) {
-                                    DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
-                                    DeviceType.NIGHT_LIGHT -> startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
-                                    else -> ToastUtils.showLong(getString(R.string.scan_end))
-                                }
+                                skipDevice(it)
                             },
                             {
                                 getVersionRetryCount++
                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                     getVersion()
                                 } else {
+                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
                                     closeAnimal()
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                     finish()
+                                    skipDevice(mDeviceInfo!!.firmwareRevision)
                                 }
                                 LogUtils.e("zcl配置传感器前失败----$it")
                             }
@@ -393,6 +389,21 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             ToastUtils.showLong(getString(R.string.get_version_fail))
             doFinish()
+        }
+    }
+
+    private fun ScanningSensorActivity.skipDevice(it: String) {
+        when (mDeviceInfo?.productUUID) {
+            DeviceType.SENSOR -> {
+                startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
+            }
+            DeviceType.NIGHT_LIGHT -> {
+                if (it.contains("NPR"))
+                    startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)
+                else
+                    startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+            }
+            else -> ToastUtils.showLong(getString(R.string.scan_end))
         }
     }
 
@@ -472,6 +483,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
+
                     isSearchedDevice = true
                     connect()
                 } else {

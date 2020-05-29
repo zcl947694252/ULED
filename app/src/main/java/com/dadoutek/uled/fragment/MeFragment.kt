@@ -7,7 +7,6 @@ import android.content.Context.POWER_SERVICE
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.os.*
 import android.provider.Settings
 import android.text.SpannableString
@@ -49,8 +48,6 @@ import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
-import com.dadoutek.uled.user.InputPwdActivity
-import com.dadoutek.uled.user.LoginActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -61,11 +58,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.db.NULL
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -362,7 +355,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                                     cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.white)
                                     cancel?.isClickable = false
                                     confirm?.isClickable = false
-                                    readTimer?.visibility =View.VISIBLE
+                                    readTimer?.visibility = View.VISIBLE
                                     readTimer?.text = getString(R.string.please_read_carefully, num)
                                 }
                             }
@@ -411,7 +404,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         cancelConfirmLy?.visibility = View.VISIBLE
         cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.gray)
         cancel?.text = getString(R.string.cancel)
-        confirm?.text = getString(R.string.btn_sure)
+        confirm?.text = getString(R.string.confirm)
         cancel?.isClickable = true
         confirm?.isClickable = true
     }
@@ -448,8 +441,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                     .setTitle(R.string.network_tip_title)
                     .setMessage(R.string.net_disconnect_tip_message)
                     .setPositiveButton(android.R.string.ok
-                    ) { _, _ ->
-                        // 跳转到设置界面
+                    ) { _, _ -> // 跳转到设置界面
                         activity.startActivityForResult(Intent(
                                 Settings.ACTION_WIRELESS_SETTINGS),
                                 0)
@@ -468,13 +460,12 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         var num = 5 - it as Long
-                        //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
-                            confirm?.text = getString(R.string.btn_sure)
+                            confirm?.text = getString(R.string.confirm)
                         } else {
                             confirm?.isClickable = false
-                            confirm?.text = getString(R.string.btn_sure) + "(" + num + "s)"
+                            confirm?.text = getString(R.string.confirm) + "(" + num + "s)"
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
@@ -571,8 +562,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
 
-            LogUtils.getConfig().setLog2FileSwitch(true)
-            LogUtils.getConfig().setDir(LOG_PATH_DIR)
+            LogUtils.getConfig().isLog2FileSwitch = true
+            LogUtils.getConfig().dir = LOG_PATH_DIR
             SharedPreferencesUtils.setDeveloperModel(!SharedPreferencesUtils.isDeveloperModel())
             if (SharedPreferencesUtils.isDeveloperModel())
                 TmtUtils.midToastLong(activity, getString(R.string.developer_mode_open))
@@ -595,7 +586,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
                     TelinkLightService.Instance()?.idleMode(true)
                     clearData()
-                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, _ -> }.create()
+                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { _, _ -> }.create()
         alertDialog.show()
         val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
         btn.isEnabled = false
@@ -614,7 +605,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     private fun clearData() {
         val dbUser = DBUtils.lastUser
-
         if (dbUser == null) {
             ToastUtils.showLong(R.string.data_empty)
             return
@@ -652,11 +642,9 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
 
     fun refreshView() {
-        if (LeBluetooth.getInstance().isEnabled && TelinkLightApplication.getApp().connectDevice != null) {
+        if (LeBluetooth.getInstance().isEnabled && TelinkLightApplication.getApp().connectDevice != null)
             setLoginChange()
-        } else {
+        else
             setLoginOutChange()
-        }
-
     }
 }

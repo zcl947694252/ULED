@@ -338,6 +338,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        TelinkLightService.Instance()?.idleMode(true)
     }
 }

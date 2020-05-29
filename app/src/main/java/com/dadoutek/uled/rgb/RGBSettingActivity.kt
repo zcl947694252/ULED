@@ -344,7 +344,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun initType() {
-        val type = intent.getStringExtra(Constant.TYPE_VIEW)
+        type = intent.getStringExtra(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
@@ -398,6 +398,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
+        //LogUtils.e("kevin init view")
         light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
@@ -582,15 +583,37 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun openOrClose(currentLight: Boolean) {
+        LogUtils.e("currentLight" + currentLight)
+
+        var addr = 0
         if (currentLight) {
             enableAllUI(true)
-            Commander.openOrCloseLights(light!!.meshAddr, true)//开灯
-            light!!.connectionStatus = ConnectionStatus.ON.value
+            if (type == Constant.TYPE_GROUP) {
+                addr = group!!.meshAddr
+                group!!.connectionStatus = ConnectionStatus.ON.value
+            } else {
+                addr = light!!.meshAddr
+                light!!.connectionStatus = ConnectionStatus.ON.value
+            }
+
         } else {
             enableAllUI(false)
-            Commander.openOrCloseLights(light!!.meshAddr, false)//关灯
-            light!!.connectionStatus = ConnectionStatus.OFF.value
+            if (type == Constant.TYPE_GROUP) {
+                addr = group!!.meshAddr
+                group!!.connectionStatus = ConnectionStatus.OFF.value
+            } else {
+                addr = light!!.meshAddr
+                light!!.connectionStatus = ConnectionStatus.OFF.value
+            }
+
         }
+
+        Thread {
+            //Thread.sleep(300) // 延时3S  防止通信失败
+            Commander.openOrCloseLights(addr, currentLight)
+        }.start()
+
+
     }
 
     private val cbOnClickListener = OnClickListener {
@@ -627,40 +650,30 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private fun enableAllUI(isEnabled: Boolean) {
         cb_brightness_enable.isClickable = isEnabled
         cb_brightness_rgb_enable.isClickable = isEnabled
+        cb_brightness_rgb_enable.isChecked = isEnabled
+        cb_brightness_enable.isChecked = isEnabled
 
-        if (isEnabled && cb_brightness_enable.isChecked) {
-            sb_w_bright.isEnabled = true
-            sb_w_bright_add.isEnabled = true
-            sb_w_bright_less.isEnabled = true
-        } else {
-            sb_w_bright.isEnabled = false
-            sb_w_bright_add.isEnabled = false
-            sb_w_bright_less.isEnabled = false
-        }
+        sb_w_bright.isEnabled = isEnabled
+        sb_w_bright_add.isEnabled = isEnabled
+        sb_w_bright_less.isEnabled = isEnabled
 
-        if (isEnabled && cb_brightness_rgb_enable.isChecked) {
-            sbBrightness.isEnabled = true
-            sbBrightness_add.isEnabled = true
-            sbBrightness_less.isEnabled = true
-        } else {
-            sbBrightness.isEnabled = false
-            sbBrightness_add.isEnabled = false
-            sbBrightness_less.isEnabled = false
-        }
+        sbBrightness.isEnabled = isEnabled
+        sbBrightness_add.isEnabled = isEnabled
+        sbBrightness_less.isEnabled = isEnabled
 
         ll_r.isEnabled = isEnabled
         ll_g.isEnabled = isEnabled
         ll_b.isEnabled = isEnabled
 
-        
-
-
         if (isEnabled) {
             colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
             colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
+            color_picker.isDispatchTouchEvent = true
+
         } else {
             colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = null
             colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = null
+            color_picker.isDispatchTouchEvent = false
         }
 
         val paint = Paint()
@@ -670,13 +683,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             colorMatrix.setSaturation(1f)
         } else {
             // 让界面变灰色
-            colorMatrix.setSaturation(0.3f)
+            colorMatrix.setSaturation(0.1f)
         }
 
         paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
         rgb_set.setLayerType(View.LAYER_TYPE_HARDWARE, paint)
-
-
     }
 
 
@@ -1594,6 +1605,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         this.color_picker!!.setOnTouchListener(this)
 //        color_picker.isEnabled = true
 
+        cb_total.setOnCheckedChangeListener { _, isChecked ->
+            if (group != null) {
+                openOrClose(isChecked)
+            }
+        }
+        cb_total.isChecked = group!!.connectionStatus == ConnectionStatus.ON.value
+
         dynamic_rgb.setOnClickListener(this.clickListener)
         ll_r.setOnClickListener(this.clickListener)
         ll_g.setOnClickListener(this.clickListener)
@@ -1602,6 +1620,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         btnAdd.setOnClickListener(this.clickListener)
         mode_preset_layout.setOnClickListener(this.clickListener)
         mode_diy_layout.setOnClickListener(this.clickListener)
+        cb_brightness_enable.setOnClickListener(cbOnClickListener)
+        cb_brightness_rgb_enable.setOnClickListener(cbOnClickListener)
 
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
@@ -2187,7 +2207,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
-
             if (isOnceSet) {
                 delay(50)
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)

@@ -1,15 +1,13 @@
-package com.dadoutek.uledtest.ble
+package com.dadoutek.uled.ble
 
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.regionAll
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -25,7 +23,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
-import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -128,7 +125,7 @@ object RxBleManager {
                     //返回true  说明是自己区域下的设备或者为恢复出厂的设备
                     var isMyDevice = isMyDevice(it.bleDevice.name)
 
-                    LogUtils.v("zcl物理搜索设备名=${regionList}=${it.bleDevice.name}---------$version--------${it.bleDevice.macAddress}----${version == "" && !isMyDevice}")
+                    LogUtils.v("zcl物理搜索设备名=$regionList=${it.bleDevice.name}---------$version--------${it.bleDevice.macAddress}----${version == "" && !isMyDevice}")
 
                     if (version == "")
                         false

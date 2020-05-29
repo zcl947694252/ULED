@@ -22,12 +22,17 @@ public class DbSceneActions {
     @NotNull
     private int brightness;
     public int color=0xffffff;//颜色;
+
     private boolean isOn;
+    private boolean isEnableBright;
+    private boolean isEnableWhiteBright;
+
     private int deviceType;
     private int circleOne;
     private int circleTwo;
     private int circleThree;
     private int circleFour;
+
 
     public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
@@ -36,12 +41,13 @@ public class DbSceneActions {
     public String gradientName  ;//渐变速度
 
 
-    @Generated(hash = 1453847336)
+    @Generated(hash = 814967990)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
             int colorTemperature, int brightness, int color, boolean isOn,
-            int deviceType, int circleOne, int circleTwo, int circleThree,
-            int circleFour, int rgbType, int gradientType, int gradientId,
-            int gradientSpeed, String gradientName) {
+            boolean isEnableBright, boolean isEnableWhiteBright, int deviceType,
+            int circleOne, int circleTwo, int circleThree, int circleFour,
+            int rgbType, int gradientType, int gradientId, int gradientSpeed,
+            String gradientName) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
@@ -49,6 +55,8 @@ public class DbSceneActions {
         this.brightness = brightness;
         this.color = color;
         this.isOn = isOn;
+        this.isEnableBright = isEnableBright;
+        this.isEnableWhiteBright = isEnableWhiteBright;
         this.deviceType = deviceType;
         this.circleOne = circleOne;
         this.circleTwo = circleTwo;
@@ -202,6 +210,22 @@ public class DbSceneActions {
         this.circleFour = circleFour;
     }
 
+    public boolean isEnableBright() {
+        return isEnableBright;
+    }
+
+    public void setEnableBright(boolean enableBright) {
+        isEnableBright = enableBright;
+    }
+
+    public boolean isEnableWhiteBright() {
+        return isEnableWhiteBright;
+    }
+
+    public void setEnableWhiteBright(boolean enableWhiteBright) {
+        isEnableWhiteBright = enableWhiteBright;
+    }
+
     @Override
     public String toString() {
         return "DbSceneActions{" +
@@ -223,5 +247,21 @@ public class DbSceneActions {
                 ", gradientSpeed=" + gradientSpeed +
                 ", gradientName='" + gradientName + '\'' +
                 '}';
+    }
+
+    public boolean getIsEnableBright() {
+        return this.isEnableBright;
+    }
+
+    public void setIsEnableBright(boolean isEnableBright) {
+        this.isEnableBright = isEnableBright;
+    }
+
+    public boolean getIsEnableWhiteBright() {
+        return this.isEnableWhiteBright;
+    }
+
+    public void setIsEnableWhiteBright(boolean isEnableWhiteBright) {
+        this.isEnableWhiteBright = isEnableWhiteBright;
     }
 }

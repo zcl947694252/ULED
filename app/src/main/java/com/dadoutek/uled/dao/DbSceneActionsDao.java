@@ -34,16 +34,18 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
         public final static Property Color = new Property(5, int.class, "color", false, "COLOR");
         public final static Property IsOn = new Property(6, boolean.class, "isOn", false, "IS_ON");
-        public final static Property DeviceType = new Property(7, int.class, "deviceType", false, "DEVICE_TYPE");
-        public final static Property CircleOne = new Property(8, int.class, "circleOne", false, "CIRCLE_ONE");
-        public final static Property CircleTwo = new Property(9, int.class, "circleTwo", false, "CIRCLE_TWO");
-        public final static Property CircleThree = new Property(10, int.class, "circleThree", false, "CIRCLE_THREE");
-        public final static Property CircleFour = new Property(11, int.class, "circleFour", false, "CIRCLE_FOUR");
-        public final static Property RgbType = new Property(12, int.class, "rgbType", false, "RGB_TYPE");
-        public final static Property GradientType = new Property(13, int.class, "gradientType", false, "GRADIENT_TYPE");
-        public final static Property GradientId = new Property(14, int.class, "gradientId", false, "GRADIENT_ID");
-        public final static Property GradientSpeed = new Property(15, int.class, "gradientSpeed", false, "GRADIENT_SPEED");
-        public final static Property GradientName = new Property(16, String.class, "gradientName", false, "GRADIENT_NAME");
+        public final static Property IsEnableBright = new Property(7, boolean.class, "isEnableBright", false, "IS_ENABLE_BRIGHT");
+        public final static Property IsEnableWhiteBright = new Property(8, boolean.class, "isEnableWhiteBright", false, "IS_ENABLE_WHITE_BRIGHT");
+        public final static Property DeviceType = new Property(9, int.class, "deviceType", false, "DEVICE_TYPE");
+        public final static Property CircleOne = new Property(10, int.class, "circleOne", false, "CIRCLE_ONE");
+        public final static Property CircleTwo = new Property(11, int.class, "circleTwo", false, "CIRCLE_TWO");
+        public final static Property CircleThree = new Property(12, int.class, "circleThree", false, "CIRCLE_THREE");
+        public final static Property CircleFour = new Property(13, int.class, "circleFour", false, "CIRCLE_FOUR");
+        public final static Property RgbType = new Property(14, int.class, "rgbType", false, "RGB_TYPE");
+        public final static Property GradientType = new Property(15, int.class, "gradientType", false, "GRADIENT_TYPE");
+        public final static Property GradientId = new Property(16, int.class, "gradientId", false, "GRADIENT_ID");
+        public final static Property GradientSpeed = new Property(17, int.class, "gradientSpeed", false, "GRADIENT_SPEED");
+        public final static Property GradientName = new Property(18, String.class, "gradientName", false, "GRADIENT_NAME");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -67,16 +69,18 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
                 "\"COLOR\" INTEGER NOT NULL ," + // 5: color
                 "\"IS_ON\" INTEGER NOT NULL ," + // 6: isOn
-                "\"DEVICE_TYPE\" INTEGER NOT NULL ," + // 7: deviceType
-                "\"CIRCLE_ONE\" INTEGER NOT NULL ," + // 8: circleOne
-                "\"CIRCLE_TWO\" INTEGER NOT NULL ," + // 9: circleTwo
-                "\"CIRCLE_THREE\" INTEGER NOT NULL ," + // 10: circleThree
-                "\"CIRCLE_FOUR\" INTEGER NOT NULL ," + // 11: circleFour
-                "\"RGB_TYPE\" INTEGER NOT NULL ," + // 12: rgbType
-                "\"GRADIENT_TYPE\" INTEGER NOT NULL ," + // 13: gradientType
-                "\"GRADIENT_ID\" INTEGER NOT NULL ," + // 14: gradientId
-                "\"GRADIENT_SPEED\" INTEGER NOT NULL ," + // 15: gradientSpeed
-                "\"GRADIENT_NAME\" TEXT);"); // 16: gradientName
+                "\"IS_ENABLE_BRIGHT\" INTEGER NOT NULL ," + // 7: isEnableBright
+                "\"IS_ENABLE_WHITE_BRIGHT\" INTEGER NOT NULL ," + // 8: isEnableWhiteBright
+                "\"DEVICE_TYPE\" INTEGER NOT NULL ," + // 9: deviceType
+                "\"CIRCLE_ONE\" INTEGER NOT NULL ," + // 10: circleOne
+                "\"CIRCLE_TWO\" INTEGER NOT NULL ," + // 11: circleTwo
+                "\"CIRCLE_THREE\" INTEGER NOT NULL ," + // 12: circleThree
+                "\"CIRCLE_FOUR\" INTEGER NOT NULL ," + // 13: circleFour
+                "\"RGB_TYPE\" INTEGER NOT NULL ," + // 14: rgbType
+                "\"GRADIENT_TYPE\" INTEGER NOT NULL ," + // 15: gradientType
+                "\"GRADIENT_ID\" INTEGER NOT NULL ," + // 16: gradientId
+                "\"GRADIENT_SPEED\" INTEGER NOT NULL ," + // 17: gradientSpeed
+                "\"GRADIENT_NAME\" TEXT);"); // 18: gradientName
     }
 
     /** Drops the underlying database table. */
@@ -99,19 +103,21 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColor());
         stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
-        stmt.bindLong(8, entity.getDeviceType());
-        stmt.bindLong(9, entity.getCircleOne());
-        stmt.bindLong(10, entity.getCircleTwo());
-        stmt.bindLong(11, entity.getCircleThree());
-        stmt.bindLong(12, entity.getCircleFour());
-        stmt.bindLong(13, entity.getRgbType());
-        stmt.bindLong(14, entity.getGradientType());
-        stmt.bindLong(15, entity.getGradientId());
-        stmt.bindLong(16, entity.getGradientSpeed());
+        stmt.bindLong(8, entity.getIsEnableBright() ? 1L: 0L);
+        stmt.bindLong(9, entity.getIsEnableWhiteBright() ? 1L: 0L);
+        stmt.bindLong(10, entity.getDeviceType());
+        stmt.bindLong(11, entity.getCircleOne());
+        stmt.bindLong(12, entity.getCircleTwo());
+        stmt.bindLong(13, entity.getCircleThree());
+        stmt.bindLong(14, entity.getCircleFour());
+        stmt.bindLong(15, entity.getRgbType());
+        stmt.bindLong(16, entity.getGradientType());
+        stmt.bindLong(17, entity.getGradientId());
+        stmt.bindLong(18, entity.getGradientSpeed());
  
         String gradientName = entity.getGradientName();
         if (gradientName != null) {
-            stmt.bindString(17, gradientName);
+            stmt.bindString(19, gradientName);
         }
     }
 
@@ -129,19 +135,21 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColor());
         stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
-        stmt.bindLong(8, entity.getDeviceType());
-        stmt.bindLong(9, entity.getCircleOne());
-        stmt.bindLong(10, entity.getCircleTwo());
-        stmt.bindLong(11, entity.getCircleThree());
-        stmt.bindLong(12, entity.getCircleFour());
-        stmt.bindLong(13, entity.getRgbType());
-        stmt.bindLong(14, entity.getGradientType());
-        stmt.bindLong(15, entity.getGradientId());
-        stmt.bindLong(16, entity.getGradientSpeed());
+        stmt.bindLong(8, entity.getIsEnableBright() ? 1L: 0L);
+        stmt.bindLong(9, entity.getIsEnableWhiteBright() ? 1L: 0L);
+        stmt.bindLong(10, entity.getDeviceType());
+        stmt.bindLong(11, entity.getCircleOne());
+        stmt.bindLong(12, entity.getCircleTwo());
+        stmt.bindLong(13, entity.getCircleThree());
+        stmt.bindLong(14, entity.getCircleFour());
+        stmt.bindLong(15, entity.getRgbType());
+        stmt.bindLong(16, entity.getGradientType());
+        stmt.bindLong(17, entity.getGradientId());
+        stmt.bindLong(18, entity.getGradientSpeed());
  
         String gradientName = entity.getGradientName();
         if (gradientName != null) {
-            stmt.bindString(17, gradientName);
+            stmt.bindString(19, gradientName);
         }
     }
 
@@ -160,16 +168,18 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getInt(offset + 4), // brightness
             cursor.getInt(offset + 5), // color
             cursor.getShort(offset + 6) != 0, // isOn
-            cursor.getInt(offset + 7), // deviceType
-            cursor.getInt(offset + 8), // circleOne
-            cursor.getInt(offset + 9), // circleTwo
-            cursor.getInt(offset + 10), // circleThree
-            cursor.getInt(offset + 11), // circleFour
-            cursor.getInt(offset + 12), // rgbType
-            cursor.getInt(offset + 13), // gradientType
-            cursor.getInt(offset + 14), // gradientId
-            cursor.getInt(offset + 15), // gradientSpeed
-            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16) // gradientName
+            cursor.getShort(offset + 7) != 0, // isEnableBright
+            cursor.getShort(offset + 8) != 0, // isEnableWhiteBright
+            cursor.getInt(offset + 9), // deviceType
+            cursor.getInt(offset + 10), // circleOne
+            cursor.getInt(offset + 11), // circleTwo
+            cursor.getInt(offset + 12), // circleThree
+            cursor.getInt(offset + 13), // circleFour
+            cursor.getInt(offset + 14), // rgbType
+            cursor.getInt(offset + 15), // gradientType
+            cursor.getInt(offset + 16), // gradientId
+            cursor.getInt(offset + 17), // gradientSpeed
+            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18) // gradientName
         );
         return entity;
     }
@@ -183,16 +193,18 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setBrightness(cursor.getInt(offset + 4));
         entity.setColor(cursor.getInt(offset + 5));
         entity.setIsOn(cursor.getShort(offset + 6) != 0);
-        entity.setDeviceType(cursor.getInt(offset + 7));
-        entity.setCircleOne(cursor.getInt(offset + 8));
-        entity.setCircleTwo(cursor.getInt(offset + 9));
-        entity.setCircleThree(cursor.getInt(offset + 10));
-        entity.setCircleFour(cursor.getInt(offset + 11));
-        entity.setRgbType(cursor.getInt(offset + 12));
-        entity.setGradientType(cursor.getInt(offset + 13));
-        entity.setGradientId(cursor.getInt(offset + 14));
-        entity.setGradientSpeed(cursor.getInt(offset + 15));
-        entity.setGradientName(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setIsEnableBright(cursor.getShort(offset + 7) != 0);
+        entity.setIsEnableWhiteBright(cursor.getShort(offset + 8) != 0);
+        entity.setDeviceType(cursor.getInt(offset + 9));
+        entity.setCircleOne(cursor.getInt(offset + 10));
+        entity.setCircleTwo(cursor.getInt(offset + 11));
+        entity.setCircleThree(cursor.getInt(offset + 12));
+        entity.setCircleFour(cursor.getInt(offset + 13));
+        entity.setRgbType(cursor.getInt(offset + 14));
+        entity.setGradientType(cursor.getInt(offset + 15));
+        entity.setGradientId(cursor.getInt(offset + 16));
+        entity.setGradientSpeed(cursor.getInt(offset + 17));
+        entity.setGradientName(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
      }
     
     @Override

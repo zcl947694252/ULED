@@ -13,10 +13,9 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uledtest.ble.RxBleManager
+import com.dadoutek.uled.ble.RxBleManager
 import com.google.gson.Gson
 import com.mob.MobSDK
-import com.squareup.leakcanary.LeakCanary
 import com.squareup.leakcanary.RefWatcher
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -53,7 +52,7 @@ class TelinkLightApplication : TelinkApplication() {
     private var lastClickTime: Long = 0
     private var mCancelAuthorTopicDisposable: Disposable? = null
     var paserCodedisposable: Disposable? = null
-
+    var lastMeshAddress:Int = 0
 
     val isEmptyMesh: Boolean
         get() = TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)

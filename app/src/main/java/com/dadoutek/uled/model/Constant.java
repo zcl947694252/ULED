@@ -1,11 +1,9 @@
 package com.dadoutek.uled.model;
-
 import java.io.Serializable;
 
 /**
  * Created by hejiajun on 2018/3/22.
  */
-
 public class Constant implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
@@ -13,13 +11,13 @@ public class Constant implements Serializable {
     //网络请求服务器java域名地址
     public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
     //网络请求服务器测试地址
+
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-
     public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
@@ -400,5 +398,8 @@ public class Constant implements Serializable {
     public static final int SER_ID_RELAY_OFF = 0x63;
     public static final int SER_ID_GATEWAY_ON = 0x64;
     public static final int SER_ID_GATEWAY_OFF = 0x65;
+    public static final int SER_ID_SENSOR_ON = 0x66;
+    public static final int SER_ID_SENSOR_OFF = 0x67;
 
+    public static final String LAST_MESS_ADDR="LAST_MESS_ADDR";
 }

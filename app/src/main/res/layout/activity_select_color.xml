@@ -19,7 +19,7 @@
             android:id="@+id/btn_save"
             android:layout_width="50dp"
             android:layout_height="20dp"
-            android:text="@string/btn_sure"
+            android:text="@string/confirm"
             android:background="@null"
             android:textSize="15sp"
             android:layout_marginRight="20dp"
