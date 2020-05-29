@@ -118,7 +118,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
-                        .setText(R.id.speed_seekbar_alg_tv, speedSeekbar!!.progress.toString() + "%")
+                        .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress+1).toString() + "%")
                 when (item.rgbType) {
                     0 -> {
                         visiableMode(helper, true)
@@ -250,6 +250,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
+                        .setGone(R.id.dot_one, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -262,6 +263,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
+                        .setGone(R.id.dot_one, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -281,6 +283,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
+                        .setGone(R.id.dot_one, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -300,6 +303,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
+                        .setGone(R.id.dot_one, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -320,12 +324,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
         speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                helper.setText(R.id.speed_seekbar_alg_tv, "$progress%")
-                data[position].gradientSpeed = progress
-                if (progress >= 100) {
+                //解决seekbar 设置min 为1时,滑动不到100%
+                var value = progress + 1;
+                helper.setText(R.id.speed_seekbar_alg_tv, "$value%")
+                data[position].gradientSpeed = value
+                if (value >= 100) {
                     lessAlgSpeed?.isEnabled = true
                     addAlgSpeed?.isEnabled = false
-                } else if (progress <= 1) {
+                } else if (value <= 1) {
                     lessAlgSpeed?.isEnabled = false
                     addAlgSpeed?.isEnabled = true
                 }

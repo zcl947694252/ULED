@@ -220,8 +220,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:max="100"
-                    android:min="1"
+                    android:max="99"
                     android:paddingStart="25dp"
                     android:paddingEnd="28dp" />
             </LinearLayout>

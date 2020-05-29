@@ -41,10 +41,9 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
 
 
     public SpeedDialog(Context context, int speed, int style, OnSpeedListener mListener) {
-        super(context,style);
+        super(context, style);
         this.mListener = mListener;
         this.speed = speed;
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -59,6 +58,8 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
         speedText = (TextView) findViewById(R.id.speed_num);
 
         speedBar.setProgress(speed);
+        if (speed >= 100)
+            speed = 100;
 
         speedText.setText(speed + "%");
 
@@ -156,7 +157,7 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
             @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                speedText.setText(progress+"%");
+                speedText.setText(progress + 1 +  "%");
             }
 
             @Override
@@ -171,10 +172,7 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
 
             private void onValueChange(SeekBar seekBar, int progress, boolean b) {
                 speed = progress;
-                if (speed == 0) {
-                    speed = 1;
-                }
-                speedText.setText(speed+"%");
+                speedText.setText(speed + 1 +  "%");
                 if (speed >= 100) {
                     addSpeenBtn.setEnabled(false);
                     lessSpeedBtn.setEnabled(true);
@@ -196,18 +194,17 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Log.e("TAG_MSG", String.valueOf(msg));
-            speedBar.setProgress(speedBar.getProgress() - 1);
+            if (speedBar.getProgress() < 100)
+                speedBar.setProgress(speedBar.getProgress() - 1);
             if (speedBar.getProgress() < 1) {
-//                lessSpeedBtn.setEnabled(false);
                 onBtnTouch = false;
             } else if (speedBar.getProgress() == 1) {
-//                lessSpeedBtn.setEnabled(false);
                 onBtnTouch = false;
-                speedText.setText(speedBar.getProgress() + "%");
+                speedText.setText(speedBar.getProgress() + 1 + "%");
                 speed = speedBar.getProgress();
             } else {
                 lessSpeedBtn.setEnabled(true);
-                speedText.setText(speedBar.getProgress() + "%");
+                speedText.setText(speedBar.getProgress() + 1 +"%");
                 speed = speedBar.getProgress();
             }
 
@@ -222,19 +219,21 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            int i= speedBar.getProgress()+1;
-            speedBar.setProgress(i);
+            if (speedBar.getProgress() < 100) {
+                int i = speedBar.getProgress() + 1;
+                speedBar.setProgress(i);
+            }
             if (speedBar.getProgress() > 100) {
                 addSpeenBtn.setEnabled(false);
                 onBtnTouch = false;
             } else if (speedBar.getProgress() == 100) {
                 addSpeenBtn.setEnabled(false);
                 onBtnTouch = false;
-                speedText.setText(speedBar.getProgress() + "%");
+                speedText.setText(speedBar.getProgress() + 1 +  "%");
                 speed = speedBar.getProgress();
             } else {
                 addSpeenBtn.setEnabled(true);
-                speedText.setText(speedBar.getProgress() + "%");
+                speedText.setText(speedBar.getProgress() + 1 +  "%");
                 speed = speedBar.getProgress();
             }
 
