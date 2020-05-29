@@ -17,28 +17,18 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 
 public class SpeedDialog extends AlertDialog implements View.OnClickListener {
-
     private OnSpeedListener mListener;
-
     private int speed;
-
     private ImageView cancelBtn;
-
     private Button okBtn;
-
     private SeekBar speedBar;
-
     private ImageView addSpeenBtn;
-
     private ImageView lessSpeedBtn;
-
     private TextView speedText;
-
     long downTime = 0;//Button被按下时的时间
     long thisTime = 0;//while每次循环时的时间
     boolean onBtnTouch = false;//Button是否被按下
     int tvValue = 0;//TextView中的值
-
 
     public SpeedDialog(Context context, int speed, int style, OnSpeedListener mListener) {
         super(context, style);
@@ -60,11 +50,13 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
         speedBar.setProgress(speed);
         if (speed >= 100)
             speed = 100;
+        if (speed==0)
+            speed =1;
 
         speedText.setText(speed + "%");
 
-        addSpeenBtn = (ImageView) findViewById(R.id.speed_add);
-        lessSpeedBtn = (ImageView) findViewById(R.id.speed_less);
+        addSpeenBtn = findViewById(R.id.speed_add);
+        lessSpeedBtn = findViewById(R.id.speed_less);
 
         cancelBtn.setOnClickListener(this);
         okBtn.setOnClickListener(this);

@@ -204,6 +204,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         autoConnect()
                     }
                     sendToGw()
+
                 } else {
                     when (view.id) {
                         R.id.device_detail_item_img_icon -> {
