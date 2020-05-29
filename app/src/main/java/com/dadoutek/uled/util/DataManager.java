@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;

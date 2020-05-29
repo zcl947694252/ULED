@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/any_environment"
+            android:text="@string/all_day"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dark_environment"
+            android:text="@string/day_time"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -54,26 +54,24 @@
     </android.support.constraint.ConstraintLayout>
 
 
-
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/very_dark_environment"
-        android:layout_width="190dp"
-        android:layout_height="30dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/darker_environment"
-        >
+            android:id="@+id/very_dark_environment"
+            android:layout_width="190dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/darker_environment">
 
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/very_dark_environment"
-            android:textColor="@color/black_three"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/night"
+                android:textColor="@color/black_three"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

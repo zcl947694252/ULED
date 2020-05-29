@@ -77,8 +77,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         try {
             if (position < adapter.data.size) {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
-                    //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-
                     sendToGw(scenesListData!![position])
                 } else {
                     setScene(scenesListData!![position].id!!)
@@ -134,48 +132,47 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun sendToGw(dbScene: DbScene) {
-        val gateWay = DBUtils.getAllGateWay()
-        if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
-                TelinkLightApplication.getApp().offLine = true
-                hideLoadingDialog()
-                t.forEach { db ->
-                    //网关在线状态，1表示在线，0表示离线
-                    if (db.state == 1)
-                        TelinkLightApplication.getApp().offLine = false
+        if (DBUtils.getAllGateWay().size > 0)
+            GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+                @RequiresApi(Build.VERSION_CODES.O)
+                override fun onNext(t: List<DbGateway>) {
+                    TelinkLightApplication.getApp().offLine = true
+                    hideLoadingDialog()
+                    t.forEach { db ->
+                        //网关在线状态，1表示在线，0表示离线
+                        if (db.state == 1)
+                            TelinkLightApplication.getApp().offLine = false
+                    }
+
+                    if (!TelinkLightApplication.getApp().offLine) {
+                        disposableTimer?.dispose()
+                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gate_way_offline))
+                        }
+                        var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
+                                dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+                        val gattBody = GwGattBody()
+                        gattBody.ser_id = Constant.SER_ID_SCENE_ON
+
+                        val encoder = Base64.getEncoder()
+                        val s = encoder.encodeToString(gattPar)
+                        gattBody.data = s
+                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                        gattBody.meshAddr = Constant.SER_ID_SCENE_ON
+                        sendToServer(gattBody)
+                    } else {
+                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                    }
                 }
 
-                if (!TelinkLightApplication.getApp().offLine) {
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.gate_way_offline))
-                    }
-                    var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
-                            dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-                    val gattBody = GwGattBody()
-                    gattBody.ser_id = Constant.SER_ID_SCENE_ON
-
-                    val encoder = Base64.getEncoder()
-                    val s = encoder.encodeToString(gattPar)
-                    gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = Constant.SER_ID_SCENE_ON
-                    sendToServer(gattBody)
-                } else {
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                hideLoadingDialog()
-                ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
-        })
+            })
     }
 
     private fun sendToServer(gattBody: GwGattBody) {
@@ -625,7 +622,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     }
 
                     R.id.add_new_scene -> {
-
                         val nowSize = DBUtils.sceneList.size
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))

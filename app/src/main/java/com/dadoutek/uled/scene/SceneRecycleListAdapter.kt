@@ -22,7 +22,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
             val deleteIcon = helper.getView<TextView>(R.id.scene_delete)
             val groupNum = helper.getView<TextView>(R.id.scene_group)
 
-            val actions = DBUtils.getActionsBySceneId(scene!!.id)
+            val actions = DBUtils.getActionsBySceneId(scene.id)
             showGroupList = ArrayList()
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
@@ -34,7 +34,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
                     itemGroup.brightness = actions[i].brightness
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color = actions[i].color
-                    itemGroup.isNo = actions[i].isOn
+                    itemGroup.isOn = actions[i].isOn
                     item.checked = true
                     showGroupList!!.add(itemGroup)
                 }

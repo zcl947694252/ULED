@@ -64,7 +64,6 @@ import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit

@@ -428,6 +428,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.productUUID = light.getProductUUID();
         deviceInfo.status = light.getStatus();
         deviceInfo.rssi = light.getRssi();
+        deviceInfo.firmwareRevision = light.getVersion();
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LE_SCAN);

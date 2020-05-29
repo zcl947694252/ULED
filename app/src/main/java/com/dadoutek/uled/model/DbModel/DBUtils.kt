@@ -28,7 +28,10 @@ object DBUtils {
     val lastRegion: DbRegion
         get() {
             val list = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().orderDesc(DbRegionDao.Properties.Id).list()
-            return list[0]
+            return when {
+                list.size>0 -> list[0]
+                else -> DbRegion()
+            }
         }
 
     val allLight: List<DbLight>
@@ -314,7 +317,8 @@ object DBUtils {
     }
 
     fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
-        val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
+        val eq = DbSceneActionsDao.Properties.BelongSceneId.eq(id)
+        val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(eq).build()
         return ArrayList(query.list())
     }
 
@@ -1382,5 +1386,22 @@ object DBUtils {
             "0$time"
         else
             time.toString()
+    }
+
+    fun getlastDeviceMesh(): Int {
+        val lights = DBUtils.allLight.map { it.meshAddr }
+        val curtain = DBUtils.allCurtain.map { it.meshAddr }
+        val relay = DBUtils.allRely.map { it.meshAddr }
+        val switch = DBUtils.getAllSwitch().map { it.meshAddr }
+        val sensor = DBUtils.getAllSensor().map { it.meshAddr }
+        val addressList = mutableListOf<Int>()
+        addressList.addAll(lights)
+        addressList.addAll(curtain)
+        addressList.addAll(relay)
+        addressList.addAll(switch)
+        addressList.addAll(sensor)
+        addressList.sortBy { it }
+
+        return  addressList.last()
     }
 }

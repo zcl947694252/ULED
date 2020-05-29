@@ -140,7 +140,7 @@
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/btn_rec_blue_bt"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="@string/btn_sure"
+                android:text="@string/confirm"
                 android:textColor="@color/black_three"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent" />

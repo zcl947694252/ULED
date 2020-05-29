@@ -23,7 +23,7 @@
             android:src="@drawable/icon_checkbox_unselected" />
 
         <TextView
-            android:id="@+id/group_name"
+            android:id="@+id/item_more_group_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

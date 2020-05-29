@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.ViewPager
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -415,6 +416,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
                 dbEightSwitch.keys = listKeysBean.toString()
+                if (TextUtils.isEmpty(version))
+                    version = mDeviceInfo!!.firmwareRevision
                 dbEightSwitch.version = version
                 DBUtils.updateSwicth(dbEightSwitch)
                 switchData = dbEightSwitch
@@ -427,6 +430,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 eightSwitch.meshAddr = mDeviceInfo?.meshAddress ?: 0
                 eightSwitch.productUUID = mDeviceInfo?.productUUID ?: 0
                 eightSwitch.index = eightSwitch.id.toInt()
+                if (TextUtils.isEmpty(version))
+                    version = mDeviceInfo!!.firmwareRevision
                 eightSwitch.version = version
 
                 eightSwitch.keys = listKeysBean.toString()
@@ -847,5 +852,10 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             intent.putExtra(Constant.EIGHT_SWITCH_TYPE, configSwitchType)
             startActivityForResult(intent, requestCodeNum)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightService.Instance()?.idleMode(true)
     }
 }

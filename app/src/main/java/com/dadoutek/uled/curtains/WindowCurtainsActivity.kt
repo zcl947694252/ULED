@@ -36,7 +36,6 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams

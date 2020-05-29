@@ -1,23 +1,25 @@
 package com.dadoutek.uled.util
 
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.util.MeshUtils
 
 /**
  * 专门用于生成可用的Mesh地址
- * 线程内不能频繁操作数据库否则gc
  */
 class MeshAddressGenerator {
     var meshAddress: Int = 0
         get() {
             //field代表meshAddress这个变量
-            do {
+            do {//先执行再判断
                 ++field
-                if (field == 0xFF) {      //为了旧设备的兼容性，要排除0xFF此地址，因为以前的PIR，开关等控制设备的meshAddress都是0xFF
+                if (field == 0xFF)     //为了旧设备的兼容性，要排除0xFF此地址，因为以前的PIR，开关等控制设备的meshAddress都是0xFF
                     ++field
-                }
-            } while (DBUtils.isDeviceExist(field) || field == 0)
-            return field
+
+                TelinkLightApplication.getApp().lastMeshAddress = field
+            } while (DBUtils.isDeviceExist(field) || field == 0||field < TelinkLightApplication.getApp().lastMeshAddress)
+
+                return field
         }
 
     init {

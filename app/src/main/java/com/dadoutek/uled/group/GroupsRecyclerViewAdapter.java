@@ -53,7 +53,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         public ViewHolder(View view) {
             super(view);
             groupImage = (ImageView) view.findViewById(R.id.group_img);
-            groupName = (TextView) view.findViewById(R.id.group_name);
+            groupName = (TextView) view.findViewById(R.id.item_more_group_name);
         }
     }
 

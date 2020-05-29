@@ -50,6 +50,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -118,6 +122,15 @@ class SettingActivity : BaseActivity() {
                     }
             }
         }
+        setting_masking.setOnClickListener { }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(500)
+            setting_masking.visibility = View.GONE
+        }
     }
 
     private fun physicalRecovery() {
@@ -131,14 +144,14 @@ class SettingActivity : BaseActivity() {
         disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
             hideLoadingDialog()
             disposableFind?.dispose()
-            ToastUtils.showShort(getString(R.string.find_device_num)+0)
+            ToastUtils.showShort(getString(R.string.find_device_num) + 0)
         }
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     disposableTimer?.dispose()
-                    ToastUtils.showShort(getString(R.string.find_device_num)+it)
+                    ToastUtils.showShort(getString(R.string.find_device_num) + it)
                     hideLoadingDialog()
                 }, {
                     disposableTimer?.dispose()
@@ -158,7 +171,7 @@ class SettingActivity : BaseActivity() {
         builder.setMessage(getString(R.string.user_reset))
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
-        builder.setPositiveButton(getString(R.string.btn_sure)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.confirm)) { _, _ ->
             clearData()//删除本地数据
             UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
                 //删除服务器数据
@@ -197,7 +210,7 @@ class SettingActivity : BaseActivity() {
     private fun setFirstePopAndShow(pleaseSureAllDevicePowerOn: Int, resetFactoryAllDevice: Int, haveQuestionLookNotice: Int, isShowThree: Int) {
         setNormalPopSetting()
 
-        if (isShowThree==2||isShowThree==3) {
+        if (isShowThree == 2 || isShowThree == 3) {
             tvThree.visibility = View.VISIBLE
             hinitThree.visibility = View.VISIBLE
         } else {
@@ -287,7 +300,7 @@ class SettingActivity : BaseActivity() {
         }
 
         cancel.text = getString(R.string.cancel)
-        confirm.text = getString(R.string.btn_sure)
+        confirm.text = getString(R.string.confirm)
         cancel.isClickable = true
         confirm.isClickable = true
     }
@@ -358,12 +371,10 @@ class SettingActivity : BaseActivity() {
                 ToastUtils.showLong(R.string.clean_tip)
                 GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
-                try {
-                    Thread.sleep(300)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
+                GlobalScope.launch(Dispatchers.Main) {
+                    delay(300)
+                    restartApplication()
                 }
-                restartApplication()
             }
 
             override fun onError(e: Throwable) {
@@ -420,9 +431,9 @@ class SettingActivity : BaseActivity() {
         confirm.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            when (isResetFactory){
+            when (isResetFactory) {
                 1 -> clearData()
-                3 ->  startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
                 2 -> if (TelinkLightApplication.getApp().connectDevice != null)
                     resetAllLights()
                 else

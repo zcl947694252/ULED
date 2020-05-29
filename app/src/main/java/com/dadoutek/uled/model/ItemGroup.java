@@ -15,13 +15,17 @@ public class ItemGroup implements Serializable {
     public boolean enableCheck=false;
     public boolean checked=false;
     public int deviceType;
-    public boolean isNo=true;
+    public boolean isOn =true;
+    public boolean isEnableWhiteLight = true;
+    public boolean isEnableBright = true;
 
+    public long sceneId= 1000000;
     public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
     public int gradientId = 0  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
     public String gradientName  ;//渐变速度
+
 
     @Override
     public String toString() {
@@ -34,7 +38,9 @@ public class ItemGroup implements Serializable {
                 ", enableCheck=" + enableCheck +
                 ", checked=" + checked +
                 ", deviceType=" + deviceType +
-                ", isNo=" + isNo +
+                ", isOn=" + isOn +
+                ", isEnableWhiteLight=" + isEnableWhiteLight +
+                ", isEnableBright=" + isEnableBright +
                 ", rgbType=" + rgbType +
                 ", gradientType=" + gradientType +
                 ", gradientId=" + gradientId +

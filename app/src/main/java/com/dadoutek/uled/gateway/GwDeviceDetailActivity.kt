@@ -706,7 +706,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             intent.putExtra(OTA_TYPE, DeviceType.GATE_WAY)
 
             startActivity(intent)
-            finish()
         }
     }
 
@@ -779,7 +778,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     val intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
                     intent.putExtra("data", currentGw)
                     startActivity(intent)
-                    finish()
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
@@ -915,7 +913,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         if (intent != null) {
             intent!!.putExtra("data", currentGw)
             startActivity(intent)
-            finish()
         }
     }
 

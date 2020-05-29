@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/group_name"
+        android:id="@+id/item_more_group_name"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_marginLeft="10dp"
@@ -19,14 +19,12 @@
         tools:ignore="MissingConstraints" />
 
     <ImageView
-        android:id="@+id/sensor_delete"
+        android:id="@+id/item_more_group_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/dp_5"
-        android:layout_marginEnd="@dimen/dp_5"
-        android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="20dp"
         android:src="@drawable/icon_checkbox_unselected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

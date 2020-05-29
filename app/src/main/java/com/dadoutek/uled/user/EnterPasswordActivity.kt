@@ -403,7 +403,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
                             SharedPreferencesUtils.setUserLogin(true)
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-
                             hideLoadingDialog()
                             ActivityUtils.finishAllActivities(true)
                             ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
@@ -425,6 +424,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         finish()
+
+        TelinkLightApplication.getApp().lastMeshAddress = DBUtils.getlastDeviceMesh()
        // ActivityUtils.finishAllActivities(true)
         //ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
     }

@@ -355,8 +355,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         DBUtils.deleteSwitch(deleteSwitch)
                         notifyData()
 
-
-
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -383,8 +381,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun getDeviceVersion(deviceInfo: DeviceInfo) {
         if (TelinkApplication.getInstance().connectDevice != null) {
              downloadDispoable = Commander.getDeviceVersion(deviceInfo.meshAddress)
-                    .subscribe(
-                            { s ->
+                    .subscribe({ s ->
                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                     currentLight!!.version = s
                                     isDirectConnectDevice()
@@ -400,7 +397,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     )
 
         }
-
         isclickOTA = false
     }
 

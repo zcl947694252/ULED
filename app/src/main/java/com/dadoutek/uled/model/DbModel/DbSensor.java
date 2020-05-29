@@ -1,9 +1,13 @@
 package com.dadoutek.uled.model.DbModel;
 
+import com.dadoutek.uled.R;
+import com.telink.bluetooth.light.ConnectionStatus;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
 
@@ -24,11 +28,19 @@ public class DbSensor implements Serializable {
     private Long belongGroupId;
     private String version;
     public int rssi =1000;
+    private int openTag = 1; //1代表开 0代表关
+    private int setType = 1; //0代表群组模式 1代表场景模式
+    private int sceneId = 0; //场景id
+    @Transient
+    public int icon = R.drawable.icon_sensor;//灯状态显示图
 
-    @Generated(hash = 2029813700)
+
+
+
+    @Generated(hash = 29991029)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
-            String macAddr, int productUUID, int index, Long belongGroupId,
-            String version, int rssi) {
+                    String macAddr, int productUUID, int index, Long belongGroupId,
+                    String version, int rssi, int openTag, int setType, int sceneId) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -39,10 +51,44 @@ public class DbSensor implements Serializable {
         this.belongGroupId = belongGroupId;
         this.version = version;
         this.rssi = rssi;
+        this.openTag = openTag;
+        this.setType = setType;
+        this.sceneId = sceneId;
     }
+
     @Generated(hash = 295132781)
     public DbSensor() {
     }
+
+
+
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public void updateIcon() {
+        if (this.openTag == ConnectionStatus.OFFLINE.getValue()) {
+            this.icon = R.drawable.icon_sensor;
+        } else if (this.openTag == ConnectionStatus.OFF.getValue()) {
+            this.icon = R.drawable.icon_sensor_close;
+        } else if (this.openTag == ConnectionStatus.ON.getValue()) {
+            this.icon = R.drawable.icon_sensor;
+        }
+    }
+
+    public int getOpenTag() {
+        return openTag;
+    }
+
+    public void setOpenTag(int openTag) {
+        this.openTag = openTag;
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -116,12 +162,34 @@ public class DbSensor implements Serializable {
                 ", index=" + index +
                 ", belongGroupId=" + belongGroupId +
                 ", version='" + version + '\'' +
+                ", rssi=" + rssi +
+                ", openTag=" + openTag +
+                ", setType=" + setType +
+                ", sceneId=" + sceneId +
+                ", icon=" + icon +
                 '}';
     }
+
     public int getRssi() {
         return this.rssi;
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public int getSetType() {
+        return this.setType;
+    }
+
+    public void setSetType(int setType) {
+        this.setType = setType;
+    }
+
+    public int getSceneId() {
+        return this.sceneId;
+    }
+
+    public void setSceneId(int sceneId) {
+        this.sceneId = sceneId;
     }
 }
