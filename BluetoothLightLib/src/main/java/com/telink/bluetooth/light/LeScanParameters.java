@@ -35,6 +35,7 @@ public final class LeScanParameters extends Parameters {
         this.set(Parameters.PARAM_MESH_NAME, value);
         return this;
     }
+
     /**
      * Scan Filter
      *
@@ -79,12 +80,10 @@ public final class LeScanParameters extends Parameters {
         return this;
     }
 
-    public LeScanParameters setScanMac(String mac){
+    public LeScanParameters setScanMac(String mac) {
         this.set(PARAM_SCAN_MAC, mac);
         return this;
     }
-
-
 
 
 }

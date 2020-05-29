@@ -58,7 +58,6 @@ public final class LeAutoConnectParameters extends Parameters {
 
     /**
      * 连接超时时间,单位秒.
-     *
      */
     public LeAutoConnectParameters setTimeoutSeconds(int timeoutSeconds) {
         this.set(PARAM_TIMEOUT_SECONDS, timeoutSeconds);
@@ -73,20 +72,21 @@ public final class LeAutoConnectParameters extends Parameters {
     /**
      * 自动连接时，连接指定设备
      * NULL,表示不指定
+     *
      * @param mac
      * @return
      */
-    public  LeAutoConnectParameters setConnectMac(String mac) {
+    public LeAutoConnectParameters setConnectMac(String mac) {
         this.set(PARAM_AUTO_CONNECT_MAC, mac);
         return this;
     }
 
-    public  LeAutoConnectParameters setConnectMeshAddress(int meshAddress) {
+    public LeAutoConnectParameters setConnectMeshAddress(int meshAddress) {
         this.set(PARAM_AUTO_CONNECT_MESH_ADDR, meshAddress);
         return this;
     }
 
-    public LeAutoConnectParameters setFastestMode(Boolean isFastestMode){
+    public LeAutoConnectParameters setFastestMode(Boolean isFastestMode) {
         this.set(PARAM_FATEST_MODE, isFastestMode);
         return this;
     }

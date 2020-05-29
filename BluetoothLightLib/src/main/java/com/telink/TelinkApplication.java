@@ -333,7 +333,7 @@ public class TelinkApplication extends Application {
 
         Intent intents = new Intent();
         intents.setAction("STATUS_CHANGED");
-        intents.putExtra("STATUS_CHANGED",deviceInfo);
+        intents.putExtra("STATUS_CHANGED", deviceInfo);
         sendBroadcast(intents);
 
         this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.STATUS_CHANGED, deviceInfo));

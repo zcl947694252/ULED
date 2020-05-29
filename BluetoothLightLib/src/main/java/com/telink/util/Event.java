@@ -38,6 +38,7 @@ public class Event<T> {
     }
 
     public enum ThreadMode {
-        Background, Main, Default,;
+        Background, Main, Default,
+        ;
     }
 }
