@@ -4,13 +4,16 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableStringBuilder
+import android.text.*
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.widget.CheckBox
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
@@ -26,6 +29,7 @@ import com.dadoutek.uled.util.PopUtil
 import com.telink.bluetooth.TelinkLog
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_splash.*
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/3/22.
@@ -91,26 +95,47 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
             R.id.splash_to_login -> gotoLoginSetting(false)
 
             R.id.splash_to_regist -> {
-                val style = SpannableStringBuilder(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
-                if (isZh(this))
-                        style.setSpan(ForegroundColorSpan(getColor(R.color.blue_text)), 3, style.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                else//《User agreement and privacy notes》have been agreed.
-                        style.setSpan(ForegroundColorSpan(getColor(R.color.blue_text)), 0, style.length - 17, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
                 popView?.let {
+                    val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
+                    val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
+                    var cs: ClickableSpan = object : ClickableSpan() {
+                        override fun onClick(widget: View) {
+                            var intent = Intent(this@SplashActivity, InstructionsForUsActivity::class.java)
+                            startActivity(intent)
+                        }
+
+                        override fun updateDrawState(ds: TextPaint) {
+                            super.updateDrawState(ds)
+                            ds.color = Color.BLUE//设置超链接的颜色
+                            ds.isUnderlineText = false
+                        }
+                    }
+                    var start = if (isZh(this)) 3 else 0
+                    var end = if (isZh(this)) ss.length else ss.length - 17
+                    ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    userAgreenment.text = ss
+                    userAgreenment?.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
+
+                    it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_de)
                     it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.privacy_statement)
                     it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
-                    it.findViewById<TextView>(R.id.code_warm_user_ly).visibility = View.VISIBLE
+                    it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.VISIBLE
                     it.findViewById<TextView>(R.id.code_warm_context).gravity = Gravity.CENTER_VERTICAL
-                    val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
                     it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.privacy_statement_content)
-                    it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
+                    val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
+                    val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
+                    cb.setOnCheckedChangeListener { _, isChecked ->
+                        iSee.text = if (isChecked)
+                            getString(R.string.i_see)
+                        else
+                            getString(R.string.read_agreen)
+                    }
+                    iSee.setOnClickListener {
                         if (cb.isChecked) {
                             PopUtil.dismiss(pop)
                             goRegist()
-                        } else {
-                            ToastUtils.showShort(getString(R.string.please_select_scene))
-                        }
+                        } else
+                            ToastUtils.showShort(getString(R.string.read_agreen))
                     }
 
                     try {
@@ -123,6 +148,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
             }
         }
     }
+
     private fun isZh(context: Context): Boolean {
         val locale = context.resources.configuration.locale
         val language = locale.language
@@ -134,5 +160,11 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         val intent = Intent(this@SplashActivity, RegisterActivity::class.java)
         intent.putExtra(IS_FIRST_LAUNCH, false)
         startActivityForResult(intent, 0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PopUtil.dismiss(pop)
+        PopUtil.dismiss(popMain)
     }
 }

@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: com.polidea.rxandroidble2:rxandroidble:1.10.1@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/975fdcd51f442764944f8b3cedaf2057/rxandroidble-1.10.1/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5c61797bb76b998a6d724bbd47b6f96a/rxandroidble-1.10.1/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/975fdcd51f442764944f8b3cedaf2057/rxandroidble-1.10.1/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/975fdcd51f442764944f8b3cedaf2057/rxandroidble-1.10.1/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5c61797bb76b998a6d724bbd47b6f96a/rxandroidble-1.10.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5c61797bb76b998a6d724bbd47b6f96a/rxandroidble-1.10.1/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.polidea.rxandroidble2/rxandroidble/1.10.1/c725b3c3ff45258f78c3eb45c60c308f4243181b/rxandroidble-1.10.1-javadoc.jar!/" />

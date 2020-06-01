@@ -43,6 +43,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -211,6 +212,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
+        user_agreement?.setOnClickListener(this)
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
         setting?.setOnClickListener(this)
@@ -336,6 +338,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.user_agreement -> {
+                var intent = Intent(activity, UserAgreementActivity::class.java)
                 startActivity(intent)
             }
             R.id.updata -> {
