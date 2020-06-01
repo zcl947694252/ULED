@@ -212,6 +212,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
+        user_agreenment?.setOnClickListener(this)
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
         setting?.setOnClickListener(this)

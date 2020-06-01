@@ -40,9 +40,9 @@ class UserAgreementActivity :BaseActivity(){
         webSettings?.domStorageEnabled = true
         webView_user_agreement!!.clearCache(true)
         if(isZh(this)){
-            webView!!.loadUrl("https://dev.dadoutek.com/static/README/index.html?lang=0")
+            webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
         }else{
-            webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
+            webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
         }
     }
 

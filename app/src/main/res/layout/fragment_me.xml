@@ -414,7 +414,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="38dp"
-                    android:text="@string/read_agreen"
+                    android:text="@string/user_agreement"
                     android:textColor="@color/black_e"
                     android:textSize="13sp" />
 
