@@ -43,6 +43,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -338,6 +339,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
+            R.id.user_agreenment -> {
+                var intent = Intent(activity, UserAgreementActivity::class.java)
+                startActivity(intent)
+            }
             R.id.updata -> {
                 checkNetworkAndSync(activity)
             }
@@ -602,6 +607,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                     btn.text = "$text (${timeout - it})"
                 }
     }
+
 
     private fun clearData() {
         val dbUser = DBUtils.lastUser

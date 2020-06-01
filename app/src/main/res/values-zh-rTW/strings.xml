@@ -1000,4 +1000,14 @@
     <string name="see_help">查看帮助</string>
     <string name="group_max">最大支持7个组</string>
     <string name="dissupport">该批次设备不支持开关功能</string>
+    <string name="china_code">中国+86</string>
+    <string name="select_country_area">国家区号选择</string>
+    <string name="have_account">使用已有账户登录</string>
+    <string name="create_account">创建新账户</string>
+    <string name="privacy_statement">隐私声明</string>
+    <string name="privacy_statement_content">优乐迪智能平台深知您的隐私对您的重要性，并充分尊重您的隐私。在优乐迪平台注册的手机号码，仅用于对优乐迪智能产品的操作使用。未经您的同意，我们不会出于任何目的访问或处理您的内容数据，除非适用的法律法规要求。</string>
+    <string name="user_agreement_context">已同意《用户协议及隐私说明》</string>
+    <string name="not_use">暂不使用</string>
+    <string name="read_agreen">请阅读协议是否同意</string>
+    <string name="user_agreement">用户协议及隐私说明</string>
 </resources>
