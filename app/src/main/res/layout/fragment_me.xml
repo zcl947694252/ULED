@@ -7,7 +7,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="185dp"
+        android:layout_height="180dp"
         android:background="@drawable/top_back">
 
         <ImageView
@@ -58,7 +58,7 @@
         <LinearLayout
             android:id="@+id/resetAllGroup"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="10dp"
@@ -79,7 +79,7 @@
         <RelativeLayout
             android:id="@+id/chearCache"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:layout_marginTop="8dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground"
@@ -119,7 +119,7 @@
         <RelativeLayout
             android:id="@+id/oneClickBackup"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground"
             android:visibility="gone">
@@ -159,7 +159,7 @@
         <RelativeLayout
             android:id="@+id/oneClickReset"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground"
             android:visibility="gone">
@@ -204,7 +204,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:visibility="visible">
@@ -244,7 +244,7 @@
         <RelativeLayout
                 android:id="@+id/updata"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -282,7 +282,7 @@
         <RelativeLayout
                 android:id="@+id/user_reset"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -320,7 +320,7 @@
         <RelativeLayout
                 android:id="@+id/save_lock_ly"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -360,7 +360,7 @@
         <RelativeLayout
             android:id="@+id/instructions"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground">
 
@@ -398,7 +398,7 @@
         <RelativeLayout
                 android:id="@+id/user_agreement"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -437,7 +437,7 @@
         <RelativeLayout
             android:id="@+id/constantQuestion"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:visibility="gone"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground">
@@ -480,7 +480,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="40dp"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -535,7 +535,7 @@
         <RelativeLayout
             android:id="@+id/developer"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground"
             android:visibility="gone">
@@ -573,7 +573,7 @@
         <RelativeLayout
             android:id="@+id/setting"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:background="@color/white"
             android:foreground="?android:attr/selectableItemBackground"
             android:visibility="visible">

@@ -100,7 +100,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
                     var cs: ClickableSpan = object : ClickableSpan() {
                         override fun onClick(widget: View) {
-                            var intent = Intent(this@SplashActivity, InstructionsForUsActivity::class.java)
+                            var intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
                             startActivity(intent)
                         }
 
