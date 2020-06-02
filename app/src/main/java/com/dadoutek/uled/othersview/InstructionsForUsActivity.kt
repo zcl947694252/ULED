@@ -45,20 +45,8 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
 //        webView!!.webViewClient = webViewClient()
     }
 
-    //Web视图
-    private inner class webViewClient : WebViewClient() {
-        override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-            view.loadUrl(url)
-            return false
-        }
-    }
 
-//    fun loadurlLocalMethod(webView: WebView, url: String) {
-//        Thread(Runnable { webView.loadUrl(url) })
-//    }
-
-    override//设置回退
-    //覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
+    override//设置回退 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
     fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && webView!!.canGoBack()) {
             webView!!.goBack() //goBack()表示返回WebView的上一页面
