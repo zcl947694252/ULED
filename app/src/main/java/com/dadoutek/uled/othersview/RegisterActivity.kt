@@ -57,11 +57,12 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     }
 
     private fun initListener() {
-        country_code_arrow.setOnClickListener {
-            val intent = Intent()
-            intent.setClass(this@RegisterActivity, CountryActivity::class.java)
-            startActivityForResult(intent, 10)
-        }
+        register_completed.setOnClickListener(this)
+        btn_send_verification.setOnClickListener(this)
+        image_password_btn.setOnClickListener(this)
+        image_again_password_btn.setOnClickListener(this)
+        return_image.setOnClickListener(this)
+        country_code_arrow.setOnClickListener(this)
 }
 
     @SuppressLint("SetTextI18n")
@@ -97,11 +98,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     private fun initView() {
         val changeKey = intent.getStringExtra("fromLogin")
         isChangePwd = changeKey != "register"
-        register_completed.setOnClickListener(this)
-        btn_send_verification.setOnClickListener(this)
-        image_password_btn.setOnClickListener(this)
-        image_again_password_btn.setOnClickListener(this)
-        return_image.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
         StringUtils.initEditTextFilterForRegister(edit_user_password)
         StringUtils.initEditTextFilterForRegister(again_password)
@@ -116,6 +112,11 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     override fun onClick(v: View?) {
         when (v!!.id) {
+            R.id.country_code_arrow -> {
+                val intent = Intent()
+                intent.setClass(this@RegisterActivity, CountryActivity::class.java)
+                startActivityForResult(intent, 10)
+            }
             R.id.register_completed -> {
                 if (NetWorkUtils.isNetworkAvalible(this)) {
                     userName = edit_user_phone!!.text.toString().trim { it <= ' ' }

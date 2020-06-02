@@ -73,7 +73,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     /**
      * 1 代表分 0代表秒
      */
-    private var timeUnitType: Int = 1
+    private var timeUnitType: Int = 0
 
     /**
      * 0 开 1关 2自定义
@@ -183,8 +183,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun getTimeUnite() {
-        listTimeUnit.add(ItemCheckBean(getString(R.string.minute), true))
         listTimeUnit.add(ItemCheckBean(getString(R.string.second), false))
+        listTimeUnit.add(ItemCheckBean(getString(R.string.minute), true))
     }
 
     private fun getTriggerAfterShow() {

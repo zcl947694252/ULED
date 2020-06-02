@@ -1,6 +1,7 @@
 package com.dadoutek.uled.user
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +13,7 @@ import android.text.TextWatcher
 import android.view.View
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -22,12 +24,17 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.othersview.CountryActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.RegisterActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_verification_code.*
+import kotlinx.android.synthetic.main.activity_verification_code.btn_send_verification
+import kotlinx.android.synthetic.main.activity_verification_code.ccp_tv
+import kotlinx.android.synthetic.main.activity_verification_code.country_code_arrow
+import kotlinx.android.synthetic.main.activity_verification_code.edit_user_phone
 import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.*
@@ -60,22 +67,46 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         sms_login.setOnClickListener(this)
         edit_user_phone.addTextChangedListener(this)
         password_login.setOnClickListener(this)
+        country_code_arrow.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.country_code_arrow -> {
+                val intent = Intent()
+                intent.setClass(this@VerificationCodeActivity, CountryActivity::class.java)
+                startActivityForResult(intent, 10)
+            }
             R.id.btn_register -> register()
             R.id.btn_send_verification -> verificationCode()
-            R.id.sms_login ->{
+            R.id.sms_login -> {
                 if (TextUtils.isEmpty(edit_user_phone.editableText.toString())) {
                     toast(getString(R.string.please_phone_number))
                     return
                 }
-            //login()
+                //login()
                 verificationCode()
             }
             R.id.password_login -> passwordLogin()
             R.id.date_phone_list -> phoneList()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            10 -> if (resultCode == Activity.RESULT_OK) {
+                val bundle = data?.extras
+                val countryName = bundle?.getString("countryName")
+                val countryNumber = bundle?.getString("countryNumber")
+                ccp_tv.text = countryName + countryNumber
+                countryCode = countryNumber?.replace("+", "").toString()
+
+                LogUtils.v("zcl------------------countryCode$countryCode")
+            }
+            else -> {
+            }
         }
     }
 
@@ -136,9 +167,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
     @SuppressLint("CheckResult")
     private fun getAccount() {
-
         if (NetWorkUtils.isNetworkAvalible(this)) {
-            val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
+            val userName = edit_user_phone.editableText.toString().trim { it <= ' ' }
                     .replace(" ".toRegex(), "")
             if (TextUtils.isEmpty(userName)) {
                 toast(getString(R.string.please_phone_number))
@@ -155,21 +185,20 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         .subscribe(object : NetworkObserver<String?>() {
                             override fun onNext(t: String) {
                                 hideLoadingDialog()
-                                dbUser.account =t
+                                dbUser.account = t
 
                                 val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
                                 intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
-                                intent.putExtra("country_code",countryCode)
+                                intent.putExtra("country_code", countryCode)
                                 intent.putExtra("phone", userName)
                                 intent.putExtra("account", dbUser.account)
                                 startActivity(intent)
-
                             }
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                    hideLoadingDialog()
-                                    ToastUtils.showLong(e.localizedMessage)
+                                hideLoadingDialog()
+                                ToastUtils.showLong(e.localizedMessage)
                             }
                         })
             }
@@ -178,9 +207,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         }
     }
 
-
-    val eventHandler = object : EventHandler() {
-            //afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
+    private val eventHandler = object : EventHandler() {
+        //afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
         override fun afterEvent(event: Int, result: Int, data: Any?) {
             val msg = Message()
             msg.arg1 = event
@@ -203,7 +231,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                 val jsonObject = JSONObject(a.localizedMessage)
                                 val message = jsonObject.opt("detail").toString()
                                 ToastUtils.showLong(message)
-                            }catch (ex:Exception){
+                            } catch (ex: Exception) {
                                 ex.printStackTrace()
                             }
                         } else {
@@ -241,10 +269,10 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     private fun syncComplet() {
 //        ToastUtils.showLong(getString(R.string.upload_complete))
         hideLoadingDialog()
-        TransformView()
+        transformView()
     }
 
-    private fun TransformView() {
+    private fun transformView() {
         startActivity(Intent(this@VerificationCodeActivity, MainActivity::class.java))
         finish()
     }
@@ -252,7 +280,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
     private fun verificationCode() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
-            val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
+            val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
             //("zcl**********************$phoneNum")
             if (StringUtils.isEmpty(phoneNum)) {
                 ToastUtils.showLong(R.string.phone_cannot_be_empty)
@@ -277,9 +305,12 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        if (TextUtils.isEmpty(p0.toString()))
-            sms_login.background = getDrawable(R.drawable.btn_rec_black_bt)
-        else
+        if (TextUtils.isEmpty(p0.toString())) {
+            sms_login.isClickable = false
+            sms_login.background = getDrawable(R.drawable.btn_rec_black_c8)
+        } else {
+            sms_login.isClickable = true
             sms_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        }
     }
 }

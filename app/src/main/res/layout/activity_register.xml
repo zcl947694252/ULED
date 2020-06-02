@@ -80,7 +80,7 @@
     <TextView
             android:id="@+id/ccp_tv"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_marginStart="27dp"
             android:gravity="center"
             android:text="@string/china_code"
@@ -88,23 +88,23 @@
             android:textSize="@dimen/sp_15"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/country_code_arrow"
-            app:layout_constraintHorizontal_bias="0.081"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/return_image"
-            app:layout_constraintVertical_bias="0.237" />
+            app:layout_constraintVertical_bias="0.241" />
 
     <ImageView
             android:id="@+id/country_code_arrow"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="16dp"
             android:padding="@dimen/dp_15"
             android:src="@drawable/icon_arrow"
-            android:layout_marginTop="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.292" />
+            app:layout_constraintVertical_bias="0.287" />
 
     <TextView
             android:id="@+id/textView8"

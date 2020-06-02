@@ -48,6 +48,12 @@ import com.telink.TelinkApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_login.btn_register
+import kotlinx.android.synthetic.main.activity_login.facebook_btn
+import kotlinx.android.synthetic.main.activity_login.google_btn
+import kotlinx.android.synthetic.main.activity_login.qq_btn
+import kotlinx.android.synthetic.main.activity_login.third_party_text
+import kotlinx.android.synthetic.main.activity_verification_code.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import java.util.*
@@ -131,7 +137,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         date_phone.setOnClickListener(this)
         eye_btn.setOnClickListener(this)
         linearLayout_1.setOnClickListener(this)
-        sms_password_login.setOnClickListener(this)
+        sms_login_btn.setOnClickListener(this)
+        //sms_password_login.setOnClickListener(this)
         edit_user_phone_or_email.addTextChangedListener(this)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
@@ -194,6 +201,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             R.id.date_phone -> phoneList()
             R.id.eye_btn -> eyePassword()
             R.id.sms_password_login -> verificationCode()
+            R.id.sms_login_btn -> verificationCode()
             R.id.linearLayout_1 -> {
                 list_phone.visibility = View.GONE
                 edit_user_password.visibility = View.GONE
@@ -203,7 +211,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 eye_btn.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
                 btn_register.visibility = View.VISIBLE
-                sms_password_login.visibility = View.VISIBLE
+                sms_password_login.visibility = View.GONE
                 third_party_text.visibility = View.VISIBLE
                 qq_btn.visibility = View.VISIBLE
                 google_btn.visibility = View.VISIBLE

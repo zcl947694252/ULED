@@ -88,8 +88,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             submitCode(countryCode ?: "", phone!!, code.toString().trim { it <= ' ' })
         }
         verCodeInputView_line.setOnTextChangeListener { s, b ->
-            codePhone.text = s
-
             if (s.length>=6){
                 submitCode(countryCode ?: "", phone!!, s)
                // verificationLogin()
@@ -204,7 +202,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     val num = 59 - it as Long
                     if (num == 0L) {
                         reacquireCode.text = resources.getString(R.string.reget)
-                        image_refresh.visibility = View.VISIBLE
+                        image_refresh.visibility = View.GONE
                         reacquireCode.setTextColor(Color.parseColor("#18B4ED"))
                         refresh_code.isEnabled = true
                     } else {

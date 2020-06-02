@@ -1010,4 +1010,5 @@
     <string name="not_use">暂不使用</string>
     <string name="read_agreen">请阅读协议是否同意</string>
     <string name="user_agreement">用户协议及隐私说明</string>
+    <string name="verification_code_login">验证码登录</string>
 </resources>
