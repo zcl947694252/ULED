@@ -182,12 +182,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         listSelectTimes.add(ItemCheckBean(getString(R.string.five_minute), false))
     }
 
-    private fun getTimeUnite() {
-        listTimeUnit.add(ItemCheckBean(getString(R.string.minute), true))
+    private fun getTimeUnite() {//1 代表分 0代表秒
         listTimeUnit.add(ItemCheckBean(getString(R.string.second), false))
+        listTimeUnit.add(ItemCheckBean(getString(R.string.minute), true))
     }
 
-    private fun getTriggerAfterShow() {
+    private fun getTriggerAfterShow() { //0 开 1关 2自定义
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_on), true))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.light_off), false))
         listTriggerAfterShow.add(ItemCheckBean(getString(R.string.custom_brightness), false))
@@ -280,7 +280,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 popDataList.addAll(listTriggerAfterShow)
                 popAdapter?.notifyDataSetChanged()
                 popAdapter?.setOnItemClickListener { _, _, position ->
-                    triggerAfterShow = position
+                    triggerAfterShow = position//0 开 1关 2自定义
                     popupWindow?.dismiss()
                     when (position) {
                         0, 1 -> {
@@ -491,7 +491,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
             //11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
             // 16触发照度(条件 全天) 17触发设置 最低位1 开 0关  次低 1 分钟 0 秒
-            //3、 触发设置，最低位，1是开，0是关，次低位 1是分钟，0是秒钟    1开0关2自定义 0分钟 1秒钟
+            //3、 触发设置，最低位，0是开，1是关，次低位 1是分钟，0是秒钟
             //例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
             //触发功能选择功能
             var triggerSet = if (triggerAfterShow == 2)

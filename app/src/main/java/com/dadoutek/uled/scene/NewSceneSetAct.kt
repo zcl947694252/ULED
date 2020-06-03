@@ -36,6 +36,8 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * 描述	      ${设置场景颜色盘}$
@@ -713,17 +715,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 when {
                     OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x10)
-                        sceneActions.setIsOn(item.isOn)
+                        sceneActions.isOn = item.isOn
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x05)
-                        sceneActions.setIsOn(item.isOn)
+                        sceneActions.isOn = item.isOn
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                         sceneActions = setSceneAc(sceneActions, idAction, item, 0x06, i)
-                        sceneActions.setIsOn(item.isOn)
+                        sceneActions.isOn = item.isOn
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     else -> {
@@ -775,31 +777,29 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         val list = DBUtils.getActionsBySceneId(id)
         var params: ByteArray
 
-        for (i in list.indices) {
-            var count = 0
-            do {
-                count++
-                Thread.sleep(300)
-                var temperature: Byte
-                if (list[i].getIsEnableWhiteBright()) {
-                    temperature = list[i].colorTemperature.toByte()
-                } else {
-                    temperature = 0
-                }
-                if (temperature > 99) {
+        var count = 0
+        do {
+            count++
+
+            with(list) { shuffle() }
+            for (i in list.indices) {
+                if (i > 0)
+                    Thread.sleep(300)
+                var temperature: Byte = if (list[i].getIsEnableWhiteBright())
+                    list[i].colorTemperature.toByte()
+                else
+                    0
+
+                if (temperature > 99)
                     temperature = 99
-                }
 
-                var light: Byte
-                if (list[i].isOn && list[i].getIsEnableBright()) {
-                    light = list[i].brightness.toByte()
-                } else {
-                    light = 0
-                }
-                if (light > 99) {
+                var light: Byte = if (list[i].isOn && list[i].getIsEnableBright())
+                    list[i].brightness.toByte()
+                else
+                    0
+
+                if (light > 99)
                     light = 99
-                }
-
                 val meshAddress = TelinkApplication.getInstance().connectDevice.meshAddress
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
@@ -842,9 +842,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
                 }
-
-            } while (count < 3)
-        }
+            }
+        } while (count < 3)
     }
 
     private fun getSceneId(): Long {
@@ -923,20 +922,20 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         for (i in list.indices) {
             Thread.sleep(100)
             var temperature: Byte
-            if (list[i].getIsEnableWhiteBright()) {
-                temperature = list[i].colorTemperature.toByte()
+            temperature = if (list[i].getIsEnableWhiteBright()) {
+                list[i].colorTemperature.toByte()
             } else {
-                temperature = 0
+                0
             }
             if (temperature > 99) {
                 temperature = 99
             }
 
             var light: Byte
-            if (list[i].isOn && list[i].getIsEnableBright()) {
-                light = list[i].brightness.toByte()
+            light = if (list[i].isOn && list[i].getIsEnableBright()) {
+                list[i].brightness.toByte()
             } else {
-                light = 0
+                0
             }
             if (light > 99) {
                 light = 99
