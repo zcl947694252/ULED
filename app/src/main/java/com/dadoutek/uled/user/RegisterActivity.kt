@@ -104,8 +104,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             iSee.setOnClickListener {
                 if (cb.isChecked) {
                     PopUtil.dismiss(popUserAgreement)
-                } else
+                } else{
                     ToastUtils.showShort(getString(R.string.read_agreen))
+                    return@setOnClickListener
+                }
             }
 
             popUserAgreement = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -172,7 +174,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         when (v!!.id) {
             R.id.register_completed -> {
                 makePop()
-                return
+
                 if (NetWorkUtils.isNetworkAvalible(this)) {
                     userName = edit_user_phone!!.text.toString().trim { it <= ' ' }
                     if (compileExChar(userName!!)) {
