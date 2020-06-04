@@ -1087,5 +1087,8 @@
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
     <string name="user_agreement">User agreement and privacy statement</string>
+<<<<<<< HEAD
     <string name="verification_code_login">Verification code Login</string>
+=======
+>>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
 </resources>

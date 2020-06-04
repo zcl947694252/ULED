@@ -212,7 +212,11 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
+<<<<<<< HEAD
         user_agreement?.setOnClickListener(this)
+=======
+        user_agreenment?.setOnClickListener(this)
+>>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
         setting?.setOnClickListener(this)
@@ -340,7 +344,11 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
+<<<<<<< HEAD
             R.id.user_agreement -> {
+=======
+            R.id.user_agreenment -> {
+>>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
                 var intent = Intent(activity, UserAgreementActivity::class.java)
                 startActivity(intent)
             }
@@ -608,6 +616,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                     btn.text = "$text (${timeout - it})"
                 }
     }
+
 
     private fun clearData() {
         val dbUser = DBUtils.lastUser
