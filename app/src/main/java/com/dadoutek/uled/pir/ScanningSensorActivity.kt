@@ -220,6 +220,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun onResume() {
         super.onResume()
+        stopTimerUpdate()
         progressBtn.progress = 0
         disableConnectionStatusListener()//停止base内部的设备变化监听 不让其自动创建对象否则会重复
     }

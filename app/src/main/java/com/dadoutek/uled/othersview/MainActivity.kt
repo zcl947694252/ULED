@@ -156,11 +156,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
             TelinkLightApplication.getApp().initStompClient()
 
-        var dbGroup = DbGroup()
-        dbGroup.id = 0
-        var dbScene = DbScene()
-        dbScene.id = 0
-
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
@@ -775,7 +770,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onDestroy() {
         super.onDestroy()
-
         TelinkLightApplication.getApp().releseStomp()
         //移除事件
         TelinkLightService.Instance()?.idleMode(true)
