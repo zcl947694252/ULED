@@ -39,11 +39,14 @@ import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     zcl
@@ -56,6 +59,7 @@ import java.util.*
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var upDateTimer: Disposable? = null
     private var isResume: Boolean = false
     private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
@@ -111,6 +115,23 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
     abstract fun setLayoutID(): Int
     open fun notifyWSData(type: Int, rid: Int) {}
+    fun startTimerUpdate() {
+        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
+            SyncDataPutOrGetUtils.syncPutDataStart(this@BaseActivity, object : SyncCallback {
+                override fun start() {}
+                override fun complete() {
+                    LogUtils.v("zcl-----------默认上传成功-------")
+                }
+
+                override fun error(msg: String?) {}
+            })
+        }
+    }
+
+    fun stopTimerUpdate() {
+        upDateTimer?.dispose()
+        upDateTimer = null
+    }
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
@@ -176,6 +197,7 @@ abstract class BaseActivity : AppCompatActivity() {
         isResume = true
         foreground = false
         PopUtil.dismiss(pop)
+        stopTimerUpdate()
     }
 
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
@@ -370,9 +392,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-//            TelinkLightApplication.getApp().initStompClient()
         isResume = true
+        startTimerUpdate()
     }
 
     open fun receviedGwCmd2000(serId: String) {
