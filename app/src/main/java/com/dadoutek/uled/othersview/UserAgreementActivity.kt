@@ -40,24 +40,14 @@ class UserAgreementActivity :BaseActivity(){
         webSettings?.domStorageEnabled = true
         webView_user_agreement!!.clearCache(true)
         if(isZh(this)){
-<<<<<<< HEAD
-            webView!!.loadUrl("https://dev.dadoutek.com/static/README/index.html?lang=0")
-        }else{
-            webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
-=======
             webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
         }else{
             webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
         }
     }
 
     override fun setLayoutID(): Int {
-<<<<<<< HEAD
         return R.layout.activity_user_agreement
-=======
-       return R.layout.activity_user_agreement
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
     }
 
     override//设置回退 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法

@@ -169,10 +169,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-            //如果没打开蓝牙，就提示用户打开
-            //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
-            // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
-            //startActivity(intent)
             installId++
             mBluetoothAdapter?.enable()
 
@@ -687,7 +683,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     fun autoConnect() {
-        //如果支持蓝牙就打开蓝牙
         // if (LeBluetooth.getInstance().isSupport(applicationContext))
         //LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须

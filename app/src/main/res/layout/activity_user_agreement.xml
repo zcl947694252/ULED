@@ -5,16 +5,10 @@
         android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
-<<<<<<< HEAD
 
     <WebView
             android:id="@+id/webView_user_agreement"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-=======
-    <WebView
-            android:id="@+id/webView_user_agreement"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"/>
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
+
 </LinearLayout>

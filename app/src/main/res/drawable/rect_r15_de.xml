@@ -3,8 +3,6 @@
     <stroke android:width="1dp" android:color="@color/black_ee"/>
     <corners android:radius="15dp"/>
     <solid android:color="@color/gray_d"/>
-<<<<<<< HEAD
+
 </shape>
-=======
-</shape>
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
+

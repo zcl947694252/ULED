@@ -190,4 +190,5 @@ dependencies {
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
     implementation 'com.github.maning0303:MNPasswordEditText:V1.0.2'
 
+
 }

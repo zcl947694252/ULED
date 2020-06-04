@@ -80,9 +80,6 @@
         <activity
                 android:name=".fragment.SafeLockActivity"
                 android:screenOrientation="portrait" />
-        <activity
-                android:name=".othersview.UserAgreementActivity"
-                android:screenOrientation="portrait" />
 
         <activity
                 android:name=".othersview.CountryActivity"

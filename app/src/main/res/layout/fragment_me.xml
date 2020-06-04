@@ -7,11 +7,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-<<<<<<< HEAD
-        android:layout_height="180dp"
-=======
         android:layout_height="170dp"
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
         android:background="@drawable/top_back">
 
         <ImageView
@@ -400,11 +396,7 @@
 
         </RelativeLayout>
         <RelativeLayout
-<<<<<<< HEAD
-                android:id="@+id/user_agreement"
-=======
                 android:id="@+id/user_agreenment"
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@color/white"

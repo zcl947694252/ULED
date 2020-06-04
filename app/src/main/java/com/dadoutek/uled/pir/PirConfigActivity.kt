@@ -182,11 +182,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         listSelectTimes.add(ItemCheckBean(getString(R.string.five_minute), false))
     }
 
-<<<<<<< HEAD
-    private fun getTimeUnite() {
-=======
     private fun getTimeUnite() {//1 代表分 0代表秒
->>>>>>> 3b3ee83a8b42c273c18c9b1bfb8b91f8262b9d3e
         listTimeUnit.add(ItemCheckBean(getString(R.string.second), false))
         listTimeUnit.add(ItemCheckBean(getString(R.string.minute), true))
     }

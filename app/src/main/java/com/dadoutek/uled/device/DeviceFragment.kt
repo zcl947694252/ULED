@@ -227,7 +227,7 @@ class DeviceFragment : BaseFragment() {
             }
             Constant.INSTALL_SWITCH -> {
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
-                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
             }
             Constant.INSTALL_SENSOR -> {
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
@@ -255,21 +255,20 @@ class DeviceFragment : BaseFragment() {
      */
     private fun initAdapterData() {
         deviceTypeList.clear()
-        deviceTypeList.add(DeviceItem(getString(R.string.normal_light), DBUtils.getAllNormalLight().size, DeviceType.LIGHT_NORMAL))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.rgb_light), DBUtils.getAllRGBLight().size, DeviceType.LIGHT_RGB))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.switch_name), DBUtils.getAllSwitch().size, DeviceType.NORMAL_SWITCH))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.sensoR), DBUtils.getAllSensor().size, DeviceType.SENSOR))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.curtain), DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.relay), DBUtils.getAllRelay().size, DeviceType.SMART_RELAY))
-
-        deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), DBUtils.getAllGateWay().size, DeviceType.GATE_WAY))
+        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL)
+        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB)
+        isAddDevice(R.string.switch_name,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH)
+        isAddDevice(R.string.sensoR,DBUtils.getAllSensor().size,DeviceType.SENSOR)
+        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN)
+        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY)
+        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY)
 
         deviceAdapter.notifyDataSetChanged()
+    }
+
+    private fun isAddDevice(strId: Int, size: Int, deviceType: Int) {
+        if (size > 0)
+            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType))
     }
 
 
@@ -285,7 +284,7 @@ class DeviceFragment : BaseFragment() {
      * 初始化布局
      */
     private fun initLayout(inflater: LayoutInflater): View? {
-         viewContent = inflater.inflate(R.layout.fragment_new_device, null)
+        viewContent = inflater.inflate(R.layout.fragment_new_device, null)
         return viewContent
     }
 
@@ -299,7 +298,7 @@ class DeviceFragment : BaseFragment() {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
-                   // addNewGroup()
+                    // addNewGroup()
                     popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
                 }
             }
@@ -408,13 +407,13 @@ class DeviceFragment : BaseFragment() {
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
-        when(gwStompBean.ser_id.toInt()){
-            Constant.SER_ID_GROUP_ALLON->{
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
 
             }
-            Constant.SER_ID_GROUP_ALLOFF->{
+            Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
             }
