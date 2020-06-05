@@ -1060,7 +1060,6 @@
     <string name="safe_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
     <string name="unlock">Unlock</string>
     <string name="reset_gw_faile">Gateway user reset failed</string>
-    <string name="no_connect_device">No reconnectable devices!</string>
     <string name="choose_scene_dot">Choose scene :</string>
     <string name="open_light">Open light</string>
     <string name="close_light">Close light</string>
@@ -1087,6 +1086,6 @@
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
     <string name="user_agreement">User agreement and privacy statement</string>
-
     <string name="verification_code_login">Verification code Login</string>
+    <string name="no_connect_device">No automatic connection!</string>
 </resources>

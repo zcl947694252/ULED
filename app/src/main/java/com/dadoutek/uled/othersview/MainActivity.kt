@@ -29,7 +29,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
-import com.allenliu.versionchecklib.v2.builder.UIData
 import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
@@ -46,12 +45,9 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
@@ -71,7 +67,6 @@ import com.telink.bluetooth.event.ServiceEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.MeshUtils
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -82,13 +77,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
-
-private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
-
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
  *
@@ -98,10 +86,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val REQUEST_ENABLE_BT: Int = 1200
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
-    private var retryDisposable: Disposable? = null
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
-
     private lateinit var deviceFragment: DeviceFragment
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
@@ -113,10 +99,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
-
     private var guideShowCurrentPage = false
     private var installId = 0
-
     private lateinit var stepOneText: TextView
     private lateinit var stepTwoText: TextView
     private lateinit var stepThreeText: TextView
@@ -209,16 +193,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         { LogUtils.d(it) })
         mCompositeDisposable.add(disposable)
     }
-
-    /**
-     * 检查App是否有新版本
-     */
-    @Deprecated("we don't need call this function manually")
-    private fun detectUpdate() {
-//        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
-//        XiaomiUpdateAgent.update(this)
-    }
-
 
     var syncCallback: SyncCallback = object : SyncCallback {
         override fun start() {
@@ -522,13 +496,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     /**
      * 检查App版本是否可用  报用户不存在  版本失败
-     *  <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Length: 92
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Connection: keep-alive
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: {"data":null,"errorCode":20001,"serverTime":1570865397299,"message":"20001 用户不存在"}
      */
     private fun checkVersionAvailable() {
         var version = packageName(this)
@@ -550,19 +517,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    /**
-     * @return
-     * @important 使用请求版本功能，可以在这里设置downloadUrl
-     * 这里可以构造UI需要显示的数据
-     * UIData 内部是一个Bundle
-     */
-    private fun crateUIData(v: VersionBean): UIData {
-        val uiData = UIData.create()
-        uiData.title = getString(R.string.update_version)
-        uiData.downloadUrl = v.url
-        uiData.content = v.description
-        return uiData
-    }
 
     private fun packageName(context: Context): String {
         val manager = context.packageManager
@@ -650,7 +604,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
-//      LogUtils.v("zcl--重加---------onPostResume")
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
@@ -690,7 +643,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             showOpenLocationServiceDialog()
         } else {
             hideLocationServiceDialog()
-            //LogUtils.v("zcl--重加---------isstart"+TelinkApplication.getInstance()?.serviceStarted)
             if (TelinkApplication.getInstance()?.serviceStarted == true) {
                 RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
                         .subscribeOn(Schedulers.io())
@@ -735,27 +687,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-    /**
-     * 重试
-     * 先扫描到信号比较好的，再连接。
-     */
-    private fun retryConnect() {
-        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
-            retryConnectCount++
-            TelinkLightService.Instance().idleMode(true)
-            ToastUtils.showLong(getString(R.string.reconnecting))
-            retryDisposable?.dispose()
-            retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
-                    .subscribe {
-                        autoConnect()
-                    }
-        } else {
-            LogUtils.d("exceed max retry time, show connection error")
-            //不调用断开，这样它就会在后台一直重连
-//            TelinkLightService.Instance()?.idleMode(true)
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         TelinkLightService.Instance()?.disableAutoRefreshNotify()
@@ -792,15 +723,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     override fun performed(event: Event<String>) {
         when (event.type) {
-//            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
-//            DeviceEvent.STATUS_CHANGED -> {
-//                progressBar.visibility = GONE
-//                this.onDeviceStatusChanged(event as DeviceEvent)
-//            }
+            NotificationEvent.GET_ALARM -> { }
             ServiceEvent.SERVICE_CONNECTED -> {
                 this.onServiceConnected(event as ServiceEvent)
             }

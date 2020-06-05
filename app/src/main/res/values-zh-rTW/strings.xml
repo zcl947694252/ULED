@@ -1011,4 +1011,5 @@
     <string name="read_agreen">请阅读协议是否同意</string>
     <string name="user_agreement">用户协议及隐私说明</string>
     <string name="verification_code_login">验证码登录</string>
+    <string name="no_connect_device">无可自动连接设备!</string>
 </resources>
