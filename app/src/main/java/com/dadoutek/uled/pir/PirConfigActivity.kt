@@ -367,7 +367,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         sendCommandOpcode(time.toInt())
                         delay(300)
                         //if (!isConfirm)//不是冲洗创建 更新mesh
-                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
+                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
                                     setLoadingVisbiltyOrGone()

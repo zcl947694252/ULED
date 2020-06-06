@@ -27,6 +27,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTimeAndDataBean
 import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -625,14 +626,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
-            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+            var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                     opcodeHead, 0x11, 0x02,
                     dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0)
-            LogUtils.v("zcl-----------发送到服务器标签列表开关-------$labHeadPar")
+            LogUtils.v("zcl-----------发送到服务器标签列表开关-------$gattPar")
 
-            val encoder = Base64.getEncoder()
-            val s = encoder.encodeToString(labHeadPar)
+
+            val s =  Base64Utils.encodeToStrings(gattPar)
             val gattBody = GwGattBody()
             gattBody.data = s
             gattBody.ser_id = GW_GATT_LABEL_SWITCH
@@ -700,8 +701,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
                     gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
             LogUtils.v("zcl-----------发送到服务器标签列表删除标签-------$labHeadPar")
-            val encoder = Base64.getEncoder()
-            val s = encoder.encodeToString(labHeadPar)
+            val s = Base64Utils.encodeToStrings(labHeadPar)
             val gattBody = GwGattBody()
             gattBody.data = s
             gattBody.ser_id = GW_GATT_DELETE_LABEL

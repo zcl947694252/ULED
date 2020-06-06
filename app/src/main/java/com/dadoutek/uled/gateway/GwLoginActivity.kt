@@ -166,7 +166,7 @@ class GwLoginActivity : TelinkBaseActivity(){
 
     private fun sendWIFIParmars(account: String, pwd: String) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(30000, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe {

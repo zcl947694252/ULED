@@ -25,6 +25,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -155,9 +156,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
                         val gattBody = GwGattBody()
                         gattBody.ser_id = Constant.SER_ID_SCENE_ON
-
-                        val encoder = Base64.getEncoder()
-                        val s = encoder.encodeToString(gattPar)
+                        val s =  Base64Utils.encodeToStrings(gattPar)
                         gattBody.data = s
                         gattBody.cmd = Constant.CMD_MQTT_CONTROL
                         gattBody.meshAddr = Constant.SER_ID_SCENE_ON

@@ -470,7 +470,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onLeScan(leScanEvent: LeScanEvent) {
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
-        val meshAddress = MeshAddressGenerator().meshAddress
+        val meshAddress = MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------传感器扫描-------${leScanEvent.args.macAddress}")
         if (meshAddress == -1) {
             this.doFinish()

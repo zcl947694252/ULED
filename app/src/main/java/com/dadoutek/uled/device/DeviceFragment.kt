@@ -28,6 +28,8 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
@@ -42,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * 创建者     zcl
@@ -52,7 +55,8 @@ import java.util.*
  * 更新时间   $Date$
  *
  */
-class DeviceFragment : BaseFragment() {
+class DeviceFragment : BaseFragment(), View.OnClickListener {
+    private var emptyGroupView: View? = null
     private var viewContent: View? = null
     private var deviceTypeList: ArrayList<DeviceItem> = ArrayList()
     private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList)
@@ -62,8 +66,10 @@ class DeviceFragment : BaseFragment() {
     private var guideShowCurrentPage = false
     private val SCENE_MAX_COUNT = 100
 
+    val CREATE_SCENE_REQUESTCODE = 2
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return initLayout(inflater)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,10 +77,16 @@ class DeviceFragment : BaseFragment() {
         initToolBar(view)
         initData()
         initView()
+        initListener()
         if (firstShowGuide) {
             firstShowGuide = false
             initOnLayoutListener()
         }
+    }
+
+    private fun initListener() {
+        main_go_help.setOnClickListener(this)
+        main_add_device.setOnClickListener(this)
     }
 
 
@@ -165,7 +177,7 @@ class DeviceFragment : BaseFragment() {
     private fun initToolBar(view: View?) {
         toolbar!!.setTitle(R.string.device_list)
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
 
@@ -186,12 +198,14 @@ class DeviceFragment : BaseFragment() {
     }
 
 
+
     private fun initView() {
         rvDevice?.layoutManager = GridLayoutManager(this.activity, 2)
         rvDevice?.itemAnimator = DefaultItemAnimator()
-
+        emptyGroupView = LayoutInflater.from(context).inflate(R.layout.empty_box_view, null)
         deviceAdapter.onItemClickListener = onItemClickListener
         deviceAdapter.bindToRecyclerView(rvDevice)
+        deviceAdapter.emptyView =emptyGroupView
 
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
@@ -377,7 +391,6 @@ class DeviceFragment : BaseFragment() {
         }
     }
 
-    val CREATE_SCENE_REQUESTCODE = 2
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 //        refreshData()
@@ -398,7 +411,6 @@ class DeviceFragment : BaseFragment() {
     override fun onDetach() {
         super.onDetach()
         callbackLinkMainActAndFragment = null
-
     }
 
     private fun showInstallDeviceList() {
@@ -416,6 +428,26 @@ class DeviceFragment : BaseFragment() {
             Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
+            }
+        }
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.main_go_help->{
+                var intent = Intent(context, InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.main_add_device->{
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
+                    else {
+                        var intent = Intent(context, SelectDeviceTypeActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
             }
         }
     }

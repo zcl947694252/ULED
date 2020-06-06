@@ -1389,11 +1389,11 @@ object DBUtils {
     }
 
     fun getlastDeviceMesh(): Int {
-        val lights = DBUtils.allLight.map { it.meshAddr }
-        val curtain = DBUtils.allCurtain.map { it.meshAddr }
-        val relay = DBUtils.allRely.map { it.meshAddr }
-        val switch = DBUtils.getAllSwitch().map { it.meshAddr }
-        val sensor = DBUtils.getAllSensor().map { it.meshAddr }
+        val lights = allLight.map { it.meshAddr }
+        val curtain = allCurtain.map { it.meshAddr }
+        val relay = allRely.map { it.meshAddr }
+        val switch = getAllSwitch().map { it.meshAddr }
+        val sensor = getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()
         addressList.addAll(lights)
         addressList.addAll(curtain)

@@ -35,6 +35,7 @@ import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -480,8 +481,7 @@ class GroupListFragment : BaseFragment() {
                         gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
                     }
 
-                    val encoder = Base64.getEncoder()
-                    val s = encoder.encodeToString(gattPar)
+                    val s =  Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = allGroup!!.meshAddr

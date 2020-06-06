@@ -28,6 +28,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -336,11 +337,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             TelinkLightService.Instance().sendCommandResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer, "1")
         } else {
             setTimerDelay(6500L, gwTaskBean)
-            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
+            var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
                     id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
-            LogUtils.v("zcl-----------发送到服务器删除标签-------$labHeadPar")
-            val encoder = Base64.getEncoder()
-            val s = encoder.encodeToString(labHeadPar)
+            LogUtils.v("zcl-----------发送到服务器删除标签-------$gattPar")
+
+            val s =  Base64Utils.encodeToStrings(gattPar)
             val gattBody = GwGattBody()
             gattBody.ser_id = Constant.GW_GATT_DELETE_LABEL_TASK
             gattBody.data = s
@@ -402,8 +403,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
                 LogUtils.v("zcl-----------发送到服务器标签头-------$labHeadPar")
-                val encoder = Base64.getEncoder()
-                val s = encoder.encodeToString(labHeadPar)
+
+                val s = Base64Utils.encodeToStrings(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_SAVE_LABEL_HEAD

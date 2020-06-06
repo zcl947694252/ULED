@@ -52,9 +52,11 @@ class UserAgreementActivity :BaseActivity(){
 
     override//设置回退 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
     fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView!!.canGoBack()) {
-            webView!!.goBack() //goBack()表示返回WebView的上一页面
-            return true
+        webView?.let {
+            if (keyCode == KeyEvent.KEYCODE_BACK && it.canGoBack()) {
+                webView!!.goBack() //goBack()表示返回WebView的上一页面
+                return true
+            }
         }
         finish()//结束退出程序
         return false

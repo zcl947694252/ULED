@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+       android:padding="@dimen/dp_10"
+        android:orientation="vertical">
+
+    <RelativeLayout
+            android:id="@+id/constraintLayout10"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/rect_gray9_empty"
+            android:layout_marginTop="12dp">
+
+        <ImageView
+                android:id="@+id/select_device_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/icon_light_device" />
+
+    </RelativeLayout>
+
+    <TextView
+            android:id="@+id/select_tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="@dimen/dp_10"
+            android:text="蓝牙接收器"
+            android:singleLine="true"
+            android:textColor="@color/black_three"
+            android:textSize="18sp" />
+
+</LinearLayout>

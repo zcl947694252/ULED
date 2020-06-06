@@ -32,7 +32,7 @@ import java.util.*
 class TelinkLightApplication : TelinkApplication() {
     companion object {
         private var app: TelinkLightApplication? = null
-        fun getApp(): TelinkLightApplication {
+        fun getApp(): TelinkLightApplication{
             return app!!
         }
     }
@@ -43,8 +43,6 @@ class TelinkLightApplication : TelinkApplication() {
     private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> = ArrayList()
-    val useIndex = mutableListOf<Int>()
-    val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
     open var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null
@@ -78,7 +76,6 @@ class TelinkLightApplication : TelinkApplication() {
     /*    val inAnalyzerProcess = LeakCanary.isInAnalyzerProcess(this)
         if (!inAnalyzerProcess)
             refWatcher = LeakCanary.install(this)*/
-
         Utils.init(this)
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false

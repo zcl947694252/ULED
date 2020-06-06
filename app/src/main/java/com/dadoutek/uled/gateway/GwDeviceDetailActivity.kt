@@ -23,6 +23,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.ClearGwBean
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -474,8 +475,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                 LogUtils.v("zcl-----------发送到服务器开关网关-------$labHeadPar")
-                val encoder = Base64.getEncoder()
-                val s = encoder.encodeToString(labHeadPar)
+                val s =  Base64Utils.encodeToStrings(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
                 gattBody.ser_id = GW_GATT_SWITCH

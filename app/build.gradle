@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao' // apply plugin
 apply plugin: 'com.mob.sdk'
-
+apply plugin: 'kotlin-kapt'
 // 在MobSDK的扩展中注册SMSSDK的相关信息
 MobSDK {
     appKey "260b846a2a8f8"
@@ -189,6 +189,6 @@ dependencies {
 
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
     implementation 'com.github.maning0303:MNPasswordEditText:V1.0.2'
-
-
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
 }

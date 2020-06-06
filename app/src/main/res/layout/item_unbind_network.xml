@@ -18,7 +18,7 @@
         android:id="@+id/item_unbind_net_unbind"
         android:layout_width="75dp"
         android:layout_height="23dp"
-        android:background="@drawable/rect_gray_nine"
+        android:background="@drawable/rect_gray9_jb"
         android:gravity="center"
         android:text="@string/unbond"
         android:textColor="@color/black_three"

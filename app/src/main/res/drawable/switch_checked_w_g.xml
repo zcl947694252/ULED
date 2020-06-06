@@ -3,6 +3,6 @@
 
     <item android:state_checked="true" android:drawable="@drawable/rect_five_w"/>
 
-    <item android:state_checked="false" android:drawable="@drawable/rect_gray_nine"/>
+    <item android:state_checked="false" android:drawable="@drawable/rect_gray9_jb"/>
 
 </selector>

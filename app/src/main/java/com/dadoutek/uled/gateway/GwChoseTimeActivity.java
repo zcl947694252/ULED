@@ -43,6 +43,7 @@ import com.telink.util.EventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
@@ -164,14 +165,20 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             // 关0 tag的外部现实
 
             LogUtils.v("zcl-----------发送到服务器定时标签头-------"+labHeadPar);
-            Base64.Encoder encoder = Base64.getEncoder();
-            String s = encoder.encodeToString(labHeadPar);
-            GwGattBody gattBody = new GwGattBody();
-            gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
-            gattBody.setData(s);
-            gattBody.setMacAddr(gwTagBean.getMacAddr());
-            gattBody.setTagName(gwTagBean.getTagName());
-            sendToServer(gattBody);
+
+            try {
+                Base64.Encoder encoder = Base64.getEncoder();
+                String s = encoder.encodeToString(labHeadPar);
+                GwGattBody gattBody = new GwGattBody();
+                gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
+                gattBody.setData(s);
+                gattBody.setMacAddr(gwTagBean.getMacAddr());
+                gattBody.setTagName(gwTagBean.getTagName());
+                sendToServer(gattBody);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
         } else {
             setHeadTimerDelay(1500L);
 

@@ -34,6 +34,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
@@ -79,8 +80,6 @@ import kotlin.collections.ArrayList
  * 更新时间   $Date$
  * 更新描述   ${}$
  */
-
-private const val MAX_RETRY_CONNECT_TIME = 5
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private var disposableTimer: Disposable? = null
@@ -352,8 +351,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
 
-                    val encoder = Base64.getEncoder()
-                    val s = encoder.encodeToString(gattPar)
+                    val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentLight!!.meshAddr

@@ -322,7 +322,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 tietMinimumBrightness.text.toString().toInt(),
                                 spTriggerLux.selectedItem.toString().toInt(), mode)
                         Thread.sleep(300)
-                       mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
+                       mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
                         Commander.updateMeshName(newMeshAddr =  mDeviceInfo.meshAddress,
                                 successCallback = {
                                     hideLoadingDialog()

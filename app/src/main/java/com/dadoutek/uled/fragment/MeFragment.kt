@@ -26,6 +26,9 @@ import android.widget.TextView
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.connect
@@ -226,16 +229,14 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         appVersion!!.text = versionName
 
         setting.visibility = View.GONE
-        userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
 
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
-//        Glide
-//                .with(context!!)
-//                .load(R.drawable.ic_launcher)
-//                .apply(RequestOptions.bitmapTransform(CircleCrop()))
-//                .placeholder(R.drawable.ic_launcher)
-//                .into(userIcon);
+        Glide
+                .with(context!!)
+                .load(R.drawable.ic_launcher)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                .into(userIcon)
         makePop()
         makePop2()
     }

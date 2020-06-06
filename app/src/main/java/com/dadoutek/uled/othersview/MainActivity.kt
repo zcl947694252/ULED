@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager.NameNotFoundException
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
@@ -28,6 +29,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.*
@@ -37,6 +39,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -128,6 +131,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     //记录用户首次点击返回键的时间
     private var firstTime: Long = 0
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,11 +157,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener {
-            installId++
-            mBluetoothAdapter?.enable()
-
-            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            val encoder = Base64.getEncoder().encodeToString(byteArrayOf(0,1,0,1,0,1))
+            val encodeToStrings = Base64Utils.encodeToStrings(byteArrayOf(0, 1, 0, 1, 0, 1))
+            LogUtils.v("zcl-------$encoder-----------$encoder---8888")
         }
         initBottomNavigation()
         checkVersionAvailable()

@@ -1259,7 +1259,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun connectBestRssiDevice() {
         disposable?.dispose()
-        val meshAddress = MeshAddressGenerator().meshAddress
+        val meshAddress = MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------网关新的meshAddress-------$meshAddress")
         disposable = Observable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
