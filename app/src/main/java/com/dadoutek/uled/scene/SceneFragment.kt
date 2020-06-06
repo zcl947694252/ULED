@@ -303,7 +303,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     val guide2 = adaper!!.getViewByPosition(0, R.id.scene_edit) as TextView?
                     GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.ADDITIONAL_GUIDE_SET_SCENE)
                             .addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout.view_guide_simple_scene_2, getString(R.string.click_update_scene),
-                                    View.OnClickListener { v -> GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_SET_KEY, true) }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
+                                    View.OnClickListener { _ -> GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_SET_KEY, true) }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
                 }
             })
         }
@@ -439,7 +439,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             refreshAllData()
             refreshView()
         }
-        builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
+        builder.setNegativeButton(activity!!.getString(R.string.cancel)) { _, _ -> }
         val dialog = builder.show()
         dialog.show()
     }

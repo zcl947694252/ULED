@@ -259,7 +259,7 @@ public class StringUtils {
             case Constant.INSTALL_CONNECTOR:
                 return context.getString(R.string.guide_tip_reset_relay);
             case Constant.INSTALL_GATEWAY:
-                return context.getString(R.string.guide_tip_reset_relay);
+                return context.getString(R.string.guide_tip_reset_gateway);
         }
         return "";
     }
