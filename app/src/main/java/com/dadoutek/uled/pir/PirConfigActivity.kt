@@ -69,21 +69,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var version: String = ""
     private var timeDispsable: Disposable? = null
     private var connectDisposable: Disposable? = null
-
-    /**
-     * 1 代表分 0代表秒
-     */
-    private var timeUnitType: Int = 1
-
-    /**
-     * 0 开 1关 2自定义
-     */
-    private var triggerAfterShow: Int = 0
-
-    /**
-     * 0全天    1白天   2夜晚
-     */
-    private var triggerKey: Int = 0
+    private var timeUnitType: Int = 1// 1 代表分 0代表秒
+    private var triggerAfterShow: Int = 0//0 开 1关 2自定义
+    private var triggerKey: Int = 0//0全天    1白天   2夜晚
     private var customBrightnessNum: Int = 0
     private var currentScene: DbScene? = null
     private val REQUEST_CODE_CHOOSE: Int = 1000
@@ -110,7 +98,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initListener() {
         top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-
             changeGroupType(checkedId == R.id.color_mode_rb)
             when (checkedId) {
                 R.id.color_mode_rb -> {
@@ -219,7 +206,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CHOOSE && resultCode == Activity.RESULT_OK) {
-
             showBottomList.clear()
             if (isGroupMode) {
                 showGroupList.clear()
@@ -359,7 +345,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 return
             }
             else -> {//符合所有条件
-
                 val device = TelinkLightApplication.getApp().connectDevice
                 if (device != null && device.macAddress == mDeviceInfo?.macAddress) {
                     GlobalScope.launch {
@@ -367,7 +352,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         sendCommandOpcode(time.toInt())
                         delay(300)
                         //if (!isConfirm)//不是冲洗创建 更新mesh
-                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
+                        mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
                                     setLoadingVisbiltyOrGone()
@@ -415,7 +400,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun saveSensor() {
         var dbSensor = DbSensor()
-
         if (isConfirm) {
             dbSensor.index = mDeviceInfo!!.id.toInt()
             if ("none" != mDeviceInfo!!.id)
@@ -473,8 +457,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                             TmtUtils.midToast(this, getString(R.string.connect_fail))
                         }
                         LogUtils.d("connect failed")
-                    }
-                    )
+                    })
         }
     }
 
@@ -488,17 +471,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
 
-
-            //11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
-            // 16触发照度(条件 全天) 17触发设置 最低位1 开 0关  次低 1 分钟 0 秒
-            //3、 触发设置，最低位，0是开，1是关，次低位 1是分钟，0是秒钟
-            //例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
-            //触发功能选择功能
-            var triggerSet = if (triggerAfterShow == 2)
-                0
-            else
-                (timeUnitType shl 1) or triggerAfterShow
-
+            // 11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
+            // 16触发照度(条件 全天) 17触发设置 最低位，0是开，1是关，次低位 1是分钟，0是秒钟
+            // 例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
+            // 触发功能选择功能
+            var triggerSet = if (triggerAfterShow == 2) 0 else (timeUnitType shl 1) or triggerAfterShow
             val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(),
                     triggerKey.toByte(), triggerSet.toByte(), 0)
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetSHow)
