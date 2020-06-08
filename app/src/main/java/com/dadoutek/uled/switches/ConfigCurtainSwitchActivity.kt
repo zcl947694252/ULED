@@ -240,7 +240,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 if (mAdapter.selectedPos != -1) {
                     progressBar.visibility = View.VISIBLE
                     setGroupForSwitch()
-                    newMeshAddr = MeshAddressGenerator().meshAddress
+                    newMeshAddr = MeshAddressGenerator().meshAddress.get()
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mDeviceInfo.meshAddress = newMeshAddr
                         mIsConfiguring = true
@@ -450,7 +450,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
             //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress
+            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -462,7 +462,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this)+mDeviceInfo.meshAddress
             dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
-            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress
+            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress.get()
            // dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch!!.index = switch.id.toInt()
@@ -473,7 +473,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
             dbSwitch.macAddr = mDeviceInfo.macAddress
-            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress
+            dbSwitch.meshAddr = MeshAddressGenerator().meshAddress.get()
             //dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch.index = dbSwitch.id.toInt()

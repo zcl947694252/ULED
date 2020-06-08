@@ -334,19 +334,19 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 TmtUtils.midToast(this, getString(R.string.timeout_period_is_empty))
                 return
             }
-            timeUnitType == 1 && time.toInt() < 10 -> {//0 代表分 1代表秒
+            timeUnitType == 0 && time.toInt() < 10 -> {//1 代表分0代表秒
                 TmtUtils.midToast(this, getString(R.string.timeout_time_less_ten))
                 return
             }
-            timeUnitType == 1 && time.toInt() > 255 -> {
+            timeUnitType == 0 && time.toInt() > 255 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_255))
                 return
             }
-            timeUnitType == 0 && time.toInt() < 1 -> {
+            timeUnitType == 1 && time.toInt() < 1 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_1m))
                 return
             }
-            timeUnitType == 0 && time.toInt() > 255 -> {
+            timeUnitType == 1 && time.toInt() > 255 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_255_big))
                 return
             }
@@ -367,7 +367,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         sendCommandOpcode(time.toInt())
                         delay(300)
                         //if (!isConfirm)//不是冲洗创建 更新mesh
-                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress
+                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
                         Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                 successCallback = {
                                     setLoadingVisbiltyOrGone()
