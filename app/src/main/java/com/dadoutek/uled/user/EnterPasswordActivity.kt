@@ -422,12 +422,9 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private fun syncComplet() {
         hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-        startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
-        finish()
-
         TelinkLightApplication.getApp().lastMeshAddress = DBUtils.getlastDeviceMesh()
-       // ActivityUtils.finishAllActivities(true)
-        //ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
+        ActivityUtils.finishAllActivities(true)
+        ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

@@ -84,11 +84,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     finish()
                 }
             }
-            else -> {
-            }
+            else -> {}
         }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

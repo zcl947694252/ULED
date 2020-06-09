@@ -137,7 +137,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
-    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.device_item, mAddedDevices)
+    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_item_device, mAddedDevices)
 
     /**
      * 有无被选中的用来分组的灯

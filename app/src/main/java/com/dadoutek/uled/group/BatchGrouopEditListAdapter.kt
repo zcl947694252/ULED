@@ -18,13 +18,13 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        helper.setText(R.id.batch_four_group_name, item.name)
-                .setText(R.id.batch_four_group_num, mContext.getString(R.string.number) + ":${item.deviceCount}")
+        helper.setText(R.id.template_device_title, item.name)
+                .setText(R.id.template_device_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
         if (item.isCheckedInGroup) {
-            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_unselected)
         }
     }
 }

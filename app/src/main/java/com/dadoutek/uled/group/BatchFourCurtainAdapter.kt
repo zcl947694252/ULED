@@ -18,37 +18,29 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
  * 更新描述
  */
 class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
-    private val bestRssi: Long = -70
-    private val normalRssi: Long = -80
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return
-        val icon = helper.getView<ImageView>(R.id.batch_img_icon)
-        val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)
-        val rssiIcon = helper.getView<ImageView>(R.id.batch_img_rssi)
-        when {
-            item?.rssi?:-1000>=bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_blue)
-            item?.rssi?:-1000 in normalRssi..bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_yellow)
-            else -> rssiIcon.setBackgroundResource(R.drawable.btn_rectangle_circle_red)
-        }
+        val icon = helper.getView<ImageView>(R.id.template_device_icon)
+        val groupName = helper.getView<TextView>(R.id.template_device_title_blow)
 
-        helper.setText(R.id.batch_tv_device_name, item?.name)
+
+        helper.setText(R.id.template_device_title, item?.name)
         if (item?.isSelected == true) {
-            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_unselected)
         }
 
         if (item?.hasGroup == true) {
-            helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))
-                    .setTextColor(R.id.batch_tv_group_name, mContext.getColor(R.color.blue_text))
+            helper.setTextColor(R.id.template_device_title, mContext.getColor(R.color.blue_text))
+                    .setTextColor(R.id.template_device_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item.groupName +"=="+item.rssi
+            groupName.text = item.groupName +"="+item.rssi
 
             icon.setImageResource(R.drawable.icon_curtain)
         } else {
-            helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
+            helper.setTextColor(R.id.template_device_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            //groupName.text ="-----"+item?.rssi
             icon.setImageResource(R.drawable.curtain_off)
         }
     }

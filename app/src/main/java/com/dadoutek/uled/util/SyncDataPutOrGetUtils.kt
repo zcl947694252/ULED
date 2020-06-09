@@ -55,10 +55,11 @@ class SyncDataPutOrGetUtils {
                 for (data in dbDataChangeList) {
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
+                    data?.let {
                     var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys
-                            ?: "")
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
                     observable?.let { observableList.add(it) }
+                    }
                 }
 
                 val observables = arrayOfNulls<Observable<String>>(observableList.size)

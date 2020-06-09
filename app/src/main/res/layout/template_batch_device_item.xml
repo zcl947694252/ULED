@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="25dp">
+
+    <ImageView
+            android:id="@+id/template_device_icon"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:contentDescription="@null"
+            android:scaleType="center"
+            android:src="@drawable/icon_device_open"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+            android:id="@+id/template_device_selected"
+            android:layout_width="@dimen/dp_13"
+            android:layout_height="@dimen/dp_13"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/icon_checkbox_unselected"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
+            app:layout_constraintStart_toEndOf="@+id/template_device_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/template_device_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:singleLine="true"
+            android:textSize="13sp"
+            android:text="@string/device_name"
+            android:textColor="@color/black_three"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
+            app:layout_constraintStart_toStartOf="@+id/template_device_icon"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_icon" />
+
+
+    <TextView
+            android:id="@+id/template_device_title_blow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="12sp"
+            android:paddingBottom="@dimen/dp_5"
+            android:layout_marginTop="@dimen/dp_5"
+            android:text="1234"
+            android:textColor="@color/black_three"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
+            app:layout_constraintStart_toStartOf="@+id/template_device_icon"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_title" />
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center_horizontal"-->
+    <!--android:orientation="vertical">-->
+    <!--<ImageView-->
+    <!--android:id="@+id/img_icon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:contentDescription="@null"-->
+    <!--android:scaleType="center"-->
+    <!--android:src="@drawable/icon_light_set"-->
+    <!--android:layout_marginTop="15dp"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/txt_name"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:singleLine="true"-->
+    <!--android:textSize="14sp" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/txt_mac"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:singleLine="false"-->
+    <!--android:textSize="12sp"-->
+    <!--android:visibility="gone" />-->
+    <!--<CheckBox-->
+    <!--android:id="@+id/selected"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:checked="true"-->
+    <!--android:clickable="false"-->
+    <!--android:focusable="false"-->
+    <!--android:focusableInTouchMode="false"-->
+    <!--style="@style/CustomCheckboxTheme"-->
+    <!--/>-->
+    <!--</LinearLayout>-->
+
+</android.support.constraint.ConstraintLayout>

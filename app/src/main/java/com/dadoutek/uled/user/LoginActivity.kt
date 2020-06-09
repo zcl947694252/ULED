@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.PowerManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -24,7 +23,6 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -33,27 +31,20 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
-import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.RegisterActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.btn_register
 import kotlinx.android.synthetic.main.activity_login.facebook_btn
 import kotlinx.android.synthetic.main.activity_login.google_btn
 import kotlinx.android.synthetic.main.activity_login.qq_btn
 import kotlinx.android.synthetic.main.activity_login.third_party_text
-import kotlinx.android.synthetic.main.activity_verification_code.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import java.util.*
@@ -108,6 +99,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
         }
     }
+
     private fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -136,7 +128,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         forget_password.setOnClickListener(this)
         date_phone.setOnClickListener(this)
         eye_btn.setOnClickListener(this)
-        linearLayout_1.setOnClickListener(this)
+        //linearLayout_1.setOnClickListener(this)
         sms_login_btn.setOnClickListener(this)
         //sms_password_login.setOnClickListener(this)
         edit_user_phone_or_email.addTextChangedListener(this)
@@ -179,7 +171,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     toast(getString(R.string.please_phone_number))
                     return
                 }
-                if (TextUtils.isEmpty(edit_user_password.editableText.toString())){
+                if (TextUtils.isEmpty(edit_user_password.editableText.toString())) {
                     toast(getString(R.string.please_password))
                     return
                 }
@@ -251,53 +243,51 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun phoneList() {
         if (isPhone) {
-            list_phone.visibility = View.VISIBLE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.GONE
-            login_isTeck.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-//            btn_register.visibility=View.GONE
-            forget_password.visibility = View.GONE
-            sms_password_login.visibility = View.GONE
-            third_party_text.visibility = View.GONE
-            qq_btn.visibility = View.GONE
-            google_btn.visibility = View.GONE
-            facebook_btn.visibility = View.GONE
-            val layoutmanager = LinearLayoutManager(this)
-            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = layoutmanager
-            this.adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
+            isShowPhoneList(true)
 
+            val layoutmanager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            recyclerView!!.layoutManager = layoutmanager
+            adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
             val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
             decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
             recyclerView?.itemAnimator = DefaultItemAnimator()
-
-//        adapter!!.addFooterView(getFooterView())
             adapter!!.bindToRecyclerView(recyclerView)
             adapter!!.onItemChildClickListener = onItemChildClickListener
-            isPhone = false
+        } else {
+            isShowPhoneList(false)
+        }
+    }
+
+    private fun isShowPhoneList(b: Boolean) {
+        eye_btn.visibility = View.GONE
+        forget_password.visibility = View.GONE
+        edit_user_password.visibility = View.GONE
+        isPhone = !b
+        if (b) {
+            qq_btn.visibility = View.GONE
+            btn_login.visibility = View.GONE
+            google_btn.visibility = View.GONE
+            facebook_btn.visibility = View.GONE
+            login_isTeck.visibility = View.GONE
+            sms_login_btn.visibility = View.GONE
+            third_party_text.visibility = View.GONE
+            sms_password_login.visibility = View.GONE
+            btn_register.visibility = View.GONE
+            list_phone.visibility = View.VISIBLE
             date_phone.setImageResource(R.drawable.icon_up)
         } else {
-            list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-            login_isTeck.visibility = View.VISIBLE
-            edit_user_password.visibility = View.VISIBLE
-            btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.VISIBLE
-            eye_btn.visibility = View.VISIBLE
-            sms_password_login.visibility = View.VISIBLE
-            third_party_text.visibility = View.VISIBLE
             qq_btn.visibility = View.VISIBLE
+            btn_login.visibility = View.VISIBLE
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
-            isPhone = true
+            login_isTeck.visibility = View.VISIBLE
+            sms_login_btn.visibility = View.VISIBLE
+            third_party_text.visibility = View.VISIBLE
+            sms_password_login.visibility = View.VISIBLE
+            btn_register.visibility = View.VISIBLE
+            list_phone.visibility = View.GONE
             date_phone.setImageResource(R.drawable.icon_down_arr)
         }
     }
@@ -451,36 +441,36 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
 
 
-       /* if (!StringUtils.isTrimEmpty(phone)) {
-            NetworkFactory.getApi()
-                    .getAccount(phone, "dadou")
-                    .compose(NetworkTransformer())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                    if (TextUtils.isEmpty(t))
-                                        startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-                                    else {
-                                        val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
-                                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-                                        intent.putExtra("phone", phone)
-                                        returnView()
-                                        startActivity(intent)
-                                        finish()
-                                    }
-                                }
+        /* if (!StringUtils.isTrimEmpty(phone)) {
+             NetworkFactory.getApi()
+                     .getAccount(phone, "dadou")
+                     .compose(NetworkTransformer())
+                     .subscribeOn(Schedulers.io())
+                     .observeOn(AndroidSchedulers.mainThread())
+                     .subscribe(
+                             object : NetworkObserver<String>() {
+                                 override fun onNext(t: String) {
+                                     if (TextUtils.isEmpty(t))
+                                         startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+                                     else {
+                                         val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
+                                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
+                                         intent.putExtra("phone", phone)
+                                         returnView()
+                                         startActivity(intent)
+                                         finish()
+                                     }
+                                 }
 
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    returnView()
+                                 override fun onError(e: Throwable) {
+                                     super.onError(e)
+                                     returnView()
 
-                                }
-                            })
-        } else {
-            ToastUtils.showShort(getString(R.string.phone_or_password_can_not_be_empty))
-        }*/
+                                 }
+                             })
+         } else {
+             ToastUtils.showShort(getString(R.string.phone_or_password_can_not_be_empty))
+         }*/
     }
 
     var isSuccess: Boolean = true
@@ -534,6 +524,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
         }
     }
+
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun loginOutMethod() {}

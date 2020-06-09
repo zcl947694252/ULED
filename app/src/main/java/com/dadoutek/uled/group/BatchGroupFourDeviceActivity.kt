@@ -50,9 +50,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -60,15 +58,10 @@ import java.util.concurrent.TimeUnit
 /**
  * 创建者     ZCL
  * 创建时间   2019/10/16 14:41
- * 描述
- *
  * 更新者     zcl$
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
- *
- * 更新描述
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
-
     private var disposableScan: Disposable? = null
     private var disposableTimerResfresh: Disposable? = null
     private var scanningList: ArrayList<DeviceInfo>? = null
@@ -103,10 +96,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val listGroupRelay: MutableList<DbConnector> = mutableListOf()
     private val deviceDataRelay: MutableList<DbConnector> = mutableListOf()
 
-    private val groupAdapter: BatchGrouopEditListAdapter = BatchGrouopEditListAdapter(R.layout.batch_four_group_edit_item, groupsByDeviceType)
+    private val groupAdapter: BatchGrouopEditListAdapter = BatchGrouopEditListAdapter(R.layout.template_batch_device_item, groupsByDeviceType)
 
-    private val lightAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.batch_device_item, noGroup)
-    private val lightGroupedAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.batch_device_item, listGroup)
+    private val lightAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_device_item, noGroup)
+    private val lightGroupedAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_device_item, listGroup)
 
     private val relayAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.batch_device_item, noGroupRelay)
     private val relayGroupedAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.batch_device_item, listGroupRelay)
@@ -115,15 +108,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val curtainGroupedAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.batch_device_item, listGroupCutain)
 
     private val allLightId: Long = 1//belongGroupId如果等于1则标识没有群组
-
     private var deviceType: Int = 100
     private var lastCheckedGroupPostion: Int = 1000
     private var retryConnectCount = 0
     private var connectMeshAddress: Int = 0
     private var mApplication: TelinkLightApplication? = null
-
     private var checkedNoGrouped: Boolean = true
-
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isAddGroupEmptyView: Boolean = false
     private var isComplete: Boolean = false
@@ -158,19 +148,18 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         emptyGroupView = LayoutInflater.from(this).inflate(R.layout.empty_group_view, null)
         btnAddGroups = emptyGroupView!!.findViewById<TextView>(R.id.add_groups_btn)
 
-        batch_four_device_recycle.layoutManager = GridLayoutManager(this, 2)
-        batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
+        batch_four_device_recycle.layoutManager = GridLayoutManager(this, 4)
+       // batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
-        batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 2)
-        batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
+        batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 4)
+        //batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
 
-        batch_four_group_recycle.layoutManager = GridLayoutManager(this, 2)
-        batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
+        batch_four_group_recycle.layoutManager = GridLayoutManager(this, 4)
+       // batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         lplong = batch_four_no_group.layoutParams as LinearLayout.LayoutParams
+        lpShort = batch_four_grouped.layoutParams as LinearLayout.LayoutParams
         lplong?.weight = 3f
-
-        lpShort = batch_four_no_group_line_ly.layoutParams as LinearLayout.LayoutParams
         lpShort?.weight = 2f
 
         batch_four_compatible_mode.isChecked = true
@@ -180,7 +169,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         scanningList = intent.getParcelableArrayListExtra(Constant.DEVICE_NUM)
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
-        swipe_refresh_ly.setProgressViewOffset(true, -0, 100)
+        swipe_refresh_ly.setProgressViewOffset(true, 0, 100)
         //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
         swipe_refresh_ly.setProgressViewEndTarget(true, 180)
         //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
@@ -669,6 +658,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             batch_four_no_group.layoutParams = lpShort
             batch_four_no_group.textSize = 15f
             batch_four_no_group_line_ly.layoutParams = lpShort
+
             batch_four_grouped.layoutParams = lplong
             batch_four_grouped.textSize = 18f
             batch_four_grouped_line_ly.layoutParams = lplong
