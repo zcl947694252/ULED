@@ -47,10 +47,7 @@ import kotlinx.android.synthetic.main.activity_pir_new.sensor_root
 import kotlinx.android.synthetic.main.activity_pir_new.trigger_time_text
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.design.snackbar
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -470,6 +467,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 paramsSetGroup[i + 2] = lowAdd.toByte()
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
+
+            Thread.sleep(200)
 
             // 11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
             // 16触发照度(条件 全天) 17触发设置 最低位，0是开，1是关，次低位 1是分钟，0是秒钟
