@@ -38,6 +38,6 @@ class MeshAddressGenerator {
                 addressList.last()
             }
         }
-        meshAddress = AtomicInteger(i)
+        meshAddress =AtomicInteger(i)
     }
 }

@@ -232,7 +232,7 @@
     <string name="phone_current">当前手机号：%1$s</string>
     <string name="select_country">选择国家</string>
     <string name="add_timing_label">添加定时标签</string>
-    <string name="open_location_service">请打开“位置服务”</string>
+    <string name="open_location_service">请打开"位置服务"</string>
     <string name="verification">验证</string>
     <string name="send_verification">发送验证码</string>
     <string name="VerificationCode">验证码</string>
@@ -424,7 +424,6 @@
     <string name="add_scene_guide_4">这里可以设置分组色温</string>
     <string name="add_scene_guide_5">这里可以设置分组颜色</string>
     <string name="add_scene_guide_6">点击保存场景</string>
-    <!---->
 
     <string name="config_pir_guide_1">灯亮度变为最终亮度的延迟时间</string>
     <string name="config_pir_guide_2">输入延迟时间过后的最终亮度</string>

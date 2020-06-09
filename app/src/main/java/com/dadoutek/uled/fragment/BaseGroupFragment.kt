@@ -33,7 +33,6 @@ import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
-import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -67,7 +66,7 @@ import kotlin.collections.ArrayList
 abstract class BaseGroupFragment : BaseFragment() {
     private var currentPosition: Int = 0
     private var disposableTimer: Disposable? = null
-    private var currentLight: DbGroup? = null
+    private var currentGroup: DbGroup? = null
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -329,53 +328,54 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
-        if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
-                TelinkLightApplication.getApp().offLine = true
-                hideLoadingDialog()
-                t.forEach { db ->
-                    //网关在线状态，1表示在线，0表示离线
-                    if (db.state == 1)
-                        TelinkLightApplication.getApp().offLine = false
-                }
-                if (!TelinkLightApplication.getApp().offLine) {
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                        hideLoadingDialog()
-                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+        if (gateWay.size > 0)
+            GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+                @RequiresApi(Build.VERSION_CODES.O)
+                override fun onNext(t: List<DbGateway>) {
+                    TelinkLightApplication.getApp().offLine = true
+                    hideLoadingDialog()
+                    t.forEach { db ->
+                        //网关在线状态，1表示在线，0表示离线
+                        if (db.state == 1)
+                            TelinkLightApplication.getApp().offLine = false
                     }
-                    val low = currentLight!!.meshAddr and 0xff
-                    val hight = (currentLight!!.meshAddr shr 8) and 0xff
-                    val gattBody = GwGattBody()
-                    var gattPar: ByteArray
-                    if (isOpen) {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_ON
-                    } else {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_OFF
-                    }
+                    if (!TelinkLightApplication.getApp().offLine) {
+                        disposableTimer?.dispose()
+                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                            hideLoadingDialog()
+                            runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                        }
+                        val low = currentGroup!!.meshAddr and 0xff
+                        val hight = (currentGroup!!.meshAddr shr 8) and 0xff
+                        val gattBody = GwGattBody()
+                        var gattPar: ByteArray
+                        if (isOpen) {
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_GROUP_ON
+                        } else {
+                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                            gattBody.ser_id = Constant.SER_ID_GROUP_OFF
+                        }
 
-                    val s = Base64Utils.encodeToStrings(gattPar)
-                    gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = currentLight!!.meshAddr
-                    sendToServer(gattBody)
-                } else {
+                        val encoder = Base64.getEncoder()
+                        val s = encoder.encodeToString(gattPar)
+                        gattBody.data = s
+                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                        gattBody.meshAddr = currentGroup!!.meshAddr
+                        sendToServer(gattBody)
+                    } else {
+                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                    }
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                hideLoadingDialog()
-                ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
-        })
+            })
     }
 
     private fun sendToServer(gattBody: GwGattBody) {
@@ -395,28 +395,26 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-        currentLight = groupList[position]
+        currentGroup = groupList[position]
         currentPosition = position
-        val dstAddr = currentLight!!.meshAddr
+        val dstAddr = currentGroup!!.meshAddr
         val groupType = setGroupType()
-        if (TelinkLightApplication.getApp().connectDevice == null) {
-            // ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 
             when (view!!.id) {
-                R.id.btn_on, R.id.tv_on -> sendToGw(true)
-                R.id.btn_off, R.id.tv_off -> sendToGw(false)
-                //不能使用group_name否则会造成长按监听无效 跳转组详情
-            }
-        } else {
-            when (view!!.id) {
                 R.id.btn_on, R.id.tv_on -> {
-                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        Commander.openOrCloseLights(dstAddr, true)
-                        groupOpenSuccess(position)
-                    }
+                    if (TelinkLightApplication.getApp().connectDevice == null)
+                        sendToGw(true)
+                    else
+                        if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                            Commander.openOrCloseLights(dstAddr, true)
+                            groupOpenSuccess(position)
+                        }
                 }
                 R.id.btn_off, R.id.tv_off -> {
-                    if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (TelinkLightApplication.getApp().connectDevice == null)
+                        sendToGw(false)
+                    else
+                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, false)
                         groupCloseSuccess(position)
                     }
@@ -428,20 +426,20 @@ abstract class BaseGroupFragment : BaseFragment() {
                         /*  if (it.id.toString() != it.last_authorizer_user_id)
                               ToastUtils.showLong(getString(R.string.author_region_warm))
                           else {*/
-                        if (currentLight!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight!!.deviceType == groupType)) {
+                        if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
                             var num = 0
                             when (groupType) {
                                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                    num = DBUtils.getLightByGroupID(currentLight!!.id).size
+                                    num = DBUtils.getLightByGroupID(currentGroup!!.id).size
                                 }
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                                    num = DBUtils.getLightByGroupID(currentLight!!.id).size
+                                    num = DBUtils.getLightByGroupID(currentGroup!!.id).size
                                 }
                                 Constant.DEVICE_TYPE_CONNECTOR -> {
-                                    num = DBUtils.getConnectorByGroupID(currentLight!!.id).size
+                                    num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
                                 }//蓝牙接收器
                                 Constant.DEVICE_TYPE_CURTAIN -> {
-                                    num = DBUtils.getCurtainByGroupID(currentLight!!.id).size
+                                    num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
                                 }
                             }
 
@@ -463,7 +461,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     }
                                 }
                                 intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                                intent?.putExtra("group", currentLight)
+                                intent?.putExtra("group", currentGroup)
                                 startActivityForResult(intent, 2)
                             }
                         }
@@ -494,31 +492,31 @@ abstract class BaseGroupFragment : BaseFragment() {
                             intent = Intent(mContext, CurtainOfGroupActivity::class.java)
                         }
                     }
-                    intent.putExtra("group", currentLight)
+                    intent.putExtra("group", currentGroup)
                     startActivityForResult(intent, 2)
                 }
-            }
+
         }
     }
 
     private fun groupCloseSuccess(position: Int) {
-        currentLight?.connectionStatus = ConnectionStatus.OFF.value
+        currentGroup?.connectionStatus = ConnectionStatus.OFF.value
         groupAdapter?.notifyItemChanged(position)
         GlobalScope.launch {
-            currentLight?.let {
-                DBUtils.updateGroup(currentLight!!)
-                updateLights(true, currentLight!!)
+            currentGroup?.let {
+                DBUtils.updateGroup(currentGroup!!)
+                updateLights(true, currentGroup!!)
             }
         }
     }
 
     private fun groupOpenSuccess(position: Int) {
-        currentLight?.connectionStatus = ConnectionStatus.ON.value
+        currentGroup?.connectionStatus = ConnectionStatus.ON.value
         groupAdapter?.notifyItemChanged(position)
         GlobalScope.launch {
-            currentLight?.let {
-                DBUtils.updateGroup(currentLight!!)
-                updateLights(true, currentLight!!)
+            currentGroup?.let {
+                DBUtils.updateGroup(currentGroup!!)
+                updateLights(true, currentGroup!!)
             }
         }
     }
