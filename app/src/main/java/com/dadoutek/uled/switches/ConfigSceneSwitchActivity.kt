@@ -127,7 +127,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                 pb_ly.visibility = View.VISIBLE
                 GlobalScope.launch {
                     setSceneForSwitch()
-                    newMeshAddr = MeshAddressGenerator().meshAddress
+                    newMeshAddr = MeshAddressGenerator().meshAddress.get()
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mDeviceInfo.meshAddress = newMeshAddr
                         mIsConfiguring = true

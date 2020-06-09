@@ -1,20 +1,29 @@
 package com.dadoutek.uled.user
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.text.Editable
-import android.text.TextUtils
-import android.text.TextWatcher
+import android.text.*
 import android.text.method.HideReturnsTransformationMethod
+import android.text.method.LinkMovementMethod
 import android.text.method.PasswordTransformationMethod
+import android.text.style.ClickableSpan
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -24,7 +33,9 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_register.*
 import org.json.JSONObject
@@ -35,25 +46,104 @@ import org.json.JSONObject
 
 class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
+    private var popUserAgreement: PopupWindow? = null
     private var userName: String? = null
     private var countryCode: String? = null
     private var isChangePwd = false
     private var dbUser: DbUser? = null
     private var isPassword = false
     private var isPasswordAgain = false
+    private var isFrist = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_register)
-        ButterKnife.bind(this)
+        isFrist = true
         initView()
-
+        makePop()
         SMSSDK.registerEventHandler(eventHandler)
     }
 
+    private fun makePop() {
+        popView?.let {
+            val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
+            val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
+            var cs: ClickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    var intent = Intent(this@RegisterActivity, UserAgreementActivity::class.java)
+                    startActivity(intent)
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = Color.BLUE//设置超链接的颜色
+                    ds.isUnderlineText = false
+                }
+            }
+            var start = if (isZh(this)) 3 else 0
+            var end = if (isZh(this)) ss.length else ss.length - 17
+            ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            userAgreenment.text = ss
+            userAgreenment?.movementMethod = LinkMovementMethod.getInstance()//必须要加
+
+            it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_w)
+            it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.privacy_statement)
+            it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
+            it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.VISIBLE
+            it.findViewById<TextView>(R.id.code_warm_context).gravity = Gravity.CENTER_VERTICAL
+            it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.privacy_statement_content)
+            val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
+            val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
+            cb.setOnCheckedChangeListener { _, isChecked ->
+                iSee.text = if (isChecked)
+                    getString(R.string.i_see)
+                else
+                    getString(R.string.read_agreen)
+            }
+            iSee.setOnClickListener {
+                if (cb.isChecked) {
+                    PopUtil.dismiss(popUserAgreement)
+                } else{
+                    ToastUtils.showShort(getString(R.string.read_agreen))
+                    return@setOnClickListener
+                }
+            }
+
+            popUserAgreement = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            popUserAgreement!!.let { itp ->
+                itp.isFocusable = true // 设置PopupWindow可获得焦点
+                itp.isTouchable = true // 设置PopupWindow可触摸补充：
+                itp.isOutsideTouchable = false
+            }
+        }
+    }
+
+
+    private fun isZh(context: Context): Boolean {
+        val locale = context.resources.configuration.locale
+        val language = locale.language
+        return language.endsWith("zh")
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus&&isFrist){
+            try {
+                if (!this@RegisterActivity.isFinishing && !popUserAgreement!!.isShowing){
+                 isFrist =false
+                    popUserAgreement!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)
+                }
+            } catch (e: Exception) {
+                LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
+            }
+        }
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
+        PopUtil.dismiss(popUserAgreement)
         SMSSDK.unregisterEventHandler(eventHandler)
     }
 
@@ -83,6 +173,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.register_completed -> {
+                makePop()
+
                 if (NetWorkUtils.isNetworkAvalible(this)) {
                     userName = edit_user_phone!!.text.toString().trim { it <= ' ' }
                     if (compileExChar(userName!!)) {
@@ -100,7 +192,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                                 regist_frist_progress.visibility = View.GONE
                                 SMSSDK.getVerificationCode(countryCode, userName)
 
-                            }else{
+                            } else {
                                 ToastUtils.showLong(getString(R.string.account_exist))
                             }
                         }
@@ -119,7 +211,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
             R.id.image_password_btn -> eyePassword()
             R.id.image_again_password_btn -> eyePasswordAgain()
-            R.id.return_image ->{
+            R.id.return_image -> {
                 SMSSDK.unregisterEventHandler(eventHandler)
                 finish()
             }

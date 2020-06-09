@@ -321,7 +321,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    private fun startTimer() {
+     private fun startTimer() {
         stopScanTimer()
         LogUtils.d("startTimer")
         mTimer = Observable.timer((SCAN_TIMEOUT_SECOND).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
@@ -1076,6 +1076,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     override fun onResume() {
         super.onResume()
+        stopTimerUpdate()
         disableConnectionStatusListener()//停止监听 否则扫描到新设备会自动创建新的对象
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -1258,7 +1259,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun connectBestRssiDevice() {
         disposable?.dispose()
-        val meshAddress = MeshAddressGenerator().meshAddress
+        val meshAddress = MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------网关新的meshAddress-------$meshAddress")
         disposable = Observable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())

@@ -220,6 +220,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun onResume() {
         super.onResume()
+        stopTimerUpdate()
         progressBtn.progress = 0
         disableConnectionStatusListener()//停止base内部的设备变化监听 不让其自动创建对象否则会重复
     }
@@ -469,7 +470,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onLeScan(leScanEvent: LeScanEvent) {
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
-        val meshAddress = MeshAddressGenerator().meshAddress
+        val meshAddress = MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------传感器扫描-------${leScanEvent.args.macAddress}")
         if (meshAddress == -1) {
             this.doFinish()

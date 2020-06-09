@@ -837,7 +837,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 configLightlight()
                 Thread.sleep(300)
                 if (!isConfirm)//新创建进行更新
-                    mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress
+                    mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()

@@ -170,7 +170,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
             return;
         }
         Mesh mesh = this.mApplication.getMesh();
-        int meshAddress = mMeshAddressGenerator.getMeshAddress();
+        int meshAddress = mMeshAddressGenerator.getMeshAddress().get();
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));

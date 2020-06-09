@@ -387,7 +387,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun updateMeshGroup(isConfigGroup: Int) {
-        newMeshAddr = MeshAddressGenerator().meshAddress
+        newMeshAddr = MeshAddressGenerator().meshAddress.get()
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
             mDeviceInfo?.meshAddress = newMeshAddr
 

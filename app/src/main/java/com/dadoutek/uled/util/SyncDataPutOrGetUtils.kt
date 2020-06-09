@@ -437,7 +437,7 @@ class SyncDataPutOrGetUtils {
                     }
                     .flatMap {
                         for (item in it) {
-                            DBUtils.saveLight(item, true)
+                            DBUtils.saveLight(item, true)//一定不能设置成true否则会造成数据过大oom
                         }
                         NetworkFactory.getApi()
                                 .gwList
@@ -447,6 +447,8 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGateWay(item, true)
                         }
+
+
                         NetworkFactory.getApi()
                                 .getSwitchList(token)
                                 .compose(NetworkTransformer())

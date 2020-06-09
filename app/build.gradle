@@ -44,8 +44,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 266
-        versionName "3.4.9"
+        versionCode 269
+        versionName "3.5.2"
 
         multiDexEnabled true
 

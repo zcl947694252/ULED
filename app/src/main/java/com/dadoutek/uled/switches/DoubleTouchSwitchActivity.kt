@@ -126,7 +126,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun upSwitchData() {
         //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-        val newMeshAddr = MeshAddressGenerator().meshAddress
+        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                 successCallback = {
                     hideLoadingDialog()
@@ -174,7 +174,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         } else {
             switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
-            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress
+            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
             DBUtils.updateSwicth(switchDate!!)
         }
     }

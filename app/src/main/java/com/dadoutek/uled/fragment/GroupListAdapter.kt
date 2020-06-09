@@ -127,7 +127,6 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
      * @param isDelete  是否处于删除状态
      */
     fun changeState(isDelete: Boolean) {
-        DeviceType
         this.isDelete = isDelete
     }
 }

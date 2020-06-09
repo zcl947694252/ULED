@@ -23,9 +23,9 @@ public class DbSceneActions {
     private int brightness;
     public int color=0xffffff;//颜色;
 
-    private boolean isOn;
-    private boolean isEnableBright;
-    private boolean isEnableWhiteBright;
+    private boolean isOn = true;
+    private boolean isEnableBright = true;
+    private boolean isEnableWhiteBright = true;
 
     private int deviceType;
     private int circleOne;

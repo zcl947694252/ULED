@@ -119,6 +119,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        stopTimerUpdate()
         disableConnectionStatusListener()//停止base内部的设备变化监听 不让其自动创建对象否则会重复
     }
 

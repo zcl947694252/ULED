@@ -63,6 +63,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 open class TelinkBaseActivity : AppCompatActivity() {
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
@@ -87,7 +88,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var mScanDisposal: Disposable? = null
     var disposableConnectTimer: Disposable? = null
     var isScanning = false
-
+    private var upDateTimer: Disposable? = null
     private lateinit var dialog: Dialog
     private var adapterType: TypeListAdapter? = null
     private var list: MutableList<String>? = null
@@ -113,6 +114,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
+
     }
 
     private fun initChangeRecevicer() {
@@ -121,6 +123,24 @@ open class TelinkBaseActivity : AppCompatActivity() {
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
 //        registerReceiver(changeRecevicer, filter)
+    }
+
+    fun startTimerUpdate() {
+        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
+            SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
+                override fun start() {}
+                override fun complete() {
+                    LogUtils.v("zcl-----------默认上传成功-------")
+                }
+
+                override fun error(msg: String?) {}
+            })
+        }
+    }
+
+    fun stopTimerUpdate() {
+        upDateTimer?.dispose()
+        upDateTimer = null
     }
 
     private fun makeDialogAndPop() {
@@ -323,7 +343,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         isResume = true
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()
-
+        startTimerUpdate()
         if (LeBluetooth.getInstance().isEnabled) {
             if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
                 changeDisplayImgOnToolbar(true)
@@ -344,6 +364,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         unregisterReceiver(stompRecevice)
         unregisterReceiver(netWorkChangReceiver)
         SMSSDK.unregisterAllEventHandler()
+        stopTimerUpdate()
     }
 
     open fun initOnLayoutListener() {
@@ -397,6 +418,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        stopTimerUpdate()
         mConnectDisposable?.dispose()
         isResume = false
     }

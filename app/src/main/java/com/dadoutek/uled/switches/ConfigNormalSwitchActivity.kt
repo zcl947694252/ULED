@@ -247,7 +247,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         setGroupForSwitch()
                         Thread.sleep(800)
                         //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-                        val newMeshAddr = MeshAddressGenerator().meshAddress
+                        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
                         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                                 successCallback = {
                                     mDeviceInfo.meshAddress = newMeshAddr
