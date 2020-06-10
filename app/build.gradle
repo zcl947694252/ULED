@@ -52,7 +52,7 @@ android {
         multiDexEnabled true
 
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
-
+        setProperty("archivesBaseName", "ULed_${versionName}_${getBuildTime()}")
         ndk {
             // 设置支持的SO库架构
             abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
@@ -100,7 +100,7 @@ greendao {
 dependencies {
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
-    implementation 'com.blankj:utilcode:1.25.5'
+    implementation 'com.blankj:utilcode:1.29.0'
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 
@@ -191,4 +191,9 @@ dependencies {
 
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
 
+}
+String getBuildTime()
+{
+    Date date = new Date();
+    return date.format("yyyy_MM_dd_HH_mm");
 }
