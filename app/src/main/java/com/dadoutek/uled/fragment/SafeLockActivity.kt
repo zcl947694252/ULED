@@ -79,7 +79,6 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_close.setBackgroundResourc
                     // rawable.rect_gray_60)
                     //safe_close_arrow.setImageResource(R.mipmap.icon_arrow_safe)
-
                 }
 
                 R.id.safe_lock -> {
