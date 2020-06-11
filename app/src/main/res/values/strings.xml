@@ -1089,4 +1089,6 @@
     <string name="user_agreement">User agreement and privacy statement</string>
     <string name="group_ota">Group to upgrade</string>
     <string name="dissupport_ota">OTA support is not available for this device version</string>
+    <string name="get_bin_fail">Failed to get bin version please check the network</string>
+    <string name="get_version_success">Version obtained successfully, has been refreshed, please try again</string>
 </resources>

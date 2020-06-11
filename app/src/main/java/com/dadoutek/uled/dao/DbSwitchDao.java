@@ -38,7 +38,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property GroupIds = new Property(11, String.class, "groupIds", false, "GROUP_IDS");
         public final static Property SceneIds = new Property(12, String.class, "sceneIds", false, "SCENE_IDS");
         public final static Property ControlGroupAddrs = new Property(13, String.class, "controlGroupAddrs", false, "CONTROL_GROUP_ADDRS");
-        public final static Property Type = new Property(14, int.class, "type", false, "TYPE");
+        public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
+        public final static Property Type = new Property(15, int.class, "type", false, "TYPE");
     }
 
 
@@ -68,7 +69,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"GROUP_IDS\" TEXT," + // 11: groupIds
                 "\"SCENE_IDS\" TEXT," + // 12: sceneIds
                 "\"CONTROL_GROUP_ADDRS\" TEXT," + // 13: controlGroupAddrs
-                "\"TYPE\" INTEGER NOT NULL );"); // 14: type
+                "\"VERSION\" TEXT," + // 14: version
+                "\"TYPE\" INTEGER NOT NULL );"); // 15: type
     }
 
     /** Drops the underlying database table. */
@@ -130,7 +132,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (controlGroupAddrs != null) {
             stmt.bindString(14, controlGroupAddrs);
         }
-        stmt.bindLong(15, entity.getType());
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(15, version);
+        }
+        stmt.bindLong(16, entity.getType());
     }
 
     @Override
@@ -186,7 +193,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (controlGroupAddrs != null) {
             stmt.bindString(14, controlGroupAddrs);
         }
-        stmt.bindLong(15, entity.getType());
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(15, version);
+        }
+        stmt.bindLong(16, entity.getType());
     }
 
     @Override
@@ -211,7 +223,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // groupIds
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // sceneIds
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // controlGroupAddrs
-            cursor.getInt(offset + 14) // type
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
+            cursor.getInt(offset + 15) // type
         );
         return entity;
     }
@@ -232,7 +245,8 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setGroupIds(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
         entity.setSceneIds(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setControlGroupAddrs(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setType(cursor.getInt(offset + 14));
+        entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setType(cursor.getInt(offset + 15));
      }
     
     @Override

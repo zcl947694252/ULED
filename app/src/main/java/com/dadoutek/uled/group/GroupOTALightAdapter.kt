@@ -1,11 +1,13 @@
 package com.dadoutek.uled.group
 
-import android.view.View
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.StringUtils
+import org.jetbrains.anko.textColor
 
 
 /**
@@ -19,22 +21,30 @@ import com.dadoutek.uled.model.DbModel.DbLight
  */
 class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAdapter<DbLight, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder, item: DbLight?) {
-        val groupName = helper.getView<TextView>(R.id.device_detail_item_group_name)
-        val deviceName = helper.getView<TextView>(R.id.device_detail_item_device_name)
+        val groupName = helper.getView<TextView>(R.id.group_ota_group_name)
+        val deviceName = helper.getView<TextView>(R.id.group_ota_name)
+        val version = helper.getView<TextView>(R.id.group_ota_version)
+        version.text = item?.version
+        deviceName.text = item?.name
+        groupName.text = StringUtils.getLightGroupName(item)
 
-        if (item?.version == null)
-            groupName.visibility = View.GONE
-        else {
-            groupName.text = item?.version
-            groupName.visibility = View.VISIBLE
+        val connectDevice = TelinkLightApplication.getApp().connectDevice
+        if (connectDevice != null && connectDevice.meshAddress == item?.meshAddr) {
+            deviceName.textColor = mContext.getColor(R.color.blue_text)
+            groupName.textColor = mContext.getColor(R.color.blue_text)
+            version.textColor = mContext.getColor(R.color.blue_text)
+        } else {
+            deviceName.textColor = mContext.getColor(R.color.gray_3)
+            groupName.textColor = mContext.getColor(R.color.gray_3)
+            version.textColor = mContext.getColor(R.color.gray_3)
         }
 
-        if (item?.name == null || item?.name == "")
-            deviceName.visibility = View.GONE
-        else {
-            deviceName.text = item?.name
-            deviceName.visibility = View.VISIBLE
+        if (item?.isSupportOta == true) {
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
+                    .setImageResource(R.id.group_ota_update, R.drawable.add)
+        } else {
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
+                    .setImageResource(R.id.group_ota_update, R.drawable.add)
         }
-
     }
 }

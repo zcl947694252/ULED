@@ -1010,4 +1010,6 @@
     <string name="user_agreement">用户协议及隐私说明</string>
     <string name="group_ota">群组升级</string>
     <string name="dissupport_ota">该设备版本不支持OTA</string>
+    <string name="get_bin_fail">获取bin版本失败请检查网络</string>
+    <string name="get_version_success">获取版本成功,已刷新,请重试</string>
 </resources>

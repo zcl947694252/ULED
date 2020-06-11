@@ -33,13 +33,11 @@ public class DbCurtain implements Serializable {
     private int index;
     private Long belongGroupId;
     public String groupName;
+    public String version;
 
-    @Expose(serialize = false, deserialize = false)
-    @Transient
+    @Expose(serialize = false, deserialize = false)//:序列化和反序列化时都不生效,即序列化和反序列化都忽略,和不加 @Expose 注解效果一样
+    @Transient//标识不存入数据库
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -55,11 +53,11 @@ public class DbCurtain implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
 
-    @Generated(hash = 1977542139)
-    public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr,
-            String macAddr, int productUUID, int status, boolean inverse,
-            boolean closePull, int speed, boolean closeSlowStart, int index,
-            Long belongGroupId, String groupName, int rssi, boolean isSupportOta) {
+    @Generated(hash = 1311287630)
+    public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
+            int productUUID, int status, boolean inverse, boolean closePull, int speed,
+            boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
+            int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -74,6 +72,7 @@ public class DbCurtain implements Serializable {
         this.index = index;
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
+        this.version = version;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
     }

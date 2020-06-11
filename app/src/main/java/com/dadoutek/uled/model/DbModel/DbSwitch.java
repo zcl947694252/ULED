@@ -37,13 +37,13 @@ public class DbSwitch implements Serializable {
     @Nullable
     public String sceneIds;
     public  String controlGroupAddrs;
+    public String version;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
+
+
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -65,11 +65,11 @@ public class DbSwitch implements Serializable {
     public int type;
 
 
-    @Generated(hash = 994557125)
+    @Generated(hash = 1421243757)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
-            String sceneIds, String controlGroupAddrs, int type) {
+            String sceneIds, String controlGroupAddrs, String version, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -84,6 +84,7 @@ public class DbSwitch implements Serializable {
         this.groupIds = groupIds;
         this.sceneIds = sceneIds;
         this.controlGroupAddrs = controlGroupAddrs;
+        this.version = version;
         this.type = type;
     }
 

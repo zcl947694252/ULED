@@ -27,13 +27,11 @@ public class DbConnector implements Serializable {
     private int index;
     public String groupName;
     public int color=0xffffff;//颜色
-
+    public String version;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
+
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -49,11 +47,11 @@ public class DbConnector implements Serializable {
     public boolean isSupportOta =true;
 
 
-    @Generated(hash = 1251145309)
+    @Generated(hash = 2085940068)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, String groupName, int color, int status, int rssi,
-            boolean isSupportOta) {
+            int index, String groupName, int color, String version, int status,
+            int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -65,6 +63,7 @@ public class DbConnector implements Serializable {
         this.index = index;
         this.groupName = groupName;
         this.color = color;
+        this.version = version;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;

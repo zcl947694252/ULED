@@ -38,8 +38,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property Index = new Property(11, int.class, "index", false, "INDEX");
         public final static Property BelongGroupId = new Property(12, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property GroupName = new Property(13, String.class, "groupName", false, "GROUP_NAME");
-        public final static Property Rssi = new Property(14, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(15, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
+        public final static Property Rssi = new Property(15, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(16, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -69,8 +70,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"INDEX\" INTEGER NOT NULL ," + // 11: index
                 "\"BELONG_GROUP_ID\" INTEGER," + // 12: belongGroupId
                 "\"GROUP_NAME\" TEXT," + // 13: groupName
-                "\"RSSI\" INTEGER NOT NULL ," + // 14: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 15: isSupportOta
+                "\"VERSION\" TEXT," + // 14: version
+                "\"RSSI\" INTEGER NOT NULL ," + // 15: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 16: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -116,8 +118,13 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (groupName != null) {
             stmt.bindString(14, groupName);
         }
-        stmt.bindLong(15, entity.getRssi());
-        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(15, version);
+        }
+        stmt.bindLong(16, entity.getRssi());
+        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -157,8 +164,13 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (groupName != null) {
             stmt.bindString(14, groupName);
         }
-        stmt.bindLong(15, entity.getRssi());
-        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(15, version);
+        }
+        stmt.bindLong(16, entity.getRssi());
+        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -183,8 +195,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.getInt(offset + 11), // index
             cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // belongGroupId
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // groupName
-            cursor.getInt(offset + 14), // rssi
-            cursor.getShort(offset + 15) != 0 // isSupportOta
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
+            cursor.getInt(offset + 15), // rssi
+            cursor.getShort(offset + 16) != 0 // isSupportOta
         );
         return entity;
     }
@@ -205,8 +218,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setIndex(cursor.getInt(offset + 11));
         entity.setBelongGroupId(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
         entity.setGroupName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setRssi(cursor.getInt(offset + 14));
-        entity.setIsSupportOta(cursor.getShort(offset + 15) != 0);
+        entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setRssi(cursor.getInt(offset + 15));
+        entity.setIsSupportOta(cursor.getShort(offset + 16) != 0);
      }
     
     @Override

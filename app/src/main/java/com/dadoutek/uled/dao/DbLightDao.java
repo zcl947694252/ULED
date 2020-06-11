@@ -36,9 +36,10 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property BelongGroupId = new Property(9, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property Index = new Property(10, int.class, "index", false, "INDEX");
         public final static Property Color = new Property(11, int.class, "color", false, "COLOR");
-        public final static Property Status = new Property(12, int.class, "status", false, "STATUS");
-        public final static Property Rssi = new Property(13, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(14, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Version = new Property(12, String.class, "version", false, "VERSION");
+        public final static Property Status = new Property(13, int.class, "status", false, "STATUS");
+        public final static Property Rssi = new Property(14, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(15, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -66,9 +67,10 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"BELONG_GROUP_ID\" INTEGER," + // 9: belongGroupId
                 "\"INDEX\" INTEGER NOT NULL ," + // 10: index
                 "\"COLOR\" INTEGER NOT NULL ," + // 11: color
-                "\"STATUS\" INTEGER NOT NULL ," + // 12: status
-                "\"RSSI\" INTEGER NOT NULL ," + // 13: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 14: isSupportOta
+                "\"VERSION\" TEXT," + // 12: version
+                "\"STATUS\" INTEGER NOT NULL ," + // 13: status
+                "\"RSSI\" INTEGER NOT NULL ," + // 14: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 15: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -112,9 +114,14 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         }
         stmt.bindLong(11, entity.getIndex());
         stmt.bindLong(12, entity.getColor());
-        stmt.bindLong(13, entity.getStatus());
-        stmt.bindLong(14, entity.getRssi());
-        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(13, version);
+        }
+        stmt.bindLong(14, entity.getStatus());
+        stmt.bindLong(15, entity.getRssi());
+        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -152,9 +159,14 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         }
         stmt.bindLong(11, entity.getIndex());
         stmt.bindLong(12, entity.getColor());
-        stmt.bindLong(13, entity.getStatus());
-        stmt.bindLong(14, entity.getRssi());
-        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(13, version);
+        }
+        stmt.bindLong(14, entity.getStatus());
+        stmt.bindLong(15, entity.getRssi());
+        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -177,9 +189,10 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // belongGroupId
             cursor.getInt(offset + 10), // index
             cursor.getInt(offset + 11), // color
-            cursor.getInt(offset + 12), // status
-            cursor.getInt(offset + 13), // rssi
-            cursor.getShort(offset + 14) != 0 // isSupportOta
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // version
+            cursor.getInt(offset + 13), // status
+            cursor.getInt(offset + 14), // rssi
+            cursor.getShort(offset + 15) != 0 // isSupportOta
         );
         return entity;
     }
@@ -198,9 +211,10 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setBelongGroupId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
         entity.setIndex(cursor.getInt(offset + 10));
         entity.setColor(cursor.getInt(offset + 11));
-        entity.setStatus(cursor.getInt(offset + 12));
-        entity.setRssi(cursor.getInt(offset + 13));
-        entity.setIsSupportOta(cursor.getShort(offset + 14) != 0);
+        entity.setVersion(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setStatus(cursor.getInt(offset + 13));
+        entity.setRssi(cursor.getInt(offset + 14));
+        entity.setIsSupportOta(cursor.getShort(offset + 15) != 0);
      }
     
     @Override

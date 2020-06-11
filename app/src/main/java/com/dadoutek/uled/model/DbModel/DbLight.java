@@ -33,13 +33,11 @@ public class DbLight implements Serializable {
     private int index;
 
     public int color=0xffffff;//颜色
+    public String version;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -58,11 +56,11 @@ public class DbLight implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
 
-    @Generated(hash = 1881139951)
+    @Generated(hash = 1383772489)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
-            int productUUID, Long belongGroupId, int index, int color, int status,
-            int rssi, boolean isSupportOta) {
+            int productUUID, Long belongGroupId, int index, int color,
+            String version, int status, int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -75,6 +73,7 @@ public class DbLight implements Serializable {
         this.belongGroupId = belongGroupId;
         this.index = index;
         this.color = color;
+        this.version = version;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;

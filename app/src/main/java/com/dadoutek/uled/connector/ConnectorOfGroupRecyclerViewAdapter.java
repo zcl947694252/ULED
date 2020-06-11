@@ -28,7 +28,7 @@ public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapte
         TextView tvName=helper.getView(R.id.name);
         TextView tvLightName=helper.getView(R.id.tv_device_name);
         TextView tvRgbColor=helper.getView(R.id.tv_rgb_color);
-        tvName.setText(StringUtils.getConnectorName(item));
+        tvName.setText(StringUtils.getConnectorGroupName(item));
 
         if(TelinkLightApplication.Companion.getApp().getConnectDevice() == null){
             tvName.setTextColor(mContext.getResources().getColor(R.color.black));

@@ -19,7 +19,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
             val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
             val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
             if (scene != null) {
-                tvName.text = StringUtils.getConnectorName(scene)
+                tvName.text = StringUtils.getConnectorGroupName(scene)
             }
 
             if (TelinkLightApplication.getApp().connectDevice == null) {
