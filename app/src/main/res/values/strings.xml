@@ -1087,4 +1087,6 @@
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
     <string name="user_agreement">User agreement and privacy statement</string>
+    <string name="group_ota">Group to upgrade</string>
+    <string name="dissupport_ota">OTA support is not available for this device version</string>
 </resources>

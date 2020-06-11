@@ -907,7 +907,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                     hideLoadingDialog()
                                     if ("" != s) {
                                         currentLightm!!.version = s
-                                        DBUtils.saveSensor(currentLightm!!, true)
+                                        DBUtils.saveSensor(currentLightm!!, false)
                                         skipeDevice(isOTA, s)
                                         isClick = SENSOR_FINISH
                                     } else {

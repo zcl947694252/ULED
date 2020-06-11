@@ -53,12 +53,13 @@ public class DbCurtain implements Serializable {
     @Transient
     public int connectionStatus = 1;//链接状态
     public int rssi =1000;
+    public boolean isSupportOta =true;
 
-    @Generated(hash = 1892218322)
+    @Generated(hash = 1977542139)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr,
             String macAddr, int productUUID, int status, boolean inverse,
             boolean closePull, int speed, boolean closeSlowStart, int index,
-            Long belongGroupId, String groupName, int rssi) {
+            Long belongGroupId, String groupName, int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -74,10 +75,21 @@ public class DbCurtain implements Serializable {
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
         this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
     }
+
     @Generated(hash = 303143706)
     public DbCurtain() {
     }
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -268,5 +280,13 @@ public class DbCurtain implements Serializable {
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
     }
 }

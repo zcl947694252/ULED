@@ -46,11 +46,14 @@ public class DbConnector implements Serializable {
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public int rssi =1000;
+    public boolean isSupportOta =true;
 
-    @Generated(hash = 615264722)
+
+    @Generated(hash = 1251145309)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, String groupName, int color, int status, int rssi) {
+            int index, String groupName, int color, int status, int rssi,
+            boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -64,9 +67,20 @@ public class DbConnector implements Serializable {
         this.color = color;
         this.status = status;
         this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
     }
+
     @Generated(hash = 1212725637)
     public DbConnector() {
+    }
+
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
     }
     public Long getId() {
         return this.id;
@@ -209,5 +223,13 @@ public class DbConnector implements Serializable {
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
     }
 }

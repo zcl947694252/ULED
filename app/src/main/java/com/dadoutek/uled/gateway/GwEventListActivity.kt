@@ -221,7 +221,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     { s: String ->
                         dbGw!!.version = s
                         bottom_version_number.text = dbGw?.version
-                        DBUtils.saveGateWay(dbGw!!, true)
+                        DBUtils.saveGateWay(dbGw!!, false)
                     }, {
 
                 ToastUtils.showLong(getString(R.string.get_version_fail))

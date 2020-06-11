@@ -1466,7 +1466,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             DeviceType.GATE_WAY -> if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
                 val disposable = Commander.getDeviceVersion(dbGw.meshAddr).subscribe({ s: String ->
                     dbGw.version = s
-                    DBUtils.saveGateWay(dbGw, true)
+                    DBUtils.saveGateWay(dbGw, false)
                     skipeGw()
                 }, {
                     skipeGw()

@@ -37,6 +37,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
         public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
         public final static Property Rssi = new Property(12, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(13, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -64,7 +65,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"GROUP_NAME\" TEXT," + // 9: groupName
                 "\"COLOR\" INTEGER NOT NULL ," + // 10: color
                 "\"STATUS\" INTEGER NOT NULL ," + // 11: status
-                "\"RSSI\" INTEGER NOT NULL );"); // 12: rssi
+                "\"RSSI\" INTEGER NOT NULL ," + // 12: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 13: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -109,6 +111,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         stmt.bindLong(11, entity.getColor());
         stmt.bindLong(12, entity.getStatus());
         stmt.bindLong(13, entity.getRssi());
+        stmt.bindLong(14, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -147,6 +150,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         stmt.bindLong(11, entity.getColor());
         stmt.bindLong(12, entity.getStatus());
         stmt.bindLong(13, entity.getRssi());
+        stmt.bindLong(14, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -169,7 +173,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // groupName
             cursor.getInt(offset + 10), // color
             cursor.getInt(offset + 11), // status
-            cursor.getInt(offset + 12) // rssi
+            cursor.getInt(offset + 12), // rssi
+            cursor.getShort(offset + 13) != 0 // isSupportOta
         );
         return entity;
     }
@@ -189,6 +194,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setColor(cursor.getInt(offset + 10));
         entity.setStatus(cursor.getInt(offset + 11));
         entity.setRssi(cursor.getInt(offset + 12));
+        entity.setIsSupportOta(cursor.getShort(offset + 13) != 0);
      }
     
     @Override

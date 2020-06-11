@@ -1008,4 +1008,6 @@
     <string name="not_use">暂不使用</string>
     <string name="read_agreen">请阅读协议是否同意</string>
     <string name="user_agreement">用户协议及隐私说明</string>
+    <string name="group_ota">群组升级</string>
+    <string name="dissupport_ota">该设备版本不支持OTA</string>
 </resources>

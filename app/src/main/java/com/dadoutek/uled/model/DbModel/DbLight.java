@@ -56,17 +56,13 @@ public class DbLight implements Serializable {
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public int rssi =1000;
+    public boolean isSupportOta =true;
 
-
-    @Generated(hash = 2075223479)
-    public DbLight() {
-    }
-
-    @Generated(hash = 1172693351)
+    @Generated(hash = 1881139951)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
             int productUUID, Long belongGroupId, int index, int color, int status,
-            int rssi) {
+            int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -81,6 +77,19 @@ public class DbLight implements Serializable {
         this.color = color;
         this.status = status;
         this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
+    }
+
+    @Generated(hash = 2075223479)
+    public DbLight() {
+    }
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
     }
 
     public static long getSerialVersionUID() {
@@ -300,5 +309,13 @@ public class DbLight implements Serializable {
 
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
     }
 }

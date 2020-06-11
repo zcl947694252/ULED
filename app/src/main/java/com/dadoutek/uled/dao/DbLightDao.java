@@ -38,6 +38,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property Color = new Property(11, int.class, "color", false, "COLOR");
         public final static Property Status = new Property(12, int.class, "status", false, "STATUS");
         public final static Property Rssi = new Property(13, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(14, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -66,7 +67,8 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"INDEX\" INTEGER NOT NULL ," + // 10: index
                 "\"COLOR\" INTEGER NOT NULL ," + // 11: color
                 "\"STATUS\" INTEGER NOT NULL ," + // 12: status
-                "\"RSSI\" INTEGER NOT NULL );"); // 13: rssi
+                "\"RSSI\" INTEGER NOT NULL ," + // 13: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 14: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -112,6 +114,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         stmt.bindLong(12, entity.getColor());
         stmt.bindLong(13, entity.getStatus());
         stmt.bindLong(14, entity.getRssi());
+        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -151,6 +154,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         stmt.bindLong(12, entity.getColor());
         stmt.bindLong(13, entity.getStatus());
         stmt.bindLong(14, entity.getRssi());
+        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -174,7 +178,8 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.getInt(offset + 10), // index
             cursor.getInt(offset + 11), // color
             cursor.getInt(offset + 12), // status
-            cursor.getInt(offset + 13) // rssi
+            cursor.getInt(offset + 13), // rssi
+            cursor.getShort(offset + 14) != 0 // isSupportOta
         );
         return entity;
     }
@@ -195,6 +200,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setColor(cursor.getInt(offset + 11));
         entity.setStatus(cursor.getInt(offset + 12));
         entity.setRssi(cursor.getInt(offset + 13));
+        entity.setIsSupportOta(cursor.getShort(offset + 14) != 0);
      }
     
     @Override
