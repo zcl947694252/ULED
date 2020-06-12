@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         xmlns:tools="http://schemas.android.com/tools"
         android:gravity="center_horizontal"
@@ -9,9 +9,9 @@
         tools:layout_editor_absoluteY="25dp">
 
     <ImageView
-            android:id="@+id/template_device_icon"
-            android:layout_width="@dimen/dp_50"
-            android:layout_height="@dimen/dp_50"
+            android:id="@+id/template_device_batch_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="15dp"
             android:contentDescription="@null"
@@ -21,18 +21,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-            android:id="@+id/template_device_selected"
-            android:layout_width="@dimen/dp_13"
-            android:layout_height="@dimen/dp_13"
+            android:id="@+id/template_device_batch_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="12dp"
             android:src="@drawable/icon_checkbox_unselected"
-            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
-            app:layout_constraintStart_toEndOf="@+id/template_device_icon"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon"
+            app:layout_constraintStart_toEndOf="@+id/template_device_batch_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-            android:id="@+id/template_device_title"
+            android:id="@+id/template_device_batch_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
@@ -40,9 +40,9 @@
             android:textSize="13sp"
             android:text="@string/device_name"
             android:textColor="@color/black_three"
-            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
-            app:layout_constraintStart_toStartOf="@+id/template_device_icon"
-            app:layout_constraintTop_toBottomOf="@+id/template_device_icon" />
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon"
+            app:layout_constraintStart_toStartOf="@+id/template_device_batch_icon"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_batch_icon" />
 
 
     <TextView
@@ -55,9 +55,9 @@
             android:layout_marginTop="@dimen/dp_5"
             android:text="1234"
             android:textColor="@color/black_three"
-            app:layout_constraintEnd_toEndOf="@+id/template_device_icon"
-            app:layout_constraintStart_toStartOf="@+id/template_device_icon"
-            app:layout_constraintTop_toBottomOf="@+id/template_device_title" />
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon"
+            app:layout_constraintStart_toStartOf="@+id/template_device_batch_icon"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_batch_title" />
 
     <!--<LinearLayout-->
     <!--android:layout_width="wrap_content"-->

@@ -18,7 +18,7 @@ import com.dadoutek.uled.model.DbModel.DbScene
  */
 class  SceneListAdapter(resId: Int, data: List<DbScene>): BaseQuickAdapter<DbScene, BaseViewHolder>(resId,data){
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-      helper?.setText(R.id.tv_group_name,item?.name)
+      helper?.setText(R.id.template_device_name,item?.name)
     }
 
 }

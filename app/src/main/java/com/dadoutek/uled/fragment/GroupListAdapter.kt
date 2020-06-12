@@ -7,7 +7,6 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.bluetooth.light.ConnectionStatus
 
@@ -77,9 +76,9 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 group.textColor = mContext.resources.getColor(R.color.black)
 
             if (group.meshAddr == 0xffff)
-                helper.setText(R.id.tv_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.template_device_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             else
-                helper.setText(R.id.tv_group_name, group.name)
+                helper.setText(R.id.template_device_name, group.name)
 
 
             if (group.isSelected)
@@ -87,7 +86,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             else
                 helper.setChecked(R.id.selected_group, false)
 
-            helper.setTextColor(R.id.tv_group_name, group.textColor)
+            helper.setTextColor(R.id.template_device_name, group.textColor)
                     .addOnClickListener(R.id.item_layout)
         }
     }

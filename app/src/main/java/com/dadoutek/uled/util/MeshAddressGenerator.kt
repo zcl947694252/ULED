@@ -32,12 +32,15 @@ class MeshAddressGenerator {
         addressList.addAll(curtain)
         addressList.addAll(relay)
         addressList.sortBy { it }
-        val i = when {
+        if (meshAddress.get()==0||meshAddress.get()<addressList.size){
+            val i = when {
             addressList.isEmpty() -> MeshUtils.DEVICE_ADDRESS_MIN
             else -> {
                 addressList.last()
             }
         }
-        meshAddress =AtomicInteger(i)
+            meshAddress =AtomicInteger(i)
+        }
+
     }
 }

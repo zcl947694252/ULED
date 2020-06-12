@@ -12,52 +12,66 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvDevice"
+    <ScrollView
+            android:id="@+id/main_sv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_10"
-            android:minHeight="330dp"
-            android:layout_below="@id/topView"/>
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rvDevice"
-            android:layout_centerVertical="true"
-            android:orientation="vertical">
-
-        <TextView
-                android:id="@+id/main_go_help"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/dp_15"
-                android:gravity="center"
-                android:text="@string/see_help"
-                android:textColor="@color/gray_3"
-                android:textSize="@dimen/sp_15" />
-
-        <Button
-                android:id="@+id/main_add_device"
-                android:layout_width="140dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="21dp"
-                android:layout_marginBottom="23dp"
-                android:background="@drawable/add_device_f5"
-                android:stateListAnimator="@null"
-                android:text="@string/add_device"
-                android:textColor="@color/blue_background"
-                android:textSize="18sp" />
-    </LinearLayout>
-
-    <include
-            android:id="@+id/dialog_pop"
-            layout="@layout/popwindow_install_deive_list"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:layout_below="@+id/topView"
-            android:layout_alignParentEnd="true"
-            android:visibility="gone" />
+            android:scrollbars="none">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#f5f5f5"
+                android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:minHeight="330dp" />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/rvDevice"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:id="@+id/main_go_help"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/dp_15"
+                        android:gravity="center"
+                        android:text="@string/see_help"
+                        android:textColor="@color/gray_3"
+                        android:textSize="@dimen/sp_15" />
+
+                <Button
+                        android:id="@+id/main_add_device"
+                        android:layout_width="140dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="21dp"
+                        android:layout_marginBottom="23dp"
+                        android:background="@drawable/add_device_f5"
+                        android:stateListAnimator="@null"
+                        android:text="@string/add_device"
+                        android:textColor="@color/blue_background"
+                        android:textSize="18sp" />
+            </LinearLayout>
+
+            <include
+                    android:id="@+id/dialog_pop"
+                    layout="@layout/popwindow_install_deive_list"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone" />
+        </RelativeLayout>
+
+    </ScrollView>
 </RelativeLayout>

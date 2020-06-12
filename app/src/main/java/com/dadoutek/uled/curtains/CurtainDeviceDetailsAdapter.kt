@@ -10,31 +10,32 @@ import com.dadoutek.uled.util.StringUtils
 
 class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
 
-    override fun convert(helper: BaseViewHolder, scene: DbCurtain) {
-        if (scene != null) {
-            val tvName = helper.getView<TextView>(R.id.name)
-            val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
+    override fun convert(helper: BaseViewHolder, dbCurtain: DbCurtain) {
+        if (dbCurtain != null) {
+            val tvName = helper.getView<TextView>(R.id.template_device_name)
+           // val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
 //            val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
-            tvName.text = StringUtils.getCurtainName(scene)
-
+           // tvName.text = StringUtils.getCurtainName(dbCurtain)
+            tvName.text = dbCurtain.name
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.meshAddr) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == dbCurtain.meshAddr) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
-                    tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
+                    //tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
                     tvName.setTextColor(mContext.resources.getColor(R.color.gray))
-                    tvLightName.setTextColor(mContext.resources.getColor(R.color.black))
+                    //tvLightName.setTextColor(mContext.resources.getColor(R.color.black))
                 }
             }
 
-            tvLightName.text = scene.name
-            helper.addOnClickListener(R.id.tv_setting)
-                    .setTag(R.id.tv_setting, helper.adapterPosition)
-                    .setTag(R.id.img_light, helper.adapterPosition)
-                    .setBackgroundRes(R.id.img_light, scene.icon)
-                    .addOnClickListener(R.id.img_light)
+            //tvLightName.text = dbCurtain.name
+            helper.addOnClickListener(R.id.template_device_setting)
+                    .setTag(R.id.template_device_setting, helper.adapterPosition)
+                    .setTag(R.id.template_device_icon, helper.adapterPosition)
+                    .setVisible(R.id.template_device_more, false)
+                    .setImageResource(R.id.template_device_icon, dbCurtain.icon)
+                    .addOnClickListener(R.id.template_device_icon)
         }
     }
 }

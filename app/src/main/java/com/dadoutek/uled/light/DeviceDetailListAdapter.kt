@@ -20,13 +20,12 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, dbLight: DbLight) {
-        val groupName = helper.getView<TextView>(R.id.device_detail_item_group_name)
-        val deviceName = helper.getView<TextView>(R.id.device_detail_item_device_name)
-
-        if (dbLight.groupName==null||dbLight.groupName=="")
-            groupName.visibility = View.GONE
-        else
-            groupName.visibility = View.VISIBLE
+       // val groupName = helper.getView<TextView>(R.id.template_device_group_icon)
+        val deviceName = helper.getView<TextView>(R.id.template_device_name)
+//        if (dbLight.groupName==null||dbLight.groupName=="")
+//            groupName.visibility = View.GONE
+//        else
+//            groupName.visibility = View.VISIBLE
 
         if (dbLight.name==null||dbLight.name=="")
             deviceName.visibility = View.GONE
@@ -35,18 +34,16 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
 
         if (TelinkLightApplication.getApp().connectDevice!=null&&TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
             deviceName.setTextColor(mContext.resources.getColor(R.color.primary))
-            groupName.setTextColor(mContext.resources.getColor(R.color.primary))
+            //groupName.setTextColor(mContext.resources.getColor(R.color.primary))
         } else {
             deviceName.setTextColor(mContext.resources.getColor(R.color.black_three))
-            groupName.setTextColor(mContext.resources.getColor(R.color.black))
+           // groupName.setTextColor(mContext.resources.getColor(R.color.black))
         }
 
-
-        helper.setText(R.id.device_detail_item_device_name,dbLight.name)
-                .setText(R.id.device_detail_item_group_name,dbLight.groupName)
-                .setImageResource(R.id.device_detail_item_img_icon,dbLight.icon)
-                .addOnClickListener(R.id.device_detail_item_name_ly)
-                .addOnClickListener(R.id.device_detail_item_arr)
-                .addOnClickListener(R.id.device_detail_item_img_icon)
+        helper.setText(R.id.template_device_name,dbLight.name)
+                .setImageResource(R.id.template_device_icon,dbLight.icon)
+                .addOnClickListener(R.id.template_device_setting)
+                .addOnClickListener(R.id.template_device_icon)
+                .setVisible(R.id.template_device_more,false)
     }
 }

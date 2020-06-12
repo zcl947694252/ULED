@@ -20,26 +20,26 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return
-        val icon = helper.getView<ImageView>(R.id.template_device_icon)
+        val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
         val groupName = helper.getView<TextView>(R.id.template_device_title_blow)
 
 
-        helper.setText(R.id.template_device_title, item?.name)
+        helper.setText(R.id.template_device_batch_title, item?.name)
         if (item?.isSelected == true) {
-            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.template_device_selected, R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
         if (item?.hasGroup == true) {
-            helper.setTextColor(R.id.template_device_title, mContext.getColor(R.color.blue_text))
+            helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
             groupName.text = item.groupName +"="+item.rssi
 
             icon.setImageResource(R.drawable.icon_curtain)
         } else {
-            helper.setTextColor(R.id.template_device_title, mContext.getColor(R.color.gray_3))
+            helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
             icon.setImageResource(R.drawable.curtain_off)
         }

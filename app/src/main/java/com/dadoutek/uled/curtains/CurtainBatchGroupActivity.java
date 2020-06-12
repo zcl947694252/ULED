@@ -1252,7 +1252,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             ImageView icon = (ImageView) convertView
                     .findViewById(R.id.img_icon);
             TextView txtName = (TextView) convertView
-                    .findViewById(R.id.tv_group_name);
+                    .findViewById(R.id.template_device_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
             TextView lightName = (TextView) convertView.findViewById(R.id.tv_device_name);
 

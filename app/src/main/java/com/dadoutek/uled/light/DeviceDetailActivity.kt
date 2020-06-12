@@ -8,10 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -67,7 +64,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -176,7 +172,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         // }
 
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
-        recycleView!!.addItemDecoration(RecyclerGridDecoration(this, 2))
+        //recycleView!!.addItemDecoration(RecyclerGridDecoration(this, 2))
+        recycleView!!.itemAnimator = DefaultItemAnimator()
 
         recycleView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -190,7 +187,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
          *单个设备列表适配器页面设置
          */
         //adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
-        adaper = DeviceDetailListAdapter(R.layout.device_detail_item, lightsData)
+        adaper = DeviceDetailListAdapter(R.layout.device_type_item, lightsData)
         adaper!!.onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
             if (position < lightsData.size) {
                 currentLight = lightsData[position]
@@ -206,7 +203,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
                 } else {
                     when (view.id) {
-                        R.id.device_detail_item_img_icon -> {
+                        R.id.template_device_icon -> {
                             canBeRefresh = true
                             openOrClose(currentLight!!)
 
@@ -225,15 +222,13 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                             }
                         }
 
-                        R.id.device_detail_item_name_ly, R.id.device_detail_item_arr -> {
+                        R.id.template_device_setting -> {
                             goSetting()
                         }
                     }
                 }
             }
         }
-
-
 
         adaper!!.bindToRecyclerView(recycleView)
         val size =/* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)

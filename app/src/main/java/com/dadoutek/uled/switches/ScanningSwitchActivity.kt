@@ -19,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
+import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
@@ -86,6 +87,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         showToast(getString(R.string.scan_end))
         stopConnectTimer()
         doFinish()
+        image_no_group.visibility =View.VISIBLE
     }
 
     private fun startAnimation() {
@@ -103,6 +105,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
     private fun startScan() {
         TelinkLightService.Instance()?.idleMode(true)
             startAnimation()
+        image_no_group.visibility =View.GONE
             val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
                     DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.EIGHT_SWITCH)
             mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
@@ -145,9 +148,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     finish()
                                 }
                                 closeAnimation()
-                            }
-                            ,
-                            {
+                            }, {
                                 //showToast(getString(R.string.get_version_fail))
                                 closeAnimation()
                                 skipSwitch(bestRSSIDevice!!.firmwareRevision)

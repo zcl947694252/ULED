@@ -48,7 +48,7 @@
         app:layout_constraintTop_toBottomOf="@+id/img_icon" />
 
     <TextView
-        android:id="@+id/tv_group_name"
+        android:id="@+id/template_device_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
@@ -67,8 +67,8 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="@+id/img_icon"
         app:layout_constraintStart_toStartOf="@+id/img_icon"
-        app:layout_constraintTop_toBottomOf="@+id/tv_group_name"
-        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/template_device_name"
+        android:visibility="visible"
         />
 
     <!--<LinearLayout-->

@@ -100,7 +100,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private var currentGw: DbGateway? = null
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
-    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.device_detail_adapter, gateWayDataList, this)
+    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.device_type_item, gateWayDataList, this)
     private var inflater: LayoutInflater? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
@@ -135,7 +135,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         disableConnectionStatusListener()
         this.mApp = this.application as TelinkLightApplication
         tv_function1.visibility = View.GONE
-        recycleView!!.layoutManager = GridLayoutManager(this, 3)
+        recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
@@ -420,19 +420,19 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGw = gateWayDataList[position]
         positionCurrent = position
-        if (view.id == R.id.tv_setting) {
+        if (view.id == R.id.template_device_setting) {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
-                    val set = view!!.findViewById<ImageView>(R.id.tv_setting)
+                    val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
                     popupWindow.dismiss()
                     popupWindow.showAsDropDown(set)
                     LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")
                 }
             }
-        } else if (view.id == R.id.img_light) {
+        } else if (view.id == R.id.template_device_icon) {
             //开关网关通过普通灯的连接状态发送
             if (TelinkLightApplication.getApp().connectDevice != null)
                 sendOpenOrCloseGw(true)

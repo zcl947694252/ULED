@@ -211,9 +211,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initView() {
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
-        recycleView!!.layoutManager = GridLayoutManager(this, 3)
+        recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData,this)
+        adapter = SwitchDeviceDetailsAdapter(R.layout.device_type_item, switchData,this)
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
@@ -246,7 +246,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentLight = switchData?.get(position)
         positionCurrent = position
-        if (view.id == R.id.tv_setting) {
+        if (view.id == R.id.template_device_setting) {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)

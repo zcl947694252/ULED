@@ -24,21 +24,22 @@ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, intern
     override fun convert(helper: BaseViewHolder, data: DbGateway) {
         if (data != null) {
             if (data.name != null && data.name != "") {
-                helper.setText(R.id.tv_device_name, data.name)
+                helper.setText(R.id.template_device_name, data.name)
             } else {
-                helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(data.productUUID, context) + "-" + helper.position)
+                helper.setText(R.id.template_device_name, StringUtils.getSwitchPirDefaultName(data.productUUID, context) + "-" + helper.position)
             }
 
-            helper.setVisible(R.id.name, false)
+            //helper.setVisible(R.id.name, false)
             if (data.openTag == 0)
-                helper.setImageResource(R.id.img_light, R.drawable.icon_gw_close)
+                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gw_close)
             else
-                helper.setImageResource(R.id.img_light, R.drawable.icon_gw_open)
+                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gw_open)
 
-            helper.addOnClickListener(R.id.tv_setting)
-                    .setTag(R.id.tv_setting, helper.adapterPosition)
-                    .setTag(R.id.img_light, helper.adapterPosition)
-                    .addOnClickListener(R.id.img_light)
+            helper.addOnClickListener(R.id.template_device_setting)
+                    .setTag(R.id.template_device_setting, helper.adapterPosition)
+                    .setVisible(R.id.template_device_more, false)
+                    .setTag(R.id.template_device_icon, helper.adapterPosition)
+                    .addOnClickListener(R.id.template_device_icon)
         }
     }
 }

@@ -17,9 +17,9 @@ class GroupListRecycleViewChildAdapter(layoutResId: Int, data: List<DbGroup>?) :
                         .getColor(R.color.black)
 //            Log.d("setAddress", group.meshAddr.toString())
             if (group.meshAddr == 0xffff) {
-                helper.setText(R.id.tv_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.template_device_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             } else {
-                helper.setText(R.id.tv_group_name, group.name)
+                helper.setText(R.id.template_device_name, group.name)
 //                if(OtherUtils.isCurtain(group)){
 //                    helper.setText(R.id.btn_set)
 //                }
@@ -33,8 +33,8 @@ class GroupListRecycleViewChildAdapter(layoutResId: Int, data: List<DbGroup>?) :
 //                helper.setVisible(R.id.btn_off,false)
 //                helper.setVisible(R.id.btn_on,false)
 //            }
-            helper.setTextColor(R.id.tv_group_name, group.textColor)
-                    .addOnClickListener(R.id.tv_group_name)
+            helper.setTextColor(R.id.template_device_name, group.textColor)
+                    .addOnClickListener(R.id.template_device_name)
                     .addOnClickListener(R.id.btn_on)
                     .addOnClickListener(R.id.btn_off)
                     .addOnClickListener(R.id.btn_set)

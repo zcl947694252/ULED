@@ -96,31 +96,31 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         setScanningMode(true)
 
         curtain = ArrayList()
-        var all_light_data = DBUtils.getAllCurtains()
+        var allLightData = DBUtils.getAllCurtains()
 
         when (type) {
             Constant.INSTALL_CURTAIN -> {
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbCurtain> = ArrayList()
-                    var no_group: ArrayList<DbCurtain> = ArrayList()
+                if (allLightData.size > 0) {
+                    var listGroup: ArrayList<DbCurtain> = ArrayList()
+                    var noGroup: ArrayList<DbCurtain> = ArrayList()
                     //判断窗帘是否有分组
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                    for (i in allLightData.indices) {
+                        if (StringUtils.getCurtainName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            noGroup.add(allLightData[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(allLightData[i])
                         }
                     }
 
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            curtain.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            curtain.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            curtain.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            curtain.add(listGroup[i])
                         }
                     }
 
@@ -152,26 +152,26 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 }
             }
             Constant.INSTALL_CURTAIN_OF -> {
-                if (all_light_data.size > 0) {
-                    var list_group: ArrayList<DbCurtain> = ArrayList()
-                    var no_group: ArrayList<DbCurtain> = ArrayList()
-                    for (i in all_light_data.indices) {
-                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            no_group.add(all_light_data[i])
+                if (allLightData.size > 0) {
+                    var listGroup: ArrayList<DbCurtain> = ArrayList()
+                    var noGroup: ArrayList<DbCurtain> = ArrayList()
+                    for (i in allLightData.indices) {
+                        if (StringUtils.getCurtainName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                            noGroup.add(allLightData[i])
                         } else {
-                            list_group.add(all_light_data[i])
+                            listGroup.add(allLightData[i])
                         }
                     }
 
-                    if (no_group.size > 0) {
-                        for (i in no_group.indices) {
-                            curtain.add(no_group[i])
+                    if (noGroup.size > 0) {
+                        for (i in noGroup.indices) {
+                            curtain.add(noGroup[i])
                         }
                     }
 
-                    if (list_group.size > 0) {
-                        for (i in list_group.indices) {
-                            curtain.add(list_group[i])
+                    if (listGroup.size > 0) {
+                        for (i in listGroup.indices) {
+                            curtain.add(listGroup[i])
                         }
                     }
                     toolbar!!.tv_function1.visibility = View.VISIBLE
@@ -213,7 +213,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         }
         toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
 
-        adapter = CurtainDeviceDetailsAdapter(R.layout.device_detail_adapter, curtain)
+        adapter = CurtainDeviceDetailsAdapter(R.layout.device_type_item, curtain)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
@@ -242,7 +242,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         }
 
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        recycleView.layoutManager = GridLayoutManager(this, 3)
+        recycleView.layoutManager = GridLayoutManager(this, 2)
     }
 
     /**
@@ -312,24 +312,24 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
         this.clickRgb = clickRgb
         val view = View.inflate(this, R.layout.dialog_install_list, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
-        val install_device_recyclerView = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { v -> installDialog?.dismiss() }
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
+        val installDeviceRecyclerview = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        closeInstallList.setOnClickListener { v -> installDialog?.dismiss() }
 
         val installList: java.util.ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
 
         val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
         val layoutManager = LinearLayoutManager(this)
-        install_device_recyclerView?.layoutManager = layoutManager
-        install_device_recyclerView?.adapter = installDeviceListAdapter
-        installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
+        installDeviceRecyclerview?.layoutManager = layoutManager
+        installDeviceRecyclerview?.adapter = installDeviceListAdapter
+        installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
         val decoration = DividerItemDecoration(this,
                 DividerItemDecoration
                         .VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
                 .divider)))
         //添加分割线
-        install_device_recyclerView?.addItemDecoration(decoration)
+        installDeviceRecyclerview?.addItemDecoration(decoration)
 
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
@@ -347,7 +347,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         installDialog?.show()
     }
 
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
@@ -392,7 +392,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
         stepOneText = view.findViewById<TextView>(R.id.step_one)
         stepTwoText = view.findViewById<TextView>(R.id.step_two)
@@ -401,22 +401,22 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
         switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
         swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
-        val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
-        val search_bar = view.findViewById<Button>(R.id.search_bar)
-        close_install_list.setOnClickListener(dialogOnclick)
+        val installTipQuestion = view.findViewById<TextView>(R.id.install_tip_question)
+        val searchBar = view.findViewById<Button>(R.id.search_bar)
+        closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
-        search_bar.setOnClickListener(dialogOnclick)
+        searchBar.setOnClickListener(dialogOnclick)
         val title = view.findViewById<TextView>(R.id.textView5)
         if (position==INSTALL_NORMAL_LIGHT){
             title.visibility =  View.GONE
-            install_tip_question.visibility =  View.GONE
+            installTipQuestion.visibility =  View.GONE
         }else{
             title.visibility =  View.VISIBLE
-            install_tip_question.visibility =  View.VISIBLE
+            installTipQuestion.visibility =  View.VISIBLE
         }
 
-        install_tip_question.text = describe
-        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
+        installTipQuestion.text = describe
+        installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
         installDialog?.show()

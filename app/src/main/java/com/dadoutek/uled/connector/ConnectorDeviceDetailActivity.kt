@@ -99,9 +99,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     private fun initView() {
-        recycleView!!.layoutManager = GridLayoutManager(this, 3)
+        recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adaper = DeviceDetailConnectorAdapter(R.layout.device_detail_adapter, lightsData)
+        adaper = DeviceDetailConnectorAdapter(R.layout.device_type_item, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
         for (i in lightsData?.indices!!) {
@@ -405,8 +405,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         currentLight = lightsData?.get(position)
         positionCurrent = position
         Opcode.LIGHT_ON_OFF
-        when {
-            view.id == R.id.img_light -> {
+        val unit = when (view.id) {
+            R.id.template_device_icon -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnect()
                 } else {
@@ -435,8 +435,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 }
             }
-
-            view.id == R.id.tv_setting -> {
+            R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)

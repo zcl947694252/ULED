@@ -181,8 +181,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
 
     private fun initView() {
-        recycleView!!.layoutManager = GridLayoutManager(this, 3)
-        adapter = SensorDeviceDetailsAdapter(R.layout.sensor_detail_adapter, sensorDatummms)
+        recycleView!!.layoutManager = GridLayoutManager(this, 2)
+        adapter = SensorDeviceDetailsAdapter(R.layout.device_type_item, sensorDatummms)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
@@ -512,8 +512,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
                 when (view.id) {
-                    R.id.tv_setting -> {
-                        set = view!!.findViewById<ImageView>(R.id.tv_setting)
+                    R.id.template_device_setting -> {
+                        set = view!!.findViewById<ImageView>(R.id.template_device_setting)
 
                         popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                         popupWindow!!.contentView = views
@@ -622,7 +622,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             popupWindow!!.dismiss()
                         }
                     }
-                    R.id.img_light -> {
+                    R.id.template_device_icon -> {
                         isClick = OPEN_CLOSE
                         if (TelinkApplication.getInstance().connectDevice == null && DBUtils.getAllGateWay().size > 0) {
                             sendToGw()

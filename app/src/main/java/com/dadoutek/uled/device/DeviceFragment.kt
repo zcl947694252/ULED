@@ -44,7 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * 创建者     zcl
@@ -229,8 +228,8 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        var intent: Intent? = null
-        when (position) {
+        var intent: Intent = Intent()
+        when (deviceTypeList[position].installType) {
             Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
@@ -269,20 +268,20 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
      */
     private fun initAdapterData() {
         deviceTypeList.clear()
-        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL)
-        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB)
-        isAddDevice(R.string.switch_name,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH)
-        isAddDevice(R.string.sensoR,DBUtils.getAllSensor().size,DeviceType.SENSOR)
-        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN)
-        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY)
-        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY)
+        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL    ,    Constant.INSTALL_NORMAL_LIGHT)
+        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB             ,Constant.INSTALL_RGB_LIGHT)
+        isAddDevice(R.string.switch_name,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH         ,     Constant.INSTALL_SWITCH)
+        isAddDevice(R.string.sensoR,DBUtils.getAllSensor().size,DeviceType.SENSOR                     ,Constant.INSTALL_SENSOR)
+        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           ,Constant.INSTALL_CURTAIN)
+        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  ,Constant.INSTALL_CONNECTOR)
+        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constant.INSTALL_GATEWAY)
 
         deviceAdapter.notifyDataSetChanged()
     }
 
-    private fun isAddDevice(strId: Int, size: Int, deviceType: Int) {
+    private fun isAddDevice(strId: Int, size: Int, deviceType: Int, installType: Int) {
         if (size > 0)
-            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType))
+            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType,installType))
     }
 
 
