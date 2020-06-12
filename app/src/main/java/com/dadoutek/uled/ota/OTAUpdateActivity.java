@@ -229,6 +229,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             finish();
             return;
         }
+        open_device.setVisibility(View.GONE);
 
         initView();
         initData();

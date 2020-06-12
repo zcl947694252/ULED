@@ -39,6 +39,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property Status = new Property(12, int.class, "status", false, "STATUS");
         public final static Property Rssi = new Property(13, int.class, "rssi", false, "RSSI");
         public final static Property IsSupportOta = new Property(14, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(15, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -68,7 +69,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"VERSION\" TEXT," + // 11: version
                 "\"STATUS\" INTEGER NOT NULL ," + // 12: status
                 "\"RSSI\" INTEGER NOT NULL ," + // 13: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 14: isSupportOta
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 14: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 15: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -119,6 +121,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         stmt.bindLong(13, entity.getStatus());
         stmt.bindLong(14, entity.getRssi());
         stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -163,6 +166,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         stmt.bindLong(13, entity.getStatus());
         stmt.bindLong(14, entity.getRssi());
         stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -187,7 +191,8 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // version
             cursor.getInt(offset + 12), // status
             cursor.getInt(offset + 13), // rssi
-            cursor.getShort(offset + 14) != 0 // isSupportOta
+            cursor.getShort(offset + 14) != 0, // isSupportOta
+            cursor.getShort(offset + 15) != 0 // isMostNew
         );
         return entity;
     }
@@ -209,6 +214,7 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setStatus(cursor.getInt(offset + 12));
         entity.setRssi(cursor.getInt(offset + 13));
         entity.setIsSupportOta(cursor.getShort(offset + 14) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 15) != 0);
      }
     
     @Override

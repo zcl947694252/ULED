@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbConnector implements Serializable {
@@ -45,13 +45,14 @@ public class DbConnector implements Serializable {
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public int rssi =1000;
     public boolean isSupportOta =true;
+    public boolean isMostNew =false;
 
 
-    @Generated(hash = 2085940068)
+    @Generated(hash = 1023579456)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
             int index, String groupName, int color, String version, int status,
-            int rssi, boolean isSupportOta) {
+            int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -67,6 +68,7 @@ public class DbConnector implements Serializable {
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
+        this.isMostNew = isMostNew;
     }
 
     @Generated(hash = 1212725637)
@@ -230,5 +232,13 @@ public class DbConnector implements Serializable {
 
     public void setIsSupportOta(boolean isSupportOta) {
         this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }

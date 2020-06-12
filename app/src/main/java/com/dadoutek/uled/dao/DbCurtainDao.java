@@ -41,6 +41,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
         public final static Property Rssi = new Property(15, int.class, "rssi", false, "RSSI");
         public final static Property IsSupportOta = new Property(16, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -72,7 +73,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"GROUP_NAME\" TEXT," + // 13: groupName
                 "\"VERSION\" TEXT," + // 14: version
                 "\"RSSI\" INTEGER NOT NULL ," + // 15: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 16: isSupportOta
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 16: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 17: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -125,6 +127,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         }
         stmt.bindLong(16, entity.getRssi());
         stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -171,6 +174,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         }
         stmt.bindLong(16, entity.getRssi());
         stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -197,7 +201,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // groupName
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
             cursor.getInt(offset + 15), // rssi
-            cursor.getShort(offset + 16) != 0 // isSupportOta
+            cursor.getShort(offset + 16) != 0, // isSupportOta
+            cursor.getShort(offset + 17) != 0 // isMostNew
         );
         return entity;
     }
@@ -221,6 +226,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
         entity.setRssi(cursor.getInt(offset + 15));
         entity.setIsSupportOta(cursor.getShort(offset + 16) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
      }
     
     @Override

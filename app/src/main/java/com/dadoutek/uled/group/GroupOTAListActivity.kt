@@ -98,10 +98,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 var versionNum = getVersionNum(itv)
                 if (split.size >= 2) {
                     LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
-                    if (!TextUtils.isEmpty(versionNum))
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
                         it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
-                    else
-                        it.isSupportOta = false
+                    }
+
                 }
             }
         }
@@ -125,10 +126,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 var versionNum = getVersionNum(itv)
                 if (split.size >= 2) {
                     LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
-                    if (!TextUtils.isEmpty(versionNum))
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
                         it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
-                    else
-                        it.isSupportOta = false
+                    }
                 }
             }
         }
@@ -152,8 +153,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 var versionNum = getVersionNum(itv)
                 if (split.size >= 2) {
                     LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
-                    if (!TextUtils.isEmpty(versionNum))
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
                         it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    }
                 }
             }
         }
@@ -247,8 +250,12 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                                 })
                     } else
                         getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, DeviceType.LIGHT_NORMAL)
-                else
-                    ToastUtils.showShort(getString(R.string.dissupport_ota))
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
             }
             DeviceType.SMART_CURTAIN -> {
             }
@@ -262,6 +269,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
         updataDevice()
     }
+
     private fun getDeviceVersion(dbLight: DbLight) {
         val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
                 { s: String ->

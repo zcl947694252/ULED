@@ -55,12 +55,15 @@ public class DbLight implements Serializable {
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public int rssi =1000;
     public boolean isSupportOta =true;
+    public boolean isMostNew= false;
 
-    @Generated(hash = 1383772489)
+
+    @Generated(hash = 278393484)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
             int productUUID, Long belongGroupId, int index, int color,
-            String version, int status, int rssi, boolean isSupportOta) {
+            String version, int status, int rssi, boolean isSupportOta,
+            boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -77,11 +80,13 @@ public class DbLight implements Serializable {
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
+        this.isMostNew = isMostNew;
     }
 
     @Generated(hash = 2075223479)
     public DbLight() {
     }
+    
 
     public boolean isSupportOta() {
         return isSupportOta;
@@ -316,5 +321,13 @@ public class DbLight implements Serializable {
 
     public void setIsSupportOta(boolean isSupportOta) {
         this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }
