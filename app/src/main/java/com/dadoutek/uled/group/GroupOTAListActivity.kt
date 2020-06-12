@@ -19,13 +19,17 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.widget.RecyclerGridDecoration
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 
@@ -40,6 +44,7 @@ import java.util.regex.Pattern
 class GroupOTAListActivity : TelinkBaseActivity() {
     private var dispose: Disposable? = null
     private var dbGroup: DbGroup? = null
+    private var mConnectDisposable: Disposable? = null
     private var lightList: MutableList<DbLight> = mutableListOf()
     private var curtainList: MutableList<DbCurtain> = mutableListOf()
     private var relayList: MutableList<DbConnector> = mutableListOf()
@@ -210,11 +215,32 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 if (dbLight.isSupportOta)
                     if (TextUtils.isEmpty(dbLight.version)) {
                         showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersion(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersion(dbLight)
+                                    }
+                                            , {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
                         connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
                                 ?.subscribeOn(Schedulers.io())
                                 ?.observeOn(AndroidSchedulers.mainThread())
                                 ?.subscribe({
-                                    getDeviceVersion(dbLight)
+
                                 }, {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.connect_fail))
@@ -231,6 +257,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        updataDevice()
+    }
     private fun getDeviceVersion(dbLight: DbLight) {
         val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
                 { s: String ->
@@ -240,6 +271,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.get_version_success))
                 }, {
+            hideLoadingDialog()
             ToastUtils.showLong(getString(R.string.get_version_fail))
         })
     }
@@ -267,7 +299,27 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
             override fun downLoadFileSuccess() {
                 hideLoadingDialog()
-                startOtaAct(meshAddr, macAddr, version, deviceType)
+                if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == meshAddr) {
+                    startOtaAct(meshAddr, macAddr, version, deviceType)
+                } else {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                    mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .flatMap {
+                                connect(meshAddr, true)
+                            }?.subscribe({
+                                hideLoadingDialog()
+                                startOtaAct(meshAddr, macAddr, version, deviceType)
+                            }
+                                    , {
+                                hideLoadingDialog()
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                LogUtils.d(it)
+                            })
+                }
+
             }
 
             override fun downLoadFileFail(message: String) {
@@ -275,7 +327,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 ToastUtils.showLong(R.string.download_pack_fail)
             }
         })
-
     }
 
     private fun startOtaAct(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
