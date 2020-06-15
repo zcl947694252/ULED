@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class SelectSceneListActivity : TelinkBaseActivity() {
     private val mSceneList = DBUtils.sceneAll
-    private val adpter = SceneListAdapter(R.layout.template_device_item_s, mSceneList)
+    private val adpter = SceneListAdapter(R.layout.template_batch_device_item, mSceneList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

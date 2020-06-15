@@ -273,30 +273,35 @@
                         android:textSize="15sp" />
             </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                    android:id="@+id/batch_four_group_recycle"
+            <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:layout_marginBottom="@dimen/dp_5"
-                    android:background="@color/white"/>
+                    android:layout_height="wrap_content">
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/batch_four_group_recycle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_5"
+                        android:layout_marginBottom="@dimen/dp_5"
+                        android:background="@color/white" />
+            </ScrollView>
+
             <TextView
                     android:id="@+id/batch_see_help"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_40"
-                    android:padding="@dimen/dp_5"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textSize="@dimen/sp_15"
-                    android:layout_marginBottom="@dimen/dp_5"
+                    android:padding="@dimen/dp_5"
+                    android:text="@string/see_help"
                     android:textColor="@color/black_three"
-                    android:text="@string/see_help" />
+                    android:textSize="17sp" />
 
             <Button
                     android:id="@+id/grouping_completed"
                     android:layout_width="match_parent"
                     android:layout_height="46dp"
                     android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="8dp"
                     android:background="@drawable/btn_rec_black_bt"

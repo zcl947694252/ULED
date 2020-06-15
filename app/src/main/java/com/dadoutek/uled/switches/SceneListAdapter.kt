@@ -1,5 +1,7 @@
 package com.dadoutek.uled.switches
 
+import android.view.View
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -16,12 +18,12 @@ import com.dadoutek.uled.model.DbModel.DbScene
  * 更新描述
  *
  */
-class  SceneListAdapter(resId: Int, data: List<DbScene>): BaseQuickAdapter<DbScene, BaseViewHolder>(resId,data){
+class SceneListAdapter(resId: Int, data: List<DbScene>) : BaseQuickAdapter<DbScene, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-      helper?.setText(R.id.template_device_name_n,item?.name)
-              ?.setImageResource(R.id.template_device_icon_n,R.drawable.bg_on)
-              ?.setVisible(R.id.template_group_name_n,false)
-              ?.setVisible(R.id.template_select_n,false)
+        helper?.setText(R.id.template_device_batch_title, item?.name)
+                ?.setImageResource(R.id.template_device_batch_icon, R.drawable.icon_sence)
+                ?.setVisible(R.id.template_device_batch_selected, false)
+        helper?.getView<TextView>(R.id.template_device_batch_title)?.visibility = View.GONE
     }
 
 }

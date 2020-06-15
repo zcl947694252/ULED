@@ -39,7 +39,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
     private fun initData() {
         //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        template_recycleView?.layoutManager = GridLayoutManager(this,4)
+        template_recycleView?.layoutManager = GridLayoutManager(this,3)
 
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
         when (type) {

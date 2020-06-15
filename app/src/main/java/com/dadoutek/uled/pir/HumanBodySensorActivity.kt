@@ -91,7 +91,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
-    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
+    //private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
+    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.template_batch_device_item, showCheckListData)
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
     private var modeSwitchMode = 0

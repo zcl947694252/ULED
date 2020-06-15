@@ -82,7 +82,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var isGroupMode = true
     private var showGroupList: MutableList<ItemGroup> = mutableListOf()
     private var showBottomList: MutableList<ItemGroup> = mutableListOf()
-    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showBottomList)
+    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_device_item, showBottomList)
+    //private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showBottomList)
     private val popDataList = mutableListOf<ItemCheckBean>()
     private val listTriggerTimes = mutableListOf<ItemCheckBean>()
     private val listTriggerAfterShow = mutableListOf<ItemCheckBean>()
@@ -119,7 +120,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         pir_config_choose_group.setOnClickListener(this)
         pir_config_btn.setOnClickListener(this)
         bottomGvAdapter.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-            if (view.id == R.id.imgDelete) adapter.remove(position)
+            if (view.id == R.id.template_device_batch_selected) adapter.remove(position)
         }
     }
 
