@@ -215,7 +215,7 @@
                     android:id="@+id/batch_four_device_empety_ly"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
                     android:orientation="vertical">
 
                 <android.support.v7.widget.RecyclerView
@@ -276,10 +276,20 @@
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/batch_four_group_recycle"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:background="@color/white"
-                    android:minHeight="150dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_5"
+                    android:layout_marginBottom="@dimen/dp_5"
+                    android:background="@color/white"/>
+            <TextView
+                    android:id="@+id/batch_see_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_40"
+                    android:padding="@dimen/dp_5"
+                    android:gravity="center"
+                    android:textSize="@dimen/sp_15"
+                    android:layout_marginBottom="@dimen/dp_5"
+                    android:textColor="@color/black_three"
+                    android:text="@string/see_help" />
 
             <Button
                     android:id="@+id/grouping_completed"

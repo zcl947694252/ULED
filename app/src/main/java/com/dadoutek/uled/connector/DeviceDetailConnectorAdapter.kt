@@ -1,7 +1,5 @@
 package com.dadoutek.uled.connector
 
-import android.graphics.drawable.GradientDrawable
-import android.view.View
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -14,7 +12,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
     override fun convert(helper: BaseViewHolder, dbConnector: DbConnector) {
         if (dbConnector != null) {
             //val tvName = helper.getView<TextView>(R.id.name)
-            val tvLightName = helper.getView<TextView>(R.id.template_device_name)
+            val tvLightName = helper.getView<TextView>(R.id.template_group_name_n)
            // val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
                // tvName.text = StringUtils.getConnectorName(scene)
 

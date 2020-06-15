@@ -69,7 +69,6 @@ import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -138,7 +137,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
-    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_item_device, mAddedDevices)
+    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_device_item_s, mAddedDevices)
 
     /**
      * 有无被选中的用来分组的灯
@@ -1095,10 +1094,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun onLocationEnable() {}
     internal inner class DeviceListAdapter(layoutId: Int, data: MutableList<ScannedDeviceItem>) : BaseQuickAdapter<ScannedDeviceItem, BaseViewHolder>(layoutId, data) {
         override fun convert(helper: BaseViewHolder?, item: ScannedDeviceItem?) {
-            val icon = helper?.getView<ImageView>(R.id.img_icon)
-            val groupName = helper?.getView<TextView>(R.id.template_device_name)
-            val deviceName = helper?.getView<TextView>(R.id.tv_device_name)
-            val checkBox = helper?.getView<CheckBox>(R.id.selected)
+            val icon = helper?.getView<ImageView>(R.id.template_device_icon_n)
+            val groupName = helper?.getView<TextView>(R.id.template_group_name_n)
+            val deviceName = helper?.getView<TextView>(R.id.template_device_name_n)
+            val checkBox = helper?.getView<CheckBox>(R.id.template_select_n)
 
             groupName?.visibility = View.GONE
             checkBox?.isChecked = item?.isSelected ?: false

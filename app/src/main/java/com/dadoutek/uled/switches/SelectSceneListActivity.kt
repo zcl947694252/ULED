@@ -3,6 +3,7 @@ package com.dadoutek.uled.switches
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class SelectSceneListActivity : TelinkBaseActivity() {
     private val mSceneList = DBUtils.sceneAll
-    private val adpter = SceneListAdapter(R.layout.item_group, mSceneList)
+    private val adpter = SceneListAdapter(R.layout.template_device_item_s, mSceneList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +47,8 @@ class SelectSceneListActivity : TelinkBaseActivity() {
             finish()
         }
 
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+       // template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = GridLayoutManager(this, 3)
         template_recycleView.adapter = adpter
         adpter.bindToRecyclerView(template_recycleView)
         adpter.setOnItemClickListener { _, _, position ->

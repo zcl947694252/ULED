@@ -76,9 +76,9 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 group.textColor = mContext.resources.getColor(R.color.black)
 
             if (group.meshAddr == 0xffff)
-                helper.setText(R.id.template_device_name, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.template_group_name_n, TelinkLightApplication.getApp().getString(R.string.allLight))
             else
-                helper.setText(R.id.template_device_name, group.name)
+                helper.setText(R.id.template_group_name_n, group.name)
 
 
             if (group.isSelected)
@@ -86,7 +86,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             else
                 helper.setChecked(R.id.selected_group, false)
 
-            helper.setTextColor(R.id.template_device_name, group.textColor)
+            helper.setTextColor(R.id.template_group_name_n, group.textColor)
                     .addOnClickListener(R.id.item_layout)
         }
     }

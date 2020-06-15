@@ -1243,11 +1243,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             DeviceItemHolder holder;
 
-            convertView = inflater.inflate(R.layout.template_item_device, null);
-            ImageView icon = convertView.findViewById(R.id.img_icon);
-            TextView txtName = convertView.findViewById(R.id.template_device_name);
-            CheckBox selected = convertView.findViewById(R.id.selected);
-            TextView lightName = convertView.findViewById(R.id.tv_device_name);
+            convertView = inflater.inflate(R.layout.template_device_item_s, null);
+            ImageView icon = convertView.findViewById(R.id.template_device_icon_n);
+            TextView txtName = convertView.findViewById(R.id.template_group_name_n);
+            CheckBox selected = convertView.findViewById(R.id.template_select_n);
+            TextView lightName = convertView.findViewById(R.id.template_device_name_n);
 
             holder = new DeviceItemHolder();
 

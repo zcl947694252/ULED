@@ -213,7 +213,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         }
         toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
 
-        adapter = CurtainDeviceDetailsAdapter(R.layout.device_type_item, curtain)
+        adapter = CurtainDeviceDetailsAdapter(R.layout.template_device_type_item, curtain)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 

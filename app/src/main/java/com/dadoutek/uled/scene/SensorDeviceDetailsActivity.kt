@@ -182,7 +182,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
-        adapter = SensorDeviceDetailsAdapter(R.layout.device_type_item, sensorDatummms)
+        adapter = SensorDeviceDetailsAdapter(R.layout.template_device_type_item, sensorDatummms)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 

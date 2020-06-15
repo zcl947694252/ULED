@@ -17,6 +17,6 @@ import com.dadoutek.uled.model.DbModel.DbScene
  */
 class SceneAdapter(resId: Int, sceneList: MutableList<DbScene>) :BaseQuickAdapter<DbScene,BaseViewHolder>(resId,sceneList){
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-        helper?.setText(R.id.template_device_name,item?.name)
+        helper?.setText(R.id.template_group_name_n,item?.name)
     }
 }

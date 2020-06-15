@@ -100,7 +100,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private var currentGw: DbGateway? = null
     private var type: Int? = null
     private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
-    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.device_type_item, gateWayDataList, this)
+    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.template_device_type_item, gateWayDataList, this)
     private var inflater: LayoutInflater? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true

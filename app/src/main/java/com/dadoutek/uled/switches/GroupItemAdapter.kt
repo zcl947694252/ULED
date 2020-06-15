@@ -9,7 +9,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 /**
  * 创建者     ZCL
  * 创建时间   2020/1/13 10:47
- * 描述
+ * 描述  组列表单选
  *
  * 更新者     $
  * 更新时间   $
@@ -17,7 +17,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup
  */
 class GroupItemAdapter(resId: Int, data: MutableList<DbGroup>):BaseQuickAdapter<DbGroup,BaseViewHolder>(resId,data){
     override fun convert(helper: BaseViewHolder?, item: DbGroup?) {
-        helper?.setText(R.id.template_device_name,item?.name)
+        helper?.setText(R.id.template_group_name_n,item?.name)
+                ?.setVisible(R.id.template_select_n,false)
     }
 
 }

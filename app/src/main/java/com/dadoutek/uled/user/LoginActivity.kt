@@ -286,6 +286,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             sms_login_btn.visibility = View.VISIBLE
             third_party_text.visibility = View.VISIBLE
             sms_password_login.visibility = View.VISIBLE
+            edit_user_password.visibility = View.VISIBLE
+            forget_password.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
             list_phone.visibility = View.GONE
             date_phone.setImageResource(R.drawable.icon_down_arr)

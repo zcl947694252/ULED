@@ -1,8 +1,6 @@
 package com.dadoutek.uled.switches
 
 import android.content.Context
-import android.view.View
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -14,9 +12,9 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,interna
     override fun convert(helper: BaseViewHolder, dbSwitch: DbSwitch) {
         if (dbSwitch != null) {
             if(dbSwitch.name!=null&&dbSwitch.name!=""){
-                helper.setText(R.id.template_device_name, dbSwitch.name)
+                helper.setText(R.id.template_group_name_n, dbSwitch.name)
             }else{
-               helper.setText(R.id.template_device_name, StringUtils.getSwitchPirDefaultName(dbSwitch.productUUID, context)+"-"+helper.position)
+               helper.setText(R.id.template_group_name_n, StringUtils.getSwitchPirDefaultName(dbSwitch.productUUID, context)+"-"+helper.position)
             }
 
 //            helper.setText(R.id.name, StringUtils.getSwitchName(dbSwitch))

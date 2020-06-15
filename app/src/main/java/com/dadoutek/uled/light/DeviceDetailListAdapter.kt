@@ -21,7 +21,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
 
     override fun convert(helper: BaseViewHolder, dbLight: DbLight) {
        // val groupName = helper.getView<TextView>(R.id.template_device_group_icon)
-        val deviceName = helper.getView<TextView>(R.id.template_device_name)
+        val deviceName = helper.getView<TextView>(R.id.template_group_name_n)
 //        if (dbLight.groupName==null||dbLight.groupName=="")
 //            groupName.visibility = View.GONE
 //        else
@@ -40,7 +40,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
            // groupName.setTextColor(mContext.resources.getColor(R.color.black))
         }
 
-        helper.setText(R.id.template_device_name,dbLight.name)
+        helper.setText(R.id.template_group_name_n,dbLight.name)
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)

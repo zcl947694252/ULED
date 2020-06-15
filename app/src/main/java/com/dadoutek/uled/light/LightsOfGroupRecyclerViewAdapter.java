@@ -32,7 +32,7 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
     @Override
     protected void convert(BaseViewHolder helper, DbLight item) {
         TextView tvName=helper.getView(R.id.name);
-        TextView tvLightName=helper.getView(R.id.tv_device_name);
+        TextView tvLightName=helper.getView(R.id.template_device_name_n);
         TextView tvRgbColor=helper.getView(R.id.tv_rgb_color);
         tvName.setText(StringUtils.getLightGroupName(item));
 

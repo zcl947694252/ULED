@@ -58,7 +58,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     private var emptyGroupView: View? = null
     private var viewContent: View? = null
     private var deviceTypeList: ArrayList<DeviceItem> = ArrayList()
-    private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList)
+    private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.template_device_type_item, deviceTypeList)
     private var isGuide = false
     private var isRgbClick = false
     private var firstShowGuide = true

@@ -101,7 +101,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adaper = DeviceDetailConnectorAdapter(R.layout.device_type_item, lightsData)
+        adaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
         for (i in lightsData?.indices!!) {

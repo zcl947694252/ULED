@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanFilter
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
@@ -154,7 +155,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 4)
         //batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
 
-        batch_four_group_recycle.layoutManager = GridLayoutManager(this, 4)
+        batch_four_group_recycle.layoutManager =  LinearLayoutManager(this, LinearLayout.HORIZONTAL,false)
        // batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         lplong = batch_four_no_group.layoutParams as LinearLayout.LayoutParams

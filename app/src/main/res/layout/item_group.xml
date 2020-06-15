@@ -6,7 +6,7 @@
         android:orientation="vertical">
 
     <TextView
-            android:id="@+id/template_device_name"
+            android:id="@+id/template_group_name_n"
             android:layout_width="match_parent"
             android:layout_height="49dp"
             android:background="@color/white"

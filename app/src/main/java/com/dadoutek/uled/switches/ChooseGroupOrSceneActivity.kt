@@ -3,6 +3,7 @@ package com.dadoutek.uled.switches
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 /**
  * 创建者     ZCL
  * 创建时间   2020/1/13 11:53
- * 描述
+ * 描述  单组列表选择
  *
  * 更新者     $
  * 更新时间   $
@@ -26,8 +27,8 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
     private var type: Int = 0
-    private var sceneAdapter = SceneItemAdapter(R.layout.item_group, sceneList)
-    private var groupAdapter = GroupItemAdapter(R.layout.item_group, allGroups)
+    private var sceneAdapter = SceneItemAdapter(R.layout.template_device_item_s, sceneList)
+    private var groupAdapter = GroupItemAdapter(R.layout.template_device_item_s, allGroups)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.choose_group_scene)
@@ -37,7 +38,9 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     }
 
     private fun initData() {
-        template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView?.layoutManager = GridLayoutManager(this,4)
+
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
         when (type) {
             0, 2 -> {

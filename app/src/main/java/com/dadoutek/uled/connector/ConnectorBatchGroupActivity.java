@@ -1229,13 +1229,13 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             DeviceItemHolder holder;
 
-            convertView = inflater.inflate(R.layout.template_item_device, null);
+            convertView = inflater.inflate(R.layout.template_device_item_s, null);
             ImageView icon = (ImageView) convertView
-                    .findViewById(R.id.img_icon);
+                    .findViewById(R.id.template_device_icon_n);
             TextView txtName = (TextView) convertView
-                    .findViewById(R.id.template_device_name);
-            CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
-            TextView lightName = (TextView) convertView.findViewById(R.id.tv_device_name);
+                    .findViewById(R.id.template_group_name_n);
+            CheckBox selected = (CheckBox) convertView.findViewById(R.id.template_select_n);
+            TextView lightName = (TextView) convertView.findViewById(R.id.template_device_name_n);
 
             holder = new DeviceItemHolder();
 

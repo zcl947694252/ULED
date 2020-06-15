@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_device_name"
+        android:id="@+id/template_device_name_n"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/device_name"
@@ -69,7 +69,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_device_name"
+        app:layout_constraintTop_toBottomOf="@id/template_device_name_n"
         android:singleLine="true"
         android:textColor="@color/black_three"
         />

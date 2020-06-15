@@ -51,7 +51,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.widget.RecyclerGridDecoration
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.util.MeshUtils
 import io.reactivex.Observable
@@ -187,7 +186,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
          *单个设备列表适配器页面设置
          */
         //adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
-        adaper = DeviceDetailListAdapter(R.layout.device_type_item, lightsData)
+        adaper = DeviceDetailListAdapter(R.layout.template_device_type_item, lightsData)
         adaper!!.onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
             if (position < lightsData.size) {
                 currentLight = lightsData[position]
