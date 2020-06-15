@@ -118,7 +118,7 @@
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add Group</string>
     <string name="set_group">CONFIRM GROUPING</string>
-    <string name="loading">Loading</string>
+    <string name="loading">Loading...</string>
     <string name="scan_end">No device found!</string>
     <string name="connecting_tip">Connecting... Later, please</string>
     <string name="grouping_completed">Grouping completed</string>
@@ -1087,7 +1087,7 @@
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
     <string name="user_agreement">User agreement and privacy statement</string>
-    <string name="group_ota">Group to upgrade</string>
+    <string name="group_ota">Online update</string>
     <string name="dissupport_ota">OTA support is not available for this device version</string>
     <string name="get_bin_fail">Failed to get bin version please check the network</string>
     <string name="get_version_success">Version obtained successfully, has been refreshed, please try again</string>

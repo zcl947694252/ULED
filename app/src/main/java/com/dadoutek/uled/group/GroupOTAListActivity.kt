@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.view.View
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -79,14 +80,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
+        loading_tansform.setOnClickListener {  }
         ota_swipe_refresh_ly.setOnRefreshListener {
+            loading_tansform.visibility = View.VISIBLE
             findMeshDevice(DBUtils.lastUser?.controlMeshName)
             disposableTimerResfresh?.dispose()
             disposableTimerResfresh = Observable.timer(4000, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
+                        loading_tansform.visibility = View.GONE
                         ota_swipe_refresh_ly.isRefreshing = false
+
                         disposableScan?.dispose()
                     }
             compositeDisposable.add(disposableTimerResfresh!!)
@@ -316,9 +321,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         getBin()
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
-        ota_swipe_refresh_ly.setProgressViewOffset(true, -0, 100)
+        ota_swipe_refresh_ly.setProgressViewOffset(true, -0, 500)
         //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
-        ota_swipe_refresh_ly.setProgressViewEndTarget(true, 180)
+        ota_swipe_refresh_ly.setProgressViewEndTarget(true, 360)
         //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
         ota_swipe_refresh_ly.setColorSchemeColors(Color.BLACK, Color.GREEN, Color.RED, Color.YELLOW, Color.BLUE)
         //设置触发刷新的距离

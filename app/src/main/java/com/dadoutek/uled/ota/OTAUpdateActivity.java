@@ -362,6 +362,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     public void connectDevice(String mac) {
         log("connectDevice :" + mac);
         btn_start_update.setText(R.string.start_connect);
+        btn_start_update.setClickable(false);
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
     }
 
@@ -424,6 +425,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         text_info.setText( getString(R.string.updateSuccess)+lightVersion);
         open_device.setText(lightVersion);
         btn_start_update.setVisibility(View.GONE);
+        btn_start_update.setClickable(true);
         switch (lightType){
            case  DeviceType.LIGHT_NORMAL:
            case  DeviceType.LIGHT_NORMAL_OLD:
@@ -491,8 +493,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 mCancelBuilder = new AlertDialog.Builder(this);
                 mCancelBuilder.setTitle(getString(R.string.warning));
                 mCancelBuilder.setMessage(getString(R.string.is_exit_ota));
-                mCancelBuilder.setPositiveButton(getString(android.R.string.ok),
-                        (dialog, which) -> {
+                mCancelBuilder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
                     sendStopMeshOTACommand();
                     Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
                     mesh.setOtaDevice(null);
@@ -500,8 +501,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     dialog.dismiss();
                     finish();
                 });
-                mCancelBuilder.setNegativeButton(getString(android.R.string.cancel), (dialog,
-                                                                                      which) ->
+                mCancelBuilder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) ->
                         dialog.dismiss()
                 );
             }
@@ -599,6 +599,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         ScanFilter scanFilter = scanFilterBuilder.build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
+        btn_start_update.setClickable(false);
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance != null)
             instance.idleMode(true);
@@ -850,8 +851,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         byte opcode = (byte) 0xC6;
         int address = 0xFFFF;
         byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params);
     }
 
     @Override
