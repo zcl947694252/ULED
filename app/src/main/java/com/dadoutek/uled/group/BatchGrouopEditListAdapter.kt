@@ -10,6 +10,8 @@ package com.dadoutek.uled.group
  * 更新时间   $
  * 更新描述
  */
+import android.view.View
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -18,6 +20,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
+        val tv = helper.getView<TextView>(R.id.template_device_title_blow)
+        tv.visibility = View.GONE
         helper.setText(R.id.template_device_batch_title, item.name)
                 .setText(R.id.template_device_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
