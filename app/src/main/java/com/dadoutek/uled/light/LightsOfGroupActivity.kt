@@ -3,11 +3,10 @@ package com.dadoutek.uled.light
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import android.support.v7.widget.*
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -20,6 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupActivity
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -46,6 +46,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -141,28 +142,52 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun initToolbar() {
         toolbar.setTitle(R.string.group_setting_header)
-        tv_function1.visibility = View.VISIBLE
-        tv_function1.setText(R.string.batch_group)
-        tv_function1.setOnClickListener {
-            when (strLight) {
-                "cw_light" -> {
-                    if (DBUtils.getAllNormalLight().size == 0) {
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    } else {
-                        val intent = Intent(this@LightsOfGroupActivity, GroupOTAListActivity::class.java)
-                        intent.putExtra("group", group)
-                        startActivity(intent)
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+    }
+
+    private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
+        when (item?.itemId) {
+            R.id.toolbar_batch_group -> {
+                val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                when (strLight) {
+                    "cw_light" -> {
+                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                    }
+                    "rgb_light" -> {
+                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                     }
                 }
-                "rgb_light" -> {
-                    if (DBUtils.getAllRGBLight().size == 0) {
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    } else {
-                        startActivity<GroupOTAListActivity>("group" to group!!, "groupType" to DeviceType.LIGHT_RGB)
+                if (TelinkLightApplication.getApp().connectDevice != null)
+                    startActivity(intent)
+                else
+                    toast(getString(R.string.device_disconnected))
+            }
+            R.id.toolbar_online_upgrade -> {
+                when (strLight) {
+                    "cw_light" -> {
+                        if (DBUtils.getAllNormalLight().size == 0) {
+                            ToastUtils.showShort(getString(R.string.no_device))
+                        } else {
+                            val intent = Intent(this@LightsOfGroupActivity, GroupOTAListActivity::class.java)
+                            intent.putExtra("group", group)
+                            startActivity(intent)
+                        }
+                    }
+                    "rgb_light" -> {
+                        if (DBUtils.getAllRGBLight().size == 0) {
+                            ToastUtils.showShort(getString(R.string.no_device))
+                        } else {
+                            startActivity<GroupOTAListActivity>("group" to group!!, "groupType" to DeviceType.LIGHT_RGB)
+                        }
                     }
                 }
             }
         }
+        true
     }
 
 
@@ -351,6 +376,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)
+                menuInflater.inflate(R.menu.menu_ota_group_setting, menu)
+        }
+        return super.onCreateOptionsMenu(menu)
+    } /*{
         if (group?.meshAddr == 0xffff) {
             menuInflater.inflate(R.menu.menu_search, menu)
             searchView = (menu!!.findItem(R.id.action_search)).actionView as SearchView
@@ -363,7 +394,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             return super.onCreateOptionsMenu(menu)
         }
         return true
-    }
+    }*/
 
 
     private fun initView() {

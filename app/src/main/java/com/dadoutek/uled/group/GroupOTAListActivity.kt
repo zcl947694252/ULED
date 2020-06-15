@@ -1,6 +1,8 @@
 package com.dadoutek.uled.group
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -22,13 +24,24 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
+import com.dadoutek.uled.util.RecoverMeshDeviceUtil
 import com.dadoutek.uled.widget.RecyclerGridDecoration
+import com.polidea.rxandroidble2.scan.ScanSettings
+import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_batch_group_four.*
+import kotlinx.android.synthetic.main.activity_group_ota_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.toolbar
+import kotlinx.android.synthetic.main.toolbar.toolbarTv
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -42,6 +55,9 @@ import java.util.regex.Pattern
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private var disposableScan: Disposable? = null
+    private var disposableTimerResfresh: Disposable? = null
     private var dispose: Disposable? = null
     private var dbGroup: DbGroup? = null
     private var mConnectDisposable: Disposable? = null
@@ -63,6 +79,113 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
+        ota_swipe_refresh_ly.setOnRefreshListener {
+            findMeshDevice(DBUtils.lastUser?.controlMeshName)
+            disposableTimerResfresh?.dispose()
+            disposableTimerResfresh = Observable.timer(4000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        ota_swipe_refresh_ly.isRefreshing = false
+                        disposableScan?.dispose()
+                    }
+            compositeDisposable.add(disposableTimerResfresh!!)
+        }
+    }
+
+
+    @SuppressLint("CheckResult")
+    fun findMeshDevice(deviceName: String?) {
+        val scanFilter = com.polidea.rxandroidble2.scan.ScanFilter.Builder().setDeviceName(deviceName).build()
+        val scanSettings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build()
+
+        LogUtils.d("findMeshDevice name = $deviceName")
+        disposableScan?.dispose()
+        disposableScan = RecoverMeshDeviceUtil.rxBleClient.scanBleDevices(scanSettings, scanFilter)
+                .observeOn(Schedulers.io())
+                .map { RecoverMeshDeviceUtil.parseData(it) }          //解析数据
+                .timeout(RecoverMeshDeviceUtil.SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
+                    LogUtils.d("findMeshDevice name complete.")
+                    when (dbGroup!!.deviceType.toInt()) {
+                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                            lightList.sortBy { it1 -> it1.rssi }
+                            supportAndUN()
+                            lightAdaper.notifyDataSetChanged()
+
+                        }
+                        DeviceType.SMART_CURTAIN -> {
+                            curtainList.sortBy { it1 -> it1.rssi }
+                            curtainAdaper.notifyDataSetChanged()
+                        }
+                        DeviceType.SMART_RELAY -> {
+                            relayList.sortBy { it1 -> it1.rssi }
+                            relayAdaper.notifyDataSetChanged()
+                        }
+                    }
+                    it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it != null)
+                        refreshRssi(it)
+                }, {})
+        compositeDisposable?.add(disposableScan!!)
+
+    }
+
+    private fun refreshRssi(deviceInfo: DeviceInfo) {
+        LogUtils.v("zcl信号$deviceInfo")
+        GlobalScope.launch(Dispatchers.Main) {
+            if (deviceInfo.productUUID == dbGroup!!.deviceType.toInt()) {
+                var deviceChangeL: DbLight? = null
+                var deviceChangeC: DbCurtain? = null
+                var deviceChangeR: DbConnector? = null
+                when (dbGroup!!.deviceType.toInt()) {
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                        for (device in lightList) {
+                            if (device.meshAddr == deviceInfo.meshAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeL = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeL")
+                            }
+                        }
+                        if (null != deviceChangeL) {
+                            lightList.remove(deviceChangeL)
+                            lightList.add(deviceChangeL)
+                        }
+                    }
+                    DeviceType.SMART_CURTAIN -> {
+                        for (device in curtainList) {
+                            if (device.macAddr == deviceInfo.macAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeC = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeC")
+                            }
+                        }
+                        if (null != deviceChangeC) {
+                            curtainList.remove(deviceChangeC)
+                            curtainList.add(deviceChangeC)
+                        }
+                    }
+                    DeviceType.SMART_RELAY -> {
+                        for (device in relayList) {
+                            if (device.macAddr == deviceInfo.macAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeR = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeR")
+                            }
+                        }
+                        if (null != deviceChangeL) {
+                            relayList.remove(deviceChangeR)
+                            relayList.add(deviceChangeR!!)
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -146,6 +269,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         lightList.clear()
         lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
         lightAdaper.onItemClickListener = onItemClickListener
+        supportAndUN()
+        lightAdaper.notifyDataSetChanged()
+    }
+
+    private fun supportAndUN() {
         lightList.forEach {
             it.version?.let { itv ->
                 it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
@@ -166,16 +294,16 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         }
         lightList.removeAll(unsupport)
         lightList.addAll(unsupport)
-        lightAdaper.notifyDataSetChanged()
     }
 
     private fun getVersionNum(it: String): StringBuilder {
         var versionNum = StringBuilder()
         val p = Pattern.compile("\\d+")
         val m = p.matcher(it)
-        while (m.find()) {
-            versionNum.append(m.group())
-        }
+        if (m != null)
+            while (m.find()) {
+                versionNum.append(m.group())
+            }
         return versionNum
     }
 
@@ -186,6 +314,15 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         template_recycleView.layoutManager = GridLayoutManager(this, 2)/*LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)*/
         template_recycleView.addItemDecoration(RecyclerGridDecoration(this, 2))
         getBin()
+
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        ota_swipe_refresh_ly.setProgressViewOffset(true, -0, 100)
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        ota_swipe_refresh_ly.setProgressViewEndTarget(true, 180)
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        ota_swipe_refresh_ly.setColorSchemeColors(Color.BLACK, Color.GREEN, Color.RED, Color.YELLOW, Color.BLUE)
+        //设置触发刷新的距离
+        ota_swipe_refresh_ly.setDistanceToTriggerSync(200)
     }
 
     private fun getBin() {
