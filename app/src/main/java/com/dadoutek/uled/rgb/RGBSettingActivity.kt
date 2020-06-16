@@ -53,7 +53,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -62,11 +61,6 @@ import top.defaults.colorpicker.ColorObserver
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-
-private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 /**
  * 创建者     zcl

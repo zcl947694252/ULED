@@ -68,7 +68,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     val CREATE_SCENE_REQUESTCODE = 2
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return initLayout(inflater)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
