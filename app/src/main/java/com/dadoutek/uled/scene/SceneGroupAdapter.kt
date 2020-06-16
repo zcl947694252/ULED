@@ -909,11 +909,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1006,11 +1006,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             seekBar!!.progress--
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1102,11 +1102,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1185,11 +1185,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar.progress < 0 -> {
+                seekBar.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar.progress == 0 -> {
+                seekBar.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1232,11 +1232,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false

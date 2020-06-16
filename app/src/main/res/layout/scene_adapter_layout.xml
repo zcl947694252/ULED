@@ -337,6 +337,7 @@
                         android:layout_marginTop="2dp"
                         android:layout_weight="1"
                         android:max="100"
+                        android:min="1"
                         android:paddingStart="25dp"
                         android:paddingEnd="17dp" />
 
@@ -420,6 +421,7 @@
                         android:layout_marginTop="2dp"
                         android:layout_weight="1"
                         android:max="100"
+                        android:min="1"
                         android:paddingStart="25dp"
                         android:paddingEnd="17dp" />
                 <ImageView

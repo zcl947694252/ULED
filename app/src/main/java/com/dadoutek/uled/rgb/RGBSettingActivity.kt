@@ -354,7 +354,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
-            Commander.getDeviceVersion(light!!.meshAddr)
+            val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
                     .subscribe(
                             { s ->
                                 localVersion = s
@@ -370,7 +370,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                     }
                                 }
                                 null
-
                             },
                             {
                                 if (toolbar.title != null) {
@@ -869,12 +868,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             super.handleMessage(msg)
             sbBrightness.progress--
             when {
-                sbBrightness.progress < 0 -> {
+                sbBrightness.progress < 1 -> {
                     sbBrightness_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sbBrightness.progress == 0 -> {
+                sbBrightness.progress == 1 -> {
                     sbBrightness_less.isEnabled = false
 
                     when {

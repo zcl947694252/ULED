@@ -89,7 +89,7 @@ class SyncDataPutOrGetUtils {
                                 }
                             })
                 } else {
-                    GlobalScope.launch(Dispatchers.Main) {k
+                    GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
                     }
                 }
