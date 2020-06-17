@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
@@ -47,6 +48,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
+    private var resId: Int? = 0
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
     private var rgbRecyclerView: RecyclerView? = null
@@ -83,6 +85,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         } else {
             isResult = false
         }
+
+        select_icon_ly.setOnClickListener {
+            startActivityForResult(Intent(this@NewSceneSetAct, SelectSceneIconActivity::class.java), 1100)
+        }
+
         initChangeState()
         initScene()//获取传递过来的场景数据
         if (!isChangeScene) {
@@ -91,6 +98,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             initOnLayoutListener()
         }
     }
+
 
     private fun makePop() {
         getModeData()
@@ -482,21 +490,33 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == 1000) {
-                val itemRgbGradient = data?.getSerializableExtra("data") as ItemRgbGradient
-                if (currentPosition != 1000000) {
-                    sceneGroupAdapter.data[currentPosition].gradientName = itemRgbGradient.name
-                    sceneGroupAdapter.data[currentPosition].gradientId = itemRgbGradient.id
-                    sceneGroupAdapter.data[currentPosition].gradientType = itemRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
+            when (requestCode) {
+                1000 -> {
+                    val itemRgbGradient = data?.getSerializableExtra("data") as ItemRgbGradient
+                    if (currentPosition != 1000000) {
+                        sceneGroupAdapter.data[currentPosition].gradientName = itemRgbGradient.name
+                        sceneGroupAdapter.data[currentPosition].gradientId = itemRgbGradient.id
+                        sceneGroupAdapter.data[currentPosition].gradientType = itemRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
+                    }
+                    sceneGroupAdapter.notifyDataSetChanged()
                 }
-                sceneGroupAdapter.notifyDataSetChanged()
-            } else {
-                try {
-                    val color = data?.getIntExtra("color", 0)
-                    showGroupList!![requestCode].color = color!!
-                    sceneGroupAdapter?.notifyItemChanged(requestCode)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                1100 -> {
+                    val intExtra = data?.getIntExtra("ID", 0)
+                    if (intExtra==0){
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                    }else{
+                        resId = intExtra
+                        scene_icon.setImageResource(resId!!);
+                    }
+                }
+                else -> {
+                    try {
+                        val color = data?.getIntExtra("color", 0)
+                        showGroupList!![requestCode].color = color!!
+                        sceneGroupAdapter?.notifyItemChanged(requestCode)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
@@ -572,7 +592,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_select_group_list_view.layoutManager = layoutmanager
+        // recyclerView_select_group_list_view.layoutManager = layoutmanager
+        recyclerView_select_group_list_view.layoutManager = GridLayoutManager(this, 4)
 
         var list = ArrayList<DbGroup>()
         showCheckListData?.forEach {
@@ -580,7 +601,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 list.add(it)
         }
 
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list)
+        //this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list)
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.template_batch_device_item, list)
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener = onItemClickListenerCheck
     }
@@ -704,6 +726,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val dbScene = DbScene()
             dbScene.id = getSceneId()
             dbScene.name = name
+            dbScene.imgName = OtherUtils.getResourceName(resId!!,this@NewSceneSetAct)
             dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
             DBUtils.saveScene(dbScene, false)
 

@@ -38,11 +38,11 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
     @SuppressLint("ViewHolder")
     @Deprecated("")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var convertView: View? = inflater.inflate(R.layout.template_device_item_s, null)
+        var convertView: View? = inflater.inflate(R.layout.template_batch_device_item, null)
 
         val holder: GroupItemHolder = GroupItemHolder()
 
-        val txtName = convertView?.findViewById<View>(R.id.template_group_name_n) as TextView
+        val txtName = convertView?.findViewById<View>(R.id.template_group_name_s) as TextView
 
         holder.name = txtName
 

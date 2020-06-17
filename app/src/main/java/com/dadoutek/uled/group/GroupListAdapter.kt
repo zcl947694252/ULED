@@ -14,10 +14,10 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
 
-        helper.setText(R.id.template_group_name_n, item.name)
+        helper.setText(R.id.template_group_name_s, item.name)
 
         if(item.meshAddr==0xffff){
-            helper.setText(R.id.template_group_name_n, R.string.allLight)
+            helper.setText(R.id.template_group_name_s, R.string.allLight)
         }
 
         if (item.checked) {

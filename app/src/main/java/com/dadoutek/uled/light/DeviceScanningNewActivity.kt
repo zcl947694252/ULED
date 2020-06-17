@@ -137,7 +137,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
-    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_device_item_s, mAddedDevices)
+    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_batch_device_item, mAddedDevices)
 
     /**
      * 有无被选中的用来分组的灯
@@ -1094,10 +1094,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun onLocationEnable() {}
     internal inner class DeviceListAdapter(layoutId: Int, data: MutableList<ScannedDeviceItem>) : BaseQuickAdapter<ScannedDeviceItem, BaseViewHolder>(layoutId, data) {
         override fun convert(helper: BaseViewHolder?, item: ScannedDeviceItem?) {
-            val icon = helper?.getView<ImageView>(R.id.template_device_icon_n)
-            val groupName = helper?.getView<TextView>(R.id.template_group_name_n)
+            val icon = helper?.getView<ImageView>(R.id.template_device_icon_s)
+            val groupName = helper?.getView<TextView>(R.id.template_group_name_s)
             val deviceName = helper?.getView<TextView>(R.id.template_device_name_n)
-            val checkBox = helper?.getView<CheckBox>(R.id.template_select_n)
+            val checkBox = helper?.getView<CheckBox>(R.id.template_select_s)
 
             groupName?.visibility = View.GONE
             checkBox?.isChecked = item?.isSelected ?: false

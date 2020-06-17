@@ -122,7 +122,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
         val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
         itemTouchHelper.attachToRecyclerView(recyclerViewChild)
 
-        adapter!!.enableDragItem(itemTouchHelper, R.id.template_group_name_n, true)
+        adapter!!.enableDragItem(itemTouchHelper, R.id.template_group_name_s, true)
         adapter!!.setOnItemDragListener(onItemDragListener)
     }
 

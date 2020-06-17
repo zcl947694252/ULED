@@ -17,8 +17,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup
  */
 class GroupItemAdapter(resId: Int, data: MutableList<DbGroup>):BaseQuickAdapter<DbGroup,BaseViewHolder>(resId,data){
     override fun convert(helper: BaseViewHolder?, item: DbGroup?) {
-        helper?.setText(R.id.template_group_name_n,item?.name)
-                ?.setVisible(R.id.template_select_n,false)
+        helper?.setText(R.id.template_group_name_s,item?.name)
+                ?.setVisible(R.id.template_device_batch_selected,false)
     }
 
 }

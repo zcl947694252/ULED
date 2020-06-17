@@ -16,7 +16,7 @@ import com.dadoutek.uled.R
  */
 class TypeListAdapter(layoutResId: Int, data: MutableList<String>) : BaseQuickAdapter<String, BaseViewHolder>(layoutResId, data) {
     override fun convert(helper: BaseViewHolder?, item: String?) {
-        helper?.setText(R.id.template_group_name_n, item)
+        helper?.setText(R.id.template_group_name_s, item)
     }
 
 }

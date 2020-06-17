@@ -44,6 +44,8 @@ public class DbScene implements Parcelable{
 
     private String times;
 
+    private String imgName= "";
+
     protected DbScene(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -58,13 +60,15 @@ public class DbScene implements Parcelable{
         }
     }
 
-    @Generated(hash = 312396504)
-    public DbScene(Long id, String name, @NotNull Long belongRegionId, int index, String times) {
+    @Generated(hash = 617725948)
+    public DbScene(Long id, String name, @NotNull Long belongRegionId, int index, String times,
+            String imgName) {
         this.id = id;
         this.name = name;
         this.belongRegionId = belongRegionId;
         this.index = index;
         this.times = times;
+        this.imgName = imgName;
     }
 
     @Generated(hash = 662958756)
@@ -114,6 +118,14 @@ public class DbScene implements Parcelable{
             dest.writeByte((byte) 1);
             dest.writeLong(belongRegionId);
         }
+    }
+
+    public String getImgName() {
+        return imgName;
+    }
+
+    public void setImgName(String imgName) {
+        this.imgName = imgName;
     }
 
     public Long getId() {

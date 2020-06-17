@@ -25,7 +25,7 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
-        val groupName = helper.getView<TextView>(R.id.template_device_title_blow)
+        val groupName = helper.getView<TextView>(R.id.template_device_batch_title_blow)
 
         helper.setText(R.id.template_device_batch_title, item?.name)
 
@@ -38,22 +38,22 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
 
         if (item?.belongGroupId !=allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
-                    .setTextColor(R.id.template_device_title_blow, mContext.getColor(R.color.blue_text))
+                    .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
             groupName.text = item?.groupName
 
             if (item?.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_sence)
+                icon.setImageResource(R.drawable.icon_rgb_n)
             } else {
-                icon.setImageResource(R.drawable.icon_sence)
+                icon.setImageResource(R.drawable.icon_light_n)
             }
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
             if (item?.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_rgblight_down)
+                icon.setImageResource(R.drawable.icon_rgb_n)
             } else {
-                icon.setImageResource(R.drawable.icon_device_down)
+                icon.setImageResource(R.drawable.icon_light_n)
             }
         }
     }

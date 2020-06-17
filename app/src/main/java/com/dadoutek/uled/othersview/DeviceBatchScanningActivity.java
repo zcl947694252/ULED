@@ -285,7 +285,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         Light light = this.adapter.getItem(position);
         light.selected = !light.selected;
         DeviceItemHolder holder = (DeviceItemHolder) view.getTag();
-        holder.selected.setChecked(light.selected);
+        holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
 
         if (light.selected) {
             this.updateList.add(light.raw);
@@ -330,7 +330,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
     private static class DeviceItemHolder {
         public ImageView icon;
         public TextView txtName;
-        public CheckBox selected;
+        public ImageView selected;
     }
 
     final class DeviceListAdapter extends BaseAdapter {
@@ -363,12 +363,10 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
             if (convertView == null) {
 
-                convertView = inflater.inflate(R.layout.template_device_item_s, null);
-                ImageView icon = (ImageView) convertView
-                        .findViewById(R.id.template_device_icon_n);
-                TextView txtName = (TextView) convertView
-                        .findViewById(R.id.template_group_name_n);
-                CheckBox selected = (CheckBox) convertView.findViewById(R.id.template_select_n);
+                convertView = inflater.inflate(R.layout.template_batch_device_item, null);
+                ImageView icon = (ImageView) convertView.findViewById(R.id.template_device_icon_s);
+                TextView txtName = (TextView) convertView.findViewById(R.id.template_group_name_s);
+                ImageView selected = (ImageView) convertView.findViewById(R.id.template_device_batch_selected);
 
                 holder = new DeviceItemHolder();
 
@@ -386,7 +384,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
             holder.txtName.setText(light.name);
             holder.icon.setImageResource(R.drawable.icon_light_on);
-            holder.selected.setChecked(light.selected);
+            holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
 
             return convertView;
         }

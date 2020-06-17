@@ -30,55 +30,49 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             }
 
             helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
-                    .setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
-                    .addOnClickListener(R.id.selected_group)
+                    .setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)
+                    .setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)
+                    //.addOnClickListener(R.id.selected_group) 多选选中删除暂时不做
 
             val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
                     || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
 
             if (isSuportOpenOrClose) {//支持点击 使用设置开关三个图标 将其显示 不支持设置按钮图标使其隐藏
-                if (num > 0) {
-                    helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
-                            .addOnClickListener(R.id.btn_on)
-                            .addOnClickListener(R.id.btn_off)
-                            .addOnClickListener(R.id.tv_on)
-                            .addOnClickListener(R.id.tv_off)
-                            .setVisible(R.id.view3, true)
-                            .setVisible(R.id.view4, true)
-                            .setVisible(R.id.btn_on, true)
-                            .setVisible(R.id.btn_on, true)
-                            .setVisible(R.id.btn_off, true)
-                            .setVisible(R.id.btn_set, true)
-                            .setVisible(R.id.tv_on, true)
-                            .setVisible(R.id.tv_off, true)
-                            .setVisible(R.id.curtain_setting, false)
+                helper.setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)//设置
+                        .setImageResource(R.id.template_device_more,R.drawable.icon_more)//进入
+                when {
+                    num > 0 -> {
 
-                    if (group.connectionStatus == ConnectionStatus.ON.value) {
-                        helper.setImageResource(R.id.btn_on, R.drawable.icon_open_group)
-                                .setImageResource(R.id.btn_off, R.drawable.icon_down)
-                                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
-                                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                    } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
-                        helper.setImageResource(R.id.btn_on, R.drawable.icon_down)
-                                .setImageResource(R.id.btn_off, R.drawable.icon_open_group)
-                                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.white))
+                        when (group.connectionStatus) {
+                            ConnectionStatus.ON.value -> {
+                                helper/*.setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)
+                                        .setImageResource(R.id.template_device_more,R.drawable.icon_more)*/
+                                        .setImageResource(R.id.template_device_icon,R.drawable.icon_group_n)
+                            }
+                            ConnectionStatus.OFF.value -> {
+                                helper/*.setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n_g)
+                                        .setImageResource(R.id.template_device_more,R.drawable.icon_more_g)*/
+                                        .setImageResource(R.id.template_device_icon,R.drawable.icon_group_g_n)
+                            }
+                        }
                     }
-                } else if (num <= 0) {//group.deviceType == Constant.DEVICE_TYPE_CURTAIN  窗帘不使用原本三个图标 使用新的按钮
-                    setCanNotClik(helper)
+                    num <= 0 -> {//group.deviceType == Constant.DEVICE_TYPE_CURTAIN  窗帘不使用原本三个图标 使用新的按钮
+
+                    }
                 }
-                helper.addOnClickListener(R.id.btn_set).setImageResource(R.id.btn_set, R.drawable.icon_setting_group)
+                helper.addOnClickListener(R.id.template_device_setting)
+                        .addOnClickListener(R.id.template_device_more)
             } else {
-                setNoClik(helper)
+               helper.addOnClickListener(R.id.template_device_icon)
             }
 
             if (group.textColor == 0)
                 group.textColor = mContext.resources.getColor(R.color.black)
 
             if (group.meshAddr == 0xffff)
-                helper.setText(R.id.template_group_name_n, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.template_group_name_s, TelinkLightApplication.getApp().getString(R.string.allLight))
             else
-                helper.setText(R.id.template_group_name_n, group.name)
+                helper.setText(R.id.template_group_name_s, group.name)
 
 
             if (group.isSelected)
@@ -86,40 +80,12 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             else
                 helper.setChecked(R.id.selected_group, false)
 
-            helper.setTextColor(R.id.template_group_name_n, group.textColor)
+            helper.setTextColor(R.id.template_group_name_s, group.textColor)
                     .addOnClickListener(R.id.item_layout)
         }
     }
 
-    private fun setCanNotClik(helper: BaseViewHolder) {
-        helper.setImageResource(R.id.btn_set, R.drawable.shezhi)
-                .setImageResource(R.id.btn_on, R.drawable.icon_gray_group)
-                .setImageResource(R.id.btn_off, R.drawable.icon_down_group)
-                .setVisible(R.id.view3, true)
-                .setVisible(R.id.view4, true)
-                .setVisible(R.id.btn_on, true)
-                .setVisible(R.id.btn_on, true)
-                .setVisible(R.id.btn_off, true)
-                .setVisible(R.id.btn_set, true)
-                .setVisible(R.id.tv_on, true)
-                .setVisible(R.id.tv_off, true)
-                .setVisible(R.id.curtain_setting, false)
-                .setTextColor(R.id.tv_on, TelinkLightApplication.getApp().getColor(R.color.white))
-                .setTextColor(R.id.tv_off, TelinkLightApplication.getApp().getColor(R.color.color_c8))
-    }
 
-    private fun setNoClik(helper: BaseViewHolder) {
-        helper.setImageResource(R.id.btn_set, R.drawable.icon_setting_group_no)
-                .setVisible(R.id.view3, false)
-                .setVisible(R.id.view4, false)
-                .setVisible(R.id.btn_on, false)
-                .setVisible(R.id.btn_off, false)
-                .setVisible(R.id.tv_on, false)
-                .setVisible(R.id.tv_off, false)
-                .setVisible(R.id.btn_set, false)
-                .setVisible(R.id.curtain_setting, true)
-                .addOnClickListener(R.id.curtain_setting)
-    }
 
     /**
      * 改变状态

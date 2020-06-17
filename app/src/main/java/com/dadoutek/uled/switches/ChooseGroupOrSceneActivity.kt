@@ -27,8 +27,8 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
     private var type: Int = 0
-    private var sceneAdapter = SceneItemAdapter(R.layout.template_device_item_s, sceneList)
-    private var groupAdapter = GroupItemAdapter(R.layout.template_device_item_s, allGroups)
+    private var sceneAdapter = SceneItemAdapter(R.layout.template_batch_device_item, sceneList)
+    private var groupAdapter = GroupItemAdapter(R.layout.template_batch_device_item, allGroups)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.choose_group_scene)

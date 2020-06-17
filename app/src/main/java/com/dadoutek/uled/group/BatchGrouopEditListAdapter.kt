@@ -20,10 +20,10 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        val tv = helper.getView<TextView>(R.id.template_device_title_blow)
+        val tv = helper.getView<TextView>(R.id.template_device_batch_title_blow)
         tv.visibility = View.GONE
         helper.setText(R.id.template_device_batch_title, item.name)
-                .setText(R.id.template_device_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
+                .setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
         if (item.isCheckedInGroup) {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)

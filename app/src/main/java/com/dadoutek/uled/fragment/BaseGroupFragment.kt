@@ -244,7 +244,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         })
 
         //LogUtils.e("zcl删除组前$groupList")
-        this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
+        //this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
+        this.groupAdapter = GroupListAdapter(R.layout.template_device_type_item, groupList, isDelete)
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线

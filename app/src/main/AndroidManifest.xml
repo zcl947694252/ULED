@@ -86,7 +86,10 @@
                 android:name=".fragment.SafeLockActivity"
                 android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
-
+        <activity
+                android:name=".scene.SelectSceneIconActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
         <activity
                 android:name=".othersview.CountryActivity"
                  android:screenOrientation="portrait"

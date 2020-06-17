@@ -1,5 +1,6 @@
 package com.dadoutek.uled.scene
 
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -12,14 +13,15 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-         helper.setText(R.id.item_more_group_name,item.name)
+         helper.setText(R.id.template_device_batch_title,item.name)
+        val view = helper.getView<TextView>(R.id.template_device_batch_title_blow)
         if (item.isChecked) {
-            helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_selected)
         } else {
             if(item.isCheckedInGroup){
-                helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)
+                helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_unselected)
             }else{
-                helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)
+                helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_unselected)
             }
         }
     }

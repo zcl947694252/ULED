@@ -222,7 +222,7 @@ public class DbLight implements Serializable {
         } else if (this.status == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_device_down;
         } else if (this.status == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_device_open;
+            this.icon = R.drawable.icon_light_n;
         }
     }
 
@@ -232,7 +232,7 @@ public class DbLight implements Serializable {
         } else if (this.status == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_rgblight_down;
         } else if (this.status == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_rgblight;
+            this.icon = R.drawable.icon_rgb_n;
         }
     }
 

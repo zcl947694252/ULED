@@ -18,12 +18,32 @@ import java.util.List;
 public class OtherUtils {
 
     /**
-     * 判断灯进行的分组是否成立
-     *
-     * @param productUUID 预分组灯的UUID
-     * @param dbGroup     分组
+     * 获取图片名称获取图片的资源id的方法
+     * @param imageName
      * @return
      */
+    public static int  getResourceId(String imageName,Context context) {
+        int resId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+        return resId;
+    }
+
+
+    /**
+     * 获取图片名称
+     * @param resid
+     * @return
+     */
+    public static String getResourceName(int resid, Context context){
+      return   context.getResources().getResourceName(resid);
+    }
+
+    /**
+         * 判断灯进行的分组是否成立
+         *
+         * @param productUUID 预分组灯的UUID
+         * @param dbGroup     分组
+         * @return
+         */
     public static boolean whetherTheGroupIsEstablished(int productUUID, DbGroup dbGroup) {
         if (groupIsEmpty(dbGroup)) {
             //如果当前组没有任何灯，直接返回分组成立

@@ -21,7 +21,7 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
-        val groupName = helper.getView<TextView>(R.id.template_device_title_blow)
+        val groupName = helper.getView<TextView>(R.id.template_device_batch_title_blow)
 
         helper.setText(R.id.template_device_batch_title, item?.name)
 
@@ -33,7 +33,7 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
 
         if (item?.hasGroup == true) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
-                    .setTextColor(R.id.template_device_title_blow, mContext.getColor(R.color.blue_text))
+                    .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
             groupName.text = item?.groupName
 

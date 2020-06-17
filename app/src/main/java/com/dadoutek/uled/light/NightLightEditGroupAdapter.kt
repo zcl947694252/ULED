@@ -11,7 +11,7 @@ class NightLightEditGroupAdapter (layoutResId: Int, data: List<DbGroup>) : BaseQ
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
         helper.setText(R.id.template_device_batch_title,item.name).addOnClickListener(R.id.item_more_group_check)
-        val smallTv = helper.getView<TextView>(R.id.template_device_title_blow)
+        val smallTv = helper.getView<TextView>(R.id.template_device_batch_title_blow)
         smallTv.visibility = View.GONE
         if (item.isChecked) {
             helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_selected)

@@ -1011,4 +1011,6 @@
     <string name="user_agreement">用户协议及隐私说明</string>
     <string name="verification_code_login">验证码登录</string>
     <string name="no_connect_device">无可自动连接设备!</string>
+    <string name="select_icon_dot">请选择图标:</string>
+    <string name="select_icon">选择图标</string>
 </resources>

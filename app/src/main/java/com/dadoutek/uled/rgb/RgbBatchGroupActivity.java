@@ -191,7 +191,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         DbLight light = this.adapter.getItem(position);
         light.selected = !light.selected;
         DeviceItemHolder holder = (DeviceItemHolder) view.getTag();
-        holder.selected.setChecked(light.selected);
+        holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
 
         if (light.selected) {
             this.updateList.add(light);
@@ -1157,7 +1157,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private static class DeviceItemHolder {
         public ImageView icon;
         public TextView txtName;
-        public CheckBox selected;
+        public ImageView selected;
         public TextView lightName;
     }
     final class DeviceListAdapter extends BaseAdapter {
@@ -1178,10 +1178,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             DeviceItemHolder holder;
-            convertView = inflater.inflate(R.layout.template_device_item_s, null);
-            ImageView icon = convertView.findViewById(R.id.template_device_icon_n);
-            TextView txtName = convertView.findViewById(R.id.template_group_name_n);
-            CheckBox selected = convertView.findViewById(R.id.template_select_n);
+            convertView = inflater.inflate(R.layout.template_, null);
+            ImageView icon = convertView.findViewById(R.id.template_device_icon_s);
+            TextView txtName = convertView.findViewById(R.id.template_group_name_s);
+            ImageView selected = convertView.findViewById(R.id.template_device_batch_selected);
             TextView lightName = convertView.findViewById(R.id.template_device_name_n);
             holder = new DeviceItemHolder();
             holder.icon = icon;
@@ -1198,7 +1198,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 holder.icon.setImageResource(R.drawable.icon_rgblight_down);
             }
 
-            holder.selected.setChecked(light.selected);
+            holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
             holder.lightName.setText(light.getName());
             holder.txtName.setText(getDeviceName(light));
             holder.icon.setVisibility(View.VISIBLE);
