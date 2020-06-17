@@ -1094,13 +1094,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun onLocationEnable() {}
     internal inner class DeviceListAdapter(layoutId: Int, data: MutableList<ScannedDeviceItem>) : BaseQuickAdapter<ScannedDeviceItem, BaseViewHolder>(layoutId, data) {
         override fun convert(helper: BaseViewHolder?, item: ScannedDeviceItem?) {
-            val icon = helper?.getView<ImageView>(R.id.template_device_icon_s)
-            val groupName = helper?.getView<TextView>(R.id.template_group_name_s)
-            val deviceName = helper?.getView<TextView>(R.id.template_device_name_n)
-            val checkBox = helper?.getView<CheckBox>(R.id.template_select_s)
+            val icon = helper?.getView<ImageView>(R.id.template_device_batch_icon)
+            val groupName = helper?.getView<TextView>(R.id.template_device_batch_title_blow)
+            val deviceName = helper?.getView<TextView>(R.id.template_device_batch_title)
+            val imageView = helper?.getView<ImageView>(R.id.template_device_batch_selected)
 
             groupName?.visibility = View.GONE
-            checkBox?.isChecked = item?.isSelected ?: false
+            if (item?.isSelected==true)
+                imageView?.setImageResource(R.drawable.icon_checkbox_selected)
+            else
+                imageView?.setImageResource(R.drawable.icon_checkbox_unselected)
+
             deviceName?.text = item?.name
             if (mAddDeviceType == DeviceType.GATE_WAY)
                 icon?.setImageResource(R.drawable.icon_gw_open)
@@ -1109,14 +1113,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             if (item?.hasGroup == true) {
                 icon?.visibility = View.VISIBLE
-                checkBox?.visibility = View.VISIBLE
+                imageView?.visibility = View.VISIBLE
             } else {
                 deviceName?.visibility = View.VISIBLE
                 icon?.visibility = View.VISIBLE
                 if (grouping) {
-                    checkBox?.visibility = View.VISIBLE
+                    imageView?.visibility = View.VISIBLE
                 } else {
-                    checkBox?.visibility = View.GONE
+                    imageView?.visibility = View.GONE
                 }
             }
         }

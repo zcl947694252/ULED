@@ -12,7 +12,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
     override fun convert(helper: BaseViewHolder, dbConnector: DbConnector) {
         if (dbConnector != null) {
             //val tvName = helper.getView<TextView>(R.id.name)
-            val tvLightName = helper.getView<TextView>(R.id.template_group_name_s)
+            val tvLightName = helper.getView<TextView>(R.id.template_group_name)
            // val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
                // tvName.text = StringUtils.getConnectorName(scene)
 

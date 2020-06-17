@@ -364,7 +364,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
             if (convertView == null) {
 
                 convertView = inflater.inflate(R.layout.template_batch_device_item, null);
-                ImageView icon = (ImageView) convertView.findViewById(R.id.template_device_icon_s);
+                ImageView icon = (ImageView) convertView.findViewById(R.id.template_device_icon_n);
                 TextView txtName = (TextView) convertView.findViewById(R.id.template_group_name_s);
                 ImageView selected = (ImageView) convertView.findViewById(R.id.template_device_batch_selected);
 

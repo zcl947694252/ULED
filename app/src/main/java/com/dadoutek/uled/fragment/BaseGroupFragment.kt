@@ -13,6 +13,7 @@ import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -237,7 +238,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         lin?.setOnClickListener(onClickAddGroup)
 
         val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        recyclerView!!.layoutManager = layoutmanager
+       // recyclerView!!.layoutManager = layoutmanager
+        recyclerView!!.layoutManager = GridLayoutManager(context,2)
 
         Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
@@ -401,101 +403,98 @@ abstract class BaseGroupFragment : BaseFragment() {
         val dstAddr = currentGroup!!.meshAddr
         val groupType = setGroupType()
 
-            when (view!!.id) {
-                R.id.btn_on, R.id.tv_on -> {
-                    if (TelinkLightApplication.getApp().connectDevice == null)
-                        sendToGw(true)
-                    else
-                        if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+        when (view!!.id) {
+            R.id.template_device_icon -> {
+                if (TelinkLightApplication.getApp().connectDevice == null)
+                    sendToGw(true)
+                else
+                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        if (currentGroup!!.status == 0) {
                             Commander.openOrCloseLights(dstAddr, true)
                             groupOpenSuccess(position)
+                        } else {
+                            Commander.openOrCloseLights(dstAddr, false)
+                            groupCloseSuccess(position)
                         }
-                }
-                R.id.btn_off, R.id.tv_off -> {
-                    if (TelinkLightApplication.getApp().connectDevice == null)
-                        sendToGw(false)
-                    else
-                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        Commander.openOrCloseLights(dstAddr, false)
-                        groupCloseSuccess(position)
                     }
-                }
+            }
 
-                R.id.btn_set, R.id.curtain_setting -> {
-                    val lastUser = DBUtils.lastUser
-                    lastUser?.let {
-                        /*  if (it.id.toString() != it.last_authorizer_user_id)
-                              ToastUtils.showLong(getString(R.string.author_region_warm))
-                          else {*/
-                        if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
-                            var num = 0
+            R.id.template_device_setting -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    /*  if (it.id.toString() != it.last_authorizer_user_id)
+                          ToastUtils.showLong(getString(R.string.author_region_warm))
+                      else {*/
+                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
+                        var num = 0
+                        when (groupType) {
+                            Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                            }
+                            Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                                num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                            }
+                            Constant.DEVICE_TYPE_CONNECTOR -> {
+                                num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
+                            }//蓝牙接收器
+                            Constant.DEVICE_TYPE_CURTAIN -> {
+                                num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
+                            }
+                        }
+
+                        if (num != 0) {
+                            var intent: Intent? = null
+
                             when (groupType) {
                                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                    num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                    intent = Intent(mContext, NormalSettingActivity::class.java)
                                 }
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                                    num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                    intent = Intent(mContext, RGBSettingActivity::class.java)
                                 }
-                                Constant.DEVICE_TYPE_CONNECTOR -> {
-                                    num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
-                                }//蓝牙接收器
+                                Constant.DEVICE_TYPE_CONNECTOR -> {//蓝牙接收器
+                                    intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                                }
                                 Constant.DEVICE_TYPE_CURTAIN -> {
-                                    num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
+                                    intent = Intent(mContext, WindowCurtainsActivity::class.java)
                                 }
                             }
-
-                            if (num != 0) {
-                                var intent: Intent? = null
-
-                                when (groupType) {
-                                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                        intent = Intent(mContext, NormalSettingActivity::class.java)
-                                    }
-                                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                                        intent = Intent(mContext, RGBSettingActivity::class.java)
-                                    }
-                                    Constant.DEVICE_TYPE_CONNECTOR -> {//蓝牙接收器
-                                        intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                                    }
-                                    Constant.DEVICE_TYPE_CURTAIN -> {
-                                        intent = Intent(mContext, WindowCurtainsActivity::class.java)
-                                    }
-                                }
-                                intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                                intent?.putExtra("group", currentGroup)
-                                startActivityForResult(intent, 2)
-                            }
+                            intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intent?.putExtra("group", currentGroup)
+                            startActivityForResult(intent, 2)
                         }
                     }
-                    //}
                 }
+                //}
+            }
 
-                R.id.selected_group -> {
-                    groupList[position].isSelected = !groupList[position].isSelected
-                }
+            R.id.selected_group -> {
+                groupList[position].isSelected = !groupList[position].isSelected
+            }
 
-                //不能使用group_name否则会造成长按监听无效 跳转组详情
-                R.id.item_layout -> {
-                    var intent = Intent()
-                    when (groupType) {
-                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                            intent.putExtra("light", "cw_light")
-                        }
-                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                            intent.putExtra("light", "rgb_light")
-                        }//蓝牙接收器
-                        Constant.DEVICE_TYPE_CONNECTOR -> {
-                            intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                        }
-                        Constant.DEVICE_TYPE_CURTAIN -> {
-                            intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                        }
+            //不能使用group_name否则会造成长按监听无效 跳转组详情
+            //  R.id.item_layout -> {
+            R.id.template_device_more -> {
+                var intent = Intent()
+                when (groupType) {
+                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "cw_light")
                     }
-                    intent.putExtra("group", currentGroup)
-                    startActivityForResult(intent, 2)
+                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "rgb_light")
+                    }//蓝牙接收器
+                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                    }
+                    Constant.DEVICE_TYPE_CURTAIN -> {
+                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                    }
                 }
+                intent.putExtra("group", currentGroup)
+                startActivityForResult(intent, 2)
+            }
 
         }
     }

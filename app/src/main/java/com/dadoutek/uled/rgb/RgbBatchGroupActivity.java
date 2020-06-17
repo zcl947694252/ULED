@@ -22,7 +22,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -1178,11 +1177,11 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             DeviceItemHolder holder;
-            convertView = inflater.inflate(R.layout.template_, null);
-            ImageView icon = convertView.findViewById(R.id.template_device_icon_s);
-            TextView txtName = convertView.findViewById(R.id.template_group_name_s);
+            convertView = inflater.inflate(R.layout.template_batch_device_item, null);
+            ImageView icon = convertView.findViewById(R.id.template_device_batch_icon);
+            TextView txtName = convertView.findViewById(R.id.template_device_batch_title_blow);
             ImageView selected = convertView.findViewById(R.id.template_device_batch_selected);
-            TextView lightName = convertView.findViewById(R.id.template_device_name_n);
+            TextView lightName = convertView.findViewById(R.id.template_device_batch_title);
             holder = new DeviceItemHolder();
             holder.icon = icon;
             holder.txtName = txtName;
@@ -1192,11 +1191,11 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             DbLight light = this.getItem(position);
 
             holder.txtName.setText(light.getName());
-            if(light.getProductUUID()== DeviceType.LIGHT_RGB){
+            if(light.getProductUUID()== DeviceType.LIGHT_RGB)
                 holder.icon.setImageResource(R.drawable.icon_rgblight);
-            } else{
+            else
                 holder.icon.setImageResource(R.drawable.icon_rgblight_down);
-            }
+
 
             holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
             holder.lightName.setText(light.getName());

@@ -24,9 +24,9 @@ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, intern
     override fun convert(helper: BaseViewHolder, data: DbGateway) {
         if (data != null) {
             if (data.name != null && data.name != "") {
-                helper.setText(R.id.template_group_name_s, data.name)
+                helper.setText(R.id.template_group_name, data.name)
             } else {
-                helper.setText(R.id.template_group_name_s, StringUtils.getSwitchPirDefaultName(data.productUUID, context) + "-" + helper.position)
+                helper.setText(R.id.template_group_name, StringUtils.getSwitchPirDefaultName(data.productUUID, context) + "-" + helper.position)
             }
 
             //helper.setVisible(R.id.name, false)

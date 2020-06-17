@@ -24,7 +24,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -142,7 +141,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     //标记登录状态
     private boolean isLoginSuccess = false;
     private GridView deviceListView;
-
+    private boolean initHasGroup = false;
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
 
@@ -1249,7 +1248,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             convertView = inflater.inflate(R.layout.template_batch_device_item, null);
             ImageView icon = (ImageView) convertView
-                    .findViewById(R.id.template_device_icon_s);
+                    .findViewById(R.id.template_device_icon_n);
             TextView txtName = (TextView) convertView
                     .findViewById(R.id.template_group_name_s);
             ImageView selected =(ImageView) convertView.findViewById(R.id.template_device_batch_selected);

@@ -9,7 +9,7 @@ class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : Base
 
     override fun convert(helper: BaseViewHolder, dbSensor: DbSensor) {
         if (dbSensor != null) {
-            helper.setText(R.id.template_group_name_s, dbSensor.name)
+            helper.setText(R.id.template_group_name, dbSensor.name)
             helper.setImageResource(R.id.template_device_icon, dbSensor.icon)
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)

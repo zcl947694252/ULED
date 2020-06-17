@@ -20,6 +20,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupActivity
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -127,21 +128,26 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun addDevice() {
         if (strLight == "cw_light") {
-            val intent = Intent(this,
-                    BatchGroupActivity::class.java)
+            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+            startActivity(intent)
+           /* val intent = Intent(this, BatchGroupActivity::class.java)
             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
             intent.putExtra("lightType", "cw_light")
             intent.putExtra("cw_light_group_name", group?.name)
-            startActivity(intent)
+            startActivity(intent)*/
         } else if (strLight == "rgb_light") {
-            val intent = Intent(this,
+          /*  val intent = Intent(this,
                     RgbBatchGroupActivity::class.java)
             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
             intent.putExtra("lightType", "rgb_light")
             intent.putExtra("rgb_light_group_name", group?.name)
 //            startActivity(intent)
+            startActivity(intent)*/
+            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
             startActivity(intent)
         }
     }
