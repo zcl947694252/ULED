@@ -60,108 +60,114 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/dp_15"
                 android:layout_marginTop="1dp"
-                android:button="@null"
-                android:background="@drawable/select_check"/>
+                android:background="@drawable/select_check"
+                android:button="@null" />
+
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_30">
-        <RadioGroup
-                android:id="@+id/slow_rg_ly"
-                android:layout_width="200dp"
-                android:layout_height="@dimen/dp_30"
-                android:layout_marginStart="12dp"
-                android:gravity="center"
-                android:background="@drawable/rect_solid_radius5_e"
-                android:orientation="horizontal">
 
-            <RadioButton
-                    android:id="@+id/slow_rg_slow"
-                    android:layout_width="60dp"
-                    android:background="@drawable/select_radius5_w_e"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:button="@null"
+            <RadioGroup
+                    android:id="@+id/slow_rg_ly"
+                    android:layout_width="200dp"
+                    android:layout_height="@dimen/dp_30"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/rect_solid_radius5_e"
                     android:gravity="center"
-                    android:text="@string/slow"
-                    android:layout_height="23dp" />
+                    android:orientation="horizontal">
 
-            <RadioButton
-                    android:id="@+id/slow_rg_middle"
-                    android:layout_width="60dp"
-                    android:layout_height="23dp"
-                    android:button="@null"
-                    android:background="@drawable/select_radius5_w_e"
-                    android:text="@string/mid"
-                    android:gravity="center"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:layout_marginEnd="@dimen/dp_5" />
+                <RadioButton
+                        android:id="@+id/slow_rg_slow"
+                        android:layout_width="60dp"
+                        android:layout_height="23dp"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:background="@drawable/select_radius5_w_e"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="@string/slow" />
 
-            <RadioButton
-                    android:id="@+id/slow_rg_fast"
-                    android:layout_width="60dp"
-                    android:layout_height="23dp"
-                    android:text="@string/fast"
-                    android:background="@drawable/select_radius5_w_e"
-                    android:gravity="center"
-                    android:button="@null"
-                    android:layout_marginEnd="@dimen/dp_5"/>
-        </RadioGroup>
+                <RadioButton
+                        android:id="@+id/slow_rg_middle"
+                        android:layout_width="60dp"
+                        android:layout_height="23dp"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginEnd="@dimen/dp_5"
+                        android:background="@drawable/select_radius5_w_e"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="@string/mid" />
+
+                <RadioButton
+                        android:id="@+id/slow_rg_fast"
+                        android:layout_width="60dp"
+                        android:layout_height="23dp"
+                        android:layout_marginEnd="@dimen/dp_5"
+                        android:background="@drawable/select_radius5_w_e"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="@string/fast" />
+            </RadioGroup>
+
             <View
                     android:id="@+id/slow_rg_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/transparent"/>
+                    android:background="@color/transparent" />
         </RelativeLayout>
     </LinearLayout>
 
-    <TextView
-            android:id="@+id/adjustment"
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_30"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="@string/brightness_adjustment"
-            android:textColor="@color/black_three"
-            android:textSize="15sp" />
+            android:orientation="horizontal">
 
-    <SeekBar
-            android:id="@+id/light_sbBrightness"
-            style="@style/SeekBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            android:padding="5dp"
-            android:progress="1" />
+        <TextView
+                android:id="@+id/adjustment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="@string/brightness_adjustment"
+                android:textColor="@color/black_three"
+                android:textSize="15sp" />
+
+        <TextView
+                android:id="@+id/tv_Brightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:text="1%"
+                android:gravity="center_vertical|end"
+                android:textColor="@color/black_three"
+                android:textSize="15sp" />
+
+    </LinearLayout>
 
     <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
             android:orientation="horizontal">
 
         <ImageView
                 android:id="@+id/device_light_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="@dimen/dp_10"
                 android:padding="5dp"
-                android:src="@drawable/icon_puls"
-                app:layout_constraintEnd_toEndOf="@+id/light_sbBrightness"
-                app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
+                android:src="@drawable/icon_puls" />
 
-        <TextView
-                android:id="@+id/tv_Brightness"
-                android:layout_width="wrap_content"
+        <SeekBar
+                android:id="@+id/light_sbBrightness"
+                style="@style/SeekBarStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="1%"
-                android:textColor="@color/black_three"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
-                app:layout_constraintEnd_toStartOf="@+id/device_light_add"
-                app:layout_constraintTop_toTopOf="@+id/device_light_add" />
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:progress="1" />
 
         <ImageView
                 android:id="@+id/device_light_minus"
@@ -169,10 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:padding="5dp"
-                android:src="@drawable/icon_minus"
-                app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
-                app:layout_constraintEnd_toStartOf="@+id/tv_Brightness" />
-
+                android:src="@drawable/icon_minus" />
     </LinearLayout>
 
     <LinearLayout
@@ -250,6 +253,7 @@
         </LinearLayout>
 
     </LinearLayout>
+
     <TextView
             android:id="@+id/textTitle"
             android:layout_width="match_parent"

@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -72,6 +73,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.OnTouchListener */ {
+    private val requestCodeNum: Int = 1000
     private var mConnectDeviceDisposable: Disposable? = null
     private var clickPostion: Int = 100
     private var postionAndNum: ItemRgbGradient? = null
@@ -185,7 +187,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun updateGroup() {
-        val intent = Intent(this, ChooseGroupForDevice::class.java)
+        val intent = Intent(this, ChooseGroupOrSceneActivity::class.java)
         intent.putExtra("light", light)
 
         if (light == null) {
@@ -201,7 +203,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             intent.putExtra("gpAddress", it.meshAddr)
             Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
         }
-        startActivity(intent)
+
+        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        startActivityForResult(intent, requestCodeNum)
+    }
+
+
+    private fun updateGroupResult(light: DbLight, group: DbGroup) {
+        light.hasGroup = true
+        light.belongGroupId = group.id
+        light.name = light.name
+        DBUtils.updateLight(light)
+        if (group != null)
+            DBUtils.updateGroup(group!!)//更新组类型
     }
 
     private fun checkPermission() {
@@ -1118,36 +1132,43 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        diyGradientList = DBUtils.diyGradientList
-
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
-        isDelete = false
-        rgbDiyGradientAdapter!!.changeState(isDelete)
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-        toolbar!!.title = getString(R.string.dynamic_gradient)
-        rgbDiyGradientAdapter!!.notifyDataSetChanged()
-        setDate()
-        if (clickPostion != 100 && diyPosition != 100) {
-            diyGradientList!![diyPosition].isSelect = false//开关状态
-            diyGradientList!![clickPostion].isSelect = true//开关状态
-            diyPosition = clickPostion
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            if (light != null)
+                updateGroupResult(light!!, group)
+            finish()
         } else {
-            if (diyPosition != 100)
-                diyGradientList!![diyPosition].isSelect = true//开关状态
-        }
-        isExitGradient = false
-        isDiyMode = true
-        changeToDiyPage()
+            diyGradientList = DBUtils.diyGradientList
 
-        //应用自定义渐变
-        if (diyPosition != 100)
-            GlobalScope.launch {
-                stopGradient()
-                delay(200)
-                Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(),
-                        diyGradientList!![diyPosition].speed, firstLightAddress)
+            this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+            isDelete = false
+            rgbDiyGradientAdapter!!.changeState(isDelete)
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+            toolbar!!.title = getString(R.string.dynamic_gradient)
+            rgbDiyGradientAdapter!!.notifyDataSetChanged()
+            setDate()
+            if (clickPostion != 100 && diyPosition != 100) {
+                diyGradientList!![diyPosition].isSelect = false//开关状态
+                diyGradientList!![clickPostion].isSelect = true//开关状态
+                diyPosition = clickPostion
+            } else {
+                if (diyPosition != 100)
+                    diyGradientList!![diyPosition].isSelect = true//开关状态
             }
+            isExitGradient = false
+            isDiyMode = true
+            changeToDiyPage()
+
+            //应用自定义渐变
+            if (diyPosition != 100)
+                GlobalScope.launch {
+                    stopGradient()
+                    delay(200)
+                    Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(),
+                            diyGradientList!![diyPosition].speed, firstLightAddress)
+                }
+        }
     }
 
     private fun setDate() {

@@ -42,7 +42,7 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         val holder: GroupItemHolder = GroupItemHolder()
 
-        val txtName = convertView?.findViewById<View>(R.id.template_group_name_s) as TextView
+        val txtName = convertView?.findViewById<View>(R.id.template_device_batch_title) as TextView
 
         holder.name = txtName
 

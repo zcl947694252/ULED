@@ -21,16 +21,13 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
         if (group != null) {
             val num = group.deviceCount //内含设备的数量
-            //val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
-            if (isDelete) {
-             //   deleteIcon.visibility = View.VISIBLE
-            } else {
-             //   deleteIcon.visibility = View.GONE
-            }
 
             helper//.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
                     .setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)
                     .setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)
+                    .addOnClickListener(R.id.template_device_icon)
+                    .addOnClickListener(R.id.template_device_more)
+                    .addOnClickListener(R.id.template_device_setting)
                     //.addOnClickListener(R.id.selected_group) 多选选中删除暂时不做
 
             val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
@@ -55,7 +52,6 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                         }
                     }
                     num <= 0 -> {//group.deviceType == Constant.DEVICE_TYPE_CURTAIN  窗帘不使用原本三个图标 使用新的按钮
-
                     }
                 }
                 helper.addOnClickListener(R.id.template_device_setting)
@@ -72,6 +68,14 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             else
                 helper.setText(R.id.template_group_name, group.name)
 
+
+
+            //val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
+            if (isDelete) {
+                //   deleteIcon.visibility = View.VISIBLE
+            } else {
+                //   deleteIcon.visibility = View.GONE
+            }
           /*  if (group.isSelected)
                 helper.setChecked(R.id.selected_group, true)
             else

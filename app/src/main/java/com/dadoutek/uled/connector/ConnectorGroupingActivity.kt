@@ -212,7 +212,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         this.inflater = this.layoutInflater
-        listView = this.findViewById<View>(R.id.list_groups) as GridView
+        listView = this.findViewById(R.id.list_groups)
         listView!!.onItemClickListener = this.itemClickListener
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)

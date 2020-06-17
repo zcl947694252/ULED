@@ -54,7 +54,7 @@ public class DbLight implements Serializable {
     public int status = 1;//连接状态
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int icon = R.drawable.icon_light_no_circle;//灯状态显示图
     public int rssi =1000;
 
 
@@ -218,21 +218,21 @@ public class DbLight implements Serializable {
     public void updateIcon() {
 
         if (this.status == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_device_down;
+            this.icon = R.drawable.icon_light_close_g;
         } else if (this.status == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_device_down;
+            this.icon = R.drawable.icon_light_close_g;
         } else if (this.status == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_light_n;
+            this.icon = R.drawable.icon_light_no_circle;
         }
     }
 
     public void updateRgbIcon(){
         if (this.status == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_rgblight_down;
+            this.icon = R.drawable.icon_light_close_g;
         } else if (this.status == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_rgblight_down;
+            this.icon = R.drawable.icon_light_close_g;
         } else if (this.status == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_rgb_n;
+            this.icon = R.drawable.icon_rgb_no_circle;
         }
     }
 

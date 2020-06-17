@@ -28,6 +28,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
@@ -65,6 +66,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
+    private var mConnectDisposable: Disposable? = null
     private var currentPosition: Int = 0
     private var disposableTimer: Disposable? = null
     private var currentGroup: DbGroup? = null
@@ -238,8 +240,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         lin?.setOnClickListener(onClickAddGroup)
 
         val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-       // recyclerView!!.layoutManager = layoutmanager
-        recyclerView!!.layoutManager = GridLayoutManager(context,2)
+        // recyclerView!!.layoutManager = layoutmanager
+        recyclerView!!.layoutManager = GridLayoutManager(context, 2)
 
         Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
@@ -405,10 +407,11 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         when (view!!.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null)
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    goConnect(false)
                     sendToGw(true)
-                else
-                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                } else
+                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && currentGroup!!.deviceType != Constant.DEVICE_TYPE_CURTAIN) {
                         if (currentGroup!!.status == 0) {
                             Commander.openOrCloseLights(dstAddr, true)
                             groupOpenSuccess(position)
@@ -444,7 +447,6 @@ abstract class BaseGroupFragment : BaseFragment() {
 
                         if (num != 0) {
                             var intent: Intent? = null
-
                             when (groupType) {
                                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
                                     intent = Intent(mContext, NormalSettingActivity::class.java)
@@ -461,7 +463,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                             intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                             intent?.putExtra("group", currentGroup)
-                            startActivityForResult(intent, 2)
+                            if (TelinkLightApplication.getApp().connectDevice == null)
+                                goConnect()
+                            else
+                                startActivityForResult(intent, 2)
                         }
                     }
                 }
@@ -497,6 +502,15 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
 
         }
+    }
+
+    private fun goConnect(ishow: Boolean = true) {
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        if (ishow)
+            ToastUtils.showShort(getString(R.string.connecting))
+        mConnectDisposable?.dispose()
+        mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                ?.subscribe({}, { LogUtils.d("connect failed") })
     }
 
     private fun groupCloseSuccess(position: Int) {
@@ -666,6 +680,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
+        mConnectDisposable?.dispose()
         localBroadcastManager.unregisterReceiver(br)
     }
 

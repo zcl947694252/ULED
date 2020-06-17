@@ -26,6 +26,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.activity_device_grouping.*
 import kotlinx.coroutines.GlobalScope
 
 
@@ -42,9 +43,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private var mGroupList: MutableList<DbGroup> = mutableListOf()
 
     private lateinit var mLight: DbLight
-
-    private var listView: GridView? = null
-
     private var type: String? = null
 
 
@@ -118,11 +116,10 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         this.inflater = this.layoutInflater
-        listView = this.findViewById<View>(R.id.list_groups) as GridView
-        listView!!.onItemClickListener = this.itemClickListener
+        list_groups!!.onItemClickListener = this.itemClickListener
 
-        adapter = DeviceGroupingAdapter(mGroupList!!, this)
-        listView!!.adapter = adapter
+        adapter = DeviceGroupingAdapter(mGroupList!!,this)
+        list_groups!!.adapter = adapter
     }
 
     private fun initData() {
@@ -257,7 +254,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         filter(list)
 
         adapter = DeviceGroupingAdapter(mGroupList!!, this)
-        listView!!.adapter = this.adapter
+        list_groups!!.adapter = this.adapter
         adapter!!.notifyDataSetChanged()
     }
 

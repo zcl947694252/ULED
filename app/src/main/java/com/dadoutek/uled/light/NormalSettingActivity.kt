@@ -34,10 +34,12 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -54,6 +56,7 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageBrightnessFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilterGroup
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
+import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
@@ -64,6 +67,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private val requestCodeNum: Int = 1000
     private var type: String? = null
     private var openNum: Int = 0
     private var isAllGroup: Boolean = false
@@ -857,23 +861,28 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun updateGroup() {//更新分组 断开提示
-        val intent = Intent(this, ChooseGroupForDevice::class.java)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-
-        if (light == null) {
-            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
-            TelinkLightService.Instance()?.idleMode(true)
-            TelinkLightService.Instance()?.disconnect()
-            return
-        }
-        intent.putExtra("light", light)
-        intent.putExtra("gpAddress", gpAddress)
-        intent.putExtra("uuid", light!!.productUUID)
-        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
-        startActivity(intent)
+        val intent = Intent(this@NormalSettingActivity, ChooseGroupOrSceneActivity::class.java)
+        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        startActivityForResult(intent, requestCodeNum)
         this?.setResult(Constant.RESULT_OK)
-        this.finish()
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            updateGroupResult(light, group)
+            finish()
+        }
+    }
+
+    private fun updateGroupResult(light: DbLight, group: DbGroup) {
+        light.hasGroup = true
+        light.belongGroupId = group.id
+        light.name = light.name
+        DBUtils.updateLight(light)
+        if (group != null)
+            DBUtils.updateGroup(group!!)//更新组类型
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -1046,7 +1055,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        slow_rg_view.setOnClickListener {  }
+        slow_rg_view.setOnClickListener { }
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
             initDataGroup()

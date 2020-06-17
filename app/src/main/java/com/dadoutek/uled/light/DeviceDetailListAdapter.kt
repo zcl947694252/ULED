@@ -5,8 +5,10 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import org.greenrobot.greendao.DbUtils
 
 /**
  * 创建者     zcl
@@ -41,6 +43,8 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         }
 
         helper.setText(R.id.template_group_name,dbLight.name)
+        .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbLight.belongGroupId))
+                .setVisible(R.id.template_gp_name,true)
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)
