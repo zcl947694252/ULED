@@ -502,9 +502,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 }
                 1100 -> {
                     val intExtra = data?.getIntExtra("ID", 0)
-                    if (intExtra==0){
+                    if (intExtra == 0) {
                         ToastUtils.showShort(getString(R.string.invalid_data))
-                    }else{
+                    } else {
                         resId = intExtra
                         scene_icon.setImageResource(resId!!);
                     }
@@ -726,7 +726,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val dbScene = DbScene()
             dbScene.id = getSceneId()
             dbScene.name = name
-            dbScene.imgName = OtherUtils.getResourceName(resId!!,this@NewSceneSetAct)
+            try {
+                dbScene.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
             dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
             DBUtils.saveScene(dbScene, false)
 

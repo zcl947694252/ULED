@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -12,6 +13,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils.allGroups
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
+import com.dadoutek.uled.widget.RecyclerGridDecoration
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -39,7 +41,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
     private fun initData() {
         //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        template_recycleView?.layoutManager = GridLayoutManager(this,3)
+        template_recycleView?.layoutManager = GridLayoutManager(this,5)
 
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
         when (type) {
@@ -59,7 +61,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
-        template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView?.layoutManager = linearLayoutManager
     }
 
     private fun initListener() {

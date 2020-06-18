@@ -23,7 +23,12 @@ public class OtherUtils {
      * @return
      */
     public static int  getResourceId(String imageName,Context context) {
-        int resId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+        int resId;
+        try {
+            resId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+        }catch (Exception e){
+            resId = 0;
+        }
         return resId;
     }
 
@@ -34,7 +39,12 @@ public class OtherUtils {
      * @return
      */
     public static String getResourceName(int resid, Context context){
-      return   context.getResources().getResourceName(resid);
+        try {
+            return   context.getResources().getResourceName(resid);
+        }catch (Exception e){
+            return   "";
+        }
+
     }
 
     /**

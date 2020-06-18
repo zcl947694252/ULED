@@ -13,15 +13,15 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-         helper.setText(R.id.template_device_batch_title,item.name)
-        val view = helper.getView<TextView>(R.id.template_device_batch_title_blow)
+        helper.setText(R.id.template_device_batch_title, item.name)
+        helper.setVisible(R.id.template_device_batch_title_blow, false)
         if (item.isChecked) {
-            helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
-            if(item.isCheckedInGroup){
-                helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_unselected)
-            }else{
-                helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_unselected)
+            if (item.isCheckedInGroup) {
+                helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
+            } else {
+                helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
             }
         }
     }

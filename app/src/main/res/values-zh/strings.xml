@@ -76,7 +76,7 @@
     <string name="device_grouping_header">分组</string>
 
     <!-- Scan DeviceSchema -->
-    <string name="device_scan_header">扫描网络</string>
+    <string name="device_scan_header">扫描网络</string>1
     <string name="device_scan_scan">扫描设备</string>
     <string name="device_scan_add">添加设备</string>
 

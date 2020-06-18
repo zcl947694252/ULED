@@ -306,12 +306,6 @@
                 tools:ignore="LockedOrientationActivity"/>
 
         <activity
-                android:name=".group.ChooseGroupForDevice"
-                android:label="@string/activity_device_grouping"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
-        <activity
                 android:name=".ota.OtaActivity"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
