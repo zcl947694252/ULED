@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
 
 class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : BaseQuickAdapter<DbSensor, BaseViewHolder>(layoutResId, data) {

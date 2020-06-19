@@ -600,7 +600,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+    val onItemClickListenerInstallList: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {

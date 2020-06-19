@@ -363,7 +363,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String>, V
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
                         //("未建立物理连接")
-
                     }
                 }
                 showDisconnectSnackBar()

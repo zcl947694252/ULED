@@ -209,10 +209,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
+        group.deviceType = light.productUUID.toLong()
         light.hasGroup = true
         light.belongGroupId = group.id
         light.name = light.name
         DBUtils.updateLight(light)
+        ToastUtils.showShort(getString(R.string.grouping_success_tip))
         if (group != null)
             DBUtils.updateGroup(group!!)//更新组类型
     }

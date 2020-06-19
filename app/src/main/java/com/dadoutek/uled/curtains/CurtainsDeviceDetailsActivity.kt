@@ -151,7 +151,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 }
             }
-            Constant.INSTALL_CURTAIN_OF -> {
+            INSTALL_CURTAIN_OF -> {
                 if (allLightData.size > 0) {
                     var listGroup: ArrayList<DbCurtain> = ArrayList()
                     var noGroup: ArrayList<DbCurtain> = ArrayList()
@@ -218,7 +218,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
         for (i in curtain?.indices!!) {
-            //curtain!![i].updateIcon()
             curtain!![i].icon = R.drawable.icon_curtain
         }
     }

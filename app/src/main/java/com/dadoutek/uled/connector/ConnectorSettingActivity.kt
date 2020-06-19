@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAConnectorActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
@@ -60,20 +61,15 @@ import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
-
 class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
 
+    private val requestCodeNum: Int = 1000
     private var localVersion: String? = null
     private var light: DbConnector? = null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
     var fromWhere: String? = null
-    private val dialog: AlertDialog? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
@@ -82,9 +78,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
-
-    //    private var stopTracking = false
-    private var connectTimes = 0
     private var currentShowPageGroup = true
 
     private val clickListener = OnClickListener { v ->
@@ -214,9 +207,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
 
-    private fun updateGroup() {
-        val intent = Intent(this,
-                ConnectorGroupingActivity::class.java)
+/*    private fun updateGroup() {
+        val intent = Intent(this, ConnectorGroupingActivity::class.java)
         if (light == null) {
             ToastUtils.showLong(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
@@ -230,6 +222,35 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         Log.d("窗帘升级点击的设备Light", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
         this.finish()
+    }*/
+
+
+
+    private fun updateGroup() {//更新分组 断开提示
+        val intent = Intent(this@ConnectorSettingActivity, ChooseGroupOrSceneActivity::class.java)
+        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        startActivityForResult(intent, requestCodeNum)
+        this?.setResult(Constant.RESULT_OK)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            updateGroupResult(light!!, group)
+            finish()
+        }
+    }
+
+    private fun updateGroupResult(light: DbConnector, group: DbGroup) {
+        group.deviceType = light.productUUID.toLong()
+        light.hasGroup = true
+        light.belongGroupId = group.id
+        light.name = light.name
+        DBUtils.updateConnector(light)
+        ToastUtils.showShort(getString(R.string.grouping_success_tip))
+        if (group != null)
+            DBUtils.updateGroup(group!!)//更新组类型
     }
 
 
@@ -252,6 +273,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 //修改分组成功后删除场景信息。
                                 deleteAllSceneByLightAddr(light.meshAddr)
                                 Thread.sleep(100)
+
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组
                                     DBUtils.deleteGroupOnly(group)

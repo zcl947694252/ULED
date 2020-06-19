@@ -12,12 +12,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.CurtainGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -28,6 +28,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -50,6 +51,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private val requestCodeNum: Int = 1000
     private var disposable: Disposable? = null
     private var mConnectDeviceDisposable: Disposable? = null
     private var localVersion: String? = null
@@ -304,20 +306,120 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-    private fun updateGroup() {
-        val intent = Intent(this, CurtainGroupingActivity::class.java)
-        if (curtain == null) {
-            ToastUtils.showLong(getString(R.string.please_connect_curtain))
-            TelinkLightService.Instance()?.idleMode(true)
-            TelinkLightService.Instance()?.disconnect()
-            return
-        }
-        intent.putExtra("curtain", curtain)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
-        intent.putExtra("gpAddress", ctAdress)
-        intent.putExtra("uuid", curtain!!.productUUID)
-        startActivity(intent)
+    /* private fun updateGroup() {
+         val intent = Intent(this, CurtainGroupingActivity::class.java)
+         if (curtain == null) {
+             ToastUtils.showLong(getString(R.string.please_connect_curtain))
+             TelinkLightService.Instance()?.idleMode(true)
+             TelinkLightService.Instance()?.disconnect()
+             return
+         }
+         intent.putExtra("curtain", curtain)
+         intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
+         intent.putExtra("gpAddress", ctAdress)
+         intent.putExtra("uuid", curtain!!.productUUID)
+         startActivity(intent)
 
+     }*/
+    private fun updateGroup() {//更新分组 断开提示
+        val intent = Intent(this@WindowCurtainsActivity, ChooseGroupOrSceneActivity::class.java)
+        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        startActivityForResult(intent, requestCodeNum)
+        this?.setResult(Constant.RESULT_OK)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            updateGroupResult(curtain!!, group)
+            finish()
+        }
+    }
+
+    private fun updateGroupResult(light: DbCurtain, group: DbGroup) {
+        if (group != null) {
+            if (TelinkApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(R.string.group_fail)
+            } else {
+                /* showLoadingDialog(getString(R.string.grouping))
+                 Thread {
+                     val sceneIds = getRelatedSceneIds(group.meshAddr)
+                     for (i in 0..1) {
+                         deletePreGroup(curtain!!.meshAddr)
+                         Thread.sleep(100)
+                     }
+                     for (i in 0..1) {
+                         deleteAllSceneByLightAddr(curtain!!.meshAddr)
+                         Thread.sleep(100)
+                     }
+                     for (i in 0..1) {
+                         allocDeviceGroup(group)
+                         Thread.sleep(100)
+                     }
+                     for (sceneId in sceneIds) {
+                         val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
+                         if (action != null) {
+                             for (i in 0..1) {
+                                 Commander.addScene(sceneId, curtain!!.meshAddr, action.color)
+                                 Thread.sleep(100)
+                             }
+                         }
+                     }*/
+                group.deviceType = curtain!!.productUUID.toLong()
+                DBUtils.updateGroup(group)
+
+                light.hasGroup = true
+                light.belongGroupId = group.id
+                light.name = light.name
+                DBUtils.updateCurtain(light)
+                ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                //}.start()
+            }
+        }
+    }
+
+    /**
+     * start to group
+     *  设置设备分组
+     */
+    private fun allocDeviceGroup(group: DbGroup) {
+        val groupAddress = group.meshAddr
+        val dstAddress = curtain!!.meshAddr
+        val opcode = 0xD7.toByte()
+        val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+        params[0] = 0x01
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
+        curtain!!.belongGroupId = group.id
+    }
+
+    /**
+     * 删除指定灯的之前的分组
+     * @param lightMeshAddr 灯的mesh地址
+     */
+    private fun deletePreGroup(lightMeshAddr: Int) {
+        if (DBUtils.getGroupByID(curtain!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(curtain!!.belongGroupId!!)?.meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
+                    (groupAddress shr 8 and 0xFF).toByte())
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
+        }
+    }
+
+    private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
+        val sceneIds = ArrayList<Long>()
+        val dbSceneList = DBUtils.sceneList
+        sceneLoop@ for (dbScene in dbSceneList) {
+            val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
+            for (action in dbActions) {
+                if (groupAddress == action.groupAddr || 0xffff == action.groupAddr) {
+                    sceneIds.add(dbScene.id)
+                    continue@sceneLoop
+                }
+            }
+        }
+        return sceneIds
     }
 
     private fun renameLight() {

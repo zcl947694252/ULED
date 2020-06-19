@@ -4,6 +4,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.tellink.TelinkLightApplication
 
@@ -35,6 +36,8 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
                     .setVisible(R.id.template_device_more, false)
                     .setImageResource(R.id.template_device_icon, dbCurtain.icon)
                     .addOnClickListener(R.id.template_device_icon)
+                    .setVisible(R.id.template_gp_name,true)
+                    .setText(R.id.template_gp_name, DBUtils.getGroupNameByID(dbCurtain.belongGroupId))
         }
     }
 }

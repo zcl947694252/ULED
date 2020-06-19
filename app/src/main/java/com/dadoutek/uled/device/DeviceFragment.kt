@@ -197,6 +197,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
 
 
+
     private fun initView() {
         rvDevice?.layoutManager = GridLayoutManager(this.activity, 2)
         rvDevice?.itemAnimator = DefaultItemAnimator()
@@ -215,10 +216,10 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
      * 刷新UI
      */
     fun refreshView() {
-        if (TelinkLightApplication.getApp().connectDevice == null)
-            bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
-        else
-            bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
+        when (TelinkLightApplication.getApp().connectDevice) {
+            null -> bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
+            else -> bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
+        }
         if (activity != null) {
             initAdapterData()
             deviceAdapter.notifyDataSetChanged()
@@ -237,23 +238,23 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
             }
-            Constant.INSTALL_SWITCH -> {
+            Constant.INSTALL_SWITCH -> {//不存在分组
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
             }
-            Constant.INSTALL_SENSOR -> {
+            Constant.INSTALL_SENSOR -> {//不存在分组
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
             }
-            Constant.INSTALL_CURTAIN -> {
+            Constant.INSTALL_CURTAIN -> {//分组已修改 旧有联动逻辑存在
                 intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
             }
-            Constant.INSTALL_CONNECTOR -> {
+            Constant.INSTALL_CONNECTOR -> {//分组已更新
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
-            Constant.INSTALL_GATEWAY -> {
+            Constant.INSTALL_GATEWAY -> {//不存在分组
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }

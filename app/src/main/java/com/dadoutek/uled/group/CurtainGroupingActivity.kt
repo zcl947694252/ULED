@@ -108,7 +108,6 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var mApplication: TelinkLightApplication? = null
 
-
     private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
         val sceneIds = ArrayList<Long>()
         val dbSceneList = DBUtils.sceneList
@@ -123,7 +122,6 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         }
         return sceneIds
     }
-
 
     /**
      * 删除指定灯里的所有场景

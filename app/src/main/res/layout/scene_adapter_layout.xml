@@ -5,11 +5,11 @@
         android:layout_height="wrap_content"
         android:background="@color/black_ee">
 
-
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="263dp"
             android:background="@drawable/btn_rectangle_all"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -53,8 +53,6 @@
                     android:layout_height="1dp"
                     android:background="@color/gray_e" />
         </RelativeLayout>
-
-
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/oval"
                 android:layout_width="match_parent"
@@ -64,7 +62,7 @@
                 android:orientation="horizontal"
                 android:visibility="visible"
                 app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rl_mode">
+                app:layout_constraintTop_toBottomOf="@+id/rl_mode">
 
             <ImageView
                     android:id="@+id/imageView13"
@@ -141,7 +139,6 @@
 
 
         </android.support.constraint.ConstraintLayout>
-
         <!--彩灯亮度色温-->
         <LinearLayout
                 android:id="@+id/alg_ly"
@@ -268,7 +265,6 @@
             </android.support.constraint.ConstraintLayout>
 
         </LinearLayout>
-
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/rgb_scene"
                 android:layout_width="match_parent"
@@ -453,6 +449,7 @@
 
             </android.support.constraint.ConstraintLayout>
         </android.support.constraint.ConstraintLayout>
+
         <!--普通灯亮度色温-->
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/cw_scene"
