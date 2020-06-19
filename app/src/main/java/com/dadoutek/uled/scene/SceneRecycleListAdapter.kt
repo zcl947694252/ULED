@@ -1,6 +1,7 @@
 package com.dadoutek.uled.scene
 
 import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 
@@ -11,6 +12,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.OtherUtils
 
 class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal var isDelete: Boolean) : BaseItemDraggableAdapter<DbScene, BaseViewHolder>(layoutResId, data) {
 
@@ -21,6 +23,10 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
         if (scene != null) {
             val deleteIcon = helper.getView<TextView>(R.id.scene_delete)
             val groupNum = helper.getView<TextView>(R.id.scene_group)
+            var resId = if (TextUtils.isEmpty(scene.imgName)) R.drawable.icon_1 else
+                OtherUtils.getResourceId(scene.imgName, mContext)
+
+            helper.setImageResource(R.id.scene_icon, resId)
 
             val actions = DBUtils.getActionsBySceneId(scene.id)
             showGroupList = ArrayList()
