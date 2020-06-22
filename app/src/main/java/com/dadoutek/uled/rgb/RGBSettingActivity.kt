@@ -72,6 +72,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.OnTouchListener */ {
+    private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var mConnectDeviceDisposable: Disposable? = null
     private var clickPostion: Int = 100
@@ -375,12 +376,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                 localVersion = s
                                 if (toolbar.title != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        lightVersion.visibility = View.VISIBLE
-                                        lightVersion.text = getString(R.string.firware_version, localVersion)
+                                        //lightVersion.visibility = View.VISIBLE
+                                        findItem!!.title = getString(R.string.firware_version, localVersion)
                                         light!!.version = localVersion
                                     } else {
-                                        lightVersion!!.visibility = View.VISIBLE
-                                        lightVersion!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        //lightVersion!!.visibility = View.VISIBLE
+                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
                                     }
                                 }
@@ -388,7 +389,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                             },
                             {
                                 if (toolbar.title != null) {
-                                    lightVersion.visibility = View.VISIBLE
+                                    //lightVersion.visibility = View.VISIBLE
                                     tvOta!!.visibility = View.GONE
                                 }
                                 LogUtils.d(it)
@@ -960,6 +961,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                    findItem = menu?.findItem(R.id.toolbar_version)
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -1529,7 +1531,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun updateOTA() {
-        if (lightVersion.text != null && lightVersion.text != " ") {
+        if (findItem?.title != null && findItem?.title != " ") {
             checkPermission()
         } else {
             Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()

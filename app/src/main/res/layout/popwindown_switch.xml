@@ -79,4 +79,18 @@
         android:textColor="@color/white"
             android:visibility="gone"
         android:textSize="16sp" />
+
+    <TextView
+            android:id="@+id/pop_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/firmware_version"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="16sp" />
+
+
 </LinearLayout>

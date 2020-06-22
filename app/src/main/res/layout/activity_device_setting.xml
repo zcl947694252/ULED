@@ -9,7 +9,6 @@
             android:id="@+id/include2"
             layout="@layout/toolbar" />
 
-    <!--<include layout="@layout/fragment_device_setting"/>-->
 
     <LinearLayout
             android:id="@+id/light_image_ly"
@@ -254,7 +253,7 @@
 
     </LinearLayout>
 
-    <TextView
+<!--    <TextView
             android:id="@+id/textTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -263,6 +262,6 @@
             android:text="version"
             android:textColor="@color/black_nine"
             android:textSize="13sp"
-            android:visibility="gone" />
+            android:visibility="visible" />-->
 
 </LinearLayout>

@@ -82,6 +82,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${TODO}$
  */
 class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+    private var popVersion: TextView? = null
     private var showDialogHardDelete: AlertDialog? = null
     private var showDialogDelete: AlertDialog? = null
     private var disposableFactoryTimer: Disposable? = null
@@ -428,6 +429,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 else {
                     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
                     popupWindow.dismiss()
+                    popVersion?.text = getString(R.string.firmware_version,currentGw?.version)
+                    popVersion?.visibility = View.VISIBLE
                     popupWindow.showAsDropDown(set)
                     LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")
                 }
@@ -532,6 +535,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         val rename = views.findViewById<TextView>(R.id.rename)
         val configGwNet = views.findViewById<TextView>(R.id.configGwNet)
         val gwUserReset = views.findViewById<TextView>(R.id.deleteBtnNoFactory)
+        popVersion = views?.findViewById<TextView>(R.id.pop_version)
 
         reConfig.text = getString(R.string.config_gate_way)
         restFactoryDelete.text = getString(R.string.delete_device)

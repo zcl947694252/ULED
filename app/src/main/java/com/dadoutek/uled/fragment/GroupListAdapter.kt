@@ -2,12 +2,14 @@ package com.dadoutek.uled.fragment
 
 import android.view.View
 import android.widget.CheckBox
+import android.widget.ImageView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DensityUtil
 import com.telink.bluetooth.light.ConnectionStatus
 
 /**
@@ -21,6 +23,9 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
         if (group != null) {
             val num = group.deviceCount //内含设备的数量
+            val iv = helper.getView<ImageView>(R.id.template_device_icon)
+            iv.layoutParams .height = DensityUtil.dip2px(mContext,50f)
+            iv.layoutParams .width = DensityUtil.dip2px(mContext,50f)
 
             helper//.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
                     .setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)

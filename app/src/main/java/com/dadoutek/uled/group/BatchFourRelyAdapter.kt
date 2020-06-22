@@ -25,11 +25,11 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
 
         helper.setText(R.id.template_device_batch_title, item?.name)
 
-        if (item?.isSelected == true) {
+        if (item?.isSelected == true)
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
-        } else {
+         else
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
-        }
+
 
         if (item?.hasGroup == true) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
@@ -37,12 +37,12 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
             groupName.visibility = View.VISIBLE
             groupName.text = item?.groupName
 
-            icon.setImageResource(R.drawable.icon_controller_open)
+            icon.setImageResource(R.drawable.icon_acceptor_s)
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
            // groupName.text ="==="+item?.rssi
-            icon.setImageResource(R.drawable.icon_controller)
+            icon.setImageResource(R.drawable.icon_acceptor_s)
         }
     }
 }

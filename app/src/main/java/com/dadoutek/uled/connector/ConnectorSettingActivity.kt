@@ -82,13 +82,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     private val clickListener = OnClickListener { v ->
         when (v.id) {
-//            R.id.tvOta ->{
-//                if(isRenameState){
-//                    saveName()
-//                }else{
-//                    checkPermission()
-//                }
-//            }
             R.id.btnRename -> {
                 renameGp()
             }

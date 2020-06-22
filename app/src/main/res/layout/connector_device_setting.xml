@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Color -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,7 +58,6 @@
                     android:text="Test"
                     android:visibility="gone" />
             </RelativeLayout>
-
         </LinearLayout>
 
 

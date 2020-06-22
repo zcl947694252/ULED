@@ -24,6 +24,10 @@
         android:title="@string/factory_reset"
         app:showAsAction="never" />
 
-
+    <item
+            android:id="@+id/toolbar_version"
+            android:orderInCategory="4"
+            android:title="@string/firmware_version"
+            app:showAsAction="never" />
 
 </menu>

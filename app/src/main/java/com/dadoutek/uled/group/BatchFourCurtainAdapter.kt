@@ -37,11 +37,11 @@ class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : 
             groupName.visibility = View.VISIBLE
             groupName.text = item.groupName +"="+item.rssi
 
-            icon.setImageResource(R.drawable.icon_curtain)
+            icon.setImageResource(R.drawable.icon_curtain_s)
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            icon.setImageResource(R.drawable.curtain_off)
+            icon.setImageResource(R.drawable.icon_curtain_s)
         }
     }
 }

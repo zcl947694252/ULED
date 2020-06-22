@@ -251,7 +251,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
-        recyclerView?.addItemDecoration(decoration)
+        //recyclerView?.addItemDecoration(decoration)
         groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         //如果是自己的区域才允许长按删除

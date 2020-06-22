@@ -90,6 +90,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
  * 描述	      ${人体感应器列表}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+    private var popVersion: TextView? = null
     private var isLogin: Boolean = false
     private var factory: TextView? = null
     private var disposableTimer: Disposable? = null
@@ -199,8 +200,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         factory = views?.findViewById<TextView>(R.id.deleteBtn)
         delete = views?.findViewById<TextView>(R.id.deleteBtnNoFactory)
         rename = views?.findViewById<TextView>(R.id.rename)
-
-
+        popVersion = views?.findViewById<TextView>(R.id.pop_version)
+        popVersion?.text = getString(R.string.firmware_version,currentLightm?.version)
+        popVersion?.visibility = View.VISIBLE
 
         rename?.visibility = View.VISIBLE
         delete?.visibility = View.VISIBLE

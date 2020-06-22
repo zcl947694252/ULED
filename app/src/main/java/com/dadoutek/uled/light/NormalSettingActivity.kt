@@ -55,8 +55,8 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageBrightnessFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilterGroup
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
+import kotlinx.android.synthetic.main.connector_device_setting.*
 import kotlinx.android.synthetic.main.eight_switch.*
-import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -66,6 +66,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var type: String? = null
     private var openNum: Int = 0
@@ -742,6 +743,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                     findItem = menu?.findItem(R.id.toolbar_version)
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -995,14 +997,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribe(
                             { s ->
                                 localVersion = s
-                                if (textTitle != null) {
+                                if (findItem != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        textTitle!!.visibility = VISIBLE
-                                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                       // textTitle!!.visibility = VISIBLE
+                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
                                     } else {
-                                        textTitle!!.visibility = VISIBLE
-                                        textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                       // textTitle!!.visibility = VISIBLE
+                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
                                         tvOta!!.visibility = GONE
                                     }
@@ -1010,10 +1012,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                             },
                             {
-                                if (textTitle != null) {
-                                    textTitle!!.visibility = GONE
+                             /*   if (textTitle != null) {
+                                   // /textTitle!!.visibility = GONE
                                     tvOta!!.visibility = GONE
-                                }
+                                }*/
                                 LogUtils.d(it)
                             })
         }
@@ -1353,7 +1355,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun updateOTA() {
-        if (textTitle.text != null && textTitle.text != "version") {
+        if (findItem?.title != null && findItem?.title != "version") {
             checkPermission()
         } else {
             Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()

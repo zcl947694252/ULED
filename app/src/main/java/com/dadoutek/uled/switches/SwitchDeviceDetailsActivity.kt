@@ -62,6 +62,8 @@ import java.util.concurrent.TimeUnit
  * 开关列表
  */
 class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private  var popupWindow: PopupWindow? = null
+    private var popVersion: TextView? = null
     private var views: View? = null
     private var downloadDispoable: Disposable? = null
     private var mConnectDeviceDisposable: Disposable? = null
@@ -74,7 +76,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var mScanTimeoutDisposal: Disposable? = null
     private var adapter: SwitchDeviceDetailsAdapter? = null
     private var currentLight: DbSwitch? = null
-    private var positionCurrent: Int = 0
+    private var positionCurrent: Int = 10000
     private var mConnectDevice: DeviceInfo? = null
     private var acitivityIsAlive = true
     private var mApplication: TelinkLightApplication? = null
@@ -104,6 +106,133 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
          views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
         initData()
         initView()
+        makePop()
+    }
+
+    private fun makePop() {
+         popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        views?.let {itv->
+            popupWindow?.contentView = itv
+            popupWindow?.isFocusable = true
+
+            val reConfig = itv.findViewById<TextView>(R.id.switch_group)
+            val ota = itv.findViewById<TextView>(R.id.ota)
+            val delete = itv.findViewById<TextView>(R.id.deleteBtn)
+            val rename = itv.findViewById<TextView>(R.id.rename)
+            popVersion = itv.findViewById<TextView>(R.id.pop_version)
+            popVersion?.text = getString(R.string.firmware_version,currentSwitch?.version)
+            popVersion?.visibility = View.VISIBLE
+            delete.text = getString(R.string.delete)
+            rename.setOnClickListener {
+                if (isRightPos()) return@setOnClickListener
+                isOta = false
+                isclickOTA = false
+                val textGp = EditText(this)
+                StringUtils.initEditTextFilter(textGp)
+                textGp.setText(currentSwitch?.name)
+                textGp.setSelection(textGp.text.toString().length)
+                android.app.AlertDialog.Builder(this@SwitchDeviceDetailsActivity)
+                        .setTitle(R.string.rename)
+                        .setView(textGp)
+                        .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                            // 获取输入框的内容
+                            if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                                ToastUtils.showLong(getString(R.string.rename_tip_check))
+                            } else {
+                                currentSwitch?.name = textGp.text.toString().trim { it <= ' ' }
+                                DBUtils.updateSwicth(currentSwitch!!)
+                                adapter!!.notifyDataSetChanged()
+                                dialog.dismiss()
+                            }
+                        }
+                        .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+            }
+            reConfig.setOnClickListener {
+                if (isRightPos()) return@setOnClickListener
+                isOta = false
+                isclickOTA = false
+
+                if (currentSwitch != null) {
+                    TelinkLightService.Instance()?.idleMode(true)
+                    showLoadingDialog(getString(R.string.connecting))
+                    connect(macAddress = currentLight?.macAddr, retryTimes = 1)
+                            ?.subscribe(
+                                    {
+                                        onLogin(it)//判断进入那个开关设置界面
+                                        LogUtils.d("login success")
+                                    }, {
+                                        hideLoadingDialog()
+                                        LogUtils.d(it)
+                                    }
+                            )
+                }else
+                    LogUtils.d("currentSwitch = $currentSwitch")
+
+            }
+            ota.setOnClickListener {
+                if (isRightPos()) return@setOnClickListener
+                isOta = true
+                isclickOTA = true
+                if (currentSwitch != null) {
+                    TelinkLightService.Instance()?.idleMode(true)
+                    showLoadingDialog(getString(R.string.connecting))
+                    connect(macAddress = currentLight?.macAddr, retryTimes = 3)
+                            ?.subscribe(
+                                    {
+                                        getDeviceVersion(it)
+                                        LogUtils.d("login success")
+                                    },
+                                    {
+                                        hideLoadingDialog()
+                                        LogUtils.d(it)
+                                    }
+                            )
+                } else {
+                    LogUtils.d("currentSwitch = $currentSwitch")
+                }
+            }
+            delete.setOnClickListener {
+                if (isRightPos()) return@setOnClickListener
+                //恢复出厂设置
+                isOta = false
+                isclickOTA = true
+                var deleteSwitch = switchData[positionCurrent]
+                AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            DBUtils.deleteSwitch(deleteSwitch)
+                            notifyData()
+
+                            Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
+                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                            }
+                            if (mConnectDevice != null) {
+                                if (deleteSwitch.meshAddr == mConnectDevice?.meshAddress) {
+                                    GlobalScope.launch {
+                                        delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+                                        if (this@SwitchDeviceDetailsActivity == null ||
+                                                this@SwitchDeviceDetailsActivity.isDestroyed ||
+                                                this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
+                                        } else
+                                            connect()
+                                    }
+                                }
+                            }
+                        }
+                        .setNegativeButton(R.string.btn_cancel, null)
+                        .show()
+            }
+        }
+    }
+
+    private fun isRightPos(): Boolean {
+        popupWindow?.dismiss()
+        if (positionCurrent == 10000) {
+            ToastUtils.showShort(getString(R.string.invalid_data))
+            return true
+        }
+       currentSwitch = switchData[positionCurrent]
+        return false
     }
 
     private fun initData() {
@@ -255,119 +384,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
-                    val popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    views?.let {itv->
-                        popupWindow.contentView = itv
-                        popupWindow.isFocusable = true
-                        popupWindow.showAsDropDown(set,40, -15)
-                        currentSwitch = switchData[position]
-
-                        val reConfig = itv.findViewById<TextView>(R.id.switch_group)
-                        val ota = itv.findViewById<TextView>(R.id.ota)
-                        val delete = itv.findViewById<TextView>(R.id.deleteBtn)
-                        val rename = itv.findViewById<TextView>(R.id.rename)
-                        delete.text = getString(R.string.delete)
-                        rename.setOnClickListener {
-                            isOta = false
-                            isclickOTA = false
-                            popupWindow.dismiss()
-                            val textGp = EditText(this)
-                            StringUtils.initEditTextFilter(textGp)
-                            textGp.setText(currentSwitch?.name)
-                            textGp.setSelection(textGp.text.toString().length)
-                            android.app.AlertDialog.Builder(this@SwitchDeviceDetailsActivity)
-                                    .setTitle(R.string.rename)
-                                    .setView(textGp)
-                                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                                        // 获取输入框的内容
-                                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                                            ToastUtils.showLong(getString(R.string.rename_tip_check))
-                                        } else {
-                                            currentSwitch?.name = textGp.text.toString().trim { it <= ' ' }
-                                            DBUtils.updateSwicth(currentSwitch!!)
-                                            adapter!!.notifyDataSetChanged()
-                                            dialog.dismiss()
-                                        }
-                                    }
-                                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-                        }
-                        reConfig.setOnClickListener {
-                            popupWindow.dismiss()
-                            isOta = false
-                            isclickOTA = false
-
-                            if (currentSwitch != null) {
-                                TelinkLightService.Instance()?.idleMode(true)
-                                showLoadingDialog(getString(R.string.connecting))
-                                connect(macAddress = currentLight?.macAddr, retryTimes = 1)
-                                        ?.subscribe(
-                                                {
-                                                    onLogin(it)//判断进入那个开关设置界面
-                                                    LogUtils.d("login success")
-                                                },
-                                                {
-                                                    hideLoadingDialog()
-                                                    LogUtils.d(it)
-                                                }
-                                        )
-                            }else {
-                                LogUtils.d("currentSwitch = $currentSwitch")
-                            }
-                        }
-                        ota.setOnClickListener {
-                            popupWindow.dismiss()
-                            isOta = true
-                            isclickOTA = true
-                            if (currentSwitch != null) {
-                                TelinkLightService.Instance()?.idleMode(true)
-                                showLoadingDialog(getString(R.string.connecting))
-                                connect(macAddress = currentLight?.macAddr, retryTimes = 3)
-                                        ?.subscribe(
-                                                {
-                                                    getDeviceVersion(it)
-                                                    LogUtils.d("login success")
-                                                },
-                                                {
-                                                    hideLoadingDialog()
-                                                    LogUtils.d(it)
-                                                }
-                                        )
-                            } else {
-                                LogUtils.d("currentSwitch = $currentSwitch")
-                            }
-                        }
-                        delete.setOnClickListener {
-                            //恢复出厂设置
-                            isOta = false
-                            isclickOTA = true
-                            popupWindow.dismiss()
-                            var deleteSwitch = switchData[position]
-                            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
-                                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                                        DBUtils.deleteSwitch(deleteSwitch)
-                                        notifyData()
-
-                                        Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch.meshAddr)) {
-                                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                                        }
-                                        if (mConnectDevice != null) {
-                                            if (deleteSwitch.meshAddr == mConnectDevice?.meshAddress) {
-                                                GlobalScope.launch {
-                                                    delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                                    if (this@SwitchDeviceDetailsActivity == null ||
-                                                            this@SwitchDeviceDetailsActivity.isDestroyed ||
-                                                            this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                                    } else
-                                                        connect()
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .setNegativeButton(R.string.btn_cancel, null)
-                                    .show()
-                        }
-                    }
+                    popupWindow?.showAsDropDown(set,40, -15)
                 }
             }
         }
@@ -600,7 +617,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    val onItemClickListenerInstallList: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+    private val onItemClickListenerInstallList: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
