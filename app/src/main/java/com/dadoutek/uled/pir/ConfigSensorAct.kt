@@ -66,6 +66,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_pir)
+        top_rg_ly.visibility = View.GONE
         telinkApplication = this.application as TelinkApplication
         initToolbar()
         initData()

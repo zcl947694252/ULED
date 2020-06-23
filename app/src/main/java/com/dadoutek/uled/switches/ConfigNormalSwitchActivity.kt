@@ -89,6 +89,18 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun deleteDevice() {
+        TODO("Not yet implemented")
+    }
+
+    override fun goOta() {
+        TODO("Not yet implemented")
+    }
+
+    override fun reName() {
+        TODO("Not yet implemented")
+    }
+
     override fun setLayoutId(): Int {
         return R.layout.activity_switch_group
     }

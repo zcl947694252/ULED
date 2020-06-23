@@ -945,6 +945,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 }
             }
         } else {
+
             if (deviceInfo.productUUID == DeviceType.SENSOR) {//老版本人体感应器
                 currentLightm!!.version = s
                 startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)

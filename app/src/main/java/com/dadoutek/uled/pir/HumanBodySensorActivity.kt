@@ -1111,8 +1111,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         tv_function1.visibility = View.GONE
 
         recyclerGroup.layoutManager = GridLayoutManager(this, 3)
-        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(
-                R.layout.activity_night_light_groups_item, showGroupList)
+        //this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
+        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_device_item, showGroupList)
 
         nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
         nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->

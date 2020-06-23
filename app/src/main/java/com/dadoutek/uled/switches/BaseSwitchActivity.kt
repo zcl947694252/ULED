@@ -19,6 +19,7 @@ import android.view.MenuItem
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
@@ -30,12 +31,15 @@ import com.dadoutek.uled.util.OtaPrepareUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
 private var last_start_time = 0
 private var debounce_time = 1000
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
+    private var mConnectDeviceDisposable: Disposable? = null
+    private lateinit var otaDeviceInfo: DeviceInfo
     internal var fiDelete: MenuItem? = null
     internal var fiFactoryReset: MenuItem? = null
     internal var fiOta: MenuItem? = null
@@ -108,12 +112,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     fun deviceOta(mDeviceInfo: DeviceInfo) {
+         otaDeviceInfo = mDeviceInfo
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress ==  mDeviceInfo.macAddress) {
             if (isBoolean)
                 transformView(mDeviceInfo)
             else
-                OtaPrepareUtils.instance().gotoUpdateView(this@ConfigSceneSwitchActivity, version, otaPrepareListner)
+                OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo.firmwareRevision, otaPrepareListner)
         } else {
             showLoadingDialog(getString(R.string.please_wait))
             TelinkLightService.Instance()?.idleMode(true)
@@ -124,11 +129,35 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                     ?.subscribe({
                         hideLoadingDialog()
                         if (isBoolean) transformView(mDeviceInfo)
-                        else OtaPrepareUtils.instance().gotoUpdateView(this@ConfigSceneSwitchActivity, mDeviceInfo?.firmwareRevision, otaPrepareListner)
+                        else OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo?.firmwareRevision, otaPrepareListner)
                     }, {
                         hideLoadingDialog()
                         ToastUtils.showLong(R.string.connect_fail2)
                     })
+        }
+    }
+
+    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
+        override fun downLoadFileStart() {}
+
+        override fun startGetVersion() {}
+
+        override fun getVersionSuccess(s: String) {}
+
+        override fun getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail)
+            hideLoadingDialog()
+        }
+
+        override fun downLoadFileSuccess() {
+            hideLoadingDialog()
+            transformView(otaDeviceInfo)
+        }
+
+        override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
+            ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
 
