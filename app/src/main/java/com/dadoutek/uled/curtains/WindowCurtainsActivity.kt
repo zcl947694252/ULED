@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -219,13 +218,13 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     R.id.toolbar_rename_group -> {
                         renameGp()
                     }
-                    R.id.toolbar_rename_light -> {
+                    R.id.toolbar_f_rename -> {
                         renameLight()
                     }
-                    R.id.toolbar_reset -> {
+                    R.id.toolbar_v_reset -> {
                         onceReset()
                     }
-                    R.id.toolbar_update_group -> {
+                    R.id.toolbar_v_change_group -> {
                         updateGroup()
                     }
                     R.id.toolbar_commutation -> {
@@ -240,7 +239,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     R.id.toolbar_slow_up -> {
                         slowUp()
                     }
-                    R.id.toolbar_ota -> {
+                    R.id.toolbar_f_ota -> {
                         updateOTA()
                     }
                 }

@@ -7,6 +7,8 @@ import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -29,7 +31,6 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -49,7 +50,7 @@ import kotlinx.coroutines.launch
  */
 
 class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var mConnectDisposable: Disposable? = null
+    private var findItem: MenuItem? = null
     private var popReNameView: View? = null
     private var renameDialog: Dialog? = null
     private var renameCancel: TextView? = null
@@ -72,12 +73,23 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         initListener()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                findItem = menu?.findItem(R.id.toolbar_f_version)
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
     fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         isRetryConfig = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
         eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
-        bottom_version_number.text = localVersion
+//        bottom_version_number.text = localVersion
+        findItem?.title = getString(R.string.firmware_version,localVersion)
         if (isRetryConfig != null && isRetryConfig == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
             switchDate?.let {

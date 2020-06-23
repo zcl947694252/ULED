@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/toolbar_update_group"
+        android:id="@+id/toolbar_v_change_group"
         android:icon="@drawable/ic_launcher"
         android:orderInCategory="1"
         android:title="@string/update_group"
         app:showAsAction="never" />
     <item
-        android:id="@+id/toolbar_rename_light"
+        android:id="@+id/toolbar_f_rename"
         android:orderInCategory="2"
         android:title="@string/btn_rename_light"
         app:showAsAction="never" />
@@ -43,13 +43,13 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_ota"
+        android:id="@+id/toolbar_f_ota"
         android:title="@string/online_upgrade"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_reset"
+        android:id="@+id/toolbar_v_reset"
         android:orderInCategory="2"
         android:title="@string/factory_reset"
         app:showAsAction="never" />

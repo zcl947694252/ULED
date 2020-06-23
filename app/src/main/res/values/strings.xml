@@ -371,7 +371,7 @@
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">1.Where can I update my app?</string>
-    <string name="update_group">Modify group</string>
+    <string name="update_group">Change group</string>
     <string name="the_last_version">It is the latest version!</string>
     <string name="updateSuccess">Update succeed!</string>
     <string name="update_fail">Update failed!</string>

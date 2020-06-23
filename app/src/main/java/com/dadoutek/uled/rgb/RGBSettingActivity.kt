@@ -961,7 +961,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                    findItem = menu?.findItem(R.id.toolbar_version)
+                    findItem = menu?.findItem(R.id.toolbar_f_version)
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -1514,16 +1514,16 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             R.id.toolbar_rename_group -> {
                 renameGp()
             }
-            R.id.toolbar_rename_light -> {
+            R.id.toolbar_f_rename -> {
                 renameLight()
             }
-            R.id.toolbar_reset -> {
+            R.id.toolbar_v_reset -> {
                 remove()
             }
-            R.id.toolbar_update_group -> {
+            R.id.toolbar_v_change_group -> {
                 updateGroup()
             }
-            R.id.toolbar_ota -> {
+            R.id.toolbar_f_ota -> {
                 updateOTA()
             }
         }

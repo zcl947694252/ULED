@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.KeyEvent
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -57,6 +58,7 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> {
+    private var findItem: MenuItem? = null
     private var currentGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var renameDialog: Dialog? = null
@@ -96,12 +98,22 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         initListener()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id){
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                findItem = menu?.findItem(R.id.toolbar_f_version)
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
     private fun initView() {
         makePop()
 
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-
+        findItem?.title = getString(R.string.firmware_version,version)
         // tvLightVersion?.text = version
         if (version!!.startsWith("ST") || (version!!.contains("BT") || version!!.contains("BTL") || version!!.contains("BTS"))) {
             isGlassSwitch = true

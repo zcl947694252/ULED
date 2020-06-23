@@ -33,7 +33,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -56,7 +55,6 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageFilterGroup
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.connector_device_setting.*
-import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -84,7 +82,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
     private var mConnectTimer: Disposable? = null
-    private var mApplication: TelinkLightApplication? = null
+    var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
     private var currentShowPageGroup = true
@@ -743,7 +741,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                     findItem = menu?.findItem(R.id.toolbar_version)
+                     findItem = menu?.findItem(R.id.toolbar_f_version)
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -1315,16 +1313,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
-            R.id.toolbar_rename_light -> {
+            R.id.toolbar_f_rename -> {
                 renameGp()
             }
-            R.id.toolbar_reset -> {
+            R.id.toolbar_v_reset -> {
                 remove()
             }
-            R.id.toolbar_update_group -> {
+            R.id.toolbar_v_change_group -> {
                 updateGroup()
             }
-            R.id.toolbar_ota -> {
+            R.id.toolbar_f_ota -> {
                 updateOTA()
             }
             R.id.toolbar_delete_group -> {
