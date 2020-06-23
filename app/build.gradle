@@ -47,14 +47,10 @@ android {
         versionCode 271
         versionName "3.5.4"
 
-
-
         multiDexEnabled true
-
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
         setProperty("archivesBaseName", "ULed_${versionName}_${getBuildTime()}")
-        ndk {
-            // 设置支持的SO库架构
+        ndk {// 设置支持的SO库架构
             abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
         signingConfig signingConfigs.release
@@ -100,7 +96,7 @@ greendao {
 dependencies {
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
-    implementation 'com.blankj:utilcode:1.29.0'
+    implementation 'com.blankj:utilcode:1.25.5'
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 
@@ -130,7 +126,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.31"
     implementation "org.jetbrains.anko:anko:0.10.8"
     implementation "org.jetbrains.anko:anko-design:0.10.8"
@@ -190,10 +186,11 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
 
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
-
+    implementation 'com.github.maning0303:MNPasswordEditText:V1.0.2'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor  'com.github.bumptech.glide:compiler:4.9.0'
 }
-String getBuildTime()
-{
+String getBuildTime() {
     Date date = new Date();
     return date.format("yyyy_MM_dd_HH_mm");
 }
