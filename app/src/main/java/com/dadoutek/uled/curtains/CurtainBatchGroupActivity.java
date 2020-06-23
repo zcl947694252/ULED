@@ -975,7 +975,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         List<DbCurtain> all_light = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            if (StringUtils.getCurtainName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
+            if (StringUtils.getCurtainGroupName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
                 no_list.add(list.get(i));
             } else {
                 group_list.add(list.get(i));

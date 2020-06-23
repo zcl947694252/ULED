@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbConnector implements Serializable {
@@ -27,13 +27,11 @@ public class DbConnector implements Serializable {
     private int index;
     public String groupName;
     public int color=0xffffff;//颜色
-
+    public String version;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
+
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -46,11 +44,15 @@ public class DbConnector implements Serializable {
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public int rssi =1000;
+    public boolean isSupportOta =true;
+    public boolean isMostNew =false;
 
-    @Generated(hash = 615264722)
+
+    @Generated(hash = 1023579456)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, String groupName, int color, int status, int rssi) {
+            int index, String groupName, int color, String version, int status,
+            int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -62,11 +64,24 @@ public class DbConnector implements Serializable {
         this.index = index;
         this.groupName = groupName;
         this.color = color;
+        this.version = version;
         this.status = status;
         this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
+        this.isMostNew = isMostNew;
     }
+
     @Generated(hash = 1212725637)
     public DbConnector() {
+    }
+
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
     }
     public Long getId() {
         return this.id;
@@ -209,5 +224,21 @@ public class DbConnector implements Serializable {
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }

@@ -712,6 +712,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                         light!!.version = localVersion
 //                        tvOta!!.visibility = View.GONE
                                     }
+                                    DBUtils.saveConnector(light!!,false)
                                 }
                             },
                             {

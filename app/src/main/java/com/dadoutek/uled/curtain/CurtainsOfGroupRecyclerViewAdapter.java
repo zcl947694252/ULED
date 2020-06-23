@@ -31,7 +31,7 @@ public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter
         TextView tvName=helper.getView(R.id.name);
         TextView tvLightName=helper.getView(R.id.template_device_name_n);
 //        TextView tvRgbColor=helper.getView(R.id.tv_rgb_color);
-        tvName.setText(StringUtils.getCurtainName(item));
+        tvName.setText(StringUtils.getCurtainGroupName(item));
 
         if(TelinkLightApplication.Companion.getApp().getConnectDevice() == null){
            tvName.setTextColor(mContext.getResources().getColor(R.color.black));

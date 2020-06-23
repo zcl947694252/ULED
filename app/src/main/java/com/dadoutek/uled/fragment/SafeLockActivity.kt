@@ -84,6 +84,8 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                 R.id.safe_lock -> {
                     ToastUtils.showShort(getString(R.string.lock))
                     //safe_close.setBackgroundResource(R.drawable.rect_gray_60)
+
+
                     // safe_open.setBackgroundResource(R.drawable.rect_blue_60)
                     //1打开2关闭 12位
                     TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))

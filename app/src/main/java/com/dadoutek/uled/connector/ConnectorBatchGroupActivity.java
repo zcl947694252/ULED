@@ -980,7 +980,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         List<DbConnector> all_light = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            if (StringUtils.getConnectorName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
+            if (StringUtils.getConnectorGroupName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
                 no_list.add(list.get(i));
             } else {
                 group_list.add(list.get(i));

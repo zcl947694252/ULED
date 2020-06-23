@@ -125,6 +125,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                             curtain!!.version = localVersion
                                             this.versionText.visibility = View.VISIBLE
                                         }
+                                        DBUtils.saveCurtain(curtain!!,false)
                                     }
                                 }
                                 null

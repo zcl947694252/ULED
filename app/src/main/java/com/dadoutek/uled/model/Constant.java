@@ -21,6 +21,7 @@ public class Constant implements Serializable {
     public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
      */

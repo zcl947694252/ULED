@@ -35,8 +35,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property Index = new Property(8, int.class, "index", false, "INDEX");
         public final static Property GroupName = new Property(9, String.class, "groupName", false, "GROUP_NAME");
         public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
-        public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
-        public final static Property Rssi = new Property(12, int.class, "rssi", false, "RSSI");
+        public final static Property Version = new Property(11, String.class, "version", false, "VERSION");
+        public final static Property Status = new Property(12, int.class, "status", false, "STATUS");
+        public final static Property Rssi = new Property(13, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(14, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(15, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -63,8 +66,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"INDEX\" INTEGER NOT NULL ," + // 8: index
                 "\"GROUP_NAME\" TEXT," + // 9: groupName
                 "\"COLOR\" INTEGER NOT NULL ," + // 10: color
-                "\"STATUS\" INTEGER NOT NULL ," + // 11: status
-                "\"RSSI\" INTEGER NOT NULL );"); // 12: rssi
+                "\"VERSION\" TEXT," + // 11: version
+                "\"STATUS\" INTEGER NOT NULL ," + // 12: status
+                "\"RSSI\" INTEGER NOT NULL ," + // 13: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 14: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 15: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -107,8 +113,15 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindString(10, groupName);
         }
         stmt.bindLong(11, entity.getColor());
-        stmt.bindLong(12, entity.getStatus());
-        stmt.bindLong(13, entity.getRssi());
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(12, version);
+        }
+        stmt.bindLong(13, entity.getStatus());
+        stmt.bindLong(14, entity.getRssi());
+        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -145,8 +158,15 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindString(10, groupName);
         }
         stmt.bindLong(11, entity.getColor());
-        stmt.bindLong(12, entity.getStatus());
-        stmt.bindLong(13, entity.getRssi());
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(12, version);
+        }
+        stmt.bindLong(13, entity.getStatus());
+        stmt.bindLong(14, entity.getRssi());
+        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -168,8 +188,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.getInt(offset + 8), // index
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // groupName
             cursor.getInt(offset + 10), // color
-            cursor.getInt(offset + 11), // status
-            cursor.getInt(offset + 12) // rssi
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // version
+            cursor.getInt(offset + 12), // status
+            cursor.getInt(offset + 13), // rssi
+            cursor.getShort(offset + 14) != 0, // isSupportOta
+            cursor.getShort(offset + 15) != 0 // isMostNew
         );
         return entity;
     }
@@ -187,8 +210,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setIndex(cursor.getInt(offset + 8));
         entity.setGroupName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setColor(cursor.getInt(offset + 10));
-        entity.setStatus(cursor.getInt(offset + 11));
-        entity.setRssi(cursor.getInt(offset + 12));
+        entity.setVersion(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setStatus(cursor.getInt(offset + 12));
+        entity.setRssi(cursor.getInt(offset + 13));
+        entity.setIsSupportOta(cursor.getShort(offset + 14) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 15) != 0);
      }
     
     @Override

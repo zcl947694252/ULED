@@ -137,7 +137,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
             ToastUtils.showLong(getString(R.string.grouping_success_tip))
-            setDeviceTypeDataStopBlink(deviceType,false)
+            setDeviceTypeDataStopBlink(deviceType, false)
             finish()
         }
 
@@ -820,12 +820,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_device_all.setOnClickListener { changeDeviceAll() }
         batch_four_group_add_group.setOnClickListener { addNewGroup() }
         grouping_completed.setOnClickListener {
-            if (!isComplete){
-            if (TelinkLightApplication.getApp().connectDevice != null)
-                sureGroups()
-            else
-                autoConnect()
-            }else{
+            if (!isComplete) {
+                if (TelinkLightApplication.getApp().connectDevice != null)
+                    sureGroups()
+                else
+                    autoConnect()
+            } else {
                 finish()
             }
         }
@@ -961,9 +961,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 if (b)
-                showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataLightAll.filter { it.isSelected }.size.toString()))
+                    showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataLightAll.filter { it.isSelected }.size.toString()))
                 else
-                  showLoadingDialog(getString(R.string.please_wait))
+                    showLoadingDialog(getString(R.string.please_wait))
                 for (light in deviceDataLightAll.filter { it.isSelected }) {
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(light.meshAddr, light.belongGroupId)
@@ -1651,6 +1651,24 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .map { RecoverMeshDeviceUtil.parseData(it) }          //解析数据
                 .timeout(RecoverMeshDeviceUtil.SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
                     LogUtils.d("findMeshDevice name complete.")
+                    when (deviceType) {
+                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                            deviceDataLightAll.sortBy { it1 -> it1.rssi }
+                            lightAdapter.notifyDataSetChanged()
+                            lightGroupedAdapter.notifyDataSetChanged()
+
+                        }
+                        DeviceType.SMART_CURTAIN -> {
+                            deviceDataCurtainAll.sortBy { it1 -> it1.rssi }
+                            curtainAdapter.notifyDataSetChanged()
+                            curtainGroupedAdapter.notifyDataSetChanged()
+                        }
+                        DeviceType.SMART_RELAY -> {
+                            relayAdapter.notifyDataSetChanged()
+                            relayGroupedAdapter.notifyDataSetChanged()
+                            deviceDataRelayAll.sortBy { it1 -> it1.rssi }
+                        }
+                    }
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .observeOn(AndroidSchedulers.mainThread())

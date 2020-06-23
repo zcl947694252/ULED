@@ -470,7 +470,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
             var list_group: ArrayList<DbConnector> = ArrayList()
             var no_group: ArrayList<DbConnector> = ArrayList()
             for (i in all_light_data.indices) {
-                if (StringUtils.getConnectorName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                if (StringUtils.getConnectorGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                     no_group.add(all_light_data[i])
                 } else {
                     list_group.add(all_light_data[i])

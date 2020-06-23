@@ -397,6 +397,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     .subscribe({ s ->
                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                     currentLight!!.version = s
+                                    DBUtils.saveSwitch(currentLight!!,false)
                                     isDirectConnectDevice()
                                 } else {
                                     ToastUtils.showLong(getString(R.string.version_disabled))

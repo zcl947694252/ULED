@@ -368,6 +368,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
@@ -384,6 +385,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                         findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
                                         light!!.version = localVersion
                                     }
+                                    DBUtils.saveLight(light!!, false)
                                 }
                                 null
                             },
