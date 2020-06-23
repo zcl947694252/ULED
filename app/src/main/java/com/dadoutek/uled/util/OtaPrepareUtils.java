@@ -241,11 +241,14 @@ public class OtaPrepareUtils {
     }
 
     //检查是否支持OTA 返回true支持  返回false不支持
-    public Boolean checkSupportOta(String localVersion) {
+    public Boolean checkSupportOta(String localVersion) {//LA\LAS    CC\CCS   LX\LXS
         int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
         boolean oldSuportVersion = (localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
-                || localVersion.contains("CR-") || localVersion.contains("LC-")
+                || localVersion.contains("CR-") || localVersion.contains("LC-")||localVersion.contains("LA-")
+                || localVersion.contains("LA-") || localVersion.contains("LAS-")||localVersion.contains("CC-")
+                || localVersion.contains("CCS-") || localVersion.contains("LX-")||localVersion.contains("LXS-")
+                || localVersion.contains("LG-")
                 || localVersion.contains("LCS-") || localVersion.contains("L36-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
         boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")||localVersion.contains("NPR");
         if (oldSuportVersion||newSuport) {

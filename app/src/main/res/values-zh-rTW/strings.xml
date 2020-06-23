@@ -111,7 +111,7 @@
     <string name="add_groups">添加分组</string>
     <string name="add_group">添加群组</string>
     <string name="set_group">设置分组</string>
-    <string name="loading">加载中</string>
+    <string name="loading">加载中...</string>
     <string name="scan_end">未扫描到设备！</string>
     <string name="connecting_tip">正在连接,请稍后</string>
     <string name="grouping_completed">分组完成</string>
@@ -1009,4 +1009,8 @@
     <string name="not_use">暂不使用</string>
     <string name="read_agreen">请阅读协议是否同意</string>
     <string name="user_agreement">用户协议及隐私说明</string>
+    <string name="group_ota">在线升级</string>
+    <string name="dissupport_ota">该设备版本不支持OTA</string>
+    <string name="get_bin_fail">获取bin版本失败请检查网络</string>
+    <string name="get_version_success">获取版本成功,已刷新,请重试</string>
 </resources>

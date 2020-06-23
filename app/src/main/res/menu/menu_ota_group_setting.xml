@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/toolbar_batch_group"
+            android:icon="@drawable/ic_launcher"
+            android:orderInCategory="1"
+            android:title="@string/batch_group"
+            app:showAsAction="never" />
+    <item
+            android:id="@+id/toolbar_online_upgrade"
+            android:orderInCategory="2"
+            android:title="@string/online_upgrade"
+            app:showAsAction="never" />
+</menu>

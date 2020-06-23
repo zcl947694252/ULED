@@ -643,7 +643,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     .subscribe(
                             { s: String ->
                                 currentGw!!.version = s
-                                DBUtils.saveGateWay(currentGw!!, true)
+                                DBUtils.saveGateWay(currentGw!!, false)
                                 var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
                                 if (isBoolean) {
                                     transformView()

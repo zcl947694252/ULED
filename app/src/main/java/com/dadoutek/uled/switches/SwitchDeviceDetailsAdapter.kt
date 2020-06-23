@@ -17,7 +17,7 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,interna
                helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID, context)+"-"+helper.position)
             }
 
-            helper.setText(R.id.name, StringUtils.getSwitchName(scene))
+            helper.setText(R.id.name, StringUtils.getSwitchGroupName(scene))
                     .setVisible(R.id.name,false)
 
             helper.setImageResource(R.id.img_light, R.drawable.icon_switch)

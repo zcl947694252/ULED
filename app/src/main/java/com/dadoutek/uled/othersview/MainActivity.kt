@@ -95,6 +95,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  * 首页设备
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
+    private var recoverDispose: Disposable? = null
     private val REQUEST_ENABLE_BT: Int = 1200
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
@@ -173,11 +174,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
             // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
             //startActivity(intent)
-            installId++
-            mBluetoothAdapter?.enable()
-
-            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+//            installId++
+//            mBluetoothAdapter?.enable()
+//            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
         initBottomNavigation()
         checkVersionAvailable()
@@ -189,6 +189,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT)
             ToastUtils.showShort("打开蓝牙")
     }
+
 
     @SuppressLint("CheckResult")
     private fun getRegionList() {
@@ -641,6 +642,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
+         recoverDispose = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName, false)
+                .subscribeOn(Schedulers.io())
+                .subscribe({}, {})
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -773,6 +777,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightApplication.getApp().releseStomp()
         //移除事件
         TelinkLightService.Instance()?.idleMode(true)
+        recoverDispose?.dispose()
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()

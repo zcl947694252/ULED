@@ -48,14 +48,13 @@ object RecoverMeshDeviceUtil {
         return addressList
     }
 
-    fun findMeshDevice(deviceName: String?): Observable<Int> {
+    fun findMeshDevice(deviceName: String?, isRecoverMeshDevice: Boolean = true): Observable<Int> {
         createdDeviceList.clear()
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder()
-               // .setScanMode(SCAN_MODE_LOW_LATENCY)
+                // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
-     count =0
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
@@ -64,7 +63,8 @@ object RecoverMeshDeviceUtil {
                     data
                 }          //解析数据
                 .filter {
-                    addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
+                    val addDevicesToDb = addDevicesToDb(it, isRecoverMeshDevice)
+                    addDevicesToDb   //当保存数据库成功时，才发射onNext
                 }
                 .map { deviceInfo ->
                     createdDeviceList.add(deviceInfo)
@@ -164,95 +164,149 @@ object RecoverMeshDeviceUtil {
      * 如果该deviceInfo不存在于数据库，则创建
      * @return true 保存成功    false，无需保存
      */
-    fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
+    fun addDevicesToDb(deviceInfo: DeviceInfo, isRecoverMeshDevice: Boolean = true): Boolean {
         val productUUID = deviceInfo.productUUID
         val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
-        if (!isExist) {
+        LogUtils.v("zcl-----------是否找回设备版本-------${!isExist&&isRecoverMeshDevice}-------------$isRecoverMeshDevice")
+        if (!isExist&&isRecoverMeshDevice) {//不存在并且是召回是设备
+                when (productUUID) {
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
+                        val dbLightNew = DbLight()
+                        dbLightNew.productUUID = productUUID
+                        dbLightNew.connectionStatus = 0
+                        dbLightNew.updateIcon()
+                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                        dbLightNew.color = 0
+                        dbLightNew.colorTemperature = 0
+                        dbLightNew.meshAddr = deviceInfo.meshAddress
+                        dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.device_name) + dbLightNew.meshAddr
+                        dbLightNew.macAddr = deviceInfo.macAddress
+                        dbLightNew.version = deviceInfo.firmwareRevision
+                        DBUtils.saveLight(dbLightNew, false)
+                        LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
+                        count++
+                        LogUtils.v("zcl找回------找回----------$count----普通灯$dbLightNew---")
+                    }
+                    DeviceType.SMART_RELAY -> {
+                        val relay = DbConnector()
+                        relay.productUUID = productUUID
+                        relay.connectionStatus = 0
+                        relay.updateIcon()
+                        relay.belongGroupId = DBUtils.groupNull?.id
+                        relay.color = 0
+                        relay.meshAddr = deviceInfo.meshAddress
+                        relay.name = TelinkLightApplication.getApp().getString(R.string.device_name) + relay.meshAddr
+                        relay.macAddr = deviceInfo.macAddress
+                        relay.version = deviceInfo.firmwareRevision
+                        DBUtils.saveConnector(relay, false)
+                        LogUtils.d("create = $relay  " + relay.meshAddr)
+                        count++
+                        LogUtils.v("zcl找回-------------$count-------relay----")
+                    }
+
+                    DeviceType.SMART_CURTAIN -> {
+                        val curtain = DbCurtain()
+                        curtain.productUUID = productUUID
+                        curtain.connectionStatus = 0
+                        curtain.updateIcon()
+                        curtain.belongGroupId = DBUtils.groupNull?.id
+                        curtain.meshAddr = deviceInfo.meshAddress
+                        curtain.name = TelinkLightApplication.getApp().getString(R.string.device_name) + curtain.meshAddr
+                        curtain.macAddr = deviceInfo.macAddress
+                        curtain.version = deviceInfo.firmwareRevision
+                        DBUtils.saveCurtain(curtain, false)
+                        LogUtils.d("create = $curtain  " + curtain.meshAddr)
+                        count++
+                        LogUtils.v("zcl找回------------$count--------curtain---")
+                    }
+                    DeviceType.NIGHT_LIGHT, DeviceType.SENSOR -> {
+                        val sensor = DbSensor()
+                        sensor.productUUID = productUUID
+                        sensor.belongGroupId = DBUtils.groupNull?.id
+                        sensor.meshAddr = deviceInfo.meshAddress
+                        sensor.name = TelinkLightApplication.getApp().getString(R.string.device_name) + sensor.meshAddr
+                        sensor.macAddr = deviceInfo.macAddress
+                        sensor.version = deviceInfo.firmwareRevision
+                        DBUtils.saveSensor(sensor, false)
+                        count++
+                        LogUtils.v("zcl找回--------------$count------sensor---")
+                    }
+                    DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH
+                        , DeviceType.NORMAL_SWITCH2 -> {
+                        val switch = DbSwitch()
+                        switch.productUUID = productUUID
+                        switch.belongGroupId = DBUtils.groupNull?.id
+                        switch.meshAddr = deviceInfo.meshAddress
+                        switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
+                        switch.macAddr = deviceInfo.macAddress
+                        switch.version = deviceInfo.firmwareRevision
+                        DBUtils.saveSwitch(switch, false)
+                        count++
+                        LogUtils.v("zcl找回------------$count-------普通-switch-")
+                    }
+                    DeviceType.EIGHT_SWITCH -> {
+                        val switch = DbEightSwitch()
+                        switch.productUUID = productUUID
+                        switch.meshAddr = deviceInfo.meshAddress
+                        switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
+                        switch.macAddr = deviceInfo.macAddress
+                        switch.firmwareVersion = deviceInfo.firmwareRevision
+                        DBUtils.saveEightSwitch(switch, false)
+                        count++
+                        LogUtils.v("zcl找回-----------$count--------8k-switch--")
+                    }
+                }
+        } else {
             when (productUUID) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
-                    val dbLightNew = DbLight()
-                    dbLightNew.productUUID = productUUID
-                    dbLightNew.connectionStatus = 0
-                    dbLightNew.updateIcon()
-                    dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                    dbLightNew.color = 0
-                    dbLightNew.colorTemperature = 0
-                    dbLightNew.meshAddr = deviceInfo.meshAddress
-                    dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.device_name)+dbLightNew.meshAddr
-                    dbLightNew.macAddr = deviceInfo.macAddress
-                    DBUtils.saveLight(dbLightNew, false)
-                    LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
-                    count++
-                    LogUtils.v("zcl找回------找回----------$count----普通灯$dbLightNew---")
+                    val db = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        LogUtils.v("zcl-----是否找回设备版本------${!isExist&&isRecoverMeshDevice}-------$isRecoverMeshDevice---${deviceInfo.firmwareRevision}")
+                        DBUtils.saveLight(it, true)
+                    }
                 }
                 DeviceType.SMART_RELAY -> {
-                    val relay = DbConnector()
-                    relay.productUUID = productUUID
-                    relay.connectionStatus = 0
-                    relay.updateIcon()
-                    relay.belongGroupId = DBUtils.groupNull?.id
-                    relay.color = 0
-                    relay.meshAddr = deviceInfo.meshAddress
-                    relay.name = TelinkLightApplication.getApp().getString(R.string.device_name)+relay.meshAddr
-                    relay.macAddr = deviceInfo.macAddress
-                    DBUtils.saveConnector(relay, false)
-                    LogUtils.d("create = $relay  " + relay.meshAddr)
-                    count++
-                    LogUtils.v("zcl找回-------------$count-------relay----")
+                    val db = DBUtils.getRelyByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        DBUtils.saveConnector(it, true)
+                    }
                 }
 
                 DeviceType.SMART_CURTAIN -> {
-                    val curtain = DbCurtain()
-                    curtain.productUUID = productUUID
-                    curtain.connectionStatus = 0
-                    curtain.updateIcon()
-                    curtain.belongGroupId = DBUtils.groupNull?.id
-                    curtain.meshAddr = deviceInfo.meshAddress
-                    curtain.name = TelinkLightApplication.getApp().getString(R.string.device_name)+curtain.meshAddr
-                    curtain.macAddr = deviceInfo.macAddress
-                    DBUtils.saveCurtain(curtain, false)
-                    LogUtils.d("create = $curtain  " + curtain.meshAddr)
-                    count++
-                    LogUtils.v("zcl找回------------$count--------curtain---")
+                    val db = DBUtils.getCurtainByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        DBUtils.saveCurtain(it, true)
+                    }
                 }
-                DeviceType.NIGHT_LIGHT,DeviceType.SENSOR -> {
-                    val sensor = DbSensor()
-                    sensor.productUUID = productUUID
-                    sensor.belongGroupId = DBUtils.groupNull?.id
-                    sensor.meshAddr = deviceInfo.meshAddress
-                    sensor.name = TelinkLightApplication.getApp().getString(R.string.device_name)+sensor.meshAddr
-                    sensor.macAddr = deviceInfo.macAddress
-                    DBUtils.saveSensor(sensor, false)
-                    count++
-                    LogUtils.v("zcl找回--------------$count------sensor---")
+                DeviceType.NIGHT_LIGHT, DeviceType.SENSOR -> {
+                    val db = DBUtils.getSensorByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        DBUtils.saveSensor(it, true)
+                    }
                 }
-                DeviceType.DOUBLE_SWITCH,DeviceType.NORMAL_SWITCH,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.SCENE_SWITCH
-                ,DeviceType.NORMAL_SWITCH2 -> {
-                    val switch = DbSwitch()
-                    switch.productUUID = productUUID
-                    switch.belongGroupId = DBUtils.groupNull?.id
-                    switch.meshAddr = deviceInfo.meshAddress
-                    switch.name = TelinkLightApplication.getApp().getString(R.string.device_name)+switch.meshAddr
-                    switch.macAddr = deviceInfo.macAddress
-                    DBUtils.saveSwitch(switch, false)
-                    count++
-                    LogUtils.v("zcl找回------------$count-------普通-switch-")
+                DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH
+                    , DeviceType.NORMAL_SWITCH2 -> {
+                    val db = DBUtils.getSwitchByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        DBUtils.saveSwitch(it, true)
+                    }
                 }
                 DeviceType.EIGHT_SWITCH -> {
-                    val switch = DbEightSwitch()
-                    switch.productUUID = productUUID
-                    switch.meshAddr = deviceInfo.meshAddress
-                    switch.name = TelinkLightApplication.getApp().getString(R.string.device_name)+switch.meshAddr
-                    switch.macAddr = deviceInfo.macAddress
-                    DBUtils.saveEightSwitch(switch, false)
-                    count++
-                    LogUtils.v("zcl找回-----------$count--------8k-switch--")
+                    val db = DBUtils.getEightSwitchByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.firmwareVersion = deviceInfo.firmwareRevision
+                        DBUtils.saveEightSwitch(it, true)
+                    }
                 }
             }
-
         }
 
-        return !isExist
+        return !isExist&&isRecoverMeshDevice
 
     }
 
@@ -282,6 +336,7 @@ object RecoverMeshDeviceUtil {
 
             if (type == 0x09) {
                 packetContentLength = packetSize - 1
+                if (packetContentLength > 16 || packetContentLength <= 0) return null
                 meshName = ByteArray(16)
                 //scanRecord要复制的源数据 postion要复制的源数据的开始位置 meshanme 代表要被复制进去的数组
                 //destPos代表被复制数据开始的位置 packetContentLength代表要复制的长度
@@ -289,23 +344,37 @@ object RecoverMeshDeviceUtil {
             } else if (type == 0xFF) {
                 rspData++
                 if (rspData == 2) {
-
                     val vendorId = ((scanRecord[position++].toInt() and 0xFF) shl 8) + (scanRecord[position++].toInt() and 0xFF)
 //                    if (vendorId != Manufacture.getDefault().vendorId)
 //                        return null
-
                     val meshUUID = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)
                     position += 4
                     val productUUID = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)
                     val status = scanRecord[position++].toInt() and 0xFF
-                    val meshAddress = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position].toInt() and 0xFF shl 8)
+                    val meshAddress = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)//可能因为后面没有其他操作所以saw没有++
+                    //                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
+//                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
+                    var version = ""
+                    val toInt = scanRecord[position++].toInt()
+                    val revType: Int = toInt and 0xFF //0XDD为版本号标识
+                    val VERSION_MARK = 0xDD
+                    //0xDD 后面15个Byte 为版本号
+                    if (revType == VERSION_MARK) {
+                        for (i in position until position + 15) {
+                            if (scanRecord[i].toInt() != 0) {
+                                version += scanRecord[i].toChar()
+                            }
+                        }
+                    }
 
                     val deviceInfo = DeviceInfo()
-                    deviceInfo.rssi =scanResult.rssi
+                    deviceInfo.rssi = scanResult.rssi
                     deviceInfo.meshAddress = meshAddress
                     deviceInfo.macAddress = scanResult.bleDevice.macAddress
                     deviceInfo.meshUUID = meshUUID
                     deviceInfo.productUUID = productUUID
+                    deviceInfo.firmwareRevision = version
+                    LogUtils.v("zcl-----------找回设备信息-------$version")
                     return deviceInfo
                 }
             }

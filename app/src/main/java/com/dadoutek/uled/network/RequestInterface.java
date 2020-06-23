@@ -27,6 +27,7 @@ import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
@@ -685,4 +686,7 @@ public interface RequestInterface {
      */
     @GET("gateway/reset/{gid}")
     Observable<Response<ClearGwBean>> clearGwInfo(@Path("gid") long gwId);
+
+    @GET("bin/latest/version")
+    Observable<Response<Map<String,Integer>>> getBinList();
 }

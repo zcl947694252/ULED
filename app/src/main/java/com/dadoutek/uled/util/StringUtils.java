@@ -195,7 +195,7 @@ public class StringUtils {
         }
     }
 
-    public static String getConnectorName(DbConnector connector) {
+    public static String getConnectorGroupName(DbConnector connector) {
         if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
@@ -207,7 +207,7 @@ public class StringUtils {
         }
     }
 
-    public static String getCurtainName(DbCurtain curtain) {
+    public static String getCurtainGroupName(DbCurtain curtain) {
         if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
@@ -219,7 +219,7 @@ public class StringUtils {
         }
     }
 
-    public static String getSwitchName(DbSwitch dbSwitch) {
+    public static String getSwitchGroupName(DbSwitch dbSwitch) {
         Long belongGroupId = dbSwitch.getBelongGroupId();
         if (belongGroupId == null || DBUtils.INSTANCE.getGroupByID(belongGroupId) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
@@ -233,7 +233,7 @@ public class StringUtils {
         }
     }
 
-    public static String getSensorName(DbSensor dbSensor) {
+    public static String getSensorGroupName(DbSensor dbSensor) {
         if (DBUtils.INSTANCE.getGroupByID(dbSensor.getBelongGroupId()) == null) {
             return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }

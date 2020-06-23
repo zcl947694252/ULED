@@ -440,7 +440,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             refreshAllData()
             refreshView()
         }
-        builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
+        builder.setNegativeButton(activity!!.getString(R.string.cancel)) { _, _ -> }
         val dialog = builder.show()
         dialog.show()
     }

@@ -105,7 +105,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     var no_group: ArrayList<DbCurtain> = ArrayList()
                     //判断窗帘是否有分组
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getCurtainGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -156,7 +156,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     var list_group: ArrayList<DbCurtain> = ArrayList()
                     var no_group: ArrayList<DbCurtain> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getCurtainName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
+                        if (StringUtils.getCurtainGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])

@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbCurtain implements Serializable {
@@ -33,13 +33,11 @@ public class DbCurtain implements Serializable {
     private int index;
     private Long belongGroupId;
     public String groupName;
+    public String version;
 
-    @Expose(serialize = false, deserialize = false)
-    @Transient
+    @Expose(serialize = false, deserialize = false)//:序列化和反序列化时都不生效,即序列化和反序列化都忽略,和不加 @Expose 注解效果一样
+    @Transient//标识不存入数据库
     public boolean selected;//选择状态
-    @Expose(serialize = false, deserialize = false)
-    @Transient
-    public String version;//选择状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
@@ -53,12 +51,15 @@ public class DbCurtain implements Serializable {
     @Transient
     public int connectionStatus = 1;//链接状态
     public int rssi =1000;
+    public boolean isSupportOta =true;
+    public boolean isMostNew = false;
 
-    @Generated(hash = 1892218322)
-    public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr,
-            String macAddr, int productUUID, int status, boolean inverse,
-            boolean closePull, int speed, boolean closeSlowStart, int index,
-            Long belongGroupId, String groupName, int rssi) {
+
+    @Generated(hash = 284432873)
+    public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
+            int productUUID, int status, boolean inverse, boolean closePull, int speed,
+            boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
+            int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -73,11 +74,25 @@ public class DbCurtain implements Serializable {
         this.index = index;
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
+        this.version = version;
         this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
+        this.isMostNew = isMostNew;
     }
+
     @Generated(hash = 303143706)
     public DbCurtain() {
     }
+
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
+
     public Long getId() {
         return this.id;
     }
@@ -268,5 +283,21 @@ public class DbCurtain implements Serializable {
     }
     public void setRssi(int rssi) {
         this.rssi = rssi;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }

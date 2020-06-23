@@ -70,7 +70,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
-    private var no_group: ConstraintLayout? = null
+    private var noGroup: ConstraintLayout? = null
     private var groupAdapter: GroupListAdapter? = null
     open var groupList: ArrayList<DbGroup> = ArrayList()
     private var isFristUserClickCheckConnect = true
@@ -187,7 +187,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.group_list_fragment, null)
         groupMesher = ArrayList()
-        no_group = view.findViewById(R.id.no_group)
+        noGroup = view.findViewById(R.id.no_group)
         recyclerView = view.findViewById(R.id.group_recyclerView)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
@@ -213,13 +213,13 @@ abstract class BaseGroupFragment : BaseFragment() {
         groupList.addAll(getGroupData())
 
         if (groupList.size > 0) {
-            no_group?.visibility = View.GONE
+            noGroup?.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             addGroupBtn?.visibility = View.VISIBLE
             viewLine?.visibility = View.VISIBLE
             viewLineRecycler?.visibility = View.VISIBLE
         } else {
-            no_group?.visibility = View.VISIBLE
+            noGroup?.visibility = View.VISIBLE
             recyclerView?.visibility = View.GONE
             addGroupBtn?.visibility = View.GONE
             viewLine?.visibility = View.GONE
@@ -313,10 +313,10 @@ abstract class BaseGroupFragment : BaseFragment() {
         }
 
         if (groupList.size > 0) {
-            no_group?.visibility = View.GONE
+            noGroup?.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
         } else {
-            no_group?.visibility = View.VISIBLE
+            noGroup?.visibility = View.VISIBLE
             recyclerView?.visibility = View.GONE
         }
 

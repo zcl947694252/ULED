@@ -59,6 +59,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -388,27 +389,27 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
             }
         } else {
-            var light_current = DBUtils.getLightByID(light!!.id)
-            if (light_current != null) {
-                if (light_current.connectionStatus == ConnectionStatus.OFF.value) {
+            var lightCurrent = DBUtils.getLightByID(light!!.id)
+            if (lightCurrent != null) {
+                if (lightCurrent.connectionStatus == ConnectionStatus.OFF.value) {
                     isSwitch = true
-                    Commander.openOrCloseLights(light_current.meshAddr, true)
+                    Commander.openOrCloseLights(lightCurrent.meshAddr, true)
                     light_switch.setImageResource(R.drawable.icon_light_open)
                     //light_image.setImageResource(R.drawable.icon_light)
                     if (isBrightness)
-                        setLightGUIImg(progress = light_current.brightness)
+                        setLightGUIImg(progress = lightCurrent.brightness)
                     else
-                        setLightGUIImg(temperatureValue = light_current.colorTemperature)
-                    light_current.connectionStatus = ConnectionStatus.ON.value
+                        setLightGUIImg(temperatureValue = lightCurrent.colorTemperature)
+                    lightCurrent.connectionStatus = ConnectionStatus.ON.value
                     light_sbBrightness!!.setOnTouchListener { v, _ -> false }
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
                         when {
-                            light_current!!.brightness <= 0 -> {
+                            lightCurrent!!.brightness <= 0 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
-                            light_current.brightness >= 100 -> {
+                            lightCurrent.brightness >= 100 -> {
                                 device_light_add.setImageResource(R.drawable.icon_puls_no)
                                 device_light_minus.setImageResource(R.drawable.icon_minus)
                             }
@@ -419,11 +420,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     } else {
                         when {
-                            light_current!!.colorTemperature <= 0 -> {
+                            lightCurrent!!.colorTemperature <= 0 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
-                            light_current.colorTemperature >= 100 -> {
+                            lightCurrent.colorTemperature >= 100 -> {
                                 device_light_add.setImageResource(R.drawable.icon_puls_no)
                                 device_light_minus.setImageResource(R.drawable.icon_minus)
                             }
@@ -497,8 +498,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     }
                 } else {
                     isSwitch = false
-                    Commander.openOrCloseLights(light_current.meshAddr, false)
-                    light_current.connectionStatus = ConnectionStatus.OFF.value
+                    Commander.openOrCloseLights(lightCurrent.meshAddr, false)
+                    lightCurrent.connectionStatus = ConnectionStatus.OFF.value
                     light_switch.setImageResource(R.drawable.icon_light_close)
                     //light_image.setImageResource()
                     setLightGUIImg(isClose = true)
@@ -509,7 +510,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     device_light_add.setOnTouchListener { v, event -> false }
                     device_light_minus.setOnTouchListener { v, event -> false }
                 }
-                DBUtils.updateLight(light_current)
+                DBUtils.updateLight(lightCurrent)
             }
         }
     }
@@ -919,6 +920,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                             { s ->
                                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                                     light!!.version = s
+                                                    DBUtils.saveLight(light!!,false)
                                                     transformView()
                                                 } else {
                                                     ToastUtils.showLong(getString(R.string.version_disabled))
@@ -996,6 +998,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                         light!!.version = localVersion
                                         tvOta!!.visibility = GONE
                                     }
+                                    DBUtils.saveLight(light,false)
                                 }
 
                             },

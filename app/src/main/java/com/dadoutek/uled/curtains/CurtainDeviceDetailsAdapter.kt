@@ -15,7 +15,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
             val tvName = helper.getView<TextView>(R.id.name)
             val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
 //            val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
-            tvName.text = StringUtils.getCurtainName(scene)
+            tvName.text = StringUtils.getCurtainGroupName(scene)
 
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))

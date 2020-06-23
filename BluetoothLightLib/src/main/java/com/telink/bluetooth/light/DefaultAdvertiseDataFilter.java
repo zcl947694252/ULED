@@ -65,11 +65,11 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
 //                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
 //                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
                     String version = "";
-                    int revType = scanRecord[position++] & 0xFF; //0XDD为版本号标识
+                    byte b = scanRecord[position++];
+                    int revType = b & 0xFF; //0XDD为版本号标识
                     final int VERSION_MARK = 0xDD;
                     //0xDD 后面15个Byte 为版本号
-                    if(revType == VERSION_MARK)
-                    {
+                    if(revType == VERSION_MARK) {
                         for(int i = position; i<position+15; i++)
                         {
                             if(scanRecord[i] != 0)
@@ -79,17 +79,6 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
                         }
                     }
 
-
-                    String one = Integer.toHexString(scanRecord[20]);
-                    String two = Integer.toHexString(scanRecord[21]);
-                    String three = Integer.toHexString(scanRecord[22]);
-                    String four = Integer.toHexString(scanRecord[23]);
-                    one = formatHex(one);
-                    two = formatHex(two);
-                    three = formatHex(three);
-                    four = formatHex(four);
-                    String mac4Byte = one + ":" + two + ":" + three + ":" + four;
-                //    LogUtils.v("zcl-----------要链接的mac3D扫描到的-------" + mac4Byte);
                     LightPeripheral light = new LightPeripheral(device, scanRecord, rssi, meshName, meshAddress,version);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_NAME, meshName);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_ADDRESS, meshAddress);
