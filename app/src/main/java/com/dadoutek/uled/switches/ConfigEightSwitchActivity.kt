@@ -59,13 +59,9 @@ import org.json.JSONObject
  */
 
 
-class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
+class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
+    private var isReConfim: Boolean = false
     private lateinit var listKeysBean: JSONArray
-    private var renameDialog: Dialog? = null
-    private var renameConfirm: TextView? = null
-    private var renameCancel: TextView? = null
-    private var renameEditText: EditText? = null
-    private var popReNameView: View? = null
     private var newMeshAddr: Int = 0
     private var switchData: DbSwitch? = null
     private var groupName: String? = null
@@ -81,7 +77,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private val sceneMap = mutableMapOf<Int, DbScene>()
     private val sceneParamList = mutableListOf<ByteArray>()
 
-    private fun initData() {
+    override fun initData() {
         val groupKey = mutableListOf(4, 5, 6, 7)
         val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6)
         val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
@@ -91,13 +87,16 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        bottom_version_number?.text = version
+        fiVersion?.title = version
 
         groupName = intent.getStringExtra("group")
         eight_switch_mode.visibility = View.GONE
         eight_switch_config.visibility = View.GONE
         eight_switch_banner_ly.visibility = View.VISIBLE
-        if (groupName != null && groupName == "true") {
+        isReConfim = groupName != null && groupName == "true"
+        fiRename?.isVisible = isReConfim
+
+        if (isReConfim) {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
@@ -178,31 +177,31 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
-               /* when (type) {
-                    0 -> {
-                        groupKey.forEach { itKey ->
-                            var dbGroup = DbGroup()
-                            dbGroup.id = 1000000L
-                            groupMap[itKey] = dbGroup
-                        }
-                    }
-                    1 -> {
-                        sceneKey.forEach { itKey ->
-                            var dbScene = DbScene()
-                            dbScene.id = 1000000L
-                            sceneMap[itKey] = dbScene
-                        }
-                    }
-                    2 -> {
-                        doubleGroupKey.forEach { itKey ->
-                            var dbGroup = DbGroup()
-                            dbGroup.id = 1000000L
-                            groupMap[itKey] = dbGroup
-                        }
-                    }
-                    else -> {
-                    }
-                }*/
+                /* when (type) {
+                     0 -> {
+                         groupKey.forEach { itKey ->
+                             var dbGroup = DbGroup()
+                             dbGroup.id = 1000000L
+                             groupMap[itKey] = dbGroup
+                         }
+                     }
+                     1 -> {
+                         sceneKey.forEach { itKey ->
+                             var dbScene = DbScene()
+                             dbScene.id = 1000000L
+                             sceneMap[itKey] = dbScene
+                         }
+                     }
+                     2 -> {
+                         doubleGroupKey.forEach { itKey ->
+                             var dbGroup = DbGroup()
+                             dbGroup.id = 1000000L
+                             groupMap[itKey] = dbGroup
+                         }
+                     }
+                     else -> {
+                     }
+                 }*/
             }
         }
     }
@@ -393,7 +392,8 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
             updateSwitch(isConfigGroup)
             GlobalScope.launch(Dispatchers.Main) {
-                showRenameDialog()
+                if (!isReConfim)
+                    showRenameDialog(switchData)
                 ToastUtils.showShort(getString(R.string.config_success))
                 hideLoadingDialog()
             }
@@ -647,15 +647,30 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.eight_switch)
-        initView()
-        initData()
-        initListener()
+    override fun deleteDevice() {
+        if (mDeviceInfo != null)
+            deleteSwitch(mDeviceInfo!!.macAddress)
+        else
+            ToastUtils.showShort(getString(R.string.invalid_data))
     }
 
-    private fun initView() {
+    override fun goOta() {
+        if (mDeviceInfo != null)
+            deviceOta(mDeviceInfo!!)
+        else
+            ToastUtils.showShort(getString(R.string.invalid_data))
+    }
+
+
+    override fun reName() {
+        showRenameDialog(switchData)
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.eight_switch
+    }
+
+    override fun initView() {
         val list = mutableListOf<View>()
         for (i in 0..2) {
             val view = layoutInflater.inflate(R.layout.item_banner, null, false)
@@ -701,7 +716,7 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         makePop()
     }
 
-    private fun initListener() {
+    override fun initListener() {
         eight_switch_retutn.setOnClickListener {
             finishAc()
         }
@@ -743,10 +758,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -769,11 +780,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             if (this != null && !this.isFinishing)
                 renameDialog?.dismiss()
         }
-
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
-
         renameDialog?.setOnDismissListener {
             switchData?.name = renameEditText?.text.toString().trim { it <= ' ' }
             if (switchData != null)
@@ -787,21 +793,6 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        StringUtils.initEditTextFilter(renameEditText)
-        if (switchData != null && switchData?.name != "")
-            renameEditText?.setText(switchData?.name)
-        else {
-            var text = eight_switch_title.text.toString()
-            renameEditText?.setText(text + "*" + DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")?.meshAddr)
-        }
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
-        }
-    }
 
     private fun finishAc() {
         TelinkLightService.Instance().idleMode(true)
@@ -852,10 +843,5 @@ class ConfigEightSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             intent.putExtra(Constant.EIGHT_SWITCH_TYPE, configSwitchType)
             startActivityForResult(intent, requestCodeNum)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        TelinkLightService.Instance()?.idleMode(true)
     }
 }

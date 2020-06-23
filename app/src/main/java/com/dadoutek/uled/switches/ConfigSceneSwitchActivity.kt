@@ -1,17 +1,12 @@
 package com.dadoutek.uled.switches
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.PopupWindow
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -39,7 +34,6 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -54,16 +48,9 @@ import kotlin.collections.ArrayList
 private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
-    private var mConnectDeviceDisposable: Disposable? = null
     private var isReConfig: Boolean = false
     private val requestCodes: Int = 1000
     private var version: String = ""
-    private var popReNameView: View? = null
-    private var renameDialog: Dialog? = null
-    private var renameCancel: TextView? = null
-    private var popRename: PopupWindow? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
     private var newMeshAddr: Int = 0
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mAdapter: SwitchSceneGroupAdapter
@@ -94,9 +81,11 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
         groupName = intent.getStringExtra("group")
         isReConfig = groupName != null && groupName == "true"
-        if (isReConfig) {
+        fiRename?.isVisible = isReConfig
+
+        if (isReConfig)
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        }
+
 
         mSwitchList = ArrayList()
         mSwitchList.add(getString(R.string.button1))
@@ -157,7 +146,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                     pb_ly.visibility = View.GONE
                     if (switchDate == null)
                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                    showRenameDialog()
+                    if (!isReConfig)
+                        showRenameDialog(switchDate)
 
                 }, failedCallback = {
                     mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
@@ -190,31 +180,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun reName() {
-        showRenameDialog()
-    }
-
-    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-
-        override fun downLoadFileStart() {}
-
-        override fun startGetVersion() {}
-
-        override fun getVersionSuccess(s: String) {}
-
-        override fun getVersionFail() {
-            ToastUtils.showLong(R.string.verification_version_fail)
-            hideLoadingDialog()
-        }
-
-        override fun downLoadFileSuccess() {
-            hideLoadingDialog()
-            transformView()
-        }
-
-        override fun downLoadFileFail(message: String) {
-            hideLoadingDialog()
-            ToastUtils.showLong(R.string.download_pack_fail)
-        }
+        showRenameDialog(switchDate)
     }
 
     override fun onClick(v: View?) {
@@ -235,23 +201,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodes)
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        hideLoadingDialog()
-        popRename?.dismiss()
-        StringUtils.initEditTextFilter(renameEditText)
-
-        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null) renameEditText?.setText(switchDate?.name)
-        else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
-
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
-        }
-    }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
@@ -291,11 +240,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            /*   if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
-                                   updateSwitch()
-                               } else {
-                                   saveSwitch()
-                               }*/
                             TelinkLightService.Instance()?.idleMode(true)
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                         }.show()
@@ -337,7 +281,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         } else {
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
-            // TODO 此处不知道为什么要设置成固定的 暂时注释 configsceneSwith也已被注释
             //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
             switchDate!!.productUUID = mDeviceInfo.productUUID
 
@@ -550,10 +493,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -575,10 +514,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (this != null && !this.isFinishing)
                 renameDialog?.dismiss()
         }
-
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }

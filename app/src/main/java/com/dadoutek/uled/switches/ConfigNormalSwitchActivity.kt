@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
-import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.text.TextUtils
@@ -19,7 +18,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -58,49 +56,19 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
-    private var findItem: MenuItem? = null
+    private var isReConfig: Boolean = false
     private var groupName: String? = null
     private var currentGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
-    private var popReNameView: View? = null
-    private var renameDialog: Dialog? = null
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
-    private var mRxPermission: RxPermissions? = null
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
     private var mConfigFailSnackbar: Snackbar? = null
     private var isGlassSwitch = false
     private var switchDate: DbSwitch? = null
-
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        DBUtils.lastUser?.let {
-            if (it.id.toString() == it.last_authorizer_user_id) {
-                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                findItem = menu?.findItem(R.id.toolbar_f_version)
-            }
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun deleteDevice() {
-        TODO("Not yet implemented")
-    }
-
-    override fun goOta() {
-        TODO("Not yet implemented")
-    }
-
-    override fun reName() {
-        TODO("Not yet implemented")
-    }
-
     override fun setLayoutId(): Int {
         return R.layout.activity_switch_group
     }
@@ -109,45 +77,56 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         setSupportActionBar(toolbar)
         supportActionBar?.title = getString(R.string.select_group)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         makePop()
+    }
+
+    override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
 
         if (TextUtils.isEmpty(localVersion))
             localVersion = mDeviceInfo.firmwareRevision
-        findItem?.title = getString(R.string.firmware_version, localVersion)
+        fiVersion?.title = getString(R.string.firmware_version, localVersion)
+
         //tvLightVersion.text = localVersion
         if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
             isGlassSwitch = true
 
-        if (groupName != null && groupName == "true") {
+        isReConfig = groupName != null && groupName == "true"
+        fiRename?.isVisible = isReConfig
+
+        if (isReConfig)
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        } else {
+        else
             groupName = "false"
-        }
+
         mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList
 
-        for (group in groupList) {
+        for (group in groupList)
             if (OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group) || OtherUtils.isConnector(group)) {
                 group.checked = false
                 mGroupArrayList.add(group)
             }
-        }
-        if (mGroupArrayList.size > 0) {
-            mGroupArrayList[0].checked = true
-        }
 
-        mRxPermission = RxPermissions(this)
+        if (mGroupArrayList.size > 0)
+            mGroupArrayList[0].checked = true
+    }
+
+    override fun deleteDevice() {
+        deleteSwitch(mDeviceInfo.macAddress)
+    }
+
+    override fun goOta() {
+        deviceOta(mDeviceInfo)
+    }
+
+    override fun reName() {
+        showRenameDialog(switchDate)
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -168,37 +147,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 renameDialog?.dismiss()
         }
 
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
-
         renameDialog?.setOnDismissListener {
-
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        hideLoadingDialog()
-        StringUtils.initEditTextFilter(renameEditText)
-
-        if (switchDate != null && switchDate?.name != "")
-            renameEditText?.setText(switchDate?.name)
-        else {
-            if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
-                renameEditText?.setText(switchDate?.name)
-            else
-                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
-                        + DBUtils.getAllSwitch().size)
-        }
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
         }
     }
 
@@ -294,7 +247,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                 disconnect()
                                 if (switchDate == null)
                                     switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                                showRenameDialog()
+                                if (!isReConfig)
+                                    showRenameDialog(switchDate)
                             },
                             failedCallback = {
                                 mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
@@ -331,8 +285,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
               }*/
     }
 
-    override fun initData() {}
-
     override fun onDestroy() {
         super.onDestroy()
         mApp?.removeEventListener(this)
@@ -354,43 +306,26 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        //("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        //("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        //("未扫到目标设备")
-                    }
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> { }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> { }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> { }
                 }
                 showDisconnectSnackBar()
 
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        //("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        //("未建立物理连接")
-                    }
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> { }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {}
                 }
                 showDisconnectSnackBar()
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        //("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        //("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        //("write login data 没有收到response")
-                    }
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> { }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {}
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {}
                 }
-                //("onError login")
                 showDisconnectSnackBar()
             }
         }
@@ -419,7 +354,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 when {
                     mIsDisconnecting -> {
                         this.mApp?.removeEventListener(this)
-
                         GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
                             sw_progressBar.visibility = View.GONE
@@ -490,9 +424,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
                 LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-                recordingChange(gotSwitchByMac?.id,
-                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
                 switchDate = dbSwitch
             }
 

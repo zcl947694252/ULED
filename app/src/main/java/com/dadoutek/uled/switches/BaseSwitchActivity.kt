@@ -9,6 +9,8 @@ package com.dadoutek.uled.switches
  * 更新时间   $
  * 更新描述
  */
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -16,18 +18,24 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
+import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -38,13 +46,21 @@ import java.util.concurrent.TimeUnit
 private var last_start_time = 0
 private var debounce_time = 1000
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
+    var renameDialog: Dialog? = null
+    var popRename: PopupWindow? = null
+
+    var popReNameView: View? = null
+    var renameCancel: TextView? = null
+    var renameConfirm: TextView? = null
+    var renameEditText: EditText? = null
+
     private var mConnectDeviceDisposable: Disposable? = null
     private lateinit var otaDeviceInfo: DeviceInfo
-    internal var fiDelete: MenuItem? = null
-    internal var fiFactoryReset: MenuItem? = null
-    internal var fiOta: MenuItem? = null
-    internal var fiChangeGp: MenuItem? = null
-    internal var fiRename: MenuItem? = null
+     var fiDelete: MenuItem? = null
+     var fiFactoryReset: MenuItem? = null
+     var fiOta: MenuItem? = null
+     var fiChangeGp: MenuItem? = null
+     var fiRename: MenuItem? = null
     internal var fiVersion: MenuItem? = null
     var mApp: TelinkLightApplication? = null
 
@@ -52,9 +68,21 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutId())
         mApp = application as TelinkLightApplication
-        initData()
+        makePopuwindow()
         initView()
+        initData()
         initListener()
+    }
+
+    private fun makePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -94,6 +122,25 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     abstract fun deleteDevice()
+
+
+    @SuppressLint("SetTextI18n")
+    fun showRenameDialog(switchDate: DbSwitch?) {
+        hideLoadingDialog()
+        popRename?.dismiss()
+        StringUtils.initEditTextFilter(renameEditText)
+
+        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
+            renameEditText?.setText(switchDate?.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+    }
 
      fun deleteSwitch(macAddress: String) {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
@@ -180,4 +227,9 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     abstract fun initListener()
     abstract fun initData()
     abstract fun initView()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        TelinkLightService.Instance()?.idleMode(true)
+    }
 }

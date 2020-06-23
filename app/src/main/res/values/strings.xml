@@ -1091,4 +1091,8 @@
     <string name="no_connect_device">No automatic connection!</string>
     <string name="select_icon_dot">Select the icon:</string>
     <string name="select_icon">Select the icon</string>
+    <string name="group_ota">Group to upgrade</string>
+    <string name="get_bin_fail">Failed to get the bin file</string>
+    <string name="dissupport_ota">Otas are not supported in this release</string>
+    <string name="get_version_success">This version does not support OTA capture of device version success</string>
 </resources>

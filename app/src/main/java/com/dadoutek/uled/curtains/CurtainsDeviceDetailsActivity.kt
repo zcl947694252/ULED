@@ -38,6 +38,7 @@ import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import java.util.*
 
 
 /**

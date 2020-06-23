@@ -105,7 +105,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     TextView tvFile;
     TextView local_version;
     TextView server_version;
-    @BindView(R.id.open_device)
     CheckBox open_device;
 
     private int mode = MODE_IDLE;
@@ -215,6 +214,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
          tvFile= findViewById(R.id.tvFile);
          local_version= findViewById(R.id.local_version);
          server_version= findViewById(R.id.server_version);
+         open_device= findViewById(R.id.open_device);
 
         btn_start_update.setOnClickListener(this);
         select.setOnClickListener(this);

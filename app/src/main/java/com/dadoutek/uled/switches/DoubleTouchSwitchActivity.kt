@@ -49,13 +49,8 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 
-class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var findItem: MenuItem? = null
-    private var popReNameView: View? = null
-    private var renameDialog: Dialog? = null
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
+class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
+    private var isReConfig: Boolean = false
     private var switchDate: DbSwitch? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
@@ -65,32 +60,33 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_switch_double_touch)
-        initView()
-        initData()
-        initListener()
+    override fun deleteDevice() {
+        deleteSwitch(mDeviceInfo.macAddress)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        DBUtils.lastUser?.let {
-            if (it.id.toString() == it.last_authorizer_user_id) {
-                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                findItem = menu?.findItem(R.id.toolbar_f_version)
-            }
-        }
-        return super.onCreateOptionsMenu(menu)
+    override fun goOta() {
+        deviceOta(mDeviceInfo)
     }
 
-    fun initData() {
+    override fun reName() {
+        showRenameDialog(switchDate)
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_switch_double_touch
+    }
+
+    override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         isRetryConfig = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
         eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
 //        bottom_version_number.text = localVersion
-        findItem?.title = getString(R.string.firmware_version,localVersion)
-        if (isRetryConfig != null && isRetryConfig == "true") {
+        fiVersion?.title = getString(R.string.firmware_version, localVersion)
+        isReConfig = isRetryConfig != null && isRetryConfig == "true"
+        fiRename?.isVisible = isReConfig
+
+        if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
@@ -112,7 +108,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
             }
-
         }
     }
 
@@ -148,7 +143,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (switchDate == null)
                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                     GlobalScope.launch(Dispatchers.Main) {
-                        showRenameDialog()
+                        if (!isReConfig)
+                        showRenameDialog(switchDate)
                     }
                 },
                 failedCallback = {
@@ -188,24 +184,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
             switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
             DBUtils.updateSwicth(switchDate!!)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        DBUtils.getAllSwitch()
-        hideLoadingDialog()
-        StringUtils.initEditTextFilter(renameEditText)
-        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
-            renameEditText?.setText(switchDate?.name)
-        else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
-                    + DBUtils.getAllSwitch().size)
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
         }
     }
 
@@ -270,7 +248,7 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
-    fun initListener() {
+    override  fun initListener() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -303,10 +281,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
@@ -324,11 +298,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
             }
         }
-
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
-
         renameDialog?.setOnDismissListener {
             switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
@@ -337,14 +306,15 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    fun initView() {
+    override  fun initView() {
         switch_double_touch_mb.visibility = View.VISIBLE
         switch_double_touch_set.visibility = View.GONE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
         toolbar.title = getString(R.string.double_switch)
         toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
-
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         makePop()
     }
 

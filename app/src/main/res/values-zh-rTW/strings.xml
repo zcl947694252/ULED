@@ -1013,4 +1013,8 @@
     <string name="no_connect_device">无可自动连接设备!</string>
     <string name="select_icon_dot">请选择图标:</string>
     <string name="select_icon">选择图标</string>
+    <string name="group_ota">群组升级</string>
+    <string name="get_bin_fail">获取bin文件失败</string>
+    <string name="dissupport_ota">该版本不支持OTA</string>
+    <string name="get_version_success">获取设备版本成功</string>
 </resources>
