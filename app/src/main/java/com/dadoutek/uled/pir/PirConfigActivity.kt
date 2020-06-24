@@ -185,8 +185,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-        toolbar.title = getString(R.string.human_body)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbarTv.text = getString(R.string.human_body)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

@@ -16,7 +16,6 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,9 +47,11 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.DialogUtils.hideLoadingDialog
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
@@ -444,32 +445,62 @@ abstract class BaseGroupFragment : BaseFragment() {
                 }
             }
 
-            R.id.selected_group -> groupList[position].isSelected = !groupList[position].isSelected
+            R.id.template_device_card_delete ->{deleteSingleGroup(currentGroup!!)}
 
             //不能使用group_name否则会造成长按监听无效 跳转组详情
             //  R.id.item_layout -> {
             R.id.template_device_more -> {
-                var intent = Intent()
-                when (groupType) {
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "cw_light")
+                val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
+                if (isLight&&position==0){
+                    if (TelinkLightApplication.getApp().connectDevice != null) {
+                        val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                        intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intentSetting.putExtra("group", DBUtils.allGroups[0])
+                        startActivityForResult(intentSetting, 1)
+                    } else {
+                        ToastUtils.showShort(getString(R.string.device_not_connected))
+                        val activity = activity as MainActivity
+                        activity.autoConnect()
                     }
-                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "rgb_light")
-                    }//蓝牙接收器
-                    Constant.DEVICE_TYPE_CONNECTOR -> {
-                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                }else{
+                    var intent = Intent()
+                    when (groupType) {
+                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "cw_light")
+                        }
+                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "rgb_light")
+                        }//蓝牙接收器
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                            intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                        }
+                        Constant.DEVICE_TYPE_CURTAIN -> {
+                            intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                        }
                     }
-                    Constant.DEVICE_TYPE_CURTAIN -> {
-                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                    }
+                    intent.putExtra("group", currentGroup)
+                    startActivityForResult(intent, 2)
                 }
-                intent.putExtra("group", currentGroup)
-                startActivityForResult(intent, 2)
             }
         }
+    }
+
+    private fun deleteSingleGroup(dbGroup: DbGroup) {
+
+        val lights = DBUtils.getLightByGroupID(dbGroup.id)
+        deleteGroup(lights, dbGroup,
+                successCallback = {
+                    isDeleteSucess = true
+                    hideLoadingDialog()
+                    sendDeleteBrocastRecevicer(300)
+                    refreshData()
+                },
+                failedCallback = {
+                    hideLoadingDialog()
+                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+                })
     }
 
     private fun goConnect(ishow: Boolean = true) {

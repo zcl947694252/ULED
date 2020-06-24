@@ -53,7 +53,7 @@ class SelectDeviceTypeActivity : BaseActivity() {
 
     override fun initView() {
         toolbar.setNavigationOnClickListener { finish() }
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbarTv.text = getString(R.string.add_device)
         template_recycleView.layoutManager = GridLayoutManager(this@SelectDeviceTypeActivity, 3)
         template_recycleView.adapter = deviceAdapter

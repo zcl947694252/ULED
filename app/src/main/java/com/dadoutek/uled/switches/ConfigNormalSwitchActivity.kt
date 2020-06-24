@@ -87,7 +87,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
         if (TextUtils.isEmpty(localVersion))
             localVersion = mDeviceInfo.firmwareRevision
-        fiVersion?.title = getString(R.string.firmware_version, localVersion)
+        fiVersion?.title = getString(R.string.firmware_version)+localVersion
 
         //tvLightVersion.text = localVersion
         if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
@@ -112,6 +112,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
         if (mGroupArrayList.size > 0)
             mGroupArrayList[0].checked = true
+    }
+
+    override fun setVersion() {
+        fiVersion?.title = getString(R.string.firmware_version)+localVersion
     }
 
     override fun deleteDevice() {
@@ -160,7 +164,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
-                        progressBar.visibility = View.VISIBLE
+                        sw_progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
                     } else {
@@ -186,7 +190,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         if (mIsConfiguring) {
             mApp?.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
+                sw_progressBar.visibility = View.GONE
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)

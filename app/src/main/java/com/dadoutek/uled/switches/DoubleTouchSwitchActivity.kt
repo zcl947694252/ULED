@@ -59,6 +59,9 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
+    override fun setVersion() {
+        fiVersion?.title = getString(R.string.firmware_version)+localVersion
+    }
 
     override fun deleteDevice() {
         deleteSwitch(mDeviceInfo.macAddress)
@@ -82,7 +85,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         localVersion = intent.getStringExtra("version")
         eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
 //        bottom_version_number.text = localVersion
-        fiVersion?.title = getString(R.string.firmware_version, localVersion)
+
         isReConfig = isRetryConfig != null && isRetryConfig == "true"
         fiRename?.isVisible = isReConfig
 
@@ -311,8 +314,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         switch_double_touch_set.visibility = View.GONE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
-        toolbar.title = getString(R.string.double_switch)
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbarTv.text = getString(R.string.double_switch)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         makePop()

@@ -115,11 +115,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.title = getString(R.string.relay) + " (" + lightsData.size + ")"
+        toolbarTv.text = getString(R.string.relay) + " (" + lightsData.size + ")"
 
     }
 
@@ -604,7 +604,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         lightsData.clear()
         lightsData.addAll(mNewDatas)
 
-        toolbar.title = getString(R.string.relay) + " (" + lightsData.size + ")"
+        toolbarTv.text = getString(R.string.relay) + " (" + lightsData.size + ")"
 //        adaper!!.setNewData(lightsData)
         adaper?.notifyDataSetChanged()
 

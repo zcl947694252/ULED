@@ -284,7 +284,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         if (light != null)
                             DBUtils.updateLight(light!!)
-                        toolbar.title = light?.name
+                        toolbarTv.text = light?.name
                         dialog.dismiss()
                     }
                 }
@@ -382,7 +382,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                         light!!.version = localVersion
                                     } else {
                                         //lightVersion!!.visibility = View.VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
+                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
                                         light!!.version = localVersion
                                     }
                                     DBUtils.saveLight(light!!, false)
@@ -415,7 +415,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         dataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
         tvRename.visibility = View.GONE
-        toolbar.title = light?.name
+        toolbarTv.text = light?.name
 
         cb_total.setOnCheckedChangeListener { _, isChecked ->
             if (light != null) {
@@ -948,7 +948,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun initToolbarGroup() {
-        toolbar.title = ""
+        toolbarTv.text = ""
         toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
@@ -1369,9 +1369,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             normal_rgb.setTextColor(resources.getColor(R.color.blue_background))
             if (group != null) {
                 if (group!!.meshAddr == 0xffff) {
-                    toolbar.title = getString(R.string.allLight)
+                    toolbarTv.text = getString(R.string.allLight)
                 } else {
-                    toolbar.title = group?.name
+                    toolbarTv.text = group?.name
                 }
             }
 
@@ -1394,7 +1394,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             rgb_set.visibility = View.VISIBLE
             dynamic_rgb.setTextColor(resources.getColor(R.color.black_nine))
             normal_rgb.setTextColor(resources.getColor(R.color.blue_background))
-            toolbar.title = light?.name
+            toolbarTv.text = light?.name
             if (isDelete) {
                 isDelete = false
                 rgbDiyGradientAdapter!!.changeState(isDelete)
@@ -1554,7 +1554,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                     if (currentShowGroupSetPage) {
                         if (group != null) {
                             if (group!!.meshAddr == 0xffff) {
-                                toolbar.title = getString(R.string.allLight)
+                                toolbarTv.text = getString(R.string.allLight)
                             } else {
                                 toolbar!!.title = getString(R.string.dynamic_gradient)
                             }
@@ -1610,9 +1610,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-                toolbar.title = getString(R.string.allLight)
+                toolbarTv.text = getString(R.string.allLight)
             } else {
-                toolbar.title = group?.name
+                toolbarTv.text = group?.name
             }
         }
 
@@ -2331,7 +2331,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                         if (canSave) {
                             group?.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateGroup(group!!)
-                            toolbar.title = group?.name
+                            toolbarTv.text = group?.name
                             dialog.dismiss()
                         }
                     }

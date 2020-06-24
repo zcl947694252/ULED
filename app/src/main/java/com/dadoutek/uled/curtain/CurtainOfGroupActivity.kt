@@ -308,9 +308,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         }
 
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + curtainList.size + ")"
+            toolbarTv.text = getString(R.string.allLight) + " (" + curtainList.size + ")"
         } else {
-            toolbar.title = (group.name ?: "") + " (" + curtainList.size + ")"
+            toolbarTv.text = (group.name ?: "") + " (" + curtainList.size + ")"
         }
         return curtainList
     }
@@ -366,9 +366,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + curtainList.size + ")"
+            toolbarTv.text = getString(R.string.allLight) + " (" + curtainList.size + ")"
         } else {
-            toolbar.title = (group.name ?: "") + " (" + curtainList.size + ")"
+            toolbarTv.text = (group.name ?: "") + " (" + curtainList.size + ")"
         }
         light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)

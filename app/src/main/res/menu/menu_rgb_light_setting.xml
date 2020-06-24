@@ -33,7 +33,7 @@
     <item
             android:id="@+id/toolbar_f_version"
             android:orderInCategory="4"
-            android:title="@string/firmware_version"
+            android:title="@string/select_group"
             app:showAsAction="never" />
 
 </menu>

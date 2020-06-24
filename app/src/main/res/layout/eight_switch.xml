@@ -15,9 +15,11 @@
             android:paddingTop="20dp"
             android:paddingEnd="@dimen/dp_10"
             android:paddingBottom="@dimen/dp_10"
+            android:visibility="gone"
             android:src="@drawable/icon_return"/>
+    <include layout="@layout/toolbar"/>
 
-    <LinearLayout
+<!--    <LinearLayout
             android:id="@+id/eight_switch_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +41,7 @@
                 android:text="@string/change_mode_8k"
                 android:textColor="#FF654405"
                 android:textSize="18sp" />
-    </LinearLayout>
+    </LinearLayout>-->
 
     <RelativeLayout
             android:layout_width="match_parent"
@@ -59,17 +61,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="230dp"
                     android:clipChildren="false"
-                    android:overScrollMode="never" />
+                    android:overScrollMode="never"/>
 
-            <TextView
-                    android:id="@+id/eight_switch_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/group_switch"
-                    android:textColor="#FF333333"
-                    android:textSize="30sp" />
         </LinearLayout>
 
 
@@ -188,6 +181,16 @@
                     android:textSize="13sp" />
 
         </RelativeLayout>
+        <TextView
+                android:id="@+id/eight_switch_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_below="@+id/eight_switch_config"
+                android:gravity="center_horizontal"
+                android:text="@string/group_switch"
+                android:textColor="#FF333333"
+                android:textSize="30sp" />
 
     </RelativeLayout>
 

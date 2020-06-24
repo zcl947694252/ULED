@@ -2,20 +2,13 @@ package com.dadoutek.uled.switches
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
-import android.os.Bundle
-import android.support.v4.view.ViewPager
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -24,14 +17,15 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
-import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.eight_switch.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -67,15 +61,15 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var groupName: String? = null
     private var version: String? = null
     private var mDeviceInfo: DeviceInfo? = null
-    private var configSwitchType = 0
+    private var configSwitchType = 1
     private var configButtonTag = 0
     private val requestCodeNum = 100
     private var clickType = 0
-
     private val groupMap = mutableMapOf<Int, DbGroup>()
     private val groupParamList = mutableListOf<ByteArray>()
     private val sceneMap = mutableMapOf<Int, DbScene>()
     private val sceneParamList = mutableListOf<ByteArray>()
+
 
     override fun initData() {
         val groupKey = mutableListOf(4, 5, 6, 7)
@@ -87,12 +81,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        fiVersion?.title = version
 
         groupName = intent.getStringExtra("group")
-        eight_switch_mode.visibility = View.GONE
-        eight_switch_config.visibility = View.GONE
-        eight_switch_banner_ly.visibility = View.VISIBLE
+        // eight_switch_mode.visibility = View.GONE
+        // eight_switch_config.visibility = View.GONE
+        // eight_switch_banner_ly.visibility = View.VISIBLE
         isReConfim = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfim
 
@@ -101,9 +94,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
 
-                eight_switch_mode.visibility = View.VISIBLE
-                eight_switch_config.visibility = View.VISIBLE
-                eight_switch_banner_ly.visibility = View.GONE
+                //eight_switch_mode.visibility = View.VISIBLE
+                //eight_switch_config.visibility = View.VISIBLE
+                // eight_switch_banner_ly.visibility = View.GONE
 
                 val type = switchData!!.type
                 configSwitchType = type//赋值选择的模式
@@ -647,6 +640,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
     }
 
+    override fun setVersion() {
+        fiVersion?.title = getString(R.string.firmware_version) + version
+    }
+
     override fun deleteDevice() {
         if (mDeviceInfo != null)
             deleteSwitch(mDeviceInfo!!.macAddress)
@@ -656,7 +653,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     override fun goOta() {
         if (mDeviceInfo != null)
-            deviceOta(mDeviceInfo!!)
+            deviceOta(mDeviceInfo!!, DeviceType.EIGHT_SWITCH)
         else
             ToastUtils.showShort(getString(R.string.invalid_data))
     }
@@ -671,79 +668,68 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun initView() {
-        val list = mutableListOf<View>()
-        for (i in 0..2) {
-            val view = layoutInflater.inflate(R.layout.item_banner, null, false)
-            when (i) {
-                0 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.group_eight_key)
-                1 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.scene_eight_key)
-                2 -> view.findViewById<ImageView>(R.id.eight_switch_item_image).setImageResource(R.drawable.icon_8k_single)
-            }
-            list.add(view)
-        }
-        eight_switch_banner.adapter = MoreItemVpAdapter(list, this)
-        eight_switch_banner.offscreenPageLimit = 3
-        eight_switch_banner.setPageTransformer(false, ScalePageTransformer(0.7f))
-        eight_switch_banner.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {}
+        toolbar.setBackgroundColor(getColor(R.color.transparent))
+        toolbarTv!!.setText(R.string.eight_switch)
 
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        img_function2.visibility = View.VISIBLE
+        img_function2.setImageResource(R.drawable.icon_more)
+        img_function2.setOnClickListener {
+            configSwitchType++
 
-            override fun onPageSelected(p0: Int) {
-                configSwitchType = p0
-
-                setDefaultData()
-                when (p0) {
-                    0 -> {
-                        configSwitchType = 0
-                        setTextColorsAndText(p0)
-                        eight_switch_title.text = getString(R.string.group_switch)
-                    }
-                    1 -> {
-                        configSwitchType = 1
-                        setTextColorsAndText(p0)
-                        eight_switch_title.text = getString(R.string.scene_switch)
-                    }
-                    2 -> {
-                        configSwitchType = 2
-                        setTextColorsAndText(p0)
-                        eight_switch_title.text = getString(R.string.single_brighress_group_switch)
-                    }
+            setDefaultData()
+            when (val type = configSwitchType % 3) {
+                1 -> {
+                    setTextColorsAndText(type)
+                    eight_switch_title.text = getString(R.string.group_switch)
+                }
+                2 -> {
+                    setTextColorsAndText(type)
+                    eight_switch_title.text = getString(R.string.scene_switch)
+                }
+                0 -> {
+                    setTextColorsAndText(type)
+                    eight_switch_title.text = getString(R.string.single_brighress_group_switch)
                 }
             }
-        })
-
+        }
         makePop()
     }
 
     override fun initListener() {
-        eight_switch_retutn.setOnClickListener {
+        toolbar.setNavigationOnClickListener {
             finishAc()
         }
         eight_switch_use_button.setOnClickListener {
-            when (clickType) {
+         /*   when (clickType) {
                 0 -> {//选择模式 显示配置界面
                     setTextColorsAndText(configSwitchType)
-                    eight_switch_mode.visibility = View.VISIBLE
-                    eight_switch_config.visibility = View.VISIBLE
-                    eight_switch_banner_ly.visibility = View.GONE
+                    // eight_switch_mode.visibility = View.VISIBLE
+                    //eight_switch_config.visibility = View.VISIBLE
+                    // eight_switch_banner_ly.visibility = View.GONE
                     clickType = 1
                 }
                 1, 2 -> {
                     clickType = 2
                     confimCongfig()
                 }
-            }
+            }*/
+            confimCongfig()
         }
 
-        eight_switch_mode.setOnClickListener {//清除数据并且清除模式
+        img_function2.setOnClickListener {//清除数据并且清除模式
             setDefaultData()
-            eight_switch_mode.visibility = View.GONE
-            eight_switch_config.visibility = View.GONE
-            eight_switch_banner_ly.visibility = View.VISIBLE
-            eight_switch_banner.currentItem = 0
-            clickType = 0//代表没有选择模式
-            configSwitchType = 0//默认选中的是群组八键开关
+            //eight_switch_mode.visibility = View.GONE
+            // eight_switch_config.visibility = View.GONE
+            //eight_switch_banner_ly.visibility = View.GONE
+            //clickType = 0//代表没有选择模式
+            configSwitchType++ //默认选中的是群组八键开关
+            when (configSwitchType % 3) {
+                1 -> eight_switch_title.text = getString(R.string.group_switch)
+                2 -> eight_switch_title.text = getString(R.string.scene_switch)
+                0 -> eight_switch_title.text = getString(R.string.single_brighress_group_switch)
+            }
             eight_switch_title.text = getString(R.string.group_switch)
         }
 

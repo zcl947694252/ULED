@@ -68,8 +68,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var downloadDispoable: Disposable? = null
     private var mConnectDeviceDisposable: Disposable? = null
     private val SCENE_MAX_COUNT = 100
-    private var isclickOTA: Boolean = false
-    private var isOta: Boolean = false
     private var last_start_time = 0
     private var debounce_time = 1000
     private lateinit var switchData: MutableList<DbSwitch>
@@ -120,13 +118,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             val delete = itv.findViewById<TextView>(R.id.deleteBtn)
             val rename = itv.findViewById<TextView>(R.id.rename)
             popVersion = itv.findViewById<TextView>(R.id.pop_version)
-            popVersion?.text = getString(R.string.firmware_version,currentSwitch?.version)
+            popVersion?.text = getString(R.string.firmware_version)+currentSwitch?.version
             popVersion?.visibility = View.VISIBLE
             delete.text = getString(R.string.delete)
             rename.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                isOta = false
-                isclickOTA = false
                 val textGp = EditText(this)
                 StringUtils.initEditTextFilter(textGp)
                 textGp.setText(currentSwitch?.name)
@@ -149,8 +145,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             reConfig.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                isOta = false
-                isclickOTA = false
 
                 if (currentSwitch != null) {
                     TelinkLightService.Instance()?.idleMode(true)
@@ -171,8 +165,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             ota.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                isOta = true
-                isclickOTA = true
                 if (currentSwitch != null) {
                     TelinkLightService.Instance()?.idleMode(true)
                     showLoadingDialog(getString(R.string.connecting))
@@ -194,8 +186,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
             delete.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
                 //恢复出厂设置
-                isOta = false
-                isclickOTA = true
                 var deleteSwitch = switchData[positionCurrent]
                 AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -359,11 +349,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.title = getString(R.string.switch_name) + " (" + switchData!!.size + ")"
+        toolbarTv.text = getString(R.string.switch_name) + " (" + switchData!!.size + ")"
     }
 
     private fun showPopupMenu() {
@@ -411,7 +401,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     )
 
         }
-        isclickOTA = false
     }
 
     private fun isDirectConnectDevice() {
@@ -515,7 +504,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
         switchData = mNewDatas!!
-        toolbar.title = getString(R.string.switch_name) + " (" + switchData!!.size + ")"
+        toolbarTv.text = getString(R.string.switch_name) + " (" + switchData!!.size + ")"
         adapter!!.setNewData(switchData)
         initData()
         initView()
@@ -523,7 +512,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun getNewData(): MutableList<DbSwitch> {
         switchData = DBUtils.getAllSwitch()
-        toolbar.title = (currentLight!!.name ?: "")
+        toolbarTv.text = (currentLight!!.name ?: "")
         return switchData
     }
 

@@ -54,7 +54,7 @@ class SelectSceneIconActivity : TelinkBaseActivity() {
     }
 
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

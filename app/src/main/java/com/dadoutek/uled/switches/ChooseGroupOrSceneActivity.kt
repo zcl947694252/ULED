@@ -59,7 +59,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     }
 
     private fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView?.layoutManager = linearLayoutManager

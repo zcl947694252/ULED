@@ -66,8 +66,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private var configTag: Int = 0
     private var mIsDisconnecting: Boolean = false
     private var mIsConfiguring: Boolean = false
-    private var last_start_time = 0
-    private var debounce_time = 1000
     override fun setLayoutId(): Int {
         return R.layout.activity_scene_switch_group
     }
@@ -75,7 +73,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        fiVersion?.title = getString(R.string.firmware_version, version)
+        fiVersion?.title = getString(R.string.firmware_version)+version
         //scene_tvLightVersion?.text = version
         map.clear()
 
@@ -159,16 +157,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             }
         }
     }
-
-    private fun transformView() {
-        val intent = Intent(this@ConfigSceneSwitchActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, mDeviceInfo?.macAddress)
-        intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo?.meshAddress)
-        intent.putExtra(Constant.OTA_VERSION, mDeviceInfo?.firmwareRevision)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.NORMAL_SWITCH)
-        val timeMillis = System.currentTimeMillis()
-        if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
-            startActivity(intent)
+    override fun setVersion() {
+        fiVersion?.title = getString(R.string.firmware_version)+version
     }
 
     override fun deleteDevice() {

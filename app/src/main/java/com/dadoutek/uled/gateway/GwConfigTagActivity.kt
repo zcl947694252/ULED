@@ -104,7 +104,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setOnClickListener {
              val textGp = EditText(this)
                          StringUtils.initEditTextFilter(textGp)

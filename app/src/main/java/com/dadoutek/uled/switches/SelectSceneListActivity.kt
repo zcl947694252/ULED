@@ -42,7 +42,7 @@ class SelectSceneListActivity : TelinkBaseActivity() {
 
     private fun initView() {
         toolbarTv.text = getString(R.string.scene_list)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

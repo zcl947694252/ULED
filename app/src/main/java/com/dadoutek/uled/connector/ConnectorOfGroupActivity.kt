@@ -299,9 +299,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         }
 
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
+            toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
         } else {
-            toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
+            toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         }
         return lightList
     }
@@ -356,9 +356,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
+            toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
         } else {
-            toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
+            toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         }
         light_add_device_btns.setOnClickListener(this)
         recyclerView = findViewById(R.id.recycler_view_lights)

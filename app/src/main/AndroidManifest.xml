@@ -257,7 +257,6 @@
 
         <activity
                 android:name=".othersview.SplashActivity"
-                android:label="@string/app_name"
                 android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -274,7 +273,6 @@
 
         <activity
                 android:name=".othersview.MainActivity"
-                android:label="@string/app_name"
                 android:launchMode="singleTop"
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan"

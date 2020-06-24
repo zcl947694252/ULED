@@ -193,7 +193,7 @@ class SettingActivity : BaseActivity() {
 
     override fun initView() {
         image_bluetooth.visibility = View.GONE
-        toolbar.title = getString(R.string.setting)
+        toolbarTv.text = getString(R.string.setting)
         toolbar.setNavigationIcon(R.mipmap.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         makePop()

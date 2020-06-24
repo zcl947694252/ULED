@@ -775,7 +775,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         if (canSave) {
                             group?.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateGroup(group!!)
-                            toolbar.title = group?.name
+                            toolbarTv.text = group?.name
                             dialog.dismiss()
                         }
                     }
@@ -1000,11 +1000,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 if (findItem != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                                        // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
+                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
                                         light!!.version = localVersion
                                     } else {
                                        // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version, localVersion)
+                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
                                         light!!.version = localVersion
                                         tvOta!!.visibility = GONE
                                     }
@@ -1055,7 +1055,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun initType() {
         LogUtils.v("zcl------打开次数-----$openNum-------")
         type = intent.getStringExtra(Constant.TYPE_VIEW)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -1077,7 +1077,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-                toolbar.title = getString(R.string.allLight)
+                toolbarTv.text = getString(R.string.allLight)
             }
         }
 
@@ -1267,14 +1267,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr != 0xFFFF) {
-            toolbar.title = group!!.name
+            toolbarTv.text = group!!.name
             setSupportActionBar(toolbar)
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-            val actionBar = supportActionBar
-            actionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
             toolbar.setOnMenuItemClickListener(menuItemClickListener)
         } else {
-            toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+            toolbar.setNavigationIcon(R.drawable.icon_return)
             toolbar.setNavigationOnClickListener {
                 finish()
             }
@@ -1304,7 +1302,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun initToolbarLight() {
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
-                toolbar.title = ""
+                toolbarTv.text = ""
                 setSupportActionBar(toolbar)
                 val actionBar = supportActionBar
                 actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -1384,7 +1382,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
-        toolbar.title = light?.name
+        toolbarTv.text = light?.name
 
         mRxPermission = RxPermissions(this)
         brightness_btn.setOnClickListener(this.clickListener)
@@ -1532,7 +1530,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateLight(light!!)
-                        toolbar.title = light?.name
+                        toolbarTv.text = light?.name
                         dialog.dismiss()
                     }
                 }

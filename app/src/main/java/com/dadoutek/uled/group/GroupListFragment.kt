@@ -62,6 +62,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -82,6 +83,7 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
+    private var toolbarTv: TextView? = null
     private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 100
@@ -160,10 +162,10 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun setBluetoothAndAddVisableDeleteGone() {
-        toolbar!!.setTitle(R.string.group_title)
+        toolbarTv!!.setText(R.string.group_title)
         toolbar!!.navigationIcon = null
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE//加号
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE//删除
         SharedPreferencesUtils.setDelete(false)
     }
@@ -175,7 +177,7 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun changeEnableBackToolbar() {
-        toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar!!.setNavigationIcon(R.drawable.icon_return)
         toolbar!!.setNavigationOnClickListener {
             sendGroupResterNormal()
             setBluetoothAndAddVisableDeleteGone()
@@ -212,12 +214,13 @@ class GroupListFragment : BaseFragment() {
         viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
         viewPager = viewContent.findViewById(R.id.list_groups)
-        groupAllLy = viewContent.findViewById(R.id.group_all_ly)
+        //groupAllLy = viewContent.findViewById(R.id.group_all_ly)
 
         toolbar = viewContent.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.group_title)
+        toolbarTv = viewContent.findViewById(R.id.toolbarTv)
+        toolbarTv!!.setText(R.string.group_title)
 
-        allLightText = viewContent.findViewById(R.id.textView6)
+       // allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
@@ -239,29 +242,26 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
-        btnOn = viewContent.findViewById(R.id.btn_on)
+        /*btnOn = viewContent.findViewById(R.id.btn_on)
         btnOff = viewContent.findViewById(R.id.btn_off)
         btnSet = viewContent.findViewById(R.id.btn_set)
         onText = viewContent.findViewById(R.id.tv_on)
         offText = viewContent.findViewById(R.id.tv_off)
-
-
         totalNum = viewContent.findViewById(R.id.total_num)
-
-        install_device = viewContent.findViewById(R.id.install_device)
-        create_group = viewContent.findViewById(R.id.create_group)
-        create_scene = viewContent.findViewById(R.id.create_scene)
-        install_device?.setOnClickListener(onClick)
-        create_group?.setOnClickListener(onClick)
-        create_scene?.setOnClickListener(onClick)
+         install_device = viewContent.findViewById(R.id.install_device)
+         create_group = viewContent.findViewById(R.id.create_group)
+         create_scene = viewContent.findViewById(R.id.create_scene)
+         install_device?.setOnClickListener(onClick)
+         create_group?.setOnClickListener(onClick)
+         create_scene?.setOnClickListener(onClick)
         btnOn?.setOnClickListener(onClick)
-        btnOff?.setOnClickListener(onClick)
-        btnSet?.setOnClickListener(onClick)
-        onText?.setOnClickListener(onClick)
-        offText?.setOnClickListener(onClick)
+         btnOff?.setOnClickListener(onClick)
+         btnSet?.setOnClickListener(onClick)
+         onText?.setOnClickListener(onClick)
+         offText?.setOnClickListener(onClick)*/
         btnDelete.setOnClickListener(onClick)
-        allLightText?.setOnClickListener(onClick)
-        groupAllLy?.setOnClickListener(onClick)
+       // allLightText?.setOnClickListener(onClick)
+       // groupAllLy?.setOnClickListener(onClick)
         return viewContent
     }
 
@@ -442,7 +442,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
-            toolbar!!.setTitle(R.string.group_title)
+            toolbarTv!!.setText(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 
         }
@@ -522,7 +522,7 @@ class GroupListFragment : BaseFragment() {
         //点击任何一个选项跳转页面都隐藏引导
         hidePopupMenu()
         when (it.id) {
-            R.id.group_all_ly -> {
+          /*  R.id.group_all_ly -> {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
                     val intentSetting = Intent(context, NormalSettingActivity::class.java)
                     intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -533,7 +533,7 @@ class GroupListFragment : BaseFragment() {
                     val activity = activity as MainActivity
                     activity.autoConnect()
                 }
-            }
+            }*/
             R.id.install_device -> {
                 showInstallDeviceList()
             }
@@ -627,9 +627,9 @@ class GroupListFragment : BaseFragment() {
                             .show()
                 }
             }
-            R.id.textView6 -> {
+         /*   R.id.textView6 -> {
                 Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
-            }
+            }*/
         }
     }
 

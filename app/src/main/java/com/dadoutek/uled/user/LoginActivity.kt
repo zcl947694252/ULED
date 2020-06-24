@@ -34,13 +34,11 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.othersview.RegisterActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login.btn_register
 import kotlinx.android.synthetic.main.activity_login.facebook_btn
 import kotlinx.android.synthetic.main.activity_login.google_btn
 import kotlinx.android.synthetic.main.activity_login.qq_btn
@@ -101,9 +99,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.user_login_title)
+        return_image.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initListener() {
@@ -124,13 +122,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
         }
         btn_login.setOnClickListener(this)
-        btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)
         date_phone.setOnClickListener(this)
         eye_btn.setOnClickListener(this)
-        //linearLayout_1.setOnClickListener(this)
         sms_login_btn.setOnClickListener(this)
-        //sms_password_login.setOnClickListener(this)
         edit_user_phone_or_email.addTextChangedListener(this)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
@@ -183,12 +178,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     login()
                 }
             }
-            R.id.btn_register -> {
-                returnView()
-                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                intent.putExtra("fromLogin", "register")
-                startActivityForResult(intent, 0)
-            }
             R.id.forget_password -> forgetPassword()
             R.id.date_phone -> phoneList()
             R.id.eye_btn -> eyePassword()
@@ -198,11 +187,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 list_phone.visibility = View.GONE
                 edit_user_password.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
-                btn_register.visibility = View.VISIBLE
                 forget_password.visibility = View.GONE
                 eye_btn.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
-                btn_register.visibility = View.VISIBLE
                 sms_password_login.visibility = View.GONE
                 third_party_text.visibility = View.VISIBLE
                 qq_btn.visibility = View.VISIBLE
@@ -274,7 +261,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             sms_login_btn.visibility = View.GONE
             third_party_text.visibility = View.GONE
             sms_password_login.visibility = View.GONE
-            btn_register.visibility = View.GONE
             list_phone.visibility = View.VISIBLE
             date_phone.setImageResource(R.drawable.icon_up)
         } else {
@@ -288,7 +274,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             sms_password_login.visibility = View.VISIBLE
             edit_user_password.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
             list_phone.visibility = View.GONE
             date_phone.setImageResource(R.drawable.icon_down_arr)
         }
@@ -337,7 +322,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             list_phone.visibility = View.GONE
             edit_user_password.visibility = View.GONE
             btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
             forget_password.visibility = View.GONE
             eye_btn.visibility = View.GONE
             sms_password_login.visibility = View.VISIBLE
@@ -382,7 +366,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             list_phone.visibility = View.GONE
             edit_user_password.visibility = View.GONE
             btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
             forget_password.visibility = View.GONE
             isPhone = true
             date_phone.visibility = View.GONE

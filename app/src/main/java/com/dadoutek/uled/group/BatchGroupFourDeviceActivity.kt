@@ -131,9 +131,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun initView() {
         toolbar.setTitleTextColor(getColor(R.color.white))
-        toolbar.title = getString(R.string.batch_group)
+        toolbarTv.text = getString(R.string.batch_group)
         image_bluetooth.visibility = View.VISIBLE
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
             ToastUtils.showLong(getString(R.string.grouping_success_tip))

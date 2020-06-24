@@ -66,7 +66,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
     }
 
     private fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         tv_function1.text = getString(R.string.confirm)
         tv_function1.visibility =View.VISIBLE

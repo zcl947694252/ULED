@@ -310,7 +310,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         closeAnimation()
         btn_stop_scan.visibility = View.GONE
         scanning_no_device.visibility = View.VISIBLE
-        toolbar.title = getString(R.string.scan_end)
+        toolbarTv.text = getString(R.string.scan_end)
 
         if (mAddDeviceType != DeviceType.LIGHT_NORMAL) {
             scanning_no_factory_btn_ly.visibility = View.GONE
@@ -332,7 +332,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun retryScan() {
-        toolbar.title = getString(R.string.scanning)
+        toolbarTv.text = getString(R.string.scanning)
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
             Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
@@ -943,7 +943,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         btn_start_scan.setOnClickListener {
             initVisiable()
-            toolbar.title = getString(R.string.scanning)
+            toolbarTv.text = getString(R.string.scanning)
             meshList.clear()
             startScan()
         }
@@ -1026,7 +1026,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("ResourceType")
     private fun initToolbar() {
-        toolbar?.setTitle(R.string.scanning)
+        toolbarTv?.setText(R.string.scanning)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -1426,7 +1426,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     isFirtst = false
                     SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
                 }
-                toolbar?.title = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
                 scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
 
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS

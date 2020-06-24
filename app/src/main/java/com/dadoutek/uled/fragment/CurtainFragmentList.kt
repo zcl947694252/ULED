@@ -22,6 +22,8 @@ class CurtainFragmentList : BaseGroupFragment() {
 
  /*   private var inflater: LayoutInflater? = null
 
+
+
     private var recyclerView: RecyclerView? = null
 
     private var no_group: ConstraintLayout? = null

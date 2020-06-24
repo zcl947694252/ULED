@@ -52,6 +52,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_ota_update.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
@@ -290,7 +291,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
     }
 
     private fun initToolbar() {
-        toolbar!!.setTitle(R.string.ota_update_title)
+        toolbarTv!!.setText(R.string.ota_update_title)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)

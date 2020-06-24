@@ -55,7 +55,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
     private fun initView() {
-        toolbar.title = getString(R.string.color_checked_set)
+        toolbarTv.text = getString(R.string.color_checked_set)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)

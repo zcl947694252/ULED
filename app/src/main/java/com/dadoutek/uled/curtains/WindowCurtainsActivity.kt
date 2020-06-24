@@ -100,9 +100,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initViewGroup() {
         if (curtainGroup != null) {
             if (curtainGroup!!.meshAddr == 0xffff) {
-                toolbar.title = getString(R.string.allLight)
+                toolbarTv.text = getString(R.string.allLight)
             } else {
-                toolbar.title = curtainGroup?.name
+                toolbarTv.text = curtainGroup?.name
             }
         }
     }
@@ -117,11 +117,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                 if (localVersion != "") {
                                     if (versionText != null) {
                                         if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                                            versionText.text = resources.getString(R.string.firmware_version)+localVersion
                                             curtain!!.version = localVersion
                                             this.versionText.visibility = View.VISIBLE
                                         } else {
-                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                                            versionText.text = resources.getString(R.string.firmware_version)+localVersion
                                             curtain!!.version = localVersion
                                             this.versionText.visibility = View.VISIBLE
                                         }
@@ -144,7 +144,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -154,7 +154,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
         this.curtain = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbCurtain
         versionText.text = ""
-        toolbar.title = curtain?.name
+        toolbarTv.text = curtain?.name
     }
 
     private fun initGroupData() {
@@ -277,7 +277,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         if (canSave) {
                             curtainGroup?.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateGroup(curtainGroup!!)
-                            toolbar.title = curtainGroup?.name
+                            toolbarTv.text = curtainGroup?.name
                             dialog.dismiss()
                         }
                     }
@@ -438,7 +438,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     } else {
                         curtain?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateCurtain(curtain!!)
-                        toolbar.title = curtain?.name
+                        toolbarTv.text = curtain?.name
                         dialog.dismiss()
                     }
                 }
@@ -447,14 +447,14 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun initToolbar() {
-        toolbar.title = ""
+        toolbarTv.text = ""
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

@@ -1,7 +1,5 @@
 package com.dadoutek.uled.fragment
 
-import android.view.View
-import android.widget.CheckBox
 import android.widget.ImageView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -27,13 +25,12 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             iv.layoutParams .height = DensityUtil.dip2px(mContext,50f)
             iv.layoutParams .width = DensityUtil.dip2px(mContext,50f)
 
-            helper//.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
-                    .setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)
+            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)
                     .setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)
                     .addOnClickListener(R.id.template_device_icon)
                     .addOnClickListener(R.id.template_device_more)
                     .addOnClickListener(R.id.template_device_setting)
-                    //.addOnClickListener(R.id.selected_group) 多选选中删除暂时不做
+                    .addOnClickListener(R.id.template_device_card_delete)
 
             val isSuportOpenOrClose = (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
                     || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR || group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL)
@@ -69,18 +66,14 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                 group.textColor = mContext.resources.getColor(R.color.black)
 
             if (group.meshAddr == 0xffff)
-                helper.setText(R.id.template_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.template_device_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             else
-                helper.setText(R.id.template_group_name, group.name)
-
-
+                helper.setText(R.id.template_device_group_name, group.name)
 
             //val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
-            if (isDelete) {
-                //   deleteIcon.visibility = View.VISIBLE
-            } else {
-                //   deleteIcon.visibility = View.GONE
-            }
+            if (helper.adapterPosition!=0)
+                helper.setVisible(R.id.template_device_card_delete,isDelete)
+
           /*  if (group.isSelected)
                 helper.setChecked(R.id.selected_group, true)
             else

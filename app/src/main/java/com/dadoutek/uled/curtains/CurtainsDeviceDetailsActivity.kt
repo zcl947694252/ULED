@@ -212,7 +212,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 }
             }
         }
-        toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbarTv.text = getString(R.string.curtain) + " (" + curtain.size + ")"
 
         adapter = CurtainDeviceDetailsAdapter(R.layout.template_device_type_item, curtain)
         adapter!!.bindToRecyclerView(recycleView)
@@ -236,7 +236,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -571,7 +571,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
             adapter!!.setNewData(curtain)
         }
 
-        toolbar.title = getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbarTv.text = getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
     private fun getNewData(): MutableList<DbCurtain> {

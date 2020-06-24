@@ -73,7 +73,7 @@ public class CountryActivity extends Activity {
 
         toolbarTv = findViewById(R.id.toolbarTv);
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white);
+        toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbar.setNavigationOnClickListener(v -> finish());
         toolbarTv.setText(R.string.select_country_area);
 

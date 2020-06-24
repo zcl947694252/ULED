@@ -32,7 +32,9 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
+import com.dadoutek.uled.model.DbModel.DbEightSwitch;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
@@ -333,10 +335,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void addEventListener() {
         TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
-        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT,
-                this);
-        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED,
-                this);
+        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
+        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
         TelinkLightApplication.Companion.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
     }
 
@@ -425,6 +425,16 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 DbConnector rely = DBUtils.INSTANCE.getRelyByMeshAddr(lightMeshAddr);
                 rely.version =StringUtils.versionResolutionURL(mPath, 2);
                 DBUtils.INSTANCE.saveConnector(rely,true);
+                break;
+            case DeviceType.NORMAL_SWITCH:
+                DbSwitch dbSwitch = DBUtils.INSTANCE.getSwitchByMeshAddr(lightMeshAddr);
+                dbSwitch.version =StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveSwitch(dbSwitch,true,lightType,dbSwitch.getKeys());
+                break;
+            case DeviceType.EIGHT_SWITCH:
+                DbEightSwitch dbSwitch8 = DBUtils.INSTANCE.getEightSwitchByMeshAddr(lightMeshAddr);
+                dbSwitch8.setFirmwareVersion(StringUtils.versionResolutionURL(mPath, 2));
+                DBUtils.INSTANCE.saveEightSwitch(dbSwitch8,true);
                 break;
         }
         ToastUtils.showLong(R.string.exit_update);

@@ -18,8 +18,8 @@ class UserAgreementActivity :BaseActivity(){
     }
 
     override fun initView() {
-        toolbar.title = getString(R.string.user_agreement)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbarTv.text = getString(R.string.user_agreement)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

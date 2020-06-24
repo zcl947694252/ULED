@@ -332,7 +332,7 @@ class GwLoginActivity : TelinkBaseActivity(){
     private fun initView() {
         disableConnectionStatusListener()
         toolbarTv.text = getString(R.string.config_net)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

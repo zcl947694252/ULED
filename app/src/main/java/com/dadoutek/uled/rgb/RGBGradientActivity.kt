@@ -129,7 +129,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.dynamic_gradient)
+        toolbarTv.text = getString(R.string.dynamic_gradient)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)

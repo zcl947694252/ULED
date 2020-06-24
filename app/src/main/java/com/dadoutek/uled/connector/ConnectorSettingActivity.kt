@@ -644,7 +644,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun initToolbarLight() {
-        toolbar.title = ""
+        toolbarTv.text = ""
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -703,12 +703,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                                 if (txtTitle != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                                         txtTitle!!.visibility = View.VISIBLE
-                                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        txtTitle!!.text = resources.getString(R.string.firmware_version)+localVersion
                                         light!!.version = localVersion
 //                        tvOta!!.visibility = View.VISIBLE
                                     } else {
                                         txtTitle!!.visibility = View.VISIBLE
-                                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                                        txtTitle!!.text = resources.getString(R.string.firmware_version)+localVersion
                                         light!!.version = localVersion
 //                        tvOta!!.visibility = View.GONE
                                     }

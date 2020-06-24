@@ -251,7 +251,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             val dbGroup = showCheckListData!![i]
             dbGroup.checked = i == 0 && dbGroup.meshAddr == 0xffff
             if (dbGroup.checked) {
-                toolbar.title = dbGroup.name
+                toolbarTv.text = dbGroup.name
                 showGroupList.let {
                     if (it?.size == 0) {
                         val newItemGroup = ItemGroup()
@@ -271,13 +271,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.human_body)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbarTv.text = getString(R.string.human_body)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE
                 recyclerView_select_group_list_view.visibility = View.GONE
-                toolbar.title = getString(R.string.human_body)
+                toolbarTv.text = getString(R.string.human_body)
                 tv_function1.visibility = View.GONE
                 isFinish = false
             } else {
@@ -1095,7 +1095,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     /*  private fun showDataListView() {
           isFinish = false
-          toolbar.title = getString(R.string.human_body)
+          toolbarTv.text = getString(R.string.human_body)
           sensor_three.visibility = View.VISIBLE
           recyclerView_select_group_list_view.visibility = View.GONE
           tv_function1.visibility = View.GONE
@@ -1105,7 +1105,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
      */
     private fun showDataListView() {
         isFinish = false
-        toolbar.title = getString(R.string.human_body)
+        toolbarTv.text = getString(R.string.human_body)
         sensor_three.visibility = View.VISIBLE
         recyclerView_select_group_list_view.visibility = View.GONE
         tv_function1.visibility = View.GONE

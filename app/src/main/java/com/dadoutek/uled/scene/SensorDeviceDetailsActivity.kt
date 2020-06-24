@@ -201,7 +201,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         delete = views?.findViewById<TextView>(R.id.deleteBtnNoFactory)
         rename = views?.findViewById<TextView>(R.id.rename)
         popVersion = views?.findViewById<TextView>(R.id.pop_version)
-        popVersion?.text = getString(R.string.firmware_version,currentLightm?.version)
+        popVersion?.text = getString(R.string.firmware_version)+currentLightm?.version
         popVersion?.visibility = View.VISIBLE
 
         rename?.visibility = View.VISIBLE
@@ -222,9 +222,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 }
             }
         }//添加设备
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { doFinish() }
-        toolbar.title = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
+        toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -800,7 +800,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             ToastUtils.showShort(getString(R.string.reset_factory_success))
                             DBUtils.deleteSensor(currentLightm!!)
                             sensorDatummms.remove(currentLightm!!)
-                            toolbar.title = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
+                            toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
                             adapter?.notifyDataSetChanged()
                             if (sensorDatummms.size<=0)
                                 setEmpty()
@@ -1078,7 +1078,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
         sensorDatummms = mNewData!!
-        toolbar.title = getString(R.string.sensoR) + " (" + sensorDatummms.size + ")"
+        toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms.size + ")"
         adapter!!.setNewData(sensorDatummms)
         if (sensorDatummms.size <= 0) {
             no_device_relativeLayout.visibility = View.VISIBLE
@@ -1091,7 +1091,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun getNewData(): MutableList<DbSensor> {
         sensorDatummms = DBUtils.getAllSensor()
-        toolbar.title = (currentLightm!!.name ?: "")
+        toolbarTv.text = (currentLightm!!.name ?: "")
         return sensorDatummms
     }
 

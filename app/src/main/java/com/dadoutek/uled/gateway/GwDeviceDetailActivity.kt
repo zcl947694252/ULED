@@ -152,7 +152,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -429,7 +429,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 else {
                     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
                     popupWindow.dismiss()
-                    popVersion?.text = getString(R.string.firmware_version,currentGw?.version)
+                    popVersion?.text = getString(R.string.firmware_version)+currentGw?.version
                     popVersion?.visibility = View.VISIBLE
                     popupWindow.showAsDropDown(set)
                     LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")

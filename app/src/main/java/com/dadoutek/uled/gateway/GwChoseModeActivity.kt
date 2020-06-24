@@ -77,7 +77,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     }
 
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbarTv.text = getString(R.string.repetition)
 
         tv_function1.text = getString(R.string.confirm)

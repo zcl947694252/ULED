@@ -173,7 +173,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun initToolBar(view: View?) {
-        toolbar!!.setTitle(R.string.device_list)
+        toolbarTv!!.setText(R.string.device_list)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

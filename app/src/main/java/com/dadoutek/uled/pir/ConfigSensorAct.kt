@@ -197,8 +197,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.sensor_title)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbarTv.text = getString(R.string.sensor_title)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { doFinish() }
     }
 

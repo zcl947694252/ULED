@@ -313,7 +313,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         toolbarTv.text = getString(R.string.group_ota)
         template_recycleView.layoutManager = GridLayoutManager(this, 2)/*LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)*/

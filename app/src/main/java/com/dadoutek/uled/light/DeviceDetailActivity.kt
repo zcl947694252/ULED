@@ -132,8 +132,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initToolbar() {
         setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -237,13 +237,13 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                toolbar.title = getString(R.string.normal_light_title) + " (" + size + ")"
+                toolbarTv.text = getString(R.string.normal_light_title) + " (" + size + ")"
                 for (i in lightsData.indices) {
                     lightsData[i].updateIcon()
                 }
             }
             Constant.INSTALL_RGB_LIGHT -> {
-                toolbar.title = getString(R.string.rgb_light) + " (" + size + ")"
+                toolbarTv.text = getString(R.string.rgb_light) + " (" + size + ")"
                 for (i in lightsData.indices) {
                     lightsData[i].updateRgbIcon()
                 }
@@ -1006,10 +1006,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             lightsData = mNewDatas!!
             when (type) {
                 Constant.INSTALL_NORMAL_LIGHT -> {
-                    toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
+                    toolbarTv.text = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
                 }
                 Constant.INSTALL_RGB_LIGHT -> {
-                    toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
+                    toolbarTv.text = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
                 }
             }
             adaper!!.setNewData(lightsData)

@@ -484,7 +484,7 @@
     <string name="rename">Rename </string>
         
         
-    <string name="firmware_version">Firmware version: %1$s</string>
+    <string name="firmware_version">Firmware version: </string>
         
     <string name="ota">OTA</string>
         
@@ -1095,4 +1095,5 @@
     <string name="get_bin_fail">Failed to get the bin file</string>
     <string name="dissupport_ota">Otas are not supported in this release</string>
     <string name="get_version_success">This version does not support OTA capture of device version success</string>
+    <string name="delete_device_fail">Device deletion failed</string>
 </resources>

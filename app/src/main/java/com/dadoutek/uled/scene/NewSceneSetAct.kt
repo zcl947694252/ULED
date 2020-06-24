@@ -307,7 +307,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_data_view_layout.setOnClickListener { }
         confirm.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_name)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             when {
                 currentPageIsEdit -> {

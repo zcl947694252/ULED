@@ -24,7 +24,7 @@ class SceneFragmentAdapter(layoutResId: Int, data: MutableList<DbScene>) : BaseI
     private var deleteB: Boolean = false
 
     override fun convert(helper: BaseViewHolder, item: DbScene?) {
-        val deviceName = helper.getView<TextView>(R.id.template_group_name)
+        val deviceName = helper.getView<TextView>(R.id.template_device_group_name)
 
         if (item?.name==null||item?.name=="")
             deviceName.visibility = View.GONE
@@ -34,7 +34,7 @@ class SceneFragmentAdapter(layoutResId: Int, data: MutableList<DbScene>) : BaseI
         if (resourceId==0)
             resourceId = R.drawable.icon_1
 
-        helper.setText(R.id.template_group_name,item?.name)
+        helper.setText(R.id.template_device_group_name,item?.name)
                 .setText(R.id.template_gp_name, item?.name)
                 .setVisible(R.id.template_gp_name,true)
                 .setImageResource(R.id.template_device_icon,resourceId)

@@ -27,7 +27,7 @@ class UnbindMeNetActivity : BaseActivity() {
 
     override fun initView() {
         image_bluetooth.visibility = View.GONE
-        toolbar.title = getString(R.string.unbind_network)
+        toolbarTv.text = getString(R.string.unbind_network)
         toolbar.setNavigationIcon(R.mipmap.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
     }

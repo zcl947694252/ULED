@@ -101,7 +101,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE

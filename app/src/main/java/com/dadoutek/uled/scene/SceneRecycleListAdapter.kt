@@ -21,12 +21,10 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
     @SuppressLint("SetTextI18n")
     override fun convert(helper: BaseViewHolder, scene: DbScene?) {
         if (scene != null) {
-            val deleteIcon = helper.getView<TextView>(R.id.scene_delete)
-            val groupNum = helper.getView<TextView>(R.id.scene_group)
-            var resId = if (TextUtils.isEmpty(scene.imgName)) R.drawable.icon_1 else
-                OtherUtils.getResourceId(scene.imgName, mContext)
+            val groupNum = helper.getView<TextView>(R.id.template_device_group_name)
 
-            helper.setImageResource(R.id.scene_icon, resId)
+            var resId = if (TextUtils.isEmpty(scene.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(scene.imgName, mContext)
+            helper.setImageResource(R.id.template_device_icon, resId)
 
             val actions = DBUtils.getActionsBySceneId(scene.id)
             showGroupList = ArrayList()
@@ -47,29 +45,20 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
             }
 
 
-            if (showGroupList!!.size > 0) {
-                groupNum.text = TelinkLightApplication.getApp().getString(R.string.total) + showGroupList!!.size + TelinkLightApplication.getApp().getString(R.string.piece) + TelinkLightApplication.getApp().getString(R.string.group)
-            } else {
-                groupNum.text = TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece) + TelinkLightApplication.getApp().getString(R.string.group)
-            }
+            groupNum.text =  if (showGroupList!!.size > 0)
+                 TelinkLightApplication.getApp().getString(R.string.total) + showGroupList!!.size + TelinkLightApplication.getApp().getString(R.string.piece) +
+                         TelinkLightApplication.getApp().getString(R.string.group)
+             else
+                TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece) + TelinkLightApplication.getApp().getString(R.string.group)
 
+            helper.setVisible(R.id.template_device_card_delete,isDelete)
+            helper.setChecked(R.id.scene_delete, scene.isSelected)
 
-            if (isDelete) {
-                deleteIcon.visibility = View.VISIBLE
-            } else {
-                deleteIcon.visibility = View.GONE
-            }
-
-            if (scene.isSelected) {
-                helper.setChecked(R.id.scene_delete, true)
-            } else {
-                helper.setChecked(R.id.scene_delete, false)
-            }
-
-            helper.setText(R.id.scene_name, scene.name)
-                    .addOnClickListener(R.id.scene_delete)
-                    .addOnClickListener(R.id.scene_edit)
-                    .addOnClickListener(R.id.scene_apply)
+            helper.setText(R.id.template_device_group_name, scene.name)
+                    .setVisible(R.id.template_device_more,false)
+                    .addOnClickListener(R.id.template_device_card_delete)
+                    .addOnClickListener(R.id.template_device_setting)
+                    .addOnClickListener(R.id.template_device_icon)
         }
     }
 

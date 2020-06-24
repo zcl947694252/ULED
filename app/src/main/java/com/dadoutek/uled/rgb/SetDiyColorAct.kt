@@ -111,7 +111,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
 
             if (isChange) {
-                toolbar.title = getString(R.string.update_gradient)
+                toolbarTv.text = getString(R.string.update_gradient)
                 editName.setText(diyGradient?.name)
                 editName.setSelection(editName.text.toString().length)
                 sbSpeed.progress = diyGradient?.speed!!
@@ -145,7 +145,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         speed_add.isEnabled = true
                     }
                 }
-                toolbar.title = getString(R.string.add_gradient)
+                toolbarTv.text = getString(R.string.add_gradient)
                 editName.setText(DBUtils.getDefaultModeName())
                 editName.setSelection(editName.text.toString().length)
                 sbSpeed.progress = 50

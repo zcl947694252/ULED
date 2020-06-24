@@ -25,6 +25,7 @@ import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -41,11 +42,15 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 private var last_start_time = 0
 private var debounce_time = 1000
+
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
+    private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var renameDialog: Dialog? = null
     var popRename: PopupWindow? = null
 
@@ -56,11 +61,11 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     private var mConnectDeviceDisposable: Disposable? = null
     private lateinit var otaDeviceInfo: DeviceInfo
-     var fiDelete: MenuItem? = null
-     var fiFactoryReset: MenuItem? = null
-     var fiOta: MenuItem? = null
-     var fiChangeGp: MenuItem? = null
-     var fiRename: MenuItem? = null
+    var fiDelete: MenuItem? = null
+    var fiFactoryReset: MenuItem? = null
+    var fiOta: MenuItem? = null
+    var fiChangeGp: MenuItem? = null
+    var fiRename: MenuItem? = null
     internal var fiVersion: MenuItem? = null
     var mApp: TelinkLightApplication? = null
 
@@ -96,17 +101,20 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 fiOta = menu?.findItem(R.id.toolbar_f_ota)
                 fiDelete = menu?.findItem(R.id.toolbar_f_delete)
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                setVersion()
             }
         }
         return super.onCreateOptionsMenu(menu)
     }
 
+    abstract fun setVersion()
+
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
             R.id.toolbar_f_rename -> reName()
-            R.id.toolbar_v_change_group-> changeGroup()
-            R.id.toolbar_v_reset-> deviceFactoryReset()
+            R.id.toolbar_v_change_group -> changeGroup()
+            R.id.toolbar_v_reset -> deviceFactoryReset()
             R.id.toolbar_f_ota -> goOta()
             R.id.toolbar_f_delete -> deleteDevice()
         }
@@ -117,7 +125,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     }
 
-    fun changeGroup(){
+    fun changeGroup() {
 
     }
 
@@ -142,28 +150,40 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         }
     }
 
-     fun deleteSwitch(macAddress: String) {
+    fun deleteSwitch(macAddress: String) {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val switchByMacAddr = DBUtils.getSwitchByMacAddr(macAddress)
-                    switchByMacAddr?.let {
-                        DBUtils.deleteSwitch(it)
-                        ToastUtils.showShort(getString(R.string.delete_switch_success))
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(it.meshAddr))
-                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                        finish()
+                    val sw = DBUtils.getSwitchByMacAddr(macAddress)
+                    sw?.let {
+                        Commander.resetDevice(sw!!.meshAddr, true)
+                                .subscribe(
+                                        {
+                                            hideLoadingDialog()
+                                            ToastUtils.showShort(getString(R.string.delete_switch_success))
+                                            DBUtils.deleteSwitch(sw)
+                                            TelinkLightService.Instance()?.idleMode(true)
+
+                                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(sw.meshAddr))
+                                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                                            finish()
+                                        }, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.delete_device_fail))
+                                }
+                                )
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
     }
 
-    fun deviceOta(mDeviceInfo: DeviceInfo) {
-         otaDeviceInfo = mDeviceInfo
+    fun deviceOta(mDeviceInfo: DeviceInfo, type:Int = DeviceType.NORMAL_SWITCH) {
+         deviceType = type
+        otaDeviceInfo = mDeviceInfo
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress ==  mDeviceInfo.macAddress) {
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == mDeviceInfo.macAddress) {
             if (isBoolean)
-                transformView(mDeviceInfo)
+                transformView(mDeviceInfo,type)
             else
                 OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo.firmwareRevision, otaPrepareListner)
         } else {
@@ -175,7 +195,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                     .flatMap { connect(mDeviceInfo?.meshAddress, macAddress = mDeviceInfo?.macAddress) }
                     ?.subscribe({
                         hideLoadingDialog()
-                        if (isBoolean) transformView(mDeviceInfo)
+                        if (isBoolean) transformView(mDeviceInfo,type)
                         else OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo?.firmwareRevision, otaPrepareListner)
                     }, {
                         hideLoadingDialog()
@@ -185,35 +205,29 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-
         override fun downLoadFileStart() {}
-
         override fun startGetVersion() {}
-
         override fun getVersionSuccess(s: String) {}
-
         override fun getVersionFail() {
             ToastUtils.showLong(R.string.verification_version_fail)
             hideLoadingDialog()
         }
-
         override fun downLoadFileSuccess() {
             hideLoadingDialog()
-            transformView(otaDeviceInfo)
+            transformView(otaDeviceInfo,deviceType)
         }
-
         override fun downLoadFileFail(message: String) {
             hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
 
-    private fun transformView(mDeviceInfo: DeviceInfo) {
+    private fun transformView(mDeviceInfo: DeviceInfo,type:Int) {
         val intent = Intent(this@BaseSwitchActivity, OTAUpdateActivity::class.java)
         intent.putExtra(Constant.OTA_MAC, mDeviceInfo?.macAddress)
         intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo?.meshAddress)
         intent.putExtra(Constant.OTA_VERSION, mDeviceInfo?.firmwareRevision)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.NORMAL_SWITCH)
+        intent.putExtra(Constant.OTA_TYPE, type)
         val timeMillis = System.currentTimeMillis()
         if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
             startActivity(intent)

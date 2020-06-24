@@ -72,6 +72,9 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var isGlassSwitch = false
     private var groupName: String? = null
     private var switchDate: DbSwitch? = null
+    override fun setVersion() {
+        fiVersion?.title = getString(R.string.firmware_version)+version
+    }
 
 
     override fun deleteDevice() {
@@ -98,7 +101,6 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        fiVersion?.title = getString(R.string.firmware_version, version)
 
         // tvLightVersion?.text = version
         if (version!!.startsWith("ST") || (version!!.contains("BT") || version!!.contains("BTL") || version!!.contains("BTS"))) {
@@ -123,10 +125,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             mGroupArrayList[0].checked = true
         }
 
-        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mAdapter.bindToRecyclerView(recyclerView)
+       // mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
+        //recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+       // mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun makePop() {

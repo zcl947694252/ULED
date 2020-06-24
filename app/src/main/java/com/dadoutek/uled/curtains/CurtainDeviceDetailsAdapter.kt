@@ -12,7 +12,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
 
     override fun convert(helper: BaseViewHolder, dbCurtain: DbCurtain) {
         if (dbCurtain != null) {
-            val tvName = helper.getView<TextView>(R.id.template_group_name)
+            val tvName = helper.getView<TextView>(R.id.template_device_group_name)
            // val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
 //            val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
            // tvName.text = StringUtils.getCurtainName(dbCurtain)
