@@ -268,7 +268,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         } else {
             lightList = DBUtils.getConnectorByGroupID(group.id)
         }
-
+        toolbar.title = group?.name+"(${group?.deviceCount})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE

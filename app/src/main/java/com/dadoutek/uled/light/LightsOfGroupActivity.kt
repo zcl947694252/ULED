@@ -109,18 +109,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
                         startActivityForResult(intent, 0)
-                    } else {
-                        addDevice()
-                    }
+                    } else addDevice()
+
                 } else if (strLight == "rgb_light") {
                     if (DBUtils.getAllRGBLight().size == 0) {
                         intent = Intent(this, DeviceScanningNewActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
                         startActivityForResult(intent, 0)
-                    } else {
-                        addDevice()
-                    }
+                    } else addDevice()
+
                 }
             }
         }
@@ -156,7 +154,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun initToolbar() {
-        toolbar.setTitle(R.string.group_setting_header)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -261,6 +258,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         } else {
             lightList = DBUtils.getLightByGroupID(group!!.id)
         }
+
+        toolbar.title = group?.name+"(${group?.deviceCount})"
 
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
@@ -413,8 +412,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         if (view.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x01, 0x00, 0x00))
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,byteArrayOf(0x01, 0x00, 0x00))
                 if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
                     Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
                 } else {

@@ -87,7 +87,7 @@
             android:gravity="center"
             android:text="@string/china_code"
             android:textColor="@color/gray_3"
-            android:textSize="@dimen/sp_15"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/country_code_arrow"
             app:layout_constraintHorizontal_bias="0.0"
@@ -99,14 +99,14 @@
             android:id="@+id/country_code_arrow"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="12dp"
             android:padding="@dimen/dp_15"
             android:src="@drawable/icon_arrow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.287" />
+            app:layout_constraintVertical_bias="0.285" />
 
     <TextView
             android:id="@+id/textView8"
@@ -118,7 +118,7 @@
             android:gravity="center"
             android:text="@string/edit_phone"
             android:textColor="@color/gray9"
-            android:textSize="@dimen/sp_15"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/register_completed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ccp"

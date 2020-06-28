@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/configPirRoot"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/configPirRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
 
     <include
-        android:id="@+id/rvToolbar"
-        layout="@layout/toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/rvToolbar"
+            layout="@layout/toolbar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/no_light"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scanPb">
-
-        <ImageView
-            android:id="@+id/image_no_device"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/no_device"
+            android:id="@+id/no_light"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.24000001" />
+            app:layout_constraintTop_toBottomOf="@+id/scanPb">
+
+        <ImageView
+                android:id="@+id/image_no_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/no_device"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.24000001" />
 
         <Button
-            android:id="@+id/light_add_device_btn"
-            style="@style/ButtonStyle"
-            android:text="@string/device_scan_add"
-            app:layout_constraintEnd_toEndOf="@+id/image_no_device"
-            app:layout_constraintStart_toStartOf="@+id/image_no_device"
-            app:layout_constraintTop_toBottomOf="@+id/image_no_device" />
+                android:id="@+id/light_add_device_btn"
+                style="@style/ButtonStyle"
+                android:text="@string/device_scan_add"
+                app:layout_constraintEnd_toEndOf="@+id/image_no_device"
+                app:layout_constraintStart_toStartOf="@+id/image_no_device"
+                app:layout_constraintTop_toBottomOf="@+id/image_no_device" />
 
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_lights"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginRight="18dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scanPb" />
+            android:id="@+id/recycler_view_lights"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginRight="18dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scanPb" />
 
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-        android:id="@+id/scanPb"
-        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
-        app:mpb_indeterminateTint="@color/accent"
-        app:mpb_progressStyle="horizontal"
-        app:mpb_showProgressBackground="false"
-        app:mpb_useIntrinsicPadding="false" />
+            android:id="@+id/scanPb"
+            style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
+            app:mpb_indeterminateTint="@color/accent"
+            app:mpb_progressStyle="horizontal"
+            app:mpb_showProgressBackground="false"
+            app:mpb_useIntrinsicPadding="false" />
 </android.support.constraint.ConstraintLayout>

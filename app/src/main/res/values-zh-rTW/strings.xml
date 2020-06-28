@@ -639,8 +639,8 @@
     <string name="color_mode">颜色模式</string>
 
     <string name="stop_model">停</string>
-    <string name="white_light_regulation">白光调节:</string>
-    <string name="bright_regulation">亮度调节:</string>
+    <string name="white_light_regulation">白光:</string>
+    <string name="bright_regulation">亮度:</string>
     <string name="mode_name">模式名称:</string>
     <string name="please_mode_name">请输入模式名称:</string>
     <string name="no_color">暂无</string>

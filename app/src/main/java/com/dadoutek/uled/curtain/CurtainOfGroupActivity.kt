@@ -104,18 +104,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
 
-    override fun onStart() {
-        super.onStart()
-        // 监听各种事件
-        //"____onStart")
-    }
-
     override fun onPostResume() {
         super.onPostResume()
         addListeners()
     }
 
-    fun addListeners() {
+    private fun addListeners() {
         mApplication?.removeEventListener(this)
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -273,6 +267,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         } else {
             curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
+
+        toolbar.title = group?.name+"(${group?.deviceCount})"
 
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE

@@ -705,8 +705,8 @@
     <string name="gradient_mode">Gradient mode</string>
     <string name="color_mode">Color mode</string>
     <string name="stop_model">stop</string>
-    <string name="white_light_regulation">White light regulation:</string>
-    <string name="bright_regulation">Bright regulation:</string>
+    <string name="white_light_regulation">White light:</string>
+    <string name="bright_regulation">Bright:</string>
     <string name="mode_name">Mode name:</string>
     <string name="please_mode_name">please enter mode name:</string>
     <string name="no_color">No</string>
