@@ -63,6 +63,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private var isAll: Boolean = false
     private var disposableScan: Disposable? = null
     private var disposableTimerResfresh: Disposable? = null
     private var scanningList: ArrayList<DeviceInfo>? = null
@@ -814,7 +815,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             checkedNoGrouped = checkedId == batch_four_no_group.id
             switchNoGroupOrGroupedAndSetEmpty()
             changeTitleChecked()
-            batch_four_device_all.text = getString(R.string.select_all)
+            //batch_four_device_all.text = getString(R.string.select_all)
+            batch_four_device_all.setImageResource(R.drawable.icon_all_check)
+            isAll = false
             setAllSelect(false)
         }
         batch_four_device_all.setOnClickListener { changeDeviceAll() }
@@ -1272,7 +1275,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 分组与未分组切换逻辑
      */
     private fun changeDeviceData() {
-        batch_four_device_all.text = getString(R.string.select_all)
+       // batch_four_device_all.text = getString(R.string.select_all)
+        batch_four_device_all.setImageResource(R.drawable.icon_all_check)
+        isAll = false
         setAllSelect(false)
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -1339,12 +1344,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 全选与取消功能相关
      */
     private fun changeDeviceAll() {
-        val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
+   /*     val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
         if (isSelectAll)
             batch_four_device_all.text = getString(R.string.cancel)
         else
-            batch_four_device_all.text = getString(R.string.select_all)
-        setAllSelect(isSelectAll)
+            batch_four_device_all.text = getString(R.string.select_all)*/
+        isAll = !isAll
+        setAllSelect(isAll)
     }
 
     private fun changeGroupSelectView(position: Int) {
@@ -1408,7 +1414,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     fun refreshData() {
-        batch_four_device_all.text = getString(R.string.select_all)
+     //   batch_four_device_all.text = getString(R.string.select_all)
         setAllSelect(false)//还原状态
 
         val groupList = DBUtils.getGroupsByDeviceType(deviceType)

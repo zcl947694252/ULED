@@ -136,15 +136,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
-                    val opcode = Opcode.SCENE_ADD_OR_DEL
-                    val params: ByteArray
-                        Thread.sleep(300)
-                        val id = dbScene.id!!
-                        val list = DBUtils.getActionsBySceneId(id)
-                        params = byteArrayOf(0x00, id.toByte())
-                        Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
-                        DBUtils.deleteSceneActionsList(list)
-                        DBUtils.deleteScene(dbScene)
+            val opcode = Opcode.SCENE_ADD_OR_DEL
+            val params: ByteArray
+            Thread.sleep(300)
+            val id = dbScene.id!!
+            val list = DBUtils.getActionsBySceneId(id)
+            params = byteArrayOf(0x00, id.toByte())
+            Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
+            DBUtils.deleteSceneActionsList(list)
+            DBUtils.deleteScene(dbScene)
             refreshAllData()
             refreshView()
         }
@@ -177,7 +177,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
                         val gattBody = GwGattBody()
                         gattBody.ser_id = Constant.SER_ID_SCENE_ON
-                        val s =  Base64Utils.encodeToStrings(gattPar)
+                        val s = Base64Utils.encodeToStrings(gattPar)
                         gattBody.data = s
                         gattBody.cmd = Constant.CMD_MQTT_CONTROL
                         gattBody.meshAddr = Constant.SER_ID_SCENE_ON
@@ -382,7 +382,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             addNewScene!!.visibility = View.GONE
         }
         //recyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        recyclerView!!.layoutManager = GridLayoutManager(activity,2)
+        recyclerView!!.layoutManager = GridLayoutManager(activity, 2)
 
         adaper = SceneRecycleListAdapter(R.layout.template_device_type_item, scenesListData, isDelete)
         adaper!!.onItemClickListener = onItemClickListener
@@ -489,7 +489,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
 
         //ToastUtils.showShort(activity, getString(R.string.scene_apply_success))
-
         ToastUtils.showShort(getString(R.string.scene_apply_success))
     }
 
@@ -550,9 +549,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (mOldDatas != null && mNewDatas != null) {
 
             val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun getOldListSize(): Int { return mOldDatas!!.size }
+                override fun getOldListSize(): Int {
+                    return mOldDatas!!.size
+                }
 
-                override fun getNewListSize(): Int { return mNewDatas.size }
+                override fun getNewListSize(): Int {
+                    return mNewDatas.size
+                }
 
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                     return mOldDatas!![oldItemPosition].id == mNewDatas[newItemPosition].id

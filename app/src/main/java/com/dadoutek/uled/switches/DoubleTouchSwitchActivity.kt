@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -60,7 +61,9 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
     override fun setVersion() {
-        fiVersion?.title = getString(R.string.firmware_version)+localVersion
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        fiVersion?.title =localVersion
     }
 
     override fun deleteDevice() {

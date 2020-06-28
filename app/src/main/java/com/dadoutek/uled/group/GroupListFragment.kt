@@ -143,7 +143,7 @@ class GroupListFragment : BaseFragment() {
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.title = ""
                     changeEnableBackToolbar()
                 } else {

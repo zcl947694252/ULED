@@ -641,7 +641,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun setVersion() {
-        fiVersion?.title = getString(R.string.firmware_version) + version
+        if (TextUtils.isEmpty(version))
+            version = getString(R.string.get_version_fail)
+        fiVersion?.title =version
     }
 
     override fun deleteDevice() {

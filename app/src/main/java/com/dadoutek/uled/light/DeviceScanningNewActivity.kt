@@ -603,10 +603,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         when (item.deviceInfo.productUUID) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 val old = DBUtils.getLightByMeshAddr(item.deviceInfo.meshAddress)
-                if (old == null||old.macAddr!=item.deviceInfo.macAddress) {
+                if (old == null || old.macAddr != item.deviceInfo.macAddress) {
                     val dbItem = DbLight()
                     dbItem.meshAddr = item.deviceInfo.meshAddress
-                    dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
+                    if (DeviceType.LIGHT_NORMAL == item.deviceInfo.productUUID)
+                        dbItem.name = getString(R.string.normal_light) + dbItem.meshAddr
+                    else
+                        dbItem.name = getString(R.string.rgb_light) + dbItem.meshAddr
                     dbItem.textColor = this.resources.getColor(R.color.black)
                     dbItem.belongGroupId = item.belongGroupId
                     dbItem.macAddr = item.deviceInfo.macAddress
@@ -621,7 +624,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             DeviceType.SENSOR -> {
                 val dbItem = DbSensor()
-                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
+                dbItem.name = getString(R.string.sensoR) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
                 dbItem.belongGroupId = item.belongGroupId
                 dbItem.macAddr = item.deviceInfo.macAddress
@@ -632,7 +635,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
             DeviceType.SMART_RELAY -> {
                 val dbItem = DbConnector()
-                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
+                dbItem.name = getString(R.string.relay) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
                 dbItem.textColor = this.resources.getColor(R.color.black)
                 dbItem.belongGroupId = item.belongGroupId
@@ -647,7 +650,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             DeviceType.SMART_CURTAIN -> {
                 LogUtils.e("zcl保存分组curtain----${DBUtils.getCurtainByGroupID(item.belongGroupId).size}")
                 val dbItem = DbCurtain()
-                dbItem.name = getString(R.string.device_name) + dbItem.meshAddr
+                dbItem.name = getString(R.string.curtain) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
                 dbItem.version = item.firmwareRevision
                 dbItem.textColor = this.resources.getColor(R.color.black)
@@ -1100,7 +1103,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             val imageView = helper?.getView<ImageView>(R.id.template_device_batch_selected)
 
             groupName?.visibility = View.GONE
-            if (item?.isSelected==true)
+            if (item?.isSelected == true)
                 imageView?.setImageResource(R.drawable.icon_checkbox_selected)
             else
                 imageView?.setImageResource(R.drawable.icon_checkbox_unselected)

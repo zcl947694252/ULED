@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -73,7 +74,9 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var groupName: String? = null
     private var switchDate: DbSwitch? = null
     override fun setVersion() {
-        fiVersion?.title = getString(R.string.firmware_version)+version
+        if (TextUtils.isEmpty(version))
+            version = getString(R.string.get_version_fail)
+        fiVersion?.title = version
     }
 
 

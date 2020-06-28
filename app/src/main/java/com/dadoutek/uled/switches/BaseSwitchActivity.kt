@@ -42,7 +42,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -95,9 +94,9 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                 fiRename = menu?.findItem(R.id.toolbar_f_rename)
-                fiChangeGp = menu?.findItem(R.id.toolbar_v_change_group)
+                fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
                 fiOta = menu?.findItem(R.id.toolbar_f_ota)
-                fiFactoryReset = menu?.findItem(R.id.toolbar_v_reset)
+                fiFactoryReset = menu?.findItem(R.id.toolbar_fv_rest)
                 fiOta = menu?.findItem(R.id.toolbar_f_ota)
                 fiDelete = menu?.findItem(R.id.toolbar_f_delete)
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
@@ -113,15 +112,15 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
             R.id.toolbar_f_rename -> reName()
-            R.id.toolbar_v_change_group -> changeGroup()
-            R.id.toolbar_v_reset -> deviceFactoryReset()
+            R.id.toolbar_fv_change_group -> changeGroup()
+            R.id.toolbar_fv_rest -> userReset()
             R.id.toolbar_f_ota -> goOta()
             R.id.toolbar_f_delete -> deleteDevice()
         }
         true
     }
 
-    private fun deviceFactoryReset() {
+    private fun userReset() {
 
     }
 

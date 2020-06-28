@@ -86,8 +86,6 @@
                 android:id="@+id/group_recyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:padding="@dimen/dp_5"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -219,28 +219,28 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     R.id.toolbar_rename_group -> {
                         renameGp()
                     }
-                    R.id.toolbar_f_rename -> {
+                    R.id.toolbar_c_rename -> {
                         renameLight()
                     }
-                    R.id.toolbar_v_reset -> {
+                    R.id.toolbar_c_factory -> {
                         onceReset()
                     }
-                    R.id.toolbar_v_change_group -> {
+                    R.id.toolbar_c_change_group -> {
                         updateGroup()
                     }
-                    R.id.toolbar_commutation -> {
+                    R.id.toolbar_c_commutation -> {
                         electricCommutation()
                     }
-                    R.id.toolbar_hand_recovery -> {
+                    R.id.toolbar_c_hand_recovery -> {
                         handRecovery()
                     }
-                    R.id.toolbar_software_restart -> {
+                    R.id.toolbar_c_software_restart -> {
                         sofwareRestart()
                     }
-                    R.id.toolbar_slow_up -> {
+                    R.id.toolbar_c_slow_up -> {
                         slowUp()
                     }
-                    R.id.toolbar_f_ota -> {
+                    R.id.toolbar_c_ota -> {
                         updateOTA()
                     }
                 }
@@ -472,30 +472,30 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         if (handBoolean) {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_recovery)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
             } else {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_recovery)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
             }
         } else {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_cancel)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
             } else {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_cancel)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
             }
         }
 
         if (slowBoolean) {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
             } else {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
             }
 
         } else {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
             } else {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
             }
         }
 

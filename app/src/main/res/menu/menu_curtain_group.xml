@@ -15,7 +15,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_commutation"
+        android:id="@+id/toolbar_c_commutation"
         android:title="@string/commutation"
         android:orderInCategory="2"
         app:showAsAction="never" />
@@ -27,19 +27,19 @@
         <!--app:showAsAction="never" />-->
 
     <item
-        android:id="@+id/toolbar_slow_up"
+        android:id="@+id/toolbar_c_slow_up"
         android:title="@string/slow_up_the_cache"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_hand_recovery"
+        android:id="@+id/toolbar_c_hand_recovery"
         android:title="@string/hand_recovery"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_software_restart"
+        android:id="@+id/toolbar_c_software_restart"
         android:title="@string/software_restart"
         android:orderInCategory="2"
         app:showAsAction="never" />

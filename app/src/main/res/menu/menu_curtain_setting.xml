@@ -3,53 +3,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/toolbar_v_change_group"
+        android:id="@+id/toolbar_c_change_group"
         android:icon="@drawable/ic_launcher"
         android:orderInCategory="1"
         android:title="@string/update_group"
         app:showAsAction="never" />
     <item
-        android:id="@+id/toolbar_f_rename"
+        android:id="@+id/toolbar_c_rename"
         android:orderInCategory="2"
         android:title="@string/btn_rename_light"
         app:showAsAction="never" />
     <item
-       android:id="@+id/toolbar_commutation"
+       android:id="@+id/toolbar_c_commutation"
        android:title="@string/commutation"
        android:orderInCategory="2"
        app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_slow_up"
+        android:id="@+id/toolbar_c_slow_up"
         android:title="@string/slow_up_the_cache"
         android:orderInCategory="2"
         app:showAsAction="never" />
-    <!--<item-->
-        <!--android:id="@+id/toolbar_restart"-->
-        <!--android:title="@string/restart"-->
-        <!--android:orderInCategory="2"-->
-        <!--app:showAsAction="never" />-->
 
     <item
-        android:id="@+id/toolbar_hand_recovery"
+        android:id="@+id/toolbar_c_hand_recovery"
         android:title="@string/hand_recovery"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_software_restart"
+        android:id="@+id/toolbar_c_software_restart"
         android:title="@string/software_restart"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_f_ota"
+        android:id="@+id/toolbar_c_ota"
         android:title="@string/online_upgrade"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/toolbar_v_reset"
+        android:id="@+id/toolbar_c_factory"
         android:orderInCategory="2"
         android:title="@string/factory_reset"
         app:showAsAction="never" />

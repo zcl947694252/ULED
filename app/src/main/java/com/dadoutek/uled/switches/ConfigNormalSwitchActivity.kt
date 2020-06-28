@@ -87,7 +87,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
         if (TextUtils.isEmpty(localVersion))
             localVersion = mDeviceInfo.firmwareRevision
-        fiVersion?.title = getString(R.string.firmware_version)+localVersion
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        fiVersion?.title = localVersion
 
         //tvLightVersion.text = localVersion
         if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
@@ -115,7 +117,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     override fun setVersion() {
-        fiVersion?.title = getString(R.string.firmware_version)+localVersion
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        fiVersion?.title = localVersion
     }
 
     override fun deleteDevice() {

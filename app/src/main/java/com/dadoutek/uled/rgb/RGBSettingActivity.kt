@@ -149,23 +149,15 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-
-                        Commander.resetDevice(light!!.meshAddr)
-                                .subscribe(
-                                        {
-                                            LogUtils.v("zcl-----恢复出厂成功")
-                                        }, {
-                                    LogUtils.v("zcl-----恢复出厂失败")
-                                })
-
+                        val subscribe = Commander.resetDevice(light!!.meshAddr)
+                                .subscribe({ LogUtils.v("zcl--恢复出厂成功") }, { LogUtils.v("zcl-恢复出厂失败") })
                         DBUtils.deleteLight(light!!)
                         isReset = true
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
-                        }
+
                         if (mConnectDevice != null) {
                             Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
-                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light!!.meshAddr)
                             if (light!!.meshAddr == mConnectDevice!!.meshAddress)
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                         }
@@ -174,8 +166,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
                             override fun complete() {}
 
-                            override fun error(msg: String?) {}
-                        })
+                            override fun error(msg: String?) {}})
                         this.finish()
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -403,7 +394,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     override fun onResume() {
         super.onResume()
         light?.let {
-            cb_total.isChecked = it.connectionStatus == ConnectionStatus.ON.value
+            rgb_switch.isChecked = it.connectionStatus == ConnectionStatus.ON.value
         }
     }
 
@@ -417,13 +408,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         tvRename.visibility = View.GONE
         toolbarTv.text = light?.name
 
-        cb_total.setOnCheckedChangeListener { _, isChecked ->
+        rgb_switch.setOnCheckedChangeListener { _, isChecked ->
             if (light != null) {
                 openOrClose(isChecked)
             }
         }
 
-        cb_total.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
+        rgb_switch.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
 
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
@@ -1519,10 +1510,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             R.id.toolbar_f_rename -> {
                 renameLight()
             }
-            R.id.toolbar_v_reset -> {
+            R.id.toolbar_fv_rest -> {
                 remove()
             }
-            R.id.toolbar_v_change_group -> {
+            R.id.toolbar_fv_change_group -> {
                 updateGroup()
             }
             R.id.toolbar_f_ota -> {
@@ -1620,12 +1611,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         this.color_picker!!.setOnTouchListener(this)
 //        color_picker.isEnabled = true
 
-        cb_total.setOnCheckedChangeListener { _, isChecked ->
+        rgb_switch.setOnCheckedChangeListener { _, isChecked ->
             if (group != null) {
                 openOrClose(isChecked)
             }
         }
-        cb_total.isChecked = group!!.connectionStatus == ConnectionStatus.ON.value
+        rgb_switch.isChecked = group!!.connectionStatus == ConnectionStatus.ON.value
 
         dynamic_rgb.setOnClickListener(this.clickListener)
         ll_r.setOnClickListener(this.clickListener)

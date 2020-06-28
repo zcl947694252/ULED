@@ -135,12 +135,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
-                android:text="1%"
                 android:gravity="center_vertical|end"
+                android:text="1%"
                 android:textColor="@color/black_three"
                 android:textSize="15sp" />
 
     </LinearLayout>
+
+    <SeekBar
+            android:id="@+id/light_sbBrightness"
+            style="@style/SeekBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:progress="1" />
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -150,31 +161,25 @@
             android:orientation="horizontal">
 
         <ImageView
+                android:id="@+id/device_light_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:padding="8dp"
+                android:src="@drawable/icon_minus" />
+        <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+        <ImageView
                 android:id="@+id/device_light_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginStart="@dimen/dp_10"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:src="@drawable/icon_puls" />
 
-        <SeekBar
-                android:id="@+id/light_sbBrightness"
-                style="@style/SeekBarStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:progress="1" />
-
-        <ImageView
-                android:id="@+id/device_light_minus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:padding="5dp"
-                android:src="@drawable/icon_minus" />
     </LinearLayout>
 
     <LinearLayout
@@ -253,15 +258,15 @@
 
     </LinearLayout>
 
-<!--    <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="version"
-            android:textColor="@color/black_nine"
-            android:textSize="13sp"
-            android:visibility="visible" />-->
+    <!--    <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="version"
+                android:textColor="@color/black_nine"
+                android:textSize="13sp"
+                android:visibility="visible" />-->
 
 </LinearLayout>

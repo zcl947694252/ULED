@@ -6,7 +6,7 @@
             android:title="@string/btn_rename_light"
             app:showAsAction="never" />
     <item
-            android:id="@+id/toolbar_v_change_group"
+            android:id="@+id/toolbar_fv_change_group"
             android:icon="@drawable/ic_launcher"
             android:orderInCategory="2"
             android:visible="false"
@@ -19,7 +19,7 @@
             android:title="@string/online_upgrade"
             app:showAsAction="never" />
     <item
-            android:id="@+id/toolbar_v_reset"
+            android:id="@+id/toolbar_fv_rest"
             android:orderInCategory="4"
             android:visible="false"
             android:title="@string/factory_reset"

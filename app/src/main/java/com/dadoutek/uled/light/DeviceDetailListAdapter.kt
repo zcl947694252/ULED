@@ -43,7 +43,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
 
         helper.setText(R.id.template_device_group_name,dbLight.name)
         .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbLight.belongGroupId))
-                .setVisible(R.id.template_gp_name,true)
+                .setVisible(R.id.template_gp_name,false)
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)

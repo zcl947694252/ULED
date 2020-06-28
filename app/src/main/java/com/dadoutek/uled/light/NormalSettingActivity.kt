@@ -59,12 +59,12 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var findItemChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var type: String? = null
@@ -98,7 +98,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private val clickListener = OnClickListener { v ->
         when (v.id) {
             R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
-            R.id.btnRename -> renameGp()
+            R.id.btnRename -> renameLight()
             R.id.updateGroup -> updateGroup()
             R.id.btnRemove -> remove()
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
@@ -525,102 +525,109 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
             if (isProcessChange == 0) {
                 light_sbBrightness.progress--
-                if (light_sbBrightness.progress <= 1) {
-                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                } else {
-                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                when {
+                    light_sbBrightness.progress <= 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                    else -> tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                 }
-
-                if (light_sbBrightness.progress < 100) {
+                if (light_sbBrightness.progress < 100)
                     device_light_add.setImageResource(R.drawable.icon_puls)
-                }
             } else {
-                if (isBrightness) {
-                    light_sbBrightness.progress--
-                    if (light_sbBrightness.progress < 1) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                    } else if (light_sbBrightness.progress <= 1) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            val lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
-                            }
-                        } else {
-                            val lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                            light_sbBrightness.progress
-                        }
-                    } else {
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            val lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
-                            }
-                        } else {
-                            val lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
+                when {
+                    isBrightness -> {//亮度
+                        light_sbBrightness.progress--
+                        when {
+                            light_sbBrightness.progress < 1 ->
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
+                            light_sbBrightness.progress <= 1 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                if (currentShowPageGroup) {
+                                    val lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.brightness = light_sbBrightness.progress
+                                        DBUtils.updateGroup(lightCurrent)
+                                        updateLights(lightCurrent.brightness, "brightness", lightCurrent)
+                                    }
+                                } else {
+                                    val lightCurrent = DBUtils.getLightByID(light!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.brightness = light_sbBrightness.progress
+                                        DBUtils.updateLight(lightCurrent)
+                                    }
+                                    light_sbBrightness.progress
+                                }
+                            }
+                            else -> {
+                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                if (currentShowPageGroup) {
+                                    val lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.brightness = light_sbBrightness.progress
+                                        DBUtils.updateGroup(lightCurrent)
+                                        updateLights(lightCurrent.brightness, "brightness", lightCurrent)
+                                    }
+                                } else {
+                                    val lightCurrent = DBUtils.getLightByID(light!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.brightness = light_sbBrightness.progress
+                                        DBUtils.updateLight(lightCurrent)
+                                    }
+                                }
+
+                            }
+                        }
+                        if (light_sbBrightness.progress < 100)
+                            device_light_add.setImageResource(R.drawable.icon_puls)
                     }
-                    if (light_sbBrightness.progress < 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    }
+                    else -> {
+                        light_sbBrightness.progress--
+                        when {
+                            light_sbBrightness.progress < 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
-                } else {
-                    light_sbBrightness.progress--
-                    if (light_sbBrightness.progress < 1) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                    } else if (light_sbBrightness.progress <= 1) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
+                            light_sbBrightness.progress <= 1 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                if (currentShowPageGroup) {
+                                    var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.colorTemperature = light_sbBrightness.progress
+                                        DBUtils.updateGroup(lightCurrent)
+                                        updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
+                                    }
+                                } else {
+                                    var lightCurrent = DBUtils.getLightByID(light!!.id)
+                                    if (lightCurrent != null) {
+                                        lightCurrent.colorTemperature = light_sbBrightness.progress
+                                        DBUtils.updateLight(lightCurrent)
+                                    }
+                                }
+
                             }
-                        } else {
-                            var lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
+                            else -> {
+                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                when {
+                                    currentShowPageGroup -> {
+                                        var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                        if (lightCurrent != null) {
+                                            lightCurrent.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateGroup(lightCurrent)
+                                            updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
+                                        }
+                                    }
+                                    else -> {
+                                        var lightCurrent = DBUtils.getLightByID(light!!.id)
+                                        if (lightCurrent != null) {
+                                            lightCurrent.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateLight(lightCurrent)
+                                        }
+                                    }
+                                }
                             }
                         }
 
-                    } else {
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
-                            }
-                        } else {
-                            var lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
-                    }
-
-                    if (light_sbBrightness.progress < 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls)
+                        if (light_sbBrightness.progress < 100)
+                            device_light_add.setImageResource(R.drawable.icon_puls)
                     }
                 }
             }
@@ -631,104 +638,118 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private val handlerAddBtn = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-
-            if (isProcessChange == 0) {
-                light_sbBrightness.progress++
-                if (light_sbBrightness.progress >= 100) {
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                } else {
-                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                }
-
-                if (light_sbBrightness.progress > 1) {
-                    device_light_minus.setImageResource(R.drawable.icon_minus)
-                }
-
-            } else if (isProcessChange == 1) {
-                if (isBrightness) {
+            when (isProcessChange) {
+                0 -> {
                     light_sbBrightness.progress++
-                    if (light_sbBrightness.progress > 100) {
+                    if (light_sbBrightness.progress >= 100)
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    } else if (light_sbBrightness.progress >= 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
+                    else
                         tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            val lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
-                            }
-                        } else {
-                            val lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light!!.brightness
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
-                    } else {
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
-                            }
-                        } else {
-                            var lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.brightness = light!!.brightness
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
 
-                    }
-
-                    if (light_sbBrightness.progress > 1) {
+                    if (light_sbBrightness.progress > 1)
                         device_light_minus.setImageResource(R.drawable.icon_minus)
-                    }
-                } else {
-                    light_sbBrightness.progress++
-                    if (light_sbBrightness.progress > 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    } else if (light_sbBrightness.progress == 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
-                            }
-                        } else {
-                            var lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
-                    } else {
-                        tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-                        if (currentShowPageGroup) {
-                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateGroup(lightCurrent)
-                                updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
-                            }
-                        } else {
-                            var lightCurrent = DBUtils.getLightByID(light!!.id)
-                            if (lightCurrent != null) {
-                                lightCurrent.colorTemperature = light_sbBrightness.progress
-                                DBUtils.updateLight(lightCurrent)
-                            }
-                        }
-                    }
+                }
+                1 -> {
+                    when {
+                        isBrightness -> {//亮度
+                            light_sbBrightness.progress++
+                            when {
+                                light_sbBrightness.progress > 100 -> device_light_add.setImageResource(R.drawable.icon_puls_no)
 
-                    if (light_sbBrightness.progress > 0) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
+                                light_sbBrightness.progress >= 100 -> {
+                                    device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                    when {
+                                        currentShowPageGroup -> {
+                                            val lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.brightness = light_sbBrightness.progress
+                                                DBUtils.updateGroup(lightCurrent)
+                                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
+                                            }
+                                        }
+                                        else -> {
+                                            val lightCurrent = DBUtils.getLightByID(light!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.brightness = light!!.brightness
+                                                DBUtils.updateLight(lightCurrent)
+                                            }
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                    when {
+                                        currentShowPageGroup -> {
+                                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.brightness = light_sbBrightness.progress
+                                                DBUtils.updateGroup(lightCurrent)
+                                                updateLights(lightCurrent.brightness, "brightness", lightCurrent)
+                                            }
+                                        }
+                                        else -> {
+                                            var lightCurrent = DBUtils.getLightByID(light!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.brightness = light!!.brightness
+                                                DBUtils.updateLight(lightCurrent)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (light_sbBrightness.progress > 1)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                        }
+                        else -> {//色温
+                            light_sbBrightness.progress++
+                            when {
+                                light_sbBrightness.progress > 100 -> device_light_add.setImageResource(R.drawable.icon_puls_no)
+
+                                light_sbBrightness.progress == 100 -> {
+                                    device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                    if (currentShowPageGroup) {
+                                        var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                        if (lightCurrent != null) {
+                                            lightCurrent.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateGroup(lightCurrent)
+                                            updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
+                                        }
+                                    } else {
+                                        var lightCurrent = DBUtils.getLightByID(light!!.id)
+                                        if (lightCurrent != null) {
+                                            lightCurrent.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateLight(lightCurrent)
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                    when {
+                                        currentShowPageGroup -> {
+                                            var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.colorTemperature = light_sbBrightness.progress
+                                                DBUtils.updateGroup(lightCurrent)
+                                                updateLights(lightCurrent.colorTemperature, "colorTemperature", lightCurrent)
+                                            }
+                                        }
+                                        else -> {
+                                            var lightCurrent = DBUtils.getLightByID(light!!.id)
+                                            if (lightCurrent != null) {
+                                                lightCurrent.colorTemperature = light_sbBrightness.progress
+                                                DBUtils.updateLight(lightCurrent)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (light_sbBrightness.progress > 0)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                        }
                     }
                 }
             }
@@ -742,7 +763,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                     findItem = menu?.findItem(R.id.toolbar_f_version)
+                    findItem = menu?.findItem(R.id.toolbar_f_version)
+                    findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                    findItemChangeGp?.isVisible = true
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -872,19 +895,24 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(light, group)
-            finish()
         }
     }
 
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
-        group.deviceType = light.productUUID.toLong()
-        light.hasGroup = true
-        light.belongGroupId = group.id
-        light.name = light.name
-        DBUtils.updateLight(light)
-        ToastUtils.showShort(getString(R.string.grouping_success_tip))
-        if (group != null)
-            DBUtils.updateGroup(group!!)//更新组类型
+        Commander.addGroup(light.meshAddr, group.meshAddr, {
+            group.deviceType = light.productUUID.toLong()
+            light.hasGroup = true
+            light.belongGroupId = group.id
+            light.name = light.name
+            DBUtils.updateLight(light)
+            ToastUtils.showShort(getString(R.string.grouping_success_tip))
+            if (group != null)
+                DBUtils.updateGroup(group!!)//更新组类型
+            finish()
+        }, {
+            ToastUtils.showShort(getString(R.string.grouping_fail))
+        })
+
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -930,7 +958,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                             { s ->
                                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                                     light!!.version = s
-                                                    DBUtils.saveLight(light!!,false)
+                                                    DBUtils.saveLight(light!!, false)
                                                     transformView()
                                                 } else {
                                                     ToastUtils.showLong(getString(R.string.version_disabled))
@@ -999,24 +1027,24 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 localVersion = s
                                 if (findItem != null) {
                                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                       // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
+                                        // textTitle!!.visibility = VISIBLE
+                                        findItem!!.title = resources.getString(R.string.firmware_version) + localVersion
                                         light!!.version = localVersion
                                     } else {
-                                       // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
+                                        // textTitle!!.visibility = VISIBLE
+                                        findItem!!.title = resources.getString(R.string.firmware_version) + localVersion
                                         light!!.version = localVersion
                                         tvOta!!.visibility = GONE
                                     }
-                                    DBUtils.saveLight(light,false)
+                                    DBUtils.saveLight(light, false)
                                 }
 
                             },
                             {
-                             /*   if (textTitle != null) {
-                                   // /textTitle!!.visibility = GONE
-                                    tvOta!!.visibility = GONE
-                                }*/
+                                /*   if (textTitle != null) {
+                                      // /textTitle!!.visibility = GONE
+                                       tvOta!!.visibility = GONE
+                                   }*/
                                 LogUtils.d(it)
                             })
         }
@@ -1145,7 +1173,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             isBrightness = false
         }
 
-        var light_current = DBUtils.getGroupByID(group!!.id)
+        var lightCurrent = DBUtils.getGroupByID(group!!.id)
 
 
         this.light_sbBrightness?.max = 100
@@ -1158,8 +1186,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             isSwitch = false
             device_light_add.setImageResource(R.drawable.icon_puls_no)
             device_light_minus.setImageResource(R.drawable.icon_minus_no)
-            device_light_add.setOnTouchListener { v, event -> false }
-            device_light_minus.setOnTouchListener { v, event -> false }
+            device_light_add.setOnTouchListener { _, _ -> false }
+            device_light_minus.setOnTouchListener { _, _ -> false }
         } else {
             //light_image.setImageResource(R.drawable.icon_light)
             setLightGUIImg()
@@ -1169,11 +1197,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             light_sbBrightness.isEnabled = true
             isSwitch = true
             when {
-                light_current!!.brightness <= 0 -> {
+                lightCurrent!!.brightness <= 0 -> {
                     device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     device_light_add.setImageResource(R.drawable.icon_puls)
                 }
-                light_current.brightness >= 100 -> {
+                lightCurrent.brightness >= 100 -> {
                     device_light_add.setImageResource(R.drawable.icon_puls_no)
                     device_light_minus.setImageResource(R.drawable.icon_minus)
                 }
@@ -1214,33 +1242,37 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
 
             device_light_minus.setOnTouchListener { _, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    downTime = System.currentTimeMillis()
-                    onBtnTouch = true
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downTime = System.currentTimeMillis()
+                        onBtnTouch = true
 
-                    GlobalScope.launch {
-                        while (onBtnTouch) {
-                            thisTime = System.currentTimeMillis()
-                            if (thisTime - downTime >= 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerMinusBtn.sendMessage(msg)
-                                Log.e("TAG_TOUCH", tvValue++.toString())
-                                delay(100)
+                        GlobalScope.launch {
+                            while (onBtnTouch) {
+                                thisTime = System.currentTimeMillis()
+                                if (thisTime - downTime >= 500) {
+                                    tvValue++
+                                    val msg = handlerMinusBtn.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handlerMinusBtn.sendMessage(msg)
+                                    Log.e("TAG_TOUCH", tvValue++.toString())
+                                    delay(100)
+                                }
                             }
                         }
                     }
-                } else if (event.action == MotionEvent.ACTION_UP) {
-                    onBtnTouch = false
-                    if (thisTime - downTime < 500) {
-                        tvValue++
-                        val msg = handlerMinusBtn.obtainMessage()
-                        msg.arg1 = tvValue
-                        handlerMinusBtn.sendMessage(msg)
+                    MotionEvent.ACTION_UP -> {
+                        onBtnTouch = false
+                        if (thisTime - downTime < 500) {
+                            tvValue++
+                            val msg = handlerMinusBtn.obtainMessage()
+                            msg.arg1 = tvValue
+                            handlerMinusBtn.sendMessage(msg)
+                        }
                     }
-                } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                    onBtnTouch = false
+                    MotionEvent.ACTION_CANCEL -> {
+                        onBtnTouch = false
+                    }
                 }
                 true
             }
@@ -1314,19 +1346,15 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
-            R.id.toolbar_f_rename -> {
-                renameGp()
-            }
-            R.id.toolbar_v_reset -> {
-                remove()
-            }
-            R.id.toolbar_v_change_group -> {
-                updateGroup()
-            }
-            R.id.toolbar_f_ota -> {
-                updateOTA()
-            }
-            R.id.toolbar_delete_group -> {
+            R.id.toolbar_f_rename -> renameLight()
+
+            R.id.toolbar_fv_change_group -> updateGroup()
+
+            R.id.toolbar_f_ota -> updateOTA()
+
+            R.id.toolbar_f_delete -> remove()//删除设备
+
+            R.id.toolbar_delete_group -> {//群组模式下
                 AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             this.showLoadingDialog(getString(R.string.deleting))
@@ -1346,9 +1374,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         .show()
             }
 
-            R.id.toolbar_rename_group -> {
-                renameGroup()
-            }
+            R.id.toolbar_rename_group -> renameGroup()//群组模式下
         }
         true
     }
@@ -1440,43 +1466,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             light_sbBrightness!!.setOnTouchListener { _, _ -> false }
             light_sbBrightness.isEnabled = true
             setAddAndMinusIcon(light!!.brightness)
-            device_light_add.setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    downTime = System.currentTimeMillis()
-                    onBtnTouch = true
-                    GlobalScope.launch {
-                        while (onBtnTouch) {
-                            thisTime = System.currentTimeMillis()
-                            if (thisTime - downTime >= 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerAddBtn.sendMessage(msg)
-                                delay(100)
-                            }
-                        }
-                    }
-                } else if (event.action == MotionEvent.ACTION_UP) {
-                    onBtnTouch = false
-                    if (thisTime - downTime < 500) {
-                        tvValue++
-                        val msg = handlerMinusBtn.obtainMessage()
-                        msg.arg1 = tvValue
-                        handlerAddBtn.sendMessage(msg)
-                    }
-                } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                    onBtnTouch = false
-                }
-                true
-            }
-            device_light_minus.setOnTouchListener { v, event ->
-                val progress: Int = if (currentShowPageGroup) {
-                    light_sbBrightness.progress
-                } else {
-                    light!!.brightness
-                }
-                if (progress > 1)
-                    if (event.action == MotionEvent.ACTION_DOWN) {
+            device_light_add.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
                         downTime = System.currentTimeMillis()
                         onBtnTouch = true
                         GlobalScope.launch {
@@ -1486,25 +1478,65 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     tvValue++
                                     val msg = handlerMinusBtn.obtainMessage()
                                     msg.arg1 = tvValue
-                                    handlerMinusBtn.sendMessage(msg)
+                                    handlerAddBtn.sendMessage(msg)
                                     delay(100)
                                 }
                             }
                         }
-
-                    } else if (event.action == MotionEvent.ACTION_UP) {
+                    }
+                    MotionEvent.ACTION_UP -> {
                         onBtnTouch = false
                         if (thisTime - downTime < 500) {
                             tvValue++
                             val msg = handlerMinusBtn.obtainMessage()
                             msg.arg1 = tvValue
-                            handlerMinusBtn.sendMessage(msg)
+                            handlerAddBtn.sendMessage(msg)
                         }
-                    } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                        onBtnTouch = false
                     }
+                    MotionEvent.ACTION_CANCEL -> onBtnTouch = false
 
-
+                }
+                true
+            }
+            device_light_minus.setOnTouchListener { _, event ->
+                val progress: Int = if (currentShowPageGroup) {
+                    light_sbBrightness.progress
+                } else {
+                    if (isBrightness)
+                        light!!.brightness
+                    else
+                        light!!.colorTemperature
+                }
+                light_sbBrightness.progress = progress
+                if (progress > 1)
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            downTime = System.currentTimeMillis()
+                            onBtnTouch = true
+                            GlobalScope.launch {
+                                while (onBtnTouch) {
+                                    thisTime = System.currentTimeMillis()
+                                    if (thisTime - downTime >= 500) {
+                                        tvValue++
+                                        val msg = handlerMinusBtn.obtainMessage()
+                                        msg.arg1 = tvValue
+                                        handlerMinusBtn.sendMessage(msg)
+                                        delay(100)
+                                    }
+                                }
+                            }
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            onBtnTouch = false
+                            if (thisTime - downTime < 500) {
+                                tvValue++
+                                val msg = handlerMinusBtn.obtainMessage()
+                                msg.arg1 = tvValue
+                                handlerMinusBtn.sendMessage(msg)
+                            }
+                        }
+                        MotionEvent.ACTION_CANCEL -> onBtnTouch = false
+                    }
                 true
             }
         }
@@ -1514,7 +1546,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.light_sbBrightness?.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
-    private fun renameGp() {
+    private fun renameLight() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)

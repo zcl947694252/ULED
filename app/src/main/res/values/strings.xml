@@ -895,8 +895,8 @@
     <string name="authorization_warm">The receiver will have only control, not management</string>
     <string name="get_version_fail">Failed to get device version number</string>
     <string name="please_select_update_file">Select OTA files to upgrade</string>
-    <string name="choose_device">Select device (Long press change name)</string>
-    <string name="choose_group_change">Select group (Long press change name)</string>
+    <string name="choose_device">Select device <!--(Long press change name)--></string>
+    <string name="choose_group_change">Select group</string>
     <string name="no_group_device_num">Ungrouped (%1$s)</string>
     <string name="grouped_num">grouped(%1$s)</string>
     <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>
@@ -1096,4 +1096,5 @@
     <string name="dissupport_ota">Otas are not supported in this release</string>
     <string name="get_version_success">This version does not support OTA capture of device version success</string>
     <string name="delete_device_fail">Device deletion failed</string>
+    <string name="delete_success">deleted successfully</string>
 </resources>

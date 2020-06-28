@@ -1,123 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-    <ImageView
-            android:id="@+id/template_device_card_delete"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginStart="@dimen/dp_5"
-            android:layout_marginBottom="-3dp"
-            android:visibility="invisible"
-            android:src="@drawable/icon_minus"/>
-    <LinearLayout
-            android:id="@+id/template_device_card"
-            android:layout_width="158dp"
-            android:layout_height="90dp"
-            android:layout_marginStart="@dimen/dp_10"
-            android:background="@drawable/device_fragment_background"
-            android:elevation="2dp"
-            android:gravity="center"
-            android:layout_marginEnd="@dimen/dp_5"
-            android:orientation="horizontal"
-            android:padding="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-                android:id="@+id/template_device_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/dp_5"
-                android:src="@drawable/icon_light_no_circle" />
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
 
         <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:id="@+id/template_device_card"
+                android:layout_width="150dp"
+                android:layout_height="90dp"
+                android:layout_marginEnd="@dimen/dp_5"
+                android:background="@drawable/device_fragment_background"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                    android:id="@+id/template_device_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/dp_5"
+                    android:src="@drawable/icon_light_no_circle" />
 
-            <TextView
-                    android:id="@+id/template_device_group_name"
+            <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:paddingEnd="2dp"
-                    android:singleLine="true"
-                    android:text="蓝牙接收器"
-                    android:textColor="@color/black_three"
-                    android:textSize="15sp" />
+                    android:orientation="vertical">
 
-            <TextView
-                    android:id="@+id/template_gp_name"
-                    android:layout_width="90dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_3"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:layout_gravity="end|center_vertical"
-                    android:gravity="end"
-                    android:layout_marginEnd="3dp"
-                    android:singleLine="true"
-                    android:text="蓝牙"
-                    android:textColor="@color/black_three"
-                    android:textSize="12sp"
-                    android:visibility="invisible" />
-
-            <RelativeLayout
-                    android:layout_width="90dp"
-                    android:layout_height="28dp"
-                    android:layout_gravity="end"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:layout_marginTop="4dp">
-
-                <LinearLayout
-                        android:id="@+id/template_device_more_ly"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:visibility="visible"
-                        android:orientation="horizontal">
-
-                    <ImageView
-                            android:id="@+id/template_device_more"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_marginEnd="10dp"
-                            android:src="@drawable/icon_more" />
-
-                    <ImageView
-                            android:id="@+id/template_device_setting"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/icon_setting_n" />
-                </LinearLayout>
 
                 <TextView
-                        android:id="@+id/template_device_num"
+                        android:id="@+id/template_device_group_name"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginEnd="5dp"
-                        android:gravity="end|center_vertical"
-                        android:text="数量0"
-                        android:textColor="@color/blue_background"
-                        android:textSize="15sp"
-                        android:visibility="gone" />
-            </RelativeLayout>
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:paddingEnd="2dp"
+                        android:singleLine="true"
+                        android:text="蓝牙接收器"
+                        android:textColor="@color/black_three"
+                        android:textSize="15sp" />
+
+                <TextView
+                        android:id="@+id/template_gp_name"
+                        android:layout_width="90dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginStart="@dimen/dp_3"
+                        android:layout_marginTop="@dimen/dp_5"
+                        android:layout_marginEnd="3dp"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        android:text="蓝牙"
+                        android:textColor="@color/black_three"
+                        android:textSize="12sp"
+                        android:visibility="invisible" />
+
+                <RelativeLayout
+                        android:layout_width="90dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="end"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:layout_marginTop="4dp">
+
+                    <LinearLayout
+                            android:id="@+id/template_device_more_ly"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center|end"
+                            android:orientation="horizontal"
+                            android:visibility="visible">
+
+                        <ImageView
+                                android:id="@+id/template_device_more"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_marginEnd="10dp"
+                                android:src="@drawable/icon_more" />
+
+                        <ImageView
+                                android:id="@+id/template_device_setting"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:src="@drawable/icon_setting_n" />
+                    </LinearLayout>
+
+                    <TextView
+                            android:id="@+id/template_device_num"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginEnd="5dp"
+                            android:gravity="end|center_vertical"
+                            android:text="数量0"
+                            android:textColor="@color/blue_background"
+                            android:textSize="15sp"
+                            android:visibility="gone" />
+                </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
+
+        <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginBottom="@dimen/dp_10"
+                app:layout_constraintTop_toBottomOf="@+id/template_device_card" />
     </LinearLayout>
 
-    <TextView
-            android:id="@+id/textView7"
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            android:layout_marginBottom="@dimen/dp_10"
-            app:layout_constraintTop_toBottomOf="@+id/template_device_card" />
+    <ImageView
+            android:id="@+id/template_device_card_delete"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="-8dp"
+            android:src="@drawable/icon_minus"
+            android:visibility="invisible" />
 
-</LinearLayout>
+</RelativeLayout>

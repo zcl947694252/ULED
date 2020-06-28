@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
+import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
@@ -73,7 +74,9 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        fiVersion?.title = getString(R.string.firmware_version)+version
+        if (TextUtils.isEmpty(version))
+            version = getString(R.string.get_version_fail)
+        fiVersion?.title = version
         //scene_tvLightVersion?.text = version
         map.clear()
 
@@ -158,7 +161,9 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         }
     }
     override fun setVersion() {
-        fiVersion?.title = getString(R.string.firmware_version)+version
+        if (TextUtils.isEmpty(version))
+            version = getString(R.string.get_version_fail)
+        fiVersion?.title = version
     }
 
     override fun deleteDevice() {
