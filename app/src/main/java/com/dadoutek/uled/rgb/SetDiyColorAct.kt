@@ -153,9 +153,8 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 speed_num.text = 50.toString() + "%"
             }
 
-            setSupportActionBar(toolbar)
-            val actionBar = supportActionBar
-            actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
         }
 
         private fun lessSpeed(event: MotionEvent?) {

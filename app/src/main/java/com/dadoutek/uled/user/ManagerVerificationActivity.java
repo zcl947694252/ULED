@@ -3,12 +3,12 @@ package com.dadoutek.uled.user;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -47,6 +47,8 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
     Button btnVerification;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.toolbarTv)
+    TextView toolbarTv;
 
     private String phone;
     private String countryCode;
@@ -80,11 +82,9 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
     }
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.manager_verification);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbarTv.setText(getString(R.string.manager_verification));
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initView() {

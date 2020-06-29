@@ -7,7 +7,7 @@
 
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="263dp"
+            android:layout_height="280dp"
             android:background="@drawable/btn_rectangle_all"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -53,6 +53,7 @@
                     android:layout_height="1dp"
                     android:background="@color/gray_e" />
         </RelativeLayout>
+
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/oval"
                 android:layout_width="match_parent"
@@ -128,7 +129,7 @@
             <CheckBox
                     android:id="@+id/cb_total"
                     android:layout_width="41.5dp"
-                    android:layout_height="24.5dp"
+                    android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/select_check"
@@ -140,136 +141,143 @@
 
         </android.support.constraint.ConstraintLayout>
         <!--彩灯亮度色温-->
+           <LinearLayout
+                   android:id="@+id/alg_ly"
+                   android:layout_width="match_parent"
+                   android:layout_height="0dp"
+                   android:layout_marginTop="@dimen/dp_5"
+                   android:orientation="vertical"
+                   android:visibility="visible"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintTop_toBottomOf="@+id/oval">
+
+               <LinearLayout
+                       android:layout_width="match_parent"
+                       android:layout_height="43dp"
+                       android:gravity="center">
+
+                   <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginLeft="12dp"
+                           android:text="@string/mode_choice"
+                           android:textColor="@color/black_three"
+                           android:textSize="12sp" />
+
+                   <LinearLayout
+                           android:layout_width="match_parent"
+                           android:layout_height="@dimen/dp_30"
+                           android:layout_marginStart="25dp"
+                           android:layout_marginTop="2dp"
+                           android:layout_marginEnd="28dp"
+                           android:background="@mipmap/icon_frame"
+                           android:gravity="center_vertical"
+                           android:orientation="horizontal">
+
+                       <TextView
+                               android:id="@+id/alg_text"
+                               android:layout_width="233dp"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center"
+                               android:layout_marginStart="@dimen/dp_10"
+                               android:layout_weight="1"
+                               android:gravity="center"
+                               android:text="@string/select_mode"
+                               android:textColor="@color/blue_text"
+                               android:textSize="@dimen/sp_15" />
+
+                       <ImageView
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_marginEnd="@dimen/dp_10"
+                               android:src="@mipmap/icon_select" />
+                   </LinearLayout>
+               </LinearLayout>
+
+               <TextView
+                       android:id="@+id/speed_seekbar_alg_tv"
+                       android:layout_width="match_parent"
+                       android:layout_height="20dp"
+                       android:layout_marginTop="8dp"
+                       android:layout_marginEnd="10dp"
+                       android:gravity="end"
+                       android:text="100%"
+                       android:textColor="@color/black_three"
+                       android:textSize="15sp" />
+
+               <LinearLayout
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_marginTop="3dp"
+                       android:gravity="center_horizontal">
+
+                   <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginLeft="12dp"
+                           android:layout_marginTop="8dp"
+                           android:text="@string/speed_regulation"
+                           android:textColor="@color/black_three"
+                           android:textSize="12sp"
+                           app:layout_constraintStart_toStartOf="parent"
+                           app:layout_constraintTop_toTopOf="parent" />
+
+                   <LinearLayout
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginEnd="10dp"
+                           android:orientation="vertical">
+
+                       <SeekBar
+                               android:id="@+id/speed_seekbar"
+                               style="@style/SeekBarStyle"
+                               android:layout_width="match_parent"
+                               android:layout_height="30dp"
+                               android:layout_marginStart="5dp"
+                               android:layout_marginTop="2dp"
+                               android:layout_marginEnd="5dp"
+                               android:max="99" />
+
+                       <LinearLayout
+                               android:id="@+id/speed_seekbar_alg"
+                               android:layout_width="match_parent"
+                               android:layout_height="35dp"
+                               android:gravity="center"
+                               android:orientation="horizontal">
+                           <ImageView
+                                   android:id="@+id/speed_seekbar_alg_less"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:layout_marginStart="10dp"
+                                   android:padding="3dp"
+                                   android:src="@drawable/less_enabled" />
+
+
+                           <View
+                                   android:layout_width="0dp"
+                                   android:layout_height="0dp"
+                                   android:layout_weight="1" />
+
+                           <ImageView
+                                   android:id="@+id/speed_seekbar_alg_add"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:layout_marginEnd="10dp"
+                                   android:src="@drawable/add_enabled" />
+
+
+                       </LinearLayout>
+                   </LinearLayout>
+               </LinearLayout>
+           </LinearLayout>
+
         <LinearLayout
-                android:id="@+id/alg_ly"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/dp_5"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/oval">
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="43dp"
-                    android:gravity="center">
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:text="@string/mode_choice"
-                        android:textColor="@color/black_three"
-                        android:textSize="12sp" />
-
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/dp_30"
-                        android:layout_marginStart="25dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginEnd="28dp"
-                        android:background="@mipmap/icon_frame"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                    <TextView
-                            android:id="@+id/alg_text"
-                            android:layout_width="233dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="@dimen/dp_10"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="@string/select_mode"
-                            android:textColor="@color/blue_text"
-                            android:textSize="@dimen/sp_15" />
-
-                    <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/dp_10"
-                            android:src="@mipmap/icon_select" />
-                </LinearLayout>
-            </LinearLayout>
-
-
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="43dp"
-                    android:layout_marginTop="@dimen/dp_8"
-                    android:gravity="center">
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:text="@string/speed_regulation"
-                        android:textColor="@color/black_three"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                <SeekBar
-                        android:id="@+id/speed_seekbar"
-                        style="@style/SeekBarStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:max="99"
-                        android:paddingStart="25dp"
-                        android:paddingEnd="28dp" />
-            </LinearLayout>
-
-            <android.support.constraint.ConstraintLayout
-                    android:id="@+id/speed_seekbar_alg"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:paddingBottom="@dimen/dp_15"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/sb_w_bright">
-
-                <ImageView
-                        android:id="@+id/speed_seekbar_alg_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="25dp"
-                        android:background="@drawable/add_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                        android:id="@+id/speed_seekbar_alg_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="100%"
-                        android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/speed_seekbar_alg_add"
-                        app:layout_constraintStart_toEndOf="@+id/speed_seekbar_alg_less"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                        android:id="@+id/speed_seekbar_alg_less"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="100dp"
-                        android:background="@drawable/less_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-            </android.support.constraint.ConstraintLayout>
-
-        </LinearLayout>
-        <android.support.constraint.ConstraintLayout
                 android:id="@+id/rgb_scene"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:visibility="visible"
+                android:orientation="vertical"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/oval">
@@ -309,50 +317,63 @@
                     android:id="@+id/ll_white_light"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:gravity="center_horizontal"
                     android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/title_white">
 
-                <ImageView
-                        android:id="@+id/sb_w_bright_less"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="10dp"
-                        android:background="@drawable/less_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                <SeekBar
-                        android:id="@+id/sb_w_bright"
-                        style="@style/SeekBarStyle"
+                <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:layout_marginTop="2dp"
-                        android:layout_weight="1"
-                        android:max="100"
-                        android:min="1"
-                        android:paddingStart="25dp"
-                        android:paddingEnd="17dp" />
-
-                <ImageView
-                        android:id="@+id/sb_w_bright_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/add_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                    <SeekBar
+                            android:id="@+id/sb_w_bright"
+                            style="@style/SeekBarStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:min="1" />
+
+                    <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                        <ImageView
+                                android:id="@+id/sb_w_bright_less"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/less_enabled" />
+
+                        <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                        <ImageView
+                                android:id="@+id/sb_w_bright_add"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/add_enabled" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <CheckBox
                         android:id="@+id/cb_white_light"
                         android:layout_width="30dp"
                         android:layout_height="20dp"
-                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/dp_10"
                         android:layout_marginEnd="10dp"
                         android:background="@drawable/select_check"
                         android:button="@null" />
@@ -376,13 +397,14 @@
                         android:text="@string/bright_regulation"
                         android:textColor="@color/black_three"
                         android:textSize="12sp" />
+
                 <TextView
                         android:id="@+id/sbBrightness_num"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="100%"
                         android:layout_marginEnd="@dimen/dp_15"
                         android:gravity="center_vertical|end"
+                        android:text="100%"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -397,49 +419,66 @@
                     android:id="@+id/ll_bright"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/title_ld">
-                <ImageView
-                        android:id="@+id/sbBrightness_less"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_10"
-                        android:background="@drawable/less_enabled"/>
 
-                <SeekBar
-                        android:id="@+id/sbBrightness"
-                        style="@style/SeekBarStyle"
+                <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:layout_marginTop="2dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_weight="1"
-                        android:max="100"
-                        android:min="1"
-                        android:paddingStart="25dp"
-                        android:paddingEnd="17dp" />
-                <ImageView
-                        android:id="@+id/sbBrightness_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="25dp"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginEnd="@dimen/dp_10"
-                        android:background="@drawable/add_enabled"/>
+                        android:orientation="vertical">
+
+                    <SeekBar
+                            android:id="@+id/sbBrightness"
+                            style="@style/SeekBarStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:min="1" />
+
+                    <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                        <ImageView
+                                android:id="@+id/sbBrightness_less"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/less_enabled"
+                                android:padding="3dp" />
+
+                        <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                        <ImageView
+                                android:id="@+id/sbBrightness_add"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/add_enabled" />
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <CheckBox
                         android:id="@+id/cb_bright"
                         android:layout_width="30dp"
                         android:layout_height="20dp"
-                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
                         android:layout_marginEnd="10dp"
                         android:background="@drawable/select_check"
                         android:button="@null" />
 
             </LinearLayout>
-
 
             <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -448,7 +487,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/ll_bright">
 
             </android.support.constraint.ConstraintLayout>
-        </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
 
         <!--普通灯亮度色温-->
         <android.support.constraint.ConstraintLayout
@@ -460,18 +499,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/oval">
 
-
-            <TextView
-                    android:id="@+id/tv_off"
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                    android:id="@+id/normal_title_ld_ly"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
                     android:layout_marginTop="18dp"
-                    android:text="@string/bright_regulation"
-                    android:textColor="@color/black_three"
-                    android:textSize="12sp"
+                    android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                        android:id="@+id/tv_off"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_weight="1"
+                        android:text="@string/bright_regulation"
+                        android:textColor="@color/black_three"
+                        android:textSize="13sp" />
+
+                <TextView
+                        android:id="@+id/cw_brightness_num"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="100%"
+                        android:textColor="@color/black_three"
+                        android:textSize="13sp" />
+
+            </LinearLayout>
 
             <SeekBar
                     android:id="@+id/cw_sbBrightness"
@@ -484,61 +542,70 @@
                     android:paddingEnd="28dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_off" />
+                    app:layout_constraintTop_toBottomOf="@+id/normal_title_ld_ly" />
 
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/constraintLayout8"
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cw_sbBrightness">
+                <ImageView
+                        android:id="@+id/cw_brightness_less"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:background="@drawable/less_enabled"/>
+
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
 
                 <ImageView
                         android:id="@+id/cw_brightness_add"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="25dp"
-                        android:background="@drawable/add_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginEnd="13dp"
+                        android:background="@drawable/add_enabled" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/normal_title_sw_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout8">
 
                 <TextView
-                        android:id="@+id/cw_brightness_num"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/textView12"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="@string/color_temperature_adjustment"
+                        android:textColor="@color/black_three"
+                        android:textSize="13sp" />
+
+                <TextView
+                        android:id="@+id/temperature_num"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="end"
                         android:text="100%"
                         android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/cw_brightness_add"
-                        app:layout_constraintStart_toEndOf="@+id/cw_brightness_less"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:textSize="13sp" />
 
-                <ImageView
-                        android:id="@+id/cw_brightness_less"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="100dp"
-                        android:background="@drawable/less_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
 
-
-            </android.support.constraint.ConstraintLayout>
-
-            <TextView
-                    android:id="@+id/textView12"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:text="@string/color_temperature_adjustment"
-                    android:textColor="@color/black_three"
-                    android:textSize="12sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout8" />
 
             <SeekBar
                     android:id="@+id/temperature"
@@ -551,48 +618,36 @@
                     android:paddingEnd="28dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView12" />
+                    app:layout_constraintTop_toBottomOf="@+id/normal_title_sw_ly" />
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/temperature">
 
-                <ImageView
-                        android:id="@+id/temperature_add"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="25dp"
-                        android:background="@drawable/add_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                        android:id="@+id/temperature_num"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="100%"
-                        android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/temperature_add"
-                        app:layout_constraintStart_toEndOf="@+id/temperature_less"
-                        app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                         android:id="@+id/temperature_less"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="100dp"
-                        android:background="@drawable/less_enabled"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="15dp"
+                        android:background="@drawable/less_enabled"/>
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                <ImageView
+                        android:id="@+id/temperature_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="13dp"
+                        android:background="@drawable/add_enabled"/>
 
 
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
 
 
         </android.support.constraint.ConstraintLayout>

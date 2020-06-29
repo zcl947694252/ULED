@@ -176,9 +176,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun initToolbar() {
         toolbar.setTitle(R.string.group_setting_header)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
 

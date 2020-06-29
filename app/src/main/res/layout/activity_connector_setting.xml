@@ -1,10 +1,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="280dp"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
+    <!-- <include layout="@layout/connector_device_setting"/>-->
+    <include layout="@layout/toolbar" />
 
-    <include layout="@layout/connector_device_setting"/>
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_50"
+            android:src="@drawable/icon_switch_eight" />
 
+    <CheckBox
+            android:id="@+id/connector_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_5"
+            android:background="@drawable/select_switch"
+            android:button="@null"
+            android:visibility="visible" />
 </LinearLayout>

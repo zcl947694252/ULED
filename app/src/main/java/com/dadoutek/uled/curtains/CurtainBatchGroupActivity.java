@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -95,6 +94,8 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.toolbarTv)
+    TextView toolbarTv;
     @BindView(R.id.recycler_view_groups)
     RecyclerView recyclerViewGroups;
     @BindView(R.id.add_group_layout)
@@ -1033,31 +1034,16 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-//        toolbar.setTitle(R.string.batch_group);
-//        setSupportActionBar(toolbar);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
-        if (curtainType.equals("group_curtain")) {
+        if (curtainType.equals("group_curtain"))
             toolbar.setTitle(groupCurtain);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        } else {
+         else
             toolbar.setTitle(R.string.batch_group);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
+
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
+        toolbarTv.setText(groupCurtain);
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     @Override

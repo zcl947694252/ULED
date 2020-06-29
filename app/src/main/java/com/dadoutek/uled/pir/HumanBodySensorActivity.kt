@@ -1,17 +1,21 @@
 package com.dadoutek.uled.pir
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import android.text.InputType
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -20,6 +24,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.NightLightEditGroupAdapter
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
@@ -28,10 +33,12 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
+import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -73,9 +80,9 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+    private var currentSensor: DbSensor? = null
+    private var disposableReset: Disposable? = null
     private var version: String = ""
-    private lateinit var mScenes: List<DbScene>
-    private lateinit var mGroups: MutableList<DbGroup>
     private var disposable: Disposable? = null
     private var isConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
@@ -84,7 +91,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private val CMD_CONTROL_GROUP = 0X02
     private var switchMode = 0X01
     private var selectTime = 10
-
+    private var fiRename: MenuItem? = null
+    private var fiVersion: MenuItem? = null
+    private lateinit var renameDialog: Dialog
+    private var renameCancel: TextView? = null
+    private var renameConfirm: TextView? = null
+    private var renameEditText: EditText? = null
+    private var popReNameView: View? = null
     //底部组适配器
     private var showGroupList: MutableList<ItemGroup>? = null
     private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
@@ -113,8 +126,110 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
         initView()
+        makePopuwindow()
         initData()
         initListener()
+    }
+
+    private fun makePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                fiRename= menu?.findItem(R.id.toolbar_f_rename)
+                fiRename?.isVisible = isConfirm
+                fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                fiVersion?.title = version
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
+        when (item?.itemId) {
+            R.id.toolbar_f_rename -> showRenameDialog(currentSensor!!)
+            R.id.toolbar_f_ota -> goOta()
+            R.id.toolbar_f_delete -> deleteDevice()
+        }
+        true
+    }
+
+    private fun deleteDevice() {
+        //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
+        showLoadingDialog(getString(R.string.please_wait))
+        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                .subscribe({
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.reset_factory_success))
+                    DBUtils.deleteSensor(currentSensor!!)
+                    TelinkLightService.Instance()?.idleMode(true)
+                    doFinish()
+                }, {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                })
+    }
+
+    private fun goOta() {
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (isBoolean) {
+            transformView()
+        } else {
+            if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
+                OtaPrepareUtils.instance().gotoUpdateView(this@HumanBodySensorActivity, version, object : OtaPrepareListner {
+                    override fun downLoadFileStart() {
+                        showLoadingDialog(getString(R.string.get_update_file))
+                    }
+
+                    override fun startGetVersion() {
+                        showLoadingDialog(getString(R.string.verification_version))
+                    }
+
+                    override fun getVersionSuccess(s: String) {
+                        hideLoadingDialog()
+                    }
+
+                    override fun getVersionFail() {
+                        ToastUtils.showLong(R.string.verification_version_fail)
+                        hideLoadingDialog()
+                    }
+
+                    override fun downLoadFileSuccess() {
+                        hideLoadingDialog()
+                        transformView()
+                    }
+
+                    override fun downLoadFileFail(message: String) {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(R.string.download_pack_fail)
+                    }
+                })
+            } else {
+                ToastUtils.showLong(getString(R.string.version_disabled))
+                hideLoadingDialog()
+            }
+        }
+
+    }
+
+    private fun transformView() {
+        val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        startActivity(intent)
+        finish()
     }
 
     private fun setAdapters() {
@@ -152,6 +267,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initListener() {
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
         tv_function1.setOnClickListener(this)
         triggering_conditions.setOnClickListener(this)
         trigger_time.setOnClickListener(this)
@@ -167,6 +283,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onDestroy() {
         super.onDestroy()
+        disposableReset?.dispose()
         TelinkLightApplication.getApp().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
@@ -230,6 +347,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         version = intent.getStringExtra("version")
         getVersion(version)
         isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
+        if (isConfirm)
+            currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
         // showCheckListData = DBUtils.allGroups
         var lightGroup = DBUtils.allGroups
 
@@ -280,21 +399,17 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 toolbarTv.text = getString(R.string.human_body)
                 tv_function1.visibility = View.GONE
                 isFinish = false
-            } else {
+            } else
                 doFinish()
-            }
         }
     }
 
     private fun doFinish() {
         disposable?.dispose()
         TelinkLightService.Instance()?.idleMode(true)
-//        TelinkLightService.Instance()?.disconnect()
         if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
         else {
-//            ActivityUtils.startActivity(MainActivity::class.java)
-            LogUtils.d("MainActivity doesn't exist in stack")
             finish()
         }
     }
@@ -310,15 +425,18 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             tvPSVersion.text = version
             var version = tvPSVersion.text.toString()
             var num: String //N-3.1.1
-            if (version.contains("N")) {
-                num = version.substring(2, 3)
-                if ("" != num && num != "-" && num.toDouble() >= 3.0) {
+            when {
+                version.contains("N") -> {
+                    num = version.substring(2, 3)
+                    if ("" != num && num != "-" && num.toDouble() >= 3.0) {
+                        isGone()
+                        isVisibility()//显示3.0新的人体感应器
+                    }
+                }
+                version.contains("PR") -> {
                     isGone()
                     isVisibility()//显示3.0新的人体感应器
                 }
-            } else if (version.contains("PR")) {
-                isGone()
-                isVisibility()//显示3.0新的人体感应器
             }
         } else {
             LogUtils.d("device isn't connected, auto connect it")
@@ -360,15 +478,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var veryDark = views.findViewById<ConstraintLayout>(R.id.very_dark_environment)
 
                 when {
-                    triggering_conditions_text.text.toString() == getString(R.string.all_day) -> {
-                        any.setBackgroundResource(R.color.blue_background)
-                    }
-                    triggering_conditions_text.text.toString() == getString(R.string.day_time) -> {
-                        darker.setBackgroundResource(R.color.blue_background)
-                    }
-                    triggering_conditions_text.text.toString() == getString(R.string.night) -> {
-                        veryDark.setBackgroundResource(R.color.blue_background)
-                    }
+                    triggering_conditions_text.text.toString() == getString(R.string.all_day) -> any.setBackgroundResource(R.color.blue_background)
+                    triggering_conditions_text.text.toString() == getString(R.string.day_time) -> darker.setBackgroundResource(R.color.blue_background)
+                    triggering_conditions_text.text.toString() == getString(R.string.night) -> veryDark.setBackgroundResource(R.color.blue_background)
                 }
 
                 any.setOnClickListener {
@@ -404,12 +516,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var brightness = views.findViewById<ConstraintLayout>(R.id.customBrightness)
 
                 when {
-                    trigger_time_text.text.toString() == getString(R.string.light_on) -> {
-                        lightOn.setBackgroundResource(R.color.blue_background)
-                    }
-                    trigger_time_text.text.toString() == getString(R.string.light_off) -> {
-                        lightOff.setBackgroundResource(R.color.blue_background)
-                    }
+                    trigger_time_text.text.toString() == getString(R.string.light_on) -> lightOn.setBackgroundResource(R.color.blue_background)
+                    trigger_time_text.text.toString() == getString(R.string.light_off) -> lightOff.setBackgroundResource(R.color.blue_background)
                     trigger_time_text.text.toString() != getString(R.string.light_on) && trigger_time_text.text.toString() != getString(R.string.light_off) -> {
                         brightness.setBackgroundResource(R.color.blue_background)
                     }
@@ -478,12 +586,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var second = views.findViewById<ConstraintLayout>(R.id.second)
 
                 when {
-                    time_type_text.text.toString() == getString(R.string.minute) -> {
-                        minute.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_type_text.text.toString() == getString(R.string.second) -> {
-                        second.setBackgroundResource(R.color.blue_background)
-                    }
+                    time_type_text.text.toString() == getString(R.string.minute) -> minute.setBackgroundResource(R.color.blue_background)
+                    time_type_text.text.toString() == getString(R.string.second) -> second.setBackgroundResource(R.color.blue_background)
                 }
 
                 minute.setOnClickListener {
@@ -511,12 +615,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var gradient = views.findViewById<ConstraintLayout>(R.id.gradient)
 
                 when {
-                    brightness_change_text.text.toString() == getString(R.string.moment) -> {
-                        moment.setBackgroundResource(R.color.blue_background)
-                    }
-                    brightness_change_text.text.toString() == getString(R.string.gradient) -> {
-                        gradient.setBackgroundResource(R.color.blue_background)
-                    }
+                    brightness_change_text.text.toString() == getString(R.string.moment) -> moment.setBackgroundResource(R.color.blue_background)
+                    brightness_change_text.text.toString() == getString(R.string.gradient) -> gradient.setBackgroundResource(R.color.blue_background)
                 }
 
                 moment.setOnClickListener {
@@ -552,36 +652,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 var fiveMin = views.findViewById<ConstraintLayout>(R.id.five_minute)
 
                 when {
-                    time_text.text.toString() == getString(R.string.ten_second) -> {
-                        tenSec.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.twenty_second) -> {
-                        twentySec.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.thirty_second) -> {
-                        thirtySec.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.forty_second) -> {
-                        fortySec.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.fifty_second) -> {
-                        fiftySec.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.one_minute) -> {
-                        oneMin.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.two_minute) -> {
-                        twoMin.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.three_minute) -> {
-                        threeMin.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.four_minute) -> {
-                        fourMin.setBackgroundResource(R.color.blue_background)
-                    }
-                    time_text.text.toString() == getString(R.string.five_minute) -> {
-                        fiveMin.setBackgroundResource(R.color.blue_background)
-                    }
+                    time_text.text.toString() == getString(R.string.ten_second) -> tenSec.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.twenty_second) -> twentySec.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.thirty_second) -> thirtySec.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.forty_second) -> fortySec.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.fifty_second) -> fiftySec.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.one_minute) -> oneMin.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.two_minute) -> twoMin.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.three_minute) -> threeMin.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.four_minute) -> fourMin.setBackgroundResource(R.color.blue_background)
+                    time_text.text.toString() == getString(R.string.five_minute) -> fiveMin.setBackgroundResource(R.color.blue_background)
                 }
 
                 tenSec.setOnClickListener {
@@ -731,12 +811,15 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 showCheckListData.let {
                     if (showGroupList!!.size != 0) {
                         for (i in it.indices)//0-1
-                            for (j in showGroupList!!.indices)//0-1-3
-                                if (it[i].meshAddr == showGroupList!![j].groupAddress) {
-                                    it[i].checked = true
-                                    break //j = 0-1-2   3-1=2
-                                } else if (j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAddress) {
-                                    it[i].checked = false
+                            loop@ for (j in showGroupList!!.indices)//0-1-3
+                                when {
+                                    it[i].meshAddr == showGroupList!![j].groupAddress -> {
+                                        it[i].checked = true
+                                        break@loop //j = 0-1-2   3-1=2
+                                    }
+                                    j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAddress -> {
+                                        it[i].checked = false
+                                    }
                                 }
                         changeCheckedViewData()
                     } else {
@@ -790,17 +873,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 showGroupList?.addAll(oldResultItemList)
                 showGroupList?.addAll(newResultItemList)
 
-                if (showGroupList!!.size > 8) {
+                if (showGroupList!!.size > 8)
                     ToastUtils.showLong(getString(R.string.tip_night_light_group_limite_tip))
-                } else {
+                 else
                     showDataListView()
-                }
-
             }
 
-            R.id.sensor_update -> {
-                configDevice()
-            }
+            R.id.sensor_update -> configDevice()
         }
     }
 
@@ -812,15 +891,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun configDevice() {
         var version = tvPSVersion.text.toString()
         var num: String //N-3.1.1
-        if (version.contains("N")) {
-            num = version.substring(2, 3)
-            if ("" != num && num.toDouble() >= 3.0)
-                setThreeVersionOrPr()
-            else
-                setBlowThreeVersion()
-        } else if (version.contains("PR"))
-            setThreeVersionOrPr()
-
+        when {
+            version.contains("N") -> {
+                num = version.substring(2, 3)
+                if ("" != num && num.toDouble() >= 3.0)
+                    setThreeVersionOrPr()
+                else
+                    setBlowThreeVersion()
+            }
+            version.contains("PR") -> setThreeVersionOrPr()
+        }
     }
 
     private fun setBlowThreeVersion() {
@@ -842,7 +922,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
                             setLoadingVisbiltyOrGone()
-                            configureComplete()
+                          saveSensor()
                         },
                         failedCallback = {
                             snackbar(sensor_root, getString(R.string.pace_fail))
@@ -866,31 +946,33 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun setThreeVersionOrPr() {
         var time = editText.text.toString()
-
         if (time == "") {
             ToastUtils.showShort(getString(R.string.timeout_period_is_empty))
             return
         }
 
-        if (time_type_text.text.toString() == getString(R.string.second)) {
-            if (time.toInt() < 10) {
-                ToastUtils.showShort(getString(R.string.timeout_time_less_ten))
-                return
-            }
+        when {
+            time_type_text.text.toString() == getString(R.string.second) -> {
+                if (time.toInt() < 10) {
+                    ToastUtils.showShort(getString(R.string.timeout_time_less_ten))
+                    return
+                }
 
-            if (time.toInt() > 255) {
-                ToastUtils.showShort(getString(R.string.timeout_255))
-                return
+                if (time.toInt() > 255) {
+                    ToastUtils.showShort(getString(R.string.timeout_255))
+                    return
+                }
             }
-        } else if (time_type_text.text.toString() == getString(R.string.minute)) {
-            if (time.toInt() < 1) {
-                ToastUtils.showShort(getString(R.string.timeout_1m))
-                return
-            }
+            time_type_text.text.toString() == getString(R.string.minute) -> {
+                if (time.toInt() < 1) {
+                    ToastUtils.showShort(getString(R.string.timeout_1m))
+                    return
+                }
 
-            if (time.toInt() > 255) {
-                ToastUtils.showShort(getString(R.string.timeout_255_big))
-                return
+                if (time.toInt() > 255) {
+                    ToastUtils.showShort(getString(R.string.timeout_255_big))
+                    return
+                }
             }
         }
 
@@ -898,9 +980,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             ToastUtils.showLong(getString(R.string.config_night_light_select_group))
             return
         }
-
-
-
 
         GlobalScope.launch {
             configNewlight()
@@ -910,13 +989,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun configLightlight() {
         val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
         val timeL: Byte = (selectTime and 0xff).toByte()
-        val paramBytes = byteArrayOf(
-                DeviceType.NIGHT_LIGHT.toByte(),
-                switchMode.toByte(), timeL, timeH
-        )
-        val paramBytesGroup = byteArrayOf(
-                DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
-        )
+        val paramBytes = byteArrayOf(DeviceType.NIGHT_LIGHT.toByte(), switchMode.toByte(), timeL, timeH)
+        val paramBytesGroup = byteArrayOf(DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
 
         var canSendGroup = true
         for (i in showGroupList!!.indices) {
@@ -929,22 +1003,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             }
         }
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                mDeviceInfo.meshAddress,
-                paramBytes)
-
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytes)
         Thread.sleep(300)
-
-        if (canSendGroup) {
+        if (canSendGroup)
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytesGroup)
-        }
 
         Thread.sleep(300)
-    }
-
-    private fun configureComplete() {
-        saveSensor()
-        doFinish()
     }
 
     private fun saveSensor() {
@@ -977,9 +1041,49 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         LogUtils.e("zcl---$allSensor2")
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
-        DBUtils.recordingChange(dbSensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
+
+        if (!isConfirm)
+            showRenameDialog(dbSensor)
+        else
+            doFinish()
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun showRenameDialog(dbSensor: DbSensor) {
+        StringUtils.initEditTextFilter(renameEditText)
+        if (dbSensor.name != "" && dbSensor.name != null)
+            renameEditText?.setText(dbSensor.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        if (!this.isFinishing) {
+            renameDialog.dismiss()
+            runOnUiThread {
+            renameDialog.show()
+            }
+        }
+
+        renameConfirm?.setOnClickListener {  // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+                DBUtils.saveSensor(dbSensor, false)
+                if (!this.isFinishing)
+                    renameDialog.dismiss()
+            }
+        }
+        renameCancel?.setOnClickListener {
+            if (!this.isFinishing)
+                renameDialog?.dismiss()
+        }
+        renameDialog.setOnDismissListener {
+            dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+            DBUtils.saveSensor(dbSensor, true)
+            doFinish()
+        }
     }
 
     private fun getControlGroup(): String? {
@@ -1063,7 +1167,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         this@HumanBodySensorActivity.runOnUiThread {
                             setLoadingVisbiltyOrGone()
                         }
-                        configureComplete()
+                        saveSensor()
                         TelinkLightService.Instance()?.idleMode(true)
                     },
                     failedCallback = {

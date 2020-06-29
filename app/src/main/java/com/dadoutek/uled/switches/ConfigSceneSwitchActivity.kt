@@ -109,9 +109,9 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun initView() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.scene_set)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbarTv?.text = getString(R.string.scene_set)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 
         makePop()
         if (mSceneList.isEmpty()) {

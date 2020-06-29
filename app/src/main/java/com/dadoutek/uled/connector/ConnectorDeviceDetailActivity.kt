@@ -7,9 +7,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -47,12 +45,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
-
 /**
  * 蓝牙接收器列表
  */
@@ -456,7 +448,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                         }
                     }
                 }
-
             }
             else -> ToastUtils.showLong(R.string.reconnecting)
         }

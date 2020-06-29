@@ -1,6 +1,7 @@
 package com.dadoutek.uled.light
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -8,6 +9,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DensityUtil
 
 /**
  * 创建者     zcl
@@ -23,6 +25,9 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
     override fun convert(helper: BaseViewHolder, dbLight: DbLight) {
        // val groupName = helper.getView<TextView>(R.id.template_device_group_icon)
         val deviceName = helper.getView<TextView>(R.id.template_device_group_name)
+        val iv = helper.getView<ImageView>(R.id.template_device_icon)
+        iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
+        iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
 //        if (dbLight.groupName==null||dbLight.groupName=="")
 //            groupName.visibility = View.GONE
 //        else

@@ -1298,16 +1298,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
+            toolbar.setNavigationIcon(R.drawable.icon_return)
+            toolbar.setNavigationOnClickListener { finish() }
         if (group!!.meshAddr != 0xFFFF) {
             toolbarTv.text = group!!.name
-            setSupportActionBar(toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
             toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        } else {
-            toolbar.setNavigationIcon(R.drawable.icon_return)
-            toolbar.setNavigationOnClickListener {
-                finish()
-            }
         }
     }
 
@@ -1335,9 +1330,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 toolbarTv.text = ""
-                setSupportActionBar(toolbar)
-                val actionBar = supportActionBar
-                actionBar?.setDisplayHomeAsUpEnabled(true)
+                toolbar.setNavigationIcon(R.drawable.icon_return)
+                toolbar.setNavigationOnClickListener { finish() }
+
                 toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
                 toolbar.setOnMenuItemClickListener(menuItemClickListener)
             }

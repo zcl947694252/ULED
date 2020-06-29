@@ -131,9 +131,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

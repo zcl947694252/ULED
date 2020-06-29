@@ -571,7 +571,7 @@
     <string name="one_level">一级</string>
     <string name="three_level">三级</string>
     <string name="four_level">四级</string>
-    <string name="commutation">换向</string>
+    <string name="commutation">电机换向</string>
     <string name="speed_adjustment">速度调节:</string>
     <string name="details">详情</string>
     <string name="restart">电机重启</string>
@@ -616,8 +616,8 @@
     <string name="no_account">还没有账号，立即</string>
     <string name="brightness">亮度</string>
     <string name="color_temperature">色温</string>
-    <string name="brightness_adjustment">亮度调节：</string>
-    <string name="color_temperature_adjustment">色温调节：</string>
+    <string name="brightness_adjustment">亮度：</string>
+    <string name="color_temperature_adjustment">色温：</string>
 
     <string name="welcome_register">您好，欢迎注册账号</string>
     <string name="please_code">请输入验证码</string>

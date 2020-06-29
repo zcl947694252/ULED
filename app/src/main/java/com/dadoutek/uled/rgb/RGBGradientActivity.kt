@@ -130,9 +130,8 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.dynamic_gradient)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+       toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 //        btnStopGradient.visibility = View.VISIBLE
 //        btnStopGradient.setOnClickListener(this)
 //        normal_rgb.setOnClickListener(this)

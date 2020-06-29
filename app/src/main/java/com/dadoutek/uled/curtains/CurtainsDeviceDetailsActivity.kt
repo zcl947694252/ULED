@@ -100,16 +100,17 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         var allLightData = DBUtils.getAllCurtains()
 
         when (type) {
-            Constant.INSTALL_CURTAIN -> {
+            INSTALL_CURTAIN -> {
                 if (allLightData.size > 0) {
                     var listGroup: ArrayList<DbCurtain> = ArrayList()
                     var noGroup: ArrayList<DbCurtain> = ArrayList()
                     //判断窗帘是否有分组
                     for (i in allLightData.indices) {
-                        if (StringUtils.getCurtainGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                            noGroup.add(allLightData[i])
-                        } else {
-                            listGroup.add(allLightData[i])
+                        when {
+                            StringUtils.getCurtainGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped) -> {
+                                noGroup.add(allLightData[i])
+                            }
+                            else -> listGroup.add(allLightData[i])
                         }
                     }
 

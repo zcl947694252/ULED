@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -98,6 +97,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.toolbarTv)
+    TextView toolbarTv;
     @BindView(R.id.recycler_view_groups)
     RecyclerView recyclerViewGroups;
     @BindView(R.id.add_group_layout)
@@ -1039,24 +1040,14 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
         if (lightType.equals("cw_light")) {
-            toolbar.setTitle(groupLight);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+            toolbarTv.setText(getString(R.string.activity_device_grouping));
         } else {
-            toolbar.setTitle(R.string.batch_group);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+            toolbarTv.setText(R.string.batch_group);
         }
     }
 

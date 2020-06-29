@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
+import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
@@ -72,6 +73,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.OnTouchListener */ {
+    private var fiChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var mConnectDeviceDisposable: Disposable? = null
@@ -166,7 +168,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
                             override fun complete() {}
 
-                            override fun error(msg: String?) {}})
+                            override fun error(msg: String?) {}
+                        })
                         this.finish()
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -266,8 +269,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         android.app.AlertDialog.Builder(this@RGBSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
@@ -279,7 +281,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -302,7 +304,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             ToastUtils.showLong(R.string.verification_version_fail)
             hideLoadingDialog()
         }
-
 
         override fun downLoadFileSuccess() {
             hideLoadingDialog()
@@ -346,6 +347,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private fun initType() {
         type = intent.getStringExtra(Constant.TYPE_VIEW)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
@@ -363,31 +367,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
-                    .subscribe(
-                            { s ->
-                                localVersion = s
-                                if (toolbar.title != null) {
-                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        //lightVersion.visibility = View.VISIBLE
-                                        findItem!!.title = getString(R.string.firware_version, localVersion)
-                                        light!!.version = localVersion
-                                    } else {
-                                        //lightVersion!!.visibility = View.VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version)+localVersion
-                                        light!!.version = localVersion
-                                    }
-                                    DBUtils.saveLight(light!!, false)
-                                }
-                                null
-                            },
-                            {
-                                if (toolbar.title != null) {
-                                    //lightVersion.visibility = View.VISIBLE
-                                    tvOta!!.visibility = View.GONE
-                                }
-                                LogUtils.d(it)
-                            }
-                    )
+                    .subscribe({ s ->
+                        if (!TextUtils.isEmpty(s)) {
+                            localVersion = s
+                            if (TextUtils.isEmpty(localVersion))
+                                localVersion = getString(R.string.number_no)
+                            light!!.version = localVersion
+                            DBUtils.saveLight(light!!, false)
+                        }
+                        null
+                    }, {
+                        LogUtils.d(it)
+                    })
         }
     }
 
@@ -400,7 +391,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
-        //LogUtils.e("kevin init view")
         light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
@@ -409,9 +399,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         toolbarTv.text = light?.name
 
         rgb_switch.setOnCheckedChangeListener { _, isChecked ->
-            if (light != null) {
+            if (light != null)
                 openOrClose(isChecked)
-            }
         }
 
         rgb_switch.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
@@ -930,20 +919,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
 
     }
 
     private fun initToolbarGroup() {
-        toolbarTv.text = ""
+        toolbarTv.text = getString(R.string.select_group)
         toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 
@@ -955,6 +938,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                     findItem = menu?.findItem(R.id.toolbar_f_version)
+                    fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                    fiChangeGp?.isVisible = true
+                    if (TextUtils.isEmpty(localVersion))
+                        localVersion = getString(R.string.number_no)
+                    findItem!!.title = localVersion
                 }
         }
         return super.onCreateOptionsMenu(menu)
@@ -1501,24 +1489,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
-            R.id.toolbar_delete_group -> {
-                removeGroup()
-            }
-            R.id.toolbar_rename_group -> {
-                renameGp()
-            }
-            R.id.toolbar_f_rename -> {
-                renameLight()
-            }
-            R.id.toolbar_fv_rest -> {
-                remove()
-            }
-            R.id.toolbar_fv_change_group -> {
-                updateGroup()
-            }
-            R.id.toolbar_f_ota -> {
-                updateOTA()
-            }
+            R.id.toolbar_delete_group -> removeGroup()
+            R.id.toolbar_rename_group -> renameGp()
+            R.id.toolbar_f_rename -> renameLight()
+            R.id.toolbar_fv_rest -> remove()
+            R.id.toolbar_fv_change_group -> updateGroup()
+            R.id.toolbar_f_ota -> updateOTA()
         }
         true
     }

@@ -154,9 +154,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationIcon(R.drawable.icon_return)
     }
 
 

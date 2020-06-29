@@ -2,6 +2,7 @@ package com.dadoutek.uled.pir
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,14 +11,14 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.text.InputType
 import android.text.TextUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -25,18 +26,21 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.saveSensor
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
+import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
 import com.telink.bluetooth.light.DeviceInfo
@@ -63,6 +67,15 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var disposableReset: Disposable? = null
+    private var currentSensor: DbSensor? = null
+    private var fiRename: MenuItem? = null
+    private var fiVersion: MenuItem? = null
+    private lateinit var renameDialog: Dialog
+    private var renameCancel: TextView? = null
+    private var renameConfirm: TextView? = null
+    private var renameEditText: EditText? = null
+    private var popReNameView: View? = null
     private var version: String = ""
     private var timeDispsable: Disposable? = null
     private var connectDisposable: Disposable? = null
@@ -80,6 +93,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var showGroupList: MutableList<ItemGroup> = mutableListOf()
     private var showBottomList: MutableList<ItemGroup> = mutableListOf()
     private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_device_item, showBottomList)
+
     //private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showBottomList)
     private val popDataList = mutableListOf<ItemCheckBean>()
     private val listTriggerTimes = mutableListOf<ItemCheckBean>()
@@ -90,11 +104,37 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pir_new)
         initView()
+        makePopuwindow()
         initData()
         initListener()
     }
 
+    private fun makePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                fiRename = menu?.findItem(R.id.toolbar_f_rename)
+                fiRename?.isVisible = isConfirm
+                fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                fiVersion?.title = version
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
     private fun initListener() {
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
         top_rg_ly.setOnCheckedChangeListener { _, checkedId ->
             changeGroupType(checkedId == R.id.color_mode_rb)
             when (checkedId) {
@@ -144,8 +184,13 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
+        if (isConfirm)
+            currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
         pir_confir_tvPSVersion.text = version
         isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
+        if (isConfirm)
+            currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
+
         color_mode_rb.isChecked = true
 
         getTriggerTimeProide()
@@ -356,7 +401,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                     setLoadingVisbiltyOrGone()
                                     GlobalScope.launch {
                                         delay(timeMillis = 500)
-                                        configureComplete()
+                                        saveSensor()
                                     }
                                 },
                                 failedCallback = {
@@ -381,7 +426,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configureComplete() {
-        saveSensor()
         allDispoables()
         TelinkLightService.Instance()?.idleMode(true)
         if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
@@ -394,6 +438,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun allDispoables() {
         connectDisposable?.dispose()
         timeDispsable?.dispose()
+        disposableReset?.dispose()
     }
 
     private fun saveSensor() {
@@ -419,9 +464,127 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         saveSensor(dbSensor, isConfirm)//保存进服务器
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
-        DBUtils.recordingChange(dbSensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
+
+        if (!isConfirm)
+            showRenameDialog(dbSensor)
+        else
+            configureComplete()
+    }
+
+    private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
+        when (item?.itemId) {
+            R.id.toolbar_f_rename -> showRenameDialog(currentSensor!!)
+            R.id.toolbar_f_ota -> goOta()
+            R.id.toolbar_f_delete -> deleteDevice()
+        }
+        true
+    }
+
+    private fun deleteDevice() {
+        //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
+        showLoadingDialog(getString(R.string.please_wait))
+        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                .subscribe({
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.reset_factory_success))
+                    DBUtils.deleteSensor(currentSensor!!)
+                    TelinkLightService.Instance()?.idleMode(true)
+                    configureComplete()
+                }, {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                })
+    }
+
+    private fun goOta() {
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (isBoolean) {
+            transformView()
+        } else {
+            if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
+                OtaPrepareUtils.instance().gotoUpdateView(this@PirConfigActivity, version, object : OtaPrepareListner {
+                    override fun downLoadFileStart() {
+                        showLoadingDialog(getString(R.string.get_update_file))
+                    }
+
+                    override fun startGetVersion() {
+                        showLoadingDialog(getString(R.string.verification_version))
+                    }
+
+                    override fun getVersionSuccess(s: String) {
+                        hideLoadingDialog()
+                    }
+
+                    override fun getVersionFail() {
+                        ToastUtils.showLong(R.string.verification_version_fail)
+                        hideLoadingDialog()
+                    }
+
+                    override fun downLoadFileSuccess() {
+                        hideLoadingDialog()
+                        transformView()
+                    }
+
+                    override fun downLoadFileFail(message: String) {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(R.string.download_pack_fail)
+                    }
+                })
+            } else {
+                ToastUtils.showLong(getString(R.string.version_disabled))
+                hideLoadingDialog()
+            }
+        }
+
+    }
+
+    private fun transformView() {
+        val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        startActivity(intent)
+        finish()
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    fun showRenameDialog(dbSensor: DbSensor) {
+        StringUtils.initEditTextFilter(renameEditText)
+        if (dbSensor.name != "" && dbSensor.name != null)
+            renameEditText?.setText(dbSensor.name)
+        else
+            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        renameConfirm?.setOnClickListener {  // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+                saveSensor(dbSensor, false)
+                if (!this.isFinishing)
+                    renameDialog.dismiss()
+            }
+        }
+        renameCancel?.setOnClickListener {
+            if (!this.isFinishing)
+                renameDialog?.dismiss()
+        }
+        renameDialog.setOnDismissListener {
+            dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+            saveSensor(dbSensor, true)
+            configureComplete()
+        }
+
+        if (!this.isFinishing) {
+            renameDialog.dismiss()
+            runOnUiThread {
+                renameDialog.show()
+            }
+        }
     }
 
     private fun getControlGroup(): String? {

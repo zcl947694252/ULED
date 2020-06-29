@@ -168,10 +168,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun initToolbar() {
-        toolbar.setTitle(R.string.group_setting_header)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbarTv?.text = getString(R.string.group_setting_header)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
 

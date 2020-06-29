@@ -1,5 +1,6 @@
 package com.dadoutek.uled.curtains
 
+import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -7,6 +8,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DensityUtil
 
 class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
 
@@ -16,6 +18,9 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
            // val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
 //            val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
            // tvName.text = StringUtils.getCurtainName(dbCurtain)
+            val iv = helper.getView<ImageView>(R.id.template_device_icon)
+            iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
+            iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
             tvName.text = dbCurtain.name
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))

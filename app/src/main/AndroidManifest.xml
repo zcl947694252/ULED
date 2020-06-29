@@ -222,9 +222,11 @@
                 android:name=".connector.ConnectorOfGroupActivity"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
+        <!--  android:theme="@style/FullHeightDialogNew"-->
         <activity
                 android:name=".connector.ConnectorSettingActivity"
-                android:theme="@style/FullHeightDialogNew" />
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".connector.ConnectorDeviceDetailActivity"
                  android:screenOrientation="portrait"

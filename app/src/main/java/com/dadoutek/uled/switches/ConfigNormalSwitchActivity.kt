@@ -74,9 +74,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     override fun initView() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.select_group)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar?.title = getString(R.string.select_group)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
         makePop()
     }
 

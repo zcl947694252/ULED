@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="160dp"
+        android:layout_width="172dp"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -14,7 +14,7 @@
 
         <LinearLayout
                 android:id="@+id/template_device_card"
-                android:layout_width="150dp"
+                android:layout_width="162dp"
                 android:layout_height="90dp"
                 android:layout_marginEnd="@dimen/dp_5"
                 android:background="@drawable/device_fragment_background"
@@ -31,9 +31,11 @@
                     android:id="@+id/template_device_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxHeight="65dp"
+                    android:maxWidth="20dp"
                     android:layout_gravity="center"
-                    android:layout_marginStart="@dimen/dp_5"
-                    android:src="@drawable/icon_light_no_circle" />
+                    android:layout_marginStart="3dp"
+                    android:src="@drawable/icon_light_no_circle"/>
 
             <LinearLayout
                     android:layout_width="match_parent"
@@ -126,6 +128,6 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="-8dp"
             android:src="@drawable/icon_minus"
-            android:visibility="invisible" />
+            android:visibility="invisible"/>
 
 </RelativeLayout>

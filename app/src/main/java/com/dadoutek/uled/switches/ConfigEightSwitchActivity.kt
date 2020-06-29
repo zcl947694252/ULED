@@ -672,9 +672,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun initView() {
         toolbar.setBackgroundColor(getColor(R.color.transparent))
         toolbarTv!!.setText(R.string.eight_switch)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         img_function2.visibility = View.VISIBLE
         img_function2.setImageResource(R.drawable.icon_more)
         img_function2.setOnClickListener {

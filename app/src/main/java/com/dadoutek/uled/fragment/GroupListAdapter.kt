@@ -19,8 +19,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
         if (group != null) {
             val num = group.deviceCount //内含设备的数量
             val iv = helper.getView<ImageView>(R.id.template_device_icon)
-            iv.layoutParams.height = DensityUtil.dip2px(mContext, 50f)
-            iv.layoutParams.width = DensityUtil.dip2px(mContext, 50f)
+            iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
+            iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
 
             helper.setImageResource(R.id.template_device_icon, R.drawable.icon_group_n)
                     .setImageResource(R.id.template_device_setting, R.drawable.icon_setting_n)

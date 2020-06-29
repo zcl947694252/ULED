@@ -8,13 +8,11 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
-import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -33,7 +31,6 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAConnectorActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -44,81 +41,36 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.ErrorReportInfo
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.bluetooth.light.Parameters
-import com.telink.util.Event
-import com.telink.util.EventListener
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.connector_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
-class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener {
+class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var isConfigGroup: Boolean = false
+    var fiDelete: MenuItem? = null
+    var fiFactoryReset: MenuItem? = null
+    var fiOta: MenuItem? = null
+    var fiChangeGp: MenuItem? = null
+    var fiRename: MenuItem? = null
+    internal var fiVersion: MenuItem? = null
 
     private val requestCodeNum: Int = 1000
     private var localVersion: String? = null
-    private var light: DbConnector? = null
+    private var currentDbConnector: DbConnector? = null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
-    var gpAddress: Int = 0
-    var fromWhere: String? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
     private var mConnectTimer: Disposable? = null
-    private var isLoginSuccess = false
-    private var mApplication: TelinkLightApplication? = null
     private var isRenameState = false
     private var group: DbGroup? = null
     private var currentShowPageGroup = true
-
-    private val clickListener = OnClickListener { v ->
-        when (v.id) {
-            R.id.btnRename -> {
-                renameGp()
-            }
-            R.id.updateGroup -> {
-                updateGroup()
-            }
-            R.id.btnRemove -> {
-                remove()
-            }
-            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        this.showLoadingDialog(getString(R.string.deleting))
-
-                        deleteGroup(DBUtils.getConnectorByGroupID(group!!.id), group!!,
-                                successCallback = {
-                                    (this).hideLoadingDialog()
-                                    this?.setResult(Constant.RESULT_OK)
-                                    this?.finish()
-                                },
-                                failedCallback = {
-                                    (this).hideLoadingDialog()
-                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                                })
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
-            R.id.btn_rename -> renameGroup()
-
-            R.id.btnOTA -> {
-                if (txtTitle.text.toString() != null && txtTitle.text.toString() != "") {
-                    checkPermission()
-                } else {
-                    Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
 
     private fun renameGroup() {
         val textGp = EditText(this)
@@ -159,27 +111,24 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-
                     if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
                         val opcode = Opcode.KICK_OUT
-
-                        val disposable = Commander.resetDevice(light!!.meshAddr)
-                                .subscribe(
-                                        {
-                                            LogUtils.v("zcl-----恢复出厂成功")
-                                        }, {
+                        val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
+                                .subscribe({
+                                    LogUtils.v("zcl-----恢复出厂成功")
+                                }, {
                                     LogUtils.v("zcl-----恢复出厂失败")
                                 })
 
-                        DBUtils.deleteConnector(light!!)
+                        DBUtils.deleteConnector(currentDbConnector!!)
 
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentDbConnector!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
                         if (mConnectDevice != null) {
                             Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
-                            if (light?.meshAddr == mConnectDevice?.meshAddress) {
+                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentDbConnector?.meshAddr)
+                            if (currentDbConnector?.meshAddr == mConnectDevice?.meshAddress) {
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                             }
                         }
@@ -199,7 +148,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 .show()
     }
 
-
 /*    private fun updateGroup() {
         val intent = Intent(this, ConnectorGroupingActivity::class.java)
         if (light == null) {
@@ -217,8 +165,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         this.finish()
     }*/
 
-
-
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@ConnectorSettingActivity, ChooseGroupOrSceneActivity::class.java)
         intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
@@ -230,7 +176,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
-            updateGroupResult(light!!, group)
+            updateGroupResult(currentDbConnector!!, group)
             finish()
         }
     }
@@ -245,7 +191,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (group != null)
             DBUtils.updateGroup(group!!)//更新组类型
     }
-
 
     /**
      * 删除组，并且把组里的灯的组也都删除。
@@ -324,12 +269,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
             relayName.visibility = View.VISIBLE
-            relayName.text = light?.name
+            relayName.text = currentDbConnector?.name
         } else {
             relayName.visibility = View.VISIBLE
             relayName.text = name
-            light?.name = name
-            DBUtils.updateConnector(light!!)
+            currentDbConnector?.name = name
+            DBUtils.updateConnector(currentDbConnector!!)
         }
     }
 
@@ -338,7 +283,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
 
-//            editTitle.visibility=View.GONE
             relayName.visibility = View.VISIBLE
             relayName.text = group?.name
         } else {
@@ -353,7 +297,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             }
 
             if (canSave) {
-//                editTitle.visibility=View.GONE
                 relayName.visibility = View.VISIBLE
                 relayName.text = name
                 group?.name = name
@@ -363,24 +306,18 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun checkPermission() {
-//        if(light!!.macAddr.length<16){
-//            ToastUtils.showLong(getString(R.string.bt_error))
-//        }else{
         mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                        if (isBoolean) {
+                        if (isBoolean)
                             transformView()
-                        } else {
+                        else
                             OtaPrepareUtils.instance().gotoUpdateView(this@ConnectorSettingActivity, localVersion, otaPrepareListner)
-                        }
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
                 })
-//        }
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -394,7 +331,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 
@@ -417,135 +353,109 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 
     private fun transformView() {
         val intent = Intent(this@ConnectorSettingActivity, OTAConnectorActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.UPDATE_LIGHT, currentDbConnector)
         startActivity(intent)
         finish()
     }
 
-    private fun renameGp() {
+    private fun renameDevice() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
-        textGp.setText(light?.name)
+        textGp.setText(currentDbConnector?.name)
         textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this@ConnectorSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
-                        light?.name = textGp.text.toString().trim { it <= ' ' }
-                        DBUtils.updateConnector(light!!)
-                        relayName.text = light?.name
+                        currentDbConnector?.name = textGp.text.toString().trim { it <= ' ' }
+                        DBUtils.updateConnector(currentDbConnector!!)
+                        relayName.text = currentDbConnector?.name
                         dialog.dismiss()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
-    private fun onErrorReport(info: ErrorReportInfo) {
-        LogUtils.e("onErrorReport current device mac ")
-        when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        // ("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        // ("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        // ("未扫到目标设备")
-                    }
-                }
-
-            }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        // ("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        //("未建立物理连接")
-                    }
-                }
-
-                autoConnect()
-
-            }
-            ErrorReportEvent.STATE_LOGIN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        //  ("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        //("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        // ("write login data 没有收到response")
-                    }
-                }
-
-                autoConnect()
-
-            }
-        }
-    }
-
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
-
-        val deviceInfo = event.args
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                hideLoadingDialog()
-                isLoginSuccess = true
-                mConnectTimer?.dispose()
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                autoConnect()
-                mConnectTimer?.dispose()
-                mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe({
-                            LogUtils.d("STATUS_LOGOUT")
-                            ToastUtils.showShort(getString(R.string.connect_fail))
-                            finish()
-                        }, {})
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connector_setting)
+        initView()
         initType()
-        this.mApplication = this.application as TelinkLightApplication
     }
 
-    override fun onResume() {
-        super.onResume()
-        addEventListeners()
+    private fun initView() {
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                fiRename = menu?.findItem(R.id.toolbar_f_rename)
+                fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                fiFactoryReset = menu?.findItem(R.id.toolbar_fv_rest)
+                fiOta = menu?.findItem(R.id.toolbar_f_ota)
+                fiDelete = menu?.findItem(R.id.toolbar_f_delete)
+                fiVersion = menu?.findItem(R.id.toolbar_f_version)
+
+                if (isConfigGroup) {//删除分组 重命名分组
+                    fiRename?.title = getString(R.string.update_name_gp)
+                    fiOta?.isVisible = false
+                    fiDelete?.title = getString(R.string.delete_group)
+                    fiVersion?.isVisible = false
+                } else {
+                    fiChangeGp?.isVisible = isConfigGroup
+                }
+
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
+        if (TelinkLightApplication.getApp().connectDevice != null) {
+            when (item?.itemId) {
+                R.id.toolbar_f_rename -> if (isConfigGroup) renameGroup() else renameDevice()
+                R.id.toolbar_fv_change_group -> updateGroup()
+                R.id.toolbar_f_ota -> {
+                    if (!TextUtils.isEmpty(localVersion))
+                        checkPermission()
+                    else
+                        Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+                }
+                R.id.toolbar_f_delete -> remove()
+            }
+        } else {
+            showLoadingDialog(getString(R.string.connecting))
+            val subscribe = connect(currentDbConnector!!.meshAddr, true)?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())?.subscribe({
+                        ToastUtils.showShort(getString(R.string.connect_success))
+                        hideLoadingDialog()
+                    }, {
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                        hideLoadingDialog()
+                    })
+        }
+        true
     }
 
     override fun onStop() {
         super.onStop()
         mConnectTimer?.dispose()
-        this.mApplication?.removeEventListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
         mDisposable.dispose()
-        this.mApplication?.removeEventListener(this)
-    }
 
-    fun addEventListeners() {
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
@@ -553,12 +463,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         return true
     }
 
-    override fun performed(event: Event<String>?) {
-        when (event?.type) {
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
-        }
-    }
 
     private fun doWhichOperation(actionId: Int) {
         when (actionId) {
@@ -573,18 +477,19 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun initType() {
-        val type = intent.getStringExtra(Constant.TYPE_VIEW)
-        if (type == Constant.TYPE_GROUP) {
+        var type = intent.getStringExtra(Constant.TYPE_VIEW)
+        isConfigGroup = type == Constant.TYPE_GROUP
+        if (isConfigGroup) {
             currentShowPageGroup = true
-            show_light_btn.visibility = View.GONE
-            show_group_btn.visibility = View.VISIBLE
-            initDataGroup()
-            initViewGroup()
+            //show_light_btn.visibility = View.GONE
+            this.group = this.intent.extras!!.get("group") as DbGroup
+            if (group != null)
+                if (group!!.meshAddr == 0xffff)
+                    toolbarTv!!.text = getString(R.string.allLight)
+                else
+                    toolbarTv!!.text = group!!.name
         } else {
             currentShowPageGroup = false
-            show_light_btn.visibility = View.VISIBLE
-            show_group_btn.visibility = View.GONE
-//            initToolbarLight()
             initViewLight()
             getVersion()
         }
@@ -594,9 +499,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         when (item.itemId) {
             android.R.id.home -> {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-                editTitle?.setFocusableInTouchMode(false)
-                editTitle?.setFocusable(false)
+                imm.hideSoftInputFromWindow(editTitle?.windowToken, 0)
+                editTitle?.isFocusableInTouchMode = false
+                editTitle?.isFocusable = false
                 finish()
             }
         }
@@ -608,167 +513,32 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
         val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
         if (get != null)
-            this.light = get as DbConnector
-
-        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
-        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
-        // intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-        //intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-        //intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-        txtTitle.visibility = View.VISIBLE
-        txtTitle!!.text = ""
-//        editTitle!!.setText(light?.name)
-//        editTitle!!.visibility=View.GONE
-        relayName.visibility = View.VISIBLE
-        relayName.text = light?.name ?: ""
-
-//        tvOta!!.setOnClickListener(this.clickListener)
-        updateGroup.setOnClickListener(this.clickListener)
-        btnRemove.setOnClickListener(this.clickListener)
-        btnRename.setOnClickListener(clickListener)
-        btnOTA.setOnClickListener(clickListener)
-        mRxPermission = RxPermissions(this)
-
-//        this.sbBrightness?.max = 100
-//        this.sbTemperature?.max = 100
-
-//        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
-        mConnectDevice = TelinkLightApplication.getApp().connectDevice
-//        sbBrightness?.progress = light!!.brightness
-//        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
-//        sbTemperature?.progress = light!!.colorTemperature
-//        tvTemperature.text = getString(R.string.device_setting_temperature, light?.colorTemperature.toString() + "")
-
-//        sendInitCmd(light.getBrightness(),light.getColorTemperature());
-
-    }
-
-    private fun initToolbarLight() {
-        toolbarTv.text = ""
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun initDataGroup() {
-        this.mApplication = this.application as TelinkLightApplication
-        this.group = this.intent.extras!!.get("group") as DbGroup
-    }
-
-    private fun initViewGroup() {
-//        editTitle.visibility=View.GONE
-        relayName.visibility = View.VISIBLE
-        if (group != null) {
-            if (group!!.meshAddr == 0xffff) {
-//                editTitle!!.setText(getString(R.string.allLight))
-                relayName!!.text = getString(R.string.allLight)
-            } else {
-//                editTitle!!.setText(group!!.name)
-                relayName!!.text = group!!.name
-            }
+            currentDbConnector = get as DbConnector
+        if (currentDbConnector == null) {
+            ToastUtils.showShort(getString(R.string.invalid_data))
+            finish()
         }
-
-        txtTitle.visibility = View.GONE
-
-//        toolbar.title=""
-//        setSupportActionBar(toolbar)
-//        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        btn_remove_group?.setOnClickListener(clickListener)
-        btn_rename?.setOnClickListener(clickListener)
-
-//        checkGroupIsSystemGroup()
-//        sbBrightness!!.progress = group!!.brightness
-//        tvBrightness.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
-//        sbTemperature!!.progress = group!!.colorTemperature
-//        tvTemperature!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
-
+        toolbarTv.text = currentDbConnector?.name ?: ""
+        mRxPermission = RxPermissions(this)
+        mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
     }
-
-    //所有灯控分组暂标为系统默认分组不做修改处理
-//    private fun checkGroupIsSystemGroup() {
-//        if (group!!.meshAddr == 0xFFFF) {
-//            show_group_btn!!.visibility=View.GONE
-//        }
-//    }
 
     private fun getVersion() {
-        var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-            val disposable = Commander.getDeviceVersion(light!!.meshAddr)
+            val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
                     .subscribe(
-                            { s ->
+                            { s: String ->
                                 localVersion = s
-                                if (txtTitle != null) {
-                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        txtTitle!!.visibility = View.VISIBLE
-                                        txtTitle!!.text = resources.getString(R.string.firmware_version)+localVersion
-                                        light!!.version = localVersion
-//                        tvOta!!.visibility = View.VISIBLE
-                                    } else {
-                                        txtTitle!!.visibility = View.VISIBLE
-                                        txtTitle!!.text = resources.getString(R.string.firmware_version)+localVersion
-                                        light!!.version = localVersion
-//                        tvOta!!.visibility = View.GONE
-                                    }
-                                    DBUtils.saveConnector(light!!,false)
-                                }
+                                if (TextUtils.isEmpty(s))
+                                    localVersion = getString(R.string.number_no)
+                                currentDbConnector!!.version = localVersion
+                                DBUtils.saveConnector(currentDbConnector!!, false)
                             },
                             {
-
                                 LogUtils.d(it)
                             }
                     )
-        } else {
-            dstAdress = 0
-        }
-    }
-
-    /**
-     * 自动重连
-     */
-    private fun autoConnect() {
-
-        if (TelinkLightService.Instance() != null) {
-
-            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-
-                ToastUtils.showLong(getString(R.string.connecting))
-
-
-                if (this.mApp?.isEmptyMesh != false)
-                    return
-
-
-                val mesh = this.mApp?.mesh
-
-                if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                    TelinkLightService.Instance()?.idleMode(true)
-                    return
-                }
-
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
-                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
-
-                connectParams.autoEnableNotification(true)
-
-                // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh!!.isOtaProcessing) {
-                    connectParams.setConnectMac(mesh?.otaDevice!!.mac)
-                }
-                //自动重连
-                TelinkLightService.Instance()?.autoConnect(connectParams)
-            }
-
-            //刷新Notify参数
-            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-            refreshNotifyParams.setRefreshRepeatCount(2)
-            refreshNotifyParams.setRefreshInterval(2000)
-            //开启自动刷新Notify
-            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
         }
     }
 

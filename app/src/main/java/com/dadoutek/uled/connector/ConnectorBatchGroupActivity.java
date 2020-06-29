@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -1047,23 +1046,13 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void initToolbar() {
         if (relayType.equals("group_relay")) {
             toolbar.setTitle(groupRelay);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
         } else {
             toolbar.setTitle(R.string.batch_group);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
         }
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
 //        toolbar.setTitle(R.string.batch_group);
 //        setSupportActionBar(toolbar);
 //        ActionBar actionBar = getSupportActionBar();

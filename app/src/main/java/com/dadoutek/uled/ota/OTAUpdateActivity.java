@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -129,6 +128,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     DbUser user;
     private TextView otaProgress;
     private Toolbar toolbar;
+    private TextView toolbarTv;
     private TextView meshOtaProgress;
     private TextView tv_log, tv_version;
     private ScrollView sv_log;
@@ -280,6 +280,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
         toolbar = findViewById(R.id.toolbar);
+        toolbarTv = findViewById(R.id.toolbarTv);
         initToolbar();
         otaProgress = findViewById(R.id.progress_ota);
         meshOtaProgress = findViewById(R.id.progress_mesh_ota);
@@ -306,11 +307,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.ota_update_title);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbarTv.setText(R.string.ota_update_title);
+        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationIcon(R.drawable.icon_return);
     }
 
     @Override

@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_margin="10dp"
-            android:visibility="gone"
+            android:visibility="visible"
             >
             <Button
                 android:id="@+id/btn_remove_group"

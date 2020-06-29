@@ -51,7 +51,6 @@ private var debounce_time = 1000
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var renameDialog: Dialog? = null
-    var popRename: PopupWindow? = null
 
     var popReNameView: View? = null
     var renameCancel: TextView? = null
@@ -134,7 +133,6 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(switchDate: DbSwitch?) {
         hideLoadingDialog()
-        popRename?.dismiss()
         StringUtils.initEditTextFilter(renameEditText)
 
         if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)

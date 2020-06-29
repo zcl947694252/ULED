@@ -66,9 +66,10 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private fun initView() {
         mIsInited = false
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.switch_title)
+        toolbarTv?.text = getString(R.string.switch_title)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+
         retryConnectCount = 0
         isSupportInstallOldDevice = false
     }

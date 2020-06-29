@@ -89,8 +89,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initView() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+
         supportActionBar?.title = getString(R.string.sensor_title)
         scanning_device_ly.visibility = View.GONE
     }

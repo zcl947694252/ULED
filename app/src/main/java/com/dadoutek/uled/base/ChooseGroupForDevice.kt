@@ -29,6 +29,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 
 
@@ -159,10 +160,9 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initView() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.activity_device_grouping)
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        toolbarTv.setText(R.string.activity_device_grouping)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationIcon(R.drawable.icon_return)
 
         this.inflater = this.layoutInflater
         listView = this.findViewById<View>(R.id.list_groups) as GridView

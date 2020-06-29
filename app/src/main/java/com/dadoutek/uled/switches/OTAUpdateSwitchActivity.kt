@@ -292,9 +292,8 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
 
     private fun initToolbar() {
         toolbarTv!!.setText(R.string.ota_update_title)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar?.setNavigationIcon(R.drawable.icon_return)
+        toolbar?.setNavigationOnClickListener { finish() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

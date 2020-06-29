@@ -14,10 +14,10 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
@@ -56,9 +56,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
     private fun initView() {
         toolbarTv.text = getString(R.string.color_checked_set)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { v: View? -> finish() }
 
         color_picker.setInitialColor(Color.WHITE)
         color_picker.subscribe(colorObserver)

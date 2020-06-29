@@ -1030,10 +1030,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("ResourceType")
     private fun initToolbar() {
         toolbarTv?.setText(R.string.scanning)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar?.setNavigationContentDescription(R.drawable.icon_top_tab_back)
+        toolbar?.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar?.setNavigationOnClickListener { finish() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

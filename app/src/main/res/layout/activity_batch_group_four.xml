@@ -45,7 +45,7 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:padding="5dp"
-                android:paddingStart="16dp"
+                android:paddingStart="5dp"
                 android:paddingEnd="8dp"
                 android:text="@string/install_device"
                 android:textColor="@color/white"

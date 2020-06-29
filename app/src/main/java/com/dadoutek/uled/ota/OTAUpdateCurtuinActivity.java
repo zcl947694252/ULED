@@ -292,11 +292,8 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
 
     private void initToolbar() {
         toolbar.setTitle(R.string.ota_update_title);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     @Override

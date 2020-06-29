@@ -32,6 +32,7 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 
 
@@ -207,9 +208,10 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initView() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.activity_device_grouping)
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        toolbarTv?.text = getString(R.string.activity_device_grouping)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 
         this.inflater = this.layoutInflater
         listView = this.findViewById(R.id.list_groups)

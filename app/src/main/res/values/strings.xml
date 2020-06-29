@@ -619,7 +619,7 @@
     <string name="one_level">ont level</string>
     <string name="three_level">three level</string>
     <string name="four_level">four level</string>
-    <string name="commutation">commutation</string>
+    <string name="commutation">Motor commutator</string>
     <string name="speed_adjustment">Speed adjustment:</string>
     <string name="details">Details</string>
     <string name="restart">Click restart</string>
@@ -677,8 +677,8 @@
 
     <string name="brightness">brightness</string>
     <string name="color_temperature">Color temperature</string>
-    <string name="brightness_adjustment">Brightness adjustment：</string>
-    <string name="color_temperature_adjustment">Color Temperature Adjustment：</string>
+    <string name="brightness_adjustment">Brightness：</string>
+    <string name="color_temperature_adjustment">Color Temperature：</string>
 
     <string name="welcome_register">Hello, welcome to register</string>
     <string name="please_code">please enter verification code</string>

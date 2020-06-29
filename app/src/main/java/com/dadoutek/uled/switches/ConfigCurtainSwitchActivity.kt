@@ -98,9 +98,9 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     override fun initView() {
         makePop()
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.select_group)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbarTv?.text = getString(R.string.select_group)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")

@@ -250,11 +250,11 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
             }
-            Constant.INSTALL_CONNECTOR -> {//分组已更新
+            Constant.INSTALL_CONNECTOR -> {//分组已更新  sandian
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
-            Constant.INSTALL_GATEWAY -> {//不存在分组
+            Constant.INSTALL_GATEWAY -> {//不存在分组    sandian
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }

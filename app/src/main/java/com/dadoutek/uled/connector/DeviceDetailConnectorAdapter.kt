@@ -1,5 +1,6 @@
 package com.dadoutek.uled.connector
 
+import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -7,6 +8,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DensityUtil
 
 class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
 
@@ -16,7 +18,9 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
             val tvLightName = helper.getView<TextView>(R.id.template_device_group_name)
            // val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
                // tvName.text = StringUtils.getConnectorName(scene)
-
+            val iv = helper.getView<ImageView>(R.id.template_device_icon)
+            iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
+            iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 //tvName.setTextColor(mContext.resources.getColor(R.color.black))
                 tvLightName.setTextColor(mContext.resources.getColor(R.color.black))

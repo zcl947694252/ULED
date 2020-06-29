@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
@@ -50,6 +51,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var fiVersion: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var disposable: Disposable? = null
     private var mConnectDeviceDisposable: Disposable? = null
@@ -63,9 +65,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var slowBoolean: Boolean = true
     private var handBoolean: Boolean = true
     private var type: String? = null
-    private lateinit var group_delete: Button
-    private lateinit var updateGroup: Button
-    private lateinit var otaButton: Button
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     private lateinit var openBtn: ImageView
@@ -86,8 +85,13 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initViewType() {
         this.type = this.intent.extras!!.getString(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
-            initGroupData()
-            initViewGroup()
+            this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
+            if (curtainGroup != null) {
+                when (curtainGroup!!.meshAddr) {
+                    0xffff -> toolbarTv.text = getString(R.string.allLight)
+                    else -> toolbarTv.text = curtainGroup?.name
+                }
+            }
             initToolGroupBar()
         } else {
             currentShowGroupSetPage = false
@@ -97,22 +101,12 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun initViewGroup() {
-        if (curtainGroup != null) {
-            if (curtainGroup!!.meshAddr == 0xffff) {
-                toolbarTv.text = getString(R.string.allLight)
-            } else {
-                toolbarTv.text = curtainGroup?.name
-            }
-        }
-    }
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             Log.e("TAG", curtain!!.meshAddr.toString())
             val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
-                    .subscribe(
-                            { s ->
+                    .subscribe({ s ->
                                 localVersion = s
                                 if (localVersion != "") {
                                     if (versionText != null) {
@@ -129,20 +123,14 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                     }
                                 }
                                 null
-
-                            },
-                            {
+                            }, {
                                 LogUtils.d(it)
-                            }
-                    )
+                            })
         }
     }
 
     private fun initToolGroupBar() {
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
@@ -157,36 +145,27 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbarTv.text = curtain?.name
     }
 
-    private fun initGroupData() {
-        this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
-    }
-
 
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
-
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
-                        val opcode = Opcode.KICK_OUT
-
-                        Commander.resetDevice(curtain!!.meshAddr)
-                                .subscribe(
-                                        {
+                        val dispose = Commander.resetDevice(curtain!!.meshAddr)
+                                .subscribe({
                                             LogUtils.v("zcl-----恢复出厂成功")
                                         }, {
                                     LogUtils.v("zcl-----恢复出厂失败")
                                 })
 
                         DBUtils.deleteCurtain(curtain!!)
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr)) {
-                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
-                        }
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr))
+                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+
                         if (mConnectDevice != null) {
-                            Log.d(this!!.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
-                            Log.d(this!!.javaClass.simpleName, "light.getMeshAddr() = " + curtain!!.meshAddr)
-                            if (curtain!!.meshAddr == mConnectDevice!!.meshAddress) {
-                                this!!.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                            }
+                            Log.d(javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
+                            Log.d(javaClass.simpleName, "light.getMeshAddr() = " + curtain!!.meshAddr)
+                            if (curtain!!.meshAddr == mConnectDevice!!.meshAddress)
+                                setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                         }
                         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
                             override fun start() {}
@@ -195,13 +174,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
                             override fun error(msg: String?) {}
                         })
-                        this!!.finish()
+                    } else ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
 
-
-                    } else {
-                        ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
-                        this!!.finish()
-                    }
+                    finish()
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
@@ -213,36 +188,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             } else {
                 when (item?.itemId) {
-                    R.id.toolbar_delete_group -> {
-                        removeGroup()
-                    }
-                    R.id.toolbar_rename_group -> {
-                        renameGp()
-                    }
-                    R.id.toolbar_c_rename -> {
-                        renameLight()
-                    }
-                    R.id.toolbar_c_factory -> {
-                        onceReset()
-                    }
-                    R.id.toolbar_c_change_group -> {
-                        updateGroup()
-                    }
-                    R.id.toolbar_c_commutation -> {
-                        electricCommutation()
-                    }
-                    R.id.toolbar_c_hand_recovery -> {
-                        handRecovery()
-                    }
-                    R.id.toolbar_c_software_restart -> {
-                        sofwareRestart()
-                    }
-                    R.id.toolbar_c_slow_up -> {
-                        slowUp()
-                    }
-                    R.id.toolbar_c_ota -> {
-                        updateOTA()
-                    }
+                    R.id.toolbar_delete_group -> removeGroup()
+                    R.id.toolbar_rename_group -> renameGp()
+                    R.id.toolbar_c_rename -> renameLight()
+                    R.id.toolbar_c_factory -> onceReset()
+                    R.id.toolbar_c_change_group -> updateGroup()
+                    R.id.toolbar_c_commutation -> electricCommutation()
+                    R.id.toolbar_c_hand_recovery -> handRecovery()
+                    R.id.toolbar_c_software_restart -> sofwareRestart()
+                    R.id.toolbar_c_slow_up ->  slowUp()
+                    R.id.toolbar_c_ota -> updateOTA()
                 }
             }
         }
@@ -257,10 +212,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         android.app.AlertDialog.Builder(this@WindowCurtainsActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {    // 获取输入框的内容
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         var name = textGp.text.toString().trim { it <= ' ' }
@@ -289,8 +242,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    this.showLoadingDialog(getString(R.string.deleting))
-
+                    showLoadingDialog(getString(R.string.deleting))
                     deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
                             successCallback = {
                                 this.hideLoadingDialog()
@@ -325,7 +277,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val intent = Intent(this@WindowCurtainsActivity, ChooseGroupOrSceneActivity::class.java)
         intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
         startActivityForResult(intent, requestCodeNum)
-        this?.setResult(Constant.RESULT_OK)
+        setResult(Constant.RESULT_OK)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -449,10 +401,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initToolbar() {
         toolbarTv.text = ""
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
@@ -465,6 +413,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             menuInflater.inflate(R.menu.menu_curtain_group, menu)
         } else {
             menuInflater.inflate(R.menu.menu_curtain_setting, menu)
+            fiVersion = menu?.findItem(R.id.toolbar_c_version)
+            fiVersion?.title = localVersion
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -546,21 +496,17 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
 
-            if (curtain!!.inverse != null) {
+            if (curtain!!.inverse != null)
                 curtain!!.inverse = commutationBoolean
-            }
 
-            if (curtain!!.closeSlowStart != null) {
+            if (curtain!!.closeSlowStart != null)
                 curtain!!.closeSlowStart = slowBoolean
-            }
 
-            if (curtain!!.closePull != null) {
+            if (curtain!!.closePull != null)
                 curtain!!.closePull = handBoolean
-            }
 
-            if (curtain!!.speed != null) {
+            if (curtain!!.speed != null)
                 indicatorSeekBar.setProgress(curtain!!.speed.toFloat())
-            }
         }
     }
 
@@ -594,13 +540,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {
+                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
 
-                }
-
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {
-
-                }
+                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
             }
         } else {
             indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
@@ -639,13 +581,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {
+                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
 
-                }
-
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {
-
-                }
+                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
             }
         }
     }
@@ -659,10 +597,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun updateOTA() {
-        if (versionText.text != null && versionText.text != "") {
-            checkPermission()
-        } else {
-            Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+        when {
+            versionText.text != null && versionText.text != "" -> checkPermission()
+            else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -690,13 +627,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isDirectConnectDevice() {
-
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
-            if (isBoolean) {
-                transformView()
-            } else {
-                OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
+            when {
+                isBoolean -> transformView()
+                else -> OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
             }
         } else {
             showLoadingDialog(getString(R.string.please_wait))

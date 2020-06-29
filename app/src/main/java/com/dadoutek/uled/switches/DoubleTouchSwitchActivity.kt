@@ -319,7 +319,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
         toolbarTv.text = getString(R.string.double_switch)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener { finish() }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         makePop()
     }
