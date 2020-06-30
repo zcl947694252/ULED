@@ -79,6 +79,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         fiVersion?.title = version
     }
 
+    override fun setConnectMeshAddr(): Int {
+       return mDeviceInfo?.meshAddress?:0
+    }
+
 
     override fun deleteDevice() {
         deleteSwitch(mDeviceInfo.macAddress)
@@ -101,7 +105,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         toolbarTv?.text = getString(R.string.select_group)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
 

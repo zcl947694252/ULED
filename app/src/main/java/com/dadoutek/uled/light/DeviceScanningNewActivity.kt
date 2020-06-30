@@ -359,7 +359,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightService.Instance()?.idleMode(true)
         closeAnimation()
         //更新Title
-        toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
+       // toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
+        toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
         if (nowDeviceList.size > 0) {
@@ -1030,7 +1031,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("ResourceType")
     private fun initToolbar() {
         toolbarTv?.setText(R.string.scanning)
-        toolbar?.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener { finish() }
     }
 
@@ -1307,14 +1308,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun getFilters(): ArrayList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-        val manuData: ByteArray?
-        manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
-
+        val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
         val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
 
-        val scanFilter = ScanFilter.Builder()
-                .setManufacturerData(VENDOR_ID, manuData, manuDataMask)
-                .build()
+        val scanFilter = ScanFilter.Builder().setManufacturerData(VENDOR_ID, manuData, manuDataMask).build()
         scanFilters.add(scanFilter)
         return scanFilters
     }

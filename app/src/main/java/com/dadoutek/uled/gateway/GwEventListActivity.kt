@@ -3,17 +3,19 @@ package com.dadoutek.uled.gateway
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
@@ -29,17 +31,23 @@ import com.dadoutek.uled.gateway.bean.GwTimeAndDataBean
 import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -54,6 +62,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
+import kotlinx.android.synthetic.main.popwindow_choose_time.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -61,6 +70,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.toast
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -76,6 +86,15 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener, EventListener<String> {
+    private var downloadDispoable: Disposable? = null
+    private var fiVersion: MenuItem? = null
+    private var fiDelete: MenuItem? = null
+    private var isRestSuccess: Boolean = false
+    private var showDialogHardDelete: android.support.v7.app.AlertDialog? = null
+    private var fiFactoryReset: MenuItem? = null
+    private var disposableFactoryTimer: Disposable? = null
+    private var showDialogDelete: android.support.v7.app.AlertDialog? = null
+    private var fiChangeGp: MenuItem? = null
     private var receiver: GwBrocasetReceiver? = null
     private lateinit var currentGwTag: GwTagBean
     private var deleteBean: GwTagBean? = null
@@ -87,8 +106,13 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private var checkedIdType: Int = 0
     private var dbGw: DbGateway? = null
     private var lastTime: Long = 0
+    private var popReNameView: View? = null
+    var renameDialog: Dialog? = null
+    var renameCancel: TextView? = null
+    var renameConfirm: TextView? = null
+    var renameEditText: EditText? = null
     val adapter = GwEventItemAdapter(R.layout.event_item, listOne)
-    val adapter2 = GwEventItemAdapter(R.layout.event_item, listTwo)
+    private val adapter2 = GwEventItemAdapter(R.layout.event_item, listTwo)
     private val function: (leftMenu: SwipeMenu, rightMenu: SwipeMenu, position: Int) -> Unit = { _, rightMenu, _ ->
         val menuItem = SwipeMenuItem(this@GwEventListActivity)// 创建菜单
         menuItem.height = ViewGroup.LayoutParams.MATCH_PARENT
@@ -102,14 +126,268 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
         add_group_btn_tv.text = getString(R.string.add_timing_label)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id) {
+                menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                fiChangeGp?.title = getString(R.string.config_net)
+
+                fiFactoryReset = menu?.findItem(R.id.toolbar_fv_rest)
+                fiDelete = menu?.findItem(R.id.toolbar_f_delete)
+                fiFactoryReset?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
+                fiDelete?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
+
+                fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                fiVersion?.title = dbGw?.version
+            }
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
+        if (TelinkLightApplication.getApp().connectDevice != null) {
+            when (item?.itemId) {
+                R.id.toolbar_f_rename -> reName()
+                R.id.toolbar_fv_change_group -> configNet()
+                R.id.toolbar_fv_rest -> userReset()
+                R.id.toolbar_f_ota -> goOta()
+                R.id.toolbar_f_delete -> deleteDevice()
+            }
+        } else {
+            showLoadingDialog(getString(R.string.connecting))
+            connect(dbGw!!.meshAddr, true)?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_success))
+                    }, {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                    })
+        }
+        true
+    }
+
+    @SuppressLint("CheckResult")
+    private fun goOta() {
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            downloadDispoable = Commander.getDeviceVersion(dbGw!!.meshAddr)
+                    .subscribe(
+                            { s: String ->
+                                dbGw!!.version = s
+                                DBUtils.saveGateWay(dbGw!!, false)
+                                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+                                if (isBoolean) {
+                                    transformView()
+                                } else {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(s)!!)
+                                        OtaPrepareUtils.instance().gotoUpdateView(this@GwEventListActivity, s, otaPrepareListner)
+                                    else
+                                        ToastUtils.showShort(getString(R.string.version_disabled))
+                                }
+                                hideLoadingDialog()
+                            }, {
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                    }
+                    )
+        } else {
+            ToastUtils.showShort(getString(R.string.connect_fail))
+            finish()
+        }
+    }
+
+    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
+        override fun startGetVersion() {
+            showLoadingDialog(getString(R.string.verification_version))
+        }
+
+        override fun getVersionSuccess(s: String) {
+            hideLoadingDialog()
+        }
+
+        override fun getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail)
+            hideLoadingDialog()
+        }
+
+
+        override fun downLoadFileSuccess() {
+            hideLoadingDialog()
+            transformView()
+        }
+
+        override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
+            ToastUtils.showLong(R.string.download_pack_fail)
+        }
+    }
+
+    private fun transformView() {
+        disableConnectionStatusListener()
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbGw?.meshAddr) {
+            val intent = Intent(this@GwEventListActivity, OTAUpdateActivity::class.java)
+            intent.putExtra(UPDATE_LIGHT, dbGw)
+            intent.putExtra(OTA_MES_Add, dbGw?.meshAddr ?: 0)
+            intent.putExtra(OTA_MAC, dbGw?.macAddr)
+            intent.putExtra(OTA_VERSION, dbGw?.version)
+            intent.putExtra(OTA_TYPE, DeviceType.GATE_WAY)
+
+            startActivity(intent)
+        }
+    }
+
+    private fun deleteDevice() {
+        //恢复出厂设置
+        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_tip)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    hardTimer()
+                    showLoadingDialog(getString(R.string.please_wait))
+                    sendGwResetFactory(0)////恢复出厂设置
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+    private fun hardTimer() {
+        disposableFactoryTimer?.dispose()
+        disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    hideLoadingDialog()
+                    showDialogDelete?.dismiss()
+                    showDialogHardDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    showLoadingDialog(getString(R.string.please_wait))
+                                }
+                                showDialogHardDelete?.dismiss()
+                                isRestSuccess = true
+                                deleteGwData(isRestSuccess)
+                            }
+                            .setNegativeButton(R.string.btn_cancel, null)
+                            .show()
+                }
+    }
+
+    private fun deleteGwData(restSuccess: Boolean = false) {
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(dbGw!!.meshAddr))
+            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+
+        DBUtils.deleteGateway(dbGw!!)
+        val gattBody = GwGattBody()
+        gattBody.idList = mutableListOf(dbGw!!.id.toInt())
+
+        GwModel.deleteGwList(gattBody)?.subscribe(object : NetworkObserver<String?>() {
+            override fun onNext(t: String) {
+                LogUtils.v("zcl-----网关删除成功返回-------------$t")
+                GlobalScope.launch(Dispatchers.Main) {
+                    if (restSuccess)
+                        delay(10000)
+                    Toast.makeText(this@GwEventListActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                    hideLoadingDialog()
+                    finish()
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showShort(e.message)
+                hideLoadingDialog()
+                //清除网关的时候。已经从数据库删除了数据，此处也需要从数据库重新拿数据，更新到UI
+                LogUtils.v("zcl-----网关删除成功返回-------------${e.message}")
+            }
+        })
+    }
+
+    private fun userReset() {
+        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.user_reset_tip)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    disposableFactoryTimer?.dispose()
+                    disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.reset_gw_faile))
+                            }
+                    GlobalScope.launch(Dispatchers.Main) {
+                        showLoadingDialog(getString(R.string.please_wait))
+                    }
+                    if (TelinkLightApplication.getApp().connectDevice != null) {
+                        sendGwResetFactory(1)//用户恢复   sendGwResetFactory(0)//恢复出厂设置
+                    } else {
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                        finish()
+                    }
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+    private fun sendGwResetFactory(frist: Int) {
+        var labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
+        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, dbGw?.meshAddr ?: 0, labHeadPar, "1")
+    }
+
+    private fun configNet() {
+        //重新配置  intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
+        var intent = Intent(this@GwEventListActivity, GwLoginActivity::class.java)
+        SharedPreferencesHelper.putBoolean(this, IS_GW_CONFIG_WIFI, true)
+        intent.putExtra("data", dbGw)
+        startActivity(intent)
+
+    }
+
+    private fun makePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+
+        renameDialog = Dialog(this)
+        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setCanceledOnTouchOutside(false)
+
+        renameCancel?.setOnClickListener {
+            renameDialog?.dismiss()
+        }
+        renameConfirm?.setOnClickListener {
+            renameDialog?.dismiss()
+            dbGw?.name = renameEditText?.text.toString()
+            DBUtils.saveGateWay(dbGw!!, false)
+        }
+    }
+
+    private fun reName() {
+        StringUtils.initEditTextFilter(renameEditText)
+        if (dbGw != null && dbGw?.name != "")
+            renameEditText?.setText(dbGw?.name)
+
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        this.mApp.removeEventListeners()
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
@@ -117,6 +395,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         super.onPause()
         this.mApp.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
+
     private fun retryConnect() {
         connect(macAddress = dbGw!!.macAddr, fastestMode = true)?.subscribe(
                 object : NetworkObserver<DeviceInfo?>() {
@@ -172,7 +451,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     hideLoadingDialog()
                     runOnUiThread { ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
                     DBUtils.saveGateWay(dbGw!!, true)
-                   finish()
+                    finish()
                 }
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)
@@ -221,7 +500,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
                     { s: String ->
                         dbGw!!.version = s
-                        bottom_version_number.text = dbGw?.version
+                        //bottom_version_number.text = dbGw?.version
+                        fiVersion?.title = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, false)
                     }, {
 
@@ -633,7 +913,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             LogUtils.v("zcl-----------发送到服务器标签列表开关-------$gattPar")
 
 
-            val s =  Base64Utils.encodeToStrings(gattPar)
+            val s = Base64Utils.encodeToStrings(gattPar)
             val gattBody = GwGattBody()
             gattBody.data = s
             gattBody.ser_id = GW_GATT_LABEL_SWITCH
@@ -778,6 +1058,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         })
         mApp = (this.application as TelinkLightApplication)
         initView()
+        makePopuwindow()
         initData()
         initListener()
     }
@@ -823,6 +1104,22 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun onDeviceEvent(event: DeviceEvent) {
         when (event.type) {
             DeviceEvent.STATUS_CHANGED -> when (event.args.status) {
+                LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
+                    val deviceInfo = event.args
+                    when (deviceInfo.gwVoipState) {
+                        GW_RESET_VOIP -> {
+                            showDialogHardDelete?.dismiss()
+                            disposableFactoryTimer?.dispose()
+                            LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                            isRestSuccess = true
+                            deleteGwData(isRestSuccess)
+                        }
+                        GW_RESET_USER_VOIP -> {
+                            disposableFactoryTimer?.dispose()
+                            finish()
+                        }
+                    }
+                }
                 LightAdapter.STATUS_LOGIN -> {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 }

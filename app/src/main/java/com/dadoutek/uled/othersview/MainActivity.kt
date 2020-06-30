@@ -274,15 +274,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
-        installDialog = AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
+        installDialog = AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
-
-        if (isGuide) {
-            installDialog?.setCancelable(false)
-        }
+        if (isGuide) installDialog?.setCancelable(false)
 
         installDialog?.show()
 

@@ -409,7 +409,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 isDelete = true
                 adaper!!.changeState(isDelete)
                 img_function1?.visibility = View.GONE
-                img_function2?.visibility = View.VISIBLE
+                img_function2?.visibility = View.GONE
                 image_bluetooth?.visibility = View.GONE
                 toolbarTv?.text = ""
                 setBack()
@@ -422,7 +422,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun setBack() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
-            toolbar?.setTitle(R.string.scene_name)
+            //toolbar?.setTitle(R.string.scene_name)
+            toolbarTv?.setText(R.string.scene_name)
             img_function2?.visibility = View.GONE
             toolbar?.navigationIcon = null
             image_bluetooth?.visibility = View.VISIBLE

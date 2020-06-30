@@ -66,6 +66,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         fiVersion?.title =localVersion
     }
 
+    override fun setConnectMeshAddr(): Int {
+        return  mDeviceInfo?.meshAddress?:0
+    }
+
     override fun deleteDevice() {
         deleteSwitch(mDeviceInfo.macAddress)
     }
@@ -258,6 +262,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)
         switch_double_touch_right.setOnClickListener(this)
@@ -320,7 +325,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         toolbarTv.text = getString(R.string.double_switch)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         makePop()
     }
 

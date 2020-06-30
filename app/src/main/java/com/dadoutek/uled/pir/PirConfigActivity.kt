@@ -235,6 +235,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         color_mode_rb.text = getString(R.string.group_mode)
         gradient_mode_rb.text = getString(R.string.scene_mode)
         color_mode_rb.isChecked = true

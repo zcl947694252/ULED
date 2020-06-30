@@ -1332,7 +1332,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 toolbarTv.text = ""
                 toolbar.setNavigationIcon(R.drawable.icon_return)
                 toolbar.setNavigationOnClickListener { finish() }
-
                 toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
                 toolbar.setOnMenuItemClickListener(menuItemClickListener)
             }

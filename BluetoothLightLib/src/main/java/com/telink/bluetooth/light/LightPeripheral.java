@@ -12,6 +12,7 @@ import android.content.Context;
 import com.telink.bluetooth.Peripheral;
 import com.telink.util.Strings;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,5 +269,22 @@ public class LightPeripheral extends Peripheral {
                       UUID serviceUUID, UUID characteristicUUID, Object tag);
 
         void onRssiChanged(LightPeripheral light);
+    }
+
+    @Override
+    public String toString() {
+        return "LightPeripheral{" +
+                "advProperties=" + advProperties +
+                ", characteristicsValue=" + characteristicsValue +
+                ", meshChanged=" + meshChanged +
+                ", meshName=" + Arrays.toString(meshName) +
+                ", password=" + Arrays.toString(password) +
+                ", longTermKey=" + Arrays.toString(longTermKey) +
+                ", meshAddress=" + meshAddress +
+                ", mCallback=" + mCallback +
+                ", meshNameStr='" + meshNameStr + '\'' +
+                ", newMeshAddress=" + newMeshAddress +
+                ", retry=" + retry +
+                '}';
     }
 }

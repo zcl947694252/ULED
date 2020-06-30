@@ -77,6 +77,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         toolbar?.title = getString(R.string.select_group)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         makePop()
     }
 
@@ -120,6 +121,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
         fiVersion?.title = localVersion
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return mDeviceInfo?.meshAddress?:0
     }
 
     override fun deleteDevice() {

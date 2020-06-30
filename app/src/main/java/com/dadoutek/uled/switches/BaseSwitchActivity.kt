@@ -109,15 +109,31 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        when (item?.itemId) {
-            R.id.toolbar_f_rename -> reName()
-            R.id.toolbar_fv_change_group -> changeGroup()
-            R.id.toolbar_fv_rest -> userReset()
-            R.id.toolbar_f_ota -> goOta()
-            R.id.toolbar_f_delete -> deleteDevice()
+        if (TelinkLightApplication.getApp().connectDevice != null) {
+            when (item?.itemId) {
+                R.id.toolbar_f_rename -> reName()
+                R.id.toolbar_fv_change_group -> changeGroup()
+                R.id.toolbar_fv_rest -> userReset()
+                R.id.toolbar_f_ota -> goOta()
+                R.id.toolbar_f_delete -> deleteDevice()
+            }
+        } else {
+            showLoadingDialog(getString(R.string.connecting))
+            connect(setConnectMeshAddr(), true)?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({
+                        ToastUtils.showShort(getString(R.string.connect_success))
+                        hideLoadingDialog()
+                    }, {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+
+                    })
         }
         true
     }
+
+    abstract fun setConnectMeshAddr(): Int
 
     private fun userReset() {
 
@@ -174,13 +190,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 .show()
     }
 
-    fun deviceOta(mDeviceInfo: DeviceInfo, type:Int = DeviceType.NORMAL_SWITCH) {
-         deviceType = type
+    fun deviceOta(mDeviceInfo: DeviceInfo, type: Int = DeviceType.NORMAL_SWITCH) {
+        deviceType = type
         otaDeviceInfo = mDeviceInfo
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == mDeviceInfo.macAddress) {
             if (isBoolean)
-                transformView(mDeviceInfo,type)
+                transformView(mDeviceInfo, type)
             else
                 OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo.firmwareRevision, otaPrepareListner)
         } else {
@@ -192,7 +208,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                     .flatMap { connect(mDeviceInfo?.meshAddress, macAddress = mDeviceInfo?.macAddress) }
                     ?.subscribe({
                         hideLoadingDialog()
-                        if (isBoolean) transformView(mDeviceInfo,type)
+                        if (isBoolean) transformView(mDeviceInfo, type)
                         else OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo?.firmwareRevision, otaPrepareListner)
                     }, {
                         hideLoadingDialog()
@@ -209,17 +225,19 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
             ToastUtils.showLong(R.string.verification_version_fail)
             hideLoadingDialog()
         }
+
         override fun downLoadFileSuccess() {
             hideLoadingDialog()
-            transformView(otaDeviceInfo,deviceType)
+            transformView(otaDeviceInfo, deviceType)
         }
+
         override fun downLoadFileFail(message: String) {
             hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
 
-    private fun transformView(mDeviceInfo: DeviceInfo,type:Int) {
+    private fun transformView(mDeviceInfo: DeviceInfo, type: Int) {
         val intent = Intent(this@BaseSwitchActivity, OTAUpdateActivity::class.java)
         intent.putExtra(Constant.OTA_MAC, mDeviceInfo?.macAddress)
         intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo?.meshAddress)

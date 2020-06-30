@@ -172,7 +172,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         toolbarTv.text = getString(R.string.activity_device_grouping)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         this.inflater = this.layoutInflater
         list_groups!!.onItemClickListener = this.itemClickListener
         adapter = DeviceGroupingAdapter(groupsInit!!, this)

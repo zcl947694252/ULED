@@ -390,6 +390,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 

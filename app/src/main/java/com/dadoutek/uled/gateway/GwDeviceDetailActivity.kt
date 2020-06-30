@@ -313,8 +313,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         else
             stepThreeTextSmall.visibility = View.GONE
 
-
-
         installTipQuestion.text = describe
         installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)
@@ -666,7 +664,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
     }
 
-
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
         override fun downLoadFileStart() {
@@ -748,8 +745,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 when (configType) {
                     0, 1 -> onLogin(configType)
                     2 -> getDeviceVersion(currentGw!!.meshAddr)
-                    3 -> sendGwResetFactory(0)
-                    4 -> sendGwResetFactory(1)
+                    3 -> sendGwResetFactory(0)////恢复出厂设置
+                    4 -> sendGwResetFactory(1)//用户恢复
                 }//判断进入那个开关设置界面
             }, {
                 hideLoadingDialog()
@@ -830,7 +827,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
         }
     }
-
     private fun deleteGwData(restSuccess: Boolean = false) {
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentGw!!.meshAddr))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -861,6 +857,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
         })
     }
+
 
     fun notifyData() {
         val mNewDatas: ArrayList<DbGateway> = getNewData()
@@ -969,7 +966,6 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         }
         toolbarTv.text = getString(R.string.Gate_way)/* + " (" + gateWayDataList.size + ")"*/
     }
-
 
     private fun disposableAll() {
         mConnectDisposal?.dispose()

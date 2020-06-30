@@ -22,7 +22,7 @@
             android:id="@+id/toolbar_fv_rest"
             android:orderInCategory="4"
             android:visible="false"
-            android:title="@string/factory_reset"
+            android:title="@string/user_reset"
             app:showAsAction="never" />
     <item
             android:id="@+id/toolbar_f_delete"

@@ -26,7 +26,7 @@ public class DbSensor implements Serializable {
     private int productUUID;
     private int index;
     private Long belongGroupId;
-    private String version;
+    private String version = "";
     public int rssi =1000;
     private int openTag = 1; //1代表开 0代表关
     private int setType = 1; //0代表群组模式 1代表场景模式

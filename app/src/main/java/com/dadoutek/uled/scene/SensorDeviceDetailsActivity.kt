@@ -911,13 +911,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         skipeDevice(isOTA, s)
                                         isClick = SENSOR_FINISH
                                     } else {
-                                        skipeDevice(isOTA, currentLightm!!.version)
+                                        skipeDevice(isOTA, currentLightm?.version?:"")
                                         hideLoadingDialog()
                                     }
                                 },
                                 {
                                     hideLoadingDialog()
-                                    skipeDevice(isOTA, currentLightm!!.version)
+                                    skipeDevice(isOTA, currentLightm?.version?:"")
                                 }
                         )
             } else {

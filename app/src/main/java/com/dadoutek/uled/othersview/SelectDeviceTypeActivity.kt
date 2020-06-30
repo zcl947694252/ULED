@@ -54,6 +54,7 @@ class SelectDeviceTypeActivity : BaseActivity() {
     override fun initView() {
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        image_bluetooth.visibility = View.GONE
         toolbarTv.text = getString(R.string.add_device)
         template_recycleView.layoutManager = GridLayoutManager(this@SelectDeviceTypeActivity, 3)
         template_recycleView.adapter = deviceAdapter

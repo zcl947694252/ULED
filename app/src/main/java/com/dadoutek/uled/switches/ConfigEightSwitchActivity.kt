@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -54,6 +56,7 @@ import org.json.JSONObject
 
 
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
+    private var findItem: MenuItem? = null
     private var isReConfim: Boolean = false
     private lateinit var listKeysBean: JSONArray
     private var newMeshAddr: Int = 0
@@ -61,7 +64,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var groupName: String? = null
     private var version: String? = null
     private var mDeviceInfo: DeviceInfo? = null
-    private var configSwitchType = 1
+    private var configSwitchType = 0
+    private var configSwitchTypeNum = 1
     private var configButtonTag = 0
     private val requestCodeNum = 100
     private var clickType = 0
@@ -93,7 +97,6 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
-
                 //eight_switch_mode.visibility = View.VISIBLE
                 //eight_switch_config.visibility = View.VISIBLE
                 // eight_switch_banner_ly.visibility = View.GONE
@@ -385,9 +388,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
             updateSwitch(isConfigGroup)
             GlobalScope.launch(Dispatchers.Main) {
+                ToastUtils.showShort(getString(R.string.config_success))
                 if (!isReConfim)
                     showRenameDialog(switchData)
-                ToastUtils.showShort(getString(R.string.config_success))
+                else
+                    finishAc()
                 hideLoadingDialog()
             }
 
@@ -643,7 +648,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
-        fiVersion?.title =version
+        fiVersion?.title = version
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return mDeviceInfo?.meshAddress ?: 0
     }
 
     override fun deleteDevice() {
@@ -670,53 +679,34 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun initView() {
-        toolbar.setBackgroundColor(getColor(R.color.transparent))
         toolbarTv!!.setText(R.string.eight_switch)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-
-        img_function2.visibility = View.VISIBLE
-        img_function2.setImageResource(R.drawable.icon_more)
-        img_function2.setOnClickListener {
-            configSwitchType++
-
-            setDefaultData()
-            when (val type = configSwitchType % 3) {
-                1 -> {
-                    setTextColorsAndText(type)
-                    eight_switch_title.text = getString(R.string.group_switch)
-                }
-                2 -> {
-                    setTextColorsAndText(type)
-                    eight_switch_title.text = getString(R.string.scene_switch)
-                }
-                0 -> {
-                    setTextColorsAndText(type)
-                    eight_switch_title.text = getString(R.string.single_brighress_group_switch)
-                }
-            }
-        }
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        toolbar.setNavigationOnClickListener { finishAc() }
+        img_function1.visibility = View.VISIBLE
+        img_function1.setImageResource(R.drawable.icon_more)
         makePop()
     }
 
     override fun initListener() {
-        toolbar.setNavigationOnClickListener {
-            finishAc()
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        img_function1.setOnClickListener {
+            changeMode()
         }
         eight_switch_use_button.setOnClickListener {
-         /*   when (clickType) {
-                0 -> {//选择模式 显示配置界面
-                    setTextColorsAndText(configSwitchType)
-                    // eight_switch_mode.visibility = View.VISIBLE
-                    //eight_switch_config.visibility = View.VISIBLE
-                    // eight_switch_banner_ly.visibility = View.GONE
-                    clickType = 1
-                }
-                1, 2 -> {
-                    clickType = 2
-                    confimCongfig()
-                }
-            }*/
+            /*   when (clickType) {
+                   0 -> {//选择模式 显示配置界面
+                       setTextColorsAndText(configSwitchType)
+                       // eight_switch_mode.visibility = View.VISIBLE
+                       //eight_switch_config.visibility = View.VISIBLE
+                       // eight_switch_banner_ly.visibility = View.GONE
+                       clickType = 1
+                   }
+                   1, 2 -> {
+                       clickType = 2
+                       confimCongfig()
+                   }
+               }*/
             confimCongfig()
         }
 
@@ -743,6 +733,28 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         eight_switch_b6.setOnClickListener(this)
         eight_switch_b7.setOnClickListener(this)
         eight_switch_b8.setOnClickListener(this)
+    }
+
+    private fun changeMode() {
+        configSwitchTypeNum++
+        setDefaultData()
+        when (val type = configSwitchTypeNum % 3) {
+            1 -> {
+                setTextColorsAndText(0)
+                configSwitchType = 0
+                eight_switch_title.text = getString(R.string.group_switch)
+            }
+            2 -> {
+                configSwitchType = 1
+                setTextColorsAndText(1)
+                eight_switch_title.text = getString(R.string.scene_switch)
+            }
+            0 -> {
+                configSwitchType = 2
+                setTextColorsAndText(2)
+                eight_switch_title.text = getString(R.string.single_brighress_group_switch)
+            }
+        }
     }
 
     private fun makePop() {

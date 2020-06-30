@@ -392,6 +392,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.human_body)
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         toolbar.setNavigationOnClickListener {
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE

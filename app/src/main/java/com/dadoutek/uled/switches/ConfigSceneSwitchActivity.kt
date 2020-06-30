@@ -112,7 +112,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         toolbarTv?.text = getString(R.string.scene_set)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         makePop()
         if (mSceneList.isEmpty()) {
             scene_use_botton.visibility = View.GONE
@@ -164,6 +164,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
         fiVersion?.title = version
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return mDeviceInfo?.meshAddress?:0
     }
 
     override fun deleteDevice() {

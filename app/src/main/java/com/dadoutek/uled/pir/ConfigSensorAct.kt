@@ -320,6 +320,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         toolbarTv.text = getString(R.string.sensor_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { doFinish() }
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
     }
 
     private fun initData() {
