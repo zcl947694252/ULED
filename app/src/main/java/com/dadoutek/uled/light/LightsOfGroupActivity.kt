@@ -23,6 +23,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -45,6 +46,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.startActivity
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -144,14 +146,25 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun initToolbar() {
         toolbar.setNavigationOnClickListener { finish() }
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
-        if (moreIcon != null) {
-            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
-            toolbar.overflowIcon = moreIcon
+        tv_function1.visibility = View.VISIBLE
+        tv_function1.setText(R.string.batch_group)
+        tv_function1.setOnClickListener {
+            when (strLight) {
+                "cw_light" -> {
+                    if (DBUtils.getAllNormalLight().size == 0) {
+                        ToastUtils.showShort(getString(R.string.no_device))
+                    } else {
+                        startActivity<GroupOTAListActivity>("group" to group!!,"DeviceType" to DeviceType.LIGHT_NORMAL)
+                    }
+                }
+                "rgb_light" -> {
+                    if (DBUtils.getAllRGBLight().size == 0) {
+                        ToastUtils.showShort(getString(R.string.no_device))
+                    } else {
+                        startActivity<GroupOTAListActivity>("group" to group!!,"DeviceType" to DeviceType.LIGHT_RGB)
+                    }
+                }
+            }
         }
     }
 

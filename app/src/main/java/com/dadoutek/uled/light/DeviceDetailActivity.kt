@@ -1,8 +1,11 @@
 package com.dadoutek.uled.light
 
+import android.app.ActionBar
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
@@ -30,6 +33,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -60,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -108,6 +113,8 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null
+    private var isEdite: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,53 +131,90 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         initView()
         initToolbar()
         scrollToPosition()
+        setBack()
         if (TelinkLightApplication.getApp().connectDevice == null)
             autoConnect()
     }
 
-
     private fun initToolbar() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
         toolbar.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.toolbar_delete_group->skipBatch()
-                R.id.toolbar_rename_group->goOta()
-                R.id.toolbar_delete_device->editeDevice()
+            when (it.itemId) {
+                R.id.toolbar_delete_group -> skipBatch()
+                R.id.toolbar_rename_group -> goOta()
+                R.id.toolbar_delete_device -> editeDevice()
             }
             true
         }
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun editeDevice() {
-
+        isEdite = !isEdite
+        deleteDevice?.title = getString(R.string.cancel_edite)
+        DBUtils.lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showLong(getString(R.string.author_region_warm))
+            else {
+                adaper!!.changeState(isEdite)
+                img_function1?.visibility = View.GONE
+                img_function2?.visibility = View.GONE
+                image_bluetooth?.visibility = View.GONE
+                toolbarTv?.text = ""
+                adaper!!.notifyDataSetChanged()
+            }
+        }
     }
 
-    private fun goOta() {
+        private fun setBack() {
+            toolbar?.setNavigationIcon(R.drawable.icon_return)
+            toolbar?.setNavigationOnClickListener {
+                isEdite = false
+                adaper?.changeState(isEdite)
+                adaper?.notifyDataSetChanged()
+            }
+        }
 
+
+    private fun goOta() {
+        when (type) {
+            Constant.INSTALL_NORMAL_LIGHT -> {
+                if (DBUtils.getAllNormalLight().size == 0)
+                    ToastUtils.showShort(getString(R.string.no_device))
+                else
+                    startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_NORMAL)
+            }
+
+            Constant.INSTALL_RGB_LIGHT -> {
+                if (DBUtils.getAllRGBLight().size == 0)
+                    ToastUtils.showShort(getString(R.string.no_device))
+                else
+                    startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_rgb_group_setting,menu)
-         batchGp = menu?.findItem(R.id.toolbar_delete_group)
-         onlineUpdate = menu?.findItem(R.id.toolbar_rename_group)
+        menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+
+        batchGp = menu?.findItem(R.id.toolbar_delete_group)
+        onlineUpdate = menu?.findItem(R.id.toolbar_rename_group)
         deleteDevice = menu?.findItem(R.id.toolbar_delete_device)
 
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
         deleteDevice?.title = getString(R.string.edite_device)
-
+        deleteDevice?.isVisible = true
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     private fun initView() {
         /* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null) {直连灯逻辑
@@ -216,53 +260,10 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
          */
         //adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper = DeviceDetailListAdapter(R.layout.template_device_type_item, lightsData)
-        adaper!!.onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
-            if (position < lightsData.size) {
-                currentLight = lightsData[position]
-                positionCurrent = position
-
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        //ToastUtils.showLong(getString(R.string.connecting_tip))
-                        retryConnectCount = 0
-                        autoConnect()
-                    }
-                    sendToGw()
-
-                } else {
-                    when (view.id) {
-                        R.id.template_device_icon -> {
-                            canBeRefresh = true
-                            openOrClose(currentLight!!)
-
-                            when (type) {
-                                Constant.INSTALL_NORMAL_LIGHT -> {
-                                    currentLight!!.updateIcon()
-                                }
-
-                                Constant.INSTALL_RGB_LIGHT -> {
-                                    currentLight!!.updateRgbIcon()
-                                }
-                            }
-                            DBUtils.updateLight(currentLight!!)
-                            runOnUiThread {
-                                adapter?.notifyDataSetChanged()
-                            }
-                        }
-
-                        R.id.template_device_setting -> {
-                            goSetting()
-                        }
-                    }
-                }
-            }
-        }
+        adaper!!.onItemChildClickListener = onItemChildClickListener
 
         adaper!!.bindToRecyclerView(recycleView)
-        val size =/* if (directLight != null && TelinkLightApplication.getApp().connectDevice != null)
-            lightsData.size + 1
-        else*/
-                lightsData.size
+        val size = lightsData.size
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
@@ -334,62 +335,113 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
     }
+    val onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
+        if (position < lightsData.size) {
+            currentLight = lightsData[position]
+            positionCurrent = position
+            if (TelinkLightApplication.getApp().connectDevice == null) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    //ToastUtils.showLong(getString(R.string.connecting_tip))
+                    retryConnectCount = 0
+                    autoConnect()
+                }
+                sendToGw()
+            } else {
+                when (view.id) {
+                    R.id.template_device_icon -> {
+                        canBeRefresh = true
+                        openOrClose(currentLight!!)
+
+                        when (type) {
+                            Constant.INSTALL_NORMAL_LIGHT -> {
+                                currentLight!!.updateIcon()
+                            }
+
+                            Constant.INSTALL_RGB_LIGHT -> {
+                                currentLight!!.updateRgbIcon()
+                            }
+                        }
+                        DBUtils.updateLight(currentLight!!)
+                        runOnUiThread {
+                            adapter?.notifyDataSetChanged()
+                        }
+                    }
+                    R.id.template_device_card_delete -> showDeleteSingleDialog(lightsData!![position])
+                    R.id.template_device_setting -> {
+                        goSetting()
+                    }
+                }
+            }
+        }
+    }
+    private fun showDeleteSingleDialog(dbLight: DbLight) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(R.string.sure_delete_device)
+        builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+            DBUtils.deleteLight(dbLight)
+            lightsData.remove(dbLight)
+            adaper?.notifyDataSetChanged()
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+        val dialog = builder.show()
+        dialog.show()
+    }
 
     private fun sendToGw() {
         val gateWay = DBUtils.getAllGateWay()
-        if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
-                TelinkLightApplication.getApp().offLine = true
-                hideLoadingDialog()
-                t.forEach { db ->
-                    //网关在线状态，1表示在线，0表示离线
-                    if (db.state == 1)
-                        TelinkLightApplication.getApp().offLine = false
-                }
-                if (!TelinkLightApplication.getApp().offLine) {
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                        hideLoadingDialog()
-                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+        if (gateWay.size > 0)
+            GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
+                @RequiresApi(Build.VERSION_CODES.O)
+                override fun onNext(t: List<DbGateway>) {
+                    TelinkLightApplication.getApp().offLine = true
+                    hideLoadingDialog()
+                    t.forEach { db ->
+                        //网关在线状态，1表示在线，0表示离线
+                        if (db.state == 1)
+                            TelinkLightApplication.getApp().offLine = false
                     }
-                    val low = currentLight!!.meshAddr and 0xff
-                    val hight = (currentLight!!.meshAddr shr 8) and 0xff
-                    val gattBody = GwGattBody()
-                    var gattPar: ByteArray = byteArrayOf()
-                    if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
-                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                    if (!TelinkLightApplication.getApp().offLine) {
+                        disposableTimer?.dispose()
+                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                            hideLoadingDialog()
+                            runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                         }
-                    } else {
-                        if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
-                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                        val low = currentLight!!.meshAddr and 0xff
+                        val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                        val gattBody = GwGattBody()
+                        var gattPar: ByteArray = byteArrayOf()
+                        if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                    || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                        0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                            }
+                        } else {
+                            if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
+                                    || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                        0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                            }
                         }
-                    }
 
-                    val s = Base64Utils.encodeToStrings(gattPar)
-                    gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = currentLight!!.meshAddr
-                    sendToServer(gattBody)
-                } else {
+                        val s = Base64Utils.encodeToStrings(gattPar)
+                        gattBody.data = s
+                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                        gattBody.meshAddr = currentLight!!.meshAddr
+                        sendToServer(gattBody)
+                    } else {
+                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                    }
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                hideLoadingDialog()
-                ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
-        })
+            })
     }
 
     private fun sendToServer(gattBody: GwGattBody) {
@@ -1120,6 +1172,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                     )
         }
     }
+
     private fun onLogin() {
         LogUtils.d("connection success")
     }
@@ -1160,15 +1213,15 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
-        when(gwStompBean.ser_id.toInt()){
-            Constant.SER_ID_LIGHT_ON->{
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_LIGHT_ON -> {
                 LogUtils.v("zcl-----------远程控制开灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
                 lightsData[positionCurrent].updateIcon()
                 adaper?.notifyDataSetChanged()
             }
-            Constant.SER_ID_LIGHT_OFF->{
+            Constant.SER_ID_LIGHT_OFF -> {
                 LogUtils.v("zcl-----------远程控制关灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value

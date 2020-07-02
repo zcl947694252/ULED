@@ -757,22 +757,22 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-      override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-          DBUtils.lastUser?.let {
-              if (it.id.toString() == it.last_authorizer_user_id)
-                  if (currentShowPageGroup) {
-                      menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-                  } else {
-                      menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                      findItem = menu?.findItem(R.id.toolbar_f_version)
-                      findItem?.title = getString(R.string.getVsersionFail)
-                      findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
-                      findItemChangeGp?.isVisible = true
-                  }
-          }
-          LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
-         return super.onCreateOptionsMenu(menu)
-      }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)
+                if (currentShowPageGroup) {
+                    menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                } else {
+                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                    findItem = menu?.findItem(R.id.toolbar_f_version)
+                    findItem?.title = getString(R.string.getVsersionFail)
+                    findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                    findItemChangeGp?.isVisible = true
+                }
+        }
+        LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
+        return super.onCreateOptionsMenu(menu)
+    }
 
     private fun renameGroup() {
         val textGp = EditText(this)
@@ -1091,7 +1091,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             toolbar.overflowIcon = moreIcon
         }
         slow_rg_view.setOnClickListener { }
-            currentShowPageGroup = type == Constant.TYPE_GROUP
+        currentShowPageGroup = type == Constant.TYPE_GROUP
         LogUtils.v("zclmenu----------currentShowPageGroup--------$currentShowPageGroup----${DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id}")
         if (currentShowPageGroup) {
             initDataGroup()
@@ -1830,31 +1830,29 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     .subscribe(
                                             {
                                                 LogUtils.v("zcl-----恢复出厂成功")
+                                                DBUtils.deleteLight(light!!)
+                                                if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
+                                                    TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+
+                                                if (mConnectDevice != null) {
+                                                    Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+                                                    Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
+                                                    if (light?.meshAddr == mConnectDevice?.meshAddress) {
+                                                        this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+                                                    }
+                                                }
+                                                SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+                                                    override fun start() {}
+
+                                                    override fun complete() {}
+
+                                                    override fun error(msg: String?) {}
+                                                })
+                                                this.finish()
                                             }, {
+                                        ToastUtils.showShort(getString(R.string.reset_factory_fail))
                                         LogUtils.v("zcl-----恢复出厂失败")
                                     })
-
-                            DBUtils.deleteLight(light!!)
-                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
-                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                            }
-                            if (mConnectDevice != null) {
-                                Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                                Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
-                                if (light?.meshAddr == mConnectDevice?.meshAddress) {
-                                    this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                                }
-                            }
-                            SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                                override fun start() {}
-
-                                override fun complete() {}
-
-                                override fun error(msg: String?) {}
-                            })
-                            this.finish()
-
-
                         } else {
                             ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                             this.finish()

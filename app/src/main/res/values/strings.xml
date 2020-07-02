@@ -1098,4 +1098,6 @@
     <string name="delete_device_fail">Device deletion failed</string>
     <string name="delete_success">deleted successfully</string>
     <string name="edite_device">Edit equipment</string>
+    <string name="cancel_edite">Cancel the editor</string>
+    <string name="sure_delete_device">Are you sure to delete this device?</string>
 </resources>

@@ -22,16 +22,15 @@ import com.dadoutek.uled.util.DensityUtil
  */
 class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
 
+    private var isDelete: Boolean = false
+
     override fun convert(helper: BaseViewHolder, dbLight: DbLight) {
        // val groupName = helper.getView<TextView>(R.id.template_device_group_icon)
         val deviceName = helper.getView<TextView>(R.id.template_device_group_name)
         val iv = helper.getView<ImageView>(R.id.template_device_icon)
         iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
         iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
-//        if (dbLight.groupName==null||dbLight.groupName=="")
-//            groupName.visibility = View.GONE
-//        else
-//            groupName.visibility = View.VISIBLE
+
 
         if (dbLight.name==null||dbLight.name=="")
             deviceName.visibility = View.GONE
@@ -47,11 +46,16 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         }
 
         helper.setText(R.id.template_device_group_name,dbLight.name)
+        helper.setVisible(R.id.template_device_card_delete,isDelete)
         .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbLight.belongGroupId))
                 .setVisible(R.id.template_gp_name,false)
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)
+                .addOnClickListener(R.id.template_device_card_delete)
                 .setVisible(R.id.template_device_more,false)
+    }
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
     }
 }

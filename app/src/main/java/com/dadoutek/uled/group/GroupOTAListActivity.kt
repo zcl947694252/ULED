@@ -56,6 +56,8 @@ import java.util.regex.Pattern
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
+    private var deviceType: Int = 0
+    private var isGroup: Boolean = false
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var disposableScan: Disposable? = null
     private var disposableTimerResfresh: Disposable? = null
@@ -80,7 +82,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
-        loading_tansform.setOnClickListener {  }
+        loading_tansform.setOnClickListener { }
         ota_swipe_refresh_ly.setOnRefreshListener {
             loading_tansform.visibility = View.VISIBLE
             findMeshDevice(DBUtils.lastUser?.controlMeshName)
@@ -97,7 +99,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             compositeDisposable.add(disposableTimerResfresh!!)
         }
     }
-
 
     @SuppressLint("CheckResult")
     fun findMeshDevice(deviceName: String?) {
@@ -196,8 +197,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @RequiresApi(Build.VERSION_CODES.N)
     private fun initData() {
         dbGroup = (intent.getSerializableExtra("group") as DbGroup) ?: DbGroup()
+        deviceType = intent.getIntExtra("DeviceType", 0)
+        isGroup = dbGroup != null
 
-        when (dbGroup!!.deviceType.toInt()) {
+        when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 template_recycleView.adapter = lightAdaper
                 lightAdaper.bindToRecyclerView(template_recycleView)
@@ -211,13 +214,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 curtainAdaper.bindToRecyclerView(template_recycleView)
             }
         }
+
         getBin()
 
     }
 
     private fun setRelayData() {
         relayList.clear()
-        relayList.addAll(DBUtils.getConnectorByGroupID(dbGroup!!.id))
+        if (isGroup)
+            relayList.addAll(DBUtils.getConnectorByGroupID(dbGroup!!.id))
+        else
+            relayList.addAll(DBUtils.allRely)
+
         relayAdaper.onItemClickListener = onItemClickListener
         relayList.forEach {
             it.version?.let { itv ->
@@ -245,7 +253,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun setCurtainData() {
         curtainList.clear()
-        curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id))
+        if (isGroup)
+            curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id))
+        else
+            curtainList.addAll(DBUtils.allCurtain)
+
         curtainAdaper.onItemClickListener = onItemClickListener
         curtainList.forEach {
             it.version?.let { itv ->
@@ -272,7 +284,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun setLightData() {
         lightList.clear()
-        lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
+        if (isGroup)
+            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
+        else
+            lightList.addAll(DBUtils.allLight)
         lightAdaper.onItemClickListener = onItemClickListener
         supportAndUN()
         lightAdaper.notifyDataSetChanged()
