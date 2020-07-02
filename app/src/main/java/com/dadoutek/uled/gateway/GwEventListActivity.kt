@@ -64,7 +64,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_event_list.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
-import kotlinx.android.synthetic.main.popwindow_choose_time.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -72,7 +71,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.toast
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -87,6 +85,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener, EventListener<String> {
+    private var fiOta: MenuItem? = null
     private var downloadDispoable: Disposable? = null
     private var fiVersion: MenuItem? = null
     private var fiDelete: MenuItem? = null
@@ -179,8 +178,12 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
                 fiFactoryReset = menu?.findItem(R.id.toolbar_fv_rest)
                 fiDelete = menu?.findItem(R.id.toolbar_f_delete)
-                fiFactoryReset?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
+                fiOta = menu?.findItem(R.id.toolbar_f_ota)
+
+                fiOta?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
                 fiDelete?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
+                fiChangeGp?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
+                fiFactoryReset?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
 
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 if (TextUtils.isEmpty(dbGw?.version))
@@ -541,17 +544,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         toolbarTv.text = dbGw?.name
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
-            val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
-                    { s: String ->
+            val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
                         bottom_version_number.text = s
                         if (TextUtils.isEmpty(dbGw?.version))
                             dbGw?.version = getString(R.string.number_no)
                         dbGw!!.version = s
                         fiVersion?.title = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, false)
-                    }, {
-                ToastUtils.showLong(getString(R.string.get_version_fail))
-            })
+                    }, {})
         }
         bottom_version_number.text = dbGw?.version
 
@@ -1054,7 +1054,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
             override fun loginFail() {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                retryConnect()
+               // retryConnect()
             }
 
             override fun setGwComplete(deviceInfo: DeviceInfo) {

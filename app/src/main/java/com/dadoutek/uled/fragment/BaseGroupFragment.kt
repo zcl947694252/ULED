@@ -34,6 +34,7 @@ import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -356,9 +357,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                             gattBody.ser_id = Constant.SER_ID_GROUP_OFF
                         }
 
-                        val encoder = Base64.getEncoder()
-                        val s = encoder.encodeToString(gattPar)
-                        gattBody.data = s
+                        //val encoder = Base64.getEncoder()
+                       // val s = encoder.encodeToString(gattPar)
+                        gattBody.data = Base64Utils.encodeToStrings(gattPar)
                         gattBody.cmd = Constant.CMD_MQTT_CONTROL
                         gattBody.meshAddr = currentGroup!!.meshAddr
                         sendToServer(gattBody)

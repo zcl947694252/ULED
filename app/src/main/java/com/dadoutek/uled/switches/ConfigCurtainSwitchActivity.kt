@@ -78,6 +78,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         return toolbar
     }
 
+    override fun setReConfig(): Boolean {
+        return reReConfig
+    }
+
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
@@ -122,7 +126,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         }
         groupName = intent.getStringExtra("group")
         reReConfig = groupName != null && groupName == "true"
-        fiRename?.isVisible = reReConfig
+
         if (reReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }

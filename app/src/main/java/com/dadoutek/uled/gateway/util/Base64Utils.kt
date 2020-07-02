@@ -1,9 +1,10 @@
 package com.dadoutek.uled.gateway.util
 
 import android.os.Build
+import android.util.Base64.*
 import androidx.annotation.RequiresApi
-import java.io.UnsupportedEncodingException
-import java.lang.UnsupportedOperationException
+import java.io.*
+import java.lang.Byte.decode
 import java.util.*
 
 

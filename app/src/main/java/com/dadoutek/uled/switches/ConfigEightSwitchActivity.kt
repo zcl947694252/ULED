@@ -688,6 +688,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         return toolbar
     }
 
+    override fun setReConfig(): Boolean {
+        return isReConfim
+    }
+
     override fun initListener() {
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         img_function1.setOnClickListener {

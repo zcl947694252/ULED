@@ -36,6 +36,7 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -54,10 +55,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
+    private  var mSwitchList: ArrayList<String>  = ArrayList()
+    private  var mSceneList: ArrayList<DbScene> = ArrayList()
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mAdapter: SwitchSceneGroupAdapter
-    private lateinit var mSwitchList: ArrayList<String>
-    private lateinit var mSceneList: List<DbScene>
     private var mConfigFailSnackbar: Snackbar? = null
     private var groupName: String? = null
     private var switchDate: DbSwitch? = null
@@ -89,12 +90,11 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
 
 
-        mSwitchList = ArrayList()
+        mSwitchList.clear()
         mSwitchList.add(getString(R.string.button1))
         mSwitchList.add(getString(R.string.button2))
         mSwitchList.add(getString(R.string.button3))
         mSwitchList.add(getString(R.string.button4))
-        mSceneList = DBUtils.sceneAll
     }
 
     override fun initListener() {
@@ -113,9 +113,14 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
       return  toolbar
     }
 
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
     override fun initView() {
         toolbarTv?.text = getString(R.string.scene_set)
-
+        mSceneList.clear()
+        mSceneList.addAll(DBUtils.sceneAll)
         makePop()
         if (mSceneList.isEmpty()) {
             scene_use_botton.visibility = View.GONE

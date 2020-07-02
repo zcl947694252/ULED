@@ -65,6 +65,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         return  toolbar
     }
 
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
     override fun setVersion() {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)

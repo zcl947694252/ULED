@@ -43,7 +43,6 @@ import com.telink.util.EventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
@@ -221,17 +220,22 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
 
             if (!TelinkLightApplication.Companion.getApp().isConnectGwBle()) {
                 sendTimeTimerDelay(tasks, 6500L);
-                labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0,
-                        Opcode.CONFIG_GW_TIMER_LABLE_TIME, 0x11, 0x02,
+                labHeadPar = new byte[]{0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_TIMER_LABLE_TIME, 0x11, 0x02,
                         (byte) (gwTagBean.getTagId() & 0xff), (byte) (tasks.getIndex() & 0xff),
                         (byte) (tasks.getStartHour() & 0xff), (byte) (tasks.getStartMins() & 0xff),
                         (byte) (tasks.getSceneId() & 0xff), 0, 0, 0, 0, 0};
 
                 LogUtils.v("zcl-----------发送到服务器定时时间task-------"+labHeadPar);
-                Base64.Encoder encoder = Base64.getEncoder();
-                String s = encoder.encodeToString(labHeadPar);
-                GwGattBody gattBody = new GwGattBody();
-                gattBody.setData(s);
+                    GwGattBody gattBody = new GwGattBody();
+
+                try{
+                    Base64.Encoder encoder = Base64.getEncoder();
+                    String s = encoder.encodeToString(labHeadPar);
+                    gattBody.setData(s);
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 gattBody.setSer_id(Constant.GW_GATT_SAVE_TIMER_TASK_TIME);
                 gattBody.setMacAddr(gwTagBean.getMacAddr());
                 sendToServer(gattBody);

@@ -115,14 +115,19 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
                 fiOta = menu?.findItem(R.id.toolbar_f_ota)
                 fiFactoryReset = menu?.findItem(R.id.toolbar_fv_rest)
-                fiOta = menu?.findItem(R.id.toolbar_f_ota)
                 fiDelete = menu?.findItem(R.id.toolbar_f_delete)
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 setVersion()
+                val reConfig = setReConfig()
+                fiRename?.isVisible = reConfig
+                fiOta?.isVisible = reConfig
+                fiDelete?.isVisible = reConfig
             }
         }
         return super.onCreateOptionsMenu(menu)
     }
+
+    abstract fun setReConfig(): Boolean
 
     abstract fun setVersion()
 
@@ -201,8 +206,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                         }, {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.delete_device_fail))
-                                }
-                                )
+                                })
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)

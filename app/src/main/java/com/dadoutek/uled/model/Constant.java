@@ -132,6 +132,8 @@ public class Constant implements Serializable {
 
     //用户信息
     public static String UPDATE_FILE_ADRESS = "UPDATE_FILE_ADRESS";
+    //版本信息名
+    public static String UPDATE_FILE_NAME = "UPDATE_FILE_NAME";
 
     //用于标记数据库改变增加
     public static final String DB_ADD = "DB_ADD";

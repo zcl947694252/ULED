@@ -99,17 +99,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var testId: DbGroup? = null
     private var mApplication: TelinkLightApplication? = null
     private var mRxPermission: RxPermissions? = null
-
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
-
     //分组所含灯的缓存
     private var nowDeviceList: MutableList<ScannedDeviceItem> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var grouping: Boolean = false
     private var isFirtst = true
     private var lastMyRegion = lastRegion
-
     //标记登录状态
     private lateinit var groupsRecyclerViewAdapter: GroupsRecyclerViewAdapter
     private var groups: MutableList<DbGroup> = ArrayList()
@@ -1108,10 +1105,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 imageView?.setImageResource(R.drawable.icon_checkbox_unselected)
 
             deviceName?.text = item?.name
-            if (mAddDeviceType == DeviceType.GATE_WAY)
-                icon?.setImageResource(R.drawable.icon_gw_open)
-            else
-                icon?.setImageResource(R.drawable.icon_device_open)
+            when (mAddDeviceType) {
+                DeviceType.GATE_WAY -> icon?.setImageResource(R.drawable.icon_gw_small)
+                DeviceType.LIGHT_RGB -> icon?.setImageResource(R.drawable.icon_rgb_n)
+                DeviceType.SMART_RELAY -> icon?.setImageResource(R.drawable.icon_acceptor_s)
+                DeviceType.SMART_CURTAIN -> icon?.setImageResource(R.drawable.icon_curtain_s)
+                DeviceType.LIGHT_NORMAL,DeviceType.LIGHT_NORMAL_OLD -> icon?.setImageResource(R.drawable.icon_light_n)
+            }
+
 
             if (item?.hasGroup == true) {
                 icon?.visibility = View.VISIBLE

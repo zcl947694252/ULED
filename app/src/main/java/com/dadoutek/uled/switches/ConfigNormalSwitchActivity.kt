@@ -77,6 +77,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     override fun setToolBar(): Toolbar {
         return toolbar
     }
+
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
     override fun initView() {
         toolbar?.title = getString(R.string.select_group)
         makePop()

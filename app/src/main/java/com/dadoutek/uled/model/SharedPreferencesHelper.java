@@ -22,24 +22,28 @@ public class SharedPreferencesHelper {
     private static final String KEY_MESH_PASSWORD = "com.telink.bluetooth.light.mesh_password";
 
     public static String getMeshName(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
         return sharedPreferences.getString(KEY_MESH_NAME, null);
     }
 
     public static String getMeshPassword(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
         return sharedPreferences.getString(KEY_MESH_PASSWORD, null);
     }
 
     public static void saveMeshName(Context context, String name) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_MESH_NAME, name)
                 .apply();
     }
 
     public static void saveMeshPassword(Context context, String pwd) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_MESH_PASSWORD, pwd)
                 .apply();
@@ -151,11 +155,11 @@ public class SharedPreferencesHelper {
             baos.close();
             oos.close();
         } catch (IOException e) {
-// TODO Auto-generated catch block
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         SharedPreferences.Editor editor = share.edit();
-// 将编码后的字符串写到base64.xml文件中
+        // 将编码后的字符串写到base64.xml文件中
         editor.putString(key, objectStr);
         return editor.commit();
     }
@@ -165,17 +169,18 @@ public class SharedPreferencesHelper {
                 .getDefaultSharedPreferences(context);
         try {
             String wordBase64 = sharePre.getString(key, "");
-// 将base64格式字符串还原成byte数组
-            if (wordBase64 == null || wordBase64.equals("")) { // 不可少，否则在下面会报java.io.StreamCorruptedException
+            // 将base64格式字符串还原成byte数组
+            if (wordBase64 == null || wordBase64.equals("")) { // 不可少，否则在下面会报java.io
+                // .StreamCorruptedException
                 return null;
             }
-            byte[] objBytes = Base64.decode(wordBase64.getBytes(),
-                    Base64.DEFAULT);
+            byte[] objBytes = Base64.decode(wordBase64.getBytes(), Base64.DEFAULT);
             ByteArrayInputStream bais = new ByteArrayInputStream(objBytes);
             ObjectInputStream ois = new ObjectInputStream(bais);
-// 将byte数组转换成product对象
+            // 将byte数组转换成product对象
             Object obj = ois.readObject();
             bais.close();
+
             ois.close();
             return obj;
         } catch (Exception e) {

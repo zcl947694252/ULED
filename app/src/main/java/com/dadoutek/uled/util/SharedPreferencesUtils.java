@@ -99,6 +99,15 @@ public class SharedPreferencesUtils {
         return SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
                 Constant.USER_INFO, "");
     }
+    public static void saveUpdateVersionName(String name) {
+        SharedPreferencesHelper.putString(TelinkLightApplication.Companion.getApp(),
+                Constant.UPDATE_FILE_NAME, name);
+    }
+
+    public static String getUpdateVersionName() {
+        return SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
+                Constant.UPDATE_FILE_NAME, "");
+    }
 
     public static void saveUpdateFilePath(String path) {
         SharedPreferencesHelper.putString(TelinkLightApplication.Companion.getApp(),

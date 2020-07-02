@@ -61,7 +61,8 @@ public class OtaPrepareUtils {
                 JSONObject jsonObject=new JSONObject((Map) s);
                 try {
                     String data=jsonObject.getString("url");
-                    localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(data, 2);
+                    String name=jsonObject.getString("name");
+                    localPath = context.getFilesDir()+ "/" +name /*StringUtils.versionResolutionURL(data, 2)*/;
                     LogUtils.e("zcl版本升级localPath-----------"+localVersion);
                     compareServerVersion(data, otaPrepareListner, context);
                 } catch (JSONException e) {
@@ -91,6 +92,7 @@ public class OtaPrepareUtils {
                 File file = new File(localPath);
                 if (file.exists()) {
                     SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    SharedPreferencesUtils.saveUpdateVersionName(localPath);
                     otaPrepareListner.downLoadFileSuccess();
                 } else {
 //                    otaPrepareListner.getVersionSuccess("");

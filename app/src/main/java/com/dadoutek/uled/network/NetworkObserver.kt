@@ -17,8 +17,8 @@ abstract class NetworkObserver<T> : Observer<T> {
     }
 
     override fun onError(e: Throwable) {
-        if ((e.message ?: "").contains("Null is not a valid element") || (e.message
-                        ?: "").contains("The mapper function returned a null value.")||TextUtils.isEmpty(e.message ?: ""))
+        if ((e.message ?: "").contains("Null is not a valid element") ||
+                (e.message ?: "").contains("The mapper function returned a null value.")||TextUtils.isEmpty(e.message ?: ""))
             return
 
         Log.e("zcl", "zcl_NetworkObserver******onError${e.localizedMessage}")

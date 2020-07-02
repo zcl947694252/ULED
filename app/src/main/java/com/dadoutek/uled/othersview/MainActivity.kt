@@ -156,11 +156,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener {
-            val encoder = Base64.getEncoder().encodeToString(byteArrayOf(0,1,0,1,0,1))
-            val encodeToStrings = Base64Utils.encodeToStrings(byteArrayOf(0, 1, 0, 1, 0, 1))
-            LogUtils.v("zcl-------$encoder-----------$encoder---8888")
-        }
+        main_toast.setOnClickListener {}
         initBottomNavigation()
         checkVersionAvailable()
         getRegionList()
