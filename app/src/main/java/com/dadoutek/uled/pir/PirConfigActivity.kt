@@ -633,16 +633,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun sendCommandOpcode(durationTime: Int) {
         if (isGroupMode) {
-            //组地址选择功能
-            val paramsSetGroup = byteArrayOf(0x24, 2, 0, 0, 0, 0, 0, 0, 0)//1关闭 最多支持七个
-            for (i in 0 until showGroupList.size) {
-                val lowAdd = showGroupList[i].groupAddress and 0xff
-                paramsSetGroup[i + 2] = lowAdd.toByte()
-            }
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
-
-            Thread.sleep(200)
-
             // 11固定1 12-13保留 14 持续时间 15最终亮度(自定义亮度)
             // 16触发照度(条件 全天) 17触发设置 最低位，0是开，1是关，次低位 1是分钟，0是秒钟
             // 例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
@@ -651,6 +641,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(),
                     triggerKey.toByte(), triggerSet.toByte(), 0)
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetSHow)
+
+            Thread.sleep(200)
+
+            //组地址选择功能
+            val paramsSetGroup = byteArrayOf(0x24, 2, 0, 0, 0, 0, 0, 0, 0)//1关闭 最多支持七个
+            for (i in 0 until showGroupList.size) {
+                val lowAdd = showGroupList[i].groupAddress and 0xff
+                paramsSetGroup[i + 2] = lowAdd.toByte()
+            }
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetGroup)
+
         } else {
             //11位固定为3。 12位的时间是纯数字时间，如果定时60分钟，就发送60 13场景ID 14 持续时间单位1是分钟，0是秒 15触发条件
             //4、 触发照度：0是任意，1是白天，2是黑夜

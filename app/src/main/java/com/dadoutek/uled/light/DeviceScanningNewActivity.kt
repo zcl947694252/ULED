@@ -1113,7 +1113,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 DeviceType.LIGHT_NORMAL,DeviceType.LIGHT_NORMAL_OLD -> icon?.setImageResource(R.drawable.icon_light_n)
             }
 
-
             if (item?.hasGroup == true) {
                 icon?.visibility = View.VISIBLE
                 imageView?.visibility = View.VISIBLE
