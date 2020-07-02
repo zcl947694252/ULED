@@ -1097,4 +1097,5 @@
     <string name="get_version_success">This version does not support OTA capture of device version success</string>
     <string name="delete_device_fail">Device deletion failed</string>
     <string name="delete_success">deleted successfully</string>
+    <string name="edite_device">Edit equipment</string>
 </resources>

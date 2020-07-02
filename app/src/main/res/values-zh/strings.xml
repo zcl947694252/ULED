@@ -1018,5 +1018,6 @@
     <string name="get_version_success">获取设备版本成功</string>
     <string name="delete_device_fail">删除设备失败</string>
     <string name="delete_success">删除成功</string>
+    <string name="edite_device">编辑设备</string>
 
 </resources>

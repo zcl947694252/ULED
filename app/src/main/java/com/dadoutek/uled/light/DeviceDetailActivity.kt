@@ -13,10 +13,7 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -77,6 +74,9 @@ import kotlin.collections.ArrayList
  */
 
 class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
+    private var deleteDevice: MenuItem? = null
+    private var onlineUpdate: MenuItem? = null
+    private var batchGp: MenuItem? = null
     private var disposableTimer: Disposable? = null
     private lateinit var allLightData: ArrayList<DbLight>
     private var directLight: DbLight? = null
@@ -120,7 +120,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        inflater = this.layoutInflater
         initData()
         initView()
         initToolbar()
@@ -133,6 +132,37 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private fun initToolbar() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.toolbar_delete_group->skipBatch()
+                R.id.toolbar_rename_group->goOta()
+                R.id.toolbar_delete_device->editeDevice()
+            }
+            true
+        }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun editeDevice() {
+
+    }
+
+    private fun goOta() {
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_rgb_group_setting,menu)
+         batchGp = menu?.findItem(R.id.toolbar_delete_group)
+         onlineUpdate = menu?.findItem(R.id.toolbar_rename_group)
+        deleteDevice = menu?.findItem(R.id.toolbar_delete_device)
+
+        batchGp?.title = getString(R.string.batch_group)
+        onlineUpdate?.title = getString(R.string.online_upgrade)
+        deleteDevice?.title = getString(R.string.edite_device)
+
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -801,18 +831,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         var batchGroup = changeHaveDeviceView()
                         batchGroup?.setOnClickListener {
                             //val intent = Intent(this, RgbBatchGroupActivity::class.java)
-                            val lastUser = DBUtils.lastUser
-                            lastUser?.let {
-                                if (it.id.toString() != it.last_authorizer_user_id)
-                                    ToastUtils.showLong(getString(R.string.author_region_warm))
-                                else {
-                                    if (dialog_device?.visibility == View.GONE) {
-                                        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                                        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                                        startActivity(intent)
-                                    }
-                                }
-                            }
+                            skipBatch()
                         }
                     } else {
                         changeNoDeviceView()
@@ -916,6 +935,21 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun skipBatch() {
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showLong(getString(R.string.author_region_warm))
+            else {
+                if (dialog_device?.visibility == View.GONE) {
+                    val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                    startActivity(intent)
+                }
+            }
+        }
+    }
+
 
     private fun changeHaveDeviceView(): TextView? {
         toolbar!!.tv_function1.visibility = View.VISIBLE
@@ -924,7 +958,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         batchGroup.setText(R.string.batch_group)
-        batchGroup.visibility = View.VISIBLE
+        batchGroup.visibility = View.GONE
         return batchGroup
     }
 
