@@ -56,7 +56,6 @@ import org.json.JSONObject
 
 
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
-    private var findItem: MenuItem? = null
     private var isReConfim: Boolean = false
     private lateinit var listKeysBean: JSONArray
     private var newMeshAddr: Int = 0
@@ -85,7 +84,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-
+        setVersion()
         groupName = intent.getStringExtra("group")
         // eight_switch_mode.visibility = View.GONE
         // eight_switch_config.visibility = View.GONE
@@ -680,12 +679,13 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     override fun initView() {
         toolbarTv!!.setText(R.string.eight_switch)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        toolbar.setNavigationOnClickListener { finishAc() }
         img_function1.visibility = View.VISIBLE
         img_function1.setImageResource(R.drawable.icon_more)
+        toolbar.setNavigationOnClickListener { finishAc() }
         makePop()
+    }
+    override fun setToolBar(): android.support.v7.widget.Toolbar {
+        return toolbar
     }
 
     override fun initListener() {

@@ -4,15 +4,20 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -83,6 +88,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initViewType() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        toolbar.setNavigationOnClickListener { finish() }
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
         this.type = this.intent.extras!!.getString(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
@@ -92,10 +107,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     else -> toolbarTv.text = curtainGroup?.name
                 }
             }
-            initToolGroupBar()
+
         } else {
             currentShowGroupSetPage = false
-            initToolbar()
             initMeshDresData()
             getVersion()
         }
@@ -129,14 +143,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun initToolGroupBar() {
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-    }
 
     private fun initMeshDresData() {
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
@@ -395,17 +401,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
-
-
-    private fun initToolbar() {
-        toolbarTv.text = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

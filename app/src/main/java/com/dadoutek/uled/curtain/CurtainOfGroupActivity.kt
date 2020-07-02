@@ -4,9 +4,11 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.GridLayoutManager
@@ -175,9 +177,16 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
     private fun initToolbar() {
-        toolbar.setTitle(R.string.group_setting_header)
+        toolbarTv.setText(R.string.group_setting_header)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
     }
 
 

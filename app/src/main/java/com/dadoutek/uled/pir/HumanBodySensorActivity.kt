@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -30,7 +32,6 @@ import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -54,12 +55,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
-import kotlinx.android.synthetic.main.huuman_body_sensor.human_progress_tv
-import kotlinx.android.synthetic.main.huuman_body_sensor.recyclerView_select_group_list_view
-import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_root
-import kotlinx.android.synthetic.main.huuman_body_sensor.sensor_three
-import kotlinx.android.synthetic.main.huuman_body_sensor.trigger_time_text
-import kotlinx.android.synthetic.main.huuman_body_sensor.tvPSVersion
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -392,7 +387,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.human_body)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
         toolbar.setNavigationOnClickListener {
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE

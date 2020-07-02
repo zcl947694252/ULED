@@ -56,9 +56,9 @@ class SyncDataPutOrGetUtils {
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
                     data?.let {
-                    var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
-                    observable?.let { observableList.add(it) }
+                        var observable: Observable<String>? = this.sendDataToServer(data.tableName,
+                                data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
+                        observable?.let { observableList.add(it) }
                     }
                 }
 
@@ -118,22 +118,22 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_GATEWAY" -> {
                         when (type) {
-                         /*   Constant.DB_ADD -> {
-                                val gw = DBUtils.getGatewayByID(changeId)
-                                return gw?.let { GwModel.add(it) }
-                            }*/
+                            /*   Constant.DB_ADD -> {
+                                   val gw = DBUtils.getGatewayByID(changeId)
+                                   return gw?.let { GwModel.add(it) }
+                               }*/
                             Constant.DB_DELETE -> {
                                 val list = arrayListOf(changeId.toInt())
                                 val gattBody = GwGattBody()
                                 gattBody.idList = list
                                 return GwModel.deleteGwList(gattBody)
                             }
-                           /* Constant.DB_UPDATE -> {
-                                val gw = DBUtils.getGatewayByID(changeId)
-                                gw?.let {
-                                    return GwModel.add(gw)
-                                }
-                            }*/
+                            /* Constant.DB_UPDATE -> {
+                                 val gw = DBUtils.getGatewayByID(changeId)
+                                 gw?.let {
+                                     return GwModel.add(gw)
+                                 }
+                             }*/
                         }
                     }
                     "DB_LIGHT" -> {
@@ -519,21 +519,21 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
-                    {
-                        //登录后同步数据完成再上传一次数据
-                        syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
-                        SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                            {
+                                //登录后同步数据完成再上传一次数据
+                                syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
+                                SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    syncCallBack.complete()
+                                }
+                            }, {
                         GlobalScope.launch(Dispatchers.Main) {
-                            syncCallBack.complete()
+                            it ?: return@launch
+                            syncCallBack.error(it.message ?: "")
+                            ToastUtils.showLong(it.message ?: "")
                         }
-                    }, {
-                GlobalScope.launch(Dispatchers.Main) {
-                    it ?: return@launch
-                    syncCallBack.error(it.message ?: "")
-                    ToastUtils.showLong(it.message ?: "")
-                }
-            }
-            )
+                    }
+                    )
         }
 
 

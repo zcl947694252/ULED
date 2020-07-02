@@ -13,6 +13,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Gravity
@@ -947,7 +948,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
-                    if (s.contains("NPR"))
+                    if (s.contains("NPR")||TextUtils.isEmpty(s))
                         startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                     else
                         startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)

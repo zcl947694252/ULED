@@ -16,6 +16,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toolbar
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
@@ -73,6 +74,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var isGlassSwitch = false
     private var groupName: String? = null
     private var switchDate: DbSwitch? = null
+    override fun setToolBar(): android.support.v7.widget.Toolbar {
+        return toolbar
+    }
+
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
@@ -106,6 +111,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
 

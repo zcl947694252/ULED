@@ -4,10 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
@@ -349,7 +346,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         type = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
@@ -919,14 +922,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun initToolbar() {
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
-
     }
 
     private fun initToolbarGroup() {
         toolbarTv.text = getString(R.string.select_group)
-        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 

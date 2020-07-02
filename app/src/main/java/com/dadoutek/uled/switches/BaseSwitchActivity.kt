@@ -12,7 +12,9 @@ package com.dadoutek.uled.switches
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -20,7 +22,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -72,10 +73,28 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         setContentView(setLayoutId())
         mApp = application as TelinkLightApplication
         makePopuwindow()
+        initToolbar()
         initView()
         initData()
+        setVersion()
         initListener()
     }
+
+    private fun initToolbar() {
+        var toolbar = setToolBar()
+
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    abstract fun setToolBar():Toolbar
 
     private fun makePopuwindow() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)

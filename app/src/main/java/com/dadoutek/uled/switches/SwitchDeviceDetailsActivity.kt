@@ -144,23 +144,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
             }
             reConfig.setOnClickListener {
-                if (isRightPos()) return@setOnClickListener
-
-                if (currentSwitch != null) {
-                    TelinkLightService.Instance()?.idleMode(true)
-                    showLoadingDialog(getString(R.string.connecting))
-                    connect(macAddress = currentLight?.macAddr, retryTimes = 1)
-                            ?.subscribe(
-                                    {
-                                        onLogin(it)//判断进入那个开关设置界面
-                                        LogUtils.d("login success")
-                                    }, {
-                                        hideLoadingDialog()
-                                        LogUtils.d(it)
-                                    }
-                            )
-                }else
-                    LogUtils.d("currentSwitch = $currentSwitch")
+                goConfig()
 
             }
             ota.setOnClickListener {
@@ -213,6 +197,23 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                         .show()
             }
         }
+    }
+
+    private fun goConfig() {
+        if (isRightPos()) return
+        if (currentSwitch != null) {
+            TelinkLightService.Instance()?.idleMode(true)
+            showLoadingDialog(getString(R.string.connecting))
+            val subscribe = connect(macAddress = currentLight?.macAddr, retryTimes = 1)
+                    ?.subscribe({
+                        onLogin(it)//判断进入那个开关设置界面
+                        LogUtils.d("login success")
+                    }, {
+                        hideLoadingDialog()
+                        LogUtils.d(it)
+                    })
+        } else
+            LogUtils.d("currentSwitch = $currentSwitch")
     }
 
     private fun isRightPos(): Boolean {
@@ -374,7 +375,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
                     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
-                    popupWindow?.showAsDropDown(set,40, -15)
+                    //popupWindow?.showAsDropDown(set,40, -15)
+                    goConfig()
                 }
             }
         }

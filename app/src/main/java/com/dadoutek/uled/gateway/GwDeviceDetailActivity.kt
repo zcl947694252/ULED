@@ -240,7 +240,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         installDialog?.show()
     }
 
-    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
@@ -315,9 +315,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
         installTipQuestion.text = describe
         installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
-        installDialog = android.app.AlertDialog.Builder(this)
-                .setView(view)
-                .create()
+        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
+
         installDialog?.show()
     }
 
@@ -425,12 +424,13 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 if (it.id.toString() != it.last_authorizer_user_id)
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
-                    val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
+                    connectGw(0)
+               /*     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
                     popupWindow.dismiss()
-                    popVersion?.text = getString(R.string.firmware_version)+currentGw?.version
+                    popVersion?.text = getString(R.string.firmware_version) + currentGw?.version
                     popVersion?.visibility = View.VISIBLE
                     popupWindow.showAsDropDown(set)
-                    LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")
+                    LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")*/
                 }
             }
         } else if (view.id == R.id.template_device_icon) {
@@ -476,7 +476,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                 LogUtils.v("zcl-----------发送到服务器开关网关-------$labHeadPar")
-                val s =  Base64Utils.encodeToStrings(labHeadPar)
+                val s = Base64Utils.encodeToStrings(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
                 gattBody.ser_id = GW_GATT_SWITCH
@@ -827,6 +827,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
         }
     }
+
     private fun deleteGwData(restSuccess: Boolean = false) {
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentGw!!.meshAddr))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -933,13 +934,11 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (dialog_relay?.visibility == View.GONE) {
+                    else
+                        if (dialog_relay?.visibility == View.GONE)
                             showPopupMenu()
-                        } else {
+                        else
                             hidePopupMenu()
-                        }
-                    }
                 }
             }
             gateWayDataList.addAll(allDeviceData)
@@ -952,14 +951,10 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (dialog_relay?.visibility == View.GONE) {
-                            showPopupMenu()
-                        } else {
-                            hidePopupMenu()
-                        }
+                    when {
+                        it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                        dialog_relay?.visibility == View.GONE -> showPopupMenu()
+                        else -> hidePopupMenu()
                     }
                 }
             }

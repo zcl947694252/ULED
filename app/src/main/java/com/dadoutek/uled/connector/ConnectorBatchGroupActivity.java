@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -1049,10 +1052,17 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         } else {
             toolbar.setTitle(R.string.batch_group);
         }
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
         toolbar.setOnMenuItemClickListener(this);
         toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbar.setNavigationOnClickListener(v -> finish());
+        Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.getContext(), R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.setOverflowIcon(moreIcon);
+        }
 //        toolbar.setTitle(R.string.batch_group);
 //        setSupportActionBar(toolbar);
 //        ActionBar actionBar = getSupportActionBar();

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -60,6 +61,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
+    override fun setToolBar(): Toolbar {
+        return  toolbar
+    }
+
     override fun setVersion() {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
@@ -259,9 +264,6 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
 
     override  fun initListener() {
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)
@@ -323,9 +325,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
         toolbarTv.text = getString(R.string.double_switch)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+
         makePop()
     }
 

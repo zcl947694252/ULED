@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
@@ -73,11 +74,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         return R.layout.activity_switch_group
     }
 
+    override fun setToolBar(): Toolbar {
+        return toolbar
+    }
     override fun initView() {
         toolbar?.title = getString(R.string.select_group)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         makePop()
     }
 

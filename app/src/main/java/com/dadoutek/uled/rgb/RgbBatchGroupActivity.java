@@ -3,8 +3,11 @@ package com.dadoutek.uled.rgb;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -1051,8 +1054,15 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
         toolbar.setOnMenuItemClickListener(this);
         toolbarTv.setText(groupLight);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbar.setNavigationOnClickListener(v -> finish());
+        Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.getContext(), R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.setOverflowIcon(moreIcon);
+        }
     }
 
     @Override

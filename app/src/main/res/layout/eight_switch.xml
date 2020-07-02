@@ -209,8 +209,5 @@
             android:textColor="@color/white"
             android:textSize="18sp" />
 
-    <include layout="@layout/bottom_version_ly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+    <include layout="@layout/bottom_version_ly" />
 </LinearLayout>

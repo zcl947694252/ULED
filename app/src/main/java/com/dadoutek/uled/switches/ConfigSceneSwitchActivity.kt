@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -108,11 +109,13 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         mApp?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
+    override fun setToolBar(): Toolbar {
+      return  toolbar
+    }
+
     override fun initView() {
         toolbarTv?.text = getString(R.string.scene_set)
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+
         makePop()
         if (mSceneList.isEmpty()) {
             scene_use_botton.visibility = View.GONE
@@ -160,6 +163,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             }
         }
     }
+
+
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)

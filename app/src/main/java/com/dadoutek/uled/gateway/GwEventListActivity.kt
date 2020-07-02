@@ -6,8 +6,10 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
@@ -79,8 +81,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 创建者     ZCL
  * 创建时间   2020/3/3 14:46
- * 描述 等待老谭联调
- *  todo 修改时间段的发送到服务器 一次发送400字节 拼接到一起的
+ * 描述
  * 更新者     $
  * 更新时间   $
  * 更新描述
@@ -121,17 +122,52 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         menuItem.setBackgroundColor(getColor(R.color.red))
         menuItem.setText(R.string.delete)
 
+        menuItem
+
         rightMenu.addMenuItem(menuItem)//添加进右侧菜单
     }
 
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.icon_return)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.overflowIcon = moreIcon;
+        }
+        toolbar.setOnClickListener { renameGw() }
+
+
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
         add_group_btn_tv.text = getString(R.string.add_timing_label)
+    }
+
+    private fun renameGw() {
+        val textGp = EditText(this)
+        StringUtils.initEditTextFilter(textGp)
+        val s = dbGw?.name ?: ""
+        textGp.setText(s)
+        textGp.setSelection(s.length)
+        AlertDialog.Builder(this)
+                .setTitle(getString(R.string.update_name))
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(textGp)
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showLong(getString(R.string.rename_tip_check))
+                    } else {
+                        val trim = textGp.text.toString().trim { it <= ' ' }
+                        dbGw?.name = trim
+                        toolbarTv.text = trim
+                        DBUtils.saveGateWay(dbGw!!, false)
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -147,10 +183,18 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 fiDelete?.isVisible = TelinkLightApplication.getApp().isConnectGwBle
 
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                if (TextUtils.isEmpty(dbGw?.version))
+                    dbGw?.version = getString(R.string.number_no)
                 fiVersion?.title = dbGw?.version
             }
         }
+        LogUtils.v("zcl------onCreateOptionsMenu------------${dbGw?.version}")
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onMenuOpened(featureId: Int, menu: Menu?): Boolean {
+       fiVersion?.title = dbGw?.version
+        return super.onMenuOpened(featureId, menu)
     }
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
@@ -179,6 +223,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     @SuppressLint("CheckResult")
     private fun goOta() {
+        showLoadingDialog(getString(R.string.please_wait))
         if (TelinkApplication.getInstance().connectDevice != null) {
             downloadDispoable = Commander.getDeviceVersion(dbGw!!.meshAddr)
                     .subscribe(
@@ -349,7 +394,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         SharedPreferencesHelper.putBoolean(this, IS_GW_CONFIG_WIFI, true)
         intent.putExtra("data", dbGw)
         startActivity(intent)
-
     }
 
     private fun makePopuwindow() {
@@ -499,12 +543,13 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
             val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe(
                     { s: String ->
+                        bottom_version_number.text = s
+                        if (TextUtils.isEmpty(dbGw?.version))
+                            dbGw?.version = getString(R.string.number_no)
                         dbGw!!.version = s
-                        //bottom_version_number.text = dbGw?.version
                         fiVersion?.title = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, false)
                     }, {
-
                 ToastUtils.showLong(getString(R.string.get_version_fail))
             })
         }
@@ -592,32 +637,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun initListener() {
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-        toolbar.setOnClickListener {
-            val textGp = EditText(this)
-            StringUtils.initEditTextFilter(textGp)
-            val s = dbGw?.name ?: ""
-            textGp.setText(s)
-            textGp.setSelection(s.length)
-            AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.update_name))
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .setView(textGp)
-                    .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showLong(getString(R.string.rename_tip_check))
-                        } else {
-                            val trim = textGp.text.toString().trim { it <= ' ' }
-                            dbGw?.name = trim
-                            toolbarTv.text = trim
-                            DBUtils.saveGateWay(dbGw!!, false)
-                        }
-                    }
-                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
-        }
-
         add_group_btn?.setOnClickListener { addNewTag() }
 
         event_timer_mode.setOnClickListener {

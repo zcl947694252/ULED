@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -292,7 +295,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     //处理扫描成功后
     private void scanSuccess() {
-        toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
+        toolbarTv.setText(getString(R.string.title_scanned_device_num, adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -630,6 +633,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void changeGroupView() {
         grouping = true;
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setOnMenuItemClickListener(this);
         deviceListView.setOnItemClickListener(this);
         deviceListView.setAdapter(adapter);
@@ -1044,6 +1049,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         toolbar.setOnMenuItemClickListener(this);
         toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbar.setNavigationOnClickListener(v -> finish());
+        Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.getContext(), R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.setOverflowIcon(moreIcon);
+        }
         if (lightType.equals("cw_light")) {
             toolbarTv.setText(getString(R.string.activity_device_grouping));
         } else {

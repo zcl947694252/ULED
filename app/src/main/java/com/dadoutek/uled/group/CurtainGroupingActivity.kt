@@ -2,9 +2,11 @@ package com.dadoutek.uled.group
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
@@ -171,8 +173,14 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initView() {
         toolbarTv.text = getString(R.string.activity_device_grouping)
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.overflowIcon = moreIcon;
+        }
         toolbar.setNavigationOnClickListener { finish() }
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         this.inflater = this.layoutInflater
         list_groups!!.onItemClickListener = this.itemClickListener
         adapter = DeviceGroupingAdapter(groupsInit!!, this)

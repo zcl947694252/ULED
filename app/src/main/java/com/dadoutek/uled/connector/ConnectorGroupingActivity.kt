@@ -2,9 +2,11 @@ package com.dadoutek.uled.connector
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
@@ -212,6 +214,13 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         toolbarTv?.text = getString(R.string.activity_device_grouping)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
 
         this.inflater = this.layoutInflater
         listView = this.findViewById(R.id.list_groups)

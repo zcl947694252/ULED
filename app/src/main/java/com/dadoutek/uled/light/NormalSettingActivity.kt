@@ -6,10 +6,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -68,7 +70,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
     private var type: String? = null
-    private var openNum: Int = 0
     private var isAllGroup: Boolean = false
     private var downloadDispoable: Disposable? = null
     private var mConnectDisposable: Disposable? = null
@@ -756,20 +757,22 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        DBUtils.lastUser?.let {
-            if (it.id.toString() == it.last_authorizer_user_id)
-                if (currentShowPageGroup) {
-                    menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-                } else {
-                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                    findItem = menu?.findItem(R.id.toolbar_f_version)
-                    findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
-                    findItemChangeGp?.isVisible = true
-                }
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
+      override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+          DBUtils.lastUser?.let {
+              if (it.id.toString() == it.last_authorizer_user_id)
+                  if (currentShowPageGroup) {
+                      menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                  } else {
+                      menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                      findItem = menu?.findItem(R.id.toolbar_f_version)
+                      findItem?.title = getString(R.string.getVsersionFail)
+                      findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                      findItemChangeGp?.isVisible = true
+                  }
+          }
+          LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
+         return super.onCreateOptionsMenu(menu)
+      }
 
     private fun renameGroup() {
         val textGp = EditText(this)
@@ -1025,20 +1028,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribe(
                             { s ->
                                 localVersion = s
-                                if (findItem != null) {
-                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                        // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version) + localVersion
-                                        light!!.version = localVersion
-                                    } else {
-                                        // textTitle!!.visibility = VISIBLE
-                                        findItem!!.title = resources.getString(R.string.firmware_version) + localVersion
-                                        light!!.version = localVersion
-                                        tvOta!!.visibility = GONE
-                                    }
-                                    DBUtils.saveLight(light, false)
+                                findItem?.title = localVersion
+                                if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                    // textTitle!!.visibility = VISIBLE
+                                    light!!.version = localVersion
+                                } else {
+                                    // textTitle!!.visibility = VISIBLE
+                                    light!!.version = localVersion
+                                    tvOta!!.visibility = GONE
                                 }
-
+                                DBUtils.saveLight(light, false)
                             },
                             {
                                 /*   if (textTitle != null) {
@@ -1063,7 +1062,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         super.onResume()
         if (type == Constant.TYPE_GROUP) {
             val dbGroup = DBUtils.getGroupByID(group!!.id)
-
             if (group?.status == 1) {
                 setLightGUIImg(progress = dbGroup?.brightness ?: 0, temperatureValue = dbGroup?.colorTemperature ?: 0)
                 light_switch.setImageResource(R.drawable.icon_light_open)
@@ -1081,35 +1079,36 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     private fun initType() {
-        LogUtils.v("zcl------打开次数-----$openNum-------")
         type = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener {
-            finish()
+        toolbar.setNavigationOnClickListener { finish() }
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
         }
         slow_rg_view.setOnClickListener { }
-        if (type == Constant.TYPE_GROUP) {
-            currentShowPageGroup = true
+            currentShowPageGroup = type == Constant.TYPE_GROUP
+        LogUtils.v("zclmenu----------currentShowPageGroup--------$currentShowPageGroup----${DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id}")
+        if (currentShowPageGroup) {
             initDataGroup()
             initViewGroup()
         } else {
             slow_ly.visibility = GONE
-            currentShowPageGroup = false
-            initToolbarLight()
             initViewLight()
             getVersion()
         }
     }
 
-
     private fun initViewGroup() {
-        if (group != null) {
-            if (group!!.meshAddr == 0xffff) {
-                toolbarTv.text = getString(R.string.allLight)
-            }
-        }
-
-        checkGroupIsSystemGroup()
+        if (group != null && group!!.meshAddr == 0xffff)
+            toolbarTv.text = getString(R.string.allLight)
+        //所有灯控分组暂标为系统默认分组不做修改处理
+        if (group!!.meshAddr != 0xFFFF)
+            toolbarTv.text = group!!.name
 
         slow_switch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) { //开 关 上电 场景 1是打开 0 是关闭
@@ -1152,7 +1151,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
 
-
         if (group!!.isSeek) {
             adjustment.text = getString(R.string.brightness_adjustment)
             brightness_btn.setImageResource(R.drawable.icon_btn)
@@ -1175,13 +1173,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
         var lightCurrent = DBUtils.getGroupByID(group!!.id)
 
-
         this.light_sbBrightness?.max = 100
         if (group!!.connectionStatus == ConnectionStatus.OFF.value) {
             // light_image.setImageResource()
             setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_close)
-            light_sbBrightness!!.setOnTouchListener { v, event -> true }
+            light_sbBrightness!!.setOnTouchListener { _, _ -> true }
             light_sbBrightness.isEnabled = false
             isSwitch = false
             device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -1193,7 +1190,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             setLightGUIImg()
 
             light_switch.setImageResource(R.drawable.icon_light_open)
-            light_sbBrightness!!.setOnTouchListener { v, event -> false }
+            light_sbBrightness!!.setOnTouchListener { v, _ -> false }
             light_sbBrightness.isEnabled = true
             isSwitch = true
             when {
@@ -1296,15 +1293,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         light_image.filter = filterGroup
     }
 
-    //所有灯控分组暂标为系统默认分组不做修改处理
-    private fun checkGroupIsSystemGroup() {
-            toolbar.setNavigationIcon(R.drawable.icon_return)
-            toolbar.setNavigationOnClickListener { finish() }
-        if (group!!.meshAddr != 0xFFFF) {
-            toolbarTv.text = group!!.name
-            toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        }
-    }
 
     private fun initDataGroup() {
         this.mApplication = this.application as TelinkLightApplication
@@ -1324,18 +1312,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             slow_ly.visibility = VISIBLE
         } else
             slow_ly.visibility = GONE
-    }
-
-    private fun initToolbarLight() {
-        DBUtils.lastUser?.let {
-            if (it.id.toString() == it.last_authorizer_user_id) {
-                toolbarTv.text = ""
-                toolbar.setNavigationIcon(R.drawable.icon_return)
-                toolbar.setNavigationOnClickListener { finish() }
-                toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-                toolbar.setOnMenuItemClickListener(menuItemClickListener)
-            }
-        }
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
@@ -1541,6 +1517,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun renameLight() {
+        findItem?.title = localVersion
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)

@@ -33,7 +33,7 @@
     <item
             android:id="@+id/toolbar_f_version"
             android:orderInCategory="4"
-            android:title="@string/number_no"
+            android:title="@string/user_reset"
             app:showAsAction="never" />
 
 </menu>
