@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -60,11 +61,13 @@ import kotlin.collections.ArrayList
  * 更新描述   显示X组里所有灯的页面
  */
 
-class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListener, View.OnClickListener {
+class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListener {
+    private var deviceType: Int? = 0
+    private var deleteDevice: MenuItem? = null
+    private var onlineUpdate: MenuItem? = null
+    private var batchGp: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var group: DbGroup? = null
-    private var mDataManager: DataManager? = null
-    private var mApplication: TelinkLightApplication? = null
     private lateinit var lightList: MutableList<DbLight>
     private var adapter: LightsOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
@@ -79,101 +82,48 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
     private var recyclerView: RecyclerView? = null
-    private var strLight: String? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lights_of_group)
         initToolbar()
-        initParameter()
         initData()
         initView()
         initOnLayoutListener()
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.light_add_device_btn -> {
-                when (strLight) {
-                    "cw_light" -> {
-                        if (DBUtils.getAllNormalLight().size == 0) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-                            startActivityForResult(intent, 0)
-                        } else addDevice()
-                    }
-                    "rgb_light" -> {
-                        if (DBUtils.getAllRGBLight().size == 0) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
-                            startActivityForResult(intent, 0)
-                        } else addDevice()
-                    }
-                }
-            }
-        }
-    }
-
     private fun addDevice() {
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-        when (strLight) {
-            "cw_light" -> {
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                /* val intent = Intent(this, BatchGroupActivity::class.java)
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-            intent.putExtra("lightType", "cw_light")
-            intent.putExtra("cw_light_group_name", group?.name)
-            startActivity(intent)*/
-            }
-            "rgb_light" -> {
-                /*  val intent = Intent(this,
-                    RgbBatchGroupActivity::class.java)
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-            intent.putExtra("lightType", "rgb_light")
-            intent.putExtra("rgb_light_group_name", group?.name)
-//            startActivity(intent)
-            startActivity(intent)*/
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-            }
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD ->intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+
+            DeviceType.LIGHT_RGB ->  intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         }
         startActivity(intent)
     }
 
     private fun initToolbar() {
         toolbar.setNavigationOnClickListener { finish() }
-        tv_function1.visibility = View.VISIBLE
-        tv_function1.setText(R.string.batch_group)
-        tv_function1.setOnClickListener {
-            when (strLight) {
-                "cw_light" -> {
-                    if (DBUtils.getAllNormalLight().size == 0) {
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    } else {
-                        startActivity<GroupOTAListActivity>("group" to group!!,"DeviceType" to DeviceType.LIGHT_NORMAL)
-                    }
-                }
-                "rgb_light" -> {
-                    if (DBUtils.getAllRGBLight().size == 0) {
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    } else {
-                        startActivity<GroupOTAListActivity>("group" to group!!,"DeviceType" to DeviceType.LIGHT_RGB)
-                    }
-                }
-            }
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
         }
     }
 
+    private fun skipeBatch() {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> if (DBUtils.getAllNormalLight().size == 0)
+                ToastUtils.showShort(getString(R.string.no_device))
+            else
+                startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.LIGHT_NORMAL)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
+            DeviceType.LIGHT_RGB -> if (DBUtils.getAllRGBLight().size == 0)
+                ToastUtils.showShort(getString(R.string.no_device))
+            else
+                startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.LIGHT_RGB)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -182,7 +132,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText != null && !newText.isEmpty()) {
+        if (newText != null && newText.isNotEmpty()) {
             filter(newText, true)
             adapter!!.notifyDataSetChanged()
         } else {
@@ -195,53 +145,28 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
-//        val nameList : ArrayList<String> = ArrayList()
-        if (lightList != null && lightList.size > 0) {
+        if (lightList != null && lightList.size > 0)
             lightList.clear()
-        }
 
-//        for(i in listTask.indices){
-//            nameList.add(listTask[i].name)
-//        }
-
-        if (isSearch) {
-            for (i in list.indices) {
-                if (groupName == list[i].name || (list[i].name).startsWith(groupName!!)) {
+        when {
+            isSearch -> for (i in list.indices)
+                if (groupName == list[i].name || (list[i].name).startsWith(groupName!!))
                     lightList.addAll(DBUtils.getLightByGroupID(list[i].id))
-                }
-            }
-
-        } else {
-            for (i in list.indices) {
-                if (list.get(i).meshAddr == 0xffff) {
-                    Collections.swap(list, 0, i)
-                }
-            }
-
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+            else -> {
+                for (i in list.indices)
+                    if (list[i].meshAddr == 0xffff)
+                        Collections.swap(list, 0, i)
+                for (j in list.indices)
+                    lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
             }
         }
-    }
-
-    private fun initParameter() {
-        val gp = this.intent.extras!!.get("group")
-        if (gp != null)
-            this.group = gp as DbGroup
-        val light = this.intent.extras!!.get("light")
-        if (light != null)
-            this.strLight = light as String
-        this.mApplication = this.application as TelinkLightApplication
-        mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
     }
 
     override fun onResume() {
         super.onResume()
         initToolbar()
-        initParameter()
         initData()
         initView()
-        initOnLayoutListener()
     }
 
     override fun onStop() {
@@ -261,68 +186,87 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun initData() {
-        lightList = ArrayList()
-        if (group?.meshAddr == 0xffff) {
-            filter("", false)
-        } else {
-            lightList = DBUtils.getLightByGroupID(group!!.id)
-        }
+        val gp = this.intent.extras!!.get("group")
+        if (gp != null) group = gp as DbGroup
 
-        toolbar.title = group?.name + "(${group?.deviceCount})"
+        deviceType = group?.deviceType?.toInt()
+        lightList = ArrayList()
+        if (group?.meshAddr == 0xffff)
+            filter("", false)
+        else
+            lightList = DBUtils.getLightByGroupID(group!!.id)
+
+        setMenu()
+
+        toolbarTv.text = group?.name + "(${group?.deviceCount})"
 
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
-            if (strLight == "cw_light") {
-                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                batchGroup.setText(R.string.batch_group)
-                batchGroup.visibility = View.GONE
-                batchGroup.setOnClickListener {
-                    val intent = Intent(this, BatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("lightType", "cw_light_group")
-                    intent.putExtra("group", group?.id?.toInt())
-                    startActivity(intent)
-                }
-            } else if (strLight == "rgb_light") {
-                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-                batchGroup.setText(R.string.batch_group)
-                batchGroup.visibility = View.GONE
-                batchGroup.setOnClickListener {
-                    val intent = Intent(this, BatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("lightType", "rgb_light_group")
-                    intent.putExtra("group", group?.id ?: 0)
-                    startActivity(intent)
-                }
-            }
         } else {
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
         }
     }
 
+    private fun setMenu() {
+        if (lightList.size > 0) {
+            toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+            batchGp = toolbar.menu?.findItem(R.id.toolbar_delete_group)
+            onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_rename_group)
+            deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+            batchGp?.title = getString(R.string.batch_group)
+            onlineUpdate?.title = getString(R.string.online_upgrade)
+            deleteDevice?.title = getString(R.string.edite_device)
+            deleteDevice?.isVisible = true
+            toolbar.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.toolbar_delete_group -> skipeBatch()
+                    R.id.toolbar_rename_group -> goOta()
+                    R.id.toolbar_delete_device -> editeDevice()
+                }
+                true
+            }
+        }
+    }
+
+    private fun editeDevice() {
+
+    }
+
+    private fun goOta() {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
+                if (DBUtils.getAllNormalLight().size == 0)
+                    ToastUtils.showShort(getString(R.string.no_device))
+                else
+                    startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_NORMAL)
+            }
+
+            DeviceType.LIGHT_RGB -> {
+                if (DBUtils.getAllRGBLight().size == 0)
+                    ToastUtils.showShort(getString(R.string.no_device))
+                else
+                    startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
+            }
+        }
+    }
+
     private fun getNewData(): MutableList<DbLight> {
         if (group?.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
             filter("", false)
         } else {
             lightList = DBUtils.getLightByGroupID(group?.id ?: 100000000000)
         }
 
-        if (group?.meshAddr == 0xffff) {
+        if (group?.meshAddr == 0xffff)
             toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-        } else {
+        else
             toolbarTv.text = (group?.name ?: "") + " (" + lightList.size + ")"
-        }
+
         return lightList
     }
+
 
     fun notifyData() {
         val mOldDatas: MutableList<DbLight>? = lightList
@@ -357,43 +301,58 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
 
     private fun initView() {
-        if (group?.meshAddr == 0xffff) {
-            toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-        } else {
-            toolbarTv.text = (group?.name ?: "") + " (" + lightList.size + ")"
+        when (group?.meshAddr) {
+            0xffff ->
+                toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
+            else ->
+                toolbarTv.text = (group?.name ?: "") + " (" + lightList.size + ")"
         }
-        light_add_device_btn.setOnClickListener(this)
+        light_add_device_btn.setOnClickListener {
+            when (deviceType) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> if (DBUtils.getAllNormalLight().size == 0) {
+                    skipeScanning(DeviceType.LIGHT_NORMAL)
+                } else addDevice()
+
+                DeviceType.LIGHT_RGB ->   if (DBUtils.getAllRGBLight().size == 0) {
+                    skipeScanning(DeviceType.LIGHT_RGB)
+                } else addDevice()
+            }
+        }
+
+
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recyclerView)
-        if (strLight == "cw_light") {
-            for (i in lightList.indices) {
-                lightList[i].updateIcon()
-            }
-        } else if (strLight == "rgb_light") {
-            for (i in lightList.indices) {
-                lightList[i].updateRgbIcon()
-            }
-        }
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
+                for (i in lightList.indices)
+                    lightList[i].updateIcon()
 
-        when (strLight) {
-            "cw_light" -> {
                 when (DBUtils.getAllNormalLight().size) {
                     0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
                     else -> light_add_device_btn.text = getString(R.string.add_device)
                 }
             }
-            "rgb_light" -> {
+
+            DeviceType.LIGHT_RGB -> {
+                for (i in lightList.indices)
+                    lightList[i].updateRgbIcon()
                 when (DBUtils.getAllRGBLight().size) {
                     0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
                     else -> light_add_device_btn.text = getString(R.string.add_device)
-
                 }
             }
         }
+
+    }
+
+    private fun skipeScanning(type: Int) {
+        intent = Intent(this, DeviceScanningNewActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE, type)
+        startActivityForResult(intent, 0)
     }
 
 
@@ -401,33 +360,35 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         currentLight = lightList[position]
         positionCurrent = position
         val opcode = Opcode.LIGHT_ON_OFF
-        if (view.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+        when (view.id) {
+            R.id.img_light -> {
+                canBeRefresh = true
+                if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
 //                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,byteArrayOf(0x01, 0x00, 0x00))
-                when (currentLight!!.productUUID) {
-                    DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                    else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                    }
+                    currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                } else {
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                    }
+                    currentLight!!.connectionStatus = ConnectionStatus.OFF.value
                 }
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-                when (currentLight!!.productUUID) {
-                    DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                    else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)
-                }
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
-            }
 
-            when (strLight) {
-                "cw_light" -> currentLight!!.updateIcon()
-                "rgb_light" -> currentLight!!.updateRgbIcon()
+                when (deviceType) {
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> currentLight!!.updateIcon()
+                    DeviceType.LIGHT_RGB -> currentLight!!.updateRgbIcon()
+                }
+
+                DBUtils.updateLight(currentLight!!)
+                runOnUiThread {
+                    adapter?.notifyDataSetChanged()
+                }
             }
-            DBUtils.updateLight(currentLight!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else
-            if (view.id == R.id.tv_setting) {
+            R.id.tv_setting -> {
                 if (scanPb.visibility != View.VISIBLE) {
                     //判断是否为rgb灯
                     var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
@@ -443,6 +404,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     ToastUtils.showLong(R.string.reconnecting)
                 }
             }
+            R.id.iv_delete->{
+
+            }
+        }
     }
 
     /*   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

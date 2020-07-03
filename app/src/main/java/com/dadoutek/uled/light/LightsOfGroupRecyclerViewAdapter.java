@@ -18,12 +18,9 @@ import java.util.List;
  * Created by hejiajun on 2018/4/25.
  */
 
-public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
-        DbLight, BaseViewHolder> {
+public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<DbLight, BaseViewHolder> {
 
-    public LightsOfGroupRecyclerViewAdapter(List<DbLight> data) {
-        super(data);
-    }
+    private Boolean isDelete = false;
 
     public LightsOfGroupRecyclerViewAdapter(int layoutResId, List<DbLight> data) {
         super(layoutResId, data);
@@ -62,7 +59,16 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
         helper.addOnClickListener(R.id.tv_setting)
                 .setTag(R.id.tv_setting,helper.getAdapterPosition())
                 .setTag(R.id.img_light,helper.getAdapterPosition())
+                .setVisible(R.id.iv_delete,isDelete)
                 .setBackgroundRes(R.id.img_light,item.icon)
                 .addOnClickListener(R.id.img_light);
+    }
+
+    /**
+     * 改变状态
+     * @param isDelete  是否处于删除状态
+     */
+    public void  changeState( Boolean  isDelete) {
+        this.isDelete = isDelete;
     }
 }

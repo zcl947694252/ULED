@@ -358,7 +358,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         }
 
                         //val encoder = Base64.getEncoder()
-                       // val s = encoder.encodeToString(gattPar)
+                        // val s = encoder.encodeToString(gattPar)
                         gattBody.data = Base64Utils.encodeToStrings(gattPar)
                         gattBody.cmd = Constant.CMD_MQTT_CONTROL
                         gattBody.meshAddr = currentGroup!!.meshAddr
@@ -418,7 +418,19 @@ abstract class BaseGroupFragment : BaseFragment() {
             R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
+                    val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
+                    if (isLight && position == 0) {
+                        if (TelinkLightApplication.getApp().connectDevice != null) {
+                            val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                            intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intentSetting.putExtra("group", DBUtils.allGroups[0])
+                            startActivityForResult(intentSetting, 1)
+                        } else {
+                            ToastUtils.showShort(getString(R.string.device_not_connected))
+                            val activity = activity as MainActivity
+                            activity.autoConnect()
+                        }
+                    }else if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
                         var num = 0
                         when (groupType) {
                             Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
@@ -431,7 +443,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         if (num != 0) {
                             var intent: Intent? = null
                             when (groupType) {
-                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
+                                Constant.DEVICE_TYPE_LIGHT_NORMAL ->intent = Intent(mContext, NormalSettingActivity::class.java)
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
                                 //蓝牙接收器
                                 Constant.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
@@ -448,26 +460,12 @@ abstract class BaseGroupFragment : BaseFragment() {
                 }
             }
 
-            R.id.template_device_card_delete -> {
-                deleteSingleGroup(currentGroup!!)
-            }
+            R.id.template_device_card_delete -> deleteSingleGroup(currentGroup!!)
+
 
             //不能使用group_name否则会造成长按监听无效 跳转组详情
             //  R.id.item_layout -> {
             R.id.template_device_more -> {
-                val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
-                if (isLight && position == 0) {
-                    if (TelinkLightApplication.getApp().connectDevice != null) {
-                        val intentSetting = Intent(context, NormalSettingActivity::class.java)
-                        intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intentSetting.putExtra("group", DBUtils.allGroups[0])
-                        startActivityForResult(intentSetting, 1)
-                    } else {
-                        ToastUtils.showShort(getString(R.string.device_not_connected))
-                        val activity = activity as MainActivity
-                        activity.autoConnect()
-                    }
-                } else {
                     var intent = Intent()
                     when (groupType) {
                         Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
@@ -488,7 +486,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                     intent.putExtra("group", currentGroup)
                     startActivityForResult(intent, 2)
                 }
-            }
         }
     }
 

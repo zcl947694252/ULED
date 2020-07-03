@@ -62,7 +62,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                         .setVisible(R.id.template_device_setting, true)
             else
                 if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB||group.deviceType ==Constant.DEVICE_TYPE_NO)
-                    helper.setVisible(R.id.template_device_setting, false).setVisible(R.id.template_device_card_delete, false)//普通灯彩灯第一个为所有组不允许删除
+                    helper.setVisible(R.id.template_device_more, false).setVisible(R.id.template_device_card_delete, false)//普通灯彩灯第一个为所有组不允许删除
                 else
                     helper.setVisible(R.id.template_device_setting, true).setVisible(R.id.template_device_card_delete, isDelete)
         }

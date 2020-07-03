@@ -671,6 +671,91 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     }
 
+    private fun initListener() {
+        //先取消，这样可以确保不会重复添加监听
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+
+        swipe_refresh_ly.setOnRefreshListener {
+            findMeshDevice(DBUtils.lastUser?.controlMeshName)
+            disposableTimerResfresh?.dispose()
+            disposableTimerResfresh = Observable.timer(4000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        swipe_refresh_ly.isRefreshing = false
+                        disposableScan?.dispose()
+                    }
+            compositeDisposable.add(disposableTimerResfresh!!)
+        }
+        batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
+            isCompatible = isChecked
+            if (!isCompatible)
+                ToastUtils.showLong(getString(R.string.compatibility_mode))
+            when (deviceType) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                    for (db in deviceDataLightAll.filter { it.isSelected })//获取组名 将分组与未分组的拆分
+                        startBlink(db.belongGroupId, db.meshAddr)
+                }
+                DeviceType.SMART_CURTAIN -> {
+                    for (db in deviceDataCurtainAll.filter { it.isSelected }) //获取组名 将分组与未分组的拆分
+                        startBlink(db.belongGroupId, db.meshAddr)
+                }
+
+                DeviceType.SMART_RELAY -> {
+                    for (db in deviceDataRelayAll.filter { it.isSelected })//获取组名 将分组与未分组的拆分
+                        startBlink(db.belongGroupId, db.meshAddr)
+                }
+            }
+            LogUtils.v("zcl是否选中$isChecked")
+        }
+        batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
+            setDeviceStopBlink(deviceType)
+            checkedNoGrouped = checkedId == batch_four_no_group.id
+            switchNoGroupOrGroupedAndSetEmpty()
+            changeTitleChecked()
+            //batch_four_device_all.text = getString(R.string.select_all)
+            batch_four_device_all.setImageResource(R.drawable.icon_all_check)
+            isAll = false
+            setAllSelect(false)
+        }
+        batch_four_device_all.setOnClickListener { changeDeviceAll() }
+        batch_four_group_add_group.setOnClickListener { addNewGroup() }
+        grouping_completed.setOnClickListener {
+            if (!isComplete) {
+                if (TelinkLightApplication.getApp().connectDevice != null)
+                    sureGroups()
+                else
+                    autoConnect()
+            } else {
+                finish()
+            }
+        }
+        groupAdapter.setOnItemClickListener { _, _, position ->
+            //如果点中的不是上次选中的组则恢复未选中状态
+            changeGroupSelectView(position)
+        }
+        groupAdapter.setOnItemLongClickListener { _, _, position ->
+            showGroupForUpdateNameDialog(position)
+            false
+        }
+        btnAddGroups?.setOnClickListener { addNewGroup() }
+
+        //如果adapter内部使用了addLongclicklistener 那么外部必须使用longchildren否则addLongClick无效
+        lightAdapter.onItemClickListener = this
+        relayAdapter.onItemClickListener = this
+        curtainAdapter.onItemClickListener = this
+        lightGroupedAdapter.onItemClickListener = this
+        relayGroupedAdapter.onItemClickListener = this
+        curtainGroupedAdapter.onItemClickListener = this
+
+        lightAdapter.onItemLongClickListener = this
+        relayAdapter.onItemLongClickListener = this
+        curtainAdapter.onItemLongClickListener = this
+
+        lightGroupedAdapter.onItemLongClickListener = this
+        relayGroupedAdapter.onItemLongClickListener = this
+        curtainGroupedAdapter.onItemLongClickListener = this
+    }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
         if (checkedNoGrouped)
@@ -771,92 +856,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
         return false
-    }
-
-    private fun initListener() {
-        //先取消，这样可以确保不会重复添加监听
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
-        swipe_refresh_ly.setOnRefreshListener {
-            findMeshDevice(DBUtils.lastUser?.controlMeshName)
-            disposableTimerResfresh?.dispose()
-            disposableTimerResfresh = Observable.timer(4000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        swipe_refresh_ly.isRefreshing = false
-                        disposableScan?.dispose()
-                    }
-            compositeDisposable.add(disposableTimerResfresh!!)
-        }
-        batch_four_compatible_mode.setOnCheckedChangeListener { _, isChecked ->
-            isCompatible = isChecked
-            if (!isCompatible)
-                ToastUtils.showLong(getString(R.string.compatibility_mode))
-            when (deviceType) {
-                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                    for (db in deviceDataLightAll.filter { it.isSelected })//获取组名 将分组与未分组的拆分
-                        startBlink(db.belongGroupId, db.meshAddr)
-                }
-                DeviceType.SMART_CURTAIN -> {
-                    for (db in deviceDataCurtainAll.filter { it.isSelected }) //获取组名 将分组与未分组的拆分
-                        startBlink(db.belongGroupId, db.meshAddr)
-                }
-
-                DeviceType.SMART_RELAY -> {
-                    for (db in deviceDataRelayAll.filter { it.isSelected })//获取组名 将分组与未分组的拆分
-                        startBlink(db.belongGroupId, db.meshAddr)
-                }
-            }
-            LogUtils.v("zcl是否选中$isChecked")
-        }
-        batch_four_group_rg.setOnCheckedChangeListener { _, checkedId ->
-            setDeviceStopBlink(deviceType)
-            checkedNoGrouped = checkedId == batch_four_no_group.id
-            switchNoGroupOrGroupedAndSetEmpty()
-            changeTitleChecked()
-            //batch_four_device_all.text = getString(R.string.select_all)
-            batch_four_device_all.setImageResource(R.drawable.icon_all_check)
-            isAll = false
-            setAllSelect(false)
-        }
-        batch_four_device_all.setOnClickListener { changeDeviceAll() }
-        batch_four_group_add_group.setOnClickListener { addNewGroup() }
-        grouping_completed.setOnClickListener {
-            if (!isComplete) {
-                if (TelinkLightApplication.getApp().connectDevice != null)
-                    sureGroups()
-                else
-                    autoConnect()
-            } else {
-                finish()
-            }
-        }
-        groupAdapter.setOnItemClickListener { _, _, position ->
-            //如果点中的不是上次选中的组则恢复未选中状态
-            changeGroupSelectView(position)
-        }
-        groupAdapter.setOnItemLongClickListener { _, _, position ->
-            showGroupForUpdateNameDialog(position)
-            false
-        }
-        btnAddGroups?.setOnClickListener { addNewGroup() }
-
-        //如果adapter内部使用了addLongclicklistener 那么外部必须使用longchildren否则addLongClick无效
-        lightAdapter.onItemClickListener = this
-        relayAdapter.onItemClickListener = this
-        curtainAdapter.onItemClickListener = this
-        lightGroupedAdapter.onItemClickListener = this
-        relayGroupedAdapter.onItemClickListener = this
-        curtainGroupedAdapter.onItemClickListener = this
-
-        lightAdapter.onItemLongClickListener = this
-        relayAdapter.onItemLongClickListener = this
-        curtainAdapter.onItemLongClickListener = this
-
-        lightGroupedAdapter.onItemLongClickListener = this
-        relayGroupedAdapter.onItemLongClickListener = this
-        curtainGroupedAdapter.onItemLongClickListener = this
     }
 
     private fun switchNoGroupOrGroupedAndSetEmpty() {
