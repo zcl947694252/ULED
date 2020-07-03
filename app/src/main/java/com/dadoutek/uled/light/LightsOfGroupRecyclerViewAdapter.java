@@ -61,7 +61,8 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<D
                 .setTag(R.id.img_light,helper.getAdapterPosition())
                 .setVisible(R.id.iv_delete,isDelete)
                 .setBackgroundRes(R.id.img_light,item.icon)
-                .addOnClickListener(R.id.img_light);
+                .addOnClickListener(R.id.img_light)
+                .addOnClickListener(R.id.iv_delete);
     }
 
     /**

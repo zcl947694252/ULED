@@ -146,6 +146,7 @@ class SettingActivity : BaseActivity() {
             disposableFind?.dispose()
             ToastUtils.showShort(getString(R.string.find_device_num) + 0)
         }
+        TelinkLightService.Instance()?.idleMode(true)
         showLoadingDialog(getString(R.string.please_wait))
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
@@ -194,7 +195,7 @@ class SettingActivity : BaseActivity() {
     override fun initView() {
         image_bluetooth.visibility = View.GONE
         toolbarTv.text = getString(R.string.setting)
-        toolbar.setNavigationIcon(R.mipmap.icon_return)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         makePop()
     }

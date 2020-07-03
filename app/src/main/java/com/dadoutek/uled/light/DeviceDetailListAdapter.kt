@@ -3,13 +3,18 @@ package com.dadoutek.uled.light
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.group.GroupOTAListActivity
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DensityUtil
+import org.jetbrains.anko.startActivity
 
 /**
  * 创建者     zcl
@@ -30,7 +35,6 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         val iv = helper.getView<ImageView>(R.id.template_device_icon)
         iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
         iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
-
 
         if (dbLight.name==null||dbLight.name=="")
             deviceName.visibility = View.GONE

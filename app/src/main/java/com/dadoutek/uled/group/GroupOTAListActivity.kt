@@ -196,7 +196,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun initData() {
-        dbGroup = (intent.getSerializableExtra("group") as DbGroup) ?: DbGroup()
+        val serializableExtra = intent.getSerializableExtra("group")
+         if(serializableExtra!=null)
+             dbGroup =  serializableExtra as DbGroup
+
         deviceType = intent.getIntExtra("DeviceType", 0)
         isGroup = dbGroup != null
 
@@ -361,7 +364,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun updataDevice() {
-        when (dbGroup!!.deviceType.toInt()) {
+        when (deviceType.toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> setLightData()
             DeviceType.SMART_CURTAIN -> setCurtainData()
             DeviceType.SMART_RELAY -> setRelayData()
@@ -369,7 +372,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        when (dbGroup!!.deviceType.toInt()) {
+        when (deviceType.toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 val dbLight = lightList[position]
                 if (dbLight.isSupportOta)

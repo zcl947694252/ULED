@@ -63,7 +63,6 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
     private var isHaveNew: Boolean = false
     private var isHaveOld: Boolean = false
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

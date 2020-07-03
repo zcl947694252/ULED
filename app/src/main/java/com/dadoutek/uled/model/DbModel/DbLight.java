@@ -29,7 +29,7 @@ public class DbLight implements Serializable {
     private String macAddr;
     private int meshUUID;
     private int productUUID;
-    private Long belongGroupId;
+    private Long belongGroupId;//belongGroupId如果等于1则标识没有群组
     private int index;
 
     public int color=0xffffff;//颜色
@@ -229,7 +229,6 @@ public class DbLight implements Serializable {
     }
 
     public void updateIcon() {
-
         if (this.status == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_light_close_g;
         } else if (this.status == ConnectionStatus.OFF.getValue()) {

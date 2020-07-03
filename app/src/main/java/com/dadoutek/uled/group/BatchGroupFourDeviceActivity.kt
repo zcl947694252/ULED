@@ -63,6 +63,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private var gpMeshAddr: Int = 0
     private var isAll: Boolean = false
     private var disposableScan: Disposable? = null
     private var disposableTimerResfresh: Disposable? = null
@@ -151,13 +152,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         btnAddGroups = emptyGroupView!!.findViewById<TextView>(R.id.add_groups_btn)
 
         batch_four_device_recycle.layoutManager = GridLayoutManager(this, 4)
-       // batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
+        // batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 4)
         //batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
 
-        batch_four_group_recycle.layoutManager =  LinearLayoutManager(this, LinearLayout.HORIZONTAL,false)
-       // batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
+        batch_four_group_recycle.layoutManager = LinearLayoutManager(this, LinearLayout.HORIZONTAL, false)
+        // batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         lplong = batch_four_no_group.layoutParams as LinearLayout.LayoutParams
         lpShort = batch_four_grouped.layoutParams as LinearLayout.LayoutParams
@@ -168,6 +169,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         isCompatible = true
 
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
+        gpMeshAddr = intent.getIntExtra("gp", 0)
         scanningList = intent.getParcelableArrayListExtra(Constant.DEVICE_NUM)
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
@@ -397,9 +399,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 deviceDataLightAll.clear()
-                if (scanningList == null)
-                    deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
-                else {
+                if (scanningList == null) {
+                    if (gpMeshAddr == 0)
+                        deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
+                    else
+                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
+                            deviceDataLightAll.addAll(it)
+                        }
+                } else {
                     for (item in scanningList!!) {
                         val light = DbLight()
                         light.macAddr = item.macAddress
@@ -416,7 +423,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_RGB -> {
                 deviceDataLightAll.clear()
                 if (scanningList == null)
-                    deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
+                    if (gpMeshAddr == 0)
+                        deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
+                    else
+                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
+                            deviceDataLightAll.addAll(it)
+                        }
                 else for (item in scanningList!!) {
                     val light = DbLight()
                     light.macAddr = item.macAddress
@@ -433,7 +445,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtainAll.clear()
                 if (scanningList == null)
-                    deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
+                    if (gpMeshAddr == 0)
+                        deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
+                    else
+                        DBUtils.getCurtainMeshAddr(gpMeshAddr)?.let {
+                            deviceDataCurtainAll.addAll(it)
+                        }
                 else for (item in scanningList!!) {
                     val device = DbCurtain()
                     device.macAddr = item.macAddress
@@ -448,7 +465,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_RELAY -> {
                 deviceDataRelayAll.clear()
                 if (scanningList == null)
-                    deviceDataRelayAll.addAll(DBUtils.getAllRelay())
+                    if (gpMeshAddr == 0)
+                        deviceDataRelayAll.addAll(DBUtils.getAllRelay())
+                    else
+                        DBUtils.getRelayByGroupMesh(gpMeshAddr)?.let {
+                            deviceDataRelayAll.addAll(it)
+                        }
                 else
                     for (item in scanningList!!) {
                         val device = DbConnector()
@@ -1274,7 +1296,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 分组与未分组切换逻辑
      */
     private fun changeDeviceData() {
-       // batch_four_device_all.text = getString(R.string.select_all)
+        // batch_four_device_all.text = getString(R.string.select_all)
         batch_four_device_all.setImageResource(R.drawable.icon_all_check)
         isAll = false
         setAllSelect(false)
@@ -1343,11 +1365,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 全选与取消功能相关
      */
     private fun changeDeviceAll() {
-   /*     val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
-        if (isSelectAll)
-            batch_four_device_all.text = getString(R.string.cancel)
-        else
-            batch_four_device_all.text = getString(R.string.select_all)*/
+        /*     val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
+             if (isSelectAll)
+                 batch_four_device_all.text = getString(R.string.cancel)
+             else
+                 batch_four_device_all.text = getString(R.string.select_all)*/
         isAll = !isAll
         setAllSelect(isAll)
     }
@@ -1413,7 +1435,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     fun refreshData() {
-     //   batch_four_device_all.text = getString(R.string.select_all)
+        //   batch_four_device_all.text = getString(R.string.select_all)
         setAllSelect(false)//还原状态
 
         val groupList = DBUtils.getGroupsByDeviceType(deviceType)

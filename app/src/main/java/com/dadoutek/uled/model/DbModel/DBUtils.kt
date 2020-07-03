@@ -606,6 +606,14 @@ object DBUtils {
         }
         return null
     }
+    fun getRelayByGroupMesh(mesh: Int): ArrayList<DbConnector>? {
+        val group = getGroupByMeshAddr(mesh)
+        if (group != null) {
+            val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
+            return ArrayList(query.list())
+        }
+        return null
+    }
 
     /********************************************保存 */
 
