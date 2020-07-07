@@ -95,8 +95,10 @@
                     android:id="@+id/pir_config_triggering_model_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:orientation="horizontal"
-                    android:padding="@dimen/dp_10"
                     android:visibility="visible">
 
                 <TextView
@@ -149,7 +151,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:orientation="horizontal"
-                    android:padding="@dimen/dp_10"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:visibility="visible">
 
                 <TextView
@@ -206,8 +210,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="@dimen/dp_10"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:visibility="visible">
 
                 <TextView
@@ -332,9 +337,10 @@
             <LinearLayout
                     android:id="@+id/pir_config_choose_scene_ly"
                     android:layout_width="match_parent"
-                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="@dimen/dp_10"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:layout_height="45dp">
 
 
@@ -378,8 +384,9 @@
                     android:id="@+id/pir_config_choose_group_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
-                    android:gravity="center_vertical"
-                    android:padding="@dimen/dp_10"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:orientation="horizontal">
 
 

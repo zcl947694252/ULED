@@ -45,7 +45,7 @@ import java.util.*
 class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private lateinit var dbUser: DbUser
-    private var countryCode: String? = null
+    private var countryCode: String = "86"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +57,10 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
 
     private fun initView() {
-        countryCode = country_code_picker?.selectedCountryCode
-        country_code_picker?.setOnCountryChangeListener {
-            countryCode = country_code_picker?.selectedCountryCode
-        }
+        /*  countryCode = country_code_picker?.selectedCountryCode
+          country_code_picker?.setOnCountryChangeListener {
+              countryCode = country_code_picker?.selectedCountryCode
+          }*/
 
         btn_register.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
@@ -68,6 +68,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         edit_user_phone.addTextChangedListener(this)
         password_login.setOnClickListener(this)
         country_code_arrow.setOnClickListener(this)
+        return_image.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -78,6 +79,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 startActivityForResult(intent, 10)
             }
             R.id.btn_register -> register()
+            R.id.return_image -> finish()
             R.id.btn_send_verification -> verificationCode()
             R.id.sms_login -> {
                 if (TextUtils.isEmpty(edit_user_phone.editableText.toString())) {
@@ -89,24 +91,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
             }
             R.id.password_login -> passwordLogin()
             R.id.date_phone_list -> phoneList()
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            10 -> if (resultCode == Activity.RESULT_OK) {
-                val bundle = data?.extras
-                val countryName = bundle?.getString("countryName")
-                val countryNumber = bundle?.getString("countryNumber")
-                ccp_tv.text = countryName + countryNumber
-                countryCode = countryNumber?.replace("+", "").toString()
-
-                LogUtils.v("zcl------------------countryCode$countryCode")
-            }
-            else -> {
-            }
         }
     }
 
@@ -220,11 +204,11 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 val data = msg.obj
                 if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
-                        // TODO 处理成功得到验证码的结果
+                        // 处理成功得到验证码的结果
                         ToastUtils.showLong(R.string.send_message_success)
                         getAccount()
                     } else {
-                        // TODO 处理错误的结果
+                        // 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             try {
                                 val a = (data as Throwable)
@@ -311,6 +295,28 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         } else {
             sms_login.isClickable = true
             sms_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            10 -> if (resultCode == Activity.RESULT_OK) {
+                val bundle = data?.extras
+                val countryName = bundle?.getString("countryName")
+                val countryNumber = bundle?.getString("countryNumber")
+                val toString = countryNumber?.replace("+", "").toString()
+
+                LogUtils.v("zcl------------------countryCode接手前$countryCode")
+                if (TextUtils.isEmpty(countryCode))
+                    return
+                LogUtils.v("zcl------------------countryCode接收后$countryCode")
+                countryCode = toString
+                ccp_tv.text = countryName + countryNumber
+            }
+            else -> {
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -17,11 +19,16 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.othersview.CountryActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_forget_password.*
+import kotlinx.android.synthetic.main.activity_forget_password.ccp_tv
+import kotlinx.android.synthetic.main.activity_forget_password.edit_user_phone
+import kotlinx.android.synthetic.main.activity_forget_password.phone_area_num_ly
+import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.jetbrains.anko.toast
 import java.util.*
 
@@ -32,7 +39,7 @@ import java.util.*
 
 class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
-    private var countryCode: String? = null
+    private var countryCode: String = "86"
     private var isChangePwd = false
     private var dbUser: DbUser? = null
 
@@ -45,8 +52,6 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     private fun initView() {
         val changeKey = intent.getStringExtra("fromLogin")
         isChangePwd = changeKey != "register"
-        countryCode = ccp.selectedCountryCode
-        ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
         image_return.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
@@ -56,6 +61,8 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             dbUser = DbUser()
             register_completed.setText(R.string.confirm)
         }
+
+        phone_area_num_ly.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -64,6 +71,11 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                 getAccount()
             }
             R.id.image_return -> finish()
+            R.id.phone_area_num_ly -> {
+                val intent = Intent()
+                intent.setClass(this@ForgetPassWordActivity, CountryActivity::class.java)
+                startActivityForResult(intent, 10)
+            }
         }
     }
 
@@ -145,6 +157,28 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         } else {
             register_phone_line.background = getDrawable(R.drawable.line_blue)
             register_completed.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            10 -> if (resultCode == Activity.RESULT_OK) {
+                val bundle = data?.extras
+                val countryName = bundle?.getString("countryName")
+                val countryNumber = bundle?.getString("countryNumber")
+
+                val toString = countryNumber?.replace("+", "").toString()
+                LogUtils.v("zcl------------------countryCode接手前$countryCode")
+                if (TextUtils.isEmpty(countryCode))
+                    return
+                LogUtils.v("zcl------------------countryCode接收后$countryCode")
+                countryCode = toString
+                ccp_tv.text = countryName + countryNumber
+            }
+            else -> { }
         }
     }
 }

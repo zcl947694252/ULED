@@ -241,7 +241,7 @@
     <string name="verification_code_error">验证码错误</string>
     <string name="successful_verification">验证成功</string>
     <string name="exit_login">退出登录</string>
-    <string name="forget_password">忘记密码?</string>
+    <string name="forget_password">忘记密码</string>
     <string name="verification_phone">验证</string>
     <string name="update_password">修改密码</string>
     <string name="password_input_error">密码不能包含特殊字符</string>
@@ -627,7 +627,6 @@
     <string name="new_password">请输入您的新密码</string>
     <string name="number">数量</string>
     <string name="login_password">使用密码登录</string>
-    <string name="account_after_login">登录后自动注册账号</string>
     <string name="online_upgrade">在线升级</string>
 
     <string name="tips">提示</string>
@@ -672,7 +671,6 @@
     <string name="send_code">验证码已发送至</string>
     <string name="follow_the_steps">按步骤操作即可找回密码</string>
     <string name="reacquire">后可重新发送</string>
-    <string name="account_after_login_two">登录后自动注册账号</string>
     <string name="next">下一步</string>
     <string name="enter_password">输入密码</string>
     <string name="please_your_password">请输入您的登陆密码</string>

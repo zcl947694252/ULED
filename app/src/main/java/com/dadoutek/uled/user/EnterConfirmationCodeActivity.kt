@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -32,6 +34,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
+import kotlinx.android.synthetic.main.activity_verification_code.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
@@ -43,7 +46,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private var account: String? = null
     private val TIME_INTERVAL: Long = 60
     private val mCompositeDisposable = CompositeDisposable()
-    private var countryCode: String? = null
+    private var countryCode: String = "86"
     private var phone: String? = null
     private var type: String? = null
 
@@ -59,16 +62,15 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
 
-
     @SuppressLint("SetTextI18n")
     private fun initViewType() {
-        countryCode = this.intent.extras!!.getString("country_code")?:""
+        countryCode = this.intent.extras!!.getString("country_code") ?: ""
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
         when (type) {
             Constant.TYPE_VERIFICATION_CODE -> {
-                tv_notice.visibility = View.VISIBLE
-                codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode+" "  + phone
+                tv_notice.visibility = View.GONE
+                codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + " " + phone
             }
             Constant.TYPE_REGISTER -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
@@ -88,9 +90,9 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             submitCode(countryCode ?: "", phone!!, code.toString().trim { it <= ' ' })
         }
         verCodeInputView_line.setOnTextChangeListener { s, b ->
-            if (s.length>=6){
-                submitCode(countryCode ?: "", phone!!, s)
-               // verificationLogin()
+            if (s.length >= 6) {
+                submitCode(countryCode, phone!!, s)
+                // verificationLogin()
             }
         }
         refresh_code.setOnClickListener(this)
@@ -102,7 +104,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         when (v?.id) {
             R.id.refresh_code -> verificationCode()
 
-            R.id.image_return ->{
+            R.id.image_return -> {
                 SMSSDK.unregisterEventHandler(eventHandler)
                 finish()
             }
@@ -120,70 +122,74 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                 val event = msg.arg1
                 val result = msg.arg2
                 val data = msg.obj
-                if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
-                    if (result == SMSSDK.RESULT_COMPLETE) {
-                        // TODO 处理成功得到验证码的结果
-                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
-                        ToastUtils.showLong(R.string.send_message_success)
-                        timing()
-                    } else {
-                        // TODO 处理错误的结果
-                        if (result == SMSSDK.RESULT_ERROR) {
-                            try {
-                                val a = (data as Throwable)
-                                val jsonObject = JSONObject(a.localizedMessage)
-                                val message = jsonObject.opt("detail").toString()
-                                ToastUtils.showLong(message)
-                            }catch (ex:Exception){
-                               ex.printStackTrace()
-                            }
+                when (event) {
+                    SMSSDK.EVENT_GET_VERIFICATION_CODE -> {
+                        if (result == SMSSDK.RESULT_COMPLETE) {
+                            // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
+                            ToastUtils.showLong(R.string.send_message_success)
+                            timing()
                         } else {
-                            val a = (data as Throwable)
-                            a.printStackTrace()
-                            ToastUtils.showLong(a.message)
-                        }
-                    }
-                    hideLoadingDialog()
-                } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                    if (result == SMSSDK.RESULT_COMPLETE) {
-                        // TODO 处理验证成功的结果
-                        when (type) {
-                            Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
-                            Constant.TYPE_REGISTER -> {
-                                val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                                intent.putExtra("phone", phone)
-                                intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
-                                startActivityForResult(intent,0)
-                                finish()
+                            when (result) {
+                                SMSSDK.RESULT_ERROR -> {
+                                    try {
+                                        val a = (data as Throwable)
+                                        val jsonObject = JSONObject(a.localizedMessage)
+                                        val message = jsonObject.opt("detail").toString()
+                                        ToastUtils.showLong(message)
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
+                                    }
+                                }
+                                else -> {
+                                    val a = (data as Throwable)
+                                    a.printStackTrace()
+                                    ToastUtils.showLong(a.message)
+                                }
                             }
-                            Constant.TYPE_FORGET_PASSWORD -> {
-                                val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                                intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
-                                intent.putExtra("phone", account)
-                                startActivity(intent)
-                                finish()
-                            }
-                        }
-                    } else {
-                        // TODO 处理错误的结果
-                        if (result == SMSSDK.RESULT_ERROR) {
-                            try {
-                                val a = (data as Throwable)
-                                val jsonObject = JSONObject(a.localizedMessage)
-                                val message = jsonObject.opt("detail").toString()
-                                ToastUtils.showLong(message)
-                            }catch (ex:Exception){
-                                ex.printStackTrace()
-                            }
-                        } else {
-                            val a = (data as Throwable)
-                            a.printStackTrace()
-                            ToastUtils.showLong(a.message)
                         }
                         hideLoadingDialog()
                     }
+                    SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE -> {
+                        when (result) {
+                            SMSSDK.RESULT_COMPLETE -> {
+                                when (type) {
+                                    Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
+                                    Constant.TYPE_REGISTER -> {
+                                        val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                                        intent.putExtra("phone", phone)
+                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
+                                        startActivityForResult(intent, 0)
+                                        finish()
+                                    }
+                                    Constant.TYPE_FORGET_PASSWORD -> {
+                                        val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
+                                        intent.putExtra("phone", account)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                }
+                            }
+                            else -> {
+                                if (result == SMSSDK.RESULT_ERROR) {
+                                    try {
+                                        val a = (data as Throwable)
+                                        val jsonObject = JSONObject(a.localizedMessage)
+                                        val message = jsonObject.opt("detail").toString()
+                                        ToastUtils.showLong(message)
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
+                                    }
+                                } else {
+                                    val a = (data as Throwable)
+                                    a.printStackTrace()
+                                    ToastUtils.showLong(a.message)
+                                }
+                                hideLoadingDialog()
+                            }
+                        }
+                    }
                 }
-                // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
                 false
             }).sendMessage(msg)
         }
@@ -259,25 +265,44 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
-        override fun start() { showLoadingDialog(getString(R.string.tip_start_sync)) }
+        override fun start() {
+            showLoadingDialog(getString(R.string.tip_start_sync))
+        }
+
         override fun complete() {
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constant.IS_LOGIN, true)
             startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
             finish()
         }
+
         override fun error(msg: String) {
             hideLoadingDialog()
             ToastUtils.showLong(msg)
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 0 && resultCode == Activity.RESULT_FIRST_USER) {
-            finish()
+        when (requestCode) {
+            10 -> if (resultCode == Activity.RESULT_OK) {
+                val bundle = data?.extras
+                val countryName = bundle?.getString("countryName")
+                val countryNumber = bundle?.getString("countryNumber")
+
+                val toString = countryNumber?.replace("+", "").toString()
+                LogUtils.v("zcl------------------countryCode接手前$countryCode")
+                if (TextUtils.isEmpty(countryCode))
+                    return
+                LogUtils.v("zcl------------------countryCode接收后$countryCode")
+                countryCode = toString
+                ccp_tv.text = countryName + countryNumber
+            }
+            0 -> if (resultCode == Activity.RESULT_FIRST_USER) finish()
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         SMSSDK.unregisterEventHandler(eventHandler)

@@ -247,7 +247,7 @@
     <string name="verification_code_error">Verification code error</string>
     <string name="successful_verification">Successful verification</string>
     <string name="exit_login">Logout</string>
-    <string name="forget_password">Forget PW?</string>
+    <string name="forget_password">Forget PW</string>
     <string name="verification_phone">Verify your phone</string>
     <string name="update_password">Change Password</string>
     <string name="password_input_error">Password cannot contain special characters</string>
@@ -691,7 +691,6 @@
     <string name="for_connector">Connector</string>
     <string name="for_gateway">Gateway</string>
     <string name="login_password">Log in with a password</string>
-    <string name="account_after_login">Automatically register an account after login</string>
     <string name="online_upgrade">Upgrade</string>
 
     <string name="tips">Tips</string>
@@ -739,7 +738,6 @@
     <string name="send_code">Verification code sent to</string>
     <string name="follow_the_steps">Follow the steps to retrieve your password.</string>
     <string name="reacquire">Reacquire</string>
-    <string name="account_after_login_two">Automatically register an account after login</string>
     <string name="next">Next</string>
     <string name="enter_password">Enter password</string>
     <string name="please_your_password">Please enter your login password</string>

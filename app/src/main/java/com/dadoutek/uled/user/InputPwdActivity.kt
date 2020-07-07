@@ -54,7 +54,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             pwd_btn.text = getString(R.string.register)
         } else if (type == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
-            pwd_title.text = getString(R.string.forget_password)
+            pwd_title.text = getString(R.string.set_password)
             pwd_btn.text = getString(R.string.next)
         }
     }

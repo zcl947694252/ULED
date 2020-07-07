@@ -29,11 +29,14 @@ import com.dadoutek.uled.user.EnterConfirmationCodeActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_forget_password.*
+import kotlinx.android.synthetic.main.activity_forget_password.ccp_tv
 import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.activity_register.btn_send_verification
 import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
+import kotlinx.android.synthetic.main.activity_register.return_image
+import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.json.JSONObject
-import kotlinx.android.synthetic.main.activity_forget_password.register_phone_line as register_phone_line1
 
 /**
  * Created by hejiajun on 2018/5/16.
@@ -62,7 +65,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         image_password_btn.setOnClickListener(this)
         image_again_password_btn.setOnClickListener(this)
         return_image.setOnClickListener(this)
-        country_code_arrow.setOnClickListener(this)
+        regist_country_code_arrow.setOnClickListener(this)
 }
 
     @SuppressLint("SetTextI18n")
@@ -73,9 +76,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 val bundle = data?.extras
                 val countryName = bundle?.getString("countryName")
                 val countryNumber = bundle?.getString("countryNumber")
-                ccp_tv.text = countryName+countryNumber
-                countryCode = countryNumber?.replace("+","").toString()
 
+                val toString = countryNumber?.replace("+", "").toString()
+                LogUtils.v("zcl------------------countryCode接手前$countryCode")
+                if (TextUtils.isEmpty(countryCode))
+                    return
+                LogUtils.v("zcl------------------countryCode接收后$countryCode")
+                countryCode = toString
+                regist_ccp_tv.text = countryName+countryNumber
                 LogUtils.v("zcl------------------countryCode$countryCode")
             }
             0->{
@@ -110,7 +118,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     override fun onClick(v: View?) {
         when (v!!.id) {
-            R.id.country_code_arrow -> {
+            R.id.regist_country_code_arrow -> {
                 val intent = Intent()
                 intent.setClass(this@RegisterActivity, CountryActivity::class.java)
                 startActivityForResult(intent, 10)
