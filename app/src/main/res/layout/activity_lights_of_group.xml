@@ -39,7 +39,7 @@
         <Button
                 android:id="@+id/light_add_device_btn"
                 style="@style/ButtonStyle"
-                android:text="@string/device_scan_add"
+                android:text="@string/add_device"
                 app:layout_constraintEnd_toEndOf="@+id/image_no_device"
                 app:layout_constraintStart_toStartOf="@+id/image_no_device"
                 app:layout_constraintTop_toBottomOf="@+id/image_no_device" />

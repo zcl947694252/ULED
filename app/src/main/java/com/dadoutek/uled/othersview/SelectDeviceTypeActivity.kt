@@ -43,7 +43,7 @@ class SelectDeviceTypeActivity : BaseActivity() {
         deviceTypeList.add(DeviceItem(getString(R.string.normal_light), 0, DeviceType.LIGHT_NORMAL))
         deviceTypeList.add(DeviceItem(getString(R.string.rgb_light), 0, DeviceType.LIGHT_RGB))
         deviceTypeList.add(DeviceItem(getString(R.string.switch_name), 0, DeviceType.NORMAL_SWITCH))
-        deviceTypeList.add(DeviceItem(getString(R.string.sensoR), 0, DeviceType.SENSOR))
+        deviceTypeList.add(DeviceItem(getString(R.string.sensor), 0, DeviceType.SENSOR))
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), 0, DeviceType.SMART_CURTAIN))
         deviceTypeList.add(DeviceItem(getString(R.string.relay), 0, DeviceType.SMART_RELAY))
         deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), 0, DeviceType.GATE_WAY))

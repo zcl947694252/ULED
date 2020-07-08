@@ -6,8 +6,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
@@ -15,11 +13,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -43,7 +39,6 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
@@ -54,7 +49,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -71,7 +65,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
@@ -225,7 +218,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }//添加设备
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { doFinish() }
-        toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
+        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms!!.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -801,7 +794,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             ToastUtils.showShort(getString(R.string.reset_factory_success))
                             DBUtils.deleteSensor(currentLightm!!)
                             sensorDatummms.remove(currentLightm!!)
-                            toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms!!.size + ")"
+                            toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms!!.size + ")"
                             adapter?.notifyDataSetChanged()
                             if (sensorDatummms.size <= 0)
                                 setEmpty()
@@ -1076,7 +1069,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
         sensorDatummms = mNewData!!
-        toolbarTv.text = getString(R.string.sensoR) + " (" + sensorDatummms.size + ")"
+        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms.size + ")"
         adapter!!.setNewData(sensorDatummms)
         if (sensorDatummms.size <= 0) {
             no_device_relativeLayout.visibility = View.VISIBLE

@@ -1035,7 +1035,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.meshAddr = mDeviceInfo.meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = getString(R.string.sensoR) + dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
         DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 

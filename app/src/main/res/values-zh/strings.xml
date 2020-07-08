@@ -78,7 +78,6 @@
     <!-- Scan DeviceSchema -->
     <string name="device_scan_header">扫描网络</string>1
     <string name="device_scan_scan">扫描设备</string>
-    <string name="device_scan_add">添加设备</string>
 
     <!-- GroupSchema Setting -->
     <string name="group_setting_header">分组设置</string>
@@ -109,7 +108,6 @@
     <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
-    <string name="add_group">添加群组</string>
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">未扫描到设备！</string>
@@ -147,7 +145,7 @@
     <string name="rename_tip_check">不允许输入特殊符号！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanned_device_num">已添加 %1$d 个设备 </string>
+    <string name="title_scanned_device_num">扫描到设备: </string>
     <string name="title_scanned_lights_num">扫描完毕：%1$d个设备</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
@@ -301,7 +299,6 @@
     <string name="start_sync">即将开始同步数据..</string>
     <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">同步数据中…</string>
-    <string name="install_device">添加设备</string>
     <string name="tip_start_sync">开始同步..</string>
     <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
@@ -527,7 +524,6 @@
     <string name="re_upgrade">重新升级</string>
     <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
     <string name="get_code_ing">获取验证...</string>
-    <string name="add_new_group">+添加分组</string>
     <string name="rename_groups">重命名分组</string>
     <string name="create_group">添加分组</string>
     <string name="create_scene_select">添加场景</string>
@@ -535,9 +531,9 @@
     <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>
     <string name="switch_name">开关</string>
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
-    <string name="sensoR">传感器</string>
+    <string name="sensor">传感器</string>
     <string name="sensor_describe">例如：人体感应器,PIR</string>
-    <string name="add_device">添加设备</string>
+    <string name="add_device">添加新设备</string>
     <string name="update_name_gp">修改组名</string>
     <string name="curtain">窗帘</string>
     <string name="smart_curtain">例如：智能窗帘</string>

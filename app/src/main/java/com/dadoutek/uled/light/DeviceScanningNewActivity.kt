@@ -234,31 +234,33 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun isSelectAll() {
-        if (isSelectAll) {
-            for (j in nowDeviceList.indices) {
-                this.updateList.add(nowDeviceList[j])
-                nowDeviceList[j].isSelected = true
+        when {isSelectAll -> {
+                for (j in nowDeviceList.indices) {
+                    this.updateList.add(nowDeviceList[j])
+                    nowDeviceList[j].isSelected = true
 
-                btn_add_groups?.setText(R.string.set_group)
+                    btn_add_groups?.setText(R.string.set_group)
 
-                if (hasGroup()) {
-                    startBlink(nowDeviceList[j])
-                } else {
-                    ToastUtils.showLong(R.string.tip_add_group)
+                    if (hasGroup()) {
+                        startBlink(nowDeviceList[j])
+                    } else {
+                        ToastUtils.showLong(R.string.tip_add_group)
+                    }
                 }
-            }
 
-            this.mAddedDevicesAdapter.notifyDataSetChanged()
-        } else {
-            for (j in nowDeviceList.indices) {
-                this.updateList.remove(nowDeviceList[j])
-                nowDeviceList[j].isSelected = false
-                stopBlink(nowDeviceList[j])
-                if (!isSelectLight && isAllLightsGrouped) {
-                    btn_add_groups?.setText(R.string.complete)
-                }
+                this.mAddedDevicesAdapter.notifyDataSetChanged()
             }
-            this.mAddedDevicesAdapter.notifyDataSetChanged()
+            else -> {
+                for (j in nowDeviceList.indices) {
+                    this.updateList.remove(nowDeviceList[j])
+                    nowDeviceList[j].isSelected = false
+                    stopBlink(nowDeviceList[j])
+                    if (!isSelectLight && isAllLightsGrouped) {
+                        btn_add_groups?.setText(R.string.complete)
+                    }
+                }
+                this.mAddedDevicesAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -307,7 +309,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         closeAnimation()
         btn_stop_scan.visibility = View.GONE
         scanning_no_device.visibility = View.VISIBLE
-        toolbarTv.text = getString(R.string.scan_end)
+        //toolbarTv.text = getString(R.string.scan_end)
 
         if (mAddDeviceType != DeviceType.LIGHT_NORMAL) {
             scanning_no_factory_btn_ly.visibility = View.GONE
@@ -329,7 +331,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun retryScan() {
-        toolbarTv.text = getString(R.string.scanning)
+       // toolbarTv.text = getString(R.string.scanning)
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
             Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
@@ -357,7 +359,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         closeAnimation()
         //更新Title
        // toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
-        toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
+       // toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
         if (nowDeviceList.size > 0) {
@@ -622,7 +624,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
             DeviceType.SENSOR -> {
                 val dbItem = DbSensor()
-                dbItem.name = getString(R.string.sensoR) + dbItem.meshAddr
+                dbItem.name = getString(R.string.sensor) + dbItem.meshAddr
                 dbItem.meshAddr = item.deviceInfo.meshAddress
                 dbItem.belongGroupId = item.belongGroupId
                 dbItem.macAddr = item.deviceInfo.macAddress
@@ -944,7 +946,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         btn_start_scan.setOnClickListener {
             initVisiable()
-            toolbarTv.text = getString(R.string.scanning)
+            //toolbarTv.text = getString(R.string.scanning)
             meshList.clear()
             startScan()
         }
@@ -1008,7 +1010,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
         scanning_no_device.visibility = View.GONE
 
-        scanning_num.text = getString(R.string.title_scanned_device_num, 0)
+        scanning_num.text = getString(R.string.title_scanned_device_num)+"0"
         btn_stop_scan?.setText(R.string.stop_scan)
         btn_stop_scan?.visibility = View.VISIBLE
     }
@@ -1027,7 +1029,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("ResourceType")
     private fun initToolbar() {
-        toolbarTv?.setText(R.string.scanning)
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener { finish() }
     }
@@ -1056,6 +1057,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN_SWITCH))
         } else
             groups.addAll(DBUtils.getGroupsByDeviceType(mAddDeviceType))
+
+       var title  = when (mAddDeviceType) {
+            DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
+            DeviceType.LIGHT_RGB -> getString(R.string.rgb_light)
+            DeviceType.SENSOR -> getString(R.string.sensor)
+            DeviceType.SMART_RELAY -> getString(R.string.relay)
+            DeviceType.SMART_CURTAIN -> getString(R.string.curtain)
+            DeviceType.GATE_WAY -> getString(R.string.Gate_way)
+           else -> getString(R.string.normal_light)
+       }
+         toolbarTv?.text = title
 
         if (groups.size > 0) {
             for (i in groups.indices) {
@@ -1398,6 +1410,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
         when (deviceInfo.status) {
@@ -1424,8 +1437,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     isFirtst = false
                     SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
                 }
-                toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-                scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+               // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                scanning_num.text = getString(R.string.title_scanned_device_num)+ mAddedDevices.size
 
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
                 mUpdateMeshRetryCount = 0

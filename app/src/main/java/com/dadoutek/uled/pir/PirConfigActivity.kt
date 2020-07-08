@@ -468,7 +468,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor.version = version
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
-        dbSensor.name = getString(R.string.sensoR) + dbSensor.meshAddr
+        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
         saveSensor(dbSensor, isConfirm)//保存进服务器
 

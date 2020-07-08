@@ -271,7 +271,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL    ,    Constant.INSTALL_NORMAL_LIGHT)
         isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB             ,Constant.INSTALL_RGB_LIGHT)
         isAddDevice(R.string.switch_name,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH         ,     Constant.INSTALL_SWITCH)
-        isAddDevice(R.string.sensoR,DBUtils.getAllSensor().size,DeviceType.SENSOR                     ,Constant.INSTALL_SENSOR)
+        isAddDevice(R.string.sensor,DBUtils.getAllSensor().size,DeviceType.SENSOR                     ,Constant.INSTALL_SENSOR)
         isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           ,Constant.INSTALL_CURTAIN)
         isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  ,Constant.INSTALL_CONNECTOR)
         isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constant.INSTALL_GATEWAY)

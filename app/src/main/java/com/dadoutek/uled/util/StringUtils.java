@@ -285,7 +285,7 @@ public class StringUtils {
                 startStr = context.getString(R.string.night_light);
                 break;
             case DeviceType.SENSOR:
-                startStr = context.getString(R.string.sensoR);
+                startStr = context.getString(R.string.sensor);
                 break;
         }
 

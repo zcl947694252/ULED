@@ -57,7 +57,7 @@
                 android:padding="5dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="8dp"
-                android:text="@string/install_device"
+                android:text="@string/add_device"
                 android:textColor="@color/gray_3"
                 android:visibility="gone" />
 

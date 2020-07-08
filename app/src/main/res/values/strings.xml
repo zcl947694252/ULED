@@ -86,7 +86,6 @@
     <!-- Scan DeviceSchema -->
     <string name="device_scan_header">Network Scanning</string>
     <string name="device_scan_scan">Scan Device</string>
-    <string name="device_scan_add">Add Device</string>
 
     <!-- GroupSchema Setting -->
     <string name="group_setting_header">Group Setting</string>
@@ -154,7 +153,7 @@
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
-    <string name="title_scanned_device_num">Added %1$d devices</string>
+    <string name="title_scanned_device_num">Scan to device:</string>
     <string name="title_scanned_lights_num">%1$d devices</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
@@ -302,7 +301,6 @@
     <string name="start_sync">Start to download data…</string>
     <string name="download_data_success">Download data success</string>
     <string name="sync_now">Download data…</string>
-    <string name="install_device">Add Device</string>
     <string name="tip_start_sync">Start syncing. . .</string>
     <string name="upload_data_success">Upload data success</string>
     <string name="network_tip_title">Network status prompt</string>
@@ -579,7 +577,6 @@
     <string name="re_upgrade">Re-upgrade</string>
     <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
     <string name="get_code_ing">Get verification...</string>
-    <string name="add_new_group">+Add group</string>
     <string name="rename_groups"> Rename group </string>
     <string name="create_group">Create group </string>
     <string name="create_scene_select">Create a scene</string>
@@ -587,9 +584,9 @@
     <string name="rgb_light_describe">RGB lights, RGBW lights</string>
     <string name="switch_name">Switch </string>
     <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
-    <string name="sensoR">Sensor </string>
+    <string name="sensor">Sensor </string>
     <string name="sensor_describe">Night light, PIR</string>
-    <string name="add_device">Add device </string>
+    <string name="add_device">Add new device </string>
     <string name="update_name_gp"> modify the group name </string>
     <string name="curtain">curtain </string>    
     <string name="smart_curtain">Smart Curtains</string>
