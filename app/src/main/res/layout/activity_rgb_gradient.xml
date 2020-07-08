@@ -7,7 +7,7 @@
         android:orientation="vertical"
         android:background="@color/background_color">
 
-    <View
+   <View
             android:id="@+id/view7"
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -67,7 +67,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view8"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -140,7 +140,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view9"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -173,7 +173,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view10"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -185,26 +185,18 @@
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
-    <android.support.constraint.ConstraintLayout
+
+    <LinearLayout
             android:id="@+id/btnAdd"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/white"
+            android:layout_margin="@dimen/dp_10"
+            android:background="@drawable/add_device_bt"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutModeDiy">
 
-
-        <ImageView
-                android:id="@+id/imageView10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/icon_add_group"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.39"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
                 android:layout_width="wrap_content"
@@ -218,7 +210,8 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
     <View
             android:id="@+id/view12"
             android:layout_width="match_parent"

@@ -85,7 +85,7 @@
                 android:layout_marginLeft="20dp"
                 android:textSize="15sp"
                 android:textColor="@color/black_three"
-                android:text="@string/create_group" />
+                android:text="@string/add_groups" />
 
         </RelativeLayout>
 

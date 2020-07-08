@@ -49,14 +49,23 @@
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/delete_cancel" />
+        <SeekBar
+                android:id="@+id/sbSpeed"
+                style="@style/SeekBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/speed_text"
+                android:max="99"
+                android:min="0"
+                android:progress="100" />
 
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/speed_text">
+                app:layout_constraintTop_toBottomOf="@id/sbSpeed">
 
             <ImageView
                     android:id="@+id/speed_less"
@@ -66,21 +75,16 @@
                     android:background="@drawable/icon_minus"
                     />
 
-            <SeekBar
-                    android:id="@+id/sbSpeed"
-                    style="@style/SeekBarStyle"
+           <View
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0.1dp"
                     android:layout_weight="1"
-                    android:max="99"
-                    android:min="0"
-                    android:progress="50" />
-
+                    android:background="@color/gray_e"/>
             <ImageView
                     android:id="@+id/speed_add"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dp_8"
+                    android:layout_margin="7dp"
                     android:background="@drawable/add_enabled"/>
         </LinearLayout>
 

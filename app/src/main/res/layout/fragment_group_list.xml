@@ -69,7 +69,7 @@
                     app:layout_constraintTop_toTopOf="@+id/btn_on" />
 
 
-                <View
+               <View
                     android:id="@+id/view3"
                     android:layout_width="1dp"
                     android:layout_height="18dp"
@@ -102,7 +102,7 @@
                     app:layout_constraintTop_toTopOf="@+id/btn_off" />
 
 
-                <View
+               <View
                     android:id="@+id/view4"
                     android:layout_width="1dp"
                     android:layout_height="18dp"
@@ -127,7 +127,7 @@
 -->
 
 
-        <View
+       <View
             android:id="@+id/view5"
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -154,7 +154,7 @@
 
 
 
-        <View
+       <View
             android:id="@+id/view6"
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -175,7 +175,7 @@
             app:layout_constraintTop_toBottomOf="@+id/view6"
             app:layout_constraintVertical_bias="0.0" />
 
-        <View
+       <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             app:layout_constraintBottom_toBottomOf="@+id/list_groups"

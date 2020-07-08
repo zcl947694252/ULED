@@ -86,7 +86,6 @@
     <string name="mesh_add_header">控制设置</string>
     <string name="mesh_add_label_mesh_setting">控制设置</string>
     <string name="install_setting">安装设置</string>
-    <string name="mesh_add_button_save">保存</string>
     <string name="mesh_add_button_share">分享</string>
     <string name="mesh_add_button_clear">清空</string>
     <string name="mesh_add_default_factory_name">telink_mesh1</string>
@@ -525,7 +524,6 @@
     <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
     <string name="get_code_ing">获取验证...</string>
     <string name="rename_groups">重命名分组</string>
-    <string name="create_group">添加分组</string>
     <string name="create_scene_select">添加场景</string>
     <string name="normal_light_describe">例如：单色温,双色温灯</string>
     <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>

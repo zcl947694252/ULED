@@ -27,7 +27,7 @@
                     android:gravity="center"
                     android:textSize="30sp" />
 
-            <View
+           <View
                     android:id="@+id/startTime_line"
                     android:layout_width="match_parent"
                     android:layout_height="1.5dp"
@@ -59,7 +59,7 @@
                     android:text="@string/endTime"
                     android:textSize="30sp" />
 
-            <View
+           <View
                     android:id="@+id/endTime_line"
                     android:layout_width="match_parent"
                     android:layout_height="1.5dp"
@@ -107,7 +107,7 @@
                 android:src="@drawable/arrow_r" />
     </LinearLayout>
 
-    <View
+   <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray_e" />

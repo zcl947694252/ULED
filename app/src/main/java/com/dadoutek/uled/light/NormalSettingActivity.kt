@@ -758,18 +758,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        DBUtils.lastUser?.let {
-            if (it.id.toString() == it.last_authorizer_user_id)
-                if (currentShowPageGroup) {
-                    menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-                } else {
-                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                    findItem = menu?.findItem(R.id.toolbar_f_version)
-                    findItem?.title = getString(R.string.getVsersionFail)
-                    findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
-                    findItemChangeGp?.isVisible = true
-                }
-        }
+        if (!currentShowPageGroup)
+            DBUtils.lastUser?.let {
+                if (it.id.toString() == it.last_authorizer_user_id)
+                    if (currentShowPageGroup) {
+                        menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                    } else {
+                        menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                        findItem = menu?.findItem(R.id.toolbar_f_version)
+                        findItem?.title = getString(R.string.getVsersionFail)
+                        findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                        findItemChangeGp?.isVisible = true
+                    }
+            }
         LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
         return super.onCreateOptionsMenu(menu)
     }
@@ -1301,7 +1302,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.group = groupString as DbGroup
         isAllGroup = 1 == (group?.id ?: 0).toInt()
         if (isAllGroup) {
-            slow_switch.isChecked = (group?.slowUpSlowDownStatus ?: 0) == 1
+            val b = (group?.slowUpSlowDownStatus ?: 0) == 1
+            slow_switch.isChecked = b
+
+            if (b)
+                slow_rg_view.visibility = GONE
+            else
+                slow_rg_view.visibility = VISIBLE
 
             when (group?.slowUpSlowDownSpeed) {
                 1 -> slow_rg_slow.isChecked = true

@@ -40,7 +40,8 @@ public class Dot extends View {
         int height = getHeight();
         int radius = Math.min(width, height) / 2;
         mPaint.setShadowLayer(45, 0, 0, getContext().getResources().getColor(R.color.white));
-        canvas.drawCircle(width / 2, height / 2, radius, mPaint);
+        //canvas.drawCircle(width / 2, height / 2, radius, mPaint);
+        canvas.drawRect(0,0,width,height,mPaint);
     }
 
     public void setChecked(boolean checked,int color) {

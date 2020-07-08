@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
+   <View
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"

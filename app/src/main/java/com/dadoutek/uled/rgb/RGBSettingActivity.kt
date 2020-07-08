@@ -956,8 +956,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             }
             R.id.img_header_menu_left -> finish()
             R.id.tvOta -> checkPermission()
-            R.id.update_group -> updateGroup()
-            R.id.btn_remove -> remove()
+           // R.id.update_group -> updateGroup()
+           // R.id.btn_remove -> remove()
             R.id.dynamic_rgb -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {

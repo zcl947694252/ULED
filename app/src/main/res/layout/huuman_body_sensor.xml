@@ -81,7 +81,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view15"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -149,7 +149,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view16"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -232,7 +232,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view17"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -299,7 +299,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view18"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -365,7 +365,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view30"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -430,7 +430,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View
+           <View
                     android:id="@+id/view31"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -527,7 +527,7 @@
                     android:layout_marginLeft="38dp"
                     android:layout_marginRight="38dp"
                     android:layout_marginBottom="36dp"
-                    android:background="@drawable/btn_rec_blue_bt"
+                    android:background="@drawable/rect_blue_5"
                     android:elevation="10dp"
                     android:text="@string/confirm"
                     android:textColor="@color/black_three"

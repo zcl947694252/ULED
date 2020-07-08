@@ -28,7 +28,7 @@
                     android:padding="5dp"
                     android:text="@string/device_setting_color" />
 
-                <View
+               <View
                     android:id="@+id/color_preview"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
 
-                <view
+               <View
                     android:id="@+id/color_picker"
                     class="com.dadoutek.uled.widget.ColorPicker"
                     android:layout_width="wrap_content"

@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
     <TextView
-        android:id="@+id/add_group"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:text="@string/add_groups"
-        android:textColor="@color/primary"
-        android:textSize="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="56dp" />
+            android:id="@+id/seehelpe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:text="@string/see_help"
+            android:textColor="@color/black_three"
+            android:textSize="16sp" />
 
-</android.support.constraint.ConstraintLayout>
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:src="@drawable/add_enabled"
+            android:visibility="gone" />
+
+    <TextView
+            android:id="@+id/add_group"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:text="@string/add_groups"
+            android:background="@drawable/add_device_bt"
+            android:textColor="@color/primary"
+            android:textSize="16sp" />
+
+</LinearLayout>

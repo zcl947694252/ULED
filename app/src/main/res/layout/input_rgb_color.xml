@@ -110,7 +110,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView21" />
 
 
-    <View
+   <View
         android:id="@+id/view11"
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -119,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView21" />
 
 
-    <View
+   <View
         android:id="@+id/view13"
         android:layout_width="1dp"
         android:layout_height="0dp"

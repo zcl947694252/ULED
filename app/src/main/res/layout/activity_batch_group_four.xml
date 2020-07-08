@@ -137,7 +137,7 @@
                             android:textColor="@color/selector_batch_group_color"
                             android:textSize="18sp" />
 
-                    <View
+                   <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:background="@color/gray_e" />
@@ -168,7 +168,7 @@
                             android:layout_weight="3"
                             android:gravity="center">
 
-                        <View
+                       <View
                                 android:id="@+id/batch_four_no_group_line"
                                 android:layout_width="25dp"
                                 android:layout_height="2dp"
@@ -177,7 +177,7 @@
                                 android:scaleType="fitXY" />
                     </LinearLayout>
 
-                    <View
+                   <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:background="@color/gray_e" />
@@ -189,7 +189,7 @@
                             android:layout_weight="2"
                             android:gravity="center">
 
-                        <View
+                       <View
                                 android:id="@+id/batch_four_grouped_line"
                                 android:layout_width="25dp"
                                 android:layout_height="2dp"
@@ -200,7 +200,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <View
+               <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/gray_e" />

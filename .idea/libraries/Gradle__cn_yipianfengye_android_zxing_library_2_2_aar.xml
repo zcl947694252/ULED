@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: cn.yipianfengye.android:zxing-library:2.2@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ccd2f36600ca57d8f3540cb912eb022/zxing-library-2.2/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ccd2f36600ca57d8f3540cb912eb022/zxing-library-2.2/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ccd2f36600ca57d8f3540cb912eb022/zxing-library-2.2/jars/libs/core_3.0.1.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/72f3d34af4e0f8ab2df88e8045ad3bd7/zxing-library-2.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/72f3d34af4e0f8ab2df88e8045ad3bd7/zxing-library-2.2/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/72f3d34af4e0f8ab2df88e8045ad3bd7/zxing-library-2.2/jars/libs/core_3.0.1.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/cn.yipianfengye.android/zxing-library/2.2/48a2d586331e558d22e2885759ebc4c12727c752/zxing-library-2.2-javadoc.jar!/" />

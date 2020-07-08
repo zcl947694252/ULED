@@ -73,7 +73,7 @@
             android:text="@string/btn_jump_over"
             android:textColor="@color/gray_6"
             android:textSize="@dimen/sp_14" />
-    <View
+   <View
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />

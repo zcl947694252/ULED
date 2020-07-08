@@ -41,10 +41,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.MeshAddressGenerator
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.TmtUtils
+import com.dadoutek.uled.util.*
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -294,6 +291,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         newItemGroup.enableCheck = true
         newItemGroup.gpName = currentScene?.name
         newItemGroup.sceneId = currentScene?.id ?: 0
+        newItemGroup.icon = if (TextUtils.isEmpty(currentScene?.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(currentScene?.imgName, this)
         if (currentScene != null)
             showBottomList.add(newItemGroup)
     }

@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -48,6 +49,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -68,6 +70,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
+    private var seeHelp: TextView? = null
+    private var addGroup: TextView? = null
     private var mConnectDisposable: Disposable? = null
     private var currentPosition: Int = 0
     private var disposableTimer: Disposable? = null
@@ -199,6 +203,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
         lin = LayoutInflater.from(activity).inflate(R.layout.gp_fragment_add_view, null)
+         addGroup = lin?.findViewById<TextView>(R.id.add_group)
+         seeHelp = lin?.findViewById<TextView>(R.id.seehelpe)
         return view
     }
 
@@ -238,7 +244,11 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         addGroupBtn?.setOnClickListener(onClickAddGroup)
         addNewGroup?.setOnClickListener(onClickAddGroup)
-        lin?.setOnClickListener(onClickAddGroup)
+        addGroup?.setOnClickListener(onClickAddGroup)
+        seeHelp?.setOnClickListener{
+            var intent = Intent(context, InstructionsForUsActivity::class.java)
+            startActivity(intent)
+        }
 
         val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         // recyclerView!!.layoutManager = layoutmanager
@@ -254,7 +264,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
         //recyclerView?.addItemDecoration(decoration)
-        groupAdapter!!.addFooterView(lin)
+       groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         //如果是自己的区域才允许长按删除
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
@@ -575,6 +585,10 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     private val onClickAddGroup = View.OnClickListener {
+        addNewGroupMode()
+    }
+
+    private fun addNewGroupMode() {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)

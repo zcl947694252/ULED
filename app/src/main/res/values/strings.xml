@@ -94,7 +94,6 @@
     <string name="mesh_add_header">Add Mesh</string>
     <string name="mesh_add_label_mesh_setting">Mesh Setting</string>
     <string name="install_setting">Install Setting</string>
-    <string name="mesh_add_button_save">Save</string>
     <string name="mesh_add_button_share">Share</string>
     <string name="mesh_add_button_clear">Clear Mesh</string>
     <string name="mesh_add_default_factory_name">Telink_mesh1</string>
@@ -578,7 +577,6 @@
     <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
     <string name="get_code_ing">Get verification...</string>
     <string name="rename_groups"> Rename group </string>
-    <string name="create_group">Create group </string>
     <string name="create_scene_select">Create a scene</string>
     <string name="normal_light_describe"> Monochrome temperature, dual color temperature light </string>
     <string name="rgb_light_describe">RGB lights, RGBW lights</string>

@@ -48,7 +48,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="start|center"
             android:paddingStart="35dp"
-            android:text="@string/create_group"
+            android:text="@string/add_groups"
             android:textColor="@color/white"
             android:textSize="16sp" />
 

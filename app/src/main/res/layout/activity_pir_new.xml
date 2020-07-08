@@ -13,7 +13,7 @@
 
     <include layout="@layout/template_radiogroup" />
 
-    <View
+   <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray_e" />
@@ -85,7 +85,7 @@
                 </RadioGroup>
             </android.support.constraint.ConstraintLayout>-->
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
@@ -140,7 +140,7 @@
 
             </LinearLayout>
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
@@ -196,7 +196,7 @@
 
             </LinearLayout>
 
-            <View
+           <View
                     android:id="@+id/pir_config_trigger_after_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -328,7 +328,7 @@
 
              </android.support.constraint.ConstraintLayout>-->
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
@@ -420,7 +420,7 @@
 
             </LinearLayout>
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee" />
@@ -456,7 +456,7 @@
                     android:layout_marginLeft="38dp"
                     android:layout_marginRight="38dp"
                     android:layout_marginBottom="30dp"
-                    android:background="@drawable/btn_rec_blue_bt"
+                    android:background="@drawable/rect_blue_5"
                     android:elevation="10dp"
                     android:text="@string/confirm"
                     android:textColor="@color/black_three"

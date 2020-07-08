@@ -66,7 +66,7 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <View
+       <View
             android:id="@+id/view14"
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -338,7 +338,7 @@
             android:textSize="15sp"
             tools:layout_editor_absoluteX="8dp" />
 
-        <View
+       <View
             android:id="@+id/view19"
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -356,7 +356,7 @@
             android:textSize="18sp"
             tools:layout_editor_absoluteX="8dp" />
 
-        <View
+       <View
                 android:layout_width="match_parent"
                 android:layout_height="5dp"
                 android:background="@color/gray_e"/>

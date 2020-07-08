@@ -52,7 +52,7 @@
         app:layout_constraintTop_toTopOf="@+id/diy_mode_on" />
 
 
-    <View
+   <View
         android:id="@+id/view3"
         android:layout_width="1dp"
         android:layout_height="18dp"
@@ -85,7 +85,7 @@
         app:layout_constraintTop_toTopOf="@+id/diy_mode_off" />
 
 
-    <View
+   <View
         android:id="@+id/view4"
         android:layout_width="1dp"
         android:layout_height="18dp"
