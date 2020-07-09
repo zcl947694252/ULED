@@ -12,7 +12,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -88,7 +87,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private var isLogin: Boolean = false
     private var factory: TextView? = null
     private var disposableTimer: Disposable? = null
-    private var connectTimer: Disposable? = null
     private var disposable: Disposable? = null
     private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
 
@@ -96,7 +94,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private lateinit var deviceInfo: DeviceInfo
     private var delete: TextView? = null
     private var group: TextView? = null
-    private var set: ImageView? = null
     private var ota: TextView? = null
     private var rename: TextView? = null
     private var views: View? = null
@@ -109,9 +106,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private val OTA_SENSOR: Int = 3//3是oat
     private val SENSOR_FINISH: Int = 4//4代表操作完成
 
-    var installDialog: android.app.AlertDialog? = null
-    var isGuide: Boolean = false
-    var clickRgb: Boolean = false
     private lateinit var sensorDatummms: MutableList<DbSensor>
     private var adapter: SensorDeviceDetailsAdapter? = null
     private var retryConnectCount = 0
@@ -124,15 +118,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-    private var isRgbClick = false
-    private var installId = 0
-    private lateinit var stepOneText: TextView
-    private lateinit var stepTwoText: TextView
-    private lateinit var stepThreeText: TextView
-    private lateinit var switchStepOne: TextView
-    private lateinit var switchStepTwo: TextView
-    private lateinit var swicthStepThree: TextView
-    private lateinit var stepThreeTextSmall: TextView
     private var popupWindow: PopupWindow? = null
     private val SCENE_MAX_COUNT = 100
     private var compositeDisposable = CompositeDisposable()
@@ -282,189 +267,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private fun showInstallDeviceList() {
         dialog_pir.visibility = View.GONE
         showInstallDeviceList(isGuide, isRgbClick)
-    }
-
-    private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
-        this.clickRgb = clickRgb
-        val view = View.inflate(this, R.layout.dialog_install_list, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
-        val install_device_recyclerView = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { installDialog?.dismiss() }
-
-        val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
-
-        val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
-        val layoutManager = LinearLayoutManager(this)
-        install_device_recyclerView?.layoutManager = layoutManager
-        install_device_recyclerView?.adapter = installDeviceListAdapter
-        installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        //添加分割线
-        install_device_recyclerView?.addItemDecoration(decoration)
-
-        installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
-
-        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
-
-        if (isGuide)
-            installDialog?.setCancelable(false)
-
-        installDialog?.show()
-
-        GlobalScope.launch(Dispatchers.Main) { delay(100) }
-    }
-
-    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, view, position ->
-        isGuide = false
-        installDialog?.dismiss()
-        when (position) {
-            INSTALL_GATEWAY -> {
-                installId = INSTALL_GATEWAY
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_NORMAL_LIGHT -> {
-                installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_RGB_LIGHT -> {
-                installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_CURTAIN -> {
-                installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_SWITCH -> {
-                installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-
-                stepOneText.visibility = View.GONE
-                stepTwoText.visibility = View.GONE
-                stepThreeText.visibility = View.GONE
-                switchStepOne.visibility = View.VISIBLE
-                switchStepTwo.visibility = View.VISIBLE
-                swicthStepThree.visibility = View.VISIBLE
-            }
-            INSTALL_SENSOR -> {
-                installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_CONNECTOR -> {
-                installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-        }
-    }
-
-    private fun showInstallDeviceDetail(describe: String, position: Int) {
-        val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-        stepOneText = view.findViewById(R.id.step_one)
-        stepTwoText = view.findViewById(R.id.step_two)
-        stepThreeText = view.findViewById(R.id.step_three)
-        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
-        switchStepOne = view.findViewById(R.id.switch_step_one)
-        switchStepTwo = view.findViewById(R.id.switch_step_two)
-        swicthStepThree = view.findViewById(R.id.switch_step_three)
-        val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
-        val search_bar = view.findViewById<Button>(R.id.search_bar)
-        close_install_list.setOnClickListener(dialogOnclick)
-        btnBack.setOnClickListener(dialogOnclick)
-        search_bar.setOnClickListener(dialogOnclick)
-
-        val title = view.findViewById<TextView>(R.id.textView5)
-        if (position == INSTALL_NORMAL_LIGHT) {
-            title.visibility = View.GONE
-            install_tip_question.visibility = View.GONE
-        } else {
-            title.visibility = View.VISIBLE
-            install_tip_question.visibility = View.VISIBLE
-        }
-
-        install_tip_question.text = describe
-        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
-        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
-
-        installDialog?.setOnShowListener {}
-        installDialog?.show()
-    }
-
-    private val dialogOnclick = View.OnClickListener {
-        var medressData = 0
-        var allData = DBUtils.allLight
-        var sizeData = DBUtils.allLight.size
-        if (sizeData != 0) {
-            var lightData = allData[sizeData - 1]
-            medressData = lightData.meshAddr
-        }
-
-        when (it.id) {
-            R.id.close_install_list -> {
-                installDialog?.dismiss()
-            }
-            R.id.search_bar -> {
-                when (installId) {
-                    INSTALL_NORMAL_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_RGB_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_CURTAIN -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_SWITCH -> {
-                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
-                        //startActivityForResult(intent, 0)
-                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                    }
-                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    INSTALL_CONNECTOR -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_GATEWAY -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                }
-            }
-            R.id.btnBack -> {
-                installDialog?.dismiss()
-                showInstallDeviceList(isGuide, clickRgb)
-            }
-        }
     }
 
     private fun initData() {

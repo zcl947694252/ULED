@@ -3,7 +3,6 @@ package com.dadoutek.uled.othersview
 import android.app.AlertDialog
 import android.content.Intent
 import android.support.v7.widget.GridLayoutManager
-import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -33,7 +32,6 @@ class SelectDeviceTypeActivity : BaseActivity() {
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-    private lateinit var stepThreeTextSmall: TextView
     private val deviceTypeList = mutableListOf<com.dadoutek.uled.device.model.DeviceItem>()
     private val deviceAdapter = DeviceTypeAdapter(R.layout.select_device_type_item, deviceTypeList)
     private var installId = 0
@@ -113,32 +111,19 @@ class SelectDeviceTypeActivity : BaseActivity() {
 
     private fun showInstallDeviceDetail(describe: String, position: Int) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
-        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
         switchStepOne = view.findViewById(R.id.switch_step_one)
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
-        val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
-        val search_bar = view.findViewById<Button>(R.id.search_bar)
-        close_install_list.setOnClickListener(dialogOnclick)
+        val searchBar = view.findViewById<Button>(R.id.search_bar)
+        closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
-        search_bar.setOnClickListener(dialogOnclick)
+        searchBar.setOnClickListener(dialogOnclick)
 
-        val title = view.findViewById<TextView>(R.id.textView5)
-
-        title.visibility = View.VISIBLE
-        install_tip_question.visibility = View.VISIBLE
-        if (position == Constant.INSTALL_SWITCH)
-            stepThreeTextSmall.visibility= View.VISIBLE
-        else
-            stepThreeTextSmall.visibility= View.GONE
-
-        install_tip_question.text = describe
-        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)
                 .setView(view)
                 .create()

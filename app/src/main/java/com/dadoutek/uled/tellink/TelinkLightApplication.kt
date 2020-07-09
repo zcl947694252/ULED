@@ -77,6 +77,7 @@ class TelinkLightApplication : TelinkApplication() {
         if (!inAnalyzerProcess)
             refWatcher = LeakCanary.install(this)*/
         Utils.init(this)
+        Beta.autoCheckUpgrade = false
         Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
         RxBleManager.init(this)
