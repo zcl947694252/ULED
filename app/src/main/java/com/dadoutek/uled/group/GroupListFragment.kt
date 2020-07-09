@@ -350,12 +350,11 @@ class GroupListFragment : BaseFragment() {
                 setBluetoothAndAddVisableDeleteGone()
             }
 
-            override fun onPageScrollStateChanged(i: Int) {
-
-            }
+            override fun onPageScrollStateChanged(i: Int) {}
         })
-        viewPager
-        bnve.setTextSize(15f)
+
+        bnve.setLargeTextSize(15f)
+        bnve.setSmallTextSize(15f)
         bnve.setIconVisibility(false)
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)

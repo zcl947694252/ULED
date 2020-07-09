@@ -11,10 +11,10 @@ class DeviceTypeAdapter(resuresId: Int, data: MutableList<DeviceItem>) : BaseQui
         helper?.setText(R.id.select_tv_name, item.name)
         when (item.productUUID) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
-                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_light_n)
+                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_light_no_circle)
             }
             DeviceType.LIGHT_RGB -> {
-                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_rgb_n)
+                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_rgb_no_circle)
             }
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
                 helper?.setImageResource(R.id.select_device_image, R.drawable.icon_switch_device)

@@ -588,7 +588,7 @@
     <string name="hand_cancel">手拉取消</string>
     <string name="delete_user">确定删除该手机号？</string>
 
-    <string name="relay">蓝牙接收器</string>
+    <string name="relay">接收器</string>
     <string name="scan_connector_num">总计：当前扫描出了 %1$s 个蓝牙接收器</string>
     <string name="title_connector_lights_num">已扫到 %1$d 个蓝牙接收器</string>
     <string name="title_connector_lights_num_total">扫描完毕：%1$d个蓝牙接收器</string>
@@ -834,7 +834,7 @@
     <string name="search_icon">&#xe63c;</string>
     <string name="no_search_result">抱歉,没有发现相关内容</string>
     <string name="change_match_type">换个关键词试试吧</string>
-    <string name="physical_recovery">物理恢复</string>
+    <string name="physical_recovery">物理恢复出厂设置</string>
     <string name="no_found_device">未发现附近有可添加设备</string>
     <string name="please">是否尝试</string>
     <string name="begin_scan">开始扫描</string>

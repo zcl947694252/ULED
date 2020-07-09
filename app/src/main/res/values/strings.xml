@@ -456,7 +456,7 @@
         
     <string name="normal_light">CW light </string>
         
-    <string name="rgb_light">RGB lights</string>
+    <string name="rgb_light">RGB light</string>
         
     <string name="i_know_tip">I know! </string>
         
@@ -913,7 +913,7 @@
     <string name="search_icon">&#xe63c;</string>
     <string name="no_search_result">Sorry, there is no relevant content</string>
     <string name="change_match_type">Try a different keyword</string>
-    <string name="physical_recovery">The physical recovery</string>
+    <string name="physical_recovery">Physical restore factory Settings</string>
     <string name="no_found_device">No additional devices were found nearby</string>
     <string name="please">Whether to try</string>
     <string name="begin_scan">Start scanning</string>
