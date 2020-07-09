@@ -355,7 +355,7 @@ class GroupListFragment : BaseFragment() {
             }
         })
         viewPager
-        bnve.setTextSize(16f)
+        bnve.setTextSize(15f)
         bnve.setIconVisibility(false)
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)

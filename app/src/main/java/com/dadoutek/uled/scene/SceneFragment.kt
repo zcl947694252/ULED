@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
@@ -55,6 +56,7 @@ import java.util.concurrent.TimeUnit
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+    private var goHelp: TextView?=null
     private var disposableTimer: Disposable? = null
     private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
@@ -69,7 +71,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var isGuide = false
     private var isRgbClick = false
     private var add_scenes: Button? = null
-    private var addNewScene: ConstraintLayout? = null
+    private var addNewScene: TextView? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
@@ -222,13 +224,16 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         install_device = viewContent.findViewById(R.id.install_device)
         create_group = viewContent.findViewById(R.id.create_group)
         create_scene = viewContent.findViewById(R.id.create_scene)
-        addNewScene = viewContent.findViewById(R.id.add_new_scene)
+        addNewScene = viewContent.findViewById(R.id.main_add_device)
+        goHelp = viewContent.findViewById(R.id.main_go_help)
+        addNewScene?.text = getString(R.string.create_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
 
         add_scenes!!.setOnClickListener(this)
         addNewScene!!.setOnClickListener(this)
+        goHelp!!.setOnClickListener(this)
 
         initToolBar(viewContent)
         initData()
@@ -638,7 +643,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         }
                     }
 
-                    R.id.add_new_scene -> {
+                    R.id.main_add_device -> {
                         val nowSize = DBUtils.sceneList.size
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
@@ -652,9 +657,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             }
                         }
                     }
+                    R.id.main_go_help -> seeHelpe()
                 }
             }
         }
+    }
+    private fun seeHelpe() {
+        var intent = Intent(context, InstructionsForUsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showPopupMenu() {

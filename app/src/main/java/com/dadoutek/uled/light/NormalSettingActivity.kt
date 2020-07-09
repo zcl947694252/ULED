@@ -310,67 +310,71 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     updateLights(true, currentGroup)
 
                     device_light_add.setOnTouchListener { v, event ->
-                        if (event.action == MotionEvent.ACTION_DOWN) {
-                            //                    tvValue = Integer.parseInt(textView.getText().toString());
-                            downTime = System.currentTimeMillis()
-                            onBtnTouch = true
-                            GlobalScope.launch {
-                                while (onBtnTouch) {
-                                    thisTime = System.currentTimeMillis()
-                                    if (thisTime - downTime >= 500) {
-                                        tvValue++
-                                        val msg = handlerMinusBtn.obtainMessage()
-                                        msg.arg1 = tvValue
-                                        handlerAddBtn.sendMessage(msg)
-                                        Log.e("TAG_TOUCH", tvValue++.toString())
-                                        delay(100)
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                downTime = System.currentTimeMillis()
+                                onBtnTouch = true
+                                GlobalScope.launch {
+                                    while (onBtnTouch) {
+                                        thisTime = System.currentTimeMillis()
+                                        if (thisTime - downTime >= 500) {
+                                            tvValue++
+                                            val msg = handlerMinusBtn.obtainMessage()
+                                            msg.arg1 = tvValue
+                                            handlerAddBtn.sendMessage(msg)
+                                            Log.e("TAG_TOUCH", tvValue++.toString())
+                                            delay(100)
+                                        }
                                     }
                                 }
                             }
-
-                        } else if (event.action == MotionEvent.ACTION_UP) {
-                            onBtnTouch = false
-                            if (thisTime - downTime < 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerAddBtn.sendMessage(msg)
+                            MotionEvent.ACTION_UP -> {
+                                onBtnTouch = false
+                                if (thisTime - downTime < 500) {
+                                    tvValue++
+                                    val msg = handlerMinusBtn.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handlerAddBtn.sendMessage(msg)
+                                }
                             }
-                        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                            onBtnTouch = false
+                            MotionEvent.ACTION_CANCEL -> {
+                                onBtnTouch = false
+                            }
                         }
                         true
                     }
 
                     device_light_minus.setOnTouchListener { v, event ->
-                        if (event.action == MotionEvent.ACTION_DOWN) {
-                            //                    tvValue = Integer.parseInt(textView.getText().toString());
-                            downTime = System.currentTimeMillis()
-                            onBtnTouch = true
-                            GlobalScope.launch {
-                                while (onBtnTouch) {
-                                    thisTime = System.currentTimeMillis()
-                                    if (thisTime - downTime >= 500) {
-                                        tvValue++
-                                        val msg = handlerMinusBtn.obtainMessage()
-                                        msg.arg1 = tvValue
-                                        handlerMinusBtn.sendMessage(msg)
-                                        Log.e("TAG_TOUCH", tvValue++.toString())
-                                        delay(100)
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                downTime = System.currentTimeMillis()
+                                onBtnTouch = true
+                                GlobalScope.launch {
+                                    while (onBtnTouch) {
+                                        thisTime = System.currentTimeMillis()
+                                        if (thisTime - downTime >= 500) {
+                                            tvValue++
+                                            val msg = handlerMinusBtn.obtainMessage()
+                                            msg.arg1 = tvValue
+                                            handlerMinusBtn.sendMessage(msg)
+                                            Log.e("TAG_TOUCH", tvValue++.toString())
+                                            delay(100)
+                                        }
                                     }
                                 }
                             }
-
-                        } else if (event.action == MotionEvent.ACTION_UP) {
-                            onBtnTouch = false
-                            if (thisTime - downTime < 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerMinusBtn.sendMessage(msg)
+                            MotionEvent.ACTION_UP -> {
+                                onBtnTouch = false
+                                if (thisTime - downTime < 500) {
+                                    tvValue++
+                                    val msg = handlerMinusBtn.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handlerMinusBtn.sendMessage(msg)
+                                }
                             }
-                        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                            onBtnTouch = false
+                            MotionEvent.ACTION_CANCEL -> {
+                                onBtnTouch = false
+                            }
                         }
                         true
                     }
@@ -438,64 +442,71 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     }
                     device_light_add.setOnTouchListener { _, event ->
-                        if (event.action == MotionEvent.ACTION_DOWN) {
-                            downTime = System.currentTimeMillis()
-                            onBtnTouch = true
-                            GlobalScope.launch {
-                                while (onBtnTouch) {
-                                    thisTime = System.currentTimeMillis()
-                                    if (thisTime - downTime >= 500) {
-                                        tvValue++
-                                        val msg = handlerMinusBtn.obtainMessage()
-                                        msg.arg1 = tvValue
-                                        handlerAddBtn.sendMessage(msg)
-                                        Log.e("TAG_TOUCH", tvValue++.toString())
-                                        delay(100)
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                downTime = System.currentTimeMillis()
+                                onBtnTouch = true
+                                GlobalScope.launch {
+                                    while (onBtnTouch) {
+                                        thisTime = System.currentTimeMillis()
+                                        if (thisTime - downTime >= 500) {
+                                            tvValue++
+                                            val msg = handlerMinusBtn.obtainMessage()
+                                            msg.arg1 = tvValue
+                                            handlerAddBtn.sendMessage(msg)
+                                            Log.e("TAG_TOUCH", tvValue++.toString())
+                                            delay(100)
+                                        }
                                     }
                                 }
                             }
-                        } else if (event.action == MotionEvent.ACTION_UP) {
-                            onBtnTouch = false
-                            if (thisTime - downTime < 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerAddBtn.sendMessage(msg)
+                            MotionEvent.ACTION_UP -> {
+                                onBtnTouch = false
+                                if (thisTime - downTime < 500) {
+                                    tvValue++
+                                    val msg = handlerMinusBtn.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handlerAddBtn.sendMessage(msg)
+                                }
                             }
-                        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                            onBtnTouch = false
+                            MotionEvent.ACTION_CANCEL -> {
+                                onBtnTouch = false
+                            }
                         }
                         true
                     }
 
                     device_light_minus.setOnTouchListener { v, event ->
-                        if (event.action == MotionEvent.ACTION_DOWN) {
-                            //                    tvValue = Integer.parseInt(textView.getText().toString());
-                            downTime = System.currentTimeMillis()
-                            onBtnTouch = true
-                            GlobalScope.launch {
-                                while (onBtnTouch) {
-                                    thisTime = System.currentTimeMillis()
-                                    if (thisTime - downTime >= 500) {
-                                        tvValue++
-                                        val msg = handlerMinusBtn.obtainMessage()
-                                        msg.arg1 = tvValue
-                                        handlerMinusBtn.sendMessage(msg)
-                                        Log.e("TAG_TOUCH", tvValue++.toString())
-                                        delay(100)
+                        when (event.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                downTime = System.currentTimeMillis()
+                                onBtnTouch = true
+                                GlobalScope.launch {
+                                    while (onBtnTouch) {
+                                        thisTime = System.currentTimeMillis()
+                                        if (thisTime - downTime >= 500) {
+                                            tvValue++
+                                            val msg = handlerMinusBtn.obtainMessage()
+                                            msg.arg1 = tvValue
+                                            handlerMinusBtn.sendMessage(msg)
+                                            Log.e("TAG_TOUCH", tvValue++.toString())
+                                            delay(100)
+                                        }
                                     }
                                 }
                             }
-                        } else if (event.action == MotionEvent.ACTION_UP) {
-                            onBtnTouch = false
-                            if (thisTime - downTime < 500) {
-                                tvValue++
-                                val msg = handlerMinusBtn.obtainMessage()
-                                msg.arg1 = tvValue
-                                handlerMinusBtn.sendMessage(msg)
+                            MotionEvent.ACTION_UP -> {
+                                onBtnTouch = false
+                                if (thisTime - downTime < 500) {
+                                    tvValue++
+                                    val msg = handlerMinusBtn.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handlerMinusBtn.sendMessage(msg)
+                                }
                             }
-                        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-                            onBtnTouch = false
+                            MotionEvent.ACTION_CANCEL -> {
+                                onBtnTouch = false
+                            }
                         }
                         true
                     }

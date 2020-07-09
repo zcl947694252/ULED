@@ -29,19 +29,19 @@
         app:layout_constraintStart_toStartOf="@+id/pwd_title" />
 
     <TextView
-        android:id="@+id/pwd_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="36dp"
-        android:layout_marginTop="64dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:text="@string/input_pwd"
-        android:textColor="@color/black_three"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/pwd_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/input_pwd"
+            android:textColor="@color/black_three"
+            android:textSize="30sp"
+            android:layout_marginTop="36dp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pwd_return" />
 
     <TextView
         android:id="@+id/pwd_notice"

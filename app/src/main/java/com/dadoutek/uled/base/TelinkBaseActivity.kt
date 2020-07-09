@@ -45,6 +45,7 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
@@ -936,7 +937,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.sensoR))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.sensor))
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
@@ -958,11 +959,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
         switchStepTwo = view.findViewById(R.id.switch_step_two)
         swicthStepThree = view.findViewById(R.id.switch_step_three)
         installHelpe = view.findViewById(R.id.install_see_helpe)
-
+        installTitleTv?.text = string
         val searchBar = view.findViewById<Button>(R.id.search_bar)
         closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         searchBar.setOnClickListener(dialogOnclick)
+        installHelpe?.setOnClickListener(dialogOnclick)
+
 
         installDialog = AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
@@ -980,6 +983,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
         when (it.id) {
             R.id.close_install_list -> installDialog?.dismiss()
+            R.id.install_see_helpe -> seeHelpe()
+
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
@@ -995,7 +1000,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
-
                     }
                     INSTALL_CURTAIN -> {
                         if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
@@ -1033,6 +1037,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 showInstallDeviceList(isGuide, clickRgb)
             }
         }
+    }
+
+    private fun seeHelpe() {
+        var intent = Intent(this, InstructionsForUsActivity::class.java)
+        startActivity(intent)
     }
 }
 

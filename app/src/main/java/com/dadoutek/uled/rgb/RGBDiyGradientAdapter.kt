@@ -16,8 +16,8 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
     override fun convert(helper: BaseViewHolder, item: DbDiyGradient) {
         var gpOn = helper.getView<ImageView>(R.id.diy_mode_on)
         var gpOff = helper.getView<ImageView>(R.id.diy_mode_off)
-        var gpOnText = helper.getView<TextView>(R.id.diy_mode_on_text)
-        var gpOffText = helper.getView<TextView>(R.id.diy_mode_off_text)
+      /*  var gpOnText = helper.getView<TextView>(R.id.diy_mode_on_text)
+        var gpOffText = helper.getView<TextView>(R.id.diy_mode_off_text)*/
 
         val deleteIcon = helper.getView<CheckBox>(R.id.diy_selected)
         if (isDelete) {
@@ -32,17 +32,16 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
             helper.setChecked(R.id.diy_selected, false)
         }
 
-
-        if(item.select){
-            gpOn.setImageResource(R.drawable.icon_open_group)
-            gpOff.setImageResource(R.drawable.icon_down_group)
-            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
-            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-        }else{
-            gpOn.setImageResource(R.drawable.icon_down_group)
-            gpOff.setImageResource(R.drawable.icon_open_group)
-            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+        if (item.select) {
+            gpOn.setImageResource(R.drawable.icon_open_blue)
+            gpOff.setImageResource(R.drawable.icon_stop2_back)
+            //gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+            // gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+        } else {
+            gpOn.setImageResource(R.drawable.icon_open2_back)
+            gpOff.setImageResource(R.drawable.icon_stop_blue)
+            //gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+            // gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
         }
 
 

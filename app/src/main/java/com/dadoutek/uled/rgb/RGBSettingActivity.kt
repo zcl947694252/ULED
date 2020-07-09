@@ -13,14 +13,12 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.Toast
+import android.widget.*
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -118,7 +116,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
-
+    private var seeHelp: TextView? = null
+    private var addGroupTv: TextView? = null
+    private var lin: View? = null
     private var acitivityIsAlive = true
     var isReset = false
 
@@ -353,6 +353,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
+
+        lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
+        addGroupTv = lin?.findViewById(R.id.main_add_device)
+        addGroupTv?.text = getString(R.string.mode_diy)
+        seeHelp = lin?.findViewById(R.id.main_go_help)
+        seeHelp?.visibility = View.GONE
+
+
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
@@ -421,7 +429,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         btnStopGradient.setOnClickListener(this.clickListener)
         cb_brightness_enable.setOnClickListener(cbOnClickListener)
         cb_brightness_rgb_enable.setOnClickListener(cbOnClickListener)
-
+        addGroupTv?.setOnClickListener(clickListener)
 
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
@@ -516,10 +524,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decorations)
+        rgbDiyGradientAdapter!!.addFooterView(lin)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
         rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
-
 
         val brightness = if (light!!.brightness >= 1) light!!.brightness else 1
         sbBrightness!!.progress = brightness
@@ -988,7 +996,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             R.id.mode_preset_layout -> {
                 changeToBuildInPage()
             }
-            R.id.btnAdd -> {
+            R.id.btnAdd,R.id.main_add_device-> {
                 transAddAct()
             }
             R.id.ll_g -> {

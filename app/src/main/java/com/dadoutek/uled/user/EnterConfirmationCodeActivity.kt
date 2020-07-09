@@ -69,15 +69,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         account = this.intent.extras!!.getString("account")
         when (type) {
             Constant.TYPE_VERIFICATION_CODE -> {
-                tv_notice.visibility = View.GONE
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + " " + phone
             }
             Constant.TYPE_REGISTER -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
-                tv_notice.visibility = View.GONE
             }
             Constant.TYPE_FORGET_PASSWORD -> {
-                tv_notice.visibility = View.GONE
                 codePhone.text = resources.getString(R.string.follow_the_steps)
             }
         }
@@ -95,7 +92,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                 // verificationLogin()
             }
         }
-        refresh_code.setOnClickListener(this)
         image_return.setOnClickListener(this)
 
     }
@@ -208,15 +204,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     val num = 59 - it as Long
                     if (num == 0L) {
                         reacquireCode.text = resources.getString(R.string.reget)
-                        image_refresh.visibility = View.GONE
                         reacquireCode.setTextColor(Color.parseColor("#18B4ED"))
-                        refresh_code.isEnabled = true
                     } else {
-                        reacquireCode.text = num.toString() + "s" + resources.getString(R.string.reacquire)
+                        reacquireCode.text = getString(R.string.regetCount,num)
                         reacquireCode.setTextColor(Color.parseColor("#999999"))
-                        refresh_code.isEnabled = false
-                        image_refresh.visibility = View.GONE
-
                     }
                 })
     }

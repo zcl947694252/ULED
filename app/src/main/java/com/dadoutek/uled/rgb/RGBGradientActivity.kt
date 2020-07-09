@@ -11,12 +11,10 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
-import android.view.GestureDetector
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.ImageView
 import android.widget.SeekBar
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -42,6 +40,9 @@ import java.util.concurrent.TimeUnit
 
 class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var seeHelp: TextView? = null
+    private var addGroupTv: TextView? = null
+    private var lin: View? = null
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
     private var diyGradientList: MutableList<DbDiyGradient>? = null
     private var rgbGradientAdapter: RGBGradientAdapter? = null
@@ -163,8 +164,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
+        lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
+        addGroupTv = lin?.findViewById(R.id.main_add_device)
+        addGroupTv?.text = getString(R.string.mode_diy)
+        seeHelp = lin?.findViewById(R.id.main_go_help)
+        seeHelp?.visibility = View.GONE
 //        changeToBuildInPage()
         btnAdd.setOnClickListener(this)
+        addGroupTv?.setOnClickListener(this)
         mode_preset_layout.setOnClickListener(this)
         mode_diy_layout.setOnClickListener(this)
 //        btnStopGradient.visibility = View.VISIBLE
@@ -184,14 +191,12 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 ////            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         builtInModeRecycleView?.addItemDecoration(decoration)
         rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
+        //rgbGradientAdapter!!.addFooterView(lin)
         rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
     }
 
@@ -205,17 +210,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 //            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .black_ee)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
         rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
-
+        rgbDiyGradientAdapter!!.addFooterView(lin)
 //        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildDiyClickListener
     }
 
@@ -455,7 +457,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.normal_rgb -> {
                 finish()
             }
-            R.id.btnAdd -> {
+            R.id.btnAdd, R.id.main_add_device -> {
                 transAddAct()
             }
         }

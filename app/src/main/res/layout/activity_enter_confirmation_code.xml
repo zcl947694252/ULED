@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
+        android:orientation="vertical"
         tools:context=".user.EnterConfirmationCodeActivity">
 
     <ImageView
@@ -12,27 +13,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:src="@drawable/icon_return"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-<!-- android:src="@drawable/rectangle_login"-->
-    <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/textView"
-            app:layout_constraintEnd_toEndOf="@+id/textView"
-            app:layout_constraintStart_toStartOf="@+id/textView" />
 
     <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="46dp"
+            android:layout_marginStart="@dimen/dp_30"
+            android:layout_marginTop="36dp"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="@string/enter_confirmation_code"
@@ -40,6 +32,7 @@
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintVertical_bias="0.043"
             app:layout_constraintTop_toBottomOf="@+id/image_return" />
 
     <TextView
@@ -54,18 +47,6 @@
             app:layout_constraintStart_toStartOf="@+id/verCodeInputView_line"
             app:layout_constraintTop_toBottomOf="@+id/verCodeInputView_line" />
 
-    <TextView
-            android:id="@+id/followSteps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="@string/follow_the_steps"
-            android:textColor="@color/black_three"
-            android:textSize="15sp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
-
 
     <com.dadoutek.uled.util.VerCodeInputView
             android:id="@+id/verCodeInputView"
@@ -77,10 +58,7 @@
             app:inputBg="@drawable/bg_edit_vercode"
             app:inputNum="6"
             app:inputTxtColor="@color/blue_background"
-            app:inputTxtSize="8sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/codePhone" />
+            app:inputTxtSize="8sp" />
 
     <com.maning.pswedittextlibrary.MNPasswordEditText
             android:id="@+id/verCodeInputView_line"
@@ -106,51 +84,15 @@
             app:mnPsw_style="StyleUnderLine"
             app:mnPsw_text_color="#393939" />
 
-    <LinearLayout
-            android:id="@+id/refresh_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingStart="5dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="2dp"
-            app:layout_constraintStart_toStartOf="@+id/codePhone"
-            app:layout_constraintTop_toBottomOf="@+id/codePhone">
 
         <TextView
                 android:id="@+id/reacquireCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/reacquire"
+                android:layout_marginTop="@dimen/dp_30"
+                android:layout_marginStart="@dimen/dp_30"
                 android:textColor="@color/black_nine"
                 android:textSize="@dimen/sp_15" />
 
-
-        <ImageView
-                android:id="@+id/image_refresh"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_5"
-                android:src="@drawable/refresh"
-                android:visibility="gone" />
-    </LinearLayout>
-
-    <TextView
-            android:id="@+id/tv_notice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:text="@string/auto_regist_account"
-            android:textColor="@color/blue_background"
-            android:textSize="@dimen/sp_15"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/refresh_code"
-            app:layout_constraintVertical_bias="0.105" />
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

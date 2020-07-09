@@ -32,9 +32,6 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
     override fun convert(helper: BaseViewHolder, dbLight: DbLight) {
        // val groupName = helper.getView<TextView>(R.id.template_device_group_icon)
         val deviceName = helper.getView<TextView>(R.id.template_device_group_name)
-        val iv = helper.getView<ImageView>(R.id.template_device_icon)
-        iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
-        iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
 
         if (dbLight.name==null||dbLight.name=="")
             deviceName.visibility = View.GONE

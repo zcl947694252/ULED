@@ -55,7 +55,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         } else if (type == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
             pwd_title.text = getString(R.string.set_password)
-            pwd_btn.text = getString(R.string.next)
+            pwd_btn.text = getString(R.string.complete)
         }
     }
 
@@ -71,41 +71,38 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             R.id.pwd_eye -> eyePassword()
 
             R.id.pwd_return -> {
-                if (pwd_btn.text.toString().equals(getString(R.string.next)) || pwd_btn.text.toString().equals(getString(R.string.register))) {
-                    finish()
-                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
-                    pwd_input.hint = getString(R.string.please_password)
-                    pwd_input.setText(password)
-                    pwd_notice.text = getString(R.string.please_password)
-                    pwd_btn.text = getString(R.string.next)
+                when {
+                    pwd_btn.text.toString() == getString(R.string.complete) || pwd_btn.text.toString() == getString(R.string.register) -> {
+                        finish()
+                    }
+                    pwd_btn.text.toString() == getString(R.string.complete) -> {
+                        pwd_input.hint = getString(R.string.please_password)
+                        pwd_input.setText(password)
+                        pwd_notice.text = getString(R.string.please_password)
+                        pwd_btn.text = getString(R.string.next)
+                    }
                 }
             }
 
             R.id.pwd_btn -> {
                 var pwd = pwd_input.editableText.toString()
-                if (pwd_btn.text.toString().equals(getString(R.string.next))) {
-                    if (TextUtils.isEmpty(pwd)) {
-                        toast(getString(R.string.please_password))
-                        return
+                password = pwd
+                when {
+                    pwd_btn.text.toString() == getString(R.string.complete) -> {
+                        if (!TextUtils.isEmpty(password)) {
+                            upDatePwd()
+                        } else {
+                            toast(getString(R.string.new_password))
+                        }
                     }
-                    pwd_btn.text = getString(R.string.complete)
-                    password = pwd
-                    pwd_input.text.clear()
-                    pwd_input.hint = getString(R.string.please_again_password)
-                    pwd_notice.text = getString(R.string.please_again_password)
-                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
-                    if (pwd.equals(password) && !TextUtils.isEmpty(password)) {
-                        upDatePwd()
-                    } else {
-                        toast(getString(R.string.different_input))
+                    pwd_btn.text.toString() == getString(R.string.register) -> {
+                        if (TextUtils.isEmpty(pwd)) {
+                            toast(getString(R.string.please_password))
+                            return
+                        }
+                        password = pwd
+                        register()
                     }
-                } else if (pwd_btn.text.toString().equals(getString(R.string.register))) {
-                    if (TextUtils.isEmpty(pwd)) {
-                        toast(getString(R.string.please_password))
-                        return
-                    }
-                    password = pwd
-                    register()
                 }
             }
         }
@@ -113,7 +110,6 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun upDatePwd() {
         //toast("账户$phone----密码$password")
-
         NetworkFactory.getApi()
                 .putPassword(phone, NetworkFactory.md5(password))
                 .subscribeOn(Schedulers.io())

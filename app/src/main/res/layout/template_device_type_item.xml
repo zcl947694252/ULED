@@ -32,7 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxHeight="65dp"
-                    android:maxWidth="20dp"
+                    android:scaleType="fitXY"
                     android:layout_gravity="center"
                     android:layout_marginStart="3dp"
                     android:src="@drawable/icon_light_no_circle"/>
@@ -42,11 +42,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-
                 <TextView
                         android:id="@+id/template_device_group_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
                         android:gravity="end"
                         android:paddingEnd="2dp"
                         android:singleLine="true"
@@ -60,27 +60,25 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:layout_marginStart="@dimen/dp_3"
-                        android:layout_marginTop="@dimen/dp_5"
-                        android:layout_marginEnd="3dp"
                         android:gravity="end"
                         android:singleLine="true"
                         android:text="蓝牙"
                         android:textColor="@color/black_three"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:visibility="invisible" />
 
                 <RelativeLayout
                         android:layout_width="90dp"
                         android:layout_height="28dp"
                         android:layout_gravity="end"
-                        android:layout_marginStart="@dimen/dp_5"
-                        android:layout_marginTop="4dp">
+                        android:layout_marginStart="@dimen/dp_5">
 
                     <LinearLayout
                             android:id="@+id/template_device_more_ly"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center|end"
+                            android:layout_marginBottom="6dp"
                             android:orientation="horizontal"
                             android:visibility="visible">
 

@@ -97,6 +97,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         //0x4FFFE0
         docOne.setChecked(true, if (item.color == 16777215) {
             docOne.visibility = View.GONE
+            dotRgb.visibility = View.VISIBLE
             TelinkLightApplication.getApp().resources.getColor(R.color.primary)
         } else {
             //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
@@ -118,7 +119,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
-                        .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress+1).toString() + "%")
+                        .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
                 when (item.rgbType) {
                     0 -> {
                         visiableMode(helper, true)
@@ -258,6 +259,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, false)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, false)
+                topRgLy?.visibility = View.GONE
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.oval, true)
@@ -271,6 +273,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
+                topRgLy?.visibility = View.GONE
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
@@ -291,6 +294,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_relay, false)
                         .setGone(R.id.scene_curtain, true)
+                topRgLy?.visibility = View.GONE
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
@@ -309,6 +313,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.alg_ly, false)
                         .setGone(R.id.cw_scene, true)
                         .setGone(R.id.switch_scene, false)
+                topRgLy?.visibility = View.GONE
             }
         }
 

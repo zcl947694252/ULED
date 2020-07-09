@@ -6,10 +6,16 @@ import android.app.AlertDialog
 import android.bluetooth.le.ScanFilter
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.util.SparseArray
 import android.view.*
@@ -40,6 +46,7 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.switches.ConfigCurtainSwitchActivity
@@ -82,6 +89,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var isScenning: Boolean = true
     private var disposableFind: Disposable? = null
     private var disposableTimer: Disposable? = null
     private var meshList: MutableList<Int> = mutableListOf()
@@ -99,14 +107,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var testId: DbGroup? = null
     private var mApplication: TelinkLightApplication? = null
     private var mRxPermission: RxPermissions? = null
+
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
+
     //分组所含灯的缓存
     private var nowDeviceList: MutableList<ScannedDeviceItem> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var grouping: Boolean = false
     private var isFirtst = true
     private var lastMyRegion = lastRegion
+
     //标记登录状态
     private lateinit var groupsRecyclerViewAdapter: GroupsRecyclerViewAdapter
     private var groups: MutableList<DbGroup> = ArrayList()
@@ -127,7 +138,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var isSelectAll = false
     private var initHasGroup = false
     private var guideShowCurrentPage = false
-    private var isGuide = false
     private var layoutmanager: LinearLayoutManager? = null
     private var allLightId: Long = 0
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
@@ -141,6 +151,18 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * @return true: 选中了       false:没选中
      */
     private val isSelectLight: Boolean get() = mAddedDevices.any { it.isSelected }       //只要已添加的设备里有一个选中的，就返回False
+    lateinit var tvOne: TextView
+    lateinit var tvTwo: TextView
+    lateinit var tvThree: TextView
+    lateinit var hinitOne: TextView
+    lateinit var hinitTwo: TextView
+    lateinit var hinitThree: TextView
+    lateinit var readTimer: TextView
+    lateinit var cancelConfirmLy: LinearLayout
+    lateinit var cancelConfirmVertical: View
+    private lateinit var popFinish: PopupWindow
+    private lateinit var cancel: Button
+    private lateinit var confirm: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,12 +173,52 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         setContentView(R.layout.activity_device_scanning)
         meshList.clear()
         TelinkLightService.Instance()?.idleMode(true)
-
+        makePop()
         initData()
         initView()
         initClick()
         startScan()
     }
+
+    private fun makePop() {
+        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
+        tvOne = popView.findViewById(R.id.tv_one)
+        tvTwo = popView.findViewById(R.id.tv_two)
+        tvThree = popView.findViewById(R.id.tv_three)
+        hinitOne = popView.findViewById(R.id.hinit_one)
+        hinitTwo = popView.findViewById(R.id.hinit_two)
+        hinitThree = popView.findViewById(R.id.hinit_three)
+        readTimer = popView.findViewById(R.id.read_timer)
+        cancel = popView.findViewById(R.id.btn_cancel)
+        confirm = popView.findViewById(R.id.btn_confirm)
+        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
+        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+
+        tvOne.visibility =View.INVISIBLE
+        tvTwo.visibility =View.GONE
+        tvThree.visibility =View.GONE
+        hinitTwo.visibility =View.GONE
+        hinitThree.visibility =View.GONE
+        readTimer.visibility = View.GONE
+
+        hinitOne.text = getString(R.string.confim_stop_scan)
+        
+        cancel.let {
+            it.setOnClickListener { PopUtil.dismiss(pop) }
+        }
+        confirm.setOnClickListener {
+            stopScanTimer()
+            closeAnimation()
+            finish()
+            PopUtil.dismiss(pop)
+        }
+        popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        confirm.isClickable = false
+        popFinish.isOutsideTouchable = false
+        popFinish.isFocusable = true // 设置PopupWindow可获得焦点
+        popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
+    }
+
 
     private val currentGroup: DbGroup?
         get() {
@@ -234,7 +296,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun isSelectAll() {
-        when {isSelectAll -> {
+        when {
+            isSelectAll -> {
                 for (j in nowDeviceList.indices) {
                     this.updateList.add(nowDeviceList[j])
                     nowDeviceList[j].isSelected = true
@@ -331,7 +394,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun retryScan() {
-       // toolbarTv.text = getString(R.string.scanning)
+        // toolbarTv.text = getString(R.string.scanning)
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
             Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
@@ -358,8 +421,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightService.Instance()?.idleMode(true)
         closeAnimation()
         //更新Title
-       // toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
-       // toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
+        // toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
+        // toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
         if (nowDeviceList.size > 0) {
@@ -876,6 +939,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun closeAnimation() {
+        isScenning = false
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
@@ -1010,7 +1074,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
         scanning_no_device.visibility = View.GONE
 
-        scanning_num.text = getString(R.string.title_scanned_device_num)+"0"
+        scanning_num.text = getString(R.string.title_scanned_device_num) + "0"
         btn_stop_scan?.setText(R.string.stop_scan)
         btn_stop_scan?.visibility = View.VISIBLE
     }
@@ -1030,7 +1094,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("ResourceType")
     private fun initToolbar() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
-        toolbar?.setNavigationOnClickListener { finish() }
+        toolbar?.setNavigationOnClickListener {
+            if (isScenning) {
+                popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+            } else {
+                finish()
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -1058,16 +1128,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else
             groups.addAll(DBUtils.getGroupsByDeviceType(mAddDeviceType))
 
-       var title  = when (mAddDeviceType) {
+        var title = when (mAddDeviceType) {
             DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
             DeviceType.LIGHT_RGB -> getString(R.string.rgb_light)
             DeviceType.SENSOR -> getString(R.string.sensor)
             DeviceType.SMART_RELAY -> getString(R.string.relay)
             DeviceType.SMART_CURTAIN -> getString(R.string.curtain)
             DeviceType.GATE_WAY -> getString(R.string.Gate_way)
-           else -> getString(R.string.normal_light)
-       }
-         toolbarTv?.text = title
+            else -> getString(R.string.normal_light)
+        }
+        toolbarTv?.text = title
 
         if (groups.size > 0) {
             for (i in groups.indices) {
@@ -1122,7 +1192,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 DeviceType.LIGHT_RGB -> icon?.setImageResource(R.drawable.icon_rgb_n)
                 DeviceType.SMART_RELAY -> icon?.setImageResource(R.drawable.icon_acceptor_s)
                 DeviceType.SMART_CURTAIN -> icon?.setImageResource(R.drawable.icon_curtain_s)
-                DeviceType.LIGHT_NORMAL,DeviceType.LIGHT_NORMAL_OLD -> icon?.setImageResource(R.drawable.icon_light_n)
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> icon?.setImageResource(R.drawable.icon_light_n)
             }
 
             if (item?.hasGroup == true) {
@@ -1223,7 +1293,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
-
+        isScenning = true
         //添加进disposable，防止内存溢出.
         mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
@@ -1437,8 +1507,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     isFirtst = false
                     SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
                 }
-               // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-                scanning_num.text = getString(R.string.title_scanned_device_num)+ mAddedDevices.size
+                // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+                scanning_num.text = getString(R.string.title_scanned_device_num) + mAddedDevices.size
 
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
                 mUpdateMeshRetryCount = 0

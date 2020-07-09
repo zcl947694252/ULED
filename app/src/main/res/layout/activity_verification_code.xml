@@ -5,45 +5,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".user.VerificationCodeActivity">
-
-    <ImageView
-            android:id="@+id/return_image"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/icon_return"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/login_bg"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/textView"
-            app:layout_constraintEnd_toEndOf="@+id/textView"
-            app:layout_constraintStart_toStartOf="@+id/textView" />
+        <ImageView
+                android:id="@+id/return_image"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_return" />
 
-
-    <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="28dp"
-            android:layout_marginBottom="8dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:text="@string/user_login_title"
-            android:textColor="@color/black_three"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/return_image"
-            app:layout_constraintVertical_bias="0.04" />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="36dp"
+                android:layout_marginBottom="8dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="@string/verification_code_login"
+                android:textColor="@color/black_three"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/return_image"
+                app:layout_constraintVertical_bias="0.043" />
+    </LinearLayout>
 
     <TextView
             android:id="@+id/textView2"
@@ -221,10 +216,10 @@
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/edit_verification"
-            app:layout_constraintHorizontal_bias="0.55"
+            app:layout_constraintHorizontal_bias="0.484"
             app:layout_constraintStart_toStartOf="@+id/edit_verification"
             app:layout_constraintTop_toBottomOf="@+id/edit_verification"
-            app:layout_constraintVertical_bias="0.111" />
+            app:layout_constraintVertical_bias="0.207" />
 
     <TextView
             android:id="@+id/password_login"

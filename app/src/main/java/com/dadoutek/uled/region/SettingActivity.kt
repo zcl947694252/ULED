@@ -306,39 +306,6 @@ class SettingActivity : BaseActivity() {
         confirm.isClickable = true
     }
 
-    /**
-     * 检查网络上传数据
-     * 如果没有网络，则弹出网络设置对话框
-     */
-    private fun checkNetworkAndSyncs(activity: Activity?) {
-        if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
-            AlertDialog.Builder(activity)
-                    .setTitle(R.string.network_tip_title)
-                    .setMessage(R.string.net_disconnect_tip_message)
-                    .setPositiveButton(android.R.string.ok
-                    ) { _, _ ->
-                        // 跳转到设置界面
-                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-                    }.create().show()
-        } else {
-            if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
-                SyncDataPutOrGetUtils.syncPutDataStart(activity, object : SyncCallback {
-                    override fun start() {
-                        showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
-                    }
-
-                    override fun complete() {
-                        ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
-                        hideLoadingDialog()
-                    }
-
-                    override fun error(msg: String) {
-                        ToastUtils.showLong(msg)
-                        hideLoadingDialog()
-                    }
-                })
-        }
-    }
 
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")

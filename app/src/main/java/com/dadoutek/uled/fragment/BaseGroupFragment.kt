@@ -54,7 +54,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.DialogUtils.hideLoadingDialog
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
@@ -71,7 +70,7 @@ import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
     private var seeHelp: TextView? = null
-    private var addGroup: TextView? = null
+    private var addGroupTv: TextView? = null
     private var mConnectDisposable: Disposable? = null
     private var currentPosition: Int = 0
     private var disposableTimer: Disposable? = null
@@ -202,9 +201,10 @@ abstract class BaseGroupFragment : BaseFragment() {
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
-        lin = LayoutInflater.from(activity).inflate(R.layout.gp_fragment_add_view, null)
-         addGroup = lin?.findViewById<TextView>(R.id.add_group)
-         seeHelp = lin?.findViewById<TextView>(R.id.seehelpe)
+        lin = LayoutInflater.from(activity).inflate(R.layout.template_add_help, null)
+        addGroupTv = lin?.findViewById(R.id.main_add_device)
+        addGroupTv?.text = getString(R.string.add_groups)
+        seeHelp = lin?.findViewById(R.id.main_go_help)
         return view
     }
 
@@ -244,8 +244,8 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         addGroupBtn?.setOnClickListener(onClickAddGroup)
         addNewGroup?.setOnClickListener(onClickAddGroup)
-        addGroup?.setOnClickListener(onClickAddGroup)
-        seeHelp?.setOnClickListener{
+        addGroupTv?.setOnClickListener(onClickAddGroup)
+        seeHelp?.setOnClickListener {
             var intent = Intent(context, InstructionsForUsActivity::class.java)
             startActivity(intent)
         }
@@ -264,7 +264,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
         //recyclerView?.addItemDecoration(decoration)
-       groupAdapter!!.addFooterView(lin)
+        groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         //如果是自己的区域才允许长按删除
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
@@ -440,7 +440,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             val activity = activity as MainActivity
                             activity.autoConnect()
                         }
-                    }else if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
+                    } else if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
                         var num = 0
                         when (groupType) {
                             Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
@@ -453,7 +453,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         if (num != 0) {
                             var intent: Intent? = null
                             when (groupType) {
-                                Constant.DEVICE_TYPE_LIGHT_NORMAL ->intent = Intent(mContext, NormalSettingActivity::class.java)
+                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
                                 //蓝牙接收器
                                 Constant.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
@@ -476,26 +476,26 @@ abstract class BaseGroupFragment : BaseFragment() {
             //不能使用group_name否则会造成长按监听无效 跳转组详情
             //  R.id.item_layout -> {
             R.id.template_device_more -> {
-                    var intent = Intent()
-                    when (groupType) {
-                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                            intent.putExtra("light", "cw_light")
-                        }
-                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                            intent.putExtra("light", "rgb_light")
-                        }//蓝牙接收器
-                        Constant.DEVICE_TYPE_CONNECTOR -> {
-                            intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                        }
-                        Constant.DEVICE_TYPE_CURTAIN -> {
-                            intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                        }
+                var intent = Intent()
+                when (groupType) {
+                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "cw_light")
                     }
-                    intent.putExtra("group", currentGroup)
-                    startActivityForResult(intent, 2)
+                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("light", "rgb_light")
+                    }//蓝牙接收器
+                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                    }
+                    Constant.DEVICE_TYPE_CURTAIN -> {
+                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                    }
                 }
+                intent.putExtra("group", currentGroup)
+                startActivityForResult(intent, 2)
+            }
         }
     }
 

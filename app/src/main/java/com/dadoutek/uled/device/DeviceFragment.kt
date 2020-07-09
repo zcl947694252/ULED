@@ -39,6 +39,7 @@ import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
+import kotlinx.android.synthetic.main.template_add_help.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
