@@ -2,14 +2,11 @@ package com.dadoutek.uled.switches
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -21,36 +18,29 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -557,7 +547,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun goSearchSwitch() {
         installId = INSTALL_SWITCH
-        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId)
+        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId, getString(R.string.Gate_way))
     }
 
     private fun addNewGroup() {

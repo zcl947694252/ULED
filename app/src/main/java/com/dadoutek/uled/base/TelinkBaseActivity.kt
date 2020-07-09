@@ -39,7 +39,6 @@ import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.AccountModel
@@ -75,6 +74,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
@@ -910,23 +910,23 @@ open class TelinkBaseActivity : AppCompatActivity() {
         when (position) {
             INSTALL_GATEWAY -> {
                 installId = INSTALL_GATEWAY
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position,getString(R.string.Gate_way))
             }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.normal_light))
             }
             INSTALL_RGB_LIGHT -> {
                 installId = INSTALL_RGB_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.rgb_light))
             }
             INSTALL_CURTAIN -> {
                 installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.curtain))
             }
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
                 stepOneText.visibility = View.GONE
                 stepTwoText.visibility = View.GONE
                 stepThreeText.visibility = View.GONE
@@ -936,19 +936,21 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.sensoR))
             }
             INSTALL_CONNECTOR -> {
                 installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.relay))
             }
         }
     }
 
-    fun showInstallDeviceDetail(describe: String, position: Int) {
+    fun showInstallDeviceDetail(describe: String, position: Int, string: String) {
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
+
+        installTitleTv = view.findViewById(R.id.install_title_tv)
         stepOneText = view.findViewById(R.id.step_one)
         stepTwoText = view.findViewById(R.id.step_two)
         stepThreeText = view.findViewById(R.id.step_three)
@@ -961,8 +963,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         searchBar.setOnClickListener(dialogOnclick)
-
-        val title = view.findViewById<TextView>(R.id.textView5)
 
         installDialog = AlertDialog.Builder(this).setView(view).create()
         installDialog?.setOnShowListener {}
