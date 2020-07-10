@@ -79,7 +79,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         initListener()
         if (firstShowGuide) {
             firstShowGuide = false
-            initOnLayoutListener()
         }
     }
 
@@ -92,7 +91,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser);
         if (userVisibleHint) {
-            initOnLayoutListener()
             refreshView()
         }
     }
@@ -100,77 +98,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         initAdapterData()
-    }
-
-    private fun initOnLayoutListener() {
-        val view = activity?.window?.decorView
-        val viewTreeObserver = view?.viewTreeObserver
-        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                lazyLoad()
-            }
-        })
-    }
-
-    fun lazyLoad() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            GuideUtils.resetGroupListGuide(activity!!)
-            val guide0 = toolbar!!.findViewById<TextView>(R.id.toolbarTv)
-            GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener {}, GuideUtils.END_GROUPLIST_KEY, activity!!)
-                            .setOnLayoutInflatedListener { view, controller ->
-                                val normal = view.findViewById<TextView>(R.id.normal_light)
-                                normal.setOnClickListener {
-                                    controller.remove()
-                                    guide1()
-                                    isRgbClick = false
-                                }
-                                val rgb = view.findViewById<TextView>(R.id.rgb_light)
-                                rgb.setOnClickListener {
-                                    controller.remove()
-                                    guide1()
-                                    isRgbClick = true
-                                }
-                                val tvJump = view.findViewById<TextView>(R.id.jump_out)
-                                tvJump.setOnClickListener {
-                                    GuideUtils.showExitGuideDialog(activity!!, controller, GuideUtils.END_GROUPLIST_KEY)
-                                }
-                            })
-                    .show()
-        }
-    }
-
-    private fun guide1() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide1 = toolbar!!.findViewById<ImageView>(R.id.img_function1)
-
-            GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
-                        isGuide = true
-                        showPopupMenu()
-                        guide2()
-                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
-                    .show()
-        }
-    }
-
-    private fun guide2(): Controller? {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            var guide3: TextView? = install_device
-
-            return GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
-                    .addGuidePage(GuideUtils.run {
-                        addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener { install_device?.performClick() }, END_GROUPLIST_KEY, activity!!)
-                    })
-                    .show()
-        }
-
-
-        return null
     }
 
     private fun initToolBar(view: View?) {
@@ -331,38 +258,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         }
-    }
-
-    private fun addNewGroup() {
-        val textGp = EditText(activity)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(DBUtils.getDefaultNewGroupName())
-        //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
-        AlertDialog.Builder(activity)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-                        callbackLinkMainActAndFragment?.changeToGroup()
-                        dialog.dismiss()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
-        val timer = Timer()
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                val inputManager = textGp.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputManager.showSoftInput(textGp, 0)
-            }
-        }, 200)
     }
 
     fun myPopViewClickPosition(x: Float, y: Float) {

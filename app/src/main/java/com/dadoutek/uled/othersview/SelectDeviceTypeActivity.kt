@@ -2,6 +2,7 @@ package com.dadoutek.uled.othersview
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.Button
@@ -10,6 +11,7 @@ import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
@@ -23,20 +25,20 @@ import com.telink.util.MeshUtils
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
-class SelectDeviceTypeActivity : BaseActivity() {
-
-    private var installDialog: AlertDialog? = null
-    private lateinit var stepOneText: TextView
-    private lateinit var stepTwoText: TextView
-    private lateinit var stepThreeText: TextView
-    private lateinit var switchStepOne: TextView
-    private lateinit var switchStepTwo: TextView
-    private lateinit var swicthStepThree: TextView
-    private val deviceTypeList = mutableListOf<com.dadoutek.uled.device.model.DeviceItem>()
+class SelectDeviceTypeActivity : TelinkBaseActivity() {
+    private val deviceTypeList = mutableListOf<DeviceItem>()
     private val deviceAdapter = DeviceTypeAdapter(R.layout.select_device_type_item, deviceTypeList)
     private var installId = 0
 
-    override fun initData() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_select_device_type)
+                initView()
+                        initData()
+                        initListener()
+    }
+     fun initData() {
         deviceTypeList.clear()
         deviceTypeList.add(DeviceItem(getString(R.string.normal_light), 0, DeviceType.LIGHT_NORMAL))
         deviceTypeList.add(DeviceItem(getString(R.string.rgb_light), 0, DeviceType.LIGHT_RGB))
@@ -49,7 +51,7 @@ class SelectDeviceTypeActivity : BaseActivity() {
         deviceAdapter.notifyDataSetChanged()
     }
 
-    override fun initView() {
+     fun initView() {
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
         image_bluetooth.visibility = View.GONE
@@ -58,151 +60,45 @@ class SelectDeviceTypeActivity : BaseActivity() {
         template_recycleView.adapter = deviceAdapter
     }
 
-    override fun setLayoutID(): Int {
-        return R.layout.activity_select_device_type
-    }
 
-
-    override fun initListener() {
+     fun initListener() {
         deviceAdapter.setOnItemClickListener { _, _, position ->
             when (position) {
-                Constant.INSTALL_NORMAL_LIGHT -> {
-                    installId = Constant.INSTALL_NORMAL_LIGHT
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_GATEWAY -> {
+                    installId = INSTALL_GATEWAY
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position,getString(R.string.Gate_way))
                 }
-                Constant.INSTALL_RGB_LIGHT -> {
-                    installId = Constant.INSTALL_RGB_LIGHT
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_NORMAL_LIGHT -> {
+                    installId = INSTALL_NORMAL_LIGHT
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.normal_light))
                 }
-                Constant.INSTALL_SWITCH -> {
-                    goSearchSwitch()
+                INSTALL_RGB_LIGHT -> {
+                    installId = INSTALL_RGB_LIGHT
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.rgb_light))
                 }
-                Constant.INSTALL_SENSOR -> {
-                    installId = Constant.INSTALL_SENSOR
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_CURTAIN -> {
+                    installId = INSTALL_CURTAIN
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.curtain))
                 }
-                Constant.INSTALL_CURTAIN -> {
-                    installId = Constant.INSTALL_CURTAIN
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_SWITCH -> {
+                    installId = INSTALL_SWITCH
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
+                    stepOneText.visibility = View.GONE
+                    stepTwoText.visibility = View.GONE
+                    stepThreeText.visibility = View.GONE
+                    switchStepOne.visibility = View.VISIBLE
+                    switchStepTwo.visibility = View.VISIBLE
+                    swicthStepThree.visibility = View.VISIBLE
                 }
-                Constant.INSTALL_CONNECTOR -> {
-                    installId = Constant.INSTALL_CONNECTOR
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_SENSOR -> {
+                    installId = INSTALL_SENSOR
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.sensor))
                 }
-                Constant.INSTALL_GATEWAY -> {
-                    installId = Constant.INSTALL_GATEWAY
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
+                INSTALL_CONNECTOR -> {
+                    installId = INSTALL_CONNECTOR
+                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.relay))
                 }
             }
         }
     }
-
-    private fun goSearchSwitch() {
-        installId = Constant.INSTALL_SWITCH
-        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId)
-
-        stepOneText.visibility = View.GONE
-        stepTwoText.visibility = View.GONE
-        stepThreeText.visibility = View.GONE
-        switchStepOne.visibility = View.VISIBLE
-        switchStepTwo.visibility = View.VISIBLE
-        swicthStepThree.visibility = View.VISIBLE
-    }
-
-    private fun showInstallDeviceDetail(describe: String, position: Int) {
-        val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-        stepOneText = view.findViewById(R.id.step_one)
-        stepTwoText = view.findViewById(R.id.step_two)
-        stepThreeText = view.findViewById(R.id.step_three)
-        switchStepOne = view.findViewById(R.id.switch_step_one)
-        switchStepTwo = view.findViewById(R.id.switch_step_two)
-        swicthStepThree = view.findViewById(R.id.switch_step_three)
-        val searchBar = view.findViewById<Button>(R.id.search_bar)
-        closeInstallList.setOnClickListener(dialogOnclick)
-        btnBack.setOnClickListener(dialogOnclick)
-        searchBar.setOnClickListener(dialogOnclick)
-
-        installDialog = android.app.AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
-        installDialog?.setOnShowListener {}
-        installDialog?.show()
-    }
-
-    private val dialogOnclick = View.OnClickListener {
-        var medressData = 0
-        var allData = DBUtils.allLight
-        var sizeData = DBUtils.allLight.size
-        if (sizeData != 0) {
-            var lightData = allData[sizeData - 1]
-            medressData = lightData.meshAddr
-        }
-
-        when (it.id) {
-            R.id.close_install_list -> {
-                installDialog?.dismiss()
-            }
-            R.id.search_bar -> {
-                when (installId) {
-                    Constant.INSTALL_NORMAL_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    Constant.INSTALL_RGB_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    Constant.INSTALL_CURTAIN -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    Constant.INSTALL_SWITCH -> {
-                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                    }
-                    Constant.INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    Constant.INSTALL_CONNECTOR -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    Constant.INSTALL_GATEWAY -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                }
-                installDialog?.dismiss()
-            }
-            R.id.btnBack -> {
-                installDialog?.dismiss()
-            }
-        }
-    }
-
 }

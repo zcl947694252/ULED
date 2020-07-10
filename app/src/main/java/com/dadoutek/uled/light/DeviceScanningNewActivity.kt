@@ -137,7 +137,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isSelectAll = false
     private var initHasGroup = false
-    private var guideShowCurrentPage = false
     private var layoutmanager: LinearLayoutManager? = null
     private var allLightId: Long = 0
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
@@ -151,15 +150,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * @return true: 选中了       false:没选中
      */
     private val isSelectLight: Boolean get() = mAddedDevices.any { it.isSelected }       //只要已添加的设备里有一个选中的，就返回False
-    lateinit var tvOne: TextView
-    lateinit var tvTwo: TextView
-    lateinit var tvThree: TextView
     lateinit var hinitOne: TextView
-    lateinit var hinitTwo: TextView
-    lateinit var hinitThree: TextView
-    lateinit var readTimer: TextView
-    lateinit var cancelConfirmLy: LinearLayout
-    lateinit var cancelConfirmVertical: View
     private lateinit var popFinish: PopupWindow
     private lateinit var cancel: Button
     private lateinit var confirm: Button
@@ -173,39 +164,26 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         setContentView(R.layout.activity_device_scanning)
         meshList.clear()
         TelinkLightService.Instance()?.idleMode(true)
-        makePop()
         initData()
+        makePop()
         initView()
         initClick()
         startScan()
     }
 
     private fun makePop() {
-        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
-        tvOne = popView.findViewById(R.id.tv_one)
-        tvTwo = popView.findViewById(R.id.tv_two)
-        tvThree = popView.findViewById(R.id.tv_three)
-        hinitOne = popView.findViewById(R.id.hinit_one)
-        hinitTwo = popView.findViewById(R.id.hinit_two)
-        hinitThree = popView.findViewById(R.id.hinit_three)
-        readTimer = popView.findViewById(R.id.read_timer)
+        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
+
+        hinitOne = popView.findViewById(R.id.pop_warm_tv)
+        popView.findViewById<LinearLayout>(R.id.cancel_confirm_ly).setOnClickListener { ToastUtils.showShort("fddf") }
         cancel = popView.findViewById(R.id.btn_cancel)
         confirm = popView.findViewById(R.id.btn_confirm)
-        cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
-        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
-
-        tvOne.visibility =View.INVISIBLE
-        tvTwo.visibility =View.GONE
-        tvThree.visibility =View.GONE
-        hinitTwo.visibility =View.GONE
-        hinitThree.visibility =View.GONE
-        readTimer.visibility = View.GONE
-
         hinitOne.text = getString(R.string.confim_stop_scan)
-        
-        cancel.let {
-            it.setOnClickListener { PopUtil.dismiss(pop) }
-        }
+
+        cancel.isClickable = true
+        confirm.isClickable = true
+
+        cancel.setOnClickListener { PopUtil.dismiss(pop) }
         confirm.setOnClickListener {
             stopScanTimer()
             closeAnimation()
@@ -213,7 +191,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             PopUtil.dismiss(pop)
         }
         popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        confirm.isClickable = false
         popFinish.isOutsideTouchable = false
         popFinish.isFocusable = true // 设置PopupWindow可获得焦点
         popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
@@ -379,7 +356,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             scanning_no_factory_btn_tv1.visibility = View.GONE
         } else {
             scanning_no_factory_btn_ly.visibility = View.VISIBLE
-            scanning_no_factory_btn_tv1.visibility = View.VISIBLE
+            scanning_no_factory_btn_tv1.visibility = View.GONE
         }
     }
 
@@ -870,7 +847,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 dialog.dismiss()
                 val imm = this@DeviceScanningNewActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
-                guideStep2()
             }
         }
         if (!isGuide) {
@@ -959,53 +935,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         })
     }
 
-    //第二部选择组
-    private fun guideStep2() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_INSTALL_LIGHT_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide2 = recycler_view_groups
-            GuideUtils.guideBuilder(this, GuideUtils.STEP4_GUIDE_SELECT_GROUP)
-                    .addGuidePage(guide2?.let {
-                        GuideUtils.addGuidePage(it, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_2),
-                                View.OnClickListener { v -> guideStep3() }, GuideUtils.END_INSTALL_LIGHT_KEY, this)
-                    })
-                    .show()
-        }
-    }
-
-    //第三部选择灯
-    private fun guideStep3() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_INSTALL_LIGHT_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide3 = list_devices!!.getChildAt(0)
-            GuideUtils.guideBuilder(this, GuideUtils.STEP5_GUIDE_SELECT_SOME_LIGHT)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3, R.layout.view_guide_scan2, getString(R.string.scan_light_guide_3), View.OnClickListener { v ->
-                        guide3.performClick()
-                        guideStep4()
-                    }, GuideUtils.END_INSTALL_LIGHT_KEY, this))
-                    .show()
-        }
-    }
-
-    //第四部确定分组
-    private fun guideStep4() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_INSTALL_LIGHT_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide4 = btn_add_groups
-            GuideUtils.guideBuilder(this, GuideUtils.STEP6_GUIDE_SURE_GROUP)
-                    .addGuidePage(guide4?.let {
-                        GuideUtils.addGuidePage(it, R.layout.view_guide_scan3, getString(R.string.scan_light_guide_4), View.OnClickListener { v ->
-                            guide4.performClick()
-                            GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_INSTALL_LIGHT_KEY, true)
-                        }, GuideUtils.END_INSTALL_LIGHT_KEY, this)
-                    })
-                    .show()
-        }
-    }
-
     private fun initClick() {
         scanning_no_factory_btn.setOnClickListener {
-            startActivity(Intent(this, PhysicalRecoveryActivity::class.java))
+            seeHelpe()
         }
 
         btn_start_scan.setOnClickListener {

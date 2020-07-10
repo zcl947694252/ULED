@@ -134,7 +134,7 @@
     <string name="select_group_tip">Please Select at Least ONE group</string>
     <string name="much_lamp_tip">Supports up to 32768 lights</string>
     <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone bluetooth</string>
-    <string name="chear_cache">Clear Data</string>
+    <string name="chear_cache">Clear all Data</string>
     <string name="update_ite">Sync ITE</string>
     <string name="clean_tip">Cache empty, App Reboot soon</string>
     <string name="wait_develop">To be developed</string>

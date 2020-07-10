@@ -75,6 +75,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private  lateinit var  viewInstall: View
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
@@ -111,12 +112,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var isRgbClick = false
     var clickRgb: Boolean = false
     private var installId = 0
-    private lateinit var stepOneText: TextView
-    private lateinit var stepTwoText: TextView
-    private lateinit var stepThreeText: TextView
-    private lateinit var switchStepOne: TextView
-    private lateinit var switchStepTwo: TextView
-    private lateinit var swicthStepThree: TextView
+    lateinit var stepOneText: TextView
+    lateinit var stepTwoText: TextView
+    lateinit var stepThreeText: TextView
+    lateinit var switchStepOne: TextView
+    lateinit var switchStepTwo: TextView
+    lateinit var swicthStepThree: TextView
     private var installHelpe: TextView? = null
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
@@ -139,6 +140,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         registerReceiver(netWorkChangReceiver, filter)
 
         initOnLayoutListener()//加载view监听
+        makeInstallView()
         makeDialogAndPop()
         makeDialog()
         initStompReceiver()
@@ -947,29 +949,31 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun showInstallDeviceDetail(describe: String, position: Int, string: String) {
-        val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-
-        installTitleTv = view.findViewById(R.id.install_title_tv)
-        stepOneText = view.findViewById(R.id.step_one)
-        stepTwoText = view.findViewById(R.id.step_two)
-        stepThreeText = view.findViewById(R.id.step_three)
-        switchStepOne = view.findViewById(R.id.switch_step_one)
-        switchStepTwo = view.findViewById(R.id.switch_step_two)
-        swicthStepThree = view.findViewById(R.id.switch_step_three)
-        installHelpe = view.findViewById(R.id.install_see_helpe)
         installTitleTv?.text = string
-        val searchBar = view.findViewById<Button>(R.id.search_bar)
+        installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
+        installDialog?.setOnShowListener {}
+        installDialog?.show()
+    }
+
+    private fun makeInstallView() {
+        viewInstall = View.inflate(this, R.layout.dialog_install_detail, null)
+        val closeInstallList = viewInstall.findViewById<ImageView>(R.id.close_install_list)
+        val btnBack = viewInstall.findViewById<ImageView>(R.id.btnBack)
+
+        installTitleTv = viewInstall.findViewById(R.id.install_title_tv)
+        stepOneText = viewInstall.findViewById(R.id.step_one)
+        stepTwoText = viewInstall.findViewById(R.id.step_two)
+        stepThreeText = viewInstall.findViewById(R.id.step_three)
+        switchStepOne = viewInstall.findViewById(R.id.switch_step_one)
+        switchStepTwo = viewInstall.findViewById(R.id.switch_step_two)
+        swicthStepThree = viewInstall.findViewById(R.id.switch_step_three)
+        installHelpe = viewInstall.findViewById(R.id.install_see_helpe)
+
+        installHelpe?.setOnClickListener(dialogOnclick)
+        val searchBar = viewInstall.findViewById<Button>(R.id.search_bar)
         closeInstallList.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         searchBar.setOnClickListener(dialogOnclick)
-        installHelpe?.setOnClickListener(dialogOnclick)
-
-
-        installDialog = AlertDialog.Builder(this).setView(view).create()
-        installDialog?.setOnShowListener {}
-        installDialog?.show()
     }
 
     private val dialogOnclick = View.OnClickListener {
@@ -1039,7 +1043,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    private fun seeHelpe() {
+     fun seeHelpe() {
         var intent = Intent(this, InstructionsForUsActivity::class.java)
         startActivity(intent)
     }

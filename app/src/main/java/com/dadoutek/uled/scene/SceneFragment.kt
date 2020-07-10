@@ -13,10 +13,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
 import com.blankj.utilcode.util.LogUtils
@@ -67,7 +64,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var isDelete = false
     internal var builder: Builder? = null
     private var recyclerView: RecyclerView? = null
-    private var no_scene: ConstraintLayout? = null
+    private var no_scene: LinearLayout? = null
     private var isGuide = false
     private var isRgbClick = false
     private var add_scenes: Button? = null
@@ -226,11 +223,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         create_scene = viewContent.findViewById(R.id.create_scene)
         addNewScene = viewContent.findViewById(R.id.main_add_device)
         goHelp = viewContent.findViewById(R.id.main_go_help)
+        var seehelp = viewContent.findViewById<TextView>(R.id.scene_see_helpe)
+        seehelp?.setOnClickListener { seeHelpe() }
         addNewScene?.text = getString(R.string.create_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
-
         add_scenes!!.setOnClickListener(this)
         addNewScene!!.setOnClickListener(this)
         goHelp!!.setOnClickListener(this)
@@ -319,39 +317,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         btn_delete?.setOnClickListener(this)
     }
 
-    private fun stepEndGuide2() {
-        if (activity != null) {
-            val view = activity!!.window.decorView
-            val viewTreeObserver = view.viewTreeObserver
-            viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    val guide2 = adaper!!.getViewByPosition(0, R.id.scene_edit) as TextView?
-                    GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.ADDITIONAL_GUIDE_SET_SCENE)
-                            .addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout.view_guide_simple_scene_2, getString(R.string.click_update_scene),
-                                    View.OnClickListener { _ -> GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_SET_KEY, true) }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
-                }
-            })
-        }
-    }
 
-    private fun stepEndGuide1() {
-        if (activity != null && adaper!!.itemCount > 0) {
-            val view = activity!!.window.decorView
-            val viewTreeObserver = view.viewTreeObserver
-            viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    val guide2 = adaper!!.getViewByPosition(0, R.id.scene_apply) as TextView?
-                    if (guide2 != null) {//guide2代表拿取此处view的锚点区域  不代表使用该view
-                        GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.STEP14_GUIDE_APPLY_SCENE)
-                                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple_scene_2, getString(R.string.apply_scene),
-                                        View.OnClickListener { v -> stepEndGuide2() }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
-                    }
-                }
-            })
-        }
-    }
 
     private fun initOnLayoutListener() {
         if (activity != null) {
@@ -472,14 +438,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         dialog.show()
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)) {
-            stepEndGuide1()
-        }
-    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         initData()
@@ -500,7 +458,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-        builder = GuideUtils.guideBuilder(this, Constant.TAG_SceneFragment)
         if (isVisibleToUser) {
             refreshAllData()
             refreshView()

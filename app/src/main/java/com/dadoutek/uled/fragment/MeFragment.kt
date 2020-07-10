@@ -633,7 +633,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         CleanUtils.cleanInternalFiles()
         CleanUtils.cleanInternalCache()
         SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-        GuideUtils.resetAllGuide(activity!!)
         hideLoadingDialog()
     }
 

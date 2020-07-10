@@ -17,34 +17,22 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.text.method.ScrollingMovementMethod
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
-import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
-import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.GroupListFragment
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -52,14 +40,11 @@ import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -69,7 +54,6 @@ import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.event.ServiceEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.MeshUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -77,9 +61,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
  *
@@ -113,8 +95,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> {
-                    }
+                    BluetoothAdapter.STATE_OFF -> { }
                 }
             }
         }
@@ -157,7 +138,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT)
-            ToastUtils.showShort("打开蓝牙")
+            ToastUtils.showShort(getString(R.string.open_blutooth_tip))
     }
 
     @SuppressLint("CheckResult")
@@ -174,15 +155,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         })
     }
 
-
-    private fun startToRecoverDevices() {
-        LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
-        val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
-                .subscribeOn(Schedulers.io())
-                .subscribe({ deviceFragment.refreshView() },
-                        { LogUtils.d(it) })
-        mCompositeDisposable.add(disposable)
-    }
 
     var syncCallback: SyncCallback = object : SyncCallback {
         override fun start() {
@@ -242,27 +214,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         return super.dispatchTouchEvent(ev)
     }
 
-    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
-        installDialog?.layoutInflater
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            installDialog?.layoutInflater
-            var guide3: View? = null
-            if (clickRgb) {
-                guide3 = install_device_recyclerView.getChildAt(1)
-            } else {
-                guide3 = install_device_recyclerView.layoutManager!!.findViewByPosition(0)
-            }
-
-            return GuideUtils.guideBuilder(this, installDialog!!.window.decorView, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
-                        guide3.performClick()
-                        GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, true)
-                    }, GuideUtils.END_GROUPLIST_KEY, this))
-                    .show()
-        }
-        return null
-    }
 
     override fun showDeviceListDialog(isGuide: Boolean, isClickRgb: Boolean) {
         showInstallDeviceList(isGuide, isClickRgb)
@@ -331,11 +282,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {
-            }
+            override fun onPageScrollStateChanged(p0: Int) {}
 
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-            }
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
 
             override fun onPageSelected(p0: Int) {
                 val intent = Intent("isDelete")

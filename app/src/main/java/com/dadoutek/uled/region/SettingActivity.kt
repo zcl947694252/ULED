@@ -337,7 +337,6 @@ class SettingActivity : BaseActivity() {
                 CleanUtils.cleanInternalFiles()
                 CleanUtils.cleanInternalCache()
                 ToastUtils.showLong(R.string.clean_tip)
-                GuideUtils.resetAllGuide(this@SettingActivity)
                 hideLoadingDialog()
                 GlobalScope.launch(Dispatchers.Main) {
                     delay(300)

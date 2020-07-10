@@ -194,28 +194,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         return false
     }
 
-    private fun step2Guide() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide1 = guide_location
-            GuideUtils.guideBuilder(this, GuideUtils.STEP9_GUIDE_ADD_SCENE_SURE)
-                    .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_2),
-                            View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
-        }
-    }
 
-    private fun stepEndGuide() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide6 = confirm
-            GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
-                    .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
-                            View.OnClickListener {
-                                guide6.performClick()
-                                GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, true)
-                            }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
-        }
-    }
 
     private fun initChangeState() {
         if (showCheckListData == null)
@@ -319,7 +298,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 else -> showExitSaveDialog()
             }
         }
-        step2Guide()
     }
 
     private fun showExitSaveDialog() {
@@ -645,7 +623,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     !currentPageIsEdit -> saveScene()
                     else -> {//添加场景选择分组
                         showDataListView()
-                        stepEndGuide()
                     }
                 }
             }

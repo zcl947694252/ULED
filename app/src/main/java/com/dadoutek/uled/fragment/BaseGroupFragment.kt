@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -61,6 +62,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.group_list_fragment.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.runOnUiThread
@@ -69,7 +71,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
-    private var seeHelp: TextView? = null
+    private var seehelp: TextView? = null
+    private var seeHelp2: TextView? = null
     private var addGroupTv: TextView? = null
     private var mConnectDisposable: Disposable? = null
     private var currentPosition: Int = 0
@@ -78,7 +81,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
-    private var noGroup: ConstraintLayout? = null
+    private var noGroup: LinearLayout? = null
     private var groupAdapter: GroupListAdapter? = null
     open var groupList: ArrayList<DbGroup> = ArrayList()
     private var isFristUserClickCheckConnect = true
@@ -200,11 +203,14 @@ abstract class BaseGroupFragment : BaseFragment() {
         recyclerView = view.findViewById(R.id.group_recyclerView)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
+        seehelp = view.findViewById<TextView>(R.id.group_see_helpe)
         viewLineRecycler = view.findViewById(R.id.viewLine)
+
         lin = LayoutInflater.from(activity).inflate(R.layout.template_add_help, null)
         addGroupTv = lin?.findViewById(R.id.main_add_device)
         addGroupTv?.text = getString(R.string.add_groups)
-        seeHelp = lin?.findViewById(R.id.main_go_help)
+        seeHelp2 = lin?.findViewById(R.id.main_go_help)
+
         return view
     }
 
@@ -245,10 +251,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         addGroupBtn?.setOnClickListener(onClickAddGroup)
         addNewGroup?.setOnClickListener(onClickAddGroup)
         addGroupTv?.setOnClickListener(onClickAddGroup)
-        seeHelp?.setOnClickListener {
-            var intent = Intent(context, InstructionsForUsActivity::class.java)
-            startActivity(intent)
-        }
+        seeHelp2?.setOnClickListener { seeHelpe() }
+        seehelp?.setOnClickListener { seeHelpe() }
 
         val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         // recyclerView!!.layoutManager = layoutmanager
@@ -269,6 +273,11 @@ abstract class BaseGroupFragment : BaseFragment() {
         //如果是自己的区域才允许长按删除
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
+    }
+
+    fun seeHelpe() {
+        var intent = Intent(mContext, InstructionsForUsActivity::class.java)
+        startActivity(intent)
     }
 
     private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { _, _, postion ->
