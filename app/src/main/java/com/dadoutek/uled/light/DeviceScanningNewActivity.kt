@@ -171,6 +171,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         startScan()
     }
 
+    public fun disPop() {
+        pop?.dismiss()
+    }
     private fun makePop() {
         var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
 
@@ -178,12 +181,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         popView.findViewById<LinearLayout>(R.id.cancel_confirm_ly).setOnClickListener { ToastUtils.showShort("fddf") }
         cancel = popView.findViewById(R.id.btn_cancel)
         confirm = popView.findViewById(R.id.btn_confirm)
-        hinitOne.text = getString(R.string.confim_stop_scan)
+        hinitOne.text = getString(R.string.exit_tips_in_scanning)
 
-        cancel.isClickable = true
-        confirm.isClickable = true
-
-        cancel.setOnClickListener { PopUtil.dismiss(pop) }
+        cancel.setOnClickListener { pop?.dismiss() }
         confirm.setOnClickListener {
             stopScanTimer()
             closeAnimation()
@@ -1028,6 +1028,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
             if (isScenning) {
+                cancel.isClickable = true
+                confirm.isClickable = true
                 popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             } else {
                 finish()

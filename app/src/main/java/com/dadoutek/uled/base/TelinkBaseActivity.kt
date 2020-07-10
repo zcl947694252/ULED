@@ -996,6 +996,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                     INSTALL_RGB_LIGHT -> {
@@ -1003,6 +1005,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                     INSTALL_CURTAIN -> {
@@ -1010,12 +1014,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
 
                     }
                     INSTALL_SWITCH -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX){
                             startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            installDialog?.show()
+                            finish()
+                        }
                         else ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
@@ -1024,6 +1033,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
                             startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
 
                     }
@@ -1032,6 +1043,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                 }
