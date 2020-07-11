@@ -1378,7 +1378,7 @@ object DBUtils {
 
 
     fun getSensorByMeshAddr(meshAddr: Int): DbSensor? {
-        val sensorDbList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        var sensorDbList: MutableList<DbSensor?> = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (sensorDbList.size > 0) {
             sensorDbList[0]
         } else null
