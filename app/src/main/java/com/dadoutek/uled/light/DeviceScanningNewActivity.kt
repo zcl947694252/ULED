@@ -183,12 +183,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         confirm = popView.findViewById(R.id.btn_confirm)
         hinitOne.text = getString(R.string.exit_tips_in_scanning)
 
-        cancel.setOnClickListener { pop?.dismiss() }
+        cancel.setOnClickListener { popFinish?.dismiss() }
         confirm.setOnClickListener {
+            popFinish?.dismiss()
             stopScanTimer()
             closeAnimation()
             finish()
-            PopUtil.dismiss(pop)
         }
         popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         popFinish.isOutsideTouchable = false

@@ -1,6 +1,7 @@
 package com.dadoutek.uled.switches
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -88,7 +89,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         showToast(getString(R.string.scan_end))
         stopConnectTimer()
         doFinish()
-        image_no_group.visibility =View.VISIBLE
+        image_no_group.visibility = View.VISIBLE
     }
 
     private fun startAnimation() {
@@ -105,20 +106,20 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private fun startScan() {
         TelinkLightService.Instance()?.idleMode(true)
-            startAnimation()
-        image_no_group.visibility =View.GONE
-            val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                    DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.EIGHT_SWITCH)
-            mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                    retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                    ?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
-                    ?.subscribe({
-                        bestRSSIDevice = it
-                        onLogin()
-                    }, {
-                        scanFail()
-                    })
+        startAnimation()
+        image_no_group.visibility = View.GONE
+        val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+                DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
+        mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+                retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe({
+                    bestRSSIDevice = it
+                    onLogin()
+                }, {
+                    scanFail()
+                })
     }
 
     override fun onResume() {
@@ -144,17 +145,26 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     skipSwitch(version)
                                     finish()
                                 } else {
-                                    skipSwitch(bestRSSIDevice!!.firmwareRevision)
-                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    val version1 = bestRSSIDevice?.firmwareRevision ?: ""
+
+                                    if (TextUtils.isEmpty(version1))
+                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    else
+                                        skipSwitch(version1)
                                     finish()
                                 }
                                 closeAnimation()
                             }, {
-                                //showToast(getString(R.string.get_version_fail))
-                                closeAnimation()
-                                skipSwitch(bestRSSIDevice!!.firmwareRevision)
-                                finish()
-                            })
+                        //showToast(getString(R.string.get_version_fail))
+                        closeAnimation()
+                        val version1 = bestRSSIDevice?.firmwareRevision ?: ""
+
+                        if (TextUtils.isEmpty(version1))
+                            ToastUtils.showLong(getString(R.string.get_version_fail))
+                        else
+                            skipSwitch(version1)
+                        finish()
+                    })
 
         }
     }

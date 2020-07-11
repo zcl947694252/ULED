@@ -1398,6 +1398,7 @@ object DBUtils {
         val switch = getAllSwitch().map { it.meshAddr }
         val sensor = getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()
+
         addressList.addAll(lights)
         addressList.addAll(curtain)
         addressList.addAll(relay)

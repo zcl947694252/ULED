@@ -54,11 +54,10 @@
                     android:id="@+id/no_scene"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="@dimen/dp_10"
-                    android:background="@color/white"
+                    android:background="@color/gray_e"
                     android:gravity="center"
-                    android:visibility="visible"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
 
                 <ImageView
@@ -66,14 +65,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="80dp"
-                        android:src="@drawable/no_device"/>
+                        android:src="@drawable/no_device" />
 
                 <TextView
                         android:id="@+id/scene_see_helpe"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:layout_marginTop="70dp"
+                        android:gravity="center"
                         android:padding="@dimen/dp_10"
                         android:text="@string/see_help"
                         android:textColor="@color/black_three"
@@ -85,10 +84,10 @@
                         android:layout_width="140dp"
                         android:layout_height="40dp"
                         android:layout_marginTop="50dp"
-                        android:stateListAnimator="@null"
-                        android:background="@drawable/add_device_bt"
-                        android:text="@string/create_scene"
                         android:layout_marginBottom="@dimen/dp_30"
+                        android:background="@drawable/add_device_bt"
+                        android:stateListAnimator="@null"
+                        android:text="@string/create_scene"
                         android:textColor="@color/blue_background"
                         android:textSize="18sp" />
 
