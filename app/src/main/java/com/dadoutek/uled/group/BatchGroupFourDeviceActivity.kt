@@ -912,7 +912,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun changeGroupingCompleteState(selectSize: Int, noGroupSize: Int) {
         if (selectSize > 0 && currentGroup != null) {//选中分组并且有选中设备的情况下
-            grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
+            grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
             isComplete = false
             grouping_completed.isClickable = true
             grouping_completed.text = getString(R.string.set_group)
@@ -922,11 +922,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 isComplete = false
                 grouping_completed.text = getString(R.string.set_group)
                 grouping_completed.isClickable = false
-                grouping_completed.setBackgroundResource(R.drawable.btn_rec_black_bt)
+                grouping_completed.setBackgroundResource(R.drawable.rect_solid_radius5_e)
             } else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
                 isComplete = true
                 grouping_completed.isClickable = true
-                grouping_completed.setBackgroundResource(R.drawable.btn_rec_blue_bt)
+                grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
                 grouping_completed.text = getString(R.string.complete)
             }
         }

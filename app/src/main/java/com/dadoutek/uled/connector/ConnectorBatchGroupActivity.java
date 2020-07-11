@@ -1181,7 +1181,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if (light.getProductUUID() == DeviceType.SMART_RELAY) {
-                holder.icon.setImageResource(R.drawable.icon_controller_open);
+                holder.icon.setImageResource(R.drawable.icon_controller);
             } else {
                 holder.icon.setImageResource(R.drawable.icon_light_on);
             }

@@ -37,7 +37,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -47,7 +46,7 @@ import kotlin.collections.ArrayList
  * 更新时间
  * 更新描述   ${设置场景颜色盘}$
  */
-class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
+class NewSceneSetAct : TelinkBaseActivity() {
     private var resId: Int? = 0
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
@@ -284,7 +283,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         edit_data_view_layout.setOnClickListener { }
-        confirm.setOnClickListener(this)
+        confirm.setOnClickListener{ save()}
         StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
@@ -522,7 +521,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_data_view_layout.visibility = View.GONE
         tv_function1.visibility = View.VISIBLE
         tv_function1.text = getString(R.string.edit)
-        tv_function1.setOnClickListener(this)
+        tv_function1.setOnClickListener{changeEditView()}
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -555,7 +554,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_name!!.isFocusable = true
         edit_name.isFocusableInTouchMode = true
         edit_name.requestFocus()
-        edit_name.setOnClickListener(this)
 
         val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.showSoftInput(edit_name, 0)
@@ -605,14 +603,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         showEditListVew()
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.tv_function1 -> changeEditView()
-            R.id.confirm -> save()
-        }
-    }
-
     private fun save() {
+        LogUtils.v("zcl-----------baocunchangjing-------")
         saveCurrenEditResult()
         when {
             edit_name.text.toString().isEmpty() -> ToastUtils.showLong(getString(R.string.name_can_not_null))

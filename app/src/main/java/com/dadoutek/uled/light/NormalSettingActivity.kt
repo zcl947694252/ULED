@@ -901,6 +901,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@NormalSettingActivity, ChooseGroupOrSceneActivity::class.java)
         intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_NORMAL)//传入0代表是群组
         startActivityForResult(intent, requestCodeNum)
         this?.setResult(Constant.RESULT_OK)
     }

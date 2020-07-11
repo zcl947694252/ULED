@@ -28,7 +28,7 @@
             android:layout_marginBottom="23dp"
             android:gravity="center"
             android:background="@drawable/add_device_f5"
-            android:text="@string/add_device"
+            android:text="@string/add_device_new"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:textColor="@color/blue_background"

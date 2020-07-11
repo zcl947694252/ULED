@@ -30,7 +30,7 @@
         android:layout_width="15dp"
         android:layout_height="4dp"
         android:layout_marginTop="3dp"
-        android:background="@drawable/btn_rec_blue_bt"
+        android:background="@drawable/rect_blue_5"
         app:layout_constraintEnd_toEndOf="@+id/item_more_group_name"
         app:layout_constraintStart_toStartOf="@+id/item_more_group_name"
         app:layout_constraintTop_toBottomOf="@+id/item_more_group_name" />

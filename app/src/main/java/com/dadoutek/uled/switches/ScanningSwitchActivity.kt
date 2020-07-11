@@ -2,6 +2,7 @@ package com.dadoutek.uled.switches
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -69,13 +70,28 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         mIsInited = false
         toolbarTv?.text = getString(R.string.switch_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            if (isScenning) {
+                cancelf.isClickable = true
+                confirmf.isClickable = true
+                popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+            } else {
+                finish()
+            }
+         }
 
         retryConnectCount = 0
         isSupportInstallOldDevice = false
     }
 
     private fun initListener() {
+        cancelf.setOnClickListener { popFinish?.dismiss() }
+        confirmf.setOnClickListener {
+            popFinish?.dismiss()
+            stopConnectTimer()
+            closeAnimation()
+            doFinish()
+        }
         btn_stop_scan.setOnClickListener {
             if (!isSeachedDevice)
                 scanFail()
@@ -99,12 +115,14 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun closeAnimation() {
+        isScanning = false
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
 
 
     private fun startScan() {
+        isScanning = true
         TelinkLightService.Instance()?.idleMode(true)
         startAnimation()
         image_no_group.visibility = View.GONE

@@ -235,7 +235,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         select_group.setOnClickListener {
             val intent = Intent(this@ConfigNormalSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-            intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL)//传入0代表是群组
             startActivityForResult(intent, requestCodeNum)
             setResult(Constant.RESULT_OK)
         }

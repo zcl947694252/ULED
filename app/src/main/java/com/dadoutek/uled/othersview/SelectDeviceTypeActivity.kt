@@ -1,34 +1,20 @@
 package com.dadoutek.uled.othersview
 
-import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
-import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
-import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.util.StringUtils
-import com.telink.util.MeshUtils
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class SelectDeviceTypeActivity : TelinkBaseActivity() {
     private val deviceTypeList = mutableListOf<DeviceItem>()
     private val deviceAdapter = DeviceTypeAdapter(R.layout.select_device_type_item, deviceTypeList)
-    private var installId = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +41,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
         image_bluetooth.visibility = View.GONE
-        toolbarTv.text = getString(R.string.add_device)
+        toolbarTv.text = getString(R.string.add_device_new)
         template_recycleView.layoutManager = GridLayoutManager(this@SelectDeviceTypeActivity, 3)
         template_recycleView.adapter = deviceAdapter
     }

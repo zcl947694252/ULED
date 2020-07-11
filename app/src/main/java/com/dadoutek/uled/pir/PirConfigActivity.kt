@@ -66,6 +66,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var fiOta: MenuItem? = null
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
     private var fiRename: MenuItem? = null
@@ -123,8 +124,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                fiRename = menu?.findItem(R.id.toolbar_f_rename)
-                fiRename?.isVisible = isConfirm
+                menu?.findItem(R.id.toolbar_f_rename)?.isVisible = isConfirm
+                 menu?.findItem(R.id.toolbar_f_ota)?.isVisible = isConfirm
+                menu?.findItem(R.id.toolbar_f_delete)?.isVisible = isConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 fiVersion?.title = version
             }
@@ -183,12 +185,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        if (isConfirm)
-            currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
         pir_confir_tvPSVersion.text = version
         isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
-        if (isConfirm)
+        if (isConfirm){
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
+        }
+
 
         color_mode_rb.isChecked = true
 
@@ -230,17 +232,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initView() {
         toolbarTv.text = getString(R.string.human_body)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { finish()
+        LogUtils.v("zcl-----------dfsfdsfsdfsdfsd-------结束")}
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         color_mode_rb.text = getString(R.string.group_mode)
         gradient_mode_rb.text = getString(R.string.scene_mode)
         color_mode_rb.isChecked = true

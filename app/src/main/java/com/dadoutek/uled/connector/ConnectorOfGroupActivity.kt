@@ -371,7 +371,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
+        adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
@@ -381,39 +381,40 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         if (DBUtils.getAllRelay().size == 0) {
             light_add_device_btns.text = getString(R.string.device_scan_scan)
         } else {
-            light_add_device_btns.text = getString(R.string.add_device)
+            light_add_device_btns.text = getString(R.string.add_device_new)
         }
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = lightList[position]
         positionCurrent = position
-        if (view.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+        when (view.id) {
+            R.id.template_device_icon -> {
+                canBeRefresh = true
+                if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                    if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                        Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                    } else {
+                        Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                    }
+
+                    currentLight!!.connectionStatus = ConnectionStatus.ON.value
                 } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                    if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                        Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                    } else {
+                        Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                    }
+                    currentLight!!.connectionStatus = ConnectionStatus.OFF.value
                 }
 
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                currentLight!!.updateIcon()
+                DBUtils.updateConnector(currentLight!!)
+                runOnUiThread {
+                    adapter?.notifyDataSetChanged()
                 }
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
-
-            currentLight!!.updateIcon()
-            DBUtils.updateConnector(currentLight!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else
-            if (view.id == R.id.tv_setting) {
+            R.id.template_device_setting -> {
 
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
@@ -437,6 +438,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     }
                 }
             }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

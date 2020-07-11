@@ -196,6 +196,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         }
 
         intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_RGB)//传入0代表是群组
         startActivityForResult(intent, requestCodeNum)
     }
 

@@ -178,9 +178,9 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
             toolbar.overflowIcon = moreIcon;
         }
-        toolbar.setNavigationOnClickListener { finish() }
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
         this.inflater = this.layoutInflater
         list_groups!!.onItemClickListener = this.itemClickListener
         adapter = DeviceGroupingAdapter(groupsInit!!, this)

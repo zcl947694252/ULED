@@ -52,7 +52,7 @@ public class DbSwitch implements Serializable {
     public int textColor;//文字颜色
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int icon = R.drawable.icon_switch;//灯状态显示图
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int connectionStatus = 1;//链接状态
@@ -212,7 +212,7 @@ public class DbSwitch implements Serializable {
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_switch;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_switch;
+            this.icon = R.drawable.icon_switch_off;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_switch;
         }

@@ -438,6 +438,22 @@
                     android:textColor="@color/black_nine"
                     android:textSize="15sp" />
 
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/pir_config_recyclerGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+            <TextView
+                    android:id="@+id/pir_confir_tvPSVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:background="@color/blue_text"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
             <TextView
                     android:id="@+id/pir_config_see_help"
                     android:layout_width="match_parent"
@@ -461,21 +477,6 @@
                     android:text="@string/confirm"
                     android:textColor="@color/black_three"
                     android:textSize="18sp" />
-
-            <android.support.v7.widget.RecyclerView
-                    android:id="@+id/pir_config_recyclerGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-            <TextView
-                    android:id="@+id/pir_confir_tvPSVersion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:background="@color/blue_text"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout

@@ -322,7 +322,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        deviceAdapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
+        deviceAdapter = LightsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
         deviceAdapter!!.onItemChildClickListener = onItemChildClickListener
         deviceAdapter!!.bindToRecyclerView(recyclerView)
         when (deviceType) {
@@ -332,7 +332,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
                 when (DBUtils.getAllNormalLight().size) {
                     0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
-                    else -> light_add_device_btn.text = getString(R.string.add_device)
+                    else -> light_add_device_btn.text = getString(R.string.add_device_new)
                 }
             }
 
@@ -341,7 +341,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     lightList[i].updateRgbIcon()
                 when (DBUtils.getAllRGBLight().size) {
                     0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
-                    else -> light_add_device_btn.text = getString(R.string.add_device)
+                    else -> light_add_device_btn.text = getString(R.string.add_device_new)
                 }
             }
         }
@@ -359,7 +359,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         currentLight = lightList[position]
         positionCurrent = position
         when (view.id) {
-            R.id.img_light -> {
+            R.id.template_device_icon -> {
                 canBeRefresh = true
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
@@ -387,7 +387,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 DBUtils.updateLight(currentLight!!)
                 adapter?.notifyDataSetChanged()
             }
-            R.id.tv_setting -> {
+            R.id.template_device_setting -> {
                 if (scanPb.visibility != View.VISIBLE) {
                     //判断是否为rgb灯
                     var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
@@ -404,7 +404,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     ToastUtils.showLong(R.string.reconnecting)
                 }
             }
-            R.id.iv_delete -> showDeleteSingleDialog(currentLight!!)
+            R.id.template_device_card_delete -> showDeleteSingleDialog(currentLight!!)
         }
     }
 

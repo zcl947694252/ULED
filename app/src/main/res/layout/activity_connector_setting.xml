@@ -12,7 +12,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_50"
-            android:src="@drawable/icon_switch_eight" />
+            android:src="@drawable/icon_accptor_b" />
 
     <CheckBox
             android:id="@+id/connector_switch"

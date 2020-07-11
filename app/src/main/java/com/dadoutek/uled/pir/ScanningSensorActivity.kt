@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -90,10 +91,23 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            if (isScenning) {
+                cancelf.isClickable = true
+                confirmf.isClickable = true
+                popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+            } else {
+                finish()
+            }
+        }
 
         supportActionBar?.title = getString(R.string.sensor_title)
         scanning_device_ly.visibility = View.GONE
+        cancelf.setOnClickListener { popFinish?.dismiss() }
+        confirmf.setOnClickListener {
+            popFinish?.dismiss()
+            doFinish()
+        }
     }
 
     private fun initListener() {
@@ -123,6 +137,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun startAnimation() {
+        isScenning = true
         device_lottieAnimationView?.playAnimation()
         start_scanning_sensor_ly?.visibility = View.GONE
         scanning_device_ly.visibility = View.VISIBLE
@@ -130,6 +145,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun closeAnimal() {
+        isScenning = false
         device_lottieAnimationView.cancelAnimation()
         start_scanning_sensor_ly.visibility = View.GONE
         scanning_device_ly.visibility = View.GONE
@@ -370,10 +386,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             dstAdress = mDeviceInfo?.meshAddress!!
             Commander.getDeviceVersion(dstAdress)
                     .subscribe({
-                                closeAnimal()
-                                finish()
-                                skipDevice(it)
-                            },
+                        closeAnimal()
+                        finish()
+                        skipDevice(it)
+                    },
                             {
                                 getVersionRetryCount++
                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {

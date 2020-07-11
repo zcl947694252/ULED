@@ -30,7 +30,7 @@
                 android:id="@+id/install_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add_device"
+                android:text="@string/add_device_new"
                 android:textColor="@color/black_three"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"

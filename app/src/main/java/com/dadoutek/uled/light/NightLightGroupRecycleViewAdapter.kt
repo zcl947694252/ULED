@@ -13,7 +13,7 @@ class NightLightGroupRecycleViewAdapter(layoutResId: Int, data: List<ItemGroup>?
     override fun convert(helper: BaseViewHolder, group: ItemGroup?) {
         helper.setImageResource(R.id.template_device_batch_selected,R.drawable.round_close)
                 .setText(R.id.template_device_batch_title,group?.gpName)
-                .setText(R.id.template_device_batch_icon,group?.icon?:0)
+                .setImageResource(R.id.template_device_batch_icon,group?.icon?:0)
                 .addOnClickListener(R.id.template_device_batch_selected)
          /* helper.setText(R.id.tvGroupName,group?.gpName)
         helper.addOnClickListener(R.id.imgDelete)*/

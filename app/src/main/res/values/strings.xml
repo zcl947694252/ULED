@@ -152,8 +152,7 @@
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
-    <string name="title_scanned_device_num">Scan to device:</string>
-    <string name="title_scanned_lights_num">%1$d devices</string>
+    <string name="title_scanned_device_num">Num:</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Need to physically reset the light before clearing the data and start clearing the data?</string>
@@ -256,10 +255,8 @@
     <string name="updating_password">Changing</string>
     <string name="connect_failed_if_there_are_lights">Connect failed, Please make sure there are lights nearby!</string>
     <string name="not_grouped">No Group</string>
-    <string name="scanning_devices">Scanning devices</string>
     <string name="tip_add_group">Please add a group first</string>
     <string name="scanning">Scanning</string>
-    <string name="scanning_dot">Scanning:</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
     <string name="upload_data">Upload data</string>
@@ -584,7 +581,7 @@
     <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
     <string name="sensor">Sensor </string>
     <string name="sensor_describe">Night light, PIR</string>
-    <string name="add_device">Add new device </string>
+    <string name="add_device_new">Add new device </string>
     <string name="update_name_gp"> modify the group name </string>
     <string name="curtain">curtain </string>    
     <string name="smart_curtain">Smart Curtains</string>
@@ -858,7 +855,7 @@
     <string name="accept_authrozation">This user has been authorized</string>
     <string name="user_locked">User locked</string>
     <string name="permission_denfied">Insufficient permission to operate</string>
-    <string name="region_not_exist">This region does not exist</string>
+    <string name="region_not_exist">This region does not exist, please switch to another region</string>
     <string name="single_login_warm">Your ULED account has been logged in on other devices. If this is not your operation, please change the password as soon as possible</string>
     <string name="other_device_login">Other device login reminders</string>
     <string name="author_region_receviced">The area you share has been received</string>
@@ -1094,4 +1091,5 @@
     <string name="cancel_edite">Cancel the editor</string>
     <string name="sure_delete_device">Are you sure to delete this device?</string>
     <string name="confim_stop_scan">Are you sure you want to exit the scan?</string>
+    <string name="add_device">Add Device</string>
 </resources>

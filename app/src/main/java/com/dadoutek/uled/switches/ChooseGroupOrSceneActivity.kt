@@ -13,6 +13,9 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils.allGroups
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
+import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.widget.RecyclerGridDecoration
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -28,9 +31,11 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述
  */
 class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
+    private var deviceType: Int = 0
     private var type: Int = 0
+    var groupList = mutableListOf<DbGroup>()
     private var sceneAdapter = SceneItemAdapter(R.layout.template_batch_device_item, sceneList)
-    private var groupAdapter = GroupItemAdapter(R.layout.template_batch_device_item, allGroups)
+    private var groupAdapter = GroupItemAdapter(R.layout.template_batch_device_item, groupList)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.choose_group_scene)
@@ -44,11 +49,14 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
         template_recycleView?.layoutManager = GridLayoutManager(this,5)
 
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+
         when (type) {
             0, 2 -> {
                 template_recycleView?.adapter = groupAdapter
                 groupAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.select_group)
+                groupList.filter { it.deviceType == deviceType.toLong() }
             }
             else -> {
                 template_recycleView?.adapter = sceneAdapter

@@ -376,7 +376,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         }
         light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
-        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, curtainList)
+        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in curtainList.indices) {
@@ -386,7 +386,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         if(DBUtils.getAllCurtains().size==0){
             light_add_device_btn.text = getString(R.string.device_scan_scan)
         }else{
-            light_add_device_btn.text = getString(R.string.add_device)
+            light_add_device_btn.text = getString(R.string.add_device_new)
         }
     }
 
@@ -395,7 +395,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentCurtain = curtainList[position]
         positionCurrent = position
-    if (view.id == R.id.tv_setting||view.id == R.id.img_light) {
+    if (view.id == R.id.template_device_icon||view.id == R.id.template_device_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){

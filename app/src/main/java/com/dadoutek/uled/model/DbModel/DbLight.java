@@ -240,9 +240,9 @@ public class DbLight implements Serializable {
 
     public void updateRgbIcon(){
         if (this.status == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_light_close_g;
+            this.icon = R.drawable.icon_rgb_close;
         } else if (this.status == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_light_close_g;
+            this.icon = R.drawable.icon_rgb_close;
         } else if (this.status == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_rgb_no_circle;
         }

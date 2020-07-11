@@ -71,7 +71,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-    private var installId = 0
     private var currentSwitch: DbSwitch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

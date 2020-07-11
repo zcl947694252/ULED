@@ -8,8 +8,8 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
         <LinearLayout
@@ -31,11 +31,11 @@
                     android:id="@+id/template_device_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxHeight="65dp"
-                    android:scaleType="fitXY"
                     android:layout_gravity="center"
                     android:layout_marginStart="3dp"
-                    android:src="@drawable/icon_light_no_circle"/>
+                    android:maxHeight="65dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/icon_light_no_circle" />
 
             <LinearLayout
                     android:layout_width="match_parent"
@@ -77,8 +77,8 @@
                             android:id="@+id/template_device_more_ly"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:gravity="center|end"
                             android:layout_marginBottom="6dp"
+                            android:gravity="center|end"
                             android:orientation="horizontal"
                             android:visibility="visible">
 
@@ -114,8 +114,7 @@
         <TextView
                 android:id="@+id/textView7"
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_marginBottom="@dimen/dp_10"
+                android:layout_height="5dp"
                 app:layout_constraintTop_toBottomOf="@+id/template_device_card" />
     </LinearLayout>
 
@@ -126,6 +125,6 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="-8dp"
             android:src="@drawable/icon_minus"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
 </RelativeLayout>

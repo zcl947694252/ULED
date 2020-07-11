@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbCurtain implements Serializable {
@@ -46,7 +46,7 @@ public class DbCurtain implements Serializable {
     public int textColor;//文字颜色
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_light_on;//灯状态显示图
+    public int icon = R.drawable.icon_curtain;//灯状态显示图
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int connectionStatus = 1;//链接状态
@@ -239,7 +239,7 @@ public class DbCurtain implements Serializable {
     public void updateIcon() {
 
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_light_offline;
+            this.icon = R.drawable.icon_curtain;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.curtain_off;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {

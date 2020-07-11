@@ -113,10 +113,10 @@ class SettingActivity : BaseActivity() {
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else
                     when (position) {
-                        0 -> emptyTheCache()
-                        1 -> showSureResetDialogByApp()
-                        2 -> startToRecoverDevices()
-                        3 -> physicalRecovery()
+                        1 -> emptyTheCache()
+                        3 -> showSureResetDialogByApp()
+                        0 -> startToRecoverDevices()
+                        2 -> physicalRecovery()
                         //3 -> userReset()
                         //1 -> checkNetworkAndSyncs(this)
                     }

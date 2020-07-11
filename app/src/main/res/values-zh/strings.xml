@@ -144,8 +144,7 @@
     <string name="rename_tip_check">不允许输入特殊符号！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanned_device_num">扫描到设备: </string>
-    <string name="title_scanned_lights_num">扫描完毕：%1$d个设备</string>
+    <string name="title_scanned_device_num">数量: </string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
@@ -249,10 +248,8 @@
     <string name="updating_password">正在更改</string>
     <string name="not_grouped">未分组</string>
     <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
-    <string name="scanning_devices">扫描设备中</string>
     <string name="tip_add_group">请先添加一个分组</string>
-    <string name="scanning">扫描中</string>
-    <string name="scanning_dot">扫描中:</string>
+    <string name="scanning">设备搜索中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
@@ -531,7 +528,7 @@
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
     <string name="sensor">传感器</string>
     <string name="sensor_describe">例如：人体感应器,PIR</string>
-    <string name="add_device">添加新设备</string>
+    <string name="add_device_new">添加新设备</string>
     <string name="update_name_gp">修改组名</string>
     <string name="curtain">窗帘</string>
     <string name="smart_curtain">例如：智能窗帘</string>
@@ -779,7 +776,7 @@
     <string name="accept_authrozation">该用户已接受授权</string>
     <string name="user_locked">用户被锁定</string>
     <string name="permission_denfied">权限不足,无法操作</string>
-    <string name="region_not_exist">该区域不存在</string>
+    <string name="region_not_exist">该区域不存在,请切换其他区域</string>
     <string name="single_login_warm">你的优乐迪账号已再其他设备登录,如果这不是你的操作,请尽快修改密码</string>
     <string name="other_device_login">其他设备登录提醒</string>
     <string name="author_region_receviced">您分享的区域已被接收</string>
@@ -1014,5 +1011,6 @@
     <string name="cancel_edite">取消编辑</string>
     <string name="sure_delete_device">确定删除此设备?</string>
     <string name="confim_stop_scan">确定要退出扫描吗?</string>
+    <string name="add_device">添加设备</string>
 
 </resources>

@@ -628,8 +628,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void changeGroupView() {
         grouping = true;
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         toolbar.setOnMenuItemClickListener(this);
         deviceListView.setOnItemClickListener(this);
         deviceListView.setAdapter(adapter);
@@ -911,6 +910,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
         toolbar.setOnMenuItemClickListener(this);
         toolbar.setNavigationIcon(R.drawable.icon_return);

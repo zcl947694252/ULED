@@ -5,7 +5,7 @@
     <item
         android:id="@+id/menu_install"
         android:icon="@drawable/ic_add_circle_white_24dp"
-        android:title="@string/add_device"
+        android:title="@string/add_device_new"
         app:showAsAction="ifRoom" />
 
 </menu>

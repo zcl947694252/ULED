@@ -967,11 +967,11 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
         } else {
             toolbar.setTitle(R.string.batch_group);
         }
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
         toolbar.setOnMenuItemClickListener(this);
         toolbarTv.setText(groupLight);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbar.setNavigationOnClickListener(v -> finish());
         Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.abc_ic_menu_overflow_material);

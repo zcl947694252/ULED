@@ -111,7 +111,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var installDialog: AlertDialog? = null
     var isRgbClick = false
     var clickRgb: Boolean = false
-    private var installId = 0
+    var installId = 0
     lateinit var stepOneText: TextView
     lateinit var stepTwoText: TextView
     lateinit var stepThreeText: TextView
@@ -127,7 +127,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
     val INSTALL_CONNECTOR = 5
     val INSTALL_GATEWAY = 6
     var isGuide: Boolean = false
-
+    lateinit var hinitOne: TextView
+     lateinit var popFinish: PopupWindow
+     lateinit var cancelf: Button
+     lateinit var confirmf: Button
+     var isScenning: Boolean = true
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,6 +146,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         initOnLayoutListener()//加载view监听
         makeInstallView()
         makeDialogAndPop()
+        makeStopScanPop()
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
@@ -952,6 +957,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         installTitleTv?.text = string
         installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
         installDialog?.setOnShowListener {}
+        installDialog?.dismiss()
         installDialog?.show()
     }
 
@@ -990,64 +996,64 @@ open class TelinkBaseActivity : AppCompatActivity() {
             R.id.install_see_helpe -> seeHelpe()
 
             R.id.search_bar -> {
-                when (installId) {
-                    INSTALL_NORMAL_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                            startActivityForResult(intent, 0)
-                            installDialog?.show()
-                            finish()
-                        } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                    }
-                    INSTALL_RGB_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                            startActivityForResult(intent, 0)
-                            installDialog?.show()
-                            finish()
-                        } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                    }
-                    INSTALL_CURTAIN -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                            startActivityForResult(intent, 0)
-                            installDialog?.show()
-                            finish()
-                        } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                    when (installId) {
+                        INSTALL_NORMAL_LIGHT -> {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                                startActivityForResult(intent, 0)
+                                installDialog?.show()
+                                finish()
+                        }
+                        INSTALL_RGB_LIGHT -> {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                                startActivityForResult(intent, 0)
+                                installDialog?.show()
+                                finish()
+                        }
+                        INSTALL_CURTAIN -> {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                                startActivityForResult(intent, 0)
+                                installDialog?.show()
+                                finish()
 
-                    }
-                    INSTALL_SWITCH -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX){
-                            startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                        }
+                        INSTALL_SWITCH -> {
+                               startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                           // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)       //connector也叫relay
+                           // startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
-                        else ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                    }
-                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    INSTALL_CONNECTOR -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
-                            startActivityForResult(intent, 0)
+                        INSTALL_SENSOR ->{
+                            startActivity(Intent(this, ScanningSensorActivity::class.java))
+                           // intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SENSOR)       //connector也叫relay
+                           // startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
-                        } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                        INSTALL_CONNECTOR -> {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                                startActivityForResult(intent, 0)
+                                installDialog?.show()
+                                finish()
+                        }
+                        INSTALL_GATEWAY -> {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                                startActivityForResult(intent, 0)
+                                installDialog?.show()
+                                finish()
+                        }
+                    }
+                } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
 
-                    }
-                    INSTALL_GATEWAY -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
-                            startActivityForResult(intent, 0)
-                            installDialog?.show()
-                            finish()
-                        } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                    }
-                }
+
             }
             R.id.btnBack -> {
                 installDialog?.dismiss()
@@ -1059,6 +1065,20 @@ open class TelinkBaseActivity : AppCompatActivity() {
      fun seeHelpe() {
         var intent = Intent(this, InstructionsForUsActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun makeStopScanPop() {
+        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
+
+        hinitOne = popView.findViewById(R.id.pop_warm_tv)
+        cancelf = popView.findViewById(R.id.btn_cancel)
+        confirmf = popView.findViewById(R.id.btn_confirm)
+        hinitOne.text = getString(R.string.exit_tips_in_scanning)
+
+        popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        popFinish.isOutsideTouchable = false
+        popFinish.isFocusable = true // 设置PopupWindow可获得焦点
+        popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 }
 

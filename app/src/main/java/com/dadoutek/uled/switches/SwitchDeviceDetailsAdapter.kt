@@ -23,11 +23,8 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,interna
 //            helper.setText(R.id.name, StringUtils.getSwitchName(dbSwitch))
 //                    .setVisible(R.id.name,false)
 
-            val iv = helper.getView<ImageView>(R.id.template_device_icon)
-            iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
-            iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
 
-            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch)
+            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch_device)
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)

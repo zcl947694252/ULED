@@ -28,29 +28,26 @@ public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter
 
     @Override
     protected void convert(BaseViewHolder helper, DbCurtain item) {
-        TextView tvName=helper.getView(R.id.name);
-        TextView tvLightName=helper.getView(R.id.template_device_name_n);
+        TextView tvName=helper.getView(R.id.template_device_group_name);
 //        TextView tvRgbColor=helper.getView(R.id.tv_rgb_color);
-        tvName.setText(StringUtils.getCurtainGroupName(item));
 
         if(TelinkLightApplication.Companion.getApp().getConnectDevice() == null){
            tvName.setTextColor(mContext.getResources().getColor(R.color.black));
         }else{
             if(TelinkLightApplication.Companion.getApp().getConnectDevice().meshAddress==item.getMeshAddr()){
                 tvName.setTextColor(mContext.getResources().getColor(R.color.primary));
-                tvLightName.setTextColor(mContext.getResources().getColor(R.color.primary));
             }else{
                 tvName.setTextColor(mContext.getResources().getColor(R.color.gray));
-                tvLightName.setTextColor(mContext.getResources().getColor(R.color.black));
             }
         }
 
-        tvLightName.setText(item.getName());
+        tvName.setText(item.getName());
 
-        helper.addOnClickListener(R.id.tv_setting)
-                .setTag(R.id.tv_setting,helper.getAdapterPosition())
-                .setTag(R.id.img_light,helper.getAdapterPosition())
-                .setBackgroundRes(R.id.img_light,item.icon)
-                .addOnClickListener(R.id.img_light);
+        helper.addOnClickListener(R.id.template_device_setting)
+                .setTag(R.id.template_device_setting,helper.getAdapterPosition())
+                .setTag(R.id.template_device_icon,helper.getAdapterPosition())
+                .setVisible(R.id.template_device_more,false)
+                .setBackgroundRes(R.id.template_device_icon,item.icon)
+                .addOnClickListener(R.id.template_device_icon);
     }
 }

@@ -55,8 +55,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
-    private  var mSwitchList: ArrayList<String>  = ArrayList()
-    private  var mSceneList: ArrayList<DbScene> = ArrayList()
+    private var mSwitchList: ArrayList<String> = ArrayList()
+    private var mSceneList: ArrayList<DbScene> = ArrayList()
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mAdapter: SwitchSceneGroupAdapter
     private var mConfigFailSnackbar: Snackbar? = null
@@ -78,6 +78,16 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         version = intent.getStringExtra("version")
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
+        else {
+            if (version.contains("BTS")) {
+                scene_switch_cw.visibility = View.GONE
+                scene_switch_touch.visibility = View.VISIBLE
+            } else {
+                scene_switch_cw.visibility = View.VISIBLE
+                scene_switch_touch.visibility = View.GONE
+            }
+
+        }
         fiVersion?.title = version
         //scene_tvLightVersion?.text = version
         map.clear()
@@ -110,7 +120,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun setToolBar(): Toolbar {
-      return  toolbar
+        return toolbar
     }
 
     override fun setReConfig(): Boolean {
@@ -177,7 +187,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun setConnectMeshAddr(): Int {
-        return mDeviceInfo?.meshAddress?:0
+        return mDeviceInfo?.meshAddress ?: 0
     }
 
     override fun deleteDevice() {
