@@ -468,7 +468,6 @@
         
     <string name="dynamic_rgb">Gradient</string>
         
-    <string name="speed_text">Speed: %1$s%%</string>
         
     <string name="dynamic_gradient">Gradient</string>
         
@@ -546,7 +545,6 @@
     <string name="mode_preset">Built-in mode</string>
     <string name="mode_diy">customize mode</string>
     <string name="please_check_group">Please select a group:</string>
-    <string name="tv_speed">Speed: %1$s</string>
     <string name="str_gradient">Gradient</string>
     <string name="str_jump">Jump</string>
     <string name="str_strobe">Strobe</string>
@@ -612,7 +610,6 @@
     <string name="three_level">three level</string>
     <string name="four_level">four level</string>
     <string name="commutation">Motor commutator</string>
-    <string name="speed_adjustment">Speed adjustment:</string>
     <string name="details">Details</string>
     <string name="restart">Click restart</string>
     <string name="successful_resumption">Successful Resumption</string>

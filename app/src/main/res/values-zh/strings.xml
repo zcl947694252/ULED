@@ -439,7 +439,6 @@
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
     <string name="dynamic_rgb">渐变</string>
-    <string name="speed_text">速度：%1$s%%</string>
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
     <string name="stopping">停止中…</string>
@@ -493,7 +492,6 @@
     <string name="mode_preset">内置模式</string>
     <string name="mode_diy">自定义模式</string>
     <string name="please_check_group">请选择分组:</string>
-    <string name="tv_speed">速度:%1$s</string>
     <string name="str_gradient">渐变</string>
     <string name="str_jump">跳变</string>
     <string name="str_strobe">频闪</string>
@@ -563,7 +561,6 @@
     <string name="three_level">三级</string>
     <string name="four_level">四级</string>
     <string name="commutation">电机换向</string>
-    <string name="speed_adjustment">速度调节:</string>
     <string name="details">详情</string>
     <string name="restart">电机重启</string>
     <string name="successful_resumption">恢复出厂成功</string>

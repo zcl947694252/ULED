@@ -19,6 +19,9 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
+import com.warkiz.widget.IndicatorSeekBar
+import com.warkiz.widget.OnSeekChangeListener
+import com.warkiz.widget.SeekParams
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +35,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private var algText: TextView? = null
     private var addAlgSpeed: ImageView? = null
     private var lessAlgSpeed: ImageView? = null
-    private var speedSeekbar: SeekBar? = null
+    private var speedSeekbar: IndicatorSeekBar? = null
     private var algLy: LinearLayout? = null
     private var topRgLy: RadioGroup? = null
     private var preTime: Long = 0
@@ -116,10 +119,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setProgress(R.id.sbBrightness, item.brightness)
                         .setProgress(R.id.sb_w_bright, item.temperature)
-                        .setProgress(R.id.speed_seekbar, item.gradientSpeed)
+                        //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
                         .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
+                speedSeekbar?.setProgress(item.gradientSpeed.toFloat())
                 when (item.rgbType) {
                     0 -> {
                         visiableMode(helper, true)
@@ -327,25 +331,30 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbtemperature!!.setOnSeekBarChangeListener(this)
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
-        speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        speedSeekbar!!.onSeekChangeListener = object : OnSeekChangeListener {
+            override fun onSeeking(seekParams: SeekParams?){
                 //解决seekbar 设置min 为1时,滑动不到100%
-                var value = progress + 1;
+                var value = seekParams?.progress?:0
                 helper.setText(R.id.speed_seekbar_alg_tv, "$value%")
                 data[position].gradientSpeed = value
-                if (value >= 100) {
-                    lessAlgSpeed?.isEnabled = true
-                    addAlgSpeed?.isEnabled = false
-                } else if (value <= 1) {
-                    lessAlgSpeed?.isEnabled = false
-                    addAlgSpeed?.isEnabled = true
+                when {
+                    value >= 100 -> {
+                        lessAlgSpeed?.isEnabled = true
+                        addAlgSpeed?.isEnabled = false
+                    }
+                    value <= 1 -> {
+                        lessAlgSpeed?.isEnabled = false
+                        addAlgSpeed?.isEnabled = true
+                    }
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
+        }
+
+
 
         topRgLy!!.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -1141,11 +1150,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as SeekBar?
+            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
             var speedTv = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
             var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
             var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
-            seekBar!!.progress++
+            //seekBar!!.progress++
+            seekBar?.progress?.toFloat()?.plus(1f)?.let { speedSeekbar?.setProgress(it) }
 
             val itemGroup = data[pos]
 
@@ -1177,12 +1187,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as SeekBar?
+            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
             var brightnText = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
             var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
             var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
-
-            seekBar!!.progress--
+            //seekBar!!.progress--
+            seekBar?.progress?.toFloat()?.minus(1f)?.let { speedSeekbar?.setProgress(it) }
 
             val address = data[pos].groupAddress
             val opcode: Byte
@@ -1190,11 +1200,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar.progress < 1 -> {
+                seekBar?.progress!! < 1f -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar.progress == 1 -> {
+                seekBar?.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false

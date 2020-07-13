@@ -68,7 +68,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
-    private var guideShowCurrentPage = false
     private val DATA_LIST_KEY = "DATA_LIST_KEY"
     private val SCENE_KEY = "SCENE_KEY"
 
@@ -312,11 +311,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun initCreateView() {
-        toolbar.setTitle(R.string.create_scene)
+        toolbarTv.setText(R.string.create_scene)
     }
 
     private fun initChangeView() {
-        toolbar.setTitle(R.string.edit_scene)
+        toolbarTv.setText(R.string.edit_scene)
         editSceneName = scene!!.name
     }
 

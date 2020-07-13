@@ -11,17 +11,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.warkiz.widget.IndicatorSeekBar;
+import com.warkiz.widget.OnSeekChangeListener;
+import com.warkiz.widget.SeekParams;
 
 public class SpeedDialog extends AlertDialog implements View.OnClickListener {
     private OnSpeedListener mListener;
     private int speed;
     private ImageView cancelBtn;
     private Button okBtn;
-    private SeekBar speedBar;
+    private IndicatorSeekBar speedBar;
     private ImageView addSpeenBtn;
     private ImageView lessSpeedBtn;
     private TextView speedText;
@@ -44,10 +46,11 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
 
         cancelBtn = (ImageView) findViewById(R.id.delete_cancel);
         okBtn = (Button) findViewById(R.id.okBtn);
-        speedBar = (SeekBar) findViewById(R.id.sbSpeed);
+        speedBar = (IndicatorSeekBar) findViewById(R.id.sbSpeed);
         speedText = (TextView) findViewById(R.id.speed_num);
 
         speedBar.setProgress(speed);
+
         if (speed >= 100)
             speed = 100;
         if (speed==0)
@@ -144,26 +147,10 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
 
         });
 
-
-        speedBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @SuppressLint("SetTextI18n")
+        speedBar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                speedText.setText(progress + 1 +  "%");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                this.onValueChange(seekBar, seekBar.getProgress(), true);
-            }
-
-            private void onValueChange(SeekBar seekBar, int progress, boolean b) {
-                speed = progress;
+            public void onSeeking(SeekParams seekParams) {
+                speed = seekParams.progress;
                 speedText.setText(speed + 1 +  "%");
                 if (speed >= 100) {
                     addSpeenBtn.setEnabled(false);
@@ -176,6 +163,10 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
                     lessSpeedBtn.setEnabled(true);
                 }
             }
+            @Override
+            public void onStartTrackingTouch(IndicatorSeekBar seekBar) { }
+            @Override
+            public void onStopTrackingTouch(IndicatorSeekBar seekBar) { }
         });
     }
 
