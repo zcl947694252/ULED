@@ -43,10 +43,10 @@ class GroupOTARelayAdapter(resId: Int, data: MutableList<DbConnector>) : BaseQui
         }
 
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

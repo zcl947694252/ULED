@@ -33,14 +33,24 @@ public class DbSensor implements Serializable {
     private int sceneId = 0; //场景id
     @Transient
     public int icon = R.drawable.icon_sensor;//灯状态显示图
+    public boolean isMostNew = false;
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
+
+    public boolean isSupportOta =true;
 
 
-
-
-    @Generated(hash = 29991029)
+    @Generated(hash = 1568479510)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
-                    String macAddr, int productUUID, int index, Long belongGroupId,
-                    String version, int rssi, int openTag, int setType, int sceneId) {
+            String macAddr, int productUUID, int index, Long belongGroupId, String version,
+            int rssi, int openTag, int setType, int sceneId, boolean isMostNew,
+            boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -54,6 +64,8 @@ public class DbSensor implements Serializable {
         this.openTag = openTag;
         this.setType = setType;
         this.sceneId = sceneId;
+        this.isMostNew = isMostNew;
+        this.isSupportOta = isSupportOta;
     }
 
     @Generated(hash = 295132781)
@@ -191,5 +203,21 @@ public class DbSensor implements Serializable {
 
     public void setSceneId(int sceneId) {
         this.sceneId = sceneId;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }

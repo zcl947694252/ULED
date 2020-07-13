@@ -107,16 +107,34 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                         startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
                 }
                 Constant.INSTALL_CURTAIN -> {
-                    if (DBUtils.getAllRGBLight().size == 0)
+                    if (DBUtils.getAllCurtains().size == 0)
                         ToastUtils.showShort(getString(R.string.no_device))
                     else
                         startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_CURTAIN)
                 }
                 Constant.INSTALL_CONNECTOR -> {
-                    if (DBUtils.getAllRGBLight().size == 0)
+                    if (DBUtils.getAllRelay().size == 0)
                         ToastUtils.showShort(getString(R.string.no_device))
                     else
                         startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_RELAY)
+                }
+                Constant.INSTALL_SWITCH -> {
+                    if (DBUtils.getAllSwitch().size == 0)
+                        ToastUtils.showShort(getString(R.string.no_device))
+                    else
+                        startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.NORMAL_SWITCH)
+                }
+                Constant.INSTALL_SENSOR -> {
+                    if (DBUtils.getAllSensor().size == 0)
+                        ToastUtils.showShort(getString(R.string.no_device))
+                    else
+                        startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SENSOR)
+                }
+                Constant.INSTALL_GATEWAY -> {
+                    if (DBUtils.getAllGateWay().size == 0)
+                        ToastUtils.showShort(getString(R.string.no_device))
+                    else
+                        startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.GATE_WAY)
                 }
             }
         else
@@ -146,11 +164,8 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     }
 
     abstract fun setPositiveBtn()
-
     abstract fun editeDeviceAdapter()
-
     abstract fun setToolbar(): Toolbar
     abstract fun setDeviceDataSize(num: Int): Int
     abstract fun setLayoutId(): Int
-
 }

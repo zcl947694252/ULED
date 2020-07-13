@@ -1148,9 +1148,9 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if (light.getProductUUID() == DeviceType.LIGHT_RGB)
-                holder.icon.setImageResource(R.drawable.icon_rgblight);
+                holder.icon.setImageResource(R.drawable.icon_rgb_no_circle);
             else
-                holder.icon.setImageResource(R.drawable.icon_rgblight_down);
+                holder.icon.setImageResource(R.drawable.icon_rgb_close);
 
 
             holder.selected.setImageResource(light.selected ? R.drawable.icon_checkbox_selected :

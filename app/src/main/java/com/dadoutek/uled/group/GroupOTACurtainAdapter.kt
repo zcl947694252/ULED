@@ -45,10 +45,10 @@ class GroupOTACurtainAdapter(resId: Int, data: MutableList<DbCurtain>) : BaseQui
             version.textColor = mContext.getColor(R.color.gray_3)
         }
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_curtain_device)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_curtain_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

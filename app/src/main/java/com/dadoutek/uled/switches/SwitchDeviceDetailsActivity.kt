@@ -81,6 +81,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         this.mApplication = this.application as TelinkLightApplication
     }
 

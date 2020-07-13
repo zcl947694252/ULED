@@ -15,6 +15,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
@@ -63,12 +64,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private var dbGroup: DbGroup? = null
     private var mConnectDisposable: Disposable? = null
     private var lightList: MutableList<DbLight> = mutableListOf()
+    private var switchList: MutableList<DbSwitch> = mutableListOf()
+    private var sensorList: MutableList<DbSensor> = mutableListOf()
     private var curtainList: MutableList<DbCurtain> = mutableListOf()
     private var relayList: MutableList<DbConnector> = mutableListOf()
+    private var gwList: MutableList<DbGateway> = mutableListOf()
     private var mapBin = mutableMapOf<String, Int>()
     private var lightAdaper = GroupOTALightAdapter(R.layout.group_ota_item, lightList)
     private var curtainAdaper = GroupOTACurtainAdapter(R.layout.group_ota_item, curtainList)
     private var relayAdaper = GroupOTARelayAdapter(R.layout.group_ota_item, relayList)
+    private var switchAdaper = GroupOTASwitchAdapter(R.layout.group_ota_item, switchList)
+    private var sensorAdaper = GroupOTASensorAdapter(R.layout.group_ota_item, sensorList)
+    private var gwAdaper = GroupOTAGwAdapter(R.layout.group_ota_item, gwList)
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,9 +108,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     fun findMeshDevice(deviceName: String?) {
         val scanFilter = com.polidea.rxandroidble2.scan.ScanFilter.Builder().setDeviceName(deviceName).build()
-        val scanSettings = ScanSettings.Builder()
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .build()
+        val scanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
         LogUtils.d("findMeshDevice name = $deviceName")
         disposableScan?.dispose()
@@ -115,17 +120,33 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     when (dbGroup!!.deviceType.toInt()) {
                         DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                             lightList.sortBy { it1 -> it1.rssi }
-                            supportAndUN()
+                            supportAndUNLight()
                             lightAdaper.notifyDataSetChanged()
-
+                        }
+                        DeviceType.NORMAL_SWITCH -> {
+                            switchList.sortBy { it1 -> it1.rssi }
+                            supportAndUNSwitch()
+                            switchAdaper.notifyDataSetChanged()
+                        }
+                        DeviceType.SENSOR -> {
+                            sensorList.sortBy { it1 -> it1.rssi }
+                            supportAndUNSensor()
+                            sensorAdaper.notifyDataSetChanged()
                         }
                         DeviceType.SMART_CURTAIN -> {
                             curtainList.sortBy { it1 -> it1.rssi }
+                            supportAndUNCurtain()
                             curtainAdaper.notifyDataSetChanged()
                         }
                         DeviceType.SMART_RELAY -> {
                             relayList.sortBy { it1 -> it1.rssi }
+                            supportAndUNConnector()
                             relayAdaper.notifyDataSetChanged()
+                        }
+                        DeviceType.GATE_WAY -> {
+                            gwList.sortBy { it1 -> it1.rssi }
+                            supportAndUNGateway()
+                            gwAdaper.notifyDataSetChanged()
                         }
                     }
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
@@ -144,8 +165,12 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             if (deviceInfo.productUUID == dbGroup!!.deviceType.toInt()) {
                 var deviceChangeL: DbLight? = null
+                var deviceChangeSw: DbSwitch? = null
+                var deviceChangeSensor: DbSensor? = null
                 var deviceChangeC: DbCurtain? = null
                 var deviceChangeR: DbConnector? = null
+                var deviceChangeGw: DbGateway? = null
+
                 when (dbGroup!!.deviceType.toInt()) {
                     DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                         for (device in lightList) {
@@ -158,6 +183,32 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                         if (null != deviceChangeL) {
                             lightList.remove(deviceChangeL)
                             lightList.add(deviceChangeL)
+                        }
+                    }
+                    DeviceType.NORMAL_SWITCH -> {
+                        for (device in switchList) {
+                            if (device.macAddr == deviceInfo.macAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeSw = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeSw")
+                            }
+                        }
+                        if (null != deviceChangeSw) {
+                            switchList.remove(deviceChangeSw)
+                            switchList.add(deviceChangeSw)
+                        }
+                    }
+                    DeviceType.SENSOR -> {
+                        for (device in sensorList) {
+                            if (device.macAddr == deviceInfo.macAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeSensor = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeSensor")
+                            }
+                        }
+                        if (null != deviceChangeSw) {
+                            sensorList.remove(deviceChangeSensor)
+                            sensorList.add(deviceChangeSensor!!)
                         }
                     }
                     DeviceType.SMART_CURTAIN -> {
@@ -186,8 +237,20 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                             relayList.add(deviceChangeR!!)
                         }
                     }
+                    DeviceType.GATE_WAY -> {
+                        for (device in gwList) {
+                            if (device.macAddr == deviceInfo.macAddress) {
+                                device.rssi = deviceInfo.rssi
+                                deviceChangeGw = device
+                                LogUtils.v("zcl设备信号$deviceInfo----------------$deviceChangeGw")
+                            }
+                        }
+                        if (null != deviceChangeL) {
+                            gwList.remove(deviceChangeGw)
+                            gwList.add(deviceChangeGw!!)
+                        }
+                    }
                 }
-
             }
         }
     }
@@ -204,6 +267,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 template_recycleView.adapter = lightAdaper
+                lightAdaper.setDeviceType(deviceType==DeviceType.LIGHT_RGB)
                 lightAdaper.bindToRecyclerView(template_recycleView)
             }
             DeviceType.SMART_CURTAIN -> {
@@ -213,6 +277,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             DeviceType.SMART_RELAY -> {
                 template_recycleView.adapter = relayAdaper
                 relayAdaper.bindToRecyclerView(template_recycleView)
+            }
+            DeviceType.NORMAL_SWITCH -> {
+                template_recycleView.adapter = switchAdaper
+                switchAdaper.bindToRecyclerView(template_recycleView)
+            }
+                DeviceType.SENSOR -> {
+                template_recycleView.adapter = sensorAdaper
+                    sensorAdaper.bindToRecyclerView(template_recycleView)
+            }
+            DeviceType.GATE_WAY -> {
+                template_recycleView.adapter = gwAdaper
+                gwAdaper.bindToRecyclerView(template_recycleView)
             }
         }
 
@@ -228,28 +304,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             relayList.addAll(DBUtils.allRely)
 
         relayAdaper.onItemClickListener = onItemClickListener
-        relayList.forEach {
-            it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
-                val split = itv.split("-")
-                var versionNum = getVersionNum(itv)
-                if (split.size >= 2) {
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
-                    if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
-                    }
-
-                }
-            }
-        }
-
-        var unsupport = relayList.filter {
-            !it.isSupportOta
-        }
-        relayList.removeAll(unsupport)
-        relayList.addAll(unsupport)
-        relayAdaper.notifyDataSetChanged()
+       supportAndUNConnector()
     }
 
     private fun setCurtainData() {
@@ -260,6 +315,122 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             curtainList.addAll(DBUtils.allCurtain)
 
         curtainAdaper.onItemClickListener = onItemClickListener
+
+        supportAndUNCurtain()
+        curtainAdaper.notifyDataSetChanged()
+    }
+
+    private fun setLightData() {
+        lightList.clear()
+        if (isGroup)
+            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
+        else
+            lightList.addAll(DBUtils.allLight)
+        lightAdaper.onItemClickListener = onItemClickListener
+        supportAndUNLight()
+        lightAdaper.notifyDataSetChanged()
+    }
+
+    private fun setSwtichData() {
+        switchList.clear()
+        if (isGroup)
+            switchList
+        else
+            switchList.addAll(DBUtils.getAllSwitch())
+        switchAdaper.onItemClickListener = onItemClickListener
+        supportAndUNSwitch()
+        switchAdaper.notifyDataSetChanged()
+    }
+
+    private fun setGwData() {
+        gwList.clear()
+        if (isGroup)
+            gwList
+        else
+            gwList.addAll(DBUtils.getAllGateWay())
+        gwAdaper.onItemClickListener = onItemClickListener
+        supportAndUNGateway()
+        gwAdaper.notifyDataSetChanged()
+    }
+
+    private fun setSensorData() {
+        sensorList.clear()
+        if (isGroup)
+            sensorList
+        else
+            sensorList.addAll(DBUtils.getAllSensor())
+        sensorAdaper.onItemClickListener = onItemClickListener
+        supportAndUNSensor()
+        sensorAdaper.notifyDataSetChanged()
+    }
+
+    private fun supportAndUNLight() {
+        lightList.forEach {
+            it.version?.let { itv ->
+                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                val split = itv.split("-")
+                var versionNum = getVersionNum(itv)
+                if (split.size >= 2) {
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    }
+                }
+            }
+        }
+
+        var unsupport = lightList.filter {
+            !it.isSupportOta
+        }
+        lightList.removeAll(unsupport)
+        lightList.addAll(unsupport)
+    }
+    private fun supportAndUNSwitch() {
+        switchList.forEach {
+            it.version?.let { itv ->
+                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                val split = itv.split("-")
+                var versionNum = getVersionNum(itv)
+                if (split.size >= 2) {
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    }
+                }
+            }
+        }
+
+        var unsupport = switchList.filter {
+            !it.isSupportOta
+        }
+        switchList.removeAll(unsupport)
+        switchList.addAll(unsupport)
+    }
+    private fun supportAndUNSensor() {
+        sensorList.forEach {
+            it.version?.let { itv ->
+                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                val split = itv.split("-")
+                var versionNum = getVersionNum(itv)
+                if (split.size >= 2) {
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    }
+                }
+            }
+        }
+
+        var unsupport = sensorList.filter {
+            !it.isSupportOta
+        }
+        sensorList.removeAll(unsupport)
+        sensorList.addAll(unsupport)
+    }
+    private fun supportAndUNCurtain() {
         curtainList.forEach {
             it.version?.let { itv ->
                 it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
@@ -280,21 +451,29 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         }
         curtainList.removeAll(unsupport)
         curtainList.addAll(unsupport)
-        curtainAdaper.notifyDataSetChanged()
     }
+    private fun supportAndUNConnector() {
+        relayList.forEach {
+            it.version?.let { itv ->
+                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                val split = itv.split("-")
+                var versionNum = getVersionNum(itv)
+                if (split.size >= 2) {
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    if (!TextUtils.isEmpty(versionNum)) {
+                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    }
+                }
+            }
+        }
 
-    private fun setLightData() {
-        lightList.clear()
-        if (isGroup)
-            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
-        else
-            lightList.addAll(DBUtils.allLight)
-        lightAdaper.onItemClickListener = onItemClickListener
-        supportAndUN()
-        lightAdaper.notifyDataSetChanged()
+        var unsupport = relayList.filter { !it.isSupportOta }
+        relayList.removeAll(unsupport)
+        relayList.addAll(unsupport)
+        relayAdaper.notifyDataSetChanged()
     }
-
-    private fun supportAndUN() {
+    private fun supportAndUNGateway() {
         lightList.forEach {
             it.version?.let { itv ->
                 it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
@@ -362,10 +541,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun updataDevice() {
-        when (deviceType.toInt()) {
+        when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> setLightData()
             DeviceType.SMART_CURTAIN -> setCurtainData()
             DeviceType.SMART_RELAY -> setRelayData()
+            DeviceType.NORMAL_SWITCH -> setSwtichData()
+            DeviceType.SENSOR -> setSensorData()
+            DeviceType.GATE_WAY -> setGwData()
         }
     }
 

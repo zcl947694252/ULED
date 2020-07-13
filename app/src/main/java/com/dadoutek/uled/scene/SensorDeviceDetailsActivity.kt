@@ -113,6 +113,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         this.mApplication = this.application as TelinkLightApplication
         addScanListeners()
         LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")

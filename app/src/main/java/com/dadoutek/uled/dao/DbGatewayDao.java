@@ -40,6 +40,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         public final static Property AddTag = new Property(13, int.class, "addTag", false, "ADD_TAG");
         public final static Property State = new Property(14, int.class, "state", false, "STATE");
         public final static Property OpenTag = new Property(15, int.class, "openTag", false, "OPEN_TAG");
+        public final static Property IsMostNew = new Property(16, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property Rssi = new Property(17, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -70,7 +73,10 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
                 "\"TIME_PERIOD_TAGS\" TEXT," + // 12: timePeriodTags
                 "\"ADD_TAG\" INTEGER NOT NULL ," + // 13: addTag
                 "\"STATE\" INTEGER NOT NULL ," + // 14: state
-                "\"OPEN_TAG\" INTEGER NOT NULL );"); // 15: openTag
+                "\"OPEN_TAG\" INTEGER NOT NULL ," + // 15: openTag
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 16: isMostNew
+                "\"RSSI\" INTEGER NOT NULL ," + // 17: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 18: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -126,6 +132,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         stmt.bindLong(14, entity.getAddTag());
         stmt.bindLong(15, entity.getState());
         stmt.bindLong(16, entity.getOpenTag());
+        stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -175,6 +184,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         stmt.bindLong(14, entity.getAddTag());
         stmt.bindLong(15, entity.getState());
         stmt.bindLong(16, entity.getOpenTag());
+        stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -200,7 +212,10 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // timePeriodTags
             cursor.getInt(offset + 13), // addTag
             cursor.getInt(offset + 14), // state
-            cursor.getInt(offset + 15) // openTag
+            cursor.getInt(offset + 15), // openTag
+            cursor.getShort(offset + 16) != 0, // isMostNew
+            cursor.getInt(offset + 17), // rssi
+            cursor.getShort(offset + 18) != 0 // isSupportOta
         );
         return entity;
     }
@@ -223,6 +238,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         entity.setAddTag(cursor.getInt(offset + 13));
         entity.setState(cursor.getInt(offset + 14));
         entity.setOpenTag(cursor.getInt(offset + 15));
+        entity.setIsMostNew(cursor.getShort(offset + 16) != 0);
+        entity.setRssi(cursor.getInt(offset + 17));
+        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
      }
     
     @Override

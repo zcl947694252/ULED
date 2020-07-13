@@ -38,7 +38,17 @@ public class DbSwitch implements Serializable {
     public String sceneIds;
     public  String controlGroupAddrs;
     public String version;
+    public boolean isMostNew = false;
 
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
+
+    public boolean isSupportOta =true;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
@@ -65,11 +75,12 @@ public class DbSwitch implements Serializable {
     public int type;
 
 
-    @Generated(hash = 1421243757)
+    @Generated(hash = 292668015)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
-            String sceneIds, String controlGroupAddrs, String version, int type) {
+            String sceneIds, String controlGroupAddrs, String version,
+            boolean isMostNew, boolean isSupportOta, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -85,6 +96,8 @@ public class DbSwitch implements Serializable {
         this.sceneIds = sceneIds;
         this.controlGroupAddrs = controlGroupAddrs;
         this.version = version;
+        this.isMostNew = isMostNew;
+        this.isSupportOta = isSupportOta;
         this.type = type;
     }
 
@@ -274,5 +287,21 @@ public class DbSwitch implements Serializable {
     }
     public void setType(int type) {
         this.type = type;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }
