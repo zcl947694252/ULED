@@ -4,54 +4,41 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.text.method.ScrollingMovementMethod
 import android.view.*
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
-import com.dadoutek.uled.group.GroupOTAListActivity
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
-import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
-import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_detail.*
@@ -61,7 +48,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -75,14 +61,10 @@ import kotlin.collections.ArrayList
  * 更新描述   ${}$
  */
 
-class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
-    private var deleteDevice: MenuItem? = null
-    private var onlineUpdate: MenuItem? = null
-    private var batchGp: MenuItem? = null
+class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var disposableTimer: Disposable? = null
     private var allLightData: ArrayList<DbLight> = arrayListOf()
     private var mConnectDisposable: Disposable? = null
-    private var type: Int? = null
     private var lightsData: ArrayList<DbLight> = arrayListOf()
     private var listAdapter: DeviceDetailListAdapter? = null
     private val SCENE_MAX_COUNT = 100
@@ -99,14 +81,25 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null
-    private var isEdite: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
-        initToolbar()
         initView()
+    }
+
+    override fun gpAllVisible(): Boolean {
+        return true
+    }
+
+    override fun setPositiveBtn() {
+        currentLight?.let {
+            DBUtils.deleteLight(it)
+            lightsData.remove(it)
+        }
+        listAdapter?.notifyDataSetChanged()
+        isEmptyDevice()
     }
 
     override fun onResume() {
@@ -114,82 +107,26 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         initData()
         scrollToPosition()
         if (TelinkLightApplication.getApp().connectDevice == null)
-            autoConnect()
+            autoConnectAll()
     }
 
-    private fun initToolbar() {
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
-        if (moreIcon != null) {
-            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
-            toolbar.overflowIcon = moreIcon
-        }
-
-        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
-        batchGp = toolbar.menu?.findItem(R.id.toolbar_delete_group)
-        onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_rename_group)
-        deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
-        batchGp?.title = getString(R.string.batch_group)
-        onlineUpdate?.title = getString(R.string.online_upgrade)
-        deleteDevice?.title = getString(R.string.edite_device)
-        deleteDevice?.isVisible = true
-        toolbar.setOnMenuItemClickListener { itm ->
-            DBUtils.lastUser?.let {
-                when {
-                    it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else ->
-                        if (lightsData.size > 0)
-                            when (itm.itemId) {
-
-                                R.id.toolbar_delete_group -> skipBatch()
-                                R.id.toolbar_rename_group -> goOta()
-                                R.id.toolbar_delete_device -> editeDevice()
-                            }
-                        else
-                            ToastUtils.showShort(getString(R.string.no_device))
-
-                }
-            }
-            true
-        }
+    override fun editeDeviceAdapter() {
+        listAdapter!!.changeState(isEdite)
+        listAdapter!!.notifyDataSetChanged()
     }
 
-    private fun editeDevice() {
-        isEdite = !isEdite
-        deleteDevice?.title = getString(R.string.cancel_edite)
-        DBUtils.lastUser?.let {
-            if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showLong(getString(R.string.author_region_warm))
-            else {
-                listAdapter!!.changeState(isEdite)
-                toolbarTv?.text = ""
-                listAdapter!!.notifyDataSetChanged()
-            }
-        }
+
+    override fun setToolbar(): Toolbar {
+        return toolbar
     }
 
-    private fun goOta() {
-        if (TelinkLightApplication.getApp().connectDevice != null)
-            when (type) {
-                Constant.INSTALL_NORMAL_LIGHT -> {
-                    if (DBUtils.getAllNormalLight().size == 0)
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    else
-                        startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_NORMAL)
-                }
-
-                Constant.INSTALL_RGB_LIGHT -> {
-                    if (DBUtils.getAllRGBLight().size == 0)
-                        ToastUtils.showShort(getString(R.string.no_device))
-                    else
-                        startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
-                }
-            }
-        else
-            autoConnect()
+    override fun setDeviceDataSize(num: Int): Int {
+        return lightsData.size
     }
 
+    override fun setLayoutId(): Int {
+        return R.layout.activity_device_detail
+    }
 
     private fun initView() {
         device_detail_direct_item?.visibility = View.GONE
@@ -274,7 +211,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showLong(getString(R.string.connecting_tip))
-                    autoConnect()
+                    autoConnectAll()
                 }
                 sendToGw()
             } else {
@@ -289,7 +226,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
                         DBUtils.updateLight(currentLight!!)
                         adapter?.notifyDataSetChanged()
                     }
-                    R.id.template_device_card_delete -> showDeleteSingleDialog(lightsData!![position])
+                    R.id.template_device_card_delete -> dialogDelete?.show()
                     R.id.template_device_setting -> goSetting()
                 }
             }
@@ -517,26 +454,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         listAdapter?.notifyDataSetChanged()
     }
 
-    private fun skipBatch() {
-        val lastUser = DBUtils.lastUser
-        lastUser?.let {
-            if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showLong(getString(R.string.author_region_warm))
-            else {
-                if (TelinkLightApplication.getApp().connectDevice != null) {
-                    val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                    when (type) {
-                        Constant.INSTALL_NORMAL_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                        Constant.INSTALL_RGB_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                    }
-
-                    startActivity(intent)
-                } else autoConnect()
-            }
-        }
-    }
-
-
     private fun isEmptyDevice() {
         if (lightsData.size > 0) {
             device_detail_have_ly.visibility = View.VISIBLE
@@ -565,7 +482,7 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
             delay(2000)
             val b = this@DeviceDetailAct == null || this@DeviceDetailAct.isDestroyed || this@DeviceDetailAct.isFinishing || !acitivityIsAlive
             if (!b)
-                autoConnect()
+                autoConnectAll()
         }
     }
 
@@ -657,25 +574,6 @@ class DeviceDetailAct : TelinkBaseActivity(), View.OnClickListener {
         lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
         if (recycleView!!.layoutManager != null && lastPosition >= 0) {
             (recycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
-        }
-    }
-
-    /**
-     * 自动重连
-     */
-    fun autoConnect() {
-        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
-        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-        if (size > 0) {
-            ToastUtils.showLong(getString(R.string.connecting_tip))
-            mConnectDisposable?.dispose()
-            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
-                    ?.subscribe({
-                        LogUtils.d("connection success")
-                    }, {
-                        LogUtils.d("connect failed")
-                    }
-                    )
         }
     }
 

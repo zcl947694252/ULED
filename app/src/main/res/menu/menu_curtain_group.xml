@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/toolbar_delete_group"
+        android:id="@+id/toolbar_batch_gp"
         android:icon="@drawable/ic_launcher"
         android:orderInCategory="1"
         android:title="@string/delete_group"
         app:showAsAction="never" />
     <item
-        android:id="@+id/toolbar_rename_group"
+        android:id="@+id/toolbar_on_line"
         android:orderInCategory="2"
         android:title="@string/rename_the_group"
         app:showAsAction="never" />

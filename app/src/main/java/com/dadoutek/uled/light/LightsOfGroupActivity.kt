@@ -195,17 +195,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         toolbarTv.text = group?.name + "(${group?.deviceCount})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
-            no_light.visibility = View.GONE
+            no_light_ly.visibility = View.GONE
         } else {
             recycler_view_lights.visibility = View.GONE
-            no_light.visibility = View.VISIBLE
+            no_light_ly.visibility = View.VISIBLE
         }
     }
 
     private fun setMenu() {
         toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
-        batchGp = toolbar.menu?.findItem(R.id.toolbar_delete_group)
-        onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_rename_group)
+        batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
+        onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
@@ -217,8 +217,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else
                     when (itm.itemId) {
-                        R.id.toolbar_delete_group -> skipeBatch()
-                        R.id.toolbar_rename_group -> goOta()
+                        R.id.toolbar_batch_gp -> skipeBatch()
+                        R.id.toolbar_on_line -> goOta()
                         R.id.toolbar_delete_device -> editeDevice()
                     }
             }
@@ -301,10 +301,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun initView() {
         when (group?.meshAddr) {
-            0xffff ->
-                toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-            else ->
-                toolbarTv.text = (group?.name ?: "") + " (" + lightList.size + ")"
+            0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
+            else -> toolbarTv.text = (group?.name ?: "") + " (" + lightList.size + ")"
         }
         light_add_device_btn.setOnClickListener {
             when (deviceType) {
@@ -318,9 +316,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             }
         }
 
-
         recyclerView = findViewById(R.id.recycler_view_lights)
-        recyclerView!!.layoutManager = GridLayoutManager(this, 3)
+        recyclerView!!.layoutManager = GridLayoutManager(this, 2)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         deviceAdapter = LightsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
         deviceAdapter!!.onItemChildClickListener = onItemChildClickListener
@@ -363,7 +360,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 canBeRefresh = true
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
-                        //                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,byteArrayOf(0x01, 0x00, 0x00))
                         when (currentLight!!.productUUID) {
                             DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
                             else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)

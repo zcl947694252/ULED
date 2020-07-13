@@ -50,8 +50,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private var listView: GridView? = null
     private var isStartGroup = false
 
-    private var type:String?=null
-
 //    private var curtain:DbCurtain?=null
 //
 //    private var address:Int?=null
@@ -238,7 +236,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 //            this.light = this.intent.extras?.get("light") as DbLight
 //        }
 
-        this.type=this.intent.getStringExtra(Constant.TYPE_VIEW)
 //        this.productUuid=this.intent.getIntExtra("uuid",0)
 //        this.address=this.intent.getIntExtra("gpAddress",0)
 //        this.beLongId=this.intent.getLongExtra("belongId",0)

@@ -43,7 +43,6 @@ import kotlinx.android.synthetic.main.activity_login.facebook_btn
 import kotlinx.android.synthetic.main.activity_login.google_btn
 import kotlinx.android.synthetic.main.activity_login.qq_btn
 import kotlinx.android.synthetic.main.activity_login.third_party_text
-import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toast
 import java.util.*
 

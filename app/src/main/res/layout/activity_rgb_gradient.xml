@@ -24,10 +24,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view7">
 
-        <android.support.constraint.ConstraintLayout
+        <LinearLayout
                 android:id="@+id/layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
 
             <android.support.constraint.ConstraintLayout
@@ -35,12 +36,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@color/white"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
+                    android:visibility="gone">
 
                 <TextView
                         android:id="@+id/buildInButton"
@@ -64,18 +60,13 @@
                         app:layout_constraintStart_toEndOf="@+id/buildInButton"
                         app:layout_constraintTop_toTopOf="parent" />
 
-
             </android.support.constraint.ConstraintLayout>
 
            <View
                     android:id="@+id/view8"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#eeeeee"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/mode_preset_layout" />
+                    android:background="#eeeeee"/>
 
             <android.support.constraint.ConstraintLayout
                     android:id="@+id/layoutModePreset"
@@ -83,10 +74,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:descendantFocusability="blocksDescendants"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/view8">
+                    android:visibility="visible">
 
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/builtInModeRecycleView"
@@ -108,12 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@color/white"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layoutModePreset">
-
+                    android:visibility="gone">
 
                 <TextView
                         android:id="@+id/diyButton"
@@ -144,21 +127,14 @@
                     android:id="@+id/view9"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#eeeeee"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/mode_diy_layout" />
+                    android:background="#eeeeee" />
 
             <android.support.constraint.ConstraintLayout
                     android:id="@+id/layoutModeDiy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/view9">
+                    android:visibility="visible">
 
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/builtDiyModeRecycleView"
@@ -173,6 +149,8 @@
 
             </android.support.constraint.ConstraintLayout>
 
+            <include layout="@layout/template_add_help"/>
+
            <View
                     android:id="@+id/view10"
                     android:layout_width="match_parent"
@@ -183,7 +161,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/layoutModeDiy" />
 
-        </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
     </ScrollView>
 
     <LinearLayout

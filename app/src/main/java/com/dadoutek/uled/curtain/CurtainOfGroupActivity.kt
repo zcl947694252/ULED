@@ -280,7 +280,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
-            no_light.visibility = View.GONE
+            no_light_ly.visibility = View.GONE
             var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
             batchGroup.setText(R.string.batch_group)
@@ -297,7 +297,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             }
         } else {
             recycler_view_lights.visibility = View.GONE
-            no_light.visibility = View.VISIBLE
+            no_light_ly.visibility = View.VISIBLE
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
@@ -375,7 +375,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             toolbarTv.text = (group.name ?: "") + " (" + curtainList.size + ")"
         }
         light_add_device_btn.setOnClickListener(this)
-        recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
+        recycler_view_lights.layoutManager = GridLayoutManager(this, 2)
         adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)

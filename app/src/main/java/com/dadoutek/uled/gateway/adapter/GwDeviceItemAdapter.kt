@@ -23,7 +23,11 @@ import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.StringUtils
 
 class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, internal var context: Context) : BaseQuickAdapter<DbGateway, BaseViewHolder>(layoutResId, data) {
+    private var isDelete: Boolean = false
 
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
+    }
     override fun convert(helper: BaseViewHolder, data: DbGateway) {
         if (data != null) {
             if (data.name != null && data.name != "") {
@@ -44,8 +48,10 @@ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, intern
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)
+                    .setVisible(R.id.template_gp_name, false)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .addOnClickListener(R.id.template_device_icon)
+                    .addOnClickListener(R.id.template_device_card_delete)
         }
     }
 }

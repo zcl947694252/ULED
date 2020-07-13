@@ -34,10 +34,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_group_ota_list.*
 import kotlinx.android.synthetic.main.template_recycleview.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.toolbar
 import kotlinx.android.synthetic.main.toolbar.toolbarTv
 import kotlinx.coroutines.Dispatchers
@@ -214,7 +212,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             }
             DeviceType.SMART_RELAY -> {
                 template_recycleView.adapter = relayAdaper
-                curtainAdaper.bindToRecyclerView(template_recycleView)
+                relayAdaper.bindToRecyclerView(template_recycleView)
             }
         }
 

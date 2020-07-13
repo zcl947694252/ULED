@@ -11,6 +11,11 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DensityUtil
 
 class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
+    private var isDelete: Boolean = false
+
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
+    }
 
     override fun convert(helper: BaseViewHolder, dbCurtain: DbCurtain) {
         if (dbCurtain != null) {
@@ -41,7 +46,9 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
                     .setVisible(R.id.template_device_more, false)
                     .setImageResource(R.id.template_device_icon, dbCurtain.icon)
                     .addOnClickListener(R.id.template_device_icon)
-                    .setVisible(R.id.template_gp_name,true)
+                    .addOnClickListener(R.id.template_device_card_delete)
+                    .setVisible(R.id.template_device_card_delete,isDelete)
+                    .setVisible(R.id.template_gp_name,false)
                     .setText(R.id.template_gp_name, DBUtils.getGroupNameByID(dbCurtain.belongGroupId))
         }
     }

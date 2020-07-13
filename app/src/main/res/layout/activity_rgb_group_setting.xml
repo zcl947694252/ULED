@@ -245,15 +245,15 @@
                                  android:min="1"
                                  android:progress="99" />
 
-                         <CheckBox
-                                 android:id="@+id/cb_brightness_enable"
-                                 android:layout_width="40dp"
-                                 android:layout_height="match_parent"
+                         <TextView
+                                 android:id="@+id/sb_w_bright_num"
+                                 android:layout_width="@dimen/dp_40"
+                                 android:layout_height="wrap_content"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
-                                 android:background="@drawable/select_check"
-                                 android:button="@null"
-                                 android:gravity="center" />
+                                 android:text="100%"
+                                 android:textColor="@color/black_three"
+                                 android:textSize="15sp" />
 
                      </LinearLayout>
 
@@ -281,20 +281,15 @@
                                  android:layout_height="wrap_content"
                                  android:layout_marginEnd="8dp"
                                  android:background="@drawable/add_enabled" />
-
-                         <TextView
-                                 android:id="@+id/sb_w_bright_num"
-                                 android:layout_width="@dimen/dp_40"
-                                 android:layout_height="wrap_content"
+                         <CheckBox
+                                 android:id="@+id/cb_brightness_enable"
+                                 android:layout_width="40dp"
+                                 android:layout_height="match_parent"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
-                                 android:text="100%"
-                                 android:textColor="@color/black_three"
-                                 android:textSize="15sp"
-                                 app:layout_constraintBottom_toBottomOf="parent"
-                                 app:layout_constraintEnd_toStartOf="@+id/sb_w_bright_add"
-                                 app:layout_constraintStart_toEndOf="@+id/sb_w_bright_less"
-                                 app:layout_constraintTop_toTopOf="parent" />
+                                 android:background="@drawable/select_check"
+                                 android:button="@null"
+                                 android:gravity="center" />
 
 
                      </LinearLayout>
@@ -352,15 +347,15 @@
                                  android:min="1"
                                  android:progress="99" />
 
-                         <CheckBox
-                                 android:id="@+id/cb_brightness_rgb_enable"
-                                 android:layout_width="40dp"
-                                 android:layout_height="match_parent"
+                         <TextView
+                                 android:id="@+id/sbBrightness_num"
+                                 android:layout_width="@dimen/dp_40"
+                                 android:layout_height="wrap_content"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
-                                 android:background="@drawable/select_check"
-                                 android:button="@null"
-                                 android:gravity="center" />
+                                 android:text="100%"
+                                 android:textColor="@color/black_three"
+                                 android:textSize="15sp" />
 
                      </LinearLayout>
 
@@ -388,16 +383,16 @@
                                  android:layout_height="wrap_content"
                                  android:layout_marginEnd="8dp"
                                  android:background="@drawable/add_enabled" />
-
-                         <TextView
-                                 android:id="@+id/sbBrightness_num"
-                                 android:layout_width="@dimen/dp_40"
-                                 android:layout_height="wrap_content"
+                         <CheckBox
+                                 android:id="@+id/cb_brightness_rgb_enable"
+                                 android:layout_width="40dp"
+                                 android:layout_height="match_parent"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
-                                 android:text="100%"
-                                 android:textColor="@color/black_three"
-                                 android:textSize="15sp" />
+                                 android:background="@drawable/select_check"
+                                 android:button="@null"
+                                 android:gravity="center" />
+
                      </LinearLayout>
 
                  </LinearLayout>

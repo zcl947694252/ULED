@@ -48,12 +48,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private val mCompositeDisposable = CompositeDisposable()
     private var countryCode: String = "86"
     private var phone: String? = null
-    private var type: String? = null
+    private var typeStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_confirmation_code)
-        type = this.intent.extras!!.getString(Constant.TYPE_USER)
+        typeStr = this.intent.extras!!.getString(Constant.TYPE_USER)
         initViewType()
         initView()
         timing()
@@ -67,7 +67,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         countryCode = this.intent.extras!!.getString("country_code") ?: ""
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
-        when (type) {
+        when (typeStr) {
             Constant.TYPE_VERIFICATION_CODE -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + " " + phone
             }
@@ -148,7 +148,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE -> {
                         when (result) {
                             SMSSDK.RESULT_COMPLETE -> {
-                                when (type) {
+                                when (typeStr) {
                                     Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
                                     Constant.TYPE_REGISTER -> {
                                         val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)

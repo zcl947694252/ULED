@@ -19,7 +19,7 @@
             android:id="@+id/btn_save"
             android:layout_width="50dp"
             android:layout_height="20dp"
-            android:text="@string/confirm"
+            android:text="@string/save"
             android:background="@null"
             android:textSize="15sp"
             android:layout_marginRight="20dp"
@@ -51,6 +51,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:orientation="horizontal"
+                android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -76,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+                android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/ll_r"
             app:layout_constraintTop_toBottomOf="@id/ll_r">
 
@@ -101,6 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+                android:visibility="gone"
             app:layout_constraintStart_toStartOf="@id/ll_r"
             app:layout_constraintTop_toBottomOf="@id/ll_g">
 

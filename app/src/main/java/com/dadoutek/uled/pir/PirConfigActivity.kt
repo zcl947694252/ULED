@@ -726,7 +726,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun makeGrideView() {
         pir_config_recyclerGroup.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        pir_config_recyclerGroup.layoutManager = GridLayoutManager(this, 3)
+        pir_config_recyclerGroup.layoutManager = GridLayoutManager(this, 2)
         bottomGvAdapter?.bindToRecyclerView(pir_config_recyclerGroup)
     }
 

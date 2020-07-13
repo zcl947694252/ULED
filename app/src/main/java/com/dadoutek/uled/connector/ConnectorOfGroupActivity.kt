@@ -59,7 +59,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_connector_of_group.*
-import kotlinx.android.synthetic.main.activity_lights_of_group.no_light
+import kotlinx.android.synthetic.main.activity_lights_of_group.no_light_ly
 import kotlinx.android.synthetic.main.activity_lights_of_group.recycler_view_lights
 import kotlinx.android.synthetic.main.activity_lights_of_group.scanPb
 import kotlinx.android.synthetic.main.activity_main.*
@@ -278,7 +278,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         toolbar.title = group?.name+"(${group?.deviceCount})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
-            no_light.visibility = View.GONE
+            no_light_ly.visibility = View.GONE
             var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
             batchGroup.setText(R.string.batch_group)
@@ -293,7 +293,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             }
         } else {
             recycler_view_lights.visibility = View.GONE
-            no_light.visibility = View.VISIBLE
+            no_light_ly.visibility = View.VISIBLE
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
         }
     }
@@ -369,7 +369,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         }
         light_add_device_btns.setOnClickListener(this)
         recyclerView = findViewById(R.id.recycler_view_lights)
-        recyclerView!!.layoutManager = GridLayoutManager(this, 3)
+        recyclerView!!.layoutManager = GridLayoutManager(this, 2)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener

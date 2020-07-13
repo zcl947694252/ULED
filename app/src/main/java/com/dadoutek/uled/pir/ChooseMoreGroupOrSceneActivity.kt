@@ -28,7 +28,6 @@ import java.util.ArrayList
  * 更新描述
  */
 class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
-    private var type: Int = 0
     private var groupDatumms: kotlin.collections.ArrayList<CheckItemBean> = arrayListOf()
     private var sceneDatumms: kotlin.collections.ArrayList<CheckItemBean> = arrayListOf()
     private var sceneAdapter = SceneMoreItemAdapter(R.layout.select_more_item, sceneDatumms)

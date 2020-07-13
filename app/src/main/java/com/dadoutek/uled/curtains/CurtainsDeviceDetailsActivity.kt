@@ -1,41 +1,34 @@
 package com.dadoutek.uled.curtains
 
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.group.InstallDeviceListAdapter
+import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.ItemTypeGroup
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
+import kotlinx.android.synthetic.main.activity_curtains_device_details.add_device_btn
+import kotlinx.android.synthetic.main.activity_curtains_device_details.no_device_relativeLayout
+import kotlinx.android.synthetic.main.activity_curtains_device_details.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import java.util.*
@@ -45,12 +38,11 @@ import java.util.*
  * 窗帘列表
  */
 
-class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener {
-    private lateinit var curtain: MutableList<DbCurtain>
+class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
+    private var curtainDatas: MutableList<DbCurtain> = mutableListOf()
     private var adapter: CurtainDeviceDetailsAdapter? = null
     private var showList: List<ItemTypeGroup>? = null
     private var gpList: List<ItemTypeGroup>? = null
-    private var type: Int? = null
     private var inflater: LayoutInflater? = null
     private var currentLight: DbCurtain? = null
     private var positionCurrent: Int = 0
@@ -64,17 +56,55 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_curtains_device_details)
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initView()
         initData()
     }
 
+    override fun gpAllVisible(): Boolean {
+        return true
+    }
+
+    override fun setPositiveBtn() {
+        currentLight?.let {
+            DBUtils.deleteCurtain(it)
+            curtainDatas.remove(it)
+        }
+        adapter?.notifyDataSetChanged()
+        isEmptyDevice()
+    }
+
+    override fun editeDeviceAdapter() {
+        adapter!!.changeState(isEdite)
+        adapter!!.notifyDataSetChanged()
+    }
+
+    override fun setToolbar(): Toolbar {
+        return toolbar
+    }
+
+    override fun setDeviceDataSize(num: Int): Int {
+        return curtainDatas.size
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_curtains_device_details
+    }
+
     override fun onResume() {
         super.onResume()
         initData()
+    }
+
+    private fun isEmptyDevice() {
+        if (curtainDatas.size > 0) {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+        } else {
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+        }
     }
 
     private fun initData() {
@@ -83,7 +113,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         showList = gpList
         setScanningMode(true)
 
-        curtain = ArrayList()
         var allLightData = DBUtils.getAllCurtains()
 
         when (type) {
@@ -103,13 +132,13 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
                     if (noGroup.size > 0) {
                         for (i in noGroup.indices) {
-                            curtain.add(noGroup[i])
+                            curtainDatas.add(noGroup[i])
                         }
                     }
 
                     if (listGroup.size > 0) {
                         for (i in listGroup.indices) {
-                            curtain.add(listGroup[i])
+                            curtainDatas.add(listGroup[i])
                         }
                     }
 
@@ -154,13 +183,13 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
                     if (noGroup.size > 0) {
                         for (i in noGroup.indices) {
-                            curtain.add(noGroup[i])
+                            curtainDatas.add(noGroup[i])
                         }
                     }
 
                     if (listGroup.size > 0) {
                         for (i in listGroup.indices) {
-                            curtain.add(listGroup[i])
+                            curtainDatas.add(listGroup[i])
                         }
                     }
                     toolbar!!.tv_function1.visibility = View.VISIBLE
@@ -200,14 +229,14 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                 }
             }
         }
-        toolbarTv.text = getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbarTv.text = getString(R.string.curtain) + " (" + curtainDatas.size + ")"
 
-        adapter = CurtainDeviceDetailsAdapter(R.layout.template_device_type_item, curtain)
+        adapter = CurtainDeviceDetailsAdapter(R.layout.template_device_type_item, curtainDatas)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
-        for (i in curtain?.indices!!) {
-            curtain!![i].icon = R.drawable.icon_curtain
+        for (i in curtainDatas?.indices!!) {
+            curtainDatas!![i].icon = R.drawable.icon_curtain
         }
     }
 
@@ -247,7 +276,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     //addNewGroup()
-                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -314,18 +343,22 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun addCurtainDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+        intent.putExtra(DEVICE_TYPE, DeviceType.SMART_CURTAIN)
         startActivityForResult(intent, 0)
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
-        currentLight = curtain?.get(position)
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
+        currentLight = curtainDatas?.get(position)
         positionCurrent = position
-                if (TelinkLightApplication.getApp().connectDevice == null)
-                    ToastUtils.showLong(getString(R.string.connecting_tip))
-                else
-                    skipSetting()
-
+        if (TelinkLightApplication.getApp().connectDevice == null)
+            ToastUtils.showLong(getString(R.string.connecting_tip))
+        else {
+            when (view.id) {
+                R.id.template_device_card_delete -> dialogDelete?.show()
+                R.id.template_device_setting -> skipSetting()
+                R.id.template_device_card_delete-> dialogDelete?.show()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -340,7 +373,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbCurtain>? = curtain
+        val mOldDatas: MutableList<DbCurtain>? = curtainDatas
         val mNewDatas: MutableList<DbCurtain>? = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -367,15 +400,16 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity(), View.OnClickListener
         }, true)
         adapter?.let {
             diffResult.dispatchUpdatesTo(it)
-            adapter!!.setNewData(curtain)
+            adapter!!.setNewData(curtainDatas)
         }
 
-        toolbarTv.text = getString(R.string.curtain) + " (" + curtain.size + ")"
+        toolbarTv.text = getString(R.string.curtain) + " (" + curtainDatas.size + ")"
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
-        curtain = DBUtils.getAllCurtains()
-        return curtain
+        curtainDatas.clear()
+        curtainDatas.addAll(DBUtils.getAllCurtains())
+        return curtainDatas
     }
 
     private fun skipSetting() {

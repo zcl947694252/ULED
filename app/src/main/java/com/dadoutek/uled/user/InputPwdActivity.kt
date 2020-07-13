@@ -33,7 +33,7 @@ import org.jetbrains.anko.toast
  * 登录不共享此界面 登录在EnterPasswordActivity
  */
 class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
-    var type: String? = null
+    var typeStr: String? = null
     var isPassword = false
     var password: String? = null
     var phone: String? = null
@@ -42,17 +42,17 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_pwd)
         phone = intent.getStringExtra("phone")
-        type = intent.getStringExtra(Constant.USER_TYPE)
+        typeStr = intent.getStringExtra(Constant.USER_TYPE)
         initView()
         initListener()
     }
 
     private fun initView() {
-        if (type == Constant.TYPE_REGISTER) {
+        if (typeStr == Constant.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
             pwd_btn.text = getString(R.string.register)
-        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
+        } else if (typeStr == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
             pwd_title.text = getString(R.string.set_password)
             pwd_btn.text = getString(R.string.complete)

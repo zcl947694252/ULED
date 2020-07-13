@@ -397,7 +397,7 @@
     <string name="switch_mode">开关灯方式</string>
     <string name="delay_unit">延时时间单位</string>
     <string name="edit">编辑</string>
-    <string name="long_click_select_color_tip">*长按保存,单击应用</string>
+    <string name="long_click_select_color_tip">*长按保存,单击设置</string>
     <string name="account">账号:</string>
     <string name="rssi_low">信号太差</string>
 
@@ -1012,5 +1012,6 @@
     <string name="sure_delete_device">确定删除此设备?</string>
     <string name="confim_stop_scan">确定要退出扫描吗?</string>
     <string name="add_device">添加设备</string>
+    <string name="set_color">设置颜色</string>
 
 </resources>

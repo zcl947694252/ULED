@@ -2,15 +2,11 @@ package com.dadoutek.uled.scene
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -19,17 +15,14 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -43,11 +36,9 @@ import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -59,7 +50,6 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -73,7 +63,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -82,7 +71,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
 /**
  * 描述	      ${人体感应器列表}$
  */
-class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<String> {
     private var popVersion: TextView? = null
     private var isLogin: Boolean = false
     private var factory: TextView? = null
@@ -106,7 +95,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private val OTA_SENSOR: Int = 3//3是oat
     private val SENSOR_FINISH: Int = 4//4代表操作完成
 
-    private lateinit var sensorDatummms: MutableList<DbSensor>
+    private var sensorDatas: MutableList<DbSensor> = mutableListOf()
     private var adapter: SensorDeviceDetailsAdapter? = null
     private var retryConnectCount = 0
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -125,9 +114,48 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
-        setContentView(R.layout.activity_sensor_device_details)
         addScanListeners()
         LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
+    }
+
+    override fun editeDeviceAdapter() {
+        adapter!!.changeState(isEdite)
+        adapter!!.notifyDataSetChanged()
+    }
+
+    override fun setToolbar(): Toolbar {
+        return toolbar
+    }
+
+    override fun gpAllVisible(): Boolean {
+        return false
+    }
+
+    override fun setDeviceDataSize(num: Int): Int {
+        return sensorDatas.size
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_sensor_device_details
+    }
+
+    override fun setPositiveBtn() {
+        currentLightm?.let {
+            DBUtils.deleteSensor(it)
+            sensorDatas.remove(it)
+        }
+        adapter?.notifyDataSetChanged()
+        isEmptyDevice()
+    }
+
+    private fun isEmptyDevice() {
+        if (sensorDatas.size > 0) {
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+        }
     }
 
     override fun onResume() {
@@ -162,7 +190,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
-        adapter = SensorDeviceDetailsAdapter(R.layout.template_device_type_item, sensorDatummms)
+        adapter = SensorDeviceDetailsAdapter(R.layout.template_device_type_item, sensorDatas)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
 
@@ -203,7 +231,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }//添加设备
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { doFinish() }
-        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms!!.size + ")"
+        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatas!!.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -256,7 +284,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     } else {
                         currentLightm?.name = textGp.text.toString()
                         DBUtils.saveSensor(currentLightm!!, true)
-                        sensorDatummms[positionCurrent].name = textGp.text.toString()
+                        sensorDatas[positionCurrent].name = textGp.text.toString()
                         adapter?.notifyDataSetChanged()
                         dialog.dismiss()
                     }
@@ -270,39 +298,16 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun initData() {
-        sensorDatummms = DBUtils.getAllSensor()
+        sensorDatas.clear()
+        sensorDatas.addAll(DBUtils.getAllSensor())
 //        LogUtils.e("zcl人体本地数据----------$sensorData")
         setScanningMode(true)
-        if (sensorDatummms.size > 0) {
-            recycleView.visibility = View.VISIBLE
-            no_device_relativeLayout.visibility = View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-        } else {
-            setEmpty()
-        }
+        isEmptyDevice()
     }
 
-    private fun setEmpty() {
-        recycleView.visibility = View.GONE
-        no_device_relativeLayout.visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-            val lastUser = DBUtils.lastUser
-            lastUser?.let {
-                if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showLong(getString(R.string.author_region_warm))
-                else {
-                    if (dialog_pir?.visibility == View.GONE) {
-                        dialog_pir?.visibility = View.VISIBLE//showPopupMenu
-                    }
-                }
-            }
-
-        }
-    }
 
     var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
-        currentLightm = sensorDatummms[position]
+        currentLightm = sensorDatas[position]
         positionCurrent = position
         val lastUser = DBUtils.lastUser
         lastUser?.let {
@@ -432,8 +437,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             setOPenOrClose(position)
                         }
                     }
-                    else -> {
-                    }
+                    R.id.template_device_card_delete -> dialogDelete?.show()
+                    else -> {}
                 }
             }
         }
@@ -527,7 +532,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm!!.meshAddr, byteArrayOf)
-            DBUtils.saveSensor(sensorDatummms[position], true)
+            DBUtils.saveSensor(sensorDatas[position], true)
             adapter?.notifyDataSetChanged()
         } else {
             ToastUtils.showShort(getString(R.string.dissupport))
@@ -535,14 +540,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun sendOpenIcon(position: Int) {
-        sensorDatummms[position].openTag = 1
-        sensorDatummms[position].updateIcon()
+        sensorDatas[position].openTag = 1
+        sensorDatas[position].updateIcon()
         ToastUtils.showShort(getString(R.string.open))
     }
 
     private fun sendCloseIcon(position: Int) {
-        sensorDatummms[position].openTag = 0
-        sensorDatummms[position].updateIcon()
+        sensorDatas[position].openTag = 0
+        sensorDatas[position].updateIcon()
         ToastUtils.showShort(getString(R.string.close))
     }
 
@@ -595,11 +600,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.reset_factory_success))
                             DBUtils.deleteSensor(currentLightm!!)
-                            sensorDatummms.remove(currentLightm!!)
-                            toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms!!.size + ")"
+                            sensorDatas.remove(currentLightm!!)
+                            toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatas!!.size + ")"
                             adapter?.notifyDataSetChanged()
-                            if (sensorDatummms.size <= 0)
-                                setEmpty()
+                            isEmptyDevice()
                             if (isLogin)
                                 TelinkLightService.Instance()?.idleMode(true)
                         }, {
@@ -707,13 +711,13 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                         skipeDevice(isOTA, s)
                                         isClick = SENSOR_FINISH
                                     } else {
-                                        skipeDevice(isOTA, currentLightm?.version?:"")
+                                        skipeDevice(isOTA, currentLightm?.version ?: "")
                                         hideLoadingDialog()
                                     }
                                 },
                                 {
                                     hideLoadingDialog()
-                                    skipeDevice(isOTA, currentLightm?.version?:"")
+                                    skipeDevice(isOTA, currentLightm?.version ?: "")
                                 }
                         )
             } else {
@@ -743,7 +747,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
-                    if (s.contains("NPR")||TextUtils.isEmpty(s))
+                    if (s.contains("NPR") || TextUtils.isEmpty(s))
                         startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                     else
                         startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
@@ -844,7 +848,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     fun notifyData() {
-        val mOldData: MutableList<DbSensor>? = sensorDatummms
+        val mOldData: MutableList<DbSensor>? = sensorDatas
         val mNewData: MutableList<DbSensor>? = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -870,10 +874,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
-        sensorDatummms = mNewData!!
-        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatummms.size + ")"
-        adapter!!.setNewData(sensorDatummms)
-        if (sensorDatummms.size <= 0) {
+        sensorDatas = mNewData!!
+        toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatas.size + ")"
+        adapter!!.setNewData(sensorDatas)
+        if (sensorDatas.size <= 0) {
             no_device_relativeLayout.visibility = View.VISIBLE
             recycleView.visibility = View.GONE
         } else {
@@ -883,9 +887,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun getNewData(): MutableList<DbSensor> {
-        sensorDatummms = DBUtils.getAllSensor()
+        sensorDatas = DBUtils.getAllSensor()
         toolbarTv.text = (currentLightm!!.name ?: "")
-        return sensorDatummms
+        return sensorDatas
     }
 
     private fun doFinish() {

@@ -34,7 +34,6 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="3dp"
                     android:maxHeight="65dp"
-                    android:scaleType="fitXY"
                     android:src="@drawable/icon_light_no_circle" />
 
             <LinearLayout

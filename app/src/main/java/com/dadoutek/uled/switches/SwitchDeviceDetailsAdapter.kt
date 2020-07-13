@@ -11,7 +11,11 @@ import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.StringUtils
 
 class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,internal var context: Context) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {
+    private var isDelete: Boolean = false
 
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
+    }
     override fun convert(helper: BaseViewHolder, dbSwitch: DbSwitch) {
         if (dbSwitch != null) {
             if(dbSwitch.name!=null&&dbSwitch.name!=""){
@@ -23,13 +27,16 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,interna
 //            helper.setText(R.id.name, StringUtils.getSwitchName(dbSwitch))
 //                    .setVisible(R.id.name,false)
 
-
             helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch_device)
-            helper.addOnClickListener(R.id.template_device_setting)
+            helper
+            .setVisible(R.id.template_device_card_delete,isDelete)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)
+                    .setVisible(R.id.template_gp_name, false)
                     .addOnClickListener(R.id.template_device_icon)
+                    .addOnClickListener(R.id.template_device_card_delete)
+                    .addOnClickListener(R.id.template_device_setting)
         }
     }
 }

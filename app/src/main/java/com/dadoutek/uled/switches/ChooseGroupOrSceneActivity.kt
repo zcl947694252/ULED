@@ -32,7 +32,6 @@ import kotlinx.android.synthetic.main.toolbar.*
  */
 class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
     private var deviceType: Int = 0
-    private var type: Int = 0
     var groupList = mutableListOf<DbGroup>()
     private var sceneAdapter = SceneItemAdapter(R.layout.template_batch_device_item, sceneList)
     private var groupAdapter = GroupItemAdapter(R.layout.template_batch_device_item, groupList)

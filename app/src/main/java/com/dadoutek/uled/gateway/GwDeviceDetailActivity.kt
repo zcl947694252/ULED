@@ -3,14 +3,12 @@ package com.dadoutek.uled.gateway
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
-import android.text.method.ScrollingMovementMethod
+import android.support.v7.widget.Toolbar
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -18,13 +16,12 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwDeviceItemAdapter
 import com.dadoutek.uled.gateway.bean.ClearGwBean
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
@@ -34,26 +31,26 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.empty_view.*
+import kotlinx.android.synthetic.main.empty_view.add_device_btn
+import kotlinx.android.synthetic.main.empty_view.no_device_relativeLayout
 import kotlinx.android.synthetic.main.template_device_detail_list.*
+import kotlinx.android.synthetic.main.template_device_detail_list.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +78,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  * 更新描述   ${TODO}$
  */
-class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, EventListener<String> {
+class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener, EventListener<String> {
     private var popVersion: TextView? = null
     private var showDialogHardDelete: AlertDialog? = null
     private var showDialogDelete: AlertDialog? = null
@@ -99,9 +96,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     private lateinit var popupWindow: PopupWindow
     private var disposableConnect: Disposable? = null
     private var currentGw: DbGateway? = null
-    private var type: Int? = null
-    private val gateWayDataList: MutableList<DbGateway> = mutableListOf()
-    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.template_device_type_item, gateWayDataList, this)
+    private val gwDatas: MutableList<DbGateway> = mutableListOf()
+    private var adaper: GwDeviceItemAdapter? = GwDeviceItemAdapter(R.layout.template_device_type_item, gwDatas, this)
     private var inflater: LayoutInflater? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
@@ -114,12 +110,51 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     override fun onCreate(savedInstanceState: Bundle?) {//其他界面添加扫描网关待做
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.template_device_detail_list)
         type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         inflater = this.layoutInflater
 
         initView()
         initData()
+    }
+
+    override fun setPositiveBtn() {
+        currentGw?.let {
+            DBUtils.deleteGateway(it)
+            gwDatas.remove(it)
+        }
+        adaper?.notifyDataSetChanged()
+        isEmptyDevice()
+    }
+
+    override fun gpAllVisible(): Boolean {
+        return false
+    }
+
+    private fun isEmptyDevice() {
+        if (gwDatas.size > 0) {
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+        }
+    }
+
+    override fun editeDeviceAdapter() {
+        adaper!!.changeState(isEdite)
+        adaper!!.notifyDataSetChanged()
+    }
+
+    override fun setToolbar(): Toolbar {
+       return toolbar
+    }
+
+    override fun setDeviceDataSize(num: Int): Int {
+       return gwDatas.size
+    }
+
+    override fun setLayoutId(): Int {
+       return R.layout.template_device_detail_list
     }
 
     private fun initView() {
@@ -132,8 +167,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
         makePopupWindow()
-        for (i in gateWayDataList.indices)
-            gateWayDataList!![i].updateIcon()
+        for (i in gwDatas.indices)
+            gwDatas!![i].updateIcon()
 
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -147,7 +182,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbarTv.text = getString(R.string.Gate_way) + " (" + gwDatas.size + ")"
     }
 
     private val onClick = View.OnClickListener {
@@ -223,29 +258,29 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-        currentGw = gateWayDataList[position]
+        currentGw = gwDatas[position]
         positionCurrent = position
-        if (view.id == R.id.template_device_setting) {
-            val lastUser = DBUtils.lastUser
-            lastUser?.let {
-                if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showLong(getString(R.string.author_region_warm))
-                else {
-                    connectGw(0)
-               /*     val set = view!!.findViewById<ImageView>(R.id.template_device_setting)
-                    popupWindow.dismiss()
-                    popVersion?.text = getString(R.string.firmware_version) + currentGw?.version
-                    popVersion?.visibility = View.VISIBLE
-                    popupWindow.showAsDropDown(set)
-                    LogUtils.v("zcl-----------获取广播mac-------${currentGw?.macAddr}")*/
+        when (view.id) {
+            R.id.template_device_setting -> {
+                val lastUser = DBUtils.lastUser
+                lastUser?.let {
+                    if (it.id.toString() != it.last_authorizer_user_id)
+                        ToastUtils.showLong(getString(R.string.author_region_warm))
+                    else {
+                        connectGw(0)
+                    }
                 }
             }
-        } else if (view.id == R.id.template_device_icon) {
-            //开关网关通过普通灯的连接状态发送
-            if (TelinkLightApplication.getApp().connectDevice != null)
-                sendOpenOrCloseGw(true)
-            else
-                getGw()
+            R.id.template_device_icon -> {
+                //开关网关通过普通灯的连接状态发送
+                if (TelinkLightApplication.getApp().connectDevice != null)
+                    sendOpenOrCloseGw(true)
+                else
+                    getGw()
+            }
+            R.id.template_device_card_delete->{
+                dialogDelete?.show()
+            }
         }
     }
 
@@ -259,7 +294,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                 else
                     byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
                 TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_SWITCH, it.meshAddr, labHeadPar, "1")
-                gateWayDataList.forEach { it1 ->
+                gwDatas.forEach { it1 ->
                     if (it1.id == it.id) {
                         it1.openTag = if (it.openTag == 0) {
                             it.icon = R.drawable.icon_gw_open
@@ -669,8 +704,8 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     fun notifyData() {
         val mNewDatas: ArrayList<DbGateway> = getNewData()
-        gateWayDataList.clear()
-        gateWayDataList.addAll(mNewDatas)
+        gwDatas.clear()
+        gwDatas.addAll(mNewDatas)
         if (mNewDatas.size > 0) {
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
@@ -679,15 +714,15 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             no_device_relativeLayout.visibility = View.VISIBLE
         }
         adaper?.notifyDataSetChanged()
-        toolbarTv.text = getString(R.string.Gate_way) + " (" + gateWayDataList.size + ")"
+        toolbarTv.text = getString(R.string.Gate_way) + " (" + gwDatas.size + ")"
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return gateWayDataList[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
+                return gwDatas[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
                         ?: false
             }
 
             override fun getOldListSize(): Int {
-                return gateWayDataList.size
+                return gwDatas.size
             }
 
             override fun getNewListSize(): Int {
@@ -695,7 +730,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = gateWayDataList[oldItemPosition]
+                val beanOld = gwDatas[oldItemPosition]
                 val beanNew = mNewDatas[newItemPosition]
                 return if (beanOld.name != beanNew.name) {
                     return false//如果有内容不同，就返回false
@@ -727,7 +762,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
 
     private fun initData() {
         setScanningMode(true)
-        gateWayDataList.clear()
+        gwDatas.clear()
         val allDeviceData = DBUtils.getAllGateWay()
         if (allDeviceData.size > 0) {
             toolbar!!.tv_function1.visibility = View.VISIBLE
@@ -748,7 +783,7 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
                             hidePopupMenu()
                 }
             }
-            gateWayDataList.addAll(allDeviceData)
+            gwDatas.addAll(allDeviceData)
             adaper?.notifyDataSetChanged()
         } else {
             recycleView.visibility = View.GONE
@@ -846,14 +881,14 @@ class GwDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener, Event
     }
 
     private fun updataUi() {
-        for (gw in gateWayDataList)
+        for (gw in gwDatas)
             if (gw.id == currentGw?.id) {
                 removeBean = gw
                 break
             }
 
-        gateWayDataList.remove(removeBean)
-        gateWayDataList.add(0, currentGw!!)
+        gwDatas.remove(removeBean)
+        gwDatas.add(0, currentGw!!)
         adaper?.notifyDataSetChanged()
     }
 

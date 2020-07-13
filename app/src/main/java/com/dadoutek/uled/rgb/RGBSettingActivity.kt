@@ -49,6 +49,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
+import kotlinx.android.synthetic.main.template_add_help.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -97,7 +98,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var isDelete = false
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
-    var type: String = Constant.TYPE_GROUP
+    var typeStr: String = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
@@ -116,9 +117,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
-    private var seeHelp: TextView? = null
-    private var addGroupTv: TextView? = null
-    private var lin: View? = null
     private var acitivityIsAlive = true
     var isReset = false
 
@@ -344,7 +342,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     private fun initType() {
-        type = intent.getStringExtra(Constant.TYPE_VIEW)
+        typeStr = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         setSupportActionBar(toolbar)
@@ -355,14 +353,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             toolbar.overflowIcon = moreIcon
         }
 
-        lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
-        addGroupTv = lin?.findViewById(R.id.main_add_device)
-        addGroupTv?.text = getString(R.string.mode_diy)
-        seeHelp = lin?.findViewById(R.id.main_go_help)
-        seeHelp?.visibility = View.GONE
+        //lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
+        main_add_device?.text = getString(R.string.mode_diy)
+        main_go_help?.visibility = View.VISIBLE
 
 
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
             initToolbarGroup()
             initDataGroup()
@@ -430,7 +426,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         btnStopGradient.setOnClickListener(this.clickListener)
         cb_brightness_enable.setOnClickListener(cbOnClickListener)
         cb_brightness_rgb_enable.setOnClickListener(cbOnClickListener)
-        addGroupTv?.setOnClickListener(clickListener)
+        main_add_device?.setOnClickListener(clickListener)
+        main_go_help?.setOnClickListener(clickListener)
 
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
@@ -525,7 +522,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decorations)
-        rgbDiyGradientAdapter!!.addFooterView(lin)
+       // rgbDiyGradientAdapter!!.addFooterView(lin)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
         rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
@@ -591,7 +588,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         var addr = 0
         if (currentLight) {
             enableAllUI(true)
-            if (type == Constant.TYPE_GROUP) {
+            if (typeStr == Constant.TYPE_GROUP) {
                 addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.ON.value
             } else {
@@ -601,7 +598,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
         } else {
             enableAllUI(false)
-            if (type == Constant.TYPE_GROUP) {
+            if (typeStr == Constant.TYPE_GROUP) {
                 addr = group!!.meshAddr
                 group!!.connectionStatus = ConnectionStatus.OFF.value
             } else {
@@ -996,6 +993,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             }
             R.id.mode_preset_layout -> {
                 changeToBuildInPage()
+            }   R.id.main_go_help -> {
+                seeHelpe()
             }
             R.id.btnAdd,R.id.main_add_device-> {
                 transAddAct()
@@ -1498,8 +1497,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
-            R.id.toolbar_delete_group -> removeGroup()
-            R.id.toolbar_rename_group -> renameGp()
+            R.id.toolbar_batch_gp -> removeGroup()
+            R.id.toolbar_on_line -> renameGp()
             R.id.toolbar_f_rename -> renameLight()
             R.id.toolbar_fv_rest -> remove()
             R.id.toolbar_fv_change_group -> updateGroup()

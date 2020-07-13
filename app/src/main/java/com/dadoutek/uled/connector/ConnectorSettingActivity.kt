@@ -32,6 +32,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAConnectorActivity
@@ -44,11 +45,13 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
+import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_connector_setting.*
 import kotlinx.android.synthetic.main.connector_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
@@ -83,8 +86,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         android.app.AlertDialog.Builder(this@ConnectorSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
@@ -115,7 +117,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
-                        val opcode = Opcode.KICK_OUT
                         val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
                                 .subscribe({
                                     LogUtils.v("zcl-----恢复出厂成功")
@@ -377,11 +378,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     } else {
                         currentDbConnector?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateConnector(currentDbConnector!!)
-                        relayName.text = currentDbConnector?.name
+                        textGp.setText(currentDbConnector?.name)
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -392,9 +393,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun initView() {
-        toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
@@ -402,6 +400,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
+
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 
 
@@ -420,7 +422,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     fiRename?.title = getString(R.string.update_name_gp)
                     fiOta?.isVisible = false
                     fiDelete?.title = getString(R.string.delete_group)
-                    fiVersion?.isVisible = false
+                    fiVersion?.title = localVersion
+
                 } else {
                     fiChangeGp?.isVisible = isConfigGroup
                 }
@@ -466,7 +469,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         super.onDestroy()
         mConnectTimer?.dispose()
         mDisposable.dispose()
-
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
@@ -488,6 +490,19 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun initType() {
+        connector_switch?.setOnCheckedChangeListener { _, isChecked ->
+            if (TelinkLightApplication.getApp().connectDevice == null)
+                autoConnect()
+             else {
+                if (!isChecked)
+                    openOrClose(true)
+                else
+                    openOrClose(false)
+                currentDbConnector!!.updateIcon()
+                DBUtils.updateConnector(currentDbConnector!!)
+            }
+        }
+
         var type = intent.getStringExtra(Constant.TYPE_VIEW)
         isConfigGroup = type == Constant.TYPE_GROUP
         if (isConfigGroup) {
@@ -504,6 +519,25 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             initViewLight()
             getVersion()
         }
+
+    }
+
+    private fun openOrClose(b: Boolean) {
+        if (currentDbConnector!!.productUUID == DeviceType.SMART_CURTAIN) {
+            Commander.openOrCloseCurtain(currentDbConnector!!.meshAddr, isOpen = b, isPause = false)
+        } else {
+            Commander.openOrCloseLights(currentDbConnector!!.meshAddr, b)
+        }
+        if (b)
+            currentDbConnector!!.connectionStatus = ConnectionStatus.ON.value
+        else
+            currentDbConnector!!.connectionStatus = ConnectionStatus.OFF.value
+    }
+
+    fun autoConnect() {
+        val subscribe = connect()?.subscribe({ ToastUtils.showShort(getString(R.string.connecting)) },
+                { ToastUtils.showShort(getString(R.string.device_disconnected)) }
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -544,6 +578,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                 if (TextUtils.isEmpty(s))
                                     localVersion = getString(R.string.number_no)
                                 currentDbConnector!!.version = localVersion
+                                fiVersion?.title = localVersion
                                 DBUtils.saveConnector(currentDbConnector!!, false)
                             },
                             {

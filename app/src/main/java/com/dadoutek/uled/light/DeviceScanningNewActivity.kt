@@ -954,7 +954,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.grouping_completed?.setBackgroundColor(resources.getColor(R.color.gray))
 
         list_devices.adapter = mAddedDevicesAdapter
-        list_devices.layoutManager = GridLayoutManager(this, 3)
+        list_devices.layoutManager = GridLayoutManager(this, 2)
 
         this.updateList.clear()
 

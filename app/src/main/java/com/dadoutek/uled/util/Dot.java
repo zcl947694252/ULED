@@ -49,7 +49,7 @@ public class Dot extends View {
         rect.right = width;
         rect.top = 0 ;
         rect.bottom = height;
-        canvas.drawRoundRect(rect,radius,radius,mPaint);
+        canvas.drawRoundRect(rect,5,5,mPaint);
     }
 
     public void setChecked(boolean checked,int color) {

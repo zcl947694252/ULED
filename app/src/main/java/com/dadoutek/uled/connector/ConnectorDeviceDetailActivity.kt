@@ -1,14 +1,10 @@
 package com.dadoutek.uled.connector
 
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
-import android.text.method.ScrollingMovementMethod
 import android.view.*
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,29 +12,24 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
-import com.telink.util.MeshUtils.DEVICE_ADDRESS_MAX
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.empty_view.*
+import kotlinx.android.synthetic.main.empty_view.add_device_btn
+import kotlinx.android.synthetic.main.empty_view.no_device_relativeLayout
 import kotlinx.android.synthetic.main.template_device_detail_list.*
+import kotlinx.android.synthetic.main.template_device_detail_list.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.GlobalScope
@@ -48,10 +39,9 @@ import kotlinx.coroutines.launch
 /**
  * 蓝牙接收器列表
  */
-class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener {
+class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
     private  var launch: Job? = null
-    private var type: Int? = null
-    private val lightsData: MutableList<DbConnector> = mutableListOf()
+    private val relayDatas: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var adaper: DeviceDetailConnectorAdapter? = null
     private var currentLight: DbConnector? = null
@@ -67,11 +57,50 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.template_device_detail_list)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
         initView()
+    }
+
+    override fun gpAllVisible(): Boolean {
+        return true
+    }
+
+    override fun setPositiveBtn() {
+        currentLight?.let {
+            DBUtils.deleteConnector(it)
+            relayDatas.remove(it)
+        }
+        adaper?.notifyDataSetChanged()
+        isEmptyDevice()
+    }
+
+    private fun isEmptyDevice() {
+        if (relayDatas.size > 0) {
+            recycleView.visibility = View.VISIBLE
+            no_device_relativeLayout.visibility = View.GONE
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
+        }
+    }
+
+    override fun editeDeviceAdapter() {
+        adaper!!.changeState(isEdite)
+        adaper!!.notifyDataSetChanged()
+    }
+
+    override fun setToolbar(): Toolbar {
+      return toolbar
+    }
+
+    override fun setDeviceDataSize(num: Int): Int {
+        return relayDatas.size
+    }
+
+    override fun setLayoutId(): Int {
+       return R.layout.template_device_detail_list
     }
 
     override fun onResume() {
@@ -84,11 +113,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, lightsData)
+        adaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, relayDatas)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
-        for (i in lightsData?.indices!!) {
-            lightsData!![i].updateIcon()
+        for (i in relayDatas?.indices!!) {
+            relayDatas!![i].updateIcon()
         }
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -102,7 +131,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.relay) + " (" + lightsData.size + ")"
+        toolbarTv.text = getString(R.string.relay) + " (" + relayDatas.size + ")"
 
     }
 
@@ -189,7 +218,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentLight = lightsData?.get(position)
+        currentLight = relayDatas?.get(position)
         positionCurrent = position
         Opcode.LIGHT_ON_OFF
         val unit = when (view.id) {
@@ -244,71 +273,39 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     }
                 }
             }
+            R.id.template_device_card_delete-> dialogDelete?.show()
             else -> ToastUtils.showLong(R.string.reconnecting)
         }
     }
 
     private fun initData() {
         setScanningMode(true)
-        lightsData.clear()
-        val all_light_data = DBUtils.getAllRelay()
-        if (all_light_data.size > 0) {
-            var list_group: ArrayList<DbConnector> = ArrayList()
-            var no_group: ArrayList<DbConnector> = ArrayList()
-            for (i in all_light_data.indices) {
-                if (StringUtils.getConnectorGroupName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
-                    no_group.add(all_light_data[i])
-                } else {
-                    list_group.add(all_light_data[i])
-                }
-            }
+        relayDatas.clear()
+        val allLightData = DBUtils.getAllRelay()
+        if (allLightData.size > 0) {
+            var listGroup: ArrayList<DbConnector> = ArrayList()
+            var noGroup: ArrayList<DbConnector> = ArrayList()
+            for (i in allLightData.indices)
+                if (StringUtils.getConnectorGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped))
+                    noGroup.add(allLightData[i])
+                 else
+                    listGroup.add(allLightData[i])
 
-            if (no_group.size > 0) {
-                for (i in no_group.indices) {
-                    lightsData.add(no_group[i])
-                }
-            }
+            if (noGroup.size > 0)
+                for (i in noGroup.indices)
+                    relayDatas.add(noGroup[i])
 
-            if (list_group.size > 0) {
-                for (i in list_group.indices) {
-                    lightsData.add(list_group[i])
-                }
-            }
-            toolbar!!.tv_function1.visibility = View.VISIBLE
+            if (listGroup.size > 0)
+                for (i in listGroup.indices)
+                    relayDatas.add(listGroup[i])
+
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
-            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.visibility = View.VISIBLE
-            batchGroup.setOnClickListener {
-                /*    val intent = Intent(this,
-                            ConnectorBatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("relayType", "all_relay")
-                    startActivity(intent)*/
-                if (TelinkLightApplication.getApp().connectDevice != null) {
-                    val lastUser = DBUtils.lastUser
-                    lastUser?.let {
-                        if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showLong(getString(R.string.author_region_warm))
-                        else {
-                            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                            startActivity(intent)
-                        }
-                    }
-                } else {
-                    autoConnect()
-                    ToastUtils.showLong(getString(R.string.connecting_tip))
-                }
-            }
         } else {
             recycleView.visibility = View.GONE
             no_device_relativeLayout.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
@@ -316,9 +313,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
-                        if (dialog_relay?.visibility == View.GONE) {
+                        if (dialog_relay?.visibility == View.GONE)
                             showPopupMenu()
-                        }
                     }
                 }
             }
@@ -360,7 +356,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbConnector> = lightsData
+        val mOldDatas: MutableList<DbConnector> = relayDatas
         val mNewDatas: MutableList<DbConnector> = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -387,19 +383,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), View.OnClickListener
         }, true)
         adaper?.let { diffResult.dispatchUpdatesTo(it) }
 
-        lightsData.clear()
-        lightsData.addAll(mNewDatas)
+        relayDatas.clear()
+        relayDatas.addAll(mNewDatas)
 
-        toolbarTv.text = getString(R.string.relay) + " (" + lightsData.size + ")"
+        toolbarTv.text = getString(R.string.relay) + " (" + relayDatas.size + ")"
 //        adaper!!.setNewData(lightsData)
         adaper?.notifyDataSetChanged()
 
     }
 
     private fun getNewData(): MutableList<DbConnector> {
-        lightsData.clear()
-        lightsData.addAll(DBUtils.getAllRelay())
-        return lightsData
+        relayDatas.clear()
+        relayDatas.addAll(DBUtils.getAllRelay())
+        return relayDatas
     }
 
     fun autoConnect() {

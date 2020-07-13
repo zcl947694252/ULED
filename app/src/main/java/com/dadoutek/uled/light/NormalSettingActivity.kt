@@ -69,7 +69,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var findItemChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
-    private var type: String? = null
+    private var typeStr: String? = null
     private var isAllGroup: Boolean = false
     private var downloadDispoable: Disposable? = null
     private var mConnectDisposable: Disposable? = null
@@ -1073,7 +1073,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onResume() {
         super.onResume()
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val dbGroup = DBUtils.getGroupByID(group!!.id)
             if (group?.status == 1) {
                 setLightGUIImg(progress = dbGroup?.brightness ?: 0, temperatureValue = dbGroup?.colorTemperature ?: 0)
@@ -1092,7 +1092,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     private fun initType() {
-        type = intent.getStringExtra(Constant.TYPE_VIEW)
+        typeStr = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         setSupportActionBar(toolbar)
@@ -1104,7 +1104,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             toolbar.overflowIcon = moreIcon
         }
         slow_rg_view.setOnClickListener { }
-        currentShowPageGroup = type == Constant.TYPE_GROUP
+        currentShowPageGroup = typeStr == Constant.TYPE_GROUP
         LogUtils.v("zclmenu----------currentShowPageGroup--------$currentShowPageGroup----${DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id}")
         if (currentShowPageGroup) {
             initDataGroup()
@@ -1343,7 +1343,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
             R.id.toolbar_f_delete -> remove()//删除设备
 
-            R.id.toolbar_delete_group -> {//群组模式下
+            R.id.toolbar_batch_gp -> {//群组模式下
                 AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             this.showLoadingDialog(getString(R.string.deleting))
@@ -1363,7 +1363,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         .show()
             }
 
-            R.id.toolbar_rename_group -> renameGroup()//群组模式下
+            R.id.toolbar_on_line -> renameGroup()//群组模式下
         }
         true
     }

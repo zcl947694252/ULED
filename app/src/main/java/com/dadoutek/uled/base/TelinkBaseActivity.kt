@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Build
@@ -20,11 +21,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.AppUtils
@@ -34,6 +33,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -72,10 +73,11 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
-open class TelinkBaseActivity : AppCompatActivity() {
-    private  lateinit var  viewInstall: View
+abstract class TelinkBaseActivity : AppCompatActivity() {
+    private lateinit var viewInstall: View
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
@@ -128,10 +130,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
     val INSTALL_GATEWAY = 6
     var isGuide: Boolean = false
     lateinit var hinitOne: TextView
-     lateinit var popFinish: PopupWindow
-     lateinit var cancelf: Button
-     lateinit var confirmf: Button
-     var isScenning: Boolean = true
+    lateinit var popFinish: PopupWindow
+    lateinit var cancelf: Button
+    lateinit var confirmf: Button
+    var isScenning: Boolean = true
+     var isEdite: Boolean = false
+     var type: Int? = null
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,7 +146,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
-
         initOnLayoutListener()//加载view监听
         makeInstallView()
         makeDialogAndPop()
@@ -152,7 +155,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         initChangeRecevicer()
 
     }
-
     private fun initChangeRecevicer() {
         changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
@@ -177,6 +179,25 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun stopTimerUpdate() {
         upDateTimer?.dispose()
         upDateTimer = null
+    }
+
+    /**
+     * 自动重连
+     */
+    fun autoConnectAll() {
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+        if (size > 0) {
+            ToastUtils.showLong(getString(R.string.connecting_tip))
+            mConnectDisposable?.dispose()
+            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                    ?.subscribe({
+                        LogUtils.d("connection success")
+                    }, {
+                        LogUtils.d("connect failed")
+                    }
+                    )
+        }
     }
 
     private fun makeDialogAndPop() {
@@ -912,13 +933,14 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (isGuide) installDialog?.setCancelable(false)
         installDialog?.show()
     }
+
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         isGuide = false
         installDialog?.dismiss()
         when (position) {
             INSTALL_GATEWAY -> {
                 installId = INSTALL_GATEWAY
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position,getString(R.string.Gate_way))
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.Gate_way))
             }
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
@@ -999,56 +1021,56 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                     when (installId) {
                         INSTALL_NORMAL_LIGHT -> {
-                                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                                startActivityForResult(intent, 0)
-                                installDialog?.show()
-                                finish()
-                        }
-                        INSTALL_RGB_LIGHT -> {
-                                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                                startActivityForResult(intent, 0)
-                                installDialog?.show()
-                                finish()
-                        }
-                        INSTALL_CURTAIN -> {
-                                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                                startActivityForResult(intent, 0)
-                                installDialog?.show()
-                                finish()
-
-                        }
-                        INSTALL_SWITCH -> {
-                               startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                            //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                           // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)       //connector也叫relay
-                           // startActivityForResult(intent, 0)
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
-                        INSTALL_SENSOR ->{
+                        INSTALL_RGB_LIGHT -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_CURTAIN -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+
+                        }
+                        INSTALL_SWITCH -> {
+                            startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)       //connector也叫relay
+                            // startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_SENSOR -> {
                             startActivity(Intent(this, ScanningSensorActivity::class.java))
-                           // intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            // intent = Intent(this, DeviceScanningNewActivity::class.java)
                             //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SENSOR)       //connector也叫relay
-                           // startActivityForResult(intent, 0)
+                            // startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_CONNECTOR -> {
-                                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
-                                startActivityForResult(intent, 0)
-                                installDialog?.show()
-                                finish()
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         }
                         INSTALL_GATEWAY -> {
-                                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
-                                startActivityForResult(intent, 0)
-                                installDialog?.show()
-                                finish()
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
                         }
                     }
                 } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -1062,7 +1084,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-     fun seeHelpe() {
+    fun seeHelpe() {
         var intent = Intent(this, InstructionsForUsActivity::class.java)
         startActivity(intent)
     }
