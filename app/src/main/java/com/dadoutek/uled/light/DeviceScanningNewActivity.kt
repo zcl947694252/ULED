@@ -85,9 +85,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var meshList: MutableList<Int> = mutableListOf()
     private lateinit var dbGw: DbGateway
     private var mConnectDisposal: Disposable? = null
-    private val MAX_RETRY_COUNT = 6   //update mesh failed的重试次数设置为6次
+    private val MAX_RETRY_COUNT = 4   //update mesh failed的重试次数设置为6次
     private val MAX_RSSI = 90
-    private val SCAN_TIMEOUT_SECOND = 30//25
+    private val SCAN_TIMEOUT_SECOND = 25//25
     private val TIME_OUT_CONNECT = 20//20
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
@@ -133,7 +133,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
-    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_batch_device_item, mAddedDevices)
+    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_batch_small_item, mAddedDevices)
 
     /**
      * 有无被选中的用来分组的灯
@@ -437,63 +437,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         this.mApplication?.removeEventListener(this)
     }
 
-    /**
-     * 开始分组
-     */
-    private fun startGrouping() {
-        closeAnimation()
-        //初始化分组页面
-        changeGroupView()
-        //完成分组跳转
-        changOtherView()
-        //确定当前分组
-        sureGroupingEvent()
-
-        toolbar!!.setNavigationOnClickListener {
-            AlertDialog.Builder(this@DeviceScanningNewActivity)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        for (meshAddr in mAddedDevices) {
-                            stopBlink(meshAddr)
-                            doFinish()
-                        }
-                        doFinish()
-                    }
-                    .setNegativeButton(R.string.btn_cancel) { _, _ -> }
-                    .setMessage(R.string.exit_tips_in_group)
-                    .show()
-        }
-    }
-
-    private fun sureGroupingEvent() {
-        btn_add_groups?.setText(R.string.sure_group)
-        //进入分组界面之后的监听
-        btn_add_groups?.setOnClickListener { v ->
-            if (isAllLightsGrouped && !isSelectLight) {
-                for (device in mAddedDevices) {
-                    stopBlink(device)
-                }
-                doFinish()
-
-            } else {
-                sureGroups()
-            }
-        }
-    }
-
-    private fun changOtherView() {
-        grouping_completed?.setOnClickListener { v ->
-            //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
-            if (isAllLightsGrouped) {//所有灯都有分组可以跳转
-                showToast(getString(R.string.grouping_completed))
-                //页面跳转前进行分组数据保存
-                TelinkLightService.Instance()?.idleMode(true)
-                //目前测试调到主页
-                doFinish()
-            } else {
-                showToast(getString(R.string.have_lamp_no_group_tip))
-            }
-        }
-    }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun sureGroups() {
@@ -711,34 +654,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    //分组页面调整
-    private fun changeGroupView() {
-        grouping = true
-        toolbar!!.inflateMenu(R.menu.menu_grouping_select_all)
-        toolbar!!.setOnMenuItemClickListener(this)
-        mAddedDevicesAdapter.notifyDataSetChanged()
-        btn_add_groups?.visibility = View.VISIBLE
-        groups_bottom?.visibility = View.VISIBLE
-
-        layoutmanager = LinearLayoutManager(this)
-        layoutmanager!!.orientation = LinearLayoutManager.HORIZONTAL
-        recycler_view_groups.layoutManager = layoutmanager
-        groupsRecyclerViewAdapter = GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener,
-                OnRecyclerviewItemLongClickListener { _, position -> showGroupForUpdateNameDialog(position) })
-        recycler_view_groups?.adapter = groupsRecyclerViewAdapter
-
-        if (groups.size > 0) {
-            recycler_view_groups?.scrollToPosition(groups.size - 1)
-            add_group_relativeLayout?.visibility = View.GONE
-            add_group?.visibility = View.VISIBLE
-        } else {
-            add_group_relativeLayout?.visibility = View.VISIBLE
-            add_group?.visibility = View.GONE
-        }
-
-        disableEventListenerInGrouping()
-        initOnLayoutListener()
-    }
 
     private fun showGroupForUpdateNameDialog(position: Int) {
         val textGp = EditText(this)
@@ -1189,6 +1104,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
+        scanning_no_factory_btn.visibility = View.VISIBLE
         isScanning = false
         TelinkLightService.Instance()?.idleMode(false)
         if (mAddedDevices.size > 0)//表示目前已经搜到了至少有一个设备
@@ -1202,6 +1118,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
+        scanning_no_factory_btn.visibility = View.GONE
         isScenning = true
         //添加进disposable，防止内存溢出.
         mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
@@ -1455,7 +1372,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //开关传感器不能批量也就不能使用找回
         when (mAddDeviceType) {
             DeviceType.NORMAL_SWITCH -> when (bestRssiDevice?.productUUID) {
-                DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false","deviceType" to bestRssiDevice?.productUUID)
                 DeviceType.SCENE_SWITCH -> skipSwitch()
                 DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }

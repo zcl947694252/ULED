@@ -36,6 +36,7 @@ import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -79,7 +80,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private var disposableReset: Disposable? = null
     private var version: String = ""
     private var disposable: Disposable? = null
-    private var isConfirm: Boolean = false
+    private var isReConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
     private val CMD_OPEN_LIGHT = 0X01
     private val CMD_CLOSE_LIGHT = 0X00
@@ -100,7 +101,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
     //private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
-    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.template_batch_device_item, showCheckListData)
+    private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.template_batch_small_item, showCheckListData)
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
     private var modeSwitchMode = 0
@@ -142,7 +143,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                 fiRename= menu?.findItem(R.id.toolbar_f_rename)
-                fiRename?.isVisible = isConfirm
+                fiRename?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 fiVersion?.title = version
             }
@@ -341,8 +342,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         getVersion(version)
-        isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
-        if (isConfirm)
+        isReConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
+        if (isReConfirm)
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
         // showCheckListData = DBUtils.allGroups
         var lightGroup = DBUtils.allGroups
@@ -402,7 +403,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 tv_function1.visibility = View.GONE
                 isFinish = false
             } else
-                doFinish()
+                configReturn()
         }
     }
 
@@ -919,7 +920,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
                 configLightlight()
                 Thread.sleep(300)
-                if (!isConfirm)//新创建进行更新
+                if (!isReConfirm)//新创建进行更新
                     mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
@@ -1018,12 +1019,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         val allSensor = DBUtils.getAllSensor()
         LogUtils.e("zcl---$allSensor")
-        if (isConfirm) {
+        if (isReConfirm) {
             dbSensor.index = mDeviceInfo.id.toInt()
             if ("none" != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
-            DBUtils.saveSensor(dbSensor, isConfirm)
+            DBUtils.saveSensor(dbSensor, isReConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
         val allSensor1 = DBUtils.getAllSensor()
@@ -1037,7 +1038,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
-        DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
+        DBUtils.saveSensor(dbSensor, isReConfirm)//保存进服务器
 
         val allSensor2 = DBUtils.getAllSensor()
         LogUtils.e("zcl---$allSensor2")
@@ -1045,7 +1046,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
 
-        if (!isConfirm)
+        if (!isReConfirm)
             showRenameDialog(dbSensor)
         else
             doFinish()
@@ -1218,7 +1219,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         recyclerGroup.layoutManager = GridLayoutManager(this, 3)
         //this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showGroupList)
-        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_device_item, showGroupList)
+        this.nightLightGroupGrideAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_small_item, showGroupList)
 
         nightLightGroupGrideAdapter?.bindToRecyclerView(recyclerGroup)
         nightLightGroupGrideAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -1265,14 +1266,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         setLoadingVisbiltyOrGone(View.VISIBLE, getString(R.string.connecting_tip))
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
-        val name: String? = if (isConfirm)
+        val name: String? = if (isReConfirm)
             DBUtils.lastUser?.controlMeshName
         else
             Constant.DEFAULT_MESH_FACTORY_NAME
         connectParams?.setMeshName(name)
 
         connectParams?.setConnectMac(mDeviceInfo.macAddress)
-        val substring: String = if (isConfirm)
+        val substring: String = if (isReConfirm)
             NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16)
         else
             Constant.DEFAULT_MESH_FACTORY_PASSWORD
@@ -1299,8 +1300,21 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (KeyEvent.KEYCODE_BACK == keyCode) {
-            finish()
+            configReturn()
         }
         return super.onKeyDown(keyCode, event)
+    }
+    private fun configReturn() {
+        if (!isReConfirm)
+            AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.config_return))
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                        dialog.dismiss()
+                        startActivity(Intent(this@HumanBodySensorActivity, SelectDeviceTypeActivity::class.java))
+                        finish()
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        else
+            doFinish()
     }
 }

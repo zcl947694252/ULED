@@ -12,7 +12,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -363,7 +362,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
             if (convertView == null) {
 
-                convertView = inflater.inflate(R.layout.template_batch_device_item, null);
+                convertView = inflater.inflate(R.layout.template_batch_small_item, null);
                 ImageView icon = (ImageView) convertView.findViewById(R.id.template_device_icon_n);
                 TextView txtName = (TextView) convertView.findViewById(R.id.template_group_name_s);
                 ImageView selected = (ImageView) convertView.findViewById(R.id.template_device_batch_selected);

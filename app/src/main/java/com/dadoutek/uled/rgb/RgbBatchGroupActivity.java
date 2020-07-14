@@ -1133,7 +1133,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             DeviceItemHolder holder;
-            convertView = inflater.inflate(R.layout.template_batch_device_item, null);
+            convertView = inflater.inflate(R.layout.template_batch_small_item, null);
             ImageView icon = convertView.findViewById(R.id.template_device_batch_icon);
             TextView txtName = convertView.findViewById(R.id.template_device_batch_title_blow);
             ImageView selected = convertView.findViewById(R.id.template_device_batch_selected);

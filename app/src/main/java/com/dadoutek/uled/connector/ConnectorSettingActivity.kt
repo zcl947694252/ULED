@@ -171,8 +171,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@ConnectorSettingActivity, ChooseGroupOrSceneActivity::class.java)
-        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CONNECTOR)//传入0代表是群组
+        val bundle = Bundle()
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CONNECTOR.toInt())
+        intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
         this?.setResult(Constant.RESULT_OK)
     }
@@ -523,15 +525,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun openOrClose(b: Boolean) {
-        if (currentDbConnector!!.productUUID == DeviceType.SMART_CURTAIN) {
-            Commander.openOrCloseCurtain(currentDbConnector!!.meshAddr, isOpen = b, isPause = false)
+        if (currentDbConnector?.productUUID == DeviceType.SMART_CURTAIN) {
+            Commander.openOrCloseCurtain(currentDbConnector?.meshAddr?:0, isOpen = b, isPause = false)
         } else {
-            Commander.openOrCloseLights(currentDbConnector!!.meshAddr, b)
+            Commander.openOrCloseLights(currentDbConnector?.meshAddr?:0, b)
         }
         if (b)
-            currentDbConnector!!.connectionStatus = ConnectionStatus.ON.value
+            currentDbConnector?.connectionStatus = ConnectionStatus.ON.value
         else
-            currentDbConnector!!.connectionStatus = ConnectionStatus.OFF.value
+            currentDbConnector?.connectionStatus = ConnectionStatus.OFF.value
     }
 
     fun autoConnect() {

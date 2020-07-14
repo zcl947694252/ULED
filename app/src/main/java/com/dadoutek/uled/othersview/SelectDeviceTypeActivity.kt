@@ -20,9 +20,9 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_device_type)
-                initView()
-                        initData()
-                        initListener()
+        initView()
+        initData()
+        initListener()
     }
      fun initData() {
         deviceTypeList.clear()
@@ -69,12 +69,12 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                 INSTALL_SWITCH -> {
                     installId = INSTALL_SWITCH
                     showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
-                    stepOneText.visibility = View.GONE
-                    stepTwoText.visibility = View.GONE
-                    stepThreeText.visibility = View.GONE
-                    switchStepOne.visibility = View.VISIBLE
-                    switchStepTwo.visibility = View.VISIBLE
-                    swicthStepThree.visibility = View.VISIBLE
+                    stepOneText?.visibility = View.GONE
+                    stepTwoText?.visibility = View.GONE
+                    stepThreeText?.visibility = View.GONE
+                    switchStepOne?.visibility = View.VISIBLE
+                    switchStepTwo?.visibility = View.VISIBLE
+                    swicthStepThree?.visibility = View.VISIBLE
                 }
                 INSTALL_SENSOR -> {
                     installId = INSTALL_SENSOR

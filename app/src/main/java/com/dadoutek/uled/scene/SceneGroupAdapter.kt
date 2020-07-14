@@ -1160,11 +1160,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             val itemGroup = data[pos]
 
             when {
-                seekBar!!.progress > 100 -> {
+                seekBar!!.progress > 5 -> {
                     addImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 100 -> {
+                seekBar!!.progress ==5 -> {
                     addImage!!.isEnabled = false
                     speedTv!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1177,7 +1177,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
 
-            if (seekBar!!.progress < 100)
+            if (seekBar!!.progress < 5)
                 lessImage!!.isEnabled = true
         }
     }

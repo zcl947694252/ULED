@@ -4,7 +4,6 @@ package com.dadoutek.uled.switches
  * 创建者     ZCL
  * 创建时间   2020/6/23 16:05
  * 描述
- *
  * 更新者     $
  * 更新时间   $
  * 更新描述
@@ -34,6 +33,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -52,7 +52,7 @@ private var debounce_time = 1000
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var renameDialog: Dialog? = null
-
+    var isReConfig: Boolean = false
     var popReNameView: View? = null
     var renameCancel: TextView? = null
     var renameConfirm: TextView? = null
@@ -94,7 +94,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    abstract fun setToolBar():Toolbar
+    abstract fun setToolBar(): Toolbar
 
     private fun makePopuwindow() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
@@ -283,5 +283,19 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         TelinkLightService.Instance()?.idleMode(true)
+    }
+
+    fun configReturn() {
+        if (!isReConfig)
+            AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.config_return))
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                        dialog.dismiss()
+                        startActivity(Intent(this@BaseSwitchActivity, SelectDeviceTypeActivity::class.java))
+                        finish()
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        else
+            finish()
     }
 }

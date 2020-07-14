@@ -10,6 +10,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by hejiajun on 2018/5/18.
@@ -259,23 +260,33 @@ object DBUtils {
 
     fun getAllUser(): ArrayList<DbUser> {
         val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().build()
-        return ArrayList(query.list())
+        var arrayList: ArrayList<DbUser> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllRGBLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_RGB)).build()
-        return ArrayList(query.list())
+        var arrayList: ArrayList<DbLight> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllNormalLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
-        return ArrayList(query.list())
+
+        var arrayList: ArrayList<DbLight> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
     fun getAllGateWay(): ArrayList<DbGateway> {
         val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
                 .where(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
-        return ArrayList(query.list())
+
+        var arrayList: ArrayList<DbGateway> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllSwitch(): ArrayList<DbSwitch> {
@@ -286,29 +297,38 @@ object DBUtils {
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.DOUBLE_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.EIGHT_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
-        return ArrayList(query.list())
+
+        var arrayList: ArrayList<DbSwitch> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllSensor(): ArrayList<DbSensor> {
         val query = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder()
                 .whereOr(DbSensorDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
-                        , DbSensorDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
-                ).build()
-        return ArrayList(query.list())
+                        , DbSensorDao.Properties.ProductUUID.eq(DeviceType.SENSOR)).build()
+
+        var arrayList: ArrayList<DbSensor> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllCurtains(): ArrayList<DbCurtain> {
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
-                .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
-                ).build()
-        return ArrayList(query.list())
+                .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)).build()
+
+        var arrayList: ArrayList<DbCurtain> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getAllRelay(): ArrayList<DbConnector> {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
-                .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_RELAY)
-                ).build()
-        return ArrayList(query.list())
+                .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_RELAY)).build()
+
+        var arrayList: ArrayList<DbConnector> =  arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
     }
 
     fun getActionBySwitchId(id: Long): ArrayList<DbSwitch> {
@@ -1399,11 +1419,27 @@ object DBUtils {
         val sensor = getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()
 
-        addressList.addAll(lights)
+      /*  addressList.addAll(lights)
         addressList.addAll(curtain)
         addressList.addAll(relay)
         addressList.addAll(switch)
-        addressList.addAll(sensor)
+        addressList.addAll(sensor)*/
+
+        lights?.let {
+            addressList.addAll(it)
+        }
+        curtain?.let {
+            addressList.addAll(it)
+        }
+        relay?.let {
+            addressList.addAll(it)
+        }
+        switch?.let {
+            addressList.addAll(it)
+        }
+        sensor?.let {
+            addressList.addAll(it)
+        }
         addressList.sortBy { it }
 
         return  addressList.last()

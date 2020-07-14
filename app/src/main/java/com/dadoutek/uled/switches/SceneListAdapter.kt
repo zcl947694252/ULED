@@ -1,11 +1,13 @@
 package com.dadoutek.uled.switches
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.util.OtherUtils
 
 
 /**
@@ -20,10 +22,11 @@ import com.dadoutek.uled.model.DbModel.DbScene
  */
 class SceneListAdapter(resId: Int, data: List<DbScene>) : BaseQuickAdapter<DbScene, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-        helper?.setText(R.id.template_device_batch_title, item?.name)
-                ?.setImageResource(R.id.template_device_batch_icon, R.drawable.icon_sence)
-                ?.setVisible(R.id.template_device_batch_selected, false)
-        helper?.getView<TextView>(R.id.template_device_batch_title)?.visibility = View.GONE
+        val icon = if (TextUtils.isEmpty(item?.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(item?.imgName, mContext)
+        helper?.setText(R.id.template_device_batch_title2, item?.name)
+                ?.setImageResource(R.id.template_device_batch_icon2, icon)
+                ?.setVisible(R.id.template_device_batch_selected2, false)
+        helper?.getView<TextView>(R.id.template_device_batch_title2)?.visibility = View.GONE
     }
 
 }

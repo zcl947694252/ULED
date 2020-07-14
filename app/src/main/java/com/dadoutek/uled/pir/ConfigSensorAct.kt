@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.KeyEvent
@@ -26,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -54,7 +56,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var connectDispose: Disposable? = null
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
-    private var isConfirm: Boolean = false
+    private var isReConfirm: Boolean = false
     private lateinit var renameDialog: Dialog
     private var renameCancel: TextView? = null
     private var renameConfirm: TextView? = null
@@ -114,7 +116,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                 fiRename = menu?.findItem(R.id.toolbar_f_rename)
-                fiRename?.isVisible = isConfirm
+                fiRename?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 fiVersion?.title = version
             }
@@ -323,7 +325,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.sensor_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { doFinish() }
+        toolbar.setNavigationOnClickListener { configReturn()}
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
@@ -336,8 +338,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-        isConfirm = mDeviceInfo.isConfirm == 1
-        if (isConfirm)
+        isReConfirm = mDeviceInfo.isConfirm == 1
+        if (isReConfirm)
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
         if (version == null)
             version = mDeviceInfo.firmwareRevision
@@ -429,8 +431,22 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         finish()
     }
 
+    private fun configReturn() {
+        if (!isReConfirm)
+            AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.config_return))
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                        dialog.dismiss()
+                        startActivity(Intent(this@ConfigSensorAct, SelectDeviceTypeActivity::class.java))
+                        finish()
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        else
+           doFinish()
+    }
+
     override fun onBackPressed() {
-        doFinish()
+        configReturn()
     }
 
     override fun onClick(v: View?) {
@@ -527,12 +543,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun saveSensor() {
         var dbSensor = DbSensor()
 
-        if (isConfirm) {
+        if (isReConfirm) {
             dbSensor.index = mDeviceInfo.id.toInt()
             if ("none" != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
-            DBUtils.saveSensor(dbSensor, isConfirm)
+            DBUtils.saveSensor(dbSensor, isReConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
 
@@ -545,12 +561,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + mDeviceInfo!!.meshAddress
 
-        DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
+        DBUtils.saveSensor(dbSensor, isReConfirm)//保存进服务器
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
         DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
-        if (!isConfirm)
+        if (!isReConfirm)
             showRenameDialog(dbSensor)
         else
             doFinish()

@@ -1011,4 +1011,5 @@
     <string name="confim_stop_scan">确定要退出扫描吗?</string>
     <string name="add_device">添加设备</string>
     <string name="set_color">设置颜色</string>
+    <string name="config_return">确定退出配置吗?</string>
 </resources>

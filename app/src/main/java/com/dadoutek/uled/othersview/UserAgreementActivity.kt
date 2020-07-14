@@ -9,14 +9,8 @@ import kotlinx.android.synthetic.main.activity_user_agreement.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class UserAgreementActivity :BaseActivity(){
-    override fun initListener() {
-
-    }
-
-    override fun initData() {
-
-    }
-
+    override fun initListener() {}
+    override fun initData() {}
     override fun initView() {
         toolbarTv.text = getString(R.string.user_agreement)
         toolbar.setNavigationIcon(R.drawable.icon_return)
@@ -38,11 +32,10 @@ class UserAgreementActivity :BaseActivity(){
         webSettings?.saveFormData = true
         webSettings?.setGeolocationEnabled(true)
         webSettings?.domStorageEnabled = true
-        webView_user_agreement!!.clearCache(true)
-        if(isZh(this)){
-            webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
-        }else{
-            webView_user_agreement!!.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
+        webView_user_agreement?.clearCache(true)
+        when {
+            isZh(this) -> webView_user_agreement?.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
+            else -> webView_user_agreement?.loadUrl("https://dev.dadoutek.com/static/disclaimer/index.html")
         }
     }
 
@@ -50,8 +43,7 @@ class UserAgreementActivity :BaseActivity(){
         return R.layout.activity_user_agreement
     }
 
-    override//设置回退 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
-    fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {//设置回退 覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法
         webView_user_agreement?.let {
             if (keyCode == KeyEvent.KEYCODE_BACK && it.canGoBack()) {
                 it.goBack() //goBack()表示返回WebView的上一页面

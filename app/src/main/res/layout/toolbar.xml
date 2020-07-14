@@ -124,7 +124,7 @@
                 android:text="@string/rename"
                 android:textColor="@color/gray_3"
                 android:textSize="16sp"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
         <com.dadoutek.uled.widget.AutoTextSizeEditText
                 android:id="@+id/editTitle"
@@ -157,6 +157,5 @@
                 android:textSize="16sp"
                 android:visibility="visible" />
     </android.support.v7.widget.Toolbar>
-
 
 </android.support.design.widget.AppBarLayout>

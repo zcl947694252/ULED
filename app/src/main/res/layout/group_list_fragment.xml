@@ -78,7 +78,7 @@
 
             <Button
                     android:id="@+id/add_device_btn"
-                    android:layout_width="140dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="38dp"
                     android:layout_below="@id/image_no_device"
                     android:layout_centerHorizontal="true"
@@ -86,8 +86,10 @@
                     android:background="@drawable/add_device_bt"
                     android:stateListAnimator="@null"
                     android:text="@string/add_groups"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
                     android:textColor="@color/blue_background"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/image_no_device" />

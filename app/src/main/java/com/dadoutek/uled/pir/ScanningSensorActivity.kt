@@ -412,9 +412,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun ScanningSensorActivity.skipDevice(it: String) {
         when (mDeviceInfo?.productUUID) {
-            DeviceType.SENSOR -> {
-                startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
-            }
+            DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
             DeviceType.NIGHT_LIGHT -> {
                 if (it.contains("NPR"))
                     startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)

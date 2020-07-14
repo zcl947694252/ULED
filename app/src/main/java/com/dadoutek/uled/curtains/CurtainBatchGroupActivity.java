@@ -1175,7 +1175,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             DeviceItemHolder holder;
 
-            convertView = inflater.inflate(R.layout.template_batch_device_item, null);
+            convertView = inflater.inflate(R.layout.template_batch_small_item, null);
             ImageView icon = (ImageView) convertView
                     .findViewById(R.id.template_device_icon_n);
             TextView txtName = (TextView) convertView

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
@@ -26,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -57,12 +59,12 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
-    private var isReConfig: Boolean = false
+    private var deviceConfigType: Int = 0
+
     private var groupName: String? = null
     private var currentGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private lateinit var mDeviceInfo: DeviceInfo
-    private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
     private var mDisconnectSnackBar: Snackbar? = null
@@ -91,6 +93,13 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
+        deviceConfigType = intent.getIntExtra("deviceType",0)
+
+        if (deviceConfigType==DeviceType.NORMAL_SWITCH)
+            sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
+        else if (deviceConfigType==DeviceType.NORMAL_SWITCH2)
+            sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+
 
         if (TextUtils.isEmpty(localVersion))
             localVersion = mDeviceInfo.firmwareRevision
@@ -192,7 +201,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                showCancelDialog()
+                //showCancelDialog()
+                configReturn()
                 return true
             }
         }
@@ -214,7 +224,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     override fun onBackPressed() {
-        showCancelDialog()
+        //showCancelDialog()
+        configReturn()
     }
 
     private var mIsConfiguring: Boolean = false
@@ -235,7 +246,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         select_group.setOnClickListener {
             val intent = Intent(this@ConfigNormalSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-            intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL)//传入0代表是群组
+            //传入0代表是群组
+            val bundle = Bundle()
+            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+            intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             setResult(Constant.RESULT_OK)
         }

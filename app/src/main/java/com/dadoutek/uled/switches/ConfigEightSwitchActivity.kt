@@ -3,6 +3,7 @@ package com.dadoutek.uled.switches
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
@@ -26,6 +27,7 @@ import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
+import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +58,6 @@ import org.json.JSONObject
 
 
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
-    private var isReConfim: Boolean = false
     private lateinit var listKeysBean: JSONArray
     private var newMeshAddr: Int = 0
     private var switchData: DbSwitch? = null
@@ -89,10 +90,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         // eight_switch_mode.visibility = View.GONE
         // eight_switch_config.visibility = View.GONE
         // eight_switch_banner_ly.visibility = View.VISIBLE
-        isReConfim = groupName != null && groupName == "true"
-        fiRename?.isVisible = isReConfim
+        isReConfig = groupName != null && groupName == "true"
+        fiRename?.isVisible = isReConfig
 
-        if (isReConfim) {
+        if (isReConfig) {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
@@ -388,7 +389,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             updateSwitch(isConfigGroup)
             GlobalScope.launch(Dispatchers.Main) {
                 ToastUtils.showShort(getString(R.string.config_success))
-                if (!isReConfim)
+                if (!isReConfig)
                     showRenameDialog(switchData)
                 else
                     finishAc()
@@ -616,8 +617,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            var name: String
+            var name: String = ""
             when (configSwitchType) {
                 0, 2 -> {
                     var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
@@ -625,9 +627,12 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     name = group.name
                 }
                 else -> {
-                    var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
-                    sceneMap[configButtonTag] = scene
-                    name = scene.name
+                    val scene = data?.getParcelableExtra<DbScene>("data")
+                    //var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                   scene?.let {
+                       sceneMap[configButtonTag] = it
+                       name = it.name
+                   }
                 }
             }
 
@@ -680,7 +685,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun initView() {
         toolbarTv!!.setText(R.string.eight_switch)
         img_function1.visibility = View.VISIBLE
-        img_function1.setImageResource(R.drawable.icon_more)
+        img_function1.setImageResource(R.drawable.icon_change_small)
         toolbar.setNavigationOnClickListener { finishAc() }
         makePop()
     }
@@ -689,7 +694,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun setReConfig(): Boolean {
-        return isReConfim
+        return isReConfig
     }
 
     override fun initListener() {
@@ -843,9 +848,16 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         }
         if (isCanClick) {
+            if (configSwitchType == 1){
+                startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodeNum)
+            }else{
             val intent = Intent(this@ConfigEightSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-            intent.putExtra(Constant.EIGHT_SWITCH_TYPE, configSwitchType)
+            val bundle = Bundle()
+            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+            intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
+            }
         }
     }
 }

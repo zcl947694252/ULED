@@ -23,6 +23,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -51,7 +52,6 @@ import kotlin.collections.ArrayList
 private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
-    private var isReConfig: Boolean = false
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
@@ -86,7 +86,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 scene_switch_cw.visibility = View.VISIBLE
                 scene_switch_touch.visibility = View.GONE
             }
-
         }
         fiVersion?.title = version
         //scene_tvLightVersion?.text = version
@@ -224,7 +223,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                showCancelDialog()
+               // showCancelDialog()
+                configReturn()
                 return true
             }
         }
@@ -232,7 +232,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun onBackPressed() {
-        showCancelDialog()
+       // showCancelDialog()
+        configReturn()
     }
 
     private fun disconnect() {
@@ -355,10 +356,11 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (KeyEvent.KEYCODE_BACK == keyCode) {
-            finish()
+            configReturn()
         }
         return super.onKeyDown(keyCode, event)
     }
+
 
     private fun onErrorReport(info: ErrorReportInfo) {
         when (info.stateCode) {
@@ -550,10 +552,22 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 map[configTag] = scene!!
                 LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
                 when (configTag) {
-                    0 -> scene_one.text = scene.name
-                    1 -> scene_two.text = scene.name
-                    2 -> scene_three.text = scene.name
-                    3 -> scene_four.text = scene.name
+                    0 -> {
+                        scene_one.text = scene.name
+                        scene_one_t.text = scene.name
+                    }
+                    1 -> {
+                        scene_two.text = scene.name
+                        scene_two_t.text = scene.name
+                    }
+                    2 -> {
+                        scene_three.text = scene.name
+                        scene_three_t.text = scene.name
+                    }
+                    3 -> {
+                        scene_four.text = scene.name
+                        scene_four_t.text = scene.name
+                    }
                 }
             }
         }

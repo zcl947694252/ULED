@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -66,10 +67,8 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var fiOta: MenuItem? = null
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
-    private var fiRename: MenuItem? = null
     private var fiVersion: MenuItem? = null
     private lateinit var renameDialog: Dialog
     private var renameCancel: TextView? = null
@@ -85,14 +84,14 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var customBrightnessNum: Int = 0
     private var currentScene: DbScene? = null
     private val REQUEST_CODE_CHOOSE: Int = 1000
-    private var isConfirm: Boolean = false
+    private var isReConfirm: Boolean = false
     private var mDeviceInfo: DeviceInfo? = null
     private var popupWindow: PopupWindow? = null
     private var popAdapter: PopupWindowAdapter? = null
     private var isGroupMode = true
     private var showGroupList: MutableList<ItemGroup> = mutableListOf()
     private var showBottomList: MutableList<ItemGroup> = mutableListOf()
-    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_device_item, showBottomList)
+    private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.template_batch_small_item, showBottomList)
 
     //private var bottomGvAdapter: NightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(R.layout.activity_night_light_groups_item, showBottomList)
     private val popDataList = mutableListOf<ItemCheckBean>()
@@ -124,9 +123,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                menu?.findItem(R.id.toolbar_f_rename)?.isVisible = isConfirm
-                 menu?.findItem(R.id.toolbar_f_ota)?.isVisible = isConfirm
-                menu?.findItem(R.id.toolbar_f_delete)?.isVisible = isConfirm
+                menu?.findItem(R.id.toolbar_f_rename)?.isVisible = isReConfirm
+                 menu?.findItem(R.id.toolbar_f_ota)?.isVisible = isReConfirm
+                menu?.findItem(R.id.toolbar_f_delete)?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 fiVersion?.title = version
             }
@@ -186,11 +185,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         pir_confir_tvPSVersion.text = version
-        isConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
-        if (isConfirm){
+        isReConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
+        if (isReConfirm)
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
-        }
-
 
         color_mode_rb.isChecked = true
 
@@ -198,6 +195,20 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         getTriggerAfterShow()
         getTimeUnite()
         getSelectTimes()
+    }
+
+    private fun configReturn() {
+        if (!isReConfirm)
+            AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.config_return))
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                        dialog.dismiss()
+                        startActivity(Intent(this@PirConfigActivity, SelectDeviceTypeActivity::class.java))
+                        finish()
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        else
+            finish()
     }
 
     private fun getSelectTimes() {
@@ -235,8 +246,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish()
-        LogUtils.v("zcl-----------dfsfdsfsdfsdfsd-------结束")}
+        toolbar.setNavigationOnClickListener {configReturn()}
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
@@ -347,11 +357,15 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
                 intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {
                 val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 1)
+                val bundle = Bundle()
+                bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 1)//传入0代表是群组
+                bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+                intent.putExtras(bundle)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_see_help -> {
@@ -452,12 +466,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun saveSensor() {
         var dbSensor = DbSensor()
-        if (isConfirm) {
+        if (isReConfirm) {
             dbSensor.index = mDeviceInfo!!.id.toInt()
             if ("none" != mDeviceInfo!!.id)
                 dbSensor.id = mDeviceInfo!!.id.toLong()
         } else {//如果不是重新配置就保存进服务器
-            saveSensor(dbSensor, isConfirm)
+            saveSensor(dbSensor, isReConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
 
@@ -470,12 +484,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
         dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
-        saveSensor(dbSensor, isConfirm)//保存进服务器
+        saveSensor(dbSensor, isReConfirm)//保存进服务器
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
         DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
 
-        if (!isConfirm)
+        if (!isReConfirm)
             showRenameDialog(dbSensor)
         else
             configureComplete()
@@ -746,6 +760,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         allDispoables()
         TelinkLightService.Instance()?.idleMode(true)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        configReturn()
     }
     /*  pir_config_switch.setOnCheckedChangeListener { _, checkedId ->
        val byteArrayOf = if (checkedId == R.id.pir_config_switch_open)

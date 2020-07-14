@@ -376,7 +376,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         }
         light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 2)
-        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, curtainList)
+        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_batch_small_item, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in curtainList.indices) {

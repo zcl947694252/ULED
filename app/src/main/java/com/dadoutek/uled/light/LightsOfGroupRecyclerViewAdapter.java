@@ -18,6 +18,7 @@ import java.util.List;
 public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<DbLight, BaseViewHolder> {
 
     private Boolean isDelete = false;
+    private Integer type =0;
 
     public LightsOfGroupRecyclerViewAdapter(int layoutResId, List<DbLight> data) {
         super(layoutResId, data);
@@ -64,5 +65,9 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<D
      */
     public void  changeState( Boolean  isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public void setType(Integer deviceType) {
+        type = deviceType;
     }
 }

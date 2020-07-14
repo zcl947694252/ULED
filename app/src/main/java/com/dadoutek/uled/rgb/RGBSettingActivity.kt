@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
+import android.os.Binder
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -177,7 +178,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private fun updateGroup() {
         val intent = Intent(this, ChooseGroupOrSceneActivity::class.java)
-        intent.putExtra("light", light)
+        val bundle = Bundle()
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_RGB.toInt())
+        intent.putExtras(bundle)
+        startActivityForResult(intent, requestCodeNum)
 
         if (light == null) {
             ToastUtils.showLong(getString(R.string.please_connect_normal_light))
@@ -192,10 +197,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             intent.putExtra("gpAddress", it.meshAddr)
             Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
         }
-
-        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_RGB)//传入0代表是群组
-        startActivityForResult(intent, requestCodeNum)
     }
 
 

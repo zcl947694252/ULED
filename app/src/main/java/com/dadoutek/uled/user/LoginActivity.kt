@@ -375,7 +375,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun getNewData(): MutableList<DbUser> {
         phoneList = DBUtils.getAllUser()
-
         return phoneList as ArrayList<DbUser>
     }
 

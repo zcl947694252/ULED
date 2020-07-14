@@ -193,7 +193,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
 
-
     private fun initChangeState() {
         if (showCheckListData == null)
             showCheckListData = mutableListOf()
@@ -282,7 +281,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
 
         edit_data_view_layout.setOnClickListener { }
-        confirm.setOnClickListener{ save()}
+        confirm.setOnClickListener { save() }
         StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
@@ -325,7 +324,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             when (view.id) {
                 R.id.btn_delete -> delete(adapter, position)
                 R.id.dot_rgb -> changeToColorSelect(position)
-               // R.id.dot_one -> changeToColorSelect(position)
+                // R.id.dot_one -> changeToColorSelect(position)
                 R.id.rg_xx -> open(position)
                 R.id.rg_yy -> close(position)
                 R.id.alg_text -> showPopMode(position)
@@ -518,9 +517,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
         currentPageIsEdit = false
         data_view_layout.visibility = View.VISIBLE
         edit_data_view_layout.visibility = View.GONE
-        tv_function1.visibility = View.VISIBLE
-        tv_function1.text = getString(R.string.edit)
-        tv_function1.setOnClickListener{changeEditView()}
+        // tv_function1.visibility = View.GONE
+        //  tv_function1.text = getString(R.string.edit)
+        // tv_function1.setOnClickListener { changeEditView() }
+
+        img_function2.visibility = View.VISIBLE
+        img_function2.setImageResource(R.drawable.edit)
+        img_function2.setOnClickListener { changeEditView() }
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -570,7 +573,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 list.add(it)
         }
         //this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list)
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.template_batch_device_item, list)
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.template_batch_small_item, list)
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener = onItemClickListenerCheck
     }
@@ -906,24 +909,27 @@ class NewSceneSetAct : TelinkBaseActivity() {
             var green = color and 0x00ff00 shr 8
             var blue = color and 0x0000ff
             var w = color shr 24
-            val meshAddress = TelinkApplication.getInstance().connectDevice.meshAddress
-            val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
-            val mesL = meshAddress and 0xff
-            var type = list[i].deviceType
-            params = when (type) {
-                SMART_CURTAIN,SMART_RELAY -> when {
-                    list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //窗帘开是1
-                    else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
+            val connectDevice = TelinkApplication.getInstance().connectDevice
+            connectDevice?.let {
+                val meshAddress = connectDevice.meshAddress
+                val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
+                val mesL = meshAddress and 0xff
+                var type = list[i].deviceType
+                params = when (type) {
+                    SMART_CURTAIN, SMART_RELAY -> when {
+                        list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //窗帘开是1
+                        else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
+                    }
+
+                    LIGHT_RGB -> if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
+                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
+                    else//11:新增场景1添 加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
+                        byteArrayOf(0x01, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
+
+                    else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 }
-
-                LIGHT_RGB -> if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
-                    byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
-                else//11:新增场景1添 加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
-                    byteArrayOf(0x01, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
-
-                else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             }
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
         }
     }
 
@@ -978,7 +984,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_DOWN)
             if (currentPageIsEdit) {
-                when {currentPageIsEdit && !isToolbar -> showExitSaveDialog()
+                when {
+                    currentPageIsEdit && !isToolbar -> showExitSaveDialog()
                     else -> finish()
                 }
             } else showExitSaveDialog()

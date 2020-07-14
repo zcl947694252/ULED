@@ -52,7 +52,6 @@ import kotlinx.coroutines.launch
  */
 
 class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
-    private var isReConfig: Boolean = false
     private var switchDate: DbSwitch? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
@@ -146,7 +145,11 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     private fun skipSelectGroup() {
         val intent = Intent(this@DoubleTouchSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        //传入0代表是群组
+        val bundle = Bundle()
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+        intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
     }
 

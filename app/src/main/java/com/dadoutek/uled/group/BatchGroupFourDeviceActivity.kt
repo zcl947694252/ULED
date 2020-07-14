@@ -32,7 +32,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.widget.RecyclerGridDecoration
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -99,16 +98,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val listGroupRelay: MutableList<DbConnector> = mutableListOf()
     private val deviceDataRelay: MutableList<DbConnector> = mutableListOf()
 
-    private val groupAdapter: BatchGrouopEditListAdapter = BatchGrouopEditListAdapter(R.layout.template_batch_device_item, groupsByDeviceType)
+    private val groupAdapter: BatchGrouopEditListAdapter = BatchGrouopEditListAdapter(R.layout.template_batch_small_item, groupsByDeviceType)
 
-    private val lightAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_device_item, noGroup)
-    private val lightGroupedAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_device_item, listGroup)
+    private val lightAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_small_item, noGroup)
+    private val lightGroupedAdapter: BatchFourLightAdapter = BatchFourLightAdapter(R.layout.template_batch_small_item, listGroup)
 
-    private val relayAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_device_item, noGroupRelay)
-    private val relayGroupedAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_device_item, listGroupRelay)
+    private val relayAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_small_item, noGroupRelay)
+    private val relayGroupedAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_small_item, listGroupRelay)
 
-    private val curtainAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_device_item, noGroupCutain)
-    private val curtainGroupedAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_device_item, listGroupCutain)
+    private val curtainAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_small_item, noGroupCutain)
+    private val curtainGroupedAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_small_item, listGroupCutain)
 
     private val allLightId: Long = 1//belongGroupId如果等于1则标识没有群组
     private var deviceType: Int = 100
@@ -1371,6 +1370,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
              else
                  batch_four_device_all.text = getString(R.string.select_all)*/
         isAll = !isAll
+        if (isAll)
+            batch_four_device_all.setImageResource(R.drawable.icon_all_checked)
+        else
+            batch_four_device_all.setImageResource(R.drawable.icon_all_check)
         setAllSelect(isAll)
     }
 

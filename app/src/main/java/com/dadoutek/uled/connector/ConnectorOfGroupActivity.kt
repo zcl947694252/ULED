@@ -371,7 +371,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 2)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_batch_device_item, lightList)
+        adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {

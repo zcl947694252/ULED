@@ -77,7 +77,7 @@ import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
-    private lateinit var viewInstall: View
+    private  var viewInstall: View? = null
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
@@ -114,12 +114,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     var isRgbClick = false
     var clickRgb: Boolean = false
     var installId = 0
-    lateinit var stepOneText: TextView
-    lateinit var stepTwoText: TextView
-    lateinit var stepThreeText: TextView
-    lateinit var switchStepOne: TextView
-    lateinit var switchStepTwo: TextView
-    lateinit var swicthStepThree: TextView
+     var stepOneText: TextView? = null
+     var stepTwoText: TextView? = null
+     var stepThreeText: TextView? = null
+     var switchStepOne: TextView? = null
+     var switchStepTwo: TextView? = null
+     var swicthStepThree: TextView? = null
     private var installHelpe: TextView? = null
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
@@ -452,7 +452,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             return
 
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing && !this.isFinishing) {
+        if ( !this.isFinishing && !loadDialog!!.isShowing ) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
@@ -463,7 +463,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
+        if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing ) {
             loadDialog?.dismiss()
         }
     }
@@ -957,12 +957,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
-                stepOneText.visibility = View.GONE
-                stepTwoText.visibility = View.GONE
-                stepThreeText.visibility = View.GONE
-                switchStepOne.visibility = View.VISIBLE
-                switchStepTwo.visibility = View.VISIBLE
-                swicthStepThree.visibility = View.VISIBLE
+                stepOneText  ?.visibility = View.GONE
+                stepTwoText  ?.visibility = View.GONE
+                stepThreeText?.visibility = View.GONE
+                switchStepOne?.visibility = View.VISIBLE
+                switchStepTwo?.visibility = View.VISIBLE
+                swicthStepThree?.visibility = View.VISIBLE
             }
             INSTALL_SENSOR -> {
                 installId = INSTALL_SENSOR
@@ -985,23 +985,23 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     private fun makeInstallView() {
         viewInstall = View.inflate(this, R.layout.dialog_install_detail, null)
-        val closeInstallList = viewInstall.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack = viewInstall.findViewById<ImageView>(R.id.btnBack)
+        val closeInstallList = viewInstall?.findViewById<ImageView>(R.id.close_install_list)
+        val btnBack = viewInstall?.findViewById<ImageView>(R.id.btnBack)
 
-        installTitleTv = viewInstall.findViewById(R.id.install_title_tv)
-        stepOneText = viewInstall.findViewById(R.id.step_one)
-        stepTwoText = viewInstall.findViewById(R.id.step_two)
-        stepThreeText = viewInstall.findViewById(R.id.step_three)
-        switchStepOne = viewInstall.findViewById(R.id.switch_step_one)
-        switchStepTwo = viewInstall.findViewById(R.id.switch_step_two)
-        swicthStepThree = viewInstall.findViewById(R.id.switch_step_three)
-        installHelpe = viewInstall.findViewById(R.id.install_see_helpe)
+        installTitleTv = viewInstall?.findViewById(R.id.install_title_tv)
+        stepOneText = viewInstall?.findViewById(R.id.step_one)
+        stepTwoText = viewInstall?.findViewById(R.id.step_two)
+        stepThreeText = viewInstall?.findViewById(R.id.step_three)
+        switchStepOne = viewInstall?.findViewById(R.id.switch_step_one)
+        switchStepTwo = viewInstall?.findViewById(R.id.switch_step_two)
+        swicthStepThree = viewInstall?.findViewById(R.id.switch_step_three)
+        installHelpe = viewInstall?.findViewById(R.id.install_see_helpe)
 
         installHelpe?.setOnClickListener(dialogOnclick)
-        val searchBar = viewInstall.findViewById<Button>(R.id.search_bar)
-        closeInstallList.setOnClickListener(dialogOnclick)
-        btnBack.setOnClickListener(dialogOnclick)
-        searchBar.setOnClickListener(dialogOnclick)
+        val searchBar = viewInstall?.findViewById<Button>(R.id.search_bar)
+        closeInstallList?.setOnClickListener(dialogOnclick)
+        btnBack?.setOnClickListener(dialogOnclick)
+        searchBar?.setOnClickListener(dialogOnclick)
     }
 
     private val dialogOnclick = View.OnClickListener {

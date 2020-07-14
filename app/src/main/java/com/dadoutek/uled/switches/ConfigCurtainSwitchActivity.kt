@@ -60,7 +60,6 @@ import org.jetbrains.anko.design.snackbar
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> {
-    private var reReConfig: Boolean = false
     private var currentGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var newMeshAddr: Int = 0
@@ -79,7 +78,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     }
 
     override fun setReConfig(): Boolean {
-        return reReConfig
+        return isReConfig
     }
 
     override fun setVersion() {
@@ -125,9 +124,9 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             isGlassSwitch = true
         }
         groupName = intent.getStringExtra("group")
-        reReConfig = groupName != null && groupName == "true"
+        isReConfig = groupName != null && groupName == "true"
 
-        if (reReConfig) {
+        if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
         mGroupArrayList = ArrayList()
@@ -204,7 +203,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                showCancelDialog()
+                //showCancelDialog()
+                configReturn()
                 return true
             }
         }
@@ -228,7 +228,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
 
     override fun onBackPressed() {
-        showCancelDialog()
+        //showCancelDialog()
+        configReturn()
     }
 
     private var mIsConfiguring: Boolean = false
@@ -247,7 +248,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
         select_group.setOnClickListener {
             val intent = Intent(this@ConfigCurtainSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-            intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            val bundle = Bundle()
+            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+            intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             setResult(Constant.RESULT_OK)
         }
@@ -273,7 +277,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                         updateSwitch()
                         if (switchDate == null)
                             switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                        if (!reReConfig)
+                        if (!isReConfig)
                             showRenameDialog(switchDate)
                     },
                             failedCallback = {

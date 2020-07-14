@@ -32,6 +32,7 @@ import kotlinx.android.synthetic.main.activity_curtains_device_details.recycleVi
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -41,8 +42,8 @@ import java.util.*
 class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var curtainDatas: MutableList<DbCurtain> = mutableListOf()
     private var adapter: CurtainDeviceDetailsAdapter? = null
-    private var showList: List<ItemTypeGroup>? = null
-    private var gpList: List<ItemTypeGroup>? = null
+    private var showList: ArrayList<ItemTypeGroup>? = arrayListOf()
+    private var gpList: ArrayList<ItemTypeGroup>? = null
     private var inflater: LayoutInflater? = null
     private var currentLight: DbCurtain? = null
     private var positionCurrent: Int = 0
@@ -109,8 +110,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun initData() {
         gpList = DBUtils.getgroupListWithType(this)
-        showList = ArrayList()
-        showList = gpList
+        showList?.clear()
+        gpList?.let {
+            showList?.addAll(it)
+        }
         setScanningMode(true)
 
         var allLightData = DBUtils.getAllCurtains()
@@ -356,7 +359,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
             when (view.id) {
                 R.id.template_device_card_delete -> dialogDelete?.show()
                 R.id.template_device_setting -> skipSetting()
-                R.id.template_device_card_delete-> dialogDelete?.show()
+                R.id.template_device_card_delete -> dialogDelete?.show()
             }
         }
     }
