@@ -48,6 +48,7 @@ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, intern
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)
+                    .setVisible(R.id.template_device_card_delete, isDelete)
                     .setVisible(R.id.template_gp_name, false)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .addOnClickListener(R.id.template_device_icon)

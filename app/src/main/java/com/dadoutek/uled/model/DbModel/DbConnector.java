@@ -28,6 +28,16 @@ public class DbConnector implements Serializable {
     public String groupName;
     public int color=0xffffff;//颜色
     public String version;
+    private String boundMac ="";
+
+    public String getBoundMac() {
+        return boundMac;
+    }
+
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
+
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
@@ -48,11 +58,11 @@ public class DbConnector implements Serializable {
     public boolean isMostNew =false;
 
 
-    @Generated(hash = 1023579456)
+    @Generated(hash = 991449584)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, String groupName, int color, String version, int status,
-            int rssi, boolean isSupportOta, boolean isMostNew) {
+            int index, String groupName, int color, String version, String boundMac,
+            int status, int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -65,6 +75,7 @@ public class DbConnector implements Serializable {
         this.groupName = groupName;
         this.color = color;
         this.version = version;
+        this.boundMac = boundMac;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;

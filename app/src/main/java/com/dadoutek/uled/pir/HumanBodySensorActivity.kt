@@ -9,10 +9,12 @@ import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.text.InputType
+import android.text.TextUtils
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -145,6 +147,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 fiRename= menu?.findItem(R.id.toolbar_f_rename)
                 fiRename?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                if (TextUtils.isEmpty(version))
+                    version = getString(R.string.number_no)
                 fiVersion?.title = version
             }
         }
@@ -162,18 +166,38 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun deleteDevice() {
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        showLoadingDialog(getString(R.string.please_wait))
-        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                .subscribe({
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.reset_factory_success))
-                    DBUtils.deleteSensor(currentSensor!!)
-                    TelinkLightService.Instance()?.idleMode(true)
-                    doFinish()
-                }, {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                })
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    if (currentSensor==null)
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                    else{
+                        showLoadingDialog(getString(R.string.please_wait))
+                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                .subscribe({
+                                    deleteData()
+                                }, {
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                })
+                    }
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        ToastUtils.showShort(getString(R.string.reset_factory_success))
+        DBUtils.deleteSensor(currentSensor!!)
+        TelinkLightService.Instance()?.idleMode(true)
+        doFinish()
     }
 
     private fun goOta() {

@@ -1104,7 +1104,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        scanning_no_factory_btn.visibility = View.VISIBLE
         isScanning = false
         TelinkLightService.Instance()?.idleMode(false)
         if (mAddedDevices.size > 0)//表示目前已经搜到了至少有一个设备
@@ -1118,7 +1117,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
-        scanning_no_factory_btn.visibility = View.GONE
         isScenning = true
         //添加进disposable，防止内存溢出.
         mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
@@ -1191,9 +1189,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun getGwId(): Long {
         val list = DBUtils.getAllGateWay()
         val idList = ArrayList<Int>()
-        for (i in list.indices) {
+        for (i in list.indices)
             idList.add(list[i].id!!.toInt())
-        }
 
         var id = 0
         if (list.size == 0) {
@@ -1376,7 +1373,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 DeviceType.SCENE_SWITCH -> skipSwitch()
                 DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }
-            //DeviceType.SMART_CURTAIN -> startGrouping()
             DeviceType.GATE_WAY -> if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
                 val disposable = Commander.getDeviceVersion(dbGw.meshAddr).subscribe({ s: String ->
                     dbGw.version = s

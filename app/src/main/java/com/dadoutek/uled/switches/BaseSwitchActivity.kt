@@ -50,6 +50,7 @@ private var last_start_time = 0
 private var debounce_time = 1000
 
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
+    private var sw: DbSwitch? = null
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var renameDialog: Dialog? = null
     var isReConfig: Boolean = false
@@ -190,27 +191,39 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     fun deleteSwitch(macAddress: String) {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val sw = DBUtils.getSwitchByMacAddr(macAddress)
+                    sw = DBUtils.getSwitchByMacAddr(macAddress)
                     sw?.let {
+                        showLoadingDialog(getString(R.string.please_wait))
                         Commander.resetDevice(sw!!.meshAddr, true)
                                 .subscribe(
                                         {
-                                            hideLoadingDialog()
-                                            ToastUtils.showShort(getString(R.string.delete_switch_success))
-                                            DBUtils.deleteSwitch(sw)
-                                            TelinkLightService.Instance()?.idleMode(true)
-
-                                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(sw.meshAddr))
-                                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                                            finish()
+                                            deleteData()
                                         }, {
                                     hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.delete_device_fail))
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
                                 })
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        ToastUtils.showShort(getString(R.string.delete_switch_success))
+        sw?.let { DBUtils.deleteSwitch(it) }
+        TelinkLightService.Instance()?.idleMode(true)
+
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(sw?.meshAddr ?: 0))
+            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+        finish()
     }
 
     fun deviceOta(mDeviceInfo: DeviceInfo, type: Int = DeviceType.NORMAL_SWITCH) {

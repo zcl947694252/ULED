@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.os.Build
@@ -21,7 +20,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -33,8 +31,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
-import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
-import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -73,11 +69,10 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
-    private  var viewInstall: View? = null
+    private var viewInstall: View? = null
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
@@ -114,12 +109,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     var isRgbClick = false
     var clickRgb: Boolean = false
     var installId = 0
-     var stepOneText: TextView? = null
-     var stepTwoText: TextView? = null
-     var stepThreeText: TextView? = null
-     var switchStepOne: TextView? = null
-     var switchStepTwo: TextView? = null
-     var swicthStepThree: TextView? = null
+    var stepOneText: TextView? = null
+    var stepTwoText: TextView? = null
+    var stepThreeText: TextView? = null
+    var switchStepOne: TextView? = null
+    var switchStepTwo: TextView? = null
+    var swicthStepThree: TextView? = null
     private var installHelpe: TextView? = null
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
@@ -134,8 +129,9 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     lateinit var cancelf: Button
     lateinit var confirmf: Button
     var isScenning: Boolean = true
-     var isEdite: Boolean = false
-     var type: Int? = null
+    var isEdite: Boolean = false
+    var type: Int? = null
+    var showDialogHardDelete:AlertDialog? = null
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,14 +143,13 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
         initOnLayoutListener()//加载view监听
-        makeInstallView()
         makeDialogAndPop()
         makeStopScanPop()
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-
     }
+
     private fun initChangeRecevicer() {
         changeRecevicer = ChangeRecevicer()
         val filter = IntentFilter()
@@ -452,7 +447,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             return
 
         //loadDialog没显示才把它显示出来
-        if ( !this.isFinishing && !loadDialog!!.isShowing ) {
+        if (!this.isFinishing && !loadDialog!!.isShowing) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
@@ -463,7 +458,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing ) {
+        if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing) {
             loadDialog?.dismiss()
         }
     }
@@ -476,6 +471,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         stopTimerUpdate()
+        showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
         isResume = false
     }
@@ -957,8 +953,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             INSTALL_SWITCH -> {
                 installId = INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
-                stepOneText  ?.visibility = View.GONE
-                stepTwoText  ?.visibility = View.GONE
+                stepOneText?.visibility = View.GONE
+                stepTwoText?.visibility = View.GONE
                 stepThreeText?.visibility = View.GONE
                 switchStepOne?.visibility = View.VISIBLE
                 switchStepTwo?.visibility = View.VISIBLE
@@ -976,6 +972,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun showInstallDeviceDetail(describe: String, position: Int, string: String) {
+        makeInstallView()
         installTitleTv?.text = string
         installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
         installDialog?.setOnShowListener {}
@@ -1102,5 +1099,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         popFinish.isFocusable = true // 设置PopupWindow可获得焦点
         popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
     }
+
 }
 

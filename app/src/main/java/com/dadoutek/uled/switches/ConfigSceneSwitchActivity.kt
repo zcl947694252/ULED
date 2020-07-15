@@ -168,7 +168,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                         showRenameDialog(switchDate)
 
                 }, failedCallback = {
-                    mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.pace_fail))
+                    mConfigFailSnackbar = snackbar(config_scene_switch, getString(R.string.pace_fail))
                     GlobalScope.launch(Dispatchers.Main) {
                         pb_ly.visibility = View.GONE
                         mIsConfiguring = false

@@ -661,9 +661,7 @@ object Commander : EventListener<String> {
             mGetVersionObservable = it
             mDstAddr = dstAddr
             var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
-
             val params: ByteArray
-
             if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
                 params = byteArrayOf(0x00, 0x00)
             } else {
@@ -672,8 +670,7 @@ object Commander : EventListener<String> {
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-        }
-                .retry(retryTimes)
+        }.retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS) {

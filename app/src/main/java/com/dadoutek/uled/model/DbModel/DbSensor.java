@@ -31,6 +31,16 @@ public class DbSensor implements Serializable {
     private int openTag = 1; //1代表开 0代表关
     private int setType = 1; //0代表群组模式 1代表场景模式
     private int sceneId = 0; //场景id
+    private String boundMac ="";
+
+    public String getBoundMac() {
+        return boundMac;
+    }
+
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
+
     @Transient
     public int icon = R.drawable.icon_sensor;//灯状态显示图
     public boolean isMostNew = false;
@@ -46,11 +56,11 @@ public class DbSensor implements Serializable {
     public boolean isSupportOta =true;
 
 
-    @Generated(hash = 1568479510)
+    @Generated(hash = 193683612)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId, String version,
-            int rssi, int openTag, int setType, int sceneId, boolean isMostNew,
-            boolean isSupportOta) {
+            int rssi, int openTag, int setType, int sceneId, String boundMac,
+            boolean isMostNew, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -64,6 +74,7 @@ public class DbSensor implements Serializable {
         this.openTag = openTag;
         this.setType = setType;
         this.sceneId = sceneId;
+        this.boundMac = boundMac;
         this.isMostNew = isMostNew;
         this.isSupportOta = isSupportOta;
     }

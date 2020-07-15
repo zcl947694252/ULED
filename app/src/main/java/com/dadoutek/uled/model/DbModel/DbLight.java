@@ -31,6 +31,7 @@ public class DbLight implements Serializable {
     private int productUUID;
     private Long belongGroupId;//belongGroupId如果等于1则标识没有群组
     private int index;
+    private String boundMac ="";
 
     public int color=0xffffff;//颜色
     public String version;
@@ -57,12 +58,19 @@ public class DbLight implements Serializable {
     public boolean isSupportOta =true;
     public boolean isMostNew= false;
 
+    public String getBoundMac() {
+        return boundMac;
+    }
 
-    @Generated(hash = 278393484)
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
+
+    @Generated(hash = 2032343110)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
-            int productUUID, Long belongGroupId, int index, int color,
-            String version, int status, int rssi, boolean isSupportOta,
+            int productUUID, Long belongGroupId, int index, String boundMac,
+            int color, String version, int status, int rssi, boolean isSupportOta,
             boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
@@ -75,6 +83,7 @@ public class DbLight implements Serializable {
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
         this.index = index;
+        this.boundMac = boundMac;
         this.color = color;
         this.version = version;
         this.status = status;

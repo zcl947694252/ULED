@@ -86,7 +86,7 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 72
+    schemaVersion 73
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -188,8 +188,8 @@ dependencies {
     implementation 'jp.co.cyberagent.android:gpuimage:2.0.4'
     implementation 'com.github.maning0303:MNPasswordEditText:V1.0.2'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
-    implementation 'com.github.edanel:GBSlideBar:0.5'
     annotationProcessor  'com.github.bumptech.glide:compiler:4.9.0'
+    implementation 'org.fusesource.mqtt-client:mqtt-client:1.12'
 }
 String getBuildTime() {
     Date date = new Date();

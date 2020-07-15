@@ -41,7 +41,6 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-           // groupName.text ="==="+item?.rssi
             icon.setImageResource(R.drawable.icon_acceptor_s)
         }
     }

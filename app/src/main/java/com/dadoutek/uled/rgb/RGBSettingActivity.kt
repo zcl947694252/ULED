@@ -142,31 +142,22 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
     }
 
     fun remove() {
-        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
+        AlertDialog.Builder(this).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
+                        showLoadingDialog(getString(R.string.please_wait))
                         val subscribe = Commander.resetDevice(light!!.meshAddr)
-                                .subscribe({ LogUtils.v("zcl--恢复出厂成功") }, { LogUtils.v("zcl-恢复出厂失败") })
-                        DBUtils.deleteLight(light!!)
-                        isReset = true
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
-                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
-
-                        if (mConnectDevice != null) {
-                            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
-                            if (light!!.meshAddr == mConnectDevice!!.meshAddress)
-                                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                        }
-                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                            override fun start() {}
-
-                            override fun complete() {}
-
-                            override fun error(msg: String?) {}
-                        })
-                        this.finish()
+                                .subscribe({ deleteData() }, {
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                })
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                         this.finish()
@@ -174,6 +165,28 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        DBUtils.deleteLight(light!!)
+        isReset = true
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
+            TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
+
+        if (mConnectDevice != null) {
+            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
+            if (light!!.meshAddr == mConnectDevice!!.meshAddress)
+                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+        }
+        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+            override fun start() {}
+
+            override fun complete() {}
+
+            override fun error(msg: String?) {}
+        })
+        this.finish()
     }
 
     private fun updateGroup() {
@@ -523,7 +536,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decorations)
-       // rgbDiyGradientAdapter!!.addFooterView(lin)
+        // rgbDiyGradientAdapter!!.addFooterView(lin)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
         rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
@@ -963,8 +976,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             }
             R.id.img_header_menu_left -> finish()
             R.id.tvOta -> checkPermission()
-           // R.id.update_group -> updateGroup()
-           // R.id.btn_remove -> remove()
+            // R.id.update_group -> updateGroup()
+            // R.id.btn_remove -> remove()
             R.id.dynamic_rgb -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
@@ -994,10 +1007,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             }
             R.id.mode_preset_layout -> {
                 changeToBuildInPage()
-            }   R.id.main_go_help -> {
+            }
+            R.id.main_go_help -> {
                 seeHelpe()
             }
-            R.id.btnAdd,R.id.main_add_device-> {
+            R.id.btnAdd, R.id.main_add_device -> {
                 transAddAct()
             }
             R.id.ll_g -> {
@@ -1501,7 +1515,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             R.id.toolbar_batch_gp -> removeGroup()
             R.id.toolbar_on_line -> renameGp()
             R.id.toolbar_f_rename -> renameLight()
-            R.id.toolbar_fv_rest -> remove()
+            R.id.toolbar_f_delete -> remove()
             R.id.toolbar_fv_change_group -> updateGroup()
             R.id.toolbar_f_ota -> updateOTA()
         }

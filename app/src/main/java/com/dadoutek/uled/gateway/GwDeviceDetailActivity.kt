@@ -80,7 +80,7 @@ import java.util.concurrent.TimeUnit
  */
 class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener, EventListener<String> {
     private var popVersion: TextView? = null
-    private var showDialogHardDelete: AlertDialog? = null
+    private var showDialogHardDeleteGw: AlertDialog? = null
     private var showDialogDelete: AlertDialog? = null
     private var disposableFactoryTimer: Disposable? = null
     private var downloadDispoable: Disposable? = null
@@ -428,7 +428,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                                 .subscribe {
                                     hideLoadingDialog()
                                     showDialogDelete?.dismiss()
-                                    showDialogHardDelete = AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                    showDialogHardDeleteGw = AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                                 GlobalScope.launch(Dispatchers.Main) {
                                                     showLoadingDialog(getString(R.string.please_wait))

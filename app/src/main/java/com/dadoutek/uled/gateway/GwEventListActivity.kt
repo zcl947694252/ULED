@@ -90,7 +90,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private var fiVersion: MenuItem? = null
     private var fiDelete: MenuItem? = null
     private var isRestSuccess: Boolean = false
-    private var showDialogHardDelete: android.support.v7.app.AlertDialog? = null
+    private var showDialogHardDeleteGw: android.support.v7.app.AlertDialog? = null
     private var fiFactoryReset: MenuItem? = null
     private var disposableFactoryTimer: Disposable? = null
     private var showDialogDelete: android.support.v7.app.AlertDialog? = null
@@ -319,7 +319,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 .subscribe {
                     hideLoadingDialog()
                     showDialogDelete?.dismiss()
-                    showDialogHardDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                    showDialogHardDeleteGw = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 GlobalScope.launch(Dispatchers.Main) {
                                     showLoadingDialog(getString(R.string.please_wait))

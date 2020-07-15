@@ -39,6 +39,15 @@ public class DbSwitch implements Serializable {
     public  String controlGroupAddrs;
     public String version;
     public boolean isMostNew = false;
+    private String boundMac ="";
+
+    public String getBoundMac() {
+        return boundMac;
+    }
+
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
 
     public boolean isSupportOta() {
         return isSupportOta;
@@ -75,12 +84,12 @@ public class DbSwitch implements Serializable {
     public int type;
 
 
-    @Generated(hash = 292668015)
+    @Generated(hash = 760809352)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
             String sceneIds, String controlGroupAddrs, String version,
-            boolean isMostNew, boolean isSupportOta, int type) {
+            boolean isMostNew, String boundMac, boolean isSupportOta, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -97,6 +106,7 @@ public class DbSwitch implements Serializable {
         this.controlGroupAddrs = controlGroupAddrs;
         this.version = version;
         this.isMostNew = isMostNew;
+        this.boundMac = boundMac;
         this.isSupportOta = isSupportOta;
         this.type = type;
     }

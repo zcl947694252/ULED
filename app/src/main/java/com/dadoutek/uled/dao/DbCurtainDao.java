@@ -39,9 +39,10 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property BelongGroupId = new Property(12, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property GroupName = new Property(13, String.class, "groupName", false, "GROUP_NAME");
         public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
-        public final static Property Rssi = new Property(15, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(16, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property BoundMac = new Property(15, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property Rssi = new Property(16, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(17, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(18, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -72,9 +73,10 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"BELONG_GROUP_ID\" INTEGER," + // 12: belongGroupId
                 "\"GROUP_NAME\" TEXT," + // 13: groupName
                 "\"VERSION\" TEXT," + // 14: version
-                "\"RSSI\" INTEGER NOT NULL ," + // 15: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 16: isSupportOta
-                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 17: isMostNew
+                "\"BOUND_MAC\" TEXT," + // 15: boundMac
+                "\"RSSI\" INTEGER NOT NULL ," + // 16: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 17: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 18: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -125,9 +127,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (version != null) {
             stmt.bindString(15, version);
         }
-        stmt.bindLong(16, entity.getRssi());
-        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(16, boundMac);
+        }
+        stmt.bindLong(17, entity.getRssi());
+        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -172,9 +179,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         if (version != null) {
             stmt.bindString(15, version);
         }
-        stmt.bindLong(16, entity.getRssi());
-        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(16, boundMac);
+        }
+        stmt.bindLong(17, entity.getRssi());
+        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -200,9 +212,10 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // belongGroupId
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // groupName
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
-            cursor.getInt(offset + 15), // rssi
-            cursor.getShort(offset + 16) != 0, // isSupportOta
-            cursor.getShort(offset + 17) != 0 // isMostNew
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // boundMac
+            cursor.getInt(offset + 16), // rssi
+            cursor.getShort(offset + 17) != 0, // isSupportOta
+            cursor.getShort(offset + 18) != 0 // isMostNew
         );
         return entity;
     }
@@ -224,9 +237,10 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setBelongGroupId(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
         entity.setGroupName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setRssi(cursor.getInt(offset + 15));
-        entity.setIsSupportOta(cursor.getShort(offset + 16) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
+        entity.setBoundMac(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setRssi(cursor.getInt(offset + 16));
+        entity.setIsSupportOta(cursor.getShort(offset + 17) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 18) != 0);
      }
     
     @Override

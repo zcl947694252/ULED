@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -54,7 +55,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 /**
@@ -124,9 +127,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                 menu?.findItem(R.id.toolbar_f_rename)?.isVisible = isReConfirm
-                 menu?.findItem(R.id.toolbar_f_ota)?.isVisible = isReConfirm
+                menu?.findItem(R.id.toolbar_f_ota)?.isVisible = isReConfirm
                 menu?.findItem(R.id.toolbar_f_delete)?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                if (TextUtils.isEmpty(version))
+                    version = getString(R.string.number_no)
                 fiVersion?.title = version
             }
         }
@@ -246,7 +251,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener {configReturn()}
+        toolbar.setNavigationOnClickListener { configReturn() }
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
@@ -506,18 +511,39 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun deleteDevice() {
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        showLoadingDialog(getString(R.string.please_wait))
-        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                .subscribe({
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.reset_factory_success))
-                    DBUtils.deleteSensor(currentSensor!!)
-                    TelinkLightService.Instance()?.idleMode(true)
-                    configureComplete()
-                }, {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                })
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    if (currentSensor == null)
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                    else {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                .subscribe({
+                                    deleteData()
+                                }, {
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                })
+                    }
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        ToastUtils.showShort(getString(R.string.reset_factory_success))
+        if (currentSensor!=null)
+        DBUtils.deleteSensor(currentSensor!!)
+        TelinkLightService.Instance()?.idleMode(true)
+        configureComplete()
+        finish()
     }
 
     private fun goOta() {

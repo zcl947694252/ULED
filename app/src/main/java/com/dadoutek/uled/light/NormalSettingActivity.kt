@@ -1845,34 +1845,21 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
             AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-
                         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                            showLoadingDialog(getString(R.string.please_wait))
                             val disposable = Commander.resetDevice(light!!.meshAddr)
                                     .subscribe(
                                             {
-                                                LogUtils.v("zcl-----恢复出厂成功")
-                                                DBUtils.deleteLight(light!!)
-                                                if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
-                                                    TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-
-                                                if (mConnectDevice != null) {
-                                                    Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                                                    Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
-                                                    if (light?.meshAddr == mConnectDevice?.meshAddress) {
-                                                        this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                                                    }
-                                                }
-                                                SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                                                    override fun start() {}
-
-                                                    override fun complete() {}
-
-                                                    override fun error(msg: String?) {}
-                                                })
-                                                this.finish()
+                                                deleteData()
                                             }, {
-                                        ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                                        LogUtils.v("zcl-----恢复出厂失败")
+                                        showDialogHardDelete?.dismiss()
+                                        showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                    showLoadingDialog(getString(R.string.please_wait))
+                                                    deleteData()
+                                                }
+                                                .setNegativeButton(R.string.btn_cancel, null)
+                                                .show()
                                     })
                         } else {
                             ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -1882,6 +1869,30 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
         }
+    }
+
+     fun deleteData() {
+        LogUtils.v("zcl-----恢复出厂成功")
+        hideLoadingDialog()
+        DBUtils.deleteLight(light!!)
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
+            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+
+        if (mConnectDevice != null) {
+            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
+            if (light?.meshAddr == mConnectDevice?.meshAddress) {
+                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+            }
+        }
+        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+            override fun start() {}
+
+            override fun complete() {}
+
+            override fun error(msg: String?) {}
+        })
+        this.finish()
     }
 
 

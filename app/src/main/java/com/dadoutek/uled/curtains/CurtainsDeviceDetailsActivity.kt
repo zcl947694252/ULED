@@ -111,6 +111,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     private fun initData() {
         gpList = DBUtils.getgroupListWithType(this)
         showList?.clear()
+        curtainDatas.clear()
         gpList?.let {
             showList?.addAll(it)
         }

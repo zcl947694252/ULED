@@ -117,32 +117,22 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
+                        showLoadingDialog(getString(R.string.please_wait))
                         val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
                                 .subscribe({
-                                    LogUtils.v("zcl-----恢复出厂成功")
+                                    deleteData()
                                 }, {
-                                    LogUtils.v("zcl-----恢复出厂失败")
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
                                 })
 
-                        DBUtils.deleteConnector(currentDbConnector!!)
 
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentDbConnector!!.meshAddr)) {
-                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                        }
-                        if (mConnectDevice != null) {
-                            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentDbConnector?.meshAddr)
-                            if (currentDbConnector?.meshAddr == mConnectDevice?.meshAddress) {
-                                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                            }
-                        }
-
-                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                            override fun start() {}
-                            override fun complete() {}
-                            override fun error(msg: String?) {}
-                        })
-                        this.finish()
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                         this.finish()
@@ -150,6 +140,29 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        DBUtils.deleteConnector(currentDbConnector!!)
+
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentDbConnector!!.meshAddr)) {
+            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+        }
+        if (mConnectDevice != null) {
+            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentDbConnector?.meshAddr)
+            if (currentDbConnector?.meshAddr == mConnectDevice?.meshAddress) {
+                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+            }
+        }
+
+        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+            override fun start() {}
+            override fun complete() {}
+            override fun error(msg: String?) {}
+        })
+        this.finish()
     }
 
 /*    private fun updateGroup() {

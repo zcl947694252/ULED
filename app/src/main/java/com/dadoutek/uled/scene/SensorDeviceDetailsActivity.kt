@@ -318,7 +318,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 when (view.id) {
                     R.id.template_device_setting -> {
                         showLoadingDialog(getString(R.string.please_wait))
-                        connect(currentLightm!!.meshAddr, true)?.subscribe(
+                        connect(currentLightm?.meshAddr ?: 0, true)?.subscribe(
                                 { relocationSensor() }, {
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.connect_fail))
@@ -439,7 +439,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         }
                     }
                     R.id.template_device_card_delete -> dialogDelete?.show()
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         }
@@ -464,11 +465,11 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
                     showLoadingDialog(getString(R.string.please_wait))
-                    val low = currentLightm!!.meshAddr and 0xff
-                    val hight = (currentLightm!!.meshAddr shr 8) and 0xff
+                    val low = currentLightm?.meshAddr ?: 0 and 0xff
+                    val hight = (currentLightm?.meshAddr ?: 0 shr 8) and 0xff
                     val gattBody = GwGattBody()
                     var gattPar: ByteArray
-                    if (currentLightm!!.openTag == 1) {
+                    if (currentLightm?.openTag == 1) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                                 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
                         gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
@@ -481,7 +482,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                     val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = currentLightm!!.meshAddr
+                    gattBody.meshAddr = currentLightm?.meshAddr ?: 0
                     sendToServer(gattBody)
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
@@ -500,7 +501,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
             override fun onNext(t: String) {
                 disposableTimer?.dispose()
-                if (currentLightm!!.openTag == 1) {
+                if (currentLightm?.openTag == 1) {
                     sendCloseIcon(positionCurrent)
                     byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
                 } else {
@@ -524,15 +525,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
-        if (currentLightm!!.version != null && currentLightm!!.version.contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
-            val byteArrayOf = if (currentLightm!!.openTag == 1) {
+        if (currentLightm?.version != null && (currentLightm?.version ?: "0").contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
+            val byteArrayOf = if (currentLightm?.openTag == 1) {
                 sendCloseIcon(position)
                 byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
             } else {
                 sendOpenIcon(position)
                 byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
             }
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm!!.meshAddr, byteArrayOf)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentLightm?.meshAddr ?: 0, byteArrayOf)
             DBUtils.saveSensor(sensorDatas[position], true)
             adapter?.notifyDataSetChanged()
         } else {
@@ -595,13 +596,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private fun resetSensor() {
         isClick = SENSOR_FINISH
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        val disposableReset = Commander.resetDevice(currentLightm!!.meshAddr, true)
+        val disposableReset = Commander.resetDevice(currentLightm?.meshAddr ?: 0, true)
                 .subscribe(
                         {
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.reset_factory_success))
-                            DBUtils.deleteSensor(currentLightm!!)
-                            sensorDatas.remove(currentLightm!!)
+                            currentLightm?.let {
+                                DBUtils.deleteSensor(it)
+                                sensorDatas.remove(it)
+                            }
                             toolbarTv.text = getString(R.string.sensor) + " (" + sensorDatas!!.size + ")"
                             adapter?.notifyDataSetChanged()
                             isEmptyDevice()
@@ -667,6 +670,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                             RESET_SENSOR -> {//恢复出厂设置成功后判断灯能扫描
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.reset_factory_success, Toast.LENGTH_LONG).show()
                                 connectSensorTimeoutDisposable?.dispose()
+                                if (currentLightm!=null)
                                 DBUtils.deleteSensor(currentLightm!!)
                                 hideLoadingDialog()
                                 notifyData()//重新设置传感器数量
@@ -701,7 +705,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         if (TelinkApplication.getInstance().connectDevice != null) {
             progressBar_sensor.visibility = View.GONE
             connectSensorTimeoutDisposable?.dispose()
-            if (currentLightm?.meshAddr != null) {
+            if (currentLightm!=null&&currentLightm?.meshAddr != null) {
                 Commander.getDeviceVersion(currentLightm!!.meshAddr)
                         .subscribe(
                                 { s ->
@@ -729,7 +733,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     private fun SensorDeviceDetailsActivity.skipeDevice(isOTA: Boolean, s: String) {
         if (isOTA) {
-            currentLightm!!.version = s
+            currentLightm?.version = s
             var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
             if (isBoolean) {
                 transformView()
@@ -744,7 +748,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         } else {
             when (deviceInfo.productUUID) {
                 DeviceType.SENSOR -> {//老版本人体感应器
-                    currentLightm!!.version = s
+                    currentLightm?.version = s
                     startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
@@ -889,7 +893,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     private fun getNewData(): MutableList<DbSensor> {
         sensorDatas = DBUtils.getAllSensor()
-        toolbarTv.text = (currentLightm!!.name ?: "")
+        toolbarTv.text = (currentLightm?.name ?: "")
         return sensorDatas
     }
 

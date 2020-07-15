@@ -37,8 +37,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property OpenTag = new Property(10, int.class, "openTag", false, "OPEN_TAG");
         public final static Property SetType = new Property(11, int.class, "setType", false, "SET_TYPE");
         public final static Property SceneId = new Property(12, int.class, "sceneId", false, "SCENE_ID");
-        public final static Property IsMostNew = new Property(13, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property IsSupportOta = new Property(14, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property BoundMac = new Property(13, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property IsMostNew = new Property(14, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property IsSupportOta = new Property(15, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -67,8 +68,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"OPEN_TAG\" INTEGER NOT NULL ," + // 10: openTag
                 "\"SET_TYPE\" INTEGER NOT NULL ," + // 11: setType
                 "\"SCENE_ID\" INTEGER NOT NULL ," + // 12: sceneId
-                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 13: isMostNew
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 14: isSupportOta
+                "\"BOUND_MAC\" TEXT," + // 13: boundMac
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 14: isMostNew
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 15: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -117,8 +119,13 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         stmt.bindLong(11, entity.getOpenTag());
         stmt.bindLong(12, entity.getSetType());
         stmt.bindLong(13, entity.getSceneId());
-        stmt.bindLong(14, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(14, boundMac);
+        }
+        stmt.bindLong(15, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -161,8 +168,13 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         stmt.bindLong(11, entity.getOpenTag());
         stmt.bindLong(12, entity.getSetType());
         stmt.bindLong(13, entity.getSceneId());
-        stmt.bindLong(14, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(15, entity.getIsSupportOta() ? 1L: 0L);
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(14, boundMac);
+        }
+        stmt.bindLong(15, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -186,8 +198,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.getInt(offset + 10), // openTag
             cursor.getInt(offset + 11), // setType
             cursor.getInt(offset + 12), // sceneId
-            cursor.getShort(offset + 13) != 0, // isMostNew
-            cursor.getShort(offset + 14) != 0 // isSupportOta
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // boundMac
+            cursor.getShort(offset + 14) != 0, // isMostNew
+            cursor.getShort(offset + 15) != 0 // isSupportOta
         );
         return entity;
     }
@@ -207,8 +220,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setOpenTag(cursor.getInt(offset + 10));
         entity.setSetType(cursor.getInt(offset + 11));
         entity.setSceneId(cursor.getInt(offset + 12));
-        entity.setIsMostNew(cursor.getShort(offset + 13) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 14) != 0);
+        entity.setBoundMac(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setIsMostNew(cursor.getShort(offset + 14) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 15) != 0);
      }
     
     @Override

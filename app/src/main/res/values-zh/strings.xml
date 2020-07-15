@@ -473,12 +473,9 @@
     <string name="name_can_not_null">名字不能为空</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
     <string name="w_bright">白光亮度:</string>
-    <string name="light_light">人体感应器</string>
     <string name="light_light_tip">请先把人体感应器调整到配置模式</string>
-    <string name="light_light_title">人体感应器</string>
     <string name="delay_time">延时时间</string>
     <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
-    <string name="night_light_title">人体感应器</string>
     <string name="current_select_group">当前选择的分组:</string>
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
@@ -684,7 +681,7 @@
     <string name="second">秒</string>
     <string name="moment">瞬间</string>
     <string name="gradient">渐变</string>
-    <string name="human_body">人体感应器</string>
+    <string name="human_body">传感器</string>
     <string name="custom_brightness">自定义亮度</string>
     <string name="target_brightness">请输入目标亮度</string>
     <string name="triggering_conditions">触&#160;&#160;&#160;发&#160;&#160;&#160;条&#160;&#160;&#160;件&#160;&#160;&#160;:</string>

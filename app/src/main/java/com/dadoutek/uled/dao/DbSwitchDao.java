@@ -40,8 +40,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property ControlGroupAddrs = new Property(13, String.class, "controlGroupAddrs", false, "CONTROL_GROUP_ADDRS");
         public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
         public final static Property IsMostNew = new Property(15, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property IsSupportOta = new Property(16, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property Type = new Property(17, int.class, "type", false, "TYPE");
+        public final static Property BoundMac = new Property(16, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property IsSupportOta = new Property(17, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Type = new Property(18, int.class, "type", false, "TYPE");
     }
 
 
@@ -73,8 +74,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"CONTROL_GROUP_ADDRS\" TEXT," + // 13: controlGroupAddrs
                 "\"VERSION\" TEXT," + // 14: version
                 "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 15: isMostNew
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 16: isSupportOta
-                "\"TYPE\" INTEGER NOT NULL );"); // 17: type
+                "\"BOUND_MAC\" TEXT," + // 16: boundMac
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 17: isSupportOta
+                "\"TYPE\" INTEGER NOT NULL );"); // 18: type
     }
 
     /** Drops the underlying database table. */
@@ -142,8 +144,13 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             stmt.bindString(15, version);
         }
         stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(18, entity.getType());
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(17, boundMac);
+        }
+        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(19, entity.getType());
     }
 
     @Override
@@ -205,8 +212,13 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             stmt.bindString(15, version);
         }
         stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(18, entity.getType());
+ 
+        String boundMac = entity.getBoundMac();
+        if (boundMac != null) {
+            stmt.bindString(17, boundMac);
+        }
+        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(19, entity.getType());
     }
 
     @Override
@@ -233,8 +245,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // controlGroupAddrs
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
             cursor.getShort(offset + 15) != 0, // isMostNew
-            cursor.getShort(offset + 16) != 0, // isSupportOta
-            cursor.getInt(offset + 17) // type
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // boundMac
+            cursor.getShort(offset + 17) != 0, // isSupportOta
+            cursor.getInt(offset + 18) // type
         );
         return entity;
     }
@@ -257,8 +270,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setControlGroupAddrs(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
         entity.setIsMostNew(cursor.getShort(offset + 15) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 16) != 0);
-        entity.setType(cursor.getInt(offset + 17));
+        entity.setBoundMac(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setIsSupportOta(cursor.getShort(offset + 17) != 0);
+        entity.setType(cursor.getInt(offset + 18));
      }
     
     @Override

@@ -31,10 +31,19 @@ public class DbCurtain implements Serializable {
     private int speed;
     private boolean closeSlowStart;
     private int index;
+
+    public String getBoundMac() {
+        return boundMac;
+    }
+
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
+
     private Long belongGroupId;
     public String groupName;
     public String version;
-
+    private String boundMac ="";
     @Expose(serialize = false, deserialize = false)//:序列化和反序列化时都不生效,即序列化和反序列化都忽略,和不加 @Expose 注解效果一样
     @Transient//标识不存入数据库
     public boolean selected;//选择状态
@@ -55,11 +64,11 @@ public class DbCurtain implements Serializable {
     public boolean isMostNew = false;
 
 
-    @Generated(hash = 284432873)
+    @Generated(hash = 131630581)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
             int productUUID, int status, boolean inverse, boolean closePull, int speed,
             boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
-            int rssi, boolean isSupportOta, boolean isMostNew) {
+            String boundMac, int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -75,6 +84,7 @@ public class DbCurtain implements Serializable {
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
         this.version = version;
+        this.boundMac = boundMac;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
         this.isMostNew = isMostNew;

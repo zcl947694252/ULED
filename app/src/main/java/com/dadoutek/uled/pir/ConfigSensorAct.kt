@@ -7,7 +7,9 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
@@ -48,6 +50,8 @@ import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * 老版本人体感应器设置详情
@@ -118,6 +122,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 fiRename = menu?.findItem(R.id.toolbar_f_rename)
                 fiRename?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
+                if (TextUtils.isEmpty(version))
+                    version = getString(R.string.number_no)
                 fiVersion?.title = version
             }
         }
@@ -135,19 +141,37 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun deleteDevice() {
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        showLoadingDialog(getString(R.string.please_wait))
-        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                .subscribe(
-                        {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.reset_factory_success))
-                            DBUtils.deleteSensor(currentSensor!!)
-                            TelinkLightService.Instance()?.idleMode(true)
-                            doFinish()
-                        }, {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                })
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    if (currentSensor == null)
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                    else {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                .subscribe({
+                                    deleteData()
+                                }, {
+                                    showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                showLoadingDialog(getString(R.string.please_wait))
+                                                deleteData()
+                                            }
+                                            .setNegativeButton(R.string.btn_cancel, null)
+                                            .show()
+                                })
+                    }
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+     fun deleteData() {
+        hideLoadingDialog()
+        ToastUtils.showShort(getString(R.string.reset_factory_success))
+        DBUtils.deleteSensor(currentSensor!!)
+        TelinkLightService.Instance()?.idleMode(true)
+        doFinish()
     }
 
     private fun goOta() {
@@ -325,7 +349,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.sensor_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { configReturn()}
+        toolbar.setNavigationOnClickListener { configReturn() }
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
@@ -442,7 +466,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     }
                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
         else
-           doFinish()
+            doFinish()
     }
 
     override fun onBackPressed() {
@@ -464,7 +488,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         val mode = getModeValue()
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             showLoadingDialog(getString(R.string.connecting))
-                             connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({
+                            connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.connect_success))
                             }, {
@@ -511,7 +535,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         if (!this.isFinishing) {
             renameDialog.dismiss()
             runOnUiThread {
-            renameDialog.show()
+                renameDialog.show()
             }
         }
 

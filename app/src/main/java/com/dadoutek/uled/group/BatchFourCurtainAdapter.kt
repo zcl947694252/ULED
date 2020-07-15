@@ -35,7 +35,7 @@ class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : 
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item.groupName +"="+item.rssi
+            groupName.text = item.groupName
 
             icon.setImageResource(R.drawable.icon_curtain_s)
         } else {
