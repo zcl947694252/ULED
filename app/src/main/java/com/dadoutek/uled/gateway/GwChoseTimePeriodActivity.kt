@@ -106,7 +106,6 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initView() {
         toolbar_t_center.text = getString(R.string.chose_time)
-        toolbar_t_confim.text = getString(R.string.next)
         makeStandingTimePop()
     }
 
@@ -144,6 +143,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initLisenter() {
         toolbar_t_cancel!!.setOnClickListener(this)
         toolbar_t_confim!!.setOnClickListener(this)
+        toolbar_t_confim.setImageResource(R.drawable.go_to_link)
         gw_times_standing_time_ly!!.setOnClickListener(this)//选择停留时间
         startTime.setOnClickListener(this)
         endTime.setOnClickListener(this)

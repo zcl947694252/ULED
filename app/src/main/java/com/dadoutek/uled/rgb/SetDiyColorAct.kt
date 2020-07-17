@@ -31,6 +31,7 @@ import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
+import kotlinx.android.synthetic.main.template_see_help.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -182,6 +183,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+        see_help_ly.setOnClickListener { seeHelpe() }
     }
 
     private fun lessSpeed(event: MotionEvent?) {

@@ -17,11 +17,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -43,6 +42,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -52,12 +54,7 @@ private var debounce_time = 1000
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
     private var sw: DbSwitch? = null
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
-    var renameDialog: Dialog? = null
     var isReConfig: Boolean = false
-    var popReNameView: View? = null
-    var renameCancel: TextView? = null
-    var renameConfirm: TextView? = null
-    var renameEditText: EditText? = null
 
     private var mConnectDeviceDisposable: Disposable? = null
     private lateinit var otaDeviceInfo: DeviceInfo
@@ -99,7 +96,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     private fun makePopuwindow() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
+        textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
         renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
@@ -174,13 +171,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(switchDate: DbSwitch?) {
         hideLoadingDialog()
-        StringUtils.initEditTextFilter(renameEditText)
+        StringUtils.initEditTextFilter(textGp)
 
-        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
-            renameEditText?.setText(switchDate?.name)
+        if (!TextUtils.isEmpty(switchDate?.name))
+            textGp?.setText(switchDate?.name)
         else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
+            textGp?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        textGp?.setSelection(textGp?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -189,7 +186,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     fun deleteSwitch(macAddress: String) {
-        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(/*R.string.delete_switch_confirm*/getString(R.string.sure_delete_device,sw?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     sw = DBUtils.getSwitchByMacAddr(macAddress)
                     sw?.let {
@@ -199,15 +196,17 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                         {
                                             deleteData()
                                         }, {
-                                    hideLoadingDialog()
-                                    showDialogHardDelete?.dismiss()
-                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                showLoadingDialog(getString(R.string.please_wait))
-                                                deleteData()
-                                            }
-                                            .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
+                                    GlobalScope.launch(Dispatchers.Main){
+                                        /*    showDialogHardDelete?.dismiss()
+                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                      showLoadingDialog(getString(R.string.please_wait))
+                                                      deleteData()
+                                                  }
+                                                  .setNegativeButton(R.string.btn_cancel, null)
+                                                  .show()*/
+                                        deleteData()
+                                    }
                                 })
                     }
                 }

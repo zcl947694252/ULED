@@ -7,7 +7,6 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.util.StringUtils;
 
 import java.util.List;
 
@@ -15,12 +14,9 @@ import java.util.List;
  * Created by hejiajun on 2018/4/25.
  */
 
-public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
-        DbCurtain, BaseViewHolder> {
+public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<DbCurtain, BaseViewHolder> {
 
-    public CurtainsOfGroupRecyclerViewAdapter(List<DbCurtain> data) {
-        super(data);
-    }
+    public boolean delete =false;
 
     public CurtainsOfGroupRecyclerViewAdapter(int layoutResId, List<DbCurtain> data) {
         super(layoutResId, data);
@@ -43,11 +39,18 @@ public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter
 
         tvName.setText(item.getName());
 
+
         helper.addOnClickListener(R.id.template_device_setting)
-                .setTag(R.id.template_device_setting,helper.getAdapterPosition())
-                .setTag(R.id.template_device_icon,helper.getAdapterPosition())
-                .setVisible(R.id.template_device_more,false)
-                .setBackgroundRes(R.id.template_device_icon,item.icon)
-                .addOnClickListener(R.id.template_device_icon);
+                .setTag(R.id.template_device_setting, helper.getAdapterPosition())
+                .setVisible(R.id.template_device_more, false)
+                .setVisible(R.id.template_device_card_delete, delete)
+                .setVisible(R.id.template_gp_name, false)
+                .setTag(R.id.template_device_icon, helper.getAdapterPosition())
+                .addOnClickListener(R.id.template_device_icon)
+                .addOnClickListener(R.id.template_device_card_delete);
+    }
+
+    public void changeState(boolean delete) {
+        this.delete = delete;
     }
 }

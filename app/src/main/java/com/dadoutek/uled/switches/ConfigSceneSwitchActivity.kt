@@ -15,15 +15,12 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -37,9 +34,7 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
-import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -516,10 +511,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
                 if (switchDate != null)
                     DBUtils.updateSwicth(switchDate!!)
                 else
@@ -537,7 +532,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         }
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()

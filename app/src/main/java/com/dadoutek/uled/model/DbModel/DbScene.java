@@ -45,6 +45,15 @@ public class DbScene implements Parcelable{
     private String times;
 
     private String imgName= "";
+    private boolean checked= false;
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
 
     protected DbScene(Parcel in) {
         if (in.readByte() == 0) {
@@ -60,15 +69,16 @@ public class DbScene implements Parcelable{
         }
     }
 
-    @Generated(hash = 617725948)
+    @Generated(hash = 837119154)
     public DbScene(Long id, String name, @NotNull Long belongRegionId, int index, String times,
-            String imgName) {
+            String imgName, boolean checked) {
         this.id = id;
         this.name = name;
         this.belongRegionId = belongRegionId;
         this.index = index;
         this.times = times;
         this.imgName = imgName;
+        this.checked = checked;
     }
 
     @Generated(hash = 662958756)
@@ -259,5 +269,9 @@ public class DbScene implements Parcelable{
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
+    }
+
+    public boolean getChecked() {
+        return this.checked;
     }
 }

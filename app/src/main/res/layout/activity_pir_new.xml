@@ -253,7 +253,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="13dp"
-                            android:text="@string/minute"
+                            android:text="@string/second"
                             android:textColor="@color/blue_background"
                             android:textSize="15sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -434,7 +434,7 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/select_group"
+                    android:text="@string/selected_group"
                     android:textColor="@color/black_nine"
                     android:textSize="15sp" />
 
@@ -461,6 +461,7 @@
                     android:padding="@dimen/dp_5"
                     android:gravity="center"
                     android:textSize="@dimen/sp_15"
+                    android:visibility="gone"
                     android:layout_marginBottom="@dimen/dp_10"
                     android:textColor="@color/black_three"
                     android:text="@string/see_help" />

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -37,6 +38,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -47,7 +49,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
-    private var resId: Int? = 0
+    private var resId: Int? = R.drawable.icon_1
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
     private var rgbRecyclerView: RecyclerView? = null
@@ -505,11 +507,18 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
-        for (index in showCheckListData!!.indices) {
-            if (showCheckListData!![index].meshAddr == showGroupList!![position].groupAddress)
-                showCheckListData!![index].isChecked = false
-        }
-        adapter.remove(position)
+        android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+                .setMessage(getString(R.string.delete_group_confirm,showGroupList!![position]?.gpName))
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    this.showLoadingDialog(getString(R.string.deleting))
+                    for (index in showCheckListData!!.indices) {
+                        if (showCheckListData!![index].meshAddr == showGroupList!![position].groupAddress)
+                            showCheckListData!![index].isChecked = false
+                    }
+                    adapter.remove(position)
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
     }
 
     //显示数据列表页面
@@ -520,10 +529,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
         // tv_function1.visibility = View.GONE
         //  tv_function1.text = getString(R.string.edit)
         // tv_function1.setOnClickListener { changeEditView() }
-
-        img_function2.visibility = View.VISIBLE
-        img_function2.setImageResource(R.drawable.edit)
-        img_function2.setOnClickListener { changeEditView() }
+        img_function1.visibility = View.VISIBLE
+        img_function1.setImageResource(R.drawable.icon_editor)
+        img_function1.setOnClickListener { changeEditView() }
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -602,6 +610,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun changeEditView() {
+        toolbarTv.text = getString(R.string.create_scene)
         showEditListVew()
     }
 
@@ -625,6 +634,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun saveCurrenEditResult() {
         editSceneName = edit_name.text.toString()
+        toolbarTv.text = editSceneName
         val oldResultItemList = ArrayList<ItemGroup>()
         val newResultItemList = ArrayList<ItemGroup>()
 

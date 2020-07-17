@@ -15,14 +15,11 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
-import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -30,12 +27,15 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -69,8 +69,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -102,7 +102,10 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
     private var recyclerView: RecyclerView? = null
-
+    private var deleteDevice: MenuItem? = null
+    private var onlineUpdate: MenuItem? = null
+    private var batchGp: MenuItem? = null
+    private var isDelete: Boolean = false
 
     override fun onPostResume() {
         super.onPostResume()
@@ -118,7 +121,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connector_of_group)
-        ButterKnife.bind(this)
         initToolbar()
         initParameter()
         initData()
@@ -171,22 +173,65 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun initToolbar() {
         toolbarTv?.text = getString(R.string.group_setting_header)
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
+        setMenu()
     }
 
+    private fun setMenu() {
+        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+        batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
+        onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
+        deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
+        batchGp?.title = getString(R.string.batch_group)
+        onlineUpdate?.title = getString(R.string.online_upgrade)
+        deleteDevice?.title = getString(R.string.edite_device)
+
+        deleteDevice?.isVisible = true
+        batchGp?.isVisible = true
+        toolbar.setOnMenuItemClickListener { itm ->
+            DBUtils.lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
+                else
+                    when (itm.itemId) {
+                        R.id.toolbar_batch_gp -> skipeBatch()
+                        R.id.toolbar_on_line -> goOta()
+                        R.id.toolbar_delete_device -> editeDevice()
+                    }
+            }
+            true
         }
-        return super.onOptionsItemSelected(item)
+    }
+
+    private fun skipeBatch() {
+        when {
+            DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
+            TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
+            else -> ToastUtils.showShort(getString(R.string.connect_fail))
+        }
+    }
+    private fun goOta() {
+        if (DBUtils.getAllCurtains().size == 0)
+            ToastUtils.showShort(getString(R.string.no_device))
+        else
+            startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.SMART_CURTAIN)
+    }
+
+    private fun editeDevice() {
+        isDelete = !isDelete
+        if (isDelete)
+            deleteDevice?.title = getString(R.string.cancel_edite)
+        else
+            deleteDevice?.title = getString(R.string.edite_device)
+
+        adapter?.changeState(isDelete)
+        adapter?.notifyDataSetChanged()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -345,21 +390,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (group.meshAddr == 0xffff) {
-            menuInflater.inflate(R.menu.menu_search, menu)
-            searchView = (menu!!.findItem(R.id.action_search)).actionView as SearchView
-            searchView!!.setOnQueryTextListener(this)
-            searchView!!.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            searchView!!.queryHint = getString(R.string.input_groupAdress)
-            searchView!!.isSubmitButtonEnabled = true
-            searchView!!.backgroundColor = resources.getColor(R.color.blue)
-            searchView!!.alpha = 0.3f
-            return super.onCreateOptionsMenu(menu)
-        }
-        return true
-    }
-
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
@@ -378,10 +408,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             lightList[i].updateIcon()
         }
 
-        if (DBUtils.getAllRelay().size == 0) {
-            light_add_device_btns.text = getString(R.string.device_scan_scan)
-        } else {
-            light_add_device_btns.text = getString(R.string.add_device_new)
+        when (DBUtils.getAllRelay().size) {
+            0 -> light_add_device_btns.text = getString(R.string.device_scan_scan)
+            else -> light_add_device_btns.text = getString(R.string.add_device)
         }
     }
 
@@ -392,18 +421,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             R.id.template_device_icon -> {
                 canBeRefresh = true
                 if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                        Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                    } else {
-                        Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)
                     }
-
                     currentLight!!.connectionStatus = ConnectionStatus.ON.value
                 } else {
-                    if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                        Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                    } else {
-                        Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)
                     }
                     currentLight!!.connectionStatus = ConnectionStatus.OFF.value
                 }
@@ -415,7 +441,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 }
             }
             R.id.template_device_setting -> {
-
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
@@ -438,6 +463,50 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     }
                 }
             }
+
+            R.id.template_device_card_delete -> showDeleteSingleDialog(currentLight!!)
+        }
+    }
+
+    private fun showDeleteSingleDialog(dbLight: DbConnector) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
+        builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+            deletePreGroup(dbLight)
+
+            DBUtils.updateGroup(group!!)
+
+            dbLight.hasGroup = false
+            dbLight.belongGroupId = 1
+            DBUtils.updateRelayLocal(dbLight)
+
+            lightList.remove(dbLight)
+            adapter?.notifyDataSetChanged()
+            setEmptyAndToolbarTV()
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+        val dialog = builder.show()
+        dialog.show()
+    }
+
+    private fun setEmptyAndToolbarTV() {
+        toolbarTv.text = group?.name + "(${group?.deviceCount})"
+        if (lightList.size > 0) {
+            recycler_view_lights.visibility = View.VISIBLE
+            no_light_ly.visibility = View.GONE
+        } else {
+            recycler_view_lights.visibility = View.GONE
+            no_light_ly.visibility = View.VISIBLE
+        }
+    }
+
+
+    private fun deletePreGroup(dbLight: DbConnector) {
+        if (DBUtils.getGroupByID(dbLight!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(dbLight!!.belongGroupId!!)?.meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())//0x00表示删除组
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dbLight.meshAddr, params)
         }
     }
 

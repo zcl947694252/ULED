@@ -53,7 +53,7 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<D
                 .setTag(R.id.template_device_setting,helper.getAdapterPosition())
                 .setTag(R.id.template_device_icon,helper.getAdapterPosition())
                 .setVisible(R.id.template_device_card_delete,isDelete)
-                .setBackgroundRes(R.id.template_device_icon,item.icon)
+                .setImageResource(R.id.template_device_icon,item.icon)
                 .setVisible(R.id.template_device_more,false)
                 .addOnClickListener(R.id.template_device_icon)
                 .addOnClickListener(R.id.template_device_card_delete);

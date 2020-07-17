@@ -106,26 +106,25 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setOnClickListener {
-             val textGp = EditText(this)
-                         StringUtils.initEditTextFilter(textGp)
-            tagBean?.tagName
-                         val s = tagBean?.tagName ?: ""
-                         textGp.setText(s)
-                         textGp.setSelection(s.length)
-                         AlertDialog.Builder(this)
-                                 .setTitle(getString(R.string.update_name))
-                                 .setIcon(android.R.drawable.ic_dialog_info)
-                                 .setView(textGp)
-                                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                                         ToastUtils.showLong(getString(R.string.rename_tip_check))
-                                     } else {
-                                         val trim = textGp.text.toString().trim { it <= ' ' }
-                                         tagBean?.tagName = trim
-                                         toolbarTv.text = trim
-                                     }
-                                 }
-                                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+
+            StringUtils.initEditTextFilter(textGp)
+                textGp?.setText(tagBean?.tagName ?: "")
+            textGp?.setSelection(textGp?.text.toString().length)
+
+            if (this != null && !this.isFinishing) {
+                renameDialog?.dismiss()
+                renameDialog?.show()
+            }
+
+            renameConfirm?.setOnClickListener {    // 获取输入框的内容
+                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else{
+                    val trim = textGp?.text.toString().trim { it <= ' ' }
+                    tagBean?.tagName = trim
+                    toolbarTv.text = trim
+                }
+            }
         }
         toolbar.setNavigationOnClickListener {
             val intent = Intent()
@@ -133,6 +132,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
+        if (TelinkLightApplication.getApp().isConnectGwBle)
+            image_bluetooth.setImageResource(R.drawable.cloud)
         tv_function1.text = getString(R.string.complete)
         tv_function1.visibility = View.VISIBLE
         gate_way_repete_mode.text = getString(R.string.only_one)
@@ -269,6 +270,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun saveOrUpdataGw(it: DbGateway) {
+        if (!netWorkCheck(this))
+            return
         it.productUUID = DeviceType.GATE_WAY
         val toJson = GsonUtils.toJson(listTask)//获取tasks字符串
         LogUtils.v("zcl网关---$toJson")

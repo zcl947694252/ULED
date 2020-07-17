@@ -65,7 +65,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     private Unbinder unbinder;
     private ImageView toolbarCancel;
     private TextView timerTitle;
-    private TextView toolbarConfirm;
+    private ImageView toolbarConfirm;
     private TextView timerScene;
     private RelativeLayout timerLy;
     private LinearLayout wheelPickerLy;
@@ -333,7 +333,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         toolbarCancel = findViewById(R.id.toolbar_t_cancel);
         toolbarTv = findViewById(R.id.toolbar_t_center);
         toolbarConfirm = findViewById(R.id.toolbar_t_confim);
-
+        toolbarConfirm.setImageResource(R.drawable.go_to_link);
         //时间选择器底部item
         timerTitle = findViewById(R.id.item_gw_timer_title);//条目头部
         timerScene = findViewById(R.id.item_gw_timer_scene);//条目尾部
@@ -355,16 +355,13 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
         picker.setSelectedItem(hourTime, minuteTime);
         picker.setOnWheelListener(new DateTimePicker.OnWheelListener() {
             @Override
-            public void onYearWheeled(int index, String year) {
-            }
+            public void onYearWheeled(int index, String year) { }
 
             @Override
-            public void onMonthWheeled(int index, String month) {
-            }
+            public void onMonthWheeled(int index, String month) { }
 
             @Override
-            public void onDayWheeled(int index, String day) {
-            }
+            public void onDayWheeled(int index, String day) { }
 
             @Override
             public void onHourWheeled(int index, String hour) {

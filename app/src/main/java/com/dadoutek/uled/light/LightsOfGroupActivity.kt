@@ -61,7 +61,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var currentLight: DbLight? = null
     private var searchView: SearchView? = null
     private var canBeRefresh = true
-    private var connectMeshAddress: Int = 0
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
@@ -207,10 +206,13 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
         deleteDevice?.title = getString(R.string.edite_device)
+
         deleteDevice?.isVisible = true
+        batchGp?.isVisible = true
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
@@ -327,19 +329,13 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 for (i in lightList.indices)
                     lightList[i].updateIcon()
 
-                when (DBUtils.getAllNormalLight().size) {
-                    0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
-                    else -> light_add_device_btn.text = getString(R.string.add_device_new)
-                }
+                if (DBUtils.getAllNormalLight().size == 0) light_add_device_btn.text = getString(R.string.device_scan_scan)
             }
 
             DeviceType.LIGHT_RGB -> {
                 for (i in lightList.indices)
                     lightList[i].updateRgbIcon()
-                when (DBUtils.getAllRGBLight().size) {
-                    0 -> light_add_device_btn.text = getString(R.string.device_scan_scan)
-                    else -> light_add_device_btn.text = getString(R.string.add_device_new)
-                }
+                if (DBUtils.getAllRGBLight().size == 0) light_add_device_btn.text = getString(R.string.device_scan_scan)
             }
         }
 
@@ -360,28 +356,22 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 canBeRefresh = true
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
-                        when (currentLight!!.productUUID) {
-                            DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                            else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)
-                        }
-                        currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                       Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
+                        lightList[position]!!.connectionStatus = ConnectionStatus.ON.value
                     }
                     else -> {
-                        when (currentLight!!.productUUID) {
-                            DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                            else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)
-                        }
-                        currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                        Commander.openOrCloseLights(lightList[position]!!.meshAddr, false)
+                        lightList[position]!!.connectionStatus = ConnectionStatus.OFF.value
                     }
                 }
 
                 when (deviceType) {
-                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> currentLight!!.updateIcon()
-                    DeviceType.LIGHT_RGB -> currentLight!!.updateRgbIcon()
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> lightList[position]!!.updateIcon()
+                    DeviceType.LIGHT_RGB -> lightList[position]!!.updateRgbIcon()
                 }
 
-                DBUtils.updateLight(currentLight!!)
-                adapter?.notifyDataSetChanged()
+                DBUtils.updateLight(lightList[position]!!)
+                deviceAdapter?.notifyDataSetChanged()
             }
             R.id.template_device_setting -> {
                 if (scanPb.visibility != View.VISIBLE) {
@@ -406,7 +396,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage(R.string.sure_delete_device)
+        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
 

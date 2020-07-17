@@ -1,5 +1,6 @@
 package com.dadoutek.uled.curtains
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.util.DiffUtil
@@ -31,7 +32,7 @@ import kotlinx.android.synthetic.main.activity_curtains_device_details.no_device
 import kotlinx.android.synthetic.main.activity_curtains_device_details.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import java.util.*
+import org.jetbrains.anko.singleLine
 import kotlin.collections.ArrayList
 
 
@@ -45,7 +46,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     private var showList: ArrayList<ItemTypeGroup>? = arrayListOf()
     private var gpList: ArrayList<ItemTypeGroup>? = null
     private var inflater: LayoutInflater? = null
-    private var currentLight: DbCurtain? = null
+    private var currentDevice: DbCurtain? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
@@ -68,7 +69,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     }
 
     override fun setPositiveBtn() {
-        currentLight?.let {
+        currentDevice?.let {
             DBUtils.deleteCurtain(it)
             curtainDatas.remove(it)
         }
@@ -233,7 +234,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                 }
             }
         }
-        toolbarTv.text = getString(R.string.curtain) + " (" + curtainDatas.size + ")"
+        toolbarTv.text = getString(R.string.curtain)
 
         adapter = CurtainDeviceDetailsAdapter(R.layout.template_device_type_item, curtainDatas)
         adapter!!.bindToRecyclerView(recycleView)
@@ -303,6 +304,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
@@ -351,16 +353,20 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
         startActivityForResult(intent, 0)
     }
 
+    @SuppressLint("StringFormatInvalid")
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-        currentLight = curtainDatas?.get(position)
+        currentDevice = curtainDatas?.get(position)
         positionCurrent = position
         if (TelinkLightApplication.getApp().connectDevice == null)
             ToastUtils.showLong(getString(R.string.connecting_tip))
         else {
             when (view.id) {
-                R.id.template_device_card_delete -> dialogDelete?.show()
+                R.id.template_device_card_delete -> {
+                      val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                        builder?.setMessage(string)
+                    builder?.create()?.show()
+                }
                 R.id.template_device_setting -> skipSetting()
-                R.id.template_device_card_delete -> dialogDelete?.show()
             }
         }
     }
@@ -407,7 +413,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
             adapter!!.setNewData(curtainDatas)
         }
 
-        toolbarTv.text = getString(R.string.curtain) + " (" + curtainDatas.size + ")"
+        toolbarTv.text = getString(R.string.curtain)
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
@@ -419,10 +425,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     private fun skipSetting() {
         var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
         intent.putExtra(TYPE_VIEW, TYPE_CURTAIN)
-        intent.putExtra(LIGHT_ARESS_KEY, currentLight)
-        intent.putExtra(CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(LIGHT_ARESS_KEY, currentDevice)
+        intent.putExtra(CURTAINS_ARESS_KEY, currentDevice!!.meshAddr)
         intent.putExtra(LIGHT_REFRESH_KEY, LIGHT_REFRESH_KEY_OK)
-        Log.d("currentLight", currentLight!!.meshAddr.toString())
+        Log.d("currentLight", currentDevice!!.meshAddr.toString())
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }
 }

@@ -9,7 +9,7 @@
     <item
             android:id="@+id/toolbar_on_line"
             android:orderInCategory="2"
-            android:title="@string/rename_the_group"
+            android:title="@string/update_group"
             app:showAsAction="never" />
     <item
             android:id="@+id/toolbar_delete_device"

@@ -18,13 +18,11 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -68,7 +66,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var lightsData: ArrayList<DbLight> = arrayListOf()
     private var listAdapter: DeviceDetailListAdapter? = null
     private val SCENE_MAX_COUNT = 100
-    private var currentLight: DbLight? = null
+    private var currentDevice: DbLight? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
@@ -94,7 +92,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     override fun setPositiveBtn() {
-        currentLight?.let {
+        currentDevice?.let {
             DBUtils.deleteLight(it)
             lightsData.remove(it)
         }
@@ -192,10 +190,10 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 for (i in lightsData.indices)
                     lightsData[i].updateIcon()
-                toolbarTv.text = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
+                toolbarTv.text = getString(R.string.normal_light_title)
             }
             Constant.INSTALL_RGB_LIGHT -> {
-                toolbarTv.text = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
+                toolbarTv.text = getString(R.string.rgb_light)
                 for (i in lightsData.indices)
                     lightsData[i].updateRgbIcon()
             }
@@ -206,7 +204,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     val onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
         if (position < lightsData.size) {
-            currentLight = lightsData[position]
+            currentDevice = lightsData[position]
             positionCurrent = position
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 GlobalScope.launch(Dispatchers.Main) {
@@ -218,15 +216,19 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 when (view.id) {
                     R.id.template_device_icon -> {
                         canBeRefresh = true
-                        openOrClose(currentLight!!)
+                        openOrClose(currentDevice!!)
                         when (type) {
-                            Constant.INSTALL_NORMAL_LIGHT -> currentLight!!.updateIcon()
-                            Constant.INSTALL_RGB_LIGHT -> currentLight!!.updateRgbIcon()
+                            Constant.INSTALL_NORMAL_LIGHT -> currentDevice!!.updateIcon()
+                            Constant.INSTALL_RGB_LIGHT -> currentDevice!!.updateRgbIcon()
                         }
-                        DBUtils.updateLight(currentLight!!)
+                        DBUtils.updateLight(currentDevice!!)
                         adapter?.notifyDataSetChanged()
                     }
-                    R.id.template_device_card_delete -> dialogDelete?.show()
+                    R.id.template_device_card_delete ->{
+                          val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                        builder?.setMessage(string)
+                        builder?.create()?.show()
+                    }
                     R.id.template_device_setting -> goSetting()
                 }
             }
@@ -266,22 +268,22 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                             hideLoadingDialog()
                             runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                         }
-                        val low = currentLight!!.meshAddr and 0xff
-                        val hight = (currentLight!!.meshAddr shr 8) and 0xff
+                        val low = currentDevice!!.meshAddr and 0xff
+                        val hight = (currentDevice!!.meshAddr shr 8) and 0xff
                         val gattBody = GwGattBody()
                         var gattPar: ByteArray = byteArrayOf()
-                        when (currentLight!!.connectionStatus) {
+                        when (currentDevice!!.connectionStatus) {
                             ConnectionStatus.OFF.value -> {
-                                if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                        || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
+                                if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
+                                        || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
                                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                             0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
                                     gattBody.ser_id = Constant.SER_ID_LIGHT_ON
                                 }
                             }
                             else -> {
-                                if (currentLight!!.productUUID == DeviceType.LIGHT_NORMAL || currentLight!!.productUUID == DeviceType.LIGHT_RGB
-                                        || currentLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                                if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
+                                        || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
                                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                             0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
                                     gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
@@ -292,7 +294,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         val s = Base64Utils.encodeToStrings(gattPar)
                         gattBody.data = s
                         gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                        gattBody.meshAddr = currentLight!!.meshAddr
+                        gattBody.meshAddr = currentDevice!!.meshAddr
                         sendToServer(gattBody)
                     } else ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
@@ -330,33 +332,33 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun goSetting() {
         var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
-        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+        if (currentDevice?.productUUID == DeviceType.LIGHT_RGB) {
             intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
         }
-        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
+        intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
         intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }
 
     private fun openOrClose(currentLight: DbLight) {
         LogUtils.v("zcl点击后的灯$currentLight")
-        this.currentLight = currentLight
+        this.currentDevice = currentLight
         when (currentLight!!.connectionStatus) {
             ConnectionStatus.OFF.value -> {
                 when (currentLight!!.productUUID) {
                     DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = true, isPause = false)//开窗
                     else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
                 }
-                this.currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
             }
             else -> {
                 when (currentLight!!.productUUID) {
                     DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = false, isPause = false)//关窗
                     else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
                 }
-                this.currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
             }
         }
     }
@@ -516,14 +518,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             }, true)
             listAdapter?.let { diffResult.dispatchUpdatesTo(it) }
             lightsData = mNewDatas!!
-            when (type) {
-                Constant.INSTALL_NORMAL_LIGHT -> {
-                    toolbarTv.text = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
-                }
-                Constant.INSTALL_RGB_LIGHT -> {
-                    toolbarTv.text = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
-                }
-            }
             listAdapter!!.setNewData(lightsData)
         }
     }

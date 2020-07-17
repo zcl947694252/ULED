@@ -1,5 +1,8 @@
 package com.dadoutek.uled.switches
 
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -15,11 +18,16 @@ import com.dadoutek.uled.model.DbModel.DbScene
  * 更新时间   $
  * 更新描述
  */
-class SceneItemAdapter(resId: Int, data: MutableList<DbScene>):BaseQuickAdapter<DbScene,BaseViewHolder>(resId,data){
+class SceneItemAdapter(resId: Int, data: MutableList<DbScene>) : BaseQuickAdapter<DbScene, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-        helper?.setText(R.id.template_device_batch_title,item?.name)
-                ?.setVisible(R.id.template_device_batch_selected,false)
-                ?.setVisible(R.id.template_device_batch_title_blow,false)
+        helper?.setText(R.id.template_device_batch_title, item?.name)
+                ?.setVisible(R.id.template_device_batch_selected, true)
+
+        helper?.getView<TextView>(R.id.template_device_batch_title_blow)?.visibility = View.GONE
+        if (item?.checked == true)
+            helper?.getView<ImageView>(R.id.template_device_batch_selected)?.setImageResource(R.drawable.icon_checkbox_selected)
+        else
+            helper?.getView<ImageView>(R.id.template_device_batch_selected)?.setImageResource(R.drawable.icon_checkbox_unselected)
     }
 
 }

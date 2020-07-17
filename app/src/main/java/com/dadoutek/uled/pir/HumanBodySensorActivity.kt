@@ -65,6 +65,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.singleLine
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -91,11 +92,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private var selectTime = 10
     private var fiRename: MenuItem? = null
     private var fiVersion: MenuItem? = null
-    private lateinit var renameDialog: Dialog
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
     private var renameEditText: EditText? = null
-    private var popReNameView: View? = null
     //底部组适配器
     private var showGroupList: MutableList<ItemGroup>? = null
     private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
@@ -166,7 +163,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun deleteDevice() {
         //mesadddr发0就是代表只发送给直连灯也就是当前连接灯 也可以使用当前灯的mesAdd 如果使用mesadd 有几个pir就恢复几个
-        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+        val deleteSwitchConfirm = getString(R.string.delete_switch_confirm)
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(deleteSwitchConfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (currentSensor==null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
@@ -176,14 +174,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                 .subscribe({
                                     deleteData()
                                 }, {
-                                    showDialogHardDelete?.dismiss()
-                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                    GlobalScope.launch(Dispatchers.Main)  {/*showDialogHardDelete?.dismiss()
+                                    showDialogHardDelete = android.app.AlertDialog.Builder(this@HumanBodySensorActivity).setMessage(R.string.delete_device_hard_tip)
                                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                                 showLoadingDialog(getString(R.string.please_wait))
                                                 deleteData()
                                             }
                                             .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
+                                            .show()*/
+                                        deleteData()
+                                    }
                                 })
                     }
                 }
@@ -566,7 +566,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     popupWindow.dismiss()
                     val textGp = EditText(this)
                     textGp.inputType = InputType.TYPE_CLASS_NUMBER
-                    textGp.maxLines = 3
+                     textGp.singleLine = true
                     StringUtils.initEditTextFilter(textGp)
                     AlertDialog.Builder(this)
                             .setTitle(R.string.target_brightness)

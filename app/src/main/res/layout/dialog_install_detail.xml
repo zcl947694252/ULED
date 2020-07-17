@@ -185,16 +185,7 @@
                         android:visibility="gone" />
             </LinearLayout>
 
-            <TextView
-                    android:id="@+id/install_see_helpe"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_30"
-                    android:padding="@dimen/dp_10"
-                    android:gravity="center"
-                    android:text="@string/see_help"
-                    android:textColor="@color/black_three"
-                    android:textSize="17sp" />
+            <include layout="@layout/template_see_help" />
         </LinearLayout>
 
     </ScrollView>

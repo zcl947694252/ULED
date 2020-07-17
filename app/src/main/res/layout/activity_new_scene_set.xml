@@ -111,9 +111,9 @@
 
                 <ImageView
                         android:id="@+id/scene_icon"
-                        android:layout_width="@dimen/dp_50"
-                        android:layout_height="@dimen/dp_50"
-                        android:src="@drawable/icon_5" />
+                        android:layout_width="40dp"
+                        android:layout_height="@dimen/dp_40"
+                        android:src="@drawable/icon_1" />
 
                 <ImageView
                         android:layout_width="wrap_content"

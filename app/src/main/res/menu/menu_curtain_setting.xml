@@ -17,18 +17,21 @@
             android:id="@+id/toolbar_c_commutation"
             android:orderInCategory="2"
             android:title="@string/commutation"
+            android:visible="false"
             app:showAsAction="never" />
 
     <item
             android:id="@+id/toolbar_c_slow_up"
             android:orderInCategory="2"
             android:title="@string/slow_up_the_cache"
+            android:visible="false"
             app:showAsAction="never" />
 
     <item
             android:id="@+id/toolbar_c_hand_recovery"
             android:orderInCategory="2"
             android:title="@string/hand_recovery"
+            android:visible="false"
             app:showAsAction="never" />
 
     <item

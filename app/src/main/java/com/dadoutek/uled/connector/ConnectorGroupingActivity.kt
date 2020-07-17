@@ -35,6 +35,7 @@ import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.singleLine
 import java.util.*
 
 
@@ -356,6 +357,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后

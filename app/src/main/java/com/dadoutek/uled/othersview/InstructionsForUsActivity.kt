@@ -9,6 +9,7 @@ import android.webkit.WebViewClient
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import kotlinx.android.synthetic.main.toolbar.*
 
 class InstructionsForUsActivity : TelinkBaseActivity() {
 
@@ -18,6 +19,8 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_instructions_for_us)
+        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         webView = findViewById<WebView>(R.id.webView)
         val webSettings = webView!!.settings
         //设置WebView属性，能够执行Javascript脚本

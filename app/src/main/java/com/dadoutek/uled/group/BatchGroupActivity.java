@@ -672,7 +672,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 //        //设置光标默认在最后
         textGp.setSelection(textGp.getText().toString().length());
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_name_gp))
+                .setTitle(getString(R.string.update_group))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {

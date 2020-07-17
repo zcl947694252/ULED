@@ -223,7 +223,7 @@ class GroupListFragment : BaseFragment() {
        // allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
@@ -439,7 +439,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
             allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
             toolbarTv!!.setText(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
@@ -615,7 +615,8 @@ class GroupListFragment : BaseFragment() {
                 deleteList.addAll(relayFragment.getGroupDeleteList())
 
                 if (deleteList.size > 0) {
-                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
+                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?))
+                            .setMessage(getString(R.string.delete_group_confirm,deleteList[0].name))
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 //showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")

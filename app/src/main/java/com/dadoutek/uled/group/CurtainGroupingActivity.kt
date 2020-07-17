@@ -34,6 +34,7 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_device_grouping.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.singleLine
 import java.lang.Thread.sleep
 import java.util.*
 
@@ -297,6 +298,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
          //设置光标默认在最后

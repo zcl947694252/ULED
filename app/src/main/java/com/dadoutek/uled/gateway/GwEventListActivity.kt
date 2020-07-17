@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -106,10 +109,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private var checkedIdType: Int = 0
     private var dbGw: DbGateway? = null
     private var lastTime: Long = 0
-    private var popReNameView: View? = null
-    var renameDialog: Dialog? = null
-    var renameCancel: TextView? = null
-    var renameConfirm: TextView? = null
     var renameEditText: EditText? = null
     val adapter = GwEventItemAdapter(R.layout.event_item, listOne)
     private val adapter2 = GwEventItemAdapter(R.layout.event_item, listTwo)
@@ -121,8 +120,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         menuItem.setBackgroundColor(getColor(R.color.red))
         menuItem.setText(R.string.delete)
 
-        menuItem
-
         rightMenu.addMenuItem(menuItem)//添加进右侧菜单
     }
 
@@ -132,6 +129,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        if (TelinkLightApplication.getApp().isConnectGwBle)
+        image_bluetooth.setImageResource(R.drawable.cloud)
         var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
         if(moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
@@ -147,26 +146,25 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun renameGw() {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        val s = dbGw?.name ?: ""
-        textGp.setText(s)
-        textGp.setSelection(s.length)
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_name))
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        val trim = textGp.text.toString().trim { it <= ' ' }
-                        dbGw?.name = trim
-                        toolbarTv.text = trim
-                        DBUtils.saveGateWay(dbGw!!, false)
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        if (!TextUtils.isEmpty(dbGw?.name))
+            textGp?.setText(dbGw?.name)
+        textGp?.setSelection(textGp?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                val trim = textGp?.text.toString().trim { it <= ' ' }
+                dbGw?.name = trim
+                toolbarTv.text = trim
+                DBUtils.saveGateWay(dbGw!!, false)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -1174,5 +1172,4 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             }
         }
     }
-
 }

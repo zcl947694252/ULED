@@ -85,11 +85,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     private var disposableFactoryTimer: Disposable? = null
     private var downloadDispoable: Disposable? = null
     private var removeBean: DbGateway? = null
-    private var renameDialog: Dialog? = null
-    private var renameConfirm: TextView? = null
-    private var renameCancel: TextView? = null
     private var renameEditText: EditText? = null
-    private var popReNameView: View? = null
     private var disposableTimer: Disposable? = null
     private var isRestSuccess: Boolean = false
     private lateinit var mApp: TelinkLightApplication
@@ -182,7 +178,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.Gate_way) + " (" + gwDatas.size + ")"
+        toolbarTv.text = getString(R.string.Gate_way)
     }
 
     private val onClick = View.OnClickListener {
@@ -279,13 +275,15 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                     getGw()
             }
             R.id.template_device_card_delete->{
-                dialogDelete?.show()
+                val string = getString(R.string.sure_delete_device, currentGw?.name)
+                builder?.setMessage(string)
+                builder?.create()?.show()
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendOpenOrCloseGw(isBleConnect: Boolean) {//TODO 4.3.7记得去掉点击图片开关的回调 因为直连灯的时候拿不到回调
+    private fun sendOpenOrCloseGw(isBleConnect: Boolean) {// 4.3.7记得去掉点击图片开关的回调 因为直连灯的时候拿不到回调
         //第是一位0x01代表开 默认开 0x00代表关
         currentGw?.let { it ->
             if (isBleConnect) {
@@ -297,10 +295,10 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                 gwDatas.forEach { it1 ->
                     if (it1.id == it.id) {
                         it1.openTag = if (it.openTag == 0) {
-                            it.icon = R.drawable.icon_gw_open
+                            it.icon = R.drawable.icon_gateway_off
                             1
                         } else {
-                            it.icon = R.drawable.icon_gw_open
+                            it.icon = R.drawable.icon_gateway
                             0
                         }
                     }
@@ -714,7 +712,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             no_device_relativeLayout.visibility = View.VISIBLE
         }
         adaper?.notifyDataSetChanged()
-        toolbarTv.text = getString(R.string.Gate_way) + " (" + gwDatas.size + ")"
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return gwDatas[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)

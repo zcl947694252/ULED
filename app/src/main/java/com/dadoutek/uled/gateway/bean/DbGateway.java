@@ -59,7 +59,7 @@ public class DbGateway implements Parcelable {
     private int openTag = 1; //1代表开 0代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_gw_open;//灯状态显示图
+    public int icon = R.drawable.icon_gateway;//灯状态显示图
     public boolean isMostNew = false;
 
     public int getRssi() {
@@ -176,9 +176,9 @@ public class DbGateway implements Parcelable {
 
     public void updateIcon() {
         if (this.state == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_gw_close;
+            this.icon = R.drawable.icon_gateway_off;
         } else if (this.state == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_gw_open;
+            this.icon = R.drawable.icon_gateway;
         }
     }
 

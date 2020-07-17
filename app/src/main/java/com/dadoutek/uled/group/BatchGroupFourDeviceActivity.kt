@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
@@ -50,7 +51,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
+import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
+import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
+import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.singleLine
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -70,7 +76,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val deviceData: MutableList<DbLight> = mutableListOf()
     private var disposableGroupTimer: Disposable? = null
     private var isCompatible: Boolean = true
-    private var isChange: Boolean = false
     private var lpShort: LinearLayout.LayoutParams? = null
     private var lplong: LinearLayout.LayoutParams? = null
     private var disposable: Disposable? = null
@@ -119,6 +124,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isAddGroupEmptyView: Boolean = false
     private var isComplete: Boolean = false
+    private var isChange: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,9 +143,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             checkNetworkAndSync(this)
-            ToastUtils.showLong(getString(R.string.grouping_success_tip))
             setDeviceTypeDataStopBlink(deviceType, false)
-            finish()
+            if (isChange)
+                AlertDialog.Builder(this)
+                        .setMessage(R.string.grouping_success_tip)
+                        .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                            dialog.dismiss()
+                            finish()
+                        }.show()
+            else
+                finish()
         }
 
         if (TelinkApplication.getInstance().connectDevice == null)
@@ -320,6 +333,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         groupsByDeviceType.clear()
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(deviceType))
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(0))
+        val element = DBUtils.getGroupByMeshAddr(0xffff)
+        element.deviceType = Constant.DEVICE_TYPE_NO
+        DBUtils.saveGroup(element, false)
+        groupsByDeviceType.remove(element)
 
         if (!isAddGroupEmptyView)
             groupAdapter.emptyView = emptyGroupView
@@ -345,12 +362,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun showGroupForUpdateNameDialog(position: Int) {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(groupsByDeviceType?.get(position)?.name)
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_name_gp))
+                .setTitle(getString(R.string.update_group))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
@@ -421,23 +439,24 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.LIGHT_RGB -> {
                 deviceDataLightAll.clear()
-                if (scanningList == null)
-                    if (gpMeshAddr == 0)
+                when (scanningList) {
+                    null -> if (gpMeshAddr == 0)
                         deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
                     else
                         DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
                             deviceDataLightAll.addAll(it)
                         }
-                else for (item in scanningList!!) {
-                    val light = DbLight()
-                    light.macAddr = item.macAddress
-                    light.meshAddr = item.meshAddress
-                    light.productUUID = item.productUUID
-                    light.meshUUID = item.meshUUID
-                    light.belongGroupId = allLightId
-                    light.name = getString(R.string.device_name) + light.meshAddr
-                    light.rssi = item.rssi
-                    deviceDataLightAll.add(light)
+                    else -> for (item in scanningList!!) {
+                        val light = DbLight()
+                        light.macAddr = item.macAddress
+                        light.meshAddr = item.meshAddress
+                        light.productUUID = item.productUUID
+                        light.meshUUID = item.meshUUID
+                        light.belongGroupId = allLightId
+                        light.name = getString(R.string.device_name) + light.meshAddr
+                        light.rssi = item.rssi
+                        deviceDataLightAll.add(light)
+                    }
                 }
 
             }
@@ -447,7 +466,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     if (gpMeshAddr == 0)
                         deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
                     else
-                        DBUtils.getCurtainMeshAddr(gpMeshAddr)?.let {
+                        DBUtils.getCurtainByGroupMesh(gpMeshAddr)?.let {
                             deviceDataCurtainAll.addAll(it)
                         }
                 else for (item in scanningList!!) {
@@ -486,77 +505,74 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun renameCurtain(curtain: DbCurtain?) {
-        if (curtain != null) {
-            var textGp = EditText(this)
-            StringUtils.initEditTextFilter(textGp)
-            textGp.setText(curtain?.name)
-            textGp.setSelection(textGp.text.toString().length)
-            android.app.AlertDialog.Builder(this@BatchGroupFourDeviceActivity)
-                    .setTitle(R.string.rename)
-                    .setView(textGp)
-                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                        // 获取输入框的内容
-                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showLong(getString(R.string.rename_tip_check))
-                        } else {
-                            curtain.name = textGp.text.toString().trim { it <= ' ' }
-                            DBUtils.updateCurtain(curtain)
-                            changeDeviceData()
-                            dialog.dismiss()
-                        }
-                    }
-                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        if (!TextUtils.isEmpty(curtain?.name))
+            textGp?.setText(curtain?.name)
+        textGp?.setSelection(textGp?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                curtain!!.name = textGp?.text.toString().trim { it <= ' ' }
+                DBUtils.updateCurtain(curtain!!)
+                changeDeviceData()
+                renameDialog.dismiss()
+            }
         }
     }
 
     private fun renameConnector(connector: DbConnector?) {
         if (connector != null) {
-            var textGp = EditText(this)
-            StringUtils.initEditTextFilter(textGp)
-            textGp.setText(connector?.name)
-            textGp.setSelection(textGp.text.toString().length)
-            android.app.AlertDialog.Builder(this@BatchGroupFourDeviceActivity)
-                    .setTitle(R.string.rename)
-                    .setView(textGp)
+            if (!TextUtils.isEmpty(connector?.name))
+                textGp?.setText(connector?.name)
+            textGp?.setSelection(textGp?.text.toString().length)
 
-                    .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                        // 获取输入框的内容
-                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showLong(getString(R.string.rename_tip_check))
-                        } else {
-                            connector.name = textGp.text.toString().trim { it <= ' ' }
-                            DBUtils.updateConnector(connector)
-                            changeDeviceData()
-                            dialog.dismiss()
-                        }
-                    }
-                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+            if (this != null && !this.isFinishing) {
+                renameDialog?.dismiss()
+                renameDialog?.show()
+            }
+
+            renameConfirm?.setOnClickListener {    // 获取输入框的内容
+                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else {
+                    connector.name = textGp?.text.toString().trim { it <= ' ' }
+                    DBUtils.updateConnector(connector)
+                    changeDeviceData()
+                    renameDialog.dismiss()
+                }
+            }
         }
     }
 
     private fun renameLight(light: DbLight?) {
-        var textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(light?.name)
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this@BatchGroupFourDeviceActivity)
-                .setTitle(R.string.rename)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        light?.name = textGp.text.toString().trim { it <= ' ' }
-                        if (light != null) {
-                            DBUtils.updateLight(light)
-                            changeSorceData(light.id)
-                        }
-                        // changeDeviceData()
-                        dialog.dismiss()
-                    }
+        if (!TextUtils.isEmpty(light?.name))
+            textGp?.setText(light?.name)
+        textGp?.setSelection(textGp?.text.toString().length)
+
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                light?.name = textGp?.text.toString().trim { it <= ' ' }
+                if (light != null) {
+                    DBUtils.updateLight(light)
+                    changeSorceData(light.id)
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+                // changeDeviceData()
+                renameDialog.dismiss()
+            }
+        }
     }
 
     private fun changeSorceData(id: Long?) {
@@ -922,18 +938,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 grouping_completed.text = getString(R.string.set_group)
                 grouping_completed.isClickable = false
                 grouping_completed.setBackgroundResource(R.drawable.rect_solid_radius5_e)
-            } else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
+            }/* else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
                 isComplete = true
                 grouping_completed.isClickable = true
                 grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
                 grouping_completed.text = getString(R.string.complete)
-            }
+            }*/
         }
     }
 
     private fun sureGroups() {
         val isSelected = isSelectDevice(deviceType)
         if (isSelected) {
+            isChange = true
             //进行分组操作
             //获取当前选择的分组
             if (currentGroup != null) {
@@ -1409,6 +1426,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun addNewGroup() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
+        textGp.singleLine = true
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)

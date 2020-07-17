@@ -1,24 +1,17 @@
 package com.dadoutek.uled.switches
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
@@ -303,10 +296,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
                 if (this != null && !this.isFinishing) {
                     renameDialog?.dismiss()
@@ -319,7 +312,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         }
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()

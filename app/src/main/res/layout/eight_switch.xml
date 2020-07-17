@@ -205,7 +205,7 @@
             android:layout_marginBottom="30dp"
             android:background="@drawable/rect_blue_5"
             android:gravity="center"
-            android:text="@string/use"
+            android:text="@string/confirm"
             android:textColor="@color/white"
             android:textSize="18sp" />
 

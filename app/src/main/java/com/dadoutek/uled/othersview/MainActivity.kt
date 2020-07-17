@@ -144,6 +144,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getRegionList() {
         val list = mutableListOf<String>()
+        if (netWorkCheck(this))
         RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
             override fun onNext(t: MutableList<RegionBean>) {
                 for (i in t) {
@@ -232,6 +233,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     private fun checkVersionAvailable() {
         var version = packageName(this)
+        if (netWorkCheck(this))
         UpdateModel.run {
             isVersionAvailable(0, version)
                     .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
@@ -244,7 +246,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            ToastUtils.showLong(R.string.get_server_version_fail)
+                            //ToastUtils.showLong(R.string.get_server_version_fail)
                         }
                     })
         }

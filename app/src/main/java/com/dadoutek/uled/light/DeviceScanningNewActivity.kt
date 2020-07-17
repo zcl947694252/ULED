@@ -67,6 +67,7 @@ import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.singleLine
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -127,7 +128,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private val mBlinkDisposables = SparseArray<Disposable>()
     private var isSelectAll = false
     private var initHasGroup = false
-    private var layoutmanager: LinearLayoutManager? = null
     private var allLightId: Long = 0
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
     private var mAddDeviceType: Int = 0
@@ -310,14 +310,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         btn_stop_scan.visibility = View.GONE
         scanning_no_device.visibility = View.VISIBLE
         //toolbarTv.text = getString(R.string.scan_end)
-
-        if (mAddDeviceType != DeviceType.LIGHT_NORMAL) {
-            scanning_no_factory_btn_ly.visibility = View.GONE
-            scanning_no_factory_btn_tv1.visibility = View.GONE
-        } else {
             scanning_no_factory_btn_ly.visibility = View.VISIBLE
-            scanning_no_factory_btn_tv1.visibility = View.GONE
-        }
+
     }
 
     private fun startTimer() {
@@ -659,10 +653,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(groups[position].name)
+        textGp.singleLine = true
         //        //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_name_gp))
+                .setTitle(getString(R.string.update_group))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
@@ -700,6 +695,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         textGp.setText(DBUtils.getDefaultNewGroupName())
         StringUtils.initEditTextFilter(textGp)
         val builder = AlertDialog.Builder(this@DeviceScanningNewActivity)
@@ -872,8 +868,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         list_devices.layoutManager = GridLayoutManager(this, 2)
 
         this.updateList.clear()
-
-
 
         initVisiable()
     }

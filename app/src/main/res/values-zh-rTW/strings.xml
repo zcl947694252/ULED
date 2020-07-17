@@ -137,7 +137,6 @@
     <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
     <string name="delete_group">删除分组</string>
     <string name="rename_the_group">重命名分组</string>
-    <string name="input_rename_text_tip">请输入新的组名:</string>
     <string name="hint_input">请输入……</string>
     <string name="confirm">确定</string>
     <string name="group_name_setting">组名设置</string>
@@ -156,7 +155,7 @@
     <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
     <string name="connect_fail">连接断开</string>
-    <string name="device_not_connected">设备未连接！</string>
+    <string name="device_not_connected">请检查蓝牙！</string>
     <string name="please_wait">请稍后…</string>
 
     <string name="smartSwitch">开关</string>
@@ -253,7 +252,7 @@
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
-    <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
+    <string name="exit_tips_in_scanning">确定要退出扫描?</string>
     <string name="exit_tips_in_group">确定要分组退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
@@ -264,9 +263,8 @@
     <string name="network_unavailable">当前网络不可用，请检查网络设置</string>
 
     <string name="network_time_out">网络连接超时，请重试</string>
-    <string name="delete_light_confirm">确定恢复出厂设置？</string>
 
-    <string name="delete_group_confirm">确定删除此组吗？</string>
+    <string name="delete_group_confirm">确定删除组:%1$s？</string>
     <string name="phone_or_password_can_not_be_empty">手机号不能为空</string>
     <string name="reconnecting">重连中……</string>
     <string name="app_version_name">版本:</string>
@@ -441,7 +439,7 @@
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
     <string name="stopping">停止中…</string>
-    <string name="rename">重命名</string>
+    <string name="rename">请输入名称</string>
     <string name="firmware_version">固件版本：</string>
     <string name="ota">OTA</string>
     <string name="my_scene">场景一</string>
@@ -625,13 +623,13 @@
     <string name="stop_model">停</string>
     <string name="white_light_regulation">白光:</string>
     <string name="bright_regulation">亮度:</string>
-    <string name="mode_name">模式名称:</string>
+    <string name="mode_name">名称:</string>
     <string name="please_mode_name">请输入模式名称:</string>
     <string name="no_color">暂无</string>
     <string name="speed_regulation">速度调节:</string>
     <string name="delete_model">确定删除此模式吗？</string>
     <string name="choose_color">选择颜色:</string>
-    <string name="group_list">分组列表</string>
+    <string name="group_list">群组列表</string>
     <string name="bluetooth">蓝牙连接失败？可能存在一些问题：</string>
     <string name="one_tip">1.系统蓝牙未开启</string>
     <string name="two_tip">2.周围未发现可连接设备</string>
@@ -675,8 +673,8 @@
     <string name="all_day">全天</string>
     <string name="day_time">白天</string>
     <string name="night">夜晚</string>
-    <string name="light_on">触发时开灯</string>
-    <string name="light_off">触发时关灯</string>
+    <string name="light_on">开灯</string>
+    <string name="light_off">关灯</string>
     <string name="startMinute">分钟</string>
     <string name="second">秒</string>
     <string name="moment">瞬间</string>
@@ -714,14 +712,13 @@
     <string name="version_disabled">当前版本不可用</string>
     <string name="syncing_relogin">同步数据中请重新登录</string>
     <string name="in_use">使用中</string>
-    <string name="use">使用</string>
     <string name="creater_name">创 建 者: </string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
     <string name="input_region_name">请输入区域名称</string>
     <string name="developer_mode_open">开发者模式已开启</string>
     <string name="apply">应用</string>
     <string name="in_apply">应用中</string>
-    <string name="scene_apply_success">场景应用成功</string>
+    <string name="scene_apply_success">应用成功</string>
     <string name="network">授权管理</string>
     <string name="transfer_accounts">移交账号</string>
     <string name="start_change_region">开始切换区域</string>
@@ -810,7 +807,7 @@
     <string name="compatible_mode">兼容模式</string>
     <string name="direck_light">直连灯:</string>
     <string name="get_data_please_wait">加载数据中,请稍后</string>
-    <string name="grouping_success_tip">设备重新分组成功后,请重新保存与该分组设备相关的场景</string>
+    <string name="grouping_success_tip">更改分组后，需进入相关联场景重新保存！</string>
     <string name="timeout_period_is_empty">超时时间为空</string>
     <string name="timeout_time_less_ten">超时时间不能小于10秒钟</string>
     <string name="timeout_255">超时时间不能大于255秒钟</string>
@@ -994,19 +991,23 @@
     <string name="user_agreement">用户协议及隐私说明</string>
     <string name="verification_code_login">验证码登录</string>
     <string name="no_connect_device">无可自动连接设备!</string>
-    <string name="select_icon_dot">请选择图标:</string>
+    <string name="select_icon_dot">选择图标:</string>
     <string name="select_icon">选择图标</string>
     <string name="group_ota">群组升级</string>
-    <string name="get_bin_fail">获取bin文件失败</string>
+    <string name="get_bin_fail">获取文件失败</string>
     <string name="dissupport_ota">该版本不支持OTA</string>
     <string name="get_version_success">获取设备版本成功</string>
     <string name="delete_device_fail">删除设备失败</string>
     <string name="delete_success">删除成功</string>
     <string name="edite_device">编辑设备</string>
     <string name="cancel_edite">取消编辑</string>
-    <string name="sure_delete_device">确定删除此设备?</string>
-    <string name="confim_stop_scan">确定要退出扫描吗?</string>
+    <string name="sure_delete_device">确定删除设备%1$s?</string>
+    <string name="confim_stop_scan">确定要退出扫描?</string>
     <string name="add_device">添加设备</string>
     <string name="set_color">设置颜色</string>
-    <string name="config_return">确定退出配置吗?</string>
+    <string name="config_return">确定退出配置?</string>
+    <string name="selected_group">选择的组</string>
+    <string name="choosed_scene">选择的场景</string>
+    <string name="please_setting_least_one_gp">请至少选择一个群组</string>
+    <string name="please_setting_least_one_scene">请至少选择一个场景</string>
 </resources>

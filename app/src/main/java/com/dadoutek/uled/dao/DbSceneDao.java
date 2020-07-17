@@ -30,6 +30,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         public final static Property Index = new Property(3, int.class, "index", false, "INDEX");
         public final static Property Times = new Property(4, String.class, "times", false, "TIMES");
         public final static Property ImgName = new Property(5, String.class, "imgName", false, "IMG_NAME");
+        public final static Property Checked = new Property(6, boolean.class, "checked", false, "CHECKED");
     }
 
     private DaoSession daoSession;
@@ -53,7 +54,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 2: belongRegionId
                 "\"INDEX\" INTEGER NOT NULL ," + // 3: index
                 "\"TIMES\" TEXT," + // 4: times
-                "\"IMG_NAME\" TEXT);"); // 5: imgName
+                "\"IMG_NAME\" TEXT," + // 5: imgName
+                "\"CHECKED\" INTEGER NOT NULL );"); // 6: checked
     }
 
     /** Drops the underlying database table. */
@@ -87,6 +89,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         if (imgName != null) {
             stmt.bindString(6, imgName);
         }
+        stmt.bindLong(7, entity.getChecked() ? 1L: 0L);
     }
 
     @Override
@@ -114,6 +117,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         if (imgName != null) {
             stmt.bindString(6, imgName);
         }
+        stmt.bindLong(7, entity.getChecked() ? 1L: 0L);
     }
 
     @Override
@@ -135,7 +139,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
             cursor.getLong(offset + 2), // belongRegionId
             cursor.getInt(offset + 3), // index
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // times
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // imgName
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // imgName
+            cursor.getShort(offset + 6) != 0 // checked
         );
         return entity;
     }
@@ -148,6 +153,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         entity.setIndex(cursor.getInt(offset + 3));
         entity.setTimes(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setImgName(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setChecked(cursor.getShort(offset + 6) != 0);
      }
     
     @Override

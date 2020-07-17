@@ -30,12 +30,15 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
+import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -69,6 +72,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -83,7 +87,11 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener ,View.OnClickListener{
-//    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
+    private var deleteDevice: MenuItem? = null
+    private var onlineUpdate: MenuItem? = null
+    private var batchGp: MenuItem? = null
+    private var isDelete: Boolean = false
+    //    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -180,22 +188,15 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         toolbarTv.setText(R.string.group_setting_header)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
+        setMenu()
     }
 
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         searchView!!.clearFocus()
@@ -312,7 +313,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         }
 
         if (group.meshAddr == 0xffff) {
-            toolbarTv.text = getString(R.string.allLight) + " (" + curtainList.size + ")"
+            toolbarTv.text = getString(R.string.allLight)
         } else {
             toolbarTv.text = (group.name ?: "") + " (" + curtainList.size + ")"
         }
@@ -350,33 +351,16 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         adapter?.setNewData(curtainList)
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (group.meshAddr == 0xffff) {
-            menuInflater.inflate(R.menu.menu_search, menu)
-            searchView = (menu!!.findItem(R.id.action_search)).actionView as SearchView
-            searchView!!.setOnQueryTextListener(this)
-            searchView!!.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            searchView!!.queryHint = getString(R.string.input_groupAdress)
-            searchView!!.isSubmitButtonEnabled = true
-            searchView!!.backgroundColor = resources.getColor(R.color.blue)
-            searchView!!.alpha = 0.3f
-//            val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
-            return super.onCreateOptionsMenu(menu)
-        }
-        return true
-    }
-
-
     private fun initView() {
         if (group.meshAddr == 0xffff) {
-            toolbarTv.text = getString(R.string.allLight) + " (" + curtainList.size + ")"
+            toolbarTv.text = getString(R.string.allLight)
         } else {
             toolbarTv.text = (group.name ?: "") + " (" + curtainList.size + ")"
         }
+
         light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 2)
-        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_batch_small_item, curtainList)
+        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in curtainList.indices) {
@@ -386,31 +370,126 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         if(DBUtils.getAllCurtains().size==0){
             light_add_device_btn.text = getString(R.string.device_scan_scan)
         }else{
-            light_add_device_btn.text = getString(R.string.add_device_new)
+            light_add_device_btn.text = getString(R.string.add_device)
+        }
+    }
+
+    private fun setMenu() {
+        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+        batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
+        onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
+        deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+
+        batchGp?.title = getString(R.string.batch_group)
+        onlineUpdate?.title = getString(R.string.online_upgrade)
+        deleteDevice?.title = getString(R.string.edite_device)
+
+        deleteDevice?.isVisible = true
+        batchGp?.isVisible = true
+        toolbar.setOnMenuItemClickListener { itm ->
+            DBUtils.lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
+                else
+                    when (itm.itemId) {
+                        R.id.toolbar_batch_gp -> skipeBatch()
+                        R.id.toolbar_on_line -> goOta()
+                        R.id.toolbar_delete_device -> editeDevice()
+                    }
+            }
+            true
+        }
+    }
+
+    private fun skipeBatch() {
+        when {
+            DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
+            TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
+            else -> ToastUtils.showShort(getString(R.string.connect_fail))
+        }
+    }
+    private fun goOta() {
+        if (DBUtils.getAllCurtains().size == 0)
+            ToastUtils.showShort(getString(R.string.no_device))
+        else
+            startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.SMART_CURTAIN)
+    }
+
+    private fun editeDevice() {
+        isDelete = !isDelete
+        if (isDelete)
+            deleteDevice?.title = getString(R.string.cancel_edite)
+        else
+            deleteDevice?.title = getString(R.string.edite_device)
+
+        adapter?.changeState(isDelete)
+        adapter?.notifyDataSetChanged()
+    }
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        currentCurtain = curtainList[position]
+        positionCurrent = position
+        when (view.id) {
+            R.id.template_device_icon, R.id.template_device_setting -> {
+                if (scanPb.visibility != View.VISIBLE) {
+                    //判断是否为rgb灯
+                    if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
+                        intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
+                    }
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                    intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
+                    intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
+                    startActivityForResult(intent, REQ_LIGHT_SETTING)
+                } else {
+                    ToastUtils.showLong(R.string.reconnecting)
+                }
+            }
+            R.id.template_device_card_delete -> showDeleteSingleDialog(currentCurtain!!)
         }
     }
 
 
+    private fun showDeleteSingleDialog(dbLight: DbCurtain) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
+        builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+            deletePreGroup(dbLight)
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentCurtain = curtainList[position]
-        positionCurrent = position
-    if (view.id == R.id.template_device_icon||view.id == R.id.template_device_setting) {
-            if (scanPb.visibility != View.VISIBLE) {
-                //判断是否为rgb灯
-                if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
-                    intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
-                }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
-                intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
-                startActivityForResult(intent, REQ_LIGHT_SETTING)
-            } else {
-                ToastUtils.showLong(R.string.reconnecting)
-            }
+            DBUtils.updateGroup(group!!)
+
+            dbLight.hasGroup = false
+            dbLight.belongGroupId = 1
+            DBUtils.updateCurtain(dbLight)
+
+            curtainList.remove(dbLight)
+            adapter?.notifyDataSetChanged()
+            setEmptyAndToolbarTV()
+        }
+        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+        val dialog = builder.show()
+        dialog.show()
+    }
+
+    private fun setEmptyAndToolbarTV() {
+        toolbarTv.text = group?.name + "(${group?.deviceCount})"
+        if (curtainList.size > 0) {
+            recycler_view_lights.visibility = View.VISIBLE
+            no_light_ly.visibility = View.GONE
+        } else {
+            recycler_view_lights.visibility = View.GONE
+            no_light_ly.visibility = View.VISIBLE
+        }
+    }
+
+
+    private fun deletePreGroup(dbLight: DbCurtain) {
+        if (DBUtils.getGroupByID(dbLight!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(dbLight!!.belongGroupId!!)?.meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())//0x00表示删除组
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dbLight.meshAddr, params)
         }
     }
 
@@ -859,4 +938,5 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         }
     }
 }
+
 

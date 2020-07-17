@@ -123,7 +123,7 @@
             android:layout_height="17dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="-8dp"
-            android:src="@drawable/icon_minus"
+            android:src="@drawable/icon_delete_red"
             android:visibility="invisible" />
 
 </RelativeLayout>

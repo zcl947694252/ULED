@@ -49,6 +49,10 @@ import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.fusesource.hawtdispatch.Dispatch
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 import kotlin.collections.ArrayList
@@ -61,11 +65,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
     private var isReConfirm: Boolean = false
-    private lateinit var renameDialog: Dialog
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
     private var renameEditText: EditText? = null
-    private var popReNameView: View? = null
     private var fiRename: MenuItem? = null
     private var fiVersion: MenuItem? = null
     private lateinit var mScenes: List<DbScene>
@@ -151,14 +151,17 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 .subscribe({
                                     deleteData()
                                 }, {
-                                    showDialogHardDelete?.dismiss()
-                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                showLoadingDialog(getString(R.string.please_wait))
-                                                deleteData()
-                                            }
-                                            .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
+                                  GlobalScope.launch(Dispatchers.Main){
+                                    /*    showDialogHardDelete?.dismiss()
+                                      showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                              .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                  showLoadingDialog(getString(R.string.please_wait))
+                                                  deleteData()
+                                              }
+                                              .setNegativeButton(R.string.btn_cancel, null)
+                                              .show()*/
+                                    deleteData()
+                                    }
                                 })
                     }
                 }

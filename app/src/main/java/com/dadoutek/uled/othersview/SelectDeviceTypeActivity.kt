@@ -9,6 +9,7 @@ import com.dadoutek.uled.device.model.DeviceItem
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
 import com.dadoutek.uled.util.StringUtils
+import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -48,6 +49,9 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
 
 
      fun initListener() {
+         install_see_helpe.setOnClickListener {
+             seeHelpe()
+         }
         deviceAdapter.setOnItemClickListener { _, _, position ->
             when (position) {
                 INSTALL_GATEWAY -> {

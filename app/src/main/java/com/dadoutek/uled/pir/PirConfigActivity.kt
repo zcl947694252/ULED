@@ -2,7 +2,6 @@ package com.dadoutek.uled.pir
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -21,7 +20,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -44,6 +42,7 @@ import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.StringUtils.*
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -55,6 +54,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.singleLine
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -73,15 +73,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
     private var fiVersion: MenuItem? = null
-    private lateinit var renameDialog: Dialog
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
-    private var popReNameView: View? = null
     private var version: String = ""
     private var timeDispsable: Disposable? = null
     private var connectDisposable: Disposable? = null
-    private var timeUnitType: Int = 1// 1 代表分 0代表秒
+    private var timeUnitType: Int = 0// 1 代表分 0代表秒
     private var triggerAfterShow: Int = 0//0 开 1关 2自定义
     private var triggerKey: Int = 0//0全天    1白天   2夜晚
     private var customBrightnessNum: Int = 0
@@ -106,20 +101,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pir_new)
         initView()
-        makePopuwindow()
         initData()
         initListener()
-    }
-
-    private fun makePopuwindow() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
-
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -173,14 +156,14 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             pir_config_choose_scene_ly.visibility = View.GONE
             pir_config_trigger_after_ly.visibility = View.VISIBLE
             pir_config_trigger_after_view.visibility = View.VISIBLE
-            pir_config_select_title.text = getString(R.string.select_group)
+            pir_config_select_title.text = getString(R.string.selected_group)
             showBottomList.addAll(showGroupList)
         } else {
             pir_config_choose_group_ly.visibility = View.GONE
             pir_config_choose_scene_ly.visibility = View.VISIBLE
             pir_config_trigger_after_ly.visibility = View.GONE
             pir_config_trigger_after_view.visibility = View.GONE
-            pir_config_select_title.text = getString(R.string.choose_scene)
+            pir_config_select_title.text = getString(R.string.choosed_scene)
             setItemScene()
         }
         bottomGvAdapter.notifyDataSetChanged()
@@ -516,20 +499,24 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        showLoadingDialog(getString(R.string.please_wait))
-                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                                .subscribe({
+                        GlobalScope.launch (Dispatchers.Main){
+                            showLoadingDialog(getString(R.string.please_wait))
+                            disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                    .subscribe({
                                     deleteData()
-                                }, {
-                                    showDialogHardDelete?.dismiss()
-                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                showLoadingDialog(getString(R.string.please_wait))
-                                                deleteData()
-                                            }
-                                            .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
-                                })
+                                    }, {
+                                        GlobalScope.launch(Dispatchers.Main){
+                                            /*    showDialogHardDelete?.dismiss()
+                                              showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                      .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                          showLoadingDialog(getString(R.string.please_wait))
+                                                          deleteData()
+                                                      }
+                                                      .setNegativeButton(R.string.btn_cancel, null)
+                                                      .show()*/
+                                            deleteData()
+                                        } })
+                        }
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
@@ -601,18 +588,18 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(dbSensor: DbSensor) {
-        StringUtils.initEditTextFilter(renameEditText)
+        initEditTextFilter(textGp)
         if (dbSensor.name != "" && dbSensor.name != null)
-            renameEditText?.setText(dbSensor.name)
+            textGp?.setText(dbSensor.name)
         else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
+            textGp?.setText(getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        textGp?.setSelection(textGp?.text.toString().length)
 
         renameConfirm?.setOnClickListener {  // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+                dbSensor.name = textGp?.text.toString().trim { it <= ' ' }
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
@@ -623,7 +610,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog.setOnDismissListener {
-            dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
+            dbSensor.name = textGp?.text.toString().trim { it <= ' ' }
             saveSensor(dbSensor, true)
             configureComplete()
         }
@@ -712,8 +699,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun setBrightness() {
         val textGp = EditText(this)
         textGp.inputType = InputType.TYPE_CLASS_NUMBER
-        textGp.maxLines = 3
-        StringUtils.initEditTextFilter(textGp)
+        textGp.singleLine = true
+        initEditTextFilter(textGp)
         AlertDialog.Builder(this)
                 .setTitle(R.string.target_brightness)
                 .setView(textGp)

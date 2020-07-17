@@ -105,13 +105,19 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         this.typeStr = this.intent.extras!!.getString(Constant.TYPE_VIEW)
         if (typeStr == Constant.TYPE_GROUP) {
             this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
-            if (curtainGroup != null) {
+            if (curtainGroup != null)
                 when (curtainGroup!!.meshAddr) {
                     0xffff -> toolbarTv.text = getString(R.string.allLight)
                     else -> toolbarTv.text = curtainGroup?.name
                 }
+
+            img_function1.setImageResource(R.drawable.icon_editor)
+            img_function1.visibility = View.VISIBLE
+            img_function1.setOnClickListener {
+                renameGp()
             }
         } else {
+            img_function1.visibility = View.GONE
             currentShowGroupSetPage = false
             initMeshDresData()
             getVersion()
@@ -177,42 +183,44 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun renameGp() {
-        val textGp = EditText(this)
-        textGp.setText(curtainGroup?.name)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this@WindowCurtainsActivity)
-                .setTitle(R.string.rename)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {    // 获取输入框的内容
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        var name = textGp.text.toString().trim { it <= ' ' }
-                        var canSave = true
-                        val groups = DBUtils.allGroups
-                        for (i in groups.indices) {
-                            if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
-                                canSave = false
-                                break
-                            }
-                        }
+        if (!TextUtils.isEmpty(curtainGroup?.name))
+            textGp?.setText(curtainGroup?.name)
+        textGp?.setSelection(textGp?.text.toString().length)
 
-                        if (canSave) {
-                            curtainGroup?.name = textGp.text.toString().trim { it <= ' ' }
-                            DBUtils.updateGroup(curtainGroup!!)
-                            toolbarTv.text = curtainGroup?.name
-                            dialog.dismiss()
-                        }
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                var name = textGp?.text.toString().trim { it <= ' ' }
+                var canSave = true
+                val groups = DBUtils.allGroups
+                for (i in groups.indices) {
+                    if (groups[i].name == name) {
+                        ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
+                        canSave = false
+                        break
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+
+                if (canSave) {
+                    curtainGroup?.name = textGp?.text.toString().trim { it <= ' ' }
+                    DBUtils.updateGroup(curtainGroup!!)
+                    toolbarTv.text = curtainGroup?.name
+                    renameDialog.dismiss()
+                }
+            }
+        }
     }
 
 
     private fun removeGroup() {
-        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
+        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+                .setMessage(getString(R.string.delete_group_confirm,curtainGroup?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     showLoadingDialog(getString(R.string.deleting))
                     deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
@@ -350,31 +358,34 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun renameLight() {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(curtain?.name)
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this@WindowCurtainsActivity)
-                .setTitle(R.string.rename)
-                .setView(textGp)
+        if (!TextUtils.isEmpty(curtain?.name))
+            textGp?.setText(curtain?.name)
+        textGp?.setSelection(textGp?.text.toString().length)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        curtain?.name = textGp.text.toString().trim { it <= ' ' }
-                        DBUtils.updateCurtain(curtain!!)
-                        toolbarTv.text = curtain?.name
-                        dialog.dismiss()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                curtain?.name = textGp?.text.toString().trim { it <= ' ' }
+                DBUtils.updateCurtain(curtain!!)
+                toolbarTv.text = curtain?.name
+                renameDialog.dismiss()
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (currentShowGroupSetPage) {
-            menuInflater.inflate(R.menu.menu_curtain_group, menu)
+            //menuInflater.inflate(R.menu.menu_curtain_group, menu)
+           // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+            //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
+            //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
         } else {
             menuInflater.inflate(R.menu.menu_curtain_setting, menu)
             fiVersion = menu?.findItem(R.id.toolbar_c_version)
@@ -776,7 +787,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     fun remove() {
-        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
+        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device,curtain?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val deviceMeshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
@@ -786,14 +797,17 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                     LogUtils.v("zcl-----恢复出厂成功")
                                     deleteData()
                                 }, {
-                                    showDialogHardDelete?.dismiss()
-                                    showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                showLoadingDialog(getString(R.string.please_wait))
-                                                deleteData()
-                                            }
-                                            .setNegativeButton(R.string.btn_cancel, null)
-                                            .show()
+                                    GlobalScope.launch(Dispatchers.Main){
+                                        /*    showDialogHardDelete?.dismiss()
+                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                      showLoadingDialog(getString(R.string.please_wait))
+                                                      deleteData()
+                                                  }
+                                                  .setNegativeButton(R.string.btn_cancel, null)
+                                                  .show()*/
+                                        deleteData()
+                                    }
                                 })
 
                     } else ToastUtils.showLong(getString(R.string.bluetooth_open_connet))

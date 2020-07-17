@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -21,7 +22,10 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.AppUtils
@@ -131,7 +135,14 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     var isScenning: Boolean = true
     var isEdite: Boolean = false
     var type: Int? = null
-    var showDialogHardDelete:AlertDialog? = null
+    var showDialogHardDelete: AlertDialog? = null
+
+    var renameCancel: TextView? = null
+    var renameConfirm: TextView? = null
+    var textGp: EditText? = null
+    var popReNameView: View? = null
+    lateinit var renameDialog: Dialog
+
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,6 +155,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         registerReceiver(netWorkChangReceiver, filter)
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
+        makeRenamePopuwindow()
         makeStopScanPop()
         makeDialog()
         initStompReceiver()
@@ -158,18 +170,27 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 //        registerReceiver(changeRecevicer, filter)
     }
 
-    fun startTimerUpdate() {
+    private fun startTimerUpdate() {
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
-            SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
-                override fun start() {}
-                override fun complete() {
-                    LogUtils.v("zcl-----------默认上传成功-------")
-                }
+            if (netWorkCheck(this))
+                SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
+                    override fun start() {}
+                    override fun complete() {
+                        LogUtils.v("zcl-----------默认上传成功-------")
+                    }
 
-                override fun error(msg: String?) {}
-            })
+                    override fun error(msg: String?) {}
+                })
         }
     }
+
+    // 网络连接判断
+    open fun netWorkCheck(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val info: NetworkInfo? = cm.activeNetworkInfo
+        return info?.isConnected ?: false
+    }
+
 
     fun stopTimerUpdate() {
         upDateTimer?.dispose()
@@ -1100,5 +1121,18 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
+    private fun makeRenamePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+        StringUtils.initEditTextFilter(textGp)
+
+        renameDialog = Dialog(this)
+        renameDialog?.setContentView(popReNameView)
+        renameDialog?.setCanceledOnTouchOutside(false)
+        renameCancel?.setOnClickListener { renameDialog?.dismiss() }
+        //确定回调 单独写
+    }
 }
 

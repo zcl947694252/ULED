@@ -2,6 +2,7 @@ package com.dadoutek.uled.fragment
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -63,6 +64,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.group_list_fragment.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.runOnUiThread
@@ -99,11 +101,17 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var compositeDisposable = CompositeDisposable()
     private var isDeleteSucess = false
 
+    var renameCancel: TextView? = null
+    var renameConfirm: TextView? = null
+    var textGp: EditText? = null
+    var popReNameView: View? = null
+    lateinit var renameDialog: Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
         setHasOptionsMenu(true)
+        makeRenamePopuwindow()
         localBroadcastManager = LocalBroadcastManager.getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("back")
@@ -195,6 +203,20 @@ abstract class BaseGroupFragment : BaseFragment() {
         return view
     }
 
+    private fun makeRenamePopuwindow() {
+        popReNameView = View.inflate(mContext, R.layout.pop_rename, null)
+        textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+        StringUtils.initEditTextFilter(textGp)
+
+        renameDialog = Dialog(mContext)
+        renameDialog?.setContentView(popReNameView)
+        renameDialog?.setCanceledOnTouchOutside(false)
+        renameCancel?.setOnClickListener { renameDialog?.dismiss() }
+        //确定回调 单独写
+    }
+
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.group_list_fragment, null)
@@ -203,7 +225,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         recyclerView = view.findViewById(R.id.group_recyclerView)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
-        seehelp = view.findViewById<TextView>(R.id.group_see_helpe)
+        seehelp = view.findViewById(R.id.group_see_helpe)
         viewLineRecycler = view.findViewById(R.id.viewLine)
 
         lin = LayoutInflater.from(activity).inflate(R.layout.template_add_help, null)
@@ -437,41 +459,44 @@ abstract class BaseGroupFragment : BaseFragment() {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
-                    if (isLight && position == 0) {
-                        if (TelinkLightApplication.getApp().connectDevice != null) {
-                            val intentSetting = Intent(context, NormalSettingActivity::class.java)
-                            intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                            intentSetting.putExtra("group", DBUtils.allGroups[0])
-                            startActivityForResult(intentSetting, 1)
-                        } else {
-                            ToastUtils.showShort(getString(R.string.device_not_connected))
-                            val activity = activity as MainActivity
-                            activity.autoConnect()
-                        }
-                    } else if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType)) {
-                        var num = 0
-                        when (groupType) {
-                            Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
-                            Constant.DEVICE_TYPE_LIGHT_RGB -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
-                            //蓝牙接收器
-                            Constant.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
-                            Constant.DEVICE_TYPE_CURTAIN -> num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
-                        }
-
-                        if (num != 0) {
-                            var intent: Intent? = null
-                            when (groupType) {
-                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
-                                Constant.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
-                                //蓝牙接收器
-                                Constant.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                                Constant.DEVICE_TYPE_CURTAIN -> intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                    when {
+                        isLight && position == 0 -> {
+                            if (TelinkLightApplication.getApp().connectDevice != null) {
+                                val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                                intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intentSetting.putExtra("group", DBUtils.allGroups[0])
+                                startActivityForResult(intentSetting, 1)
+                            } else {
+                                ToastUtils.showShort(getString(R.string.device_not_connected))
+                                val activity = activity as MainActivity
+                                activity.autoConnect()
                             }
-                            intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                            intent?.putExtra("group", currentGroup)
-                            when (TelinkLightApplication.getApp().connectDevice) {
-                                null -> goConnect()
-                                else -> startActivityForResult(intent, 2)
+                        }
+                        currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType) -> {
+                            var num = 0
+                            when (groupType) {
+                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                Constant.DEVICE_TYPE_LIGHT_RGB -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                //蓝牙接收器
+                                Constant.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
+                                Constant.DEVICE_TYPE_CURTAIN -> num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
+                            }
+
+                            if (num != 0) {
+                                var intent: Intent? = null
+                                when (groupType) {
+                                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
+                                    Constant.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
+                                    //蓝牙接收器
+                                    Constant.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                                    Constant.DEVICE_TYPE_CURTAIN -> intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                                }
+                                intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intent?.putExtra("group", currentGroup)
+                                when (TelinkLightApplication.getApp().connectDevice) {
+                                    null -> goConnect()
+                                    else -> startActivityForResult(intent, 2)
+                                }
                             }
                         }
                     }
@@ -509,7 +534,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     private fun deleteSingleGroup(dbGroup: DbGroup) {
         AlertDialog.Builder(mContext)
-                .setMessage(R.string.delete_group_confirm)
+                .setMessage(getString(R.string.delete_group_confirm,dbGroup?.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     val lights = DBUtils.getLightByGroupID(dbGroup.id)
                     showLoadingDialog(getString(R.string.please_wait))
@@ -519,7 +544,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 hideLoadingDialog()
                                 sendDeleteBrocastRecevicer(300)
                                 refreshData()
-                                ToastUtils.showShort(getString(R.string.delete_success))
                             },
                             failedCallback = {
                                 hideLoadingDialog()
@@ -601,41 +625,31 @@ abstract class BaseGroupFragment : BaseFragment() {
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
-            else {
-                when (TelinkLightApplication.getApp().connectDevice) {
-                    null -> ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                    else -> addNewGroup()
-                }
-            }
+            else
+                addNewGroup()
         }
     }
 
+
     private fun addNewGroup() {
-        val textGp = EditText(activity)
         StringUtils.initEditTextFilter(textGp)
-        textGp.setText(DBUtils.getDefaultNewGroupName())
-        //设置光标默认在最后
-        textGp.setSelection(textGp.text.toString().length)
-        AlertDialog.Builder(activity)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    when {
-                        StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' }) -> {  // 获取输入框的内容
-                            ToastUtils.showLong(getString(R.string.rename_tip_check))
-                        }
-                        else -> {//往DB里添加组数据
-                            val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, setGroupType())
-                            dbGroup?.let {
-                                groupList?.add(it)
-                            }
-                            refreshData()
-                            dialog.dismiss()
-                        }
-                    }
+        if (this != null && mContext?.isFinishing == false) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else{//往DB里添加组数据
+                val dbGroup = DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, setGroupType())
+                dbGroup?.let {
+                    groupList?.add(it)
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                refreshData()
+                renameDialog.dismiss()
+            }
+        }
     }
 
     abstract fun setGroupType(): Long

@@ -12,6 +12,17 @@
 
     <include layout="@layout/template_recycleview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:padding="@dimen/dp_10"/>
+    <TextView
+            android:id="@+id/install_see_helpe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_10"
+            android:gravity="center"
+            android:text="@string/see_help"
+            android:textColor="@color/black_three"
+            android:layout_marginBottom="@dimen/dp_10"
+            android:textSize="17sp" />
 </LinearLayout>

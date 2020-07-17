@@ -124,6 +124,7 @@
                 android:layout_marginEnd="@dimen/dp_10"
                 android:layout_weight="1"
                 android:text="100%"
+                android:visibility="gone"
                 android:gravity="center_vertical|end"
                 android:textColor="@color/black_three"
                 android:textSize="15sp" />
@@ -172,6 +173,7 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
+                android:visibility="gone"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -197,29 +199,25 @@
 
     </LinearLayout>
 
-
+<include layout="@layout/template_see_help"
+        android:id="@+id/see_help_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/sbSpeed_ly"/>
     <Button
             android:id="@+id/saveNode"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:layout_marginLeft="38dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="38dp"
             android:background="@drawable/rect_blue_5"
             android:elevation="20dp"
             android:text="@string/save"
             android:textColor="@color/black_three"
             android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@+id/sbSpeed_ly" />
-
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/saveNode" />
-
+            app:layout_constraintTop_toBottomOf="@+id/see_help_ly"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

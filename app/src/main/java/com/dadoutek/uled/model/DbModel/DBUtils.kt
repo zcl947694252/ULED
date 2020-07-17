@@ -613,6 +613,11 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
+    fun getCurtainByGroupMesh(mesh: Int): ArrayList<DbCurtain> {
+        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.BelongGroupId.eq(mesh)).build()
+        return ArrayList(query.list())
+    }
+
     fun getCurtainByGroupID(id: Long): ArrayList<DbCurtain> {
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())

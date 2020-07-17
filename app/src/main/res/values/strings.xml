@@ -145,7 +145,6 @@
     <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
     <string name="delete_group">Delete group</string>
     <string name="rename_the_group">Rename the group</string>
-    <string name="input_rename_text_tip">Please enter a new group name:</string>
     <string name="hint_input">Please enter. . .</string>
     <string name="confirm">OK</string>
     <string name="group_name_setting">Group name setting</string>
@@ -165,7 +164,7 @@
     <string name="connecting_please_wait">connecting, please wait…</string>
     <string name="connect_success">Connection succeeded!</string>
     <string name="connect_fail">Disconnect </string>
-    <string name="device_not_connected">The device is not connected!</string>
+    <string name="device_not_connected">Please check bluetooth!</string>
     <string name="please_wait">Please wait…</string>
 
     <string name="smartSwitch">switch</string>
@@ -268,8 +267,7 @@
     <string name="network_error">Network Error</string>
     <string name="network_unavailable">Network unavailable.Check your network settings.</string>
     <string name="network_time_out">Network connection timed out, please try again.</string>
-    <string name="delete_light_confirm">Confirm the light reset?</string>
-    <string name="delete_group_confirm">Confirm delete this group?</string>
+    <string name="delete_group_confirm">Sure delete group :%1$s?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number cannot be empty!</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="app_version_name">Version:</string>
@@ -474,7 +472,7 @@
     <string name="stop">Stop</string>
     <string name="stopping">Stopping…</string>
         
-    <string name="rename">Rename </string>
+    <string name="rename">Please enter the name </string>
         
         
     <string name="firmware_version">Firmware version: </string>
@@ -692,7 +690,7 @@
     <string name="stop_model">stop</string>
     <string name="white_light_regulation">White light:</string>
     <string name="bright_regulation">Bright:</string>
-    <string name="mode_name">Mode name:</string>
+    <string name="mode_name">Name:</string>
     <string name="please_mode_name">please enter mode name:</string>
     <string name="no_color">No</string>
     <string name="speed_regulation">Speed regulation:</string>
@@ -791,7 +789,6 @@
     <string name="version_disabled">This version is not available</string>
     <string name="syncing_relogin">Please login again in sync data</string>
     <string name="in_use">in_use</string>
-    <string name="use">use</string>
     <string name="creater_name">Creator: </string>
     <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
     <string name="input_region_name">Please enter a zone name</string>
@@ -799,7 +796,7 @@
     <string name="developer_mode_open">Developer mode is on</string>
     <string name="apply">apply</string>
     <string name="in_apply">applied</string>
-    <string name="scene_apply_success">Scene apply success</string>
+    <string name="scene_apply_success"> Apply success</string>
     <string name="network">authorization management</string>
     <string name="transfer_accounts">Transfer A/C</string>
     <string name="start_change_region">Start switching area</string>
@@ -889,7 +886,7 @@
     <string name="compatible_mode">compatible_mode</string>
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
-    <string name="grouping_success_tip">After successful regrouping of devices, please save the scene related to the grouping device again</string>
+    <string name="grouping_success_tip">After changing the grouping, enter the associated scenario and save again!</string>
     <string name="timeout_period_is_empty">The timeout period is empty</string>
     <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
     <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
@@ -1076,16 +1073,21 @@
     <string name="select_icon_dot">Select the icon:</string>
     <string name="select_icon">Select the icon</string>
     <string name="group_ota">Group to upgrade</string>
-    <string name="get_bin_fail">Failed to get the bin file</string>
+    <string name="get_bin_fail">Failed to get the  file</string>
     <string name="dissupport_ota">Otas are not supported in this release</string>
     <string name="get_version_success">This version does not support OTA capture of device version success</string>
     <string name="delete_device_fail">Device deletion failed</string>
     <string name="delete_success">deleted successfully</string>
     <string name="edite_device">Edit equipment</string>
     <string name="cancel_edite">Cancel the editor</string>
-    <string name="sure_delete_device">Are you sure to delete this device?</string>
+    <string name="sure_delete_device">Are you sure to delete  device:%1$s?</string>
     <string name="confim_stop_scan">Are you sure you want to exit the scan?</string>
     <string name="add_device">Add Device</string>
     <string name="set_color">Set colors</string>
-    <string name="config_return">确定退出配置吗?</string>
+    <string name="config_return">Are you sure to exit the configuration?</string>
+    <string name="selected_group">The selected group</string>
+    <string name="choosed_scene">The selected scene</string>
+    <string name="please_setting_least_one_gp">Please select at least one group</string>
+    <string name="please_setting_least_one_scene">Please select at least one scene</string>
+
 </resources>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
@@ -15,9 +16,12 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
 
 abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
+    lateinit var dialogTv: TextView
+    var builder: AlertDialog.Builder? = null
     var dialogDelete: AlertDialog? = null
     var deleteDeviceAll: MenuItem? = null
     private var onlineUpdateAll: MenuItem? = null
@@ -154,13 +158,12 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     }
 
     private fun makeDeleteDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage(R.string.sure_delete_device)
-        builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
+        builder = AlertDialog.Builder(this)
+        //dialogTv.setText(getString(R.string.sure_delete_device))
+        builder?.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             setPositiveBtn()
         }
-        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-        dialogDelete = builder.create()
+        builder?.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
     }
 
     abstract fun setPositiveBtn()

@@ -55,7 +55,7 @@ public class DbCurtain implements Serializable {
     public int textColor;//文字颜色
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_curtain;//灯状态显示图
+    public int icon = R.drawable.icon_curtain_device;//灯状态显示图
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int connectionStatus = 1;//链接状态
@@ -249,11 +249,11 @@ public class DbCurtain implements Serializable {
     public void updateIcon() {
 
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_curtain;
+            this.icon = R.drawable.icon_curtain_off;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.curtain_off;
+            this.icon = R.drawable.icon_curtain_off;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_curtain;
+            this.icon = R.drawable.icon_curtain_device;
         }
     }
     public String getGroupName() {

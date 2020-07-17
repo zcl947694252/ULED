@@ -10,11 +10,8 @@ import com.dadoutek.uled.tellink.TelinkLightApplication;
 
 import java.util.List;
 
-public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
-        DbConnector, BaseViewHolder> {
-    public ConnectorOfGroupRecyclerViewAdapter(List<DbConnector> data) {
-        super(data);
-    }
+public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<DbConnector, BaseViewHolder> {
+    private Boolean isDelete = false;
 
     public ConnectorOfGroupRecyclerViewAdapter(int layoutResId, List<DbConnector> data) {
         super(layoutResId, data);
@@ -23,7 +20,6 @@ public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapte
     @Override
     protected void convert(BaseViewHolder helper, DbConnector item) {
         TextView tvName=helper.getView(R.id.template_device_group_name);
-
         if(TelinkLightApplication.Companion.getApp().getConnectDevice() == null){
             tvName.setTextColor(mContext.getResources().getColor(R.color.black));
         }else{
@@ -33,9 +29,7 @@ public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapte
                 tvName.setTextColor(mContext.getResources().getColor(R.color.gray));
             }
         }
-
         tvName.setText(item.getName());
-
    /*     GradientDrawable myGrad = (GradientDrawable)tvRgbColor.getBackground();
         if(item.getColor()==0||item.getColor()==0xffffff){
             tvRgbColor.setVisibility(View.GONE);
@@ -45,10 +39,20 @@ public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapte
         }*/
 
         helper.addOnClickListener(R.id.template_device_setting)
-                .setTag(R.id.template_device_setting,helper.getAdapterPosition())
-                .setTag(R.id.template_device_icon,helper.getAdapterPosition())
-                .setVisible(R.id.template_device_more,false)
-                .setBackgroundRes(R.id.template_device_icon,item.icon)
-                .addOnClickListener(R.id.template_device_icon);
+                .setTag(R.id.template_device_setting, helper.getAdapterPosition())
+                .setVisible(R.id.template_device_more, false)
+                .setVisible(R.id.template_device_card_delete, isDelete)
+                .setVisible(R.id.template_gp_name, false)
+                .setTag(R.id.template_device_icon, helper.getAdapterPosition())
+                .addOnClickListener(R.id.template_device_icon)
+                .addOnClickListener(R.id.template_device_card_delete);
+    }
+
+    /**
+     * 改变状态
+     * @param isDelete  是否处于删除状态
+     */
+    public void  changeState( Boolean  isDelete) {
+        this.isDelete = isDelete;
     }
 }

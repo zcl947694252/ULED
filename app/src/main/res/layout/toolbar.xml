@@ -30,6 +30,8 @@
                 android:id="@+id/toolbarTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxWidth="100dp"
+                android:singleLine="true"
                 android:layout_gravity="center"
                 android:textColor="@color/gray_3"
                 android:textSize="20sp"
@@ -75,6 +77,7 @@
         <ImageView
                 android:id="@+id/image_bluetooth"
                 android:layout_width="wrap_content"
+                android:maxWidth="@dimen/dp_50"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:foreground="?android:attr/selectableItemBackground"

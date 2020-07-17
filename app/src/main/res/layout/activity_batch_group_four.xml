@@ -298,7 +298,7 @@
                     android:layout_marginBottom="8dp"
                     android:background="@drawable/btn_rec_black_bt"
                     android:clickable="false"
-                    android:text="@string/set_group"
+                    android:text="@string/sure_group"
                     android:textColor="@android:color/white"
                     android:visibility="visible" />
         </LinearLayout>

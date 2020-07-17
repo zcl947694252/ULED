@@ -1,27 +1,21 @@
 package com.dadoutek.uled.switches
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
 import android.text.TextUtils
 import android.view.KeyEvent
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toolbar
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
@@ -47,7 +41,6 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_switch_group.*
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -150,15 +143,15 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     private fun makePop() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
+        textGp = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
         renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
                 if (this != null && !this.isFinishing) {
                     renameDialog?.dismiss()
@@ -176,7 +169,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()

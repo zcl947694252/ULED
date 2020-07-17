@@ -31,11 +31,12 @@ import kotlinx.android.synthetic.main.empty_view.no_device_relativeLayout
 import kotlinx.android.synthetic.main.template_device_detail_list.*
 import kotlinx.android.synthetic.main.template_device_detail_list.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.singleLine
+
 /**
  * 蓝牙接收器列表
  */
@@ -44,7 +45,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     private val relayDatas: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
     private var adaper: DeviceDetailConnectorAdapter? = null
-    private var currentLight: DbConnector? = null
+    private var currentDevice: DbConnector? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
@@ -68,7 +69,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     }
 
     override fun setPositiveBtn() {
-        currentLight?.let {
+        currentDevice?.let {
             DBUtils.deleteConnector(it)
             relayDatas.remove(it)
         }
@@ -131,7 +132,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.relay) + " (" + relayDatas.size + ")"
+        toolbarTv.text = getString(R.string.relay)
 
     }
 
@@ -169,6 +170,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
@@ -218,7 +220,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentLight = relayDatas?.get(position)
+        currentDevice = relayDatas?.get(position)
         positionCurrent = position
         Opcode.LIGHT_ON_OFF
         val unit = when (view.id) {
@@ -227,25 +229,25 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                     autoConnect()
                 } else {
                     canBeRefresh = true
-                    if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                        if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                            Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                    if (currentDevice!!.connectionStatus == ConnectionStatus.OFF.value) {
+                        if (currentDevice!!.productUUID == DeviceType.SMART_CURTAIN) {
+                            Commander.openOrCloseCurtain(currentDevice!!.meshAddr, true, false)
                         } else {
-                            Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                            Commander.openOrCloseLights(currentDevice!!.meshAddr, true)
                         }
 
-                        currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                        currentDevice!!.connectionStatus = ConnectionStatus.ON.value
                     } else {
-                        if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                            Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                        if (currentDevice!!.productUUID == DeviceType.SMART_CURTAIN) {
+                            Commander.openOrCloseCurtain(currentDevice!!.meshAddr, false, false)
                         } else {
-                            Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                            Commander.openOrCloseLights(currentDevice!!.meshAddr, false)
                         }
-                        currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                        currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
                     }
 
-                    currentLight!!.updateIcon()
-                    DBUtils.updateConnector(currentLight!!)
+                    currentDevice!!.updateIcon()
+                    DBUtils.updateConnector(currentDevice!!)
                     runOnUiThread {
                         adapter?.notifyDataSetChanged()
                     }
@@ -261,19 +263,23 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                             autoConnect()
                         } else {
                             var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                            if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                            if (currentDevice?.productUUID == DeviceType.LIGHT_RGB) {
                                 intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
                                 intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
                             }
-                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
+                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
                             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         }
                     }
                 }
             }
-            R.id.template_device_card_delete-> dialogDelete?.show()
+            R.id.template_device_card_delete-> {
+                val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                builder?.setMessage(string)
+                builder?.create()?.show()
+            }
             else -> ToastUtils.showLong(R.string.reconnecting)
         }
     }
@@ -386,7 +392,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         relayDatas.clear()
         relayDatas.addAll(mNewDatas)
 
-        toolbarTv.text = getString(R.string.relay) + " (" + relayDatas.size + ")"
 //        adaper!!.setNewData(lightsData)
         adaper?.notifyDataSetChanged()
 

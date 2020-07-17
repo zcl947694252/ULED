@@ -6,8 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -27,7 +25,6 @@ import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
-import kotlinx.android.synthetic.main.activity_scene_switch_group.*
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -769,10 +766,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchData?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                switchData?.name = textGp?.text.toString().trim { it <= ' ' }
                 if (switchData == null)
                     switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
                 if (switchData != null)
@@ -790,7 +787,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog?.setOnDismissListener {
-            switchData?.name = renameEditText?.text.toString().trim { it <= ' ' }
+            switchData?.name = textGp?.text.toString().trim { it <= ' ' }
             if (switchData != null)
                 DBUtils.updateSwicth(switchData!!)
             SyncDataPutOrGetUtils.syncPutDataStart(this!!, object : SyncCallback {

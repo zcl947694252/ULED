@@ -156,7 +156,7 @@
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/rect_gray_22"
                     android:gravity="center"
-                    android:text="@string/use"
+                    android:text="@string/confirm"
                     android:textColor="@color/gray_3"
                     android:textSize="18sp" />
 
