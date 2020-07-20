@@ -12,8 +12,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DBUtils.allGroups
-import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
 import com.dadoutek.uled.model.DbModel.DbGroup
 import kotlinx.android.synthetic.main.choose_group_scene.*
 import kotlinx.android.synthetic.main.template_recycleview.*
@@ -53,8 +51,12 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
         elements.removeAt(0)
         groupList.addAll(elements)
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
-        type = intent.extras.get(Constant.EIGHT_SWITCH_TYPE) as Int
-        deviceType = intent.extras.get(Constant.DEVICE_TYPE) as Int
+        val get = intent.extras.get(Constant.EIGHT_SWITCH_TYPE)
+        if (get!=null)
+        type = get as Int
+        val get1 = intent.extras.get(Constant.DEVICE_TYPE)
+        if (get1!=null)
+        deviceType = get1 as Int
 
         isGroup = type == 0 || type == 2
         when (type) {
@@ -84,8 +86,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-        val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        template_recycleView?.layoutManager = linearLayoutManager
+       // val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //template_recycleView?.layoutManager = linearLayoutManager
     }
 
     private fun initListener() {

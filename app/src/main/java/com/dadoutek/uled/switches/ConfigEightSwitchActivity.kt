@@ -628,7 +628,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     name = group.name
                 }
                 else -> {
-                    val scene = data?.getParcelableExtra<DbScene>("data")
+                    val scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                     //var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                    scene?.let {
                        sceneMap[configButtonTag] = it
@@ -849,16 +849,16 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         }
         if (isCanClick) {
-            if (configSwitchType == 1){
-                startActivityForResult(Intent(this, SelectSceneListActivity::class.java), requestCodeNum)
-            }else{
+           /* if (configSwitchType == 1){
+                startActivityForResult(Intent(this@GwTimerPeriodListActivity, SelectSceneListActivity::class.java), requestCodes)
+            }else{*/
             val intent = Intent(this@ConfigEightSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
             bundle.putInt(Constant.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组
             bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
-            }
+            //}
         }
     }
 }

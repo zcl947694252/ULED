@@ -172,7 +172,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                         showLoadingDialog(getString(R.string.please_wait))
                         disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
                                 .subscribe({
-                                    deleteData()
+                                  //  deleteData()
                                 }, {
                                     GlobalScope.launch(Dispatchers.Main)  {/*showDialogHardDelete?.dismiss()
                                     showDialogHardDelete = android.app.AlertDialog.Builder(this@HumanBodySensorActivity).setMessage(R.string.delete_device_hard_tip)
@@ -182,9 +182,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                             }
                                             .setNegativeButton(R.string.btn_cancel, null)
                                             .show()*/
-                                        deleteData()
                                     }
                                 })
+                                        deleteData()
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)

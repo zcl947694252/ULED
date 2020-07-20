@@ -55,8 +55,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var batchGp: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var group: DbGroup? = null
-    private lateinit var lightList: MutableList<DbLight>
-    private var deviceAdapter: LightsOfGroupRecyclerViewAdapter? = null
+    private  var lightList: MutableList<DbLight> = mutableListOf()
+    private var deviceAdapter: LightsOfGroupRecyclerViewAdapter? = LightsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
     private var positionCurrent: Int = 0
     private var currentLight: DbLight? = null
     private var searchView: SearchView? = null
@@ -180,18 +180,18 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         val gp = this.intent.extras!!.get("group")
         if (gp != null) group = gp as DbGroup
         deviceType = group?.deviceType?.toInt()
-        lightList = ArrayList()
+        lightList.clear()
         if (group?.meshAddr == 0xffff)
             filter("", false)
         else
-            lightList = DBUtils.getLightByGroupID(group!!.id)
+            lightList .addAll( DBUtils.getLightByGroupID(group!!.id))
 
         deviceAdapter?.notifyDataSetChanged()
         setEmptyAndToolbarTV()
     }
 
     private fun setEmptyAndToolbarTV() {
-        toolbarTv.text = group?.name + "(${group?.deviceCount})"
+        toolbarTv.text = group?.name + "(${lightList?.size})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
@@ -321,7 +321,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 2)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        deviceAdapter = LightsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
         deviceAdapter!!.onItemChildClickListener = onItemChildClickListener
         deviceAdapter!!.bindToRecyclerView(recyclerView)
         when (deviceType) {

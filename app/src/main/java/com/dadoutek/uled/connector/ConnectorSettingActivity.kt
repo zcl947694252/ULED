@@ -122,7 +122,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                         showLoadingDialog(getString(R.string.please_wait))
                         val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
                                 .subscribe({
-                                    deleteData()
+                                   // deleteData()
                                 }, {
                                     GlobalScope.launch(Dispatchers.Main){
                                         /*    showDialogHardDelete?.dismiss()
@@ -133,9 +133,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                                   }
                                                   .setNegativeButton(R.string.btn_cancel, null)
                                                   .show()*/
-                                        deleteData()
                                     }
                                 })
+                                        deleteData()
 
 
                     } else {

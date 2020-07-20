@@ -514,8 +514,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     for (index in showCheckListData!!.indices) {
                         if (showCheckListData!![index].meshAddr == showGroupList!![position].groupAddress)
                             showCheckListData!![index].isChecked = false
+
                     }
                     adapter.remove(position)
+                    hideLoadingDialog()
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()

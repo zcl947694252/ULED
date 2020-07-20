@@ -186,7 +186,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     fun deleteSwitch(macAddress: String) {
-        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(/*R.string.delete_switch_confirm*/getString(R.string.sure_delete_device,sw?.name))
+        AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(/*R.string.delete_switch_confirm*/getString(R.string.sure_delete_device2))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     sw = DBUtils.getSwitchByMacAddr(macAddress)
                     sw?.let {
@@ -194,7 +194,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                         Commander.resetDevice(sw!!.meshAddr, true)
                                 .subscribe(
                                         {
-                                            deleteData()
+                                           // deleteData()
                                         }, {
                                     GlobalScope.launch(Dispatchers.Main){
                                         /*    showDialogHardDelete?.dismiss()
@@ -205,9 +205,9 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                                   }
                                                   .setNegativeButton(R.string.btn_cancel, null)
                                                   .show()*/
-                                        deleteData()
                                     }
                                 })
+                                        deleteData()
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)

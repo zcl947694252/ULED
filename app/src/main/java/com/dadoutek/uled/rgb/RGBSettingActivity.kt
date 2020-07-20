@@ -149,7 +149,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                         val opcode = Opcode.KICK_OUT
                         showLoadingDialog(getString(R.string.please_wait))
                         val subscribe = Commander.resetDevice(light!!.meshAddr)
-                                .subscribe({deleteData() }, {
+                                .subscribe({
+                                    //deleteData()
+                                }, {
                                   GlobalScope.launch(Dispatchers.Main) {
                                       /*   showDialogHardDelete?.dismiss()
                                        showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
@@ -158,10 +160,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                                    deleteData()
                                                }
                                                .setNegativeButton(R.string.btn_cancel, null)
-                                               .show()*/
-                                      deleteData()
+                                               .show()
+                                       */
                                     }
                                 })
+                                      deleteData()
 
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -219,14 +222,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
 
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
-        group.deviceType = light.productUUID.toLong()
-        light.hasGroup = true
-        light.belongGroupId = group.id
-        light.name = light.name
-        DBUtils.updateLight(light)
-        ToastUtils.showShort(getString(R.string.grouping_success_tip))
-        if (group != null)
-            DBUtils.updateGroup(group!!)//更新组类型
+        Commander.addGroup(light.meshAddr, group.meshAddr, {
+            group.deviceType = light.productUUID.toLong()
+            light.hasGroup = true
+            light.belongGroupId = group.id
+            light.name = light.name
+            DBUtils.updateLight(light)
+            ToastUtils.showShort(getString(R.string.grouping_success_tip))
+            if (group != null)
+                DBUtils.updateGroup(group!!)//更新组类型
+            finish()
+        }, {
+            ToastUtils.showShort(getString(R.string.grouping_fail))
+        })
     }
 
     private fun checkPermission() {
@@ -1156,7 +1164,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             if (light != null)
                 updateGroupResult(light!!, group)
-            finish()
         } else {
             diyGradientList = DBUtils.diyGradientList
 

@@ -3,6 +3,7 @@ package com.dadoutek.uled.pir
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
@@ -30,8 +31,8 @@ import java.util.ArrayList
 class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemClickListener {
     private var groupDatumms: kotlin.collections.ArrayList<CheckItemBean> = arrayListOf()
     private var sceneDatumms: kotlin.collections.ArrayList<CheckItemBean> = arrayListOf()
-    private var sceneAdapter = SceneMoreItemAdapter(R.layout.select_more_item, sceneDatumms)
-    private var groupAdapter = GroupMoreItemAdapter(R.layout.select_more_item, groupDatumms)
+    private var sceneAdapter = SceneMoreItemAdapter(R.layout.template_batch_small_item, sceneDatumms)
+    private var groupAdapter = GroupMoreItemAdapter(R.layout.template_batch_small_item, groupDatumms)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.choose_group_scene)
@@ -42,13 +43,14 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
 
     private fun initData() {
         sceneList.forEach {
-            sceneDatumms.add(CheckItemBean(it.id, it.name, false))
+            sceneDatumms.add(CheckItemBean(it.id, it.name, false,it.imgName))
         }
         groupList.forEach {
-            groupDatumms.add(CheckItemBean(it.id, it.name, false))
+            groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
         }
 
-        template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView?.layoutManager = GridLayoutManager(this, 5)
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
         when (type) {
             0, 2 -> {//选群组

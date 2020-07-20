@@ -46,6 +46,7 @@ public class CurtainsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter
                 .setVisible(R.id.template_device_card_delete, delete)
                 .setVisible(R.id.template_gp_name, false)
                 .setTag(R.id.template_device_icon, helper.getAdapterPosition())
+                .setImageResource(R.id.template_device_icon,item.icon)
                 .addOnClickListener(R.id.template_device_icon)
                 .addOnClickListener(R.id.template_device_card_delete);
     }

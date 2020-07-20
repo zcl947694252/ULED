@@ -115,7 +115,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initListener() {
         device_stop_scan.setOnClickListener {
-            if (isScanning) {
+            if (isScanning&&!isSearchedDevice) {
                 scanFail()
                 doFinish()
             } else{
@@ -376,6 +376,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         connectDisposable?.dispose()
         scanDisposable?.dispose()
         isSearchedDevice = false
+
 
         progressBtn.progress = 100  //进度控件显示成完成状态
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())

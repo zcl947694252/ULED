@@ -2,6 +2,7 @@ package com.dadoutek.uled.switches
 
 import android.text.TextUtils
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -22,11 +23,15 @@ import com.dadoutek.uled.util.OtherUtils
  */
 class SceneListAdapter(resId: Int, data: List<DbScene>) : BaseQuickAdapter<DbScene, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
-        val icon = if (TextUtils.isEmpty(item?.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(item?.imgName, mContext)
+        var icon = if (TextUtils.isEmpty(item?.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(item?.imgName, mContext)
         helper?.setText(R.id.template_device_batch_title2, item?.name)
-                ?.setImageResource(R.id.template_device_batch_icon2, icon)
-                ?.setVisible(R.id.template_device_batch_selected2, false)
-        helper?.getView<TextView>(R.id.template_device_batch_title2)?.visibility = View.GONE
-    }
+                ?.setImageResource(R.id.template_device_batch_icon2,icon)
+                ?.setVisible(R.id.template_device_batch_selected2, true)
 
+        helper?.getView<TextView>(R.id.template_device_batch_title_blow2)?.visibility = View.GONE
+        if (item?.checked == true)
+            helper?.getView<ImageView>(R.id.template_device_batch_selected2)?.setImageResource(R.drawable.icon_checkbox_selected)
+        else
+            helper?.getView<ImageView>(R.id.template_device_batch_selected2)?.setImageResource(R.drawable.icon_checkbox_unselected)
+    }
 }

@@ -200,7 +200,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             this.updateList.add(light);
             nowLightList.get(position).selected = true;
 
-            btnAddGroups.setText(R.string.set_group);
+            btnAddGroups.setText(R.string.sure_group);
 
             if (hasGroup()) {
                 startBlink(light);
@@ -223,7 +223,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 this.updateList.add(nowLightList.get(j));
                 nowLightList.get(j).selected = true;
 
-                btnAddGroups.setText(R.string.set_group);
+                btnAddGroups.setText(R.string.sure_group);
 
                 if (hasGroup()) {
                     startBlink(nowLightList.get(j));

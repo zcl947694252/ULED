@@ -206,8 +206,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                     batchGroup.setText(R.string.batch_group)
                     batchGroup.setOnClickListener {
-                        val intent = Intent(this,
-                                CurtainBatchGroupActivity::class.java)
+                        val intent = Intent(this, CurtainBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("curtain", "group_curtain")

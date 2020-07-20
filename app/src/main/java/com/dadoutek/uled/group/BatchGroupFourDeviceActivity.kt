@@ -142,16 +142,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         image_bluetooth.visibility = View.VISIBLE
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
-            checkNetworkAndSync(this)
+            //checkNetworkAndSync(this)
             setDeviceTypeDataStopBlink(deviceType, false)
-            if (isChange)
+            if (isChange) {
                 AlertDialog.Builder(this)
                         .setMessage(R.string.grouping_success_tip)
-                        .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                        .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                             dialog.dismiss()
                             finish()
                         }.show()
-            else
+            } else
                 finish()
         }
 
@@ -930,12 +930,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
             isComplete = false
             grouping_completed.isClickable = true
-            grouping_completed.text = getString(R.string.set_group)
+            grouping_completed.text = getString(R.string.sure_group)
         } else {//没有选中设备或者未选中分组的情况下
             if (noGroupSize > 0 || selectSize > 0 || currentGroup != null) {
                 //有未分组的设备或者有选中设备或者选中组但是未达到分组条件的情况下
                 isComplete = false
-                grouping_completed.text = getString(R.string.set_group)
+                grouping_completed.text = getString(R.string.sure_group)
                 grouping_completed.isClickable = false
                 grouping_completed.setBackgroundResource(R.drawable.rect_solid_radius5_e)
             }/* else {//既没有选中设备有没有选中分组还没有未分组设备的情况下显示完成
@@ -1424,31 +1424,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun addNewGroup() {
-            StringUtils.initEditTextFilter(textGp)
-            textGp?.setSelection(textGp?.text.toString().length)
+        StringUtils.initEditTextFilter(textGp)
+        textGp?.setSelection(textGp?.text.toString().length)
 
-            if (this != null && !this.isFinishing) {
-                renameDialog?.dismiss()
-                renameDialog?.show()
-            }
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
 
-            renameConfirm?.setOnClickListener {    // 获取输入框的内容
-                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
-                    ToastUtils.showLong(getString(R.string.rename_tip_check))
-                } else  {
-                    //往DB里添加组数据
-                    var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
-                    when (deviceType) {
-                        DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                        DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                        DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
-                        DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
-                    }
-                    DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, groupType)
-                    setGroupData()
-                    renameDialog.dismiss()
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                //往DB里添加组数据
+                var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
+                when (deviceType) {
+                    DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                    DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                    DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                    DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
                 }
+                DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, groupType)
+                setGroupData()
+                renameDialog.dismiss()
             }
+        }
     }
 
     fun refreshData() {

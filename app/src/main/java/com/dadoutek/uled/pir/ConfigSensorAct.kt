@@ -149,7 +149,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         showLoadingDialog(getString(R.string.please_wait))
                         disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
                                 .subscribe({
-                                    deleteData()
+                                  //  deleteData()
                                 }, {
                                   GlobalScope.launch(Dispatchers.Main){
                                     /*    showDialogHardDelete?.dismiss()
@@ -160,9 +160,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                               }
                                               .setNegativeButton(R.string.btn_cancel, null)
                                               .show()*/
-                                    deleteData()
                                     }
                                 })
+                                    deleteData()
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)

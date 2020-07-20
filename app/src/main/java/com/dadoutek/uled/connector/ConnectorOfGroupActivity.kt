@@ -86,7 +86,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
     private lateinit var lightList: MutableList<DbConnector>
-    private var adapter: ConnectorOfGroupRecyclerViewAdapter? = null
+    private var adapterDevice: ConnectorOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
     private var currentLight: DbConnector? = null
     private var searchView: SearchView? = null
@@ -230,8 +230,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         else
             deleteDevice?.title = getString(R.string.edite_device)
 
-        adapter?.changeState(isDelete)
-        adapter?.notifyDataSetChanged()
+        adapterDevice?.changeState(isDelete)
+        adapterDevice?.notifyDataSetChanged()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -242,10 +242,10 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun onQueryTextChange(newText: String?): Boolean {
         if (newText != null && !newText.isEmpty()) {
             filter(newText, true)
-            adapter!!.notifyDataSetChanged()
+            adapterDevice!!.notifyDataSetChanged()
         } else {
             filter(newText, false)
-            adapter!!.notifyDataSetChanged()
+            adapterDevice!!.notifyDataSetChanged()
         }
 
         return false
@@ -384,9 +384,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
             }
         }, true)
-        adapter?.let { diffResult.dispatchUpdatesTo(it) }
+        adapterDevice?.let { diffResult.dispatchUpdatesTo(it) }
         lightList = mNewDatas!!
-        adapter?.setNewData(lightList)
+        adapterDevice?.setNewData(lightList)
     }
 
 
@@ -401,9 +401,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 2)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        adapter = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
-        adapter!!.onItemChildClickListener = onItemChildClickListener
-        adapter!!.bindToRecyclerView(recyclerView)
+        adapterDevice = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
+        adapterDevice!!.onItemChildClickListener = onItemChildClickListener
+        adapterDevice!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
         }
@@ -436,9 +436,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
                 currentLight!!.updateIcon()
                 DBUtils.updateConnector(currentLight!!)
-                runOnUiThread {
-                    adapter?.notifyDataSetChanged()
-                }
+                adapterDevice?.notifyDataSetChanged()
             }
             R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
@@ -481,7 +479,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             DBUtils.updateRelayLocal(dbLight)
 
             lightList.remove(dbLight)
-            adapter?.notifyDataSetChanged()
+            adapterDevice?.notifyDataSetChanged()
             setEmptyAndToolbarTV()
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
@@ -587,7 +585,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     dbLight.updateIcon()
                     DBUtils.updateConnector(dbLight)
                     runOnUiThread {
-                        adapter?.notifyDataSetChanged()
+                        adapterDevice?.notifyDataSetChanged()
                     }
 
                 }
@@ -865,7 +863,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 }
 
                 scanPb.visibility = View.GONE
-                adapter?.notifyDataSetChanged()
+                adapterDevice?.notifyDataSetChanged()
 
             }
             LightAdapter.STATUS_CONNECTING -> {

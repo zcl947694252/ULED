@@ -43,6 +43,7 @@ public class ConnectorOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapte
                 .setVisible(R.id.template_device_more, false)
                 .setVisible(R.id.template_device_card_delete, isDelete)
                 .setVisible(R.id.template_gp_name, false)
+                .setImageResource(R.id.template_device_icon,item.icon)
                 .setTag(R.id.template_device_icon, helper.getAdapterPosition())
                 .addOnClickListener(R.id.template_device_icon)
                 .addOnClickListener(R.id.template_device_card_delete);

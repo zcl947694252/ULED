@@ -13,17 +13,19 @@ import android.os.Parcelable
  * 更新时间   $
  * 更新描述
  */
-class CheckItemBean(var id: Long, var name: String, var checked: Boolean) : Parcelable {
+class CheckItemBean(var id: Long, var name: String, var checked: Boolean,var imgName: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readLong(),
             parcel.readString(),
-            parcel.readByte() != 0.toByte()) {
+            parcel.readByte() != 0.toByte(),
+            parcel.readString()) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(id)
         parcel.writeString(name)
         parcel.writeByte(if (checked) 1 else 0)
+        parcel.writeString(imgName)
     }
 
     override fun describeContents(): Int {

@@ -417,7 +417,13 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         isResume = true
 //       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
 //           TelinkLightApplication.getApp().initStompClient()
-        startTimerUpdate()
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
+                startTimerUpdate()
+        }
+
+
         if (LeBluetooth.getInstance().isEnabled) {
             if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
                 changeDisplayImgOnToolbar(true)
@@ -1136,5 +1142,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写
     }
+
 }
 

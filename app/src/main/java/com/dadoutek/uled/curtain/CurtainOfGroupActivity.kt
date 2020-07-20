@@ -14,11 +14,9 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
@@ -70,7 +68,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.startActivity
 import java.util.*
@@ -98,7 +95,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
     private lateinit var curtainList: MutableList<DbCurtain>
-    private var adapter: CurtainsOfGroupRecyclerViewAdapter? = null
+    private var adapterDevice: CurtainsOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
     private var currentCurtain: DbCurtain? = null
     private var searchView: SearchView? = null
@@ -206,10 +203,10 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onQueryTextChange(newText: String?): Boolean {
         if (newText != null && !newText.isEmpty()) {
             filter(newText, true)
-            adapter!!.notifyDataSetChanged()
+            adapterDevice!!.notifyDataSetChanged()
         } else {
             filter(newText, false)
-            adapter!!.notifyDataSetChanged()
+            adapterDevice!!.notifyDataSetChanged()
         }
 
         return false
@@ -346,9 +343,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
             }
         }, true)
-        adapter?.let { diffResult.dispatchUpdatesTo(it) }
+        adapterDevice?.let { diffResult.dispatchUpdatesTo(it) }
         curtainList = mNewDatas!!
-        adapter?.setNewData(curtainList)
+        adapterDevice?.setNewData(curtainList)
     }
 
     private fun initView() {
@@ -360,9 +357,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
         light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 2)
-        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, curtainList)
-        adapter!!.onItemChildClickListener = onItemChildClickListener
-        adapter!!.bindToRecyclerView(recycler_view_lights)
+        adapterDevice = CurtainsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, curtainList)
+        adapterDevice!!.onItemChildClickListener = onItemChildClickListener
+        adapterDevice!!.bindToRecyclerView(recycler_view_lights)
         for (i in curtainList.indices) {
             curtainList[i].updateIcon()
         }
@@ -422,8 +419,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         else
             deleteDevice?.title = getString(R.string.edite_device)
 
-        adapter?.changeState(isDelete)
-        adapter?.notifyDataSetChanged()
+        adapterDevice?.changeState(isDelete)
+        adapterDevice?.notifyDataSetChanged()
     }
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentCurtain = curtainList[position]
@@ -464,7 +461,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             DBUtils.updateCurtain(dbLight)
 
             curtainList.remove(dbLight)
-            adapter?.notifyDataSetChanged()
+            adapterDevice?.notifyDataSetChanged()
             setEmptyAndToolbarTV()
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
@@ -809,7 +806,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 }
 
                 scanPb.visibility = View.GONE
-                adapter?.notifyDataSetChanged()
+                adapterDevice?.notifyDataSetChanged()
 
             }
             LightAdapter.STATUS_CONNECTING -> {

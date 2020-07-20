@@ -346,7 +346,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
                 intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {

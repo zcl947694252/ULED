@@ -1861,17 +1861,18 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             val disposable = Commander.resetDevice(light!!.meshAddr)
                                     .subscribe(
                                             {
-                                                deleteData()
+                                                //deleteData()
                                             }, {
-                                        showDialogHardDelete?.dismiss()
+                                     /*   showDialogHardDelete?.dismiss()
                                         showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                                     showLoadingDialog(getString(R.string.please_wait))
                                                     deleteData()
                                                 }
                                                 .setNegativeButton(R.string.btn_cancel, null)
-                                                .show()
+                                                .show()*/
                                     })
+                            deleteData()
                         } else {
                             ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                             this.finish()

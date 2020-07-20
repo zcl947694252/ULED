@@ -239,7 +239,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     this.updateList.add(nowDeviceList[j])
                     nowDeviceList[j].isSelected = true
 
-                    btn_add_groups?.setText(R.string.set_group)
+                    btn_add_groups?.setText(R.string.sure_group)
 
                     if (hasGroup()) {
                         startBlink(nowDeviceList[j])
@@ -835,7 +835,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 this.updateList.add(item)
                 nowDeviceList[position].isSelected = true
 
-                btn_add_groups?.setText(R.string.set_group)
+                btn_add_groups?.setText(R.string.sure_group)
 
                 if (hasGroup()) {
                     startBlink(item)
