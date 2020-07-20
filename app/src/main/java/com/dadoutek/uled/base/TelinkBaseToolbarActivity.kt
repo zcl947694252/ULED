@@ -147,7 +147,11 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
 
     private fun editeDevice() {
         isEdite = !isEdite
-        deleteDeviceAll?.title = getString(R.string.cancel_edite)
+        if (isEdite)
+            deleteDeviceAll?.title = getString(R.string.cancel_edite)
+        else
+            deleteDeviceAll?.title = getString(R.string.edite_device)
+
         DBUtils.lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))

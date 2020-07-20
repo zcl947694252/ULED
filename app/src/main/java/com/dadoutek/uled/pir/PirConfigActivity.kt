@@ -174,9 +174,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         version = intent.getStringExtra("version")
         pir_confir_tvPSVersion.text = version
         isReConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
-        if (isReConfirm)
+        if (isReConfirm){
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
-
+            toolbarTv.text = currentSensor?.name
+        }
         color_mode_rb.isChecked = true
 
         getTriggerTimeProide()

@@ -138,7 +138,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         }
         toolbar.setOnClickListener { renameGw() }
 
-
         img_function1.visibility = View.GONE
         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
         image_bluetooth.visibility = View.VISIBLE
@@ -299,7 +298,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     private fun deleteDevice() {
         //恢复出厂设置
-        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_tip)
+        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.sure_delete_device2)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     hardTimer()
                     showLoadingDialog(getString(R.string.please_wait))

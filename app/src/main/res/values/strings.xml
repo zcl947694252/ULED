@@ -472,7 +472,7 @@
     <string name="stop">Stop</string>
     <string name="stopping">Stopping…</string>
         
-    <string name="rename">Please enter the name </string>
+    <string name="please_rename">Please enter the name </string>
         
         
     <string name="firmware_version">Firmware version: </string>
@@ -1021,7 +1021,7 @@
     <string name="left">Left:</string>
     <string name="right">Right:</string>
     <string name="single_brighress_group_switch">Dimmer double switch</string>
-    <string name="eight_switch">8k Switch</string>
+    <string name="eight_switch">Multifunction switch</string>
     <string name="double_switch">DoubleGroup Switch</string>
     <string name="delete_device">Delete Device</string>
     <string name="delete_device_tip">Whether or not to delete?</string>
@@ -1089,5 +1089,11 @@
     <string name="choosed_scene">The selected scene</string>
     <string name="please_setting_least_one_gp">Please select at least one group</string>
     <string name="please_setting_least_one_scene">Please select at least one scene</string>
+    <string name="sure_delete_device2">Are you sure you want delete this device?</string>
+    <string name="light_sw">Light switch</string>
+    <string name="touch_sw">Touch switch</string>
+    <string name="touch_double_sw">Touch two sets of switches</string>
+    <string name="bt_scene_sw">Touch scene switch</string>
+    <string name="scene_sw">Scene switch</string>
 
 </resources>

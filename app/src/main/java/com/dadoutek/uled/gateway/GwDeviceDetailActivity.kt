@@ -417,7 +417,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         }
         restFactoryDelete.setOnClickListener {
             //恢复出厂设置
-            showDialogDelete = AlertDialog.Builder(this).setMessage(R.string.delete_device_tip)
+            showDialogDelete = AlertDialog.Builder(this).setMessage(R.string.sure_delete_device2)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         disposableFactoryTimer?.dispose()
                         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
@@ -830,7 +830,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     override fun receviedGwCmd2000(ser_id: String) {
         if (GW_GATT_SWITCH == ser_id?.toInt()) {
             currentGw?.openTag = if (currentGw?.openTag == 0) 1 else 0
-            currentGw?.icon = if (currentGw?.openTag == 0) R.drawable.icon_gw_close else R.drawable.icon_gw_open
+            currentGw?.icon = if (currentGw?.openTag == 0) R.drawable.icon_gateway_off else R.drawable.icon_gateway
             DBUtils.saveGateWay(currentGw!!, false)
             updataUi()
             disposableTimer?.dispose()

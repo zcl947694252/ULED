@@ -101,11 +101,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun isEmptyDevice() {
         if (curtainDatas.size > 0) {
-            recycleView.visibility = View.GONE
-            no_device_relativeLayout.visibility = View.VISIBLE
-        } else {
             recycleView.visibility = View.VISIBLE
             no_device_relativeLayout.visibility = View.GONE
+        } else {
+            recycleView.visibility = View.GONE
+            no_device_relativeLayout.visibility = View.VISIBLE
         }
     }
 

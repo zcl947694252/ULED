@@ -41,9 +41,9 @@ class GwDeviceItemAdapter(layoutResId: Int, data: MutableList<DbGateway>, intern
             iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
             //helper.setVisible(R.id.name, false)
             if (data.openTag == 0)
-                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gw_close)
+                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gateway_off)
             else
-                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gw_open)
+                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gateway)
 
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)

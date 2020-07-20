@@ -103,7 +103,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     override fun initView() {
         makePop()
-        toolbarTv?.text = getString(R.string.select_group)
+        toolbarTv?.text = getString(R.string.curtain_switch)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
@@ -121,6 +121,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
         if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
         }
         mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList

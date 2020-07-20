@@ -1854,7 +1854,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     fun remove() {
         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device, light.name))
+            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                             showLoadingDialog(getString(R.string.please_wait))

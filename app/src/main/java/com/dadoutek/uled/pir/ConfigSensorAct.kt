@@ -366,8 +366,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         isReConfirm = mDeviceInfo.isConfirm == 1
-        if (isReConfirm)
+        if (isReConfirm){
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
+            toolbarTv.text = currentSensor?.name
+        }
         if (version == null)
             version = mDeviceInfo.firmwareRevision
         mGroupScenesName = ArrayList()

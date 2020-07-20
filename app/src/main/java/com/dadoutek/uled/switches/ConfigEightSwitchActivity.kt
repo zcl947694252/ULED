@@ -79,6 +79,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         //先进行填充默认数据
         setDefaultData()
 
+        toolbarTv.text = getString(R.string.eight_switch)
+
         //重新赋值新数据
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
@@ -92,8 +94,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
         if (isReConfig) {
             switchData = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchData?.name
             switchData?.keys?.let {
                 listKeysBean = JSONArray(it)
+                toolbarTv.text = switchData?.name
                 //eight_switch_mode.visibility = View.VISIBLE
                 //eight_switch_config.visibility = View.VISIBLE
                 // eight_switch_banner_ly.visibility = View.GONE

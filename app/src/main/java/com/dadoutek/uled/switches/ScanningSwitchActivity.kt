@@ -34,7 +34,6 @@ import org.jetbrains.anko.startActivity
  * 更新描述   ${为类添加标识}$
  */
 class ScanningSwitchActivity : TelinkBaseActivity() {
-    private var isSeachedDevice: Boolean = false
     private lateinit var mApplication: TelinkLightApplication
     private var mRxPermission: RxPermissions? = null
     private var bestRSSIDevice: DeviceInfo? = null
@@ -78,7 +77,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             } else {
                 finish()
             }
-         }
+        }
 
         retryConnectCount = 0
         isSupportInstallOldDevice = false
@@ -93,22 +92,32 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             doFinish()
         }
         btn_stop_scan.setOnClickListener {
-            if (!isSeachedDevice)
+            if (isScanning){
                 scanFail()
+                doFinish()
+            }
             else
-                ToastUtils.showLong(getString(R.string.connecting_tip))
+                startScan()
+        }
+        scanning_num.setOnClickListener {
+            if (isScanning)
+                seeHelpe()
         }
     }
 
     //扫描失败处理方法
     private fun scanFail() {
+        scanning_num.text = getString(R.string.see_help)
         showToast(getString(R.string.scan_end))
         stopConnectTimer()
-        doFinish()
+        closeAnimation()
+        //  doFinish()
+        btn_stop_scan.text = getString(R.string.scan_retry)
         image_no_group.visibility = View.VISIBLE
     }
 
     private fun startAnimation() {
+        isScanning = true
         lottieAnimationView?.playAnimation()
         lottieAnimationView?.visibility = View.VISIBLE
     }
@@ -122,8 +131,8 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun startScan() {
-        isScanning = true
         TelinkLightService.Instance()?.idleMode(true)
+        scanning_num.text = getString(R.string.scanning)
         startAnimation()
         image_no_group.visibility = View.GONE
         val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,

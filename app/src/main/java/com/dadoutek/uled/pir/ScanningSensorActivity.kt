@@ -102,21 +102,25 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
         supportActionBar?.title = getString(R.string.sensor_title)
+        toolbarTv.text = getString(R.string.sensor)
         scanning_device_ly.visibility = View.GONE
         cancelf.setOnClickListener { popFinish?.dismiss() }
         confirmf.setOnClickListener {
             popFinish?.dismiss()
             doFinish()
         }
+
+        setNewScan()
     }
 
     private fun initListener() {
-        setNewScan()
         device_stop_scan.setOnClickListener {
-            if (!isSearchedDevice)
+            if (isScanning) {
                 scanFail()
-            else
-                ToastUtils.showLong(getString(R.string.connecting_tip))
+                doFinish()
+            } else{
+                startScan()
+            }
         }
         progressBtn.onClick {
             setNewScan()
@@ -169,7 +173,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
-
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
@@ -322,8 +325,8 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
             ToastUtils.showLong(R.string.not_find_pir)
-            doFinish()
         }
+        device_stop_scan.text  = getString(R.string.scan_retry)
     }
 
 
@@ -410,7 +413,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun ScanningSensorActivity.skipDevice(it: String) {
+    private fun skipDevice(it: String) {
         when (mDeviceInfo?.productUUID) {
             DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
             DeviceType.NIGHT_LIGHT -> {
@@ -432,7 +435,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_fail)
         isSearchedDevice = false
-        doFinish()
+        device_stop_scan.text  = getString(R.string.scan_retry)
     }
 
 
@@ -483,6 +486,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
+        isScanning = true
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val meshAddress = MeshAddressGenerator().meshAddress.get()

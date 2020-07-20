@@ -88,10 +88,18 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType",0)
 
-        if (deviceConfigType==DeviceType.NORMAL_SWITCH)
-            sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
-        else if (deviceConfigType==DeviceType.NORMAL_SWITCH2)
-            sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+        when (deviceConfigType) {
+            DeviceType.NORMAL_SWITCH -> {
+                sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
+                toolbarTv.text = getString(R.string.light_sw)
+            }
+            DeviceType.NORMAL_SWITCH2 -> {
+                toolbarTv.text = getString(R.string.touch_sw)
+                sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+            }
+
+            //tvLightVersion.text = localVersion
+        }
 
 
         if (TextUtils.isEmpty(localVersion))
@@ -107,10 +115,13 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         isReConfig = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfig
 
-        if (isReConfig)
+        if (isReConfig){
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
-        else
+            toolbarTv.text = switchDate?.name
+        } else{
+            toolbarTv.text = switchDate?.name
             groupName = "false"
+        }
 
         mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList

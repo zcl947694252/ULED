@@ -93,12 +93,14 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         localVersion = intent.getStringExtra("version")
         eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
 //        bottom_version_number.text = localVersion
+        toolbarTv.text = getString(R.string.touch_sw)
 
         isReConfig = isRetryConfig != null && isRetryConfig == "true"
         fiRename?.isVisible = isReConfig
 
         if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
                 if (stringToList == null || stringToList.size < 2) {

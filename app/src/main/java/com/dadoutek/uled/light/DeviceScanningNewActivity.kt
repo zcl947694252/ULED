@@ -202,7 +202,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         stopScanTimer()
         closeAnimation()
 
-        list_devices.visibility = View.VISIBLE
+        list_devices.visibility = View.GONE
         scanning_num.visibility = View.GONE
         btn_stop_scan.visibility = View.GONE
 

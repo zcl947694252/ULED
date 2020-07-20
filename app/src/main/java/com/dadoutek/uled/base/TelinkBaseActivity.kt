@@ -73,6 +73,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
@@ -1127,6 +1128,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         StringUtils.initEditTextFilter(textGp)
+        textGp?.singleLine = true
 
         renameDialog = Dialog(this)
         renameDialog?.setContentView(popReNameView)

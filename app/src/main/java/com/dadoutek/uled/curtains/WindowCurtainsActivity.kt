@@ -220,7 +220,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                .setMessage(getString(R.string.delete_group_confirm,curtainGroup?.name))
+                .setMessage(getString(R.string.delete_group_confirm, curtainGroup?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     showLoadingDialog(getString(R.string.deleting))
                     deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
@@ -383,7 +383,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (currentShowGroupSetPage) {
             //menuInflater.inflate(R.menu.menu_curtain_group, menu)
-           // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+            // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
             //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
             //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
         } else {
@@ -727,16 +727,19 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun handRecovery() {
         if (typeStr == Constant.TYPE_GROUP) {
-            if (handBoolean) {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                handBoolean = false
-            } else {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                handBoolean = true
+            when {
+                handBoolean -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    handBoolean = false
+                }
+                else -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    handBoolean = true
+                }
             }
         } else {
             if (handBoolean) {
@@ -787,7 +790,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     fun remove() {
-        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device,curtain?.name))
+        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device, curtain?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val deviceMeshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
@@ -795,9 +798,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         val dispose = Commander.resetDevice(deviceMeshAddr ?: 0)
                                 .subscribe({
                                     LogUtils.v("zcl-----恢复出厂成功")
-                                    deleteData()
+                                    //  deleteData()
                                 }, {
-                                    GlobalScope.launch(Dispatchers.Main){
+                                    GlobalScope.launch(Dispatchers.Main) {
                                         /*    showDialogHardDelete?.dismiss()
                                           showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                   .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -806,9 +809,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                                   }
                                                   .setNegativeButton(R.string.btn_cancel, null)
                                                   .show()*/
-                                        deleteData()
+
                                     }
                                 })
+
+                        deleteData()
 
                     } else ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
 
@@ -817,21 +822,21 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-     fun deleteData() {
+    fun deleteData() {
         hideLoadingDialog()
-        if (typeStr == Constant.TYPE_GROUP)
+        if (typeStr == Constant.TYPE_GROUP) {
             if (curtainGroup != null)
                 DBUtils.deleteGroupOnly(curtainGroup!!)
-            else
-                if (curtain != null) {
-                    DBUtils.deleteCurtain(curtain!!)
-                    if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr))
-                        TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                    if (mConnectDevice != null) {
-                        if (curtain!!.meshAddr == mConnectDevice!!.meshAddress)
-                            setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                    }
+        } else
+            if (curtain != null) {
+                DBUtils.deleteCurtain(curtain!!)
+                if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr))
+                    TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                if (mConnectDevice != null) {
+                    if (curtain!!.meshAddr == mConnectDevice!!.meshAddress)
+                        setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                 }
+            }
         finish()
     }
 

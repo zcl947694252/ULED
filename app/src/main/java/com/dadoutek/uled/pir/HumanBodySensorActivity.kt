@@ -367,8 +367,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         version = intent.getStringExtra("version")
         getVersion(version)
         isReConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
-        if (isReConfirm)
+        if (isReConfirm){
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
+            toolbarTv.text = currentSensor?.name
+        }
         // showCheckListData = DBUtils.allGroups
         var lightGroup = DBUtils.allGroups
 

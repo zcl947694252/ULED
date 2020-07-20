@@ -77,9 +77,11 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (version.contains("BTS")) {
                 scene_switch_cw.visibility = View.GONE
                 scene_switch_touch.visibility = View.VISIBLE
+                toolbarTv.text = getString(R.string.touch_sw)
             } else {
                 scene_switch_cw.visibility = View.VISIBLE
                 scene_switch_touch.visibility = View.GONE
+                toolbarTv.text = getString(R.string.light_sw)
             }
         }
         fiVersion?.title = version
@@ -90,8 +92,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         isReConfig = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfig
 
-        if (isReConfig)
+        if (isReConfig){
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
+        }
 
 
         mSwitchList.clear()

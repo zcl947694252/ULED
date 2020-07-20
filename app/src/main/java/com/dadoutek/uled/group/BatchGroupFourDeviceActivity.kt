@@ -1424,35 +1424,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun addNewGroup() {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.singleLine = true
-        textGp.setText(DBUtils.getDefaultNewGroupName())
-        //设置光标默认在最后
-        textGp.setSelection(textGp.text.toString().length)
-        AlertDialog.Builder(this)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        //往DB里添加组数据
-                        var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
-                        when (deviceType) {
-                            DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                            DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
-                            DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
-                        }
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, groupType)
-                        setGroupData()
-                        dialog.dismiss()
+            StringUtils.initEditTextFilter(textGp)
+            textGp?.setSelection(textGp?.text.toString().length)
+
+            if (this != null && !this.isFinishing) {
+                renameDialog?.dismiss()
+                renameDialog?.show()
+            }
+
+            renameConfirm?.setOnClickListener {    // 获取输入框的内容
+                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else  {
+                    //往DB里添加组数据
+                    var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
+                    when (deviceType) {
+                        DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
+                        DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
+                        DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
+                        DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
                     }
+                    DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, groupType)
+                    setGroupData()
+                    renameDialog.dismiss()
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+            }
     }
 
     fun refreshData() {

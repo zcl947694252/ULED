@@ -439,7 +439,7 @@
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
     <string name="stopping">停止中…</string>
-    <string name="rename">请输入名称</string>
+    <string name="please_rename">请输入名称</string>
     <string name="firmware_version">固件版本：</string>
     <string name="ota">OTA</string>
     <string name="my_scene">场景一</string>
@@ -942,7 +942,7 @@
     <string name="left">左:</string>
     <string name="right">右:</string>
     <string name="single_brighress_group_switch">单调光群组开关</string>
-    <string name="eight_switch">八键开关</string>
+    <string name="eight_switch">多功能开关</string>
     <string name="double_switch">双组开关</string>
     <string name="delete_device">删除设备</string>
     <string name="delete_device_tip">是否删除?</string>
@@ -1010,4 +1010,7 @@
     <string name="choosed_scene">选择的场景</string>
     <string name="please_setting_least_one_gp">请至少选择一个群组</string>
     <string name="please_setting_least_one_scene">请至少选择一个场景</string>
+    <string name="sure_delete_device2">确定删除此设备?</string>
+    <string name="light_sw">光能开关</string>
+    <string name="touch_sw">触摸开关</string>
 </resources>
