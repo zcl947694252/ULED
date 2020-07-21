@@ -49,7 +49,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
-    private var resId: Int? = R.drawable.icon_1
+    private var resId: Int? = R.drawable.icon_out
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
     private var rgbRecyclerView: RecyclerView? = null
@@ -508,7 +508,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
         android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                .setMessage(getString(R.string.delete_group_confirm,showGroupList!![position]?.gpName))
+                .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
                     for (index in showCheckListData!!.indices) {
@@ -702,7 +702,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
             dbScene.id = getSceneId()
             dbScene.name = name
             try {
-                dbScene.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct)
+                val split = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")
+                if (split.size == 2)
+                    dbScene.imgName = split[1]
+                else
+                    dbScene.imgName = "icon_out"
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

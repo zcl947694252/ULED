@@ -50,13 +50,14 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
         DBUtils.saveGroup(elements[0], false)
         elements.removeAt(0)
         groupList.addAll(elements)
+
+
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
         val get = intent.extras.get(Constant.EIGHT_SWITCH_TYPE)
-        if (get!=null)
-        type = get as Int
+        if (get != null) type = get as Int
+
         val get1 = intent.extras.get(Constant.DEVICE_TYPE)
-        if (get1!=null)
-        deviceType = get1 as Int
+        if (get1 != null) deviceType = get1 as Int
 
         isGroup = type == 0 || type == 2
         when (type) {
@@ -64,14 +65,21 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 template_recycleView?.adapter = groupAdapter
                 groupAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.group_list)
-                if (deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL.toInt()) {
-                    val filter = groupList.filter { it.deviceType == deviceType.toLong() }
-                    filter.forEach {
-                        it.isChecked =false
+
+                var filter: List<DbGroup> = mutableListOf()
+                when (deviceType) {
+                    Constant.DEVICE_TYPE_LIGHT.toInt() -> {
+                        filter = groupList.filter { it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL }
                     }
-                    groupList.clear()
-                    groupList.addAll(filter)
+                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(), Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
+                        filter = groupList.filter { it.deviceType == deviceType.toLong() }
+                    }
                 }
+                filter.forEach {
+                    it.isChecked = false
+                }
+                groupList.clear()
+                groupList.addAll(filter)
                 groupAdapter?.notifyDataSetChanged()
             }
             else -> {
@@ -86,7 +94,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-       // val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        // val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         //template_recycleView?.layoutManager = linearLayoutManager
     }
 
@@ -101,10 +109,15 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                     ToastUtils.showShort(getString(R.string.please_setting_least_one_scene))
                 return@setOnClickListener
             }
-            if (isGroup)
+            if (isGroup){
                 setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
-            else
+                groupList.forEach { it.isChecked = false }
+            } else{
                 setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
+                sceneList.forEach { it.isChecked = false }
+            }
+
+
             finish()
         }
     }

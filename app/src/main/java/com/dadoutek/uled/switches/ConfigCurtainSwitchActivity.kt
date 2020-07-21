@@ -244,7 +244,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             val intent = Intent(this@ConfigCurtainSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
             bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CURTAIN.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             setResult(Constant.RESULT_OK)

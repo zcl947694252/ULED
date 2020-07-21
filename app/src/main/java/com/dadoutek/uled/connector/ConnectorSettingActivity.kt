@@ -616,13 +616,13 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                 fiVersion?.title = localVersion
                                 if (TextUtils.isEmpty(localVersion))
                                     localVersion = getString(R.string.number_no)
-                                fiVersion?.title = localVersion
+                                runOnUiThread {  fiVersion?.title = localVersion }
                                 DBUtils.saveConnector(currentDbConnector!!, false)
                             },
                             {
                                 if (TextUtils.isEmpty(localVersion))
                                     localVersion = getString(R.string.number_no)
-                                fiVersion?.title = localVersion
+                                runOnUiThread {  fiVersion?.title = localVersion }
                             }
                     )
         }

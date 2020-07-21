@@ -632,8 +632,12 @@ object DBUtils {
     }
 
     fun getCurtainByGroupMesh(mesh: Int): ArrayList<DbCurtain> {
-        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.BelongGroupId.eq(mesh)).build()
-        return ArrayList(query.list())
+        val group = getGroupByMeshAddr(mesh)
+        if (group != null) {
+            val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.BelongGroupId.eq(group.id)).build()
+            return ArrayList(query.list())
+        }
+        return ArrayList()
     }
 
     fun getCurtainByGroupID(id: Long): ArrayList<DbCurtain> {
@@ -647,15 +651,15 @@ object DBUtils {
             val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
             return ArrayList(query.list())
         }
-        return null
+        return ArrayList()
     }
     fun getRelayByGroupMesh(mesh: Int): ArrayList<DbConnector>? {
         val group = getGroupByMeshAddr(mesh)
         if (group != null) {
-            val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
+            val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.BelongGroupId.eq(group.id)).build()
             return ArrayList(query.list())
         }
-        return null
+        return ArrayList()
     }
 
     /********************************************保存 */

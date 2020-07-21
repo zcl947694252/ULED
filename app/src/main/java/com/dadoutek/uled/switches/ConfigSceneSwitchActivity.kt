@@ -474,7 +474,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 }
             }
         }
-
     }
 
     private fun setSceneForSwitch() {//设置开关场景

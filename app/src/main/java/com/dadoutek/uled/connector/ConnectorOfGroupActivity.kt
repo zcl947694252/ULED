@@ -81,7 +81,6 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
     private val REQ_LIGHT_SETTING: Int = 0x01
-
     private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
@@ -202,7 +201,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun skipeBatch() {
         when {
             DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
+            TelinkLightApplication.getApp().connectDevice != null ->
+                startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }

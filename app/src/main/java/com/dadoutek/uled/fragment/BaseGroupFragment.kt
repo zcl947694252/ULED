@@ -444,7 +444,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                     goConnect(false)
                     sendToGw(true)
                 } else
-                    if (currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && currentGroup!!.deviceType != Constant.DEVICE_TYPE_CURTAIN) {
+                    if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
+                            ||currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR||currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
                         if (currentGroup!!.status == 0) {
                             Commander.openOrCloseLights(dstAddr, true)
                             groupOpenSuccess(position)

@@ -21,7 +21,6 @@ import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -104,7 +103,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             R.id.updateGroup -> updateGroup()
             R.id.btnRemove -> remove()
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                    .setMessage(getString(R.string.delete_group_confirm,group?.name))
+                    .setMessage(getString(R.string.delete_group_confirm, group?.name))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
 
@@ -772,20 +771,20 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
-            DBUtils.lastUser?.let {
-                if (it.id.toString() == it.last_authorizer_user_id)
-                    if (currentShowPageGroup) {
-                       // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-                        //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
-                        //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
-                    } else {
-                        menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                        findItem = menu?.findItem(R.id.toolbar_f_version)
-                        findItem?.title = getString(R.string.getVsersionFail)
-                        findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
-                        findItemChangeGp?.isVisible = true
-                    }
-            }
+        DBUtils.lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)
+                if (currentShowPageGroup) {
+                    // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                    //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
+                    //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
+                } else {
+                    menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
+                    findItem = menu?.findItem(R.id.toolbar_f_version)
+                    findItem?.title = getString(R.string.getVsersionFail)
+                    findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
+                    findItemChangeGp?.isVisible = true
+                }
+        }
         LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
         return super.onCreateOptionsMenu(menu)
     }
@@ -1343,6 +1342,24 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             slow_ly.visibility = VISIBLE
         } else
             slow_ly.visibility = GONE
+
+        setLightBrightnessNum(group?.brightness ?: 1,group?.meshAddr!!)
+        setLightTemperatureValue(group?.colorTemperature ?: 1,group?.meshAddr ?: 0)
+    }
+
+    private fun setLightTemperatureValue(colorNum: Int, meshAddr: Int) {
+        var opcode = Opcode.SET_TEMPERATURE
+        var params = byteArrayOf(0x05,colorNum.toByte())
+        setLightGUIImg(temperatureValue = colorNum)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+    }
+
+    private fun setLightBrightnessNum(num: Int, meshAddr: Int) {
+        var opcode = Opcode.SET_LUM
+        var params = byteArrayOf(num.toByte())
+        light_sbBrightness.progress = num
+        setLightGUIImg(progress = num)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
@@ -1357,7 +1374,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
             R.id.toolbar_batch_gp -> {//群组模式下
                 AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                        .setMessage(getString(R.string.delete_group_confirm,group?.name))
+                        .setMessage(getString(R.string.delete_group_confirm, group?.name))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             this.showLoadingDialog(getString(R.string.deleting))
 
@@ -1432,7 +1449,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.brightness < 1) 1 else light!!.brightness
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-
+            setLightBrightnessNum(brightnes,light?.meshAddr)
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1444,7 +1461,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.colorTemperature < 1) 1 else light!!.colorTemperature
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-
+            setLightTemperatureValue(light?.colorTemperature,light?.meshAddr)
             isBrightness = false
         }
 
@@ -1863,14 +1880,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                             {
                                                 //deleteData()
                                             }, {
-                                     /*   showDialogHardDelete?.dismiss()
-                                        showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                                .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                    showLoadingDialog(getString(R.string.please_wait))
-                                                    deleteData()
-                                                }
-                                                .setNegativeButton(R.string.btn_cancel, null)
-                                                .show()*/
+                                        /*   showDialogHardDelete?.dismiss()
+                                           showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                   .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                       showLoadingDialog(getString(R.string.please_wait))
+                                                       deleteData()
+                                                   }
+                                                   .setNegativeButton(R.string.btn_cancel, null)
+                                                   .show()*/
                                     })
                             deleteData()
                         } else {

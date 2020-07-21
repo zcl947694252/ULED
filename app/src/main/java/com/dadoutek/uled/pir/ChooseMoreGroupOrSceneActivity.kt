@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils.groupList
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
 import com.dadoutek.uled.switches.SceneMoreItemAdapter
+import kotlinx.android.synthetic.main.choose_group_scene.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.ArrayList
@@ -70,14 +71,14 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         tv_function1.text = getString(R.string.confirm)
-        tv_function1.visibility =View.VISIBLE
+        tv_function1.visibility =View.GONE
         template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
     private fun initListener() {
         sceneAdapter.onItemClickListener = this
         groupAdapter.onItemClickListener = this
-        tv_function1.setOnClickListener {
+        choose_scene_confim.setOnClickListener {
             val intent = Intent()
             if (type == 0 || type == 2)
                 intent.putParcelableArrayListExtra("data", groupDatumms.filter { it.checked } as ArrayList)
@@ -87,6 +88,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
+
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {

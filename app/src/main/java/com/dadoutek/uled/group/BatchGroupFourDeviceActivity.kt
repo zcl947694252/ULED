@@ -420,7 +420,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     if (gpMeshAddr == 0)
                         deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
                     else
-                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
+                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {//如果组地址有效就说明是分该组内的设备
                             deviceDataLightAll.addAll(it)
                         }
                 } else {

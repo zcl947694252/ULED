@@ -352,7 +352,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
                 val bundle = Bundle()
                 bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 1)//传入0代表是群组
-                bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_DEFAULT_ALL.toInt())
+                bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT.toInt())
                 intent.putExtras(bundle)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
@@ -610,8 +610,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog.setOnDismissListener {
-            dbSensor.name = textGp?.text.toString().trim { it <= ' ' }
-            saveSensor(dbSensor, true)
             configureComplete()
         }
 

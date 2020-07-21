@@ -44,7 +44,7 @@ public class DbScene implements Parcelable{
 
     private String times;
 
-    private String imgName= "";
+    private String imgName= "icon_out";
     private boolean checked= false;
 
     public boolean isChecked() {

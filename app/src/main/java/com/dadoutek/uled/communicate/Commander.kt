@@ -93,14 +93,12 @@ object Commander : EventListener<String> {
 
     fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
                        failedCallback: () -> Unit1) {
-
         LogUtils.e("zcl---添加表 更新数据$lightList")
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
-                ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
