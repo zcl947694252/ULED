@@ -150,8 +150,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-        val intent = Intent(this,
-                ConnectorBatchGroupActivity::class.java)
+        val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
         intent.putExtra("relayType", "group_relay")
@@ -160,15 +159,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         finish()
     }
 
-    override fun initOnLayoutListener() {
-        val view = window.decorView
-        val viewTreeObserver = view.viewTreeObserver
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
-    }
 
     private fun initToolbar() {
         toolbarTv?.text = getString(R.string.group_setting_header)
@@ -240,7 +230,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText != null && !newText.isEmpty()) {
+        if (newText != null && newText.isNotEmpty()) {
             filter(newText, true)
             adapterDevice!!.notifyDataSetChanged()
         } else {
@@ -254,26 +244,24 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
-        if (lightList != null && lightList.size > 0) {
+        if (lightList != null && lightList.size > 0)
             lightList.clear()
-        }
 
-        if (isSearch) {
-            for (i in list.indices) {
-                if (groupName == list[i].name || (list[i].name).startsWith(groupName!!)) {
-                    lightList.addAll(DBUtils.getConnectorByGroupID(list[i].id))
-                }
+        when {
+            isSearch -> {
+                for (i in list.indices)
+                    if (groupName == list[i].name || (list[i].name).startsWith(groupName!!))
+                        lightList.addAll(DBUtils.getConnectorByGroupID(list[i].id))
+
+
             }
+            else -> {
+                for (i in list.indices)
+                    if (list[i].meshAddr == 0xffff)
+                        Collections.swap(list, 0, i)
 
-        } else {
-            for (i in list.indices) {
-                if (list[i].meshAddr == 0xffff) {
-                    Collections.swap(list, 0, i)
-                }
-            }
-
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getConnectorByGroupID(list[j].id))
+                for (j in list.indices)
+                    lightList.addAll(DBUtils.getConnectorByGroupID(list[j].id))
             }
         }
     }
@@ -288,11 +276,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onResume() {
         super.onResume()
-        initToolbar()
         initParameter()
         initData()
         initView()
-        initOnLayoutListener()
     }
 
     override fun onStop() {
@@ -315,10 +301,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initData() {
         lightList = ArrayList()
-        if (group.meshAddr == 0xffff) {
-            filter("", false)
-        } else {
-            lightList = DBUtils.getConnectorByGroupID(group.id)
+        when (group.meshAddr) {
+            0xffff -> filter("", false)
+            else -> lightList = DBUtils.getConnectorByGroupID(group.id)
         }
         toolbar.title = group?.name+"(${group?.deviceCount})"
         if (lightList.size > 0) {
@@ -344,16 +329,14 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun getNewData(): MutableList<DbConnector> {
-        if (group.meshAddr == 0xffff) {
-            filter("", false)
-        } else {
-            lightList = DBUtils.getConnectorByGroupID(group.id)
+        when (group.meshAddr) {
+            0xffff -> filter("", false)
+            else -> lightList = DBUtils.getConnectorByGroupID(group.id)
         }
 
-        if (group.meshAddr == 0xffff) {
-            toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-        } else {
-            toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
+        when (group.meshAddr) {
+            0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
+            else -> toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         }
         return lightList
     }
@@ -392,10 +375,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
 
     private fun initView() {
-        if (group.meshAddr == 0xffff) {
-            toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-        } else {
-            toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
+        when (group.meshAddr) {
+            0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
+            else -> toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         }
         light_add_device_btns.setOnClickListener(this)
         recyclerView = findViewById(R.id.recycler_view_lights)
@@ -404,9 +386,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         adapterDevice = ConnectorOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
         adapterDevice!!.onItemChildClickListener = onItemChildClickListener
         adapterDevice!!.bindToRecyclerView(recyclerView)
-        for (i in lightList.indices) {
+        for (i in lightList.indices)
             lightList[i].updateIcon()
-        }
 
         when (DBUtils.getAllRelay().size) {
             0 -> light_add_device_btns.text = getString(R.string.device_scan_scan)
@@ -471,9 +452,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
-
             DBUtils.updateGroup(group!!)
-
             dbLight.hasGroup = false
             dbLight.belongGroupId = 1
             DBUtils.updateRelayLocal(dbLight)
@@ -516,16 +495,14 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             scanPb.visibility = View.VISIBLE
         }
 
-        Thread {
+        GlobalScope.launch {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-            Thread.sleep(2500)
-            if (this@ConnectorOfGroupActivity == null ||
-                    this@ConnectorOfGroupActivity.isDestroyed ||
-                    this@ConnectorOfGroupActivity.isFinishing || !acitivityIsAlive) {
-            } else {
-                autoConnect()
+            delay(2500)
+            when {
+                this@ConnectorOfGroupActivity == null || this@ConnectorOfGroupActivity.isDestroyed || this@ConnectorOfGroupActivity.isFinishing || !acitivityIsAlive -> { }
+                else -> autoConnect()
             }
-        }.start()
+        }
     }
 
     /**********************************telink part***************************************************/
@@ -533,62 +510,12 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
+            NotificationEvent.GET_ALARM -> { }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
-            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
-//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
-            }
-        }
-    }
-
-    private fun onLogout() {
-
-    }
-
-    /**
-     * 处理[NotificationEvent.ONLINE_STATUS]事件
-     */
-    private fun onOnlineStatusNotify(event: NotificationEvent) {
-
-        if (canBeRefresh) {
-            canBeRefresh = false
-        } else {
-            return
-        }
-
-        TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().id)
-
-        val notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
-
-        if (notificationInfoList.isEmpty())
-            return
-
-        for (notificationInfo in notificationInfoList) {
-
-            if (notificationInfo.meshAddress == TelinkApplication.getInstance().connectDevice.meshAddress) {
-                currentLight?.textColor = ContextCompat.getColor(
-                        this, R.color.primary)
-            }
-
-            for (dbLight in lightList) {
-                if (notificationInfo.meshAddress == dbLight.meshAddr) {
-                    dbLight.connectionStatus = notificationInfo.connectionStatus.value
-                    dbLight.updateIcon()
-                    DBUtils.updateConnector(dbLight)
-                    runOnUiThread {
-                        adapterDevice?.notifyDataSetChanged()
-                    }
-
-                }
             }
         }
     }
@@ -634,22 +561,18 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
                 }
             }
-
         }
 
         val deviceInfo = this.mApplication?.connectDevice
-
-        if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
-                    ?: 0x00) and 0xFF
-        }
+        if (deviceInfo != null)
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
     }
 
     @SuppressLint("CheckResult")
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
+            if (acitivityIsAlive || mScanDisposal?.isDisposed != true) {
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -661,9 +584,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                                 val account = DBUtils.lastUser?.account
 
                                 val scanFilters = ArrayList<ScanFilter>()
-                                val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
-                                        .build()
+                                val scanFilter = ScanFilter.Builder().setDeviceName(account).build()
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
@@ -678,7 +599,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                                 addScanListeners()
                                 TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
-
                             } else {
                                 //没有授予权限
                                 DialogUtils.showNoBlePermissionDialog(this, {
@@ -733,17 +653,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        ("onErrorReport: onLeScanTimeout")
-//        if (mConnectSnackBar) {
-//        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
-//        }
-//        } else {
-//            retryConnect()
-//        }
-
     }
 
     private fun startCheckRSSITimer() {
@@ -763,7 +675,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            ("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -784,18 +695,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun login() {
         val meshName = DBUtils.lastUser?.controlMeshName
         val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
-                , Strings.stringToBytes(pwd, 16))
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
     private fun onNError(event: DeviceEvent) {
-
-//        ToastUtils.showLong(getString(R.string.connect_fail))
-
-
         TelinkLightService.Instance()?.idleMode(true)
-        TelinkLog.d("DeviceScanningActivity#onNError")
-
         val builder = AlertDialog.Builder(this)
         builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
         builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
@@ -834,17 +738,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()
         mCheckRssiDisposal?.dispose()
-//        try {
-//            this.unregisterReceiver(mReceiver)
-//        }catch (e:Exception){
-//            e.printStackTrace()
-//        }
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
 
         val deviceInfo = event.args
-
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
 
@@ -879,10 +777,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         }
     }
 
-    private fun onServiceConnected(event: ServiceEvent) {
-//        ("onServiceConnected")
-    }
-
     private fun onServiceDisconnected(event: ServiceEvent) {
         TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
@@ -906,14 +800,13 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         }.start()
 
         if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
-//            connect(deviceInfo.macAddress)
-            if (bestRSSIDevice != null) {
-                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
-                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                    bestRSSIDevice = deviceInfo
+            when {
+                bestRSSIDevice != null -> {
+                    //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                    if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0)
+                        bestRSSIDevice = deviceInfo
                 }
-            } else {
-                bestRSSIDevice = deviceInfo
+                else -> bestRSSIDevice = deviceInfo
             }
 
         }
@@ -922,22 +815,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
-                ("This is switch")
-                true
-            }
-            else -> {
-                false
-
-            }
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> true
+            else -> false
         }
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//        ("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
-        if (bestRSSIDevice != null) {
+        if (bestRSSIDevice != null)
             connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
-        }
+
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {

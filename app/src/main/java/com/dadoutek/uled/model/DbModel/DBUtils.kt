@@ -37,23 +37,38 @@ object DBUtils {
 
     val allLight: List<DbLight>
         //普通等
-        get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
+        get() {
+            val arrayList = ArrayList<DbLight>()
+            arrayList.addAll(DaoSessionInstance.getInstance().dbLightDao.loadAll())
+            return arrayList
+        }
+
 
     val allCurtain: List<DbCurtain>
         //窗帘
-        get() = DaoSessionInstance.getInstance().dbCurtainDao.loadAll()
+        get(){
+                val arrayList = ArrayList<DbCurtain>()
+                arrayList.addAll(DaoSessionInstance.getInstance().dbCurtainDao.loadAll())
+                return arrayList
+            }
+
 
     val allRely: List<DbConnector>
         //蓝牙接收器
-        get() = DaoSessionInstance.getInstance().dbConnectorDao.loadAll()
+        get()  {
+            val arrayList = ArrayList<DbConnector>()
+            arrayList.addAll(DaoSessionInstance.getInstance().dbConnectorDao.loadAll())
+            return arrayList
+        }
 
     val sceneList: MutableList<DbScene>
         get() {
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
 
-            return qb.where(
-                    DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId()))
-                    .list()
+            val list = qb.where(DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId())).list()
+            val arrayList = ArrayList<DbScene>()
+            arrayList.addAll(list)
+            return arrayList
         }
 
     val swtichList: MutableList<DbSwitch>
@@ -68,7 +83,10 @@ object DBUtils {
         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
-            return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId())).list()
+            val list = qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegionId())).list()
+            val arrayList = ArrayList<DbGroup>()
+            arrayList.addAll(list)
+            return arrayList
         }
 
 
@@ -1417,9 +1435,9 @@ object DBUtils {
     }
 
     fun getlastDeviceMesh(): Int {
-        val lights = allLight.map { it.meshAddr }
-        val curtain = allCurtain.map { it.meshAddr }
-        val relay = allRely.map { it.meshAddr }
+        val lights = allLight?.map { it.meshAddr }
+        val curtain = allCurtain?.map { it.meshAddr }
+        val relay = allRely?.map { it.meshAddr }
         val switch = getAllSwitch().map { it.meshAddr }
         val sensor = getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()

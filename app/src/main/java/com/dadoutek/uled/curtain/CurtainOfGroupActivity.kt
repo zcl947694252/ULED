@@ -284,8 +284,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             batchGroup.setText(R.string.batch_group)
             batchGroup.visibility = View.GONE
             batchGroup.setOnClickListener {
-                val intent = Intent(this,
-                        CurtainBatchGroupActivity::class.java)
+                val intent = Intent(this, CurtainBatchGroupActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                 intent.putExtra("curtain", "curtain_group")

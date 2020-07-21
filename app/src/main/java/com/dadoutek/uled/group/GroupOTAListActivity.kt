@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -42,6 +44,7 @@ import kotlinx.android.synthetic.main.toolbar.toolbarTv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -257,6 +260,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun initData() {
+        var emptyView = View.inflate(this, R.layout.empty_view, null)
+        val addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
+        addBtn.visibility = View.INVISIBLE
         val serializableExtra = intent.getSerializableExtra("group")
          if(serializableExtra!=null)
              dbGroup =  serializableExtra as DbGroup
@@ -269,26 +275,32 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 template_recycleView.adapter = lightAdaper
                 lightAdaper.setDeviceType(deviceType==DeviceType.LIGHT_RGB)
                 lightAdaper.bindToRecyclerView(template_recycleView)
+                lightAdaper.emptyView = emptyView
             }
             DeviceType.SMART_CURTAIN -> {
                 template_recycleView.adapter = curtainAdaper
                 curtainAdaper.bindToRecyclerView(template_recycleView)
+                curtainAdaper.emptyView = emptyView
             }
             DeviceType.SMART_RELAY -> {
                 template_recycleView.adapter = relayAdaper
                 relayAdaper.bindToRecyclerView(template_recycleView)
+                relayAdaper.emptyView = emptyView
             }
             DeviceType.NORMAL_SWITCH -> {
                 template_recycleView.adapter = switchAdaper
                 switchAdaper.bindToRecyclerView(template_recycleView)
+                switchAdaper.emptyView = emptyView
             }
                 DeviceType.SENSOR -> {
                 template_recycleView.adapter = sensorAdaper
                     sensorAdaper.bindToRecyclerView(template_recycleView)
+                    sensorAdaper.emptyView = emptyView
             }
             DeviceType.GATE_WAY -> {
                 template_recycleView.adapter = gwAdaper
                 gwAdaper.bindToRecyclerView(template_recycleView)
+                gwAdaper.emptyView = emptyView
             }
         }
 
@@ -513,6 +525,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         toolbarTv.text = getString(R.string.group_ota)
         template_recycleView.layoutManager = GridLayoutManager(this, 2)/*LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)*/
         template_recycleView.addItemDecoration(RecyclerGridDecoration(this, 2))
+
         getBin()
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画

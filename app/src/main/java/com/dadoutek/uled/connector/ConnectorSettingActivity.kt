@@ -122,9 +122,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                         showLoadingDialog(getString(R.string.please_wait))
                         val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
                                 .subscribe({
-                                   // deleteData()
+                                    // deleteData()
                                 }, {
-                                    GlobalScope.launch(Dispatchers.Main){
+                                    GlobalScope.launch(Dispatchers.Main) {
                                         /*    showDialogHardDelete?.dismiss()
                                           showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                   .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -135,7 +135,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                                   .show()*/
                                     }
                                 })
-                                        deleteData()
+                        deleteData()
 
 
                     } else {
@@ -147,7 +147,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 .show()
     }
 
-     fun deleteData() {
+    private fun deleteData() {
         hideLoadingDialog()
         DBUtils.deleteConnector(currentDbConnector!!)
 
@@ -207,14 +207,18 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun updateGroupResult(light: DbConnector, group: DbGroup) {
-        group.deviceType = light.productUUID.toLong()
-        light.hasGroup = true
-        light.belongGroupId = group.id
-        light.name = light.name
-        DBUtils.updateConnector(light)
-        ToastUtils.showShort(getString(R.string.grouping_success_tip))
-        if (group != null)
-            DBUtils.updateGroup(group!!)//更新组类型
+        Commander.addGroup(light.meshAddr, group.meshAddr, {
+            group.deviceType = light.productUUID.toLong()
+            light.hasGroup = true
+            light.belongGroupId = group.id
+            light.name = light.name
+            DBUtils.updateConnector(light)
+            ToastUtils.showShort(getString(R.string.grouping_success_tip))
+            if (group != null)
+                DBUtils.updateGroup(group!!)//更新组类型
+        }, {
+            ToastUtils.showShort(getString(R.string.grouping_fail))
+        })
     }
 
     /**
@@ -420,7 +424,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
-
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
@@ -430,11 +433,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
-                if (isConfigGroup){
-                   // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
-                   // toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
-                    //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
-                }else{
+                if (isConfigGroup) {
+                    /* menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                     toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
+                     toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false*/
+                } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                     fiRename = menu?.findItem(R.id.toolbar_f_rename)
                     fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
@@ -519,7 +522,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         connector_switch?.setOnCheckedChangeListener { _, isChecked ->
             if (TelinkLightApplication.getApp().connectDevice == null)
                 autoConnect()
-             else {
+            else {
                 if (!isChecked)
                     openOrClose(true)
                 else
@@ -556,9 +559,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun openOrClose(b: Boolean) {
         if (currentDbConnector?.productUUID == DeviceType.SMART_CURTAIN) {
-            Commander.openOrCloseCurtain(currentDbConnector?.meshAddr?:0, isOpen = b, isPause = false)
+            Commander.openOrCloseCurtain(currentDbConnector?.meshAddr ?: 0, isOpen = b, isPause = false)
         } else {
-            Commander.openOrCloseLights(currentDbConnector?.meshAddr?:0, b)
+            Commander.openOrCloseLights(currentDbConnector?.meshAddr ?: 0, b)
         }
         if (b)
             currentDbConnector?.connectionStatus = ConnectionStatus.ON.value
@@ -611,10 +614,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                     localVersion = getString(R.string.number_no)
                                 currentDbConnector!!.version = localVersion
                                 fiVersion?.title = localVersion
+                                if (TextUtils.isEmpty(localVersion))
+                                    localVersion = getString(R.string.number_no)
+                                fiVersion?.title = localVersion
                                 DBUtils.saveConnector(currentDbConnector!!, false)
                             },
                             {
-                                LogUtils.d(it)
+                                if (TextUtils.isEmpty(localVersion))
+                                    localVersion = getString(R.string.number_no)
+                                fiVersion?.title = localVersion
                             }
                     )
         }
