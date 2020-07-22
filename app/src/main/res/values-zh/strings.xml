@@ -691,7 +691,7 @@
     <string name="brightness_cannot_be_greater_than">亮度不能大于100</string>
     <string name="delay_time_unit">延时时间单位</string>
     <string name="trigger_mode_text">触&#160;&#160;&#160;发&#160;&#160;&#160;方&#160;&#160;&#160;式&#160;&#160;&#160;:</string>
-    <string name="delay_time_unit_text">延时时间单位&#160;&#160;&#160;:</string>
+    <string name="delay_time_unit_text">延时时间单位&#160;:</string>
     <string name="ten_second">10秒</string>
     <string name="twenty_second">20秒</string>
     <string name="thirty_second">30秒</string>

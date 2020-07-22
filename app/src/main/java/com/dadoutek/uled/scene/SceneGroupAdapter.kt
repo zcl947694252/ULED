@@ -129,8 +129,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
 
-                        //LogUtils.e(item.toString())
-
                         if (item.isEnableBright) {
                             sbBrightnessRGB.isEnabled = true
                             addBrightnessRGB.isEnabled = true

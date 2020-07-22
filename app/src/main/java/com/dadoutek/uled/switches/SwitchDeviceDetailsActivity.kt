@@ -77,7 +77,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-    private var currentSwitch: DbSwitch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +106,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
     }
 
     override fun setPositiveBtn() {
-        currentSwitch?.let {
+        currentDevice?.let {
             DBUtils.deleteSwitch(it)
             switchData.remove(it)
         }
@@ -134,13 +133,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
             val delete = itv.findViewById<TextView>(R.id.deleteBtn)
             val rename = itv.findViewById<TextView>(R.id.rename)
             popVersion = itv.findViewById<TextView>(R.id.pop_version)
-            popVersion?.text = getString(R.string.firmware_version) + currentSwitch?.version
+            popVersion?.text = getString(R.string.firmware_version) + currentDevice?.version
             popVersion?.visibility = View.VISIBLE
             delete.text = getString(R.string.delete)
             rename.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                if (!TextUtils.isEmpty(currentSwitch?.name))
-                    textGp?.setText(currentSwitch?.name)
+                if (!TextUtils.isEmpty(currentDevice?.name))
+                    textGp?.setText(currentDevice?.name)
                 textGp?.setSelection(textGp?.text.toString().length)
 
                 if (this != null && !this.isFinishing) {
@@ -152,8 +151,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                     if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
-                        currentSwitch?.name = textGp?.text.toString().trim { it <= ' ' }
-                        DBUtils.updateSwicth(currentSwitch!!)
+                        currentDevice?.name = textGp?.text.toString().trim { it <= ' ' }
+                        DBUtils.updateSwicth(currentDevice!!)
                         adapter!!.notifyDataSetChanged()
                         renameDialog.dismiss()
                     }
@@ -165,7 +164,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
             }
             ota.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                if (currentSwitch != null) {
+                if (currentDevice != null) {
                     TelinkLightService.Instance()?.idleMode(true)
                     showLoadingDialog(getString(R.string.connecting))
                     connect(macAddress = currentDevice?.macAddr, retryTimes = 3)
@@ -180,7 +179,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                                     }
                             )
                 } else {
-                    LogUtils.d("currentSwitch = $currentSwitch")
+                    LogUtils.d("currentDevice = $currentDevice")
                 }
             }
             delete.setOnClickListener {
@@ -217,7 +216,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
 
     private fun goConfig() {
         if (isRightPos()) return
-        if (currentSwitch != null) {
+        if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting))
             val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
@@ -229,7 +228,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                         LogUtils.d(it)
                     })
         } else
-            LogUtils.d("currentSwitch = $currentSwitch")
+            LogUtils.d("currentDevice = $currentDevice")
     }
 
     private fun isRightPos(): Boolean {
@@ -238,7 +237,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
             ToastUtils.showShort(getString(R.string.invalid_data))
             return true
         }
-        currentSwitch = switchData[positionCurrent]
+        currentDevice = switchData[positionCurrent]
         return false
     }
 
@@ -279,26 +278,26 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                                 if (version != null && version != "") {
                                     when (bestRSSIDevice?.productUUID) {
                                         DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             finish()
                                         }
                                         DeviceType.DOUBLE_SWITCH -> {
-                                            startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             finish()
                                         }
                                         DeviceType.SCENE_SWITCH -> {
                                             if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
-                                                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             else
-                                                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             finish()
                                         }
                                         DeviceType.EIGHT_SWITCH -> {
-                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             finish()
                                         }
                                         DeviceType.SMART_CURTAIN_SWITCH -> {
-                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch, "version" to version)
+                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
                                             finish()
                                         }
                                     }

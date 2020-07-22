@@ -281,6 +281,7 @@ class SyncDataPutOrGetUtils {
                             val gson = Gson()
                             body.name = scene.name
                             body.belongRegionId = scene.belongRegionId
+                            body.imgName = scene.imgName
                             body.actions = DBUtils.getActionsBySceneId(changeId)
 
                             postInfoStr = gson.toJson(body)

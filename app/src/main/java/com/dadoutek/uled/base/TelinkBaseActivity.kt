@@ -133,7 +133,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     lateinit var popFinish: PopupWindow
     lateinit var cancelf: Button
     lateinit var confirmf: Button
-    var isScenning: Boolean = true
     var isEdite: Boolean = false
     var type: Int? = null
     var showDialogHardDelete: AlertDialog? = null

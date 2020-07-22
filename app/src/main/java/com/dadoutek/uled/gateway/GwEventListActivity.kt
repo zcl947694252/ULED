@@ -200,7 +200,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         if (TelinkLightApplication.getApp().connectDevice != null) {
             when (item?.itemId) {
-                R.id.toolbar_f_rename -> reName()
+                R.id.toolbar_f_rename -> renameGw()
                 R.id.toolbar_fv_change_group -> configNet()
                 R.id.toolbar_fv_rest -> userReset()
                 R.id.toolbar_f_ota -> goOta()
@@ -416,18 +416,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         }
     }
 
-    private fun reName() {
-        StringUtils.initEditTextFilter(renameEditText)
-        if (dbGw != null && dbGw?.name != "")
-            renameEditText?.setText(dbGw?.name)
-
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
-        }
-    }
 
     override fun onResume() {
         super.onResume()

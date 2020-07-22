@@ -62,6 +62,7 @@ public class DbScene implements Parcelable{
             id = in.readLong();
         }
         name = in.readString();
+        imgName = in.readString();
         if (in.readByte() == 0) {
             belongRegionId = null;
         } else {
@@ -122,6 +123,8 @@ public class DbScene implements Parcelable{
             dest.writeLong(id);
         }
         dest.writeString(name);
+        dest.writeString(imgName);
+
         if (belongRegionId == null) {
             dest.writeByte((byte) 0);
         } else {

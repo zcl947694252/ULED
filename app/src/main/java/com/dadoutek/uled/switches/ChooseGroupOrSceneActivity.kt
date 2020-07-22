@@ -69,9 +69,12 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 var filter: List<DbGroup> = mutableListOf()
                 when (deviceType) {
                     Constant.DEVICE_TYPE_LIGHT.toInt() -> {
-                        filter = groupList.filter { it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL }
+                        filter = groupList.filter { it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL||
+                                it.deviceType == Constant.DEVICE_TYPE_CONNECTOR }
+                        groupList.add(0,DBUtils.allGroups[0])
                     }
-                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(), Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
+                    Constant.DEVICE_TYPE_LIGHT_NORMAL.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(),
+                    Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
                         filter = groupList.filter { it.deviceType == deviceType.toLong() }
                     }
                 }
@@ -86,6 +89,9 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 template_recycleView?.adapter = sceneAdapter
                 sceneAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.scene_list)
+                sceneList.forEach {
+                    it.isChecked = false
+                }
                 sceneAdapter?.notifyDataSetChanged()
             }
         }
@@ -109,15 +115,10 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                     ToastUtils.showShort(getString(R.string.please_setting_least_one_scene))
                 return@setOnClickListener
             }
-            if (isGroup){
-                setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
-                groupList.forEach { it.isChecked = false }
-            } else{
-                setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
-                sceneList.forEach { it.isChecked = false }
+            when {
+                isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
+                else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
             }
-
-
             finish()
         }
     }

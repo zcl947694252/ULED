@@ -70,7 +70,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         toolbarTv?.text = getString(R.string.switch_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
-            if (isScenning) {
+            if (isScanning) {
                 cancelf.isClickable = true
                 confirmf.isClickable = true
                 popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)

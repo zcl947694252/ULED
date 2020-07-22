@@ -336,8 +336,12 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         lightList.clear()
         if (isGroup)
             lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
-        else
-            lightList.addAll(DBUtils.allLight)
+        else {
+            when(deviceType){
+                DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
+                DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
+            }
+        }
         lightAdaper.onItemClickListener = onItemClickListener
         supportAndUNLight()
         lightAdaper.notifyDataSetChanged()

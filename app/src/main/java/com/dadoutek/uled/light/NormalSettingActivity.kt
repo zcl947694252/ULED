@@ -1115,7 +1115,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             initDataGroup()
             initViewGroup()
             img_function1.setImageResource(R.drawable.icon_editor)
-            img_function1.visibility = VISIBLE
+            if (group?.meshAddr != 0xffff)
+                img_function1.visibility = VISIBLE
             img_function1.setOnClickListener {
                 renameGroup()
             }
@@ -1343,13 +1344,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else
             slow_ly.visibility = GONE
 
-        setLightBrightnessNum(group?.brightness ?: 1,group?.meshAddr!!)
-        setLightTemperatureValue(group?.colorTemperature ?: 1,group?.meshAddr ?: 0)
+        setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
+        setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
     }
 
     private fun setLightTemperatureValue(colorNum: Int, meshAddr: Int) {
         var opcode = Opcode.SET_TEMPERATURE
-        var params = byteArrayOf(0x05,colorNum.toByte())
+        var params = byteArrayOf(0x05, colorNum.toByte())
         setLightGUIImg(temperatureValue = colorNum)
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
     }
@@ -1449,7 +1450,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.brightness < 1) 1 else light!!.brightness
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-            setLightBrightnessNum(brightnes,light?.meshAddr)
+            setLightBrightnessNum(brightnes, light?.meshAddr)
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1461,7 +1462,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.colorTemperature < 1) 1 else light!!.colorTemperature
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-            setLightTemperatureValue(light?.colorTemperature,light?.meshAddr)
+            setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
             isBrightness = false
         }
 

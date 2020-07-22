@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model.DbModel;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class DbSceneBody {
@@ -9,6 +11,8 @@ public class DbSceneBody {
     private Long belongRegionId;
 
     private List<DbSceneActions> actions;
+    @Nullable
+    public String imgName;
 
     public String getName() {
         return name;
@@ -40,6 +44,7 @@ public class DbSceneBody {
                 "name='" + name + '\'' +
                 ", belongRegionId=" + belongRegionId +
                 ", actions=" + actions +
+                ", imgName='" + imgName + '\'' +
                 '}';
     }
 }

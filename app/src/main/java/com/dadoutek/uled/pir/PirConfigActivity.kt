@@ -151,6 +151,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun changeGroupType(b: Boolean) {
         showBottomList.clear()
+        bottomGvAdapter.isScene(!b)
         if (b) {
             pir_config_choose_group_ly.visibility = View.VISIBLE
             pir_config_choose_scene_ly.visibility = View.GONE
@@ -174,7 +175,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         version = intent.getStringExtra("version")
         pir_confir_tvPSVersion.text = version
         isReConfirm = mDeviceInfo?.isConfirm == 1//等于1代表是重新配置
-        if (isReConfirm){
+        if (isReConfirm) {
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo!!.meshAddress)
             toolbarTv.text = currentSensor?.name
         }
@@ -292,7 +293,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         newItemGroup.enableCheck = true
         newItemGroup.gpName = currentScene?.name
         newItemGroup.sceneId = currentScene?.id ?: 0
-        newItemGroup.icon = if (TextUtils.isEmpty(currentScene?.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(currentScene?.imgName, this)
+        val i = if (TextUtils.isEmpty(currentScene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(currentScene?.imgName, this)
+        newItemGroup.icon = i
         if (currentScene != null)
             showBottomList.add(newItemGroup)
     }
@@ -400,7 +402,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             else -> {//符合所有条件
                 val device = TelinkLightApplication.getApp().connectDevice
-                if (device != null && device.macAddress == mDeviceInfo?.macAddress) {
+                if (device != null) {
                     GlobalScope.launch {
                         setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
                         sendCommandOpcode(time.toInt())
@@ -470,7 +472,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor.version = version
         dbSensor.productUUID = mDeviceInfo!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
-        dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
+        if (!isReConfirm)
+            dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
 
         saveSensor(dbSensor, isReConfirm)//保存进服务器
 
@@ -499,13 +502,13 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        GlobalScope.launch (Dispatchers.Main){
+                        GlobalScope.launch(Dispatchers.Main) {
                             showLoadingDialog(getString(R.string.please_wait))
                             disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
                                     .subscribe({
-                                    deleteData()
+                                        deleteData()
                                     }, {
-                                        GlobalScope.launch(Dispatchers.Main){
+                                        GlobalScope.launch(Dispatchers.Main) {
                                             /*    showDialogHardDelete?.dismiss()
                                               showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                       .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -515,7 +518,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                                       .setNegativeButton(R.string.btn_cancel, null)
                                                       .show()*/
                                             deleteData()
-                                        } })
+                                        }
+                                    })
                         }
                     }
                 }
@@ -523,11 +527,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-     fun deleteData() {
+    fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.reset_factory_success))
-        if (currentSensor!=null)
-        DBUtils.deleteSensor(currentSensor!!)
+        if (currentSensor != null)
+            DBUtils.deleteSensor(currentSensor!!)
         TelinkLightService.Instance()?.idleMode(true)
         configureComplete()
         finish()
@@ -603,14 +607,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
+                configureComplete()
             }
         }
         renameCancel?.setOnClickListener {
             if (!this.isFinishing)
                 renameDialog?.dismiss()
-        }
-        renameDialog.setOnDismissListener {
-            configureComplete()
         }
 
         if (!this.isFinishing) {
@@ -634,12 +636,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     fun autoConnect() {
-        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        val deviceTypes = mutableListOf(DeviceType.SENSOR)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
             ToastUtils.showLong(getString(R.string.connecting_tip))
             connectDisposable?.dispose()
-            connectDisposable = connect(meshAddress = mDeviceInfo!!.meshAddress, fastestMode = true, retryTimes = 2)
+            connectDisposable = connect(meshAddress = mDeviceInfo!!.meshAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
                     ?.subscribe({
                         runOnUiThread {
                             hideLoadingDialog()
@@ -751,7 +753,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun makeGrideView() {
         pir_config_recyclerGroup.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        pir_config_recyclerGroup.layoutManager = GridLayoutManager(this, 2)
+        pir_config_recyclerGroup.layoutManager = GridLayoutManager(this, 5)
         bottomGvAdapter?.bindToRecyclerView(pir_config_recyclerGroup)
     }
 

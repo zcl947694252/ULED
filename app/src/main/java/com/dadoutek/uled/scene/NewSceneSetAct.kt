@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -49,7 +50,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
-    private var resId: Int? = R.drawable.icon_out
+    private var resId: Int = R.drawable.icon_out
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
     private var rgbRecyclerView: RecyclerView? = null
@@ -316,7 +317,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun initChangeView() {
-        toolbarTv.setText(R.string.edit_scene)
+        toolbarTv.setText(scene!!.name)
         editSceneName = scene!!.name
     }
 
@@ -475,8 +476,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     when (val intExtra = data?.getIntExtra("ID", 0)) {
                         0 -> ToastUtils.showShort(getString(R.string.invalid_data))
                         else -> {
-                            resId = intExtra
-                            scene_icon.setImageResource(resId!!);
+                            intExtra?.let { resId = it }
+                            scene_icon.setImageResource(resId);
                         }
                     }
                 }
@@ -555,6 +556,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             editSceneName != null -> edit_name.setText(editSceneName)
             scene != null -> edit_name.setText(scene!!.name)
         }
+        resId = if (TextUtils.isEmpty(scene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(scene?.imgName, this)
+        scene_icon.setImageResource(resId)
 
         isToolbar = false
         currentPageIsEdit = true
@@ -618,25 +621,29 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun save() {
         LogUtils.v("zcl-----------baocunchangjing-------")
+        if (edit_name.text.toString().isEmpty()) {
+            ToastUtils.showLong(getString(R.string.name_can_not_null))
+            return
+        }
         saveCurrenEditResult()
+
+        editSceneName = edit_name.text.toString()
+        toolbarTv.text = editSceneName
+
         when {
-            edit_name.text.toString().isEmpty() -> ToastUtils.showLong(getString(R.string.name_can_not_null))
             showGroupList!!.size <= 0 -> ToastUtils.showLong(R.string.add_scene_gp_tip)
             else -> {
                 isToolbar = true
-                when {
-                    !currentPageIsEdit -> saveScene()
-                    else -> {//添加场景选择分组
-                        showDataListView()
-                    }
+                if (!currentPageIsEdit)
+                    saveScene()
+                else {//添加场景选择分组
+                    showDataListView()
                 }
             }
         }
     }
 
     private fun saveCurrenEditResult() {
-        editSceneName = edit_name.text.toString()
-        toolbarTv.text = editSceneName
         val oldResultItemList = ArrayList<ItemGroup>()
         val newResultItemList = ArrayList<ItemGroup>()
 
@@ -702,11 +709,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             dbScene.id = getSceneId()
             dbScene.name = name
             try {
-                val split = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")
-                if (split.size == 2)
-                    dbScene.imgName = split[1]
-                else
-                    dbScene.imgName = "icon_out"
+                dbScene.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
@@ -861,6 +864,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val nameList = java.util.ArrayList<Int>()
 
             scene?.name = name
+            scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
             DBUtils.updateScene(scene!!)
             val idAction = scene?.id!!
 

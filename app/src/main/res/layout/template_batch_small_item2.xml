@@ -15,7 +15,7 @@
             android:id="@+id/template_device_batch_icon_ly2"
             android:layout_width="@dimen/dp_50"
             android:layout_height="@dimen/dp_50"
-            android:background="@drawable/rect_r15_w"
+            android:background="@drawable/rect_r15_graye"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginLeft="5dp"

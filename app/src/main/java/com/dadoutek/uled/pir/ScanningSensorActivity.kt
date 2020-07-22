@@ -92,7 +92,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
-            if (isScenning) {
+            if (isScanning) {
                 cancelf.isClickable = true
                 confirmf.isClickable = true
                 popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
@@ -115,7 +115,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initListener() {
         device_stop_scan.setOnClickListener {
-            if (isScanning&&!isSearchedDevice) {
+            if (isScanning) {
                 scanFail()
                 doFinish()
             } else{
@@ -141,7 +141,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun startAnimation() {
-        isScenning = true
+        isScanning = true
         device_lottieAnimationView?.playAnimation()
         start_scanning_sensor_ly?.visibility = View.GONE
         scanning_device_ly.visibility = View.VISIBLE
@@ -149,7 +149,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun closeAnimal() {
-        isScenning = false
+        isScanning = false
         device_lottieAnimationView.cancelAnimation()
         start_scanning_sensor_ly.visibility = View.GONE
         scanning_device_ly.visibility = View.GONE

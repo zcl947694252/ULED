@@ -1609,7 +1609,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         } else {
             newStartBlinkOpcode(groupAddress, meshAddr, true)
         }
-
     }
 
     private fun newStartBlinkOpcode(groupAddress: Int, meshAddr: Int, isStart: Boolean) {

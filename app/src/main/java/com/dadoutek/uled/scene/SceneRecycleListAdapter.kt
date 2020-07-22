@@ -23,7 +23,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
         if (scene != null) {
             val groupNum = helper.getView<TextView>(R.id.template_device_group_name)
 
-            var resId = if (TextUtils.isEmpty(scene.imgName)) R.drawable.icon_1 else OtherUtils.getResourceId(scene.imgName, mContext)
+            var resId = if (TextUtils.isEmpty(scene.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(scene.imgName, mContext)
             helper.setImageResource(R.id.template_device_icon, resId)
 
             val actions = DBUtils.getActionsBySceneId(scene.id)

@@ -788,7 +788,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun closeAnimation() {
-        isScenning = false
+        isScanning = false
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
@@ -910,7 +910,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initToolbar() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
-            if (isScenning) {
+            if (isScanning) {
                 cancelf.isClickable = true
                 confirmf.isClickable = true
                 popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
@@ -1111,7 +1111,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
-        isScenning = true
+        isScanning = true
         //添加进disposable，防止内存溢出.
         mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->

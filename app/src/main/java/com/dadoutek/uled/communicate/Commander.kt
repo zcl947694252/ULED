@@ -623,13 +623,15 @@ object Commander : EventListener<String> {
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
-                if (macAddress != null && macAddress != "0")
-                    connectParams.setConnectMac(macAddress)
-                else if (meshAddr != 0)
-                    connectParams.setConnectMeshAddress(meshAddr)
+                when {
+                    macAddress != null && macAddress != "0" -> connectParams.setConnectMac(macAddress)
+                    meshAddr != 0 -> connectParams.setConnectMeshAddress(meshAddr)
+                    //true == 快速模式(不会扫几秒去找信号最好的)   //1367540967
+                }
 
                 if (deviceTypes != null)
                     connectParams.setConnectDeviceType(deviceTypes)
+
                 connectParams.setPassword(meshPwd)
                 connectParams.autoEnableNotification(true)
                 connectParams.setFastestMode(fastestMode)      //true == 快速模式(不会扫几秒去找信号最好的)
@@ -637,7 +639,7 @@ object Commander : EventListener<String> {
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
-                    TelinkLightService.Instance()?.autoConnect(connectParams)
+                TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
