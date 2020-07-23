@@ -2,7 +2,6 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -14,7 +13,6 @@ import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -107,9 +105,9 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setOnClickListener {
 
-            StringUtils.initEditTextFilter(textGp)
-                textGp?.setText(tagBean?.tagName ?: "")
-            textGp?.setSelection(textGp?.text.toString().length)
+            StringUtils.initEditTextFilter(renameEt)
+                renameEt?.setText(tagBean?.tagName ?: "")
+            renameEt?.setSelection(renameEt?.text.toString().length)
 
             if (this != null && !this.isFinishing) {
                 renameDialog?.dismiss()
@@ -117,10 +115,10 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             }
 
             renameConfirm?.setOnClickListener {    // 获取输入框的内容
-                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                     ToastUtils.showLong(getString(R.string.rename_tip_check))
                 } else{
-                    val trim = textGp?.text.toString().trim { it <= ' ' }
+                    val trim = renameEt?.text.toString().trim { it <= ' ' }
                     tagBean?.tagName = trim
                     toolbarTv.text = trim
                 }

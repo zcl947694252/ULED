@@ -791,8 +791,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun renameGroup() {
         if (!TextUtils.isEmpty(group?.name))
-            textGp?.setText(group?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(group?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -800,10 +800,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                var name = textGp?.text.toString().trim { it <= ' ' }
+                var name = renameEt?.text.toString().trim { it <= ' ' }
                 var canSave = true
                 val groups = DBUtils.allGroups
                 for (i in groups.indices) {
@@ -815,7 +815,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
 
                 if (canSave) {
-                    group?.name = textGp?.text.toString().trim { it <= ' ' }
+                    group?.name = renameEt?.text.toString().trim { it <= ' ' }
                     DBUtils.updateGroup(group!!)
                     toolbarTv.text = group?.name
                     renameDialog.dismiss()
@@ -1569,9 +1569,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun renameLight() {
         findItem?.title = localVersion
         hideLoadingDialog()
-        StringUtils.initEditTextFilter(textGp)
-        textGp?.setText(light.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+        StringUtils.initEditTextFilter(renameEt)
+        renameEt?.setText(light.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -1579,10 +1579,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                light?.name = textGp?.text.toString().trim { it <= ' ' }
+                light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateLight(light!!)
                 toolbarTv.text = light?.name
                 renameDialog?.dismiss()

@@ -80,6 +80,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         }
 
         retryConnectCount = 0
+
         isSupportInstallOldDevice = false
     }
 

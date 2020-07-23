@@ -1,16 +1,18 @@
 package com.dadoutek.uled.stomp
 
 import android.util.Log
-import com.blankj.utilcode.util.PhoneUtils.getIMEI
+import com.dadoutek.uled.base.CancelAuthorMsg
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DeviceUtils
 import com.dadoutek.uled.util.DeviceUtils.getIMEI
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.fusesource.hawtbuf.Buffer
 import org.fusesource.hawtbuf.UTF8Buffer
 import org.fusesource.mqtt.client.*
-import org.greenrobot.greendao.DbUtils
+import org.json.JSONObject
 
 
 /**
@@ -22,23 +24,21 @@ import org.greenrobot.greendao.DbUtils
  * 更新时间   $
  * 更新描述
  */
-class MqttManger private constructor() {
-    private val HOST: String? = "47.107.227.130"
-    private val PORT: Int = 1885
+object MqttManger {
     private var connection: CallbackConnection? = null
     private var mqtt: MQTT? = null
     private val imei = getIMEI(TelinkLightApplication.getApp().mContext)
-    private var CLIENTID: String = NetworkFactory.md5((DBUtils.lastUser?.id?:0).toString()+ imei) //设备唯一标识
-    var topics = arrayOf(Topic("app/test", QoS.AT_LEAST_ONCE), Topic("app/test", QoS.AT_LEAST_ONCE))
+    private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id?:0).toString()+ imei) //设备唯一标识
+    private var topics = arrayOf(Topic("app/test", QoS.AT_LEAST_ONCE))
 
     private val listener = object : Listener {
         override fun onFailure(value: Throwable?) {
             Log.e("zcl_mqtt", "zcl******mqtt连接回调----------onFailure");
-            initMqtt()
         }
 
         override fun onPublish(topic: UTF8Buffer?, body: Buffer?, ack: Runnable?) {
             Log . e ("zcl_mqtt", "zcl******mqtt连接回调------------onPublish---${topic?.toString()}---${body?.toString()}======${body?.get(0).toString()}====${body?.get(1).toString()}");
+            val bean = Gson().fromJson(body.toString(), MqttBodyBean::class.java)
         }
 
         override fun onConnected() {
@@ -64,7 +64,7 @@ class MqttManger private constructor() {
         connection?.subscribe(topics, object : Callback<ByteArray?> {
             override fun onSuccess(value: ByteArray?) {
                 Log.v("zcl_mqtt","zclmqtt------------------订阅成功")
-                startPublish()
+                //startPublish()
             }
 
             override fun onFailure(value: Throwable?) {
@@ -86,10 +86,10 @@ class MqttManger private constructor() {
         })
     }
 
-    private fun initMqtt() {//去订阅app/test 浏览器里访问 http://dev.dadoutek.com/smartlight_test/test/send 会向该频道发送{"hello":"world"}
+    fun initMqtt() {//去订阅app/test 浏览器里访问 http://dev.dadoutek.com/smartlight_test/test/send 会向该频道发送{"hello":"world"}
         mqtt = MQTT()
-        mqtt?.setHost(HOST, PORT)
-        mqtt?.setClientId(CLIENTID)
+        mqtt?.setHost(Constant.HOST, Constant.PORT)
+        mqtt?.setClientId(clientId)
         mqtt?.isCleanSession = false//是否记住重连时请清除缓存
         mqtt?.keepAlive = 5//心跳时间
 
@@ -101,7 +101,7 @@ class MqttManger private constructor() {
         mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
         mqtt?.version ="3.3.0"
 
-        mqtt?.connectAttemptsMax = 1//默认是-1 无重试上限
+        mqtt?.connectAttemptsMax = -1//默认是-1 无重试上限
         mqtt?.reconnectDelay =10 //首次重连间隔时间毫秒
         mqtt?.reconnectAttemptsMax = 30000 //重连间隔时间默认时间30000毫秒
 

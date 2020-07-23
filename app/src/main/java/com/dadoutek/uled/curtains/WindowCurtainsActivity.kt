@@ -15,7 +15,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -25,7 +24,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -39,7 +37,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -184,8 +181,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun renameGp() {
         if (!TextUtils.isEmpty(curtainGroup?.name))
-            textGp?.setText(curtainGroup?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(curtainGroup?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -193,10 +190,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                var name = textGp?.text.toString().trim { it <= ' ' }
+                var name = renameEt?.text.toString().trim { it <= ' ' }
                 var canSave = true
                 val groups = DBUtils.allGroups
                 for (i in groups.indices) {
@@ -208,7 +205,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
 
                 if (canSave) {
-                    curtainGroup?.name = textGp?.text.toString().trim { it <= ' ' }
+                    curtainGroup?.name = renameEt?.text.toString().trim { it <= ' ' }
                     DBUtils.updateGroup(curtainGroup!!)
                     toolbarTv.text = curtainGroup?.name
                     renameDialog.dismiss()
@@ -359,8 +356,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun renameLight() {
         if (!TextUtils.isEmpty(curtain?.name))
-            textGp?.setText(curtain?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(curtain?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -368,10 +365,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                curtain?.name = textGp?.text.toString().trim { it <= ' ' }
+                curtain?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateCurtain(curtain!!)
                 toolbarTv.text = curtain?.name
                 renameDialog.dismiss()

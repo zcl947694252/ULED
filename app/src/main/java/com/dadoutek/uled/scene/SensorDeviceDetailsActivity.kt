@@ -271,8 +271,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     private fun renameSesor() {
         if (!TextUtils.isEmpty(currentDevice?.name))
-            textGp?.setText(currentDevice?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(currentDevice?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -280,12 +280,12 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                currentDevice?.name = textGp?.text.toString()
+                currentDevice?.name = renameEt?.text.toString()
                 DBUtils.saveSensor(currentDevice!!, true)
-                sensorDatas[positionCurrent].name = textGp?.text.toString()
+                sensorDatas[positionCurrent].name = renameEt?.text.toString()
                 adapter?.notifyDataSetChanged()
                 renameDialog.dismiss()
             }
@@ -317,9 +317,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 when (view.id) {
                     R.id.template_device_setting -> {
                         showLoadingDialog(getString(R.string.please_wait))
-                        val deviceTypes = mutableListOf(DeviceType.SENSOR)
-                        connect(macAddress = currentDevice?.macAddr,/* meshAddress = currentDevice?.meshAddr
-                                ?: 0,*/ fastestMode = true,deviceTypes = deviceTypes)?.subscribe({
+                        val deviceTypes = mutableListOf(currentDevice?.productUUID?:DeviceType.NIGHT_LIGHT)
+                        connect(macAddress = currentDevice?.macAddr,deviceTypes = deviceTypes)?.subscribe({
                             relocationSensor()
                         }, {
                             hideLoadingDialog()

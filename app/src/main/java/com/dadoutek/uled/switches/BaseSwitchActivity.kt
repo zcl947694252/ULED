@@ -96,7 +96,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     private fun makePopuwindow() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameEt = popReNameView?.findViewById(R.id.pop_rename_edt)
         renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
@@ -171,13 +171,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(switchDate: DbSwitch?) {
         hideLoadingDialog()
-        StringUtils.initEditTextFilter(textGp)
+        StringUtils.initEditTextFilter(renameEt)
 
         if (!TextUtils.isEmpty(switchDate?.name))
-            textGp?.setText(switchDate?.name)
+            renameEt?.setText(switchDate?.name)
         else
-            textGp?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()

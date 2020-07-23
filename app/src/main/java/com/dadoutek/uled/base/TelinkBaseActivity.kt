@@ -70,9 +70,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.fusesource.mqtt.client.MQTT
 import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
 
@@ -139,7 +138,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     var renameCancel: TextView? = null
     var renameConfirm: TextView? = null
-    var textGp: EditText? = null
+    var renameEt: EditText? = null
     var popReNameView: View? = null
     lateinit var renameDialog: Dialog
 
@@ -172,15 +171,17 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     private fun startTimerUpdate() {
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
-            if (netWorkCheck(this))
-                SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
-                    override fun start() {}
-                    override fun complete() {
-                        LogUtils.v("zcl-----------默认上传成功-------")
-                    }
+            if (netWorkCheck(this))//oom溢出
+                CoroutineScope(Dispatchers.IO).launch {
+                    SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
+                        override fun start() {}
+                        override fun complete() {
+                            LogUtils.v("zcl-----------默认上传成功-------")
+                        }
 
-                    override fun error(msg: String?) {}
-                })
+                        override fun error(msg: String?) {}
+                    })
+                }
         }
     }
 
@@ -914,9 +915,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 var networkInfo = connectivityManager.activeNetworkInfo
                 if (networkInfo != null && networkInfo.isAvailable) {
                     if (!isHaveNetwork) {
+
                         val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
                         if (connected != true)
                             TelinkLightApplication.getApp().initStompClient()
+
                         LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
                         isHaveNetwork = true
                     }
@@ -1129,11 +1132,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     private fun makeRenamePopuwindow() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameEt = popReNameView?.findViewById(R.id.pop_rename_edt)
         renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
-        StringUtils.initEditTextFilter(textGp)
-        textGp?.singleLine = true
+        StringUtils.initEditTextFilter(renameEt)
+        renameEt?.singleLine = true
 
         renameDialog = Dialog(this)
         renameDialog?.setContentView(popReNameView)

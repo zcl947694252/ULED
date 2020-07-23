@@ -22,9 +22,11 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述
  */
 class SelectSceneIconActivity : TelinkBaseActivity() {
-    private  val iconList = arrayListOf(R.drawable.icon_1,R.drawable.icon_2,R.drawable.icon_3,R.drawable.icon_4,
-            R.drawable.icon_5,R.drawable.icon_6,R.drawable.icon_home,R.drawable.icon_film,R.drawable.icon_from,R.drawable.icon_guest ,
-            R.drawable.icon_jobs,R.drawable.icon_out ,R.drawable.icon_party ,R.drawable.icon_sleep ,R.drawable.icon_warm)
+    private  val iconList = arrayListOf(  R.drawable.icon_1,R.drawable.icon_2,R.drawable.icon_3,
+                                                        R.drawable.icon_4, R.drawable.icon_5,R.drawable.icon_6,
+                                                        R.drawable.icon_home,R.drawable.icon_film,R.drawable.icon_from,
+                                                        R.drawable.icon_guest , R.drawable.icon_jobs,R.drawable.icon_out
+                                                        ,R.drawable.icon_party ,R.drawable.icon_sleep ,R.drawable.icon_warm)
 
     private val iconAdapter: IconAdapter = IconAdapter(R.layout.item_icon,iconList)
 

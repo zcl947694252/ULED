@@ -1108,11 +1108,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (!this.isFinishing)
                 renameDialog?.dismiss()
         }
-        renameDialog.setOnDismissListener {
-            dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
-            DBUtils.saveSensor(dbSensor, true)
-            doFinish()
-        }
+
     }
 
     private fun getControlGroup(): String? {

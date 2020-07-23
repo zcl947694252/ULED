@@ -470,10 +470,16 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         if (TextUtils.isEmpty(version))
             version = mDeviceInfo!!.firmwareRevision
         dbSensor.version = version
-        dbSensor.productUUID = mDeviceInfo!!.productUUID
+        if (!isReConfirm)
+            dbSensor.productUUID = mDeviceInfo!!.productUUID
+        else
+            dbSensor.productUUID = currentSensor!!.productUUID
         dbSensor.meshAddr = mDeviceInfo!!.meshAddress
         if (!isReConfirm)
             dbSensor.name = getString(R.string.sensor) + dbSensor.meshAddr
+        else
+            dbSensor.name = currentSensor?.name
+
 
         saveSensor(dbSensor, isReConfirm)//保存进服务器
 
@@ -592,22 +598,20 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(dbSensor: DbSensor) {
-        initEditTextFilter(textGp)
         if (dbSensor.name != "" && dbSensor.name != null)
-            textGp?.setText(dbSensor.name)
+            renameEt?.setText(dbSensor.name)
         else
-            textGp?.setText(getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(getSwitchPirDefaultName(dbSensor.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         renameConfirm?.setOnClickListener {  // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                dbSensor.name = textGp?.text.toString().trim { it <= ' ' }
+                dbSensor.name = renameEt?.text.toString().trim { it <= ' ' }
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
-                configureComplete()
             }
         }
         renameCancel?.setOnClickListener {

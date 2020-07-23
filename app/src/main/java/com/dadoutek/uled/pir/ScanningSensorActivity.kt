@@ -114,6 +114,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initListener() {
+        tv_tip.setOnClickListener {
+            if (!isScanning)
+                seeHelpe()
+        }
         device_stop_scan.setOnClickListener {
             if (isScanning) {
                 scanFail()
@@ -122,9 +126,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 startScan()
             }
         }
-        progressBtn.onClick {
-            setNewScan()
-        }
     }
 
     //扫描失败处理方法
@@ -132,7 +133,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         showToast(getString(R.string.scan_end))
         doFinish()
     }
-
 
     private fun setNewScan() {
         mRetryConnectCount = 0
@@ -143,16 +143,20 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun startAnimation() {
         isScanning = true
         device_lottieAnimationView?.playAnimation()
-        start_scanning_sensor_ly?.visibility = View.GONE
         scanning_device_ly.visibility = View.VISIBLE
+        device_lottieAnimationView.visibility = View.VISIBLE
+        image_no_group.visibility = View.GONE
+        tv_tip.text = getString(R.string.scanning)
     }
 
 
     private fun closeAnimal() {
         isScanning = false
         device_lottieAnimationView.cancelAnimation()
-        start_scanning_sensor_ly.visibility = View.GONE
-        scanning_device_ly.visibility = View.GONE
+        //scanning_device_ly.visibility = View.GONE
+        device_lottieAnimationView.visibility = View.GONE
+        image_no_group.visibility = View.VISIBLE
+        tv_tip.text = getString(R.string.see_help)
     }
 
 
@@ -213,8 +217,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 }.start()
 
                 LogUtils.e("zcl pir开始扫描")
-                progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
             }
         }
     }
@@ -241,7 +243,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onResume() {
         super.onResume()
         stopTimerUpdate()
-        progressBtn.progress = 0
         disableConnectionStatusListener()//停止base内部的设备变化监听 不让其自动创建对象否则会重复
     }
 
@@ -322,11 +323,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onLeScanTimeout() {
         LogUtils.e("zcl onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
-            progressBtn.progress = -1   //控件显示Error状态
-            progressBtn.text = getString(R.string.not_find_pir)
             ToastUtils.showLong(R.string.not_find_pir)
         }
         device_stop_scan.text  = getString(R.string.scan_retry)
+        closeAnimal()
     }
 
 
@@ -378,7 +378,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         isSearchedDevice = false
 
 
-        progressBtn.progress = 100  //进度控件显示成完成状态
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
         getVersion()
     }
@@ -433,8 +432,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         hideLoadingDialog()
         LogUtils.e("zcl  showConnectFailed")
         ToastUtils.showLong(getString(R.string.connect_fail))
-        progressBtn.progress = -1    //控件显示Error状态
-        progressBtn.text = getString(R.string.connect_fail)
         isSearchedDevice = false
         device_stop_scan.text  = getString(R.string.scan_retry)
     }
@@ -446,7 +443,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-        progressBtn.text = getString(R.string.connecting)
         device_stop_scan.text = getString(R.string.connecting_tip)
         scanDisposable?.dispose()
 
@@ -467,7 +463,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun doFinish() {
-        closeAnimal()
+        //closeAnimal()
         this.mApplication.removeEventListener(this)
         if (TelinkLightService.Instance() != null) {
             TelinkLightService.Instance()?.idleMode(true)

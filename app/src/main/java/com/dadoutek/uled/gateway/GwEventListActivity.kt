@@ -2,14 +2,10 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -130,9 +126,9 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
         if (TelinkLightApplication.getApp().isConnectGwBle)
-        image_bluetooth.setImageResource(R.drawable.cloud)
+            image_bluetooth.setImageResource(R.drawable.cloud)
         var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
-        if(moreIcon != null) {
+        if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
             toolbar.overflowIcon = moreIcon;
         }
@@ -145,9 +141,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun renameGw() {
-        if (!TextUtils.isEmpty(dbGw?.name))
-            textGp?.setText(dbGw?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+        renameEditText?.setText(dbGw?.name)
+        renameEditText?.setSelection(renameEditText?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -155,13 +150,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            val trim = renameEditText?.text.toString().trim { it <= ' ' }
+            if (StringUtils.compileExChar(trim)) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                val trim = textGp?.text.toString().trim { it <= ' ' }
                 dbGw?.name = trim
                 toolbarTv.text = trim
                 DBUtils.saveGateWay(dbGw!!, false)
+                renameDialog?.dismiss()
             }
         }
     }
@@ -193,7 +189,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     override fun onMenuOpened(featureId: Int, menu: Menu?): Boolean {
-       fiVersion?.title = dbGw?.version
+        fiVersion?.title = dbGw?.version
         return super.onMenuOpened(featureId, menu)
     }
 
@@ -530,13 +526,13 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
             val disposable = Commander.getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
-                        bottom_version_number.text = s
-                        if (TextUtils.isEmpty(dbGw?.version))
-                            dbGw?.version = getString(R.string.number_no)
-                        dbGw!!.version = s
-                        fiVersion?.title = dbGw?.version
-                        DBUtils.saveGateWay(dbGw!!, false)
-                    }, {})
+                bottom_version_number.text = s
+                if (TextUtils.isEmpty(dbGw?.version))
+                    dbGw?.version = getString(R.string.number_no)
+                dbGw!!.version = s
+                fiVersion?.title = dbGw?.version
+                DBUtils.saveGateWay(dbGw!!, false)
+            }, {})
         }
         bottom_version_number.text = dbGw?.version
 
@@ -1039,7 +1035,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
             override fun loginFail() {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-               // retryConnect()
+                // retryConnect()
             }
 
             override fun setGwComplete(deviceInfo: DeviceInfo) {

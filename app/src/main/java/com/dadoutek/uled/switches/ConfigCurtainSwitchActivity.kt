@@ -144,15 +144,15 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     private fun makePop() {
         popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        textGp = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
+        renameEt = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
         renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
+                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
                 if (this != null && !this.isFinishing) {
                     renameDialog?.dismiss()
@@ -170,7 +170,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
+            switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()

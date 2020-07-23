@@ -139,8 +139,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
             rename.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
                 if (!TextUtils.isEmpty(currentDevice?.name))
-                    textGp?.setText(currentDevice?.name)
-                textGp?.setSelection(textGp?.text.toString().length)
+                    renameEt?.setText(currentDevice?.name)
+                renameEt?.setSelection(renameEt?.text.toString().length)
 
                 if (this != null && !this.isFinishing) {
                     renameDialog?.dismiss()
@@ -148,10 +148,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                 }
 
                 renameConfirm?.setOnClickListener {    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                    if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
-                        currentDevice?.name = textGp?.text.toString().trim { it <= ' ' }
+                        currentDevice?.name = renameEt?.text.toString().trim { it <= ' ' }
                         DBUtils.updateSwicth(currentDevice!!)
                         adapter!!.notifyDataSetChanged()
                         renameDialog.dismiss()

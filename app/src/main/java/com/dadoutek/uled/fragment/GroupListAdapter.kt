@@ -22,10 +22,10 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
             helper.addOnClickListener(R.id.template_device_more)
                     .addOnClickListener(R.id.template_device_card_delete)
-            if (isSuportOpenOrClose)//支持点击 使用设置开关三个图标 将其显示 不支持设置按钮图标使其隐藏
+           // if (isSuportOpenOrClose)//支持点击 使用设置开关三个图标 将其显示 不支持设置按钮图标使其隐藏
                 helper.addOnClickListener(R.id.template_device_icon)
-            else
-                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_group_g_n)
+         //   else
+               // helper.setImageResource(R.id.template_device_icon, R.drawable.icon_group_g_n)
 
             when {
                 group.deviceCount > 0 -> {

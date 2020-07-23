@@ -770,10 +770,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchData?.name = textGp?.text.toString().trim { it <= ' ' }
+                switchData?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (switchData == null)
                     switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
                 if (switchData != null)
@@ -791,7 +791,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog?.setOnDismissListener {
-            switchData?.name = textGp?.text.toString().trim { it <= ' ' }
+            switchData?.name = renameEt?.text.toString().trim { it <= ' ' }
             if (switchData != null)
                 DBUtils.updateSwicth(switchData!!)
             SyncDataPutOrGetUtils.syncPutDataStart(this!!, object : SyncCallback {

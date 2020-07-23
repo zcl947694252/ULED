@@ -54,7 +54,6 @@ import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
 import java.util.*
@@ -506,8 +505,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun renameCurtain(curtain: DbCurtain?) {
         if (!TextUtils.isEmpty(curtain?.name))
-            textGp?.setText(curtain?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(curtain?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -515,10 +514,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                curtain!!.name = textGp?.text.toString().trim { it <= ' ' }
+                curtain!!.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateCurtain(curtain!!)
                 changeDeviceData()
                 renameDialog.dismiss()
@@ -529,8 +528,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun renameConnector(connector: DbConnector?) {
         if (connector != null) {
             if (!TextUtils.isEmpty(connector?.name))
-                textGp?.setText(connector?.name)
-            textGp?.setSelection(textGp?.text.toString().length)
+                renameEt?.setText(connector?.name)
+            renameEt?.setSelection(renameEt?.text.toString().length)
 
             if (this != null && !this.isFinishing) {
                 renameDialog?.dismiss()
@@ -538,10 +537,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
 
             renameConfirm?.setOnClickListener {    // 获取输入框的内容
-                if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+                if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                     ToastUtils.showLong(getString(R.string.rename_tip_check))
                 } else {
-                    connector.name = textGp?.text.toString().trim { it <= ' ' }
+                    connector.name = renameEt?.text.toString().trim { it <= ' ' }
                     DBUtils.updateConnector(connector)
                     changeDeviceData()
                     renameDialog.dismiss()
@@ -552,8 +551,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun renameLight(light: DbLight?) {
         if (!TextUtils.isEmpty(light?.name))
-            textGp?.setText(light?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(light?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -561,10 +560,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                light?.name = textGp?.text.toString().trim { it <= ' ' }
+                light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (light != null) {
                     DBUtils.updateLight(light)
                     changeSorceData(light.id)
@@ -1424,8 +1423,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun addNewGroup() {
-        StringUtils.initEditTextFilter(textGp)
-        textGp?.setSelection(textGp?.text.toString().length)
+        StringUtils.initEditTextFilter(renameEt)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -1433,7 +1432,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 //往DB里添加组数据
@@ -1444,7 +1443,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
                     DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
                 }
-                DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, groupType)
+                DBUtils.addNewGroupWithType(renameEt?.text.toString().trim { it <= ' ' }, groupType)
                 setGroupData()
                 renameDialog.dismiss()
             }

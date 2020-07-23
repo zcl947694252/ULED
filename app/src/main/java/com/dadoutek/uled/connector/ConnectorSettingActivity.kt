@@ -18,10 +18,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -83,8 +81,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun renameGroup() {
         if (!TextUtils.isEmpty(group?.name))
-            textGp?.setText(group?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(group?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -92,10 +90,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                var name = textGp?.text.toString().trim { it <= ' ' }
+                var name = renameEt?.text.toString().trim { it <= ' ' }
                 var canSave = true
                 val groups = DBUtils.allGroups
                 for (i in groups.indices) {
@@ -106,7 +104,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     }
                 }
                 if (canSave) {
-                    group?.name = textGp?.text.toString().trim { it <= ' ' }
+                    group?.name = renameEt?.text.toString().trim { it <= ' ' }
                     DBUtils.updateGroup(group!!)
                     toolbarTv.text = group?.name
                     renameDialog.dismiss()
@@ -389,8 +387,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun renameDevice() {
         if (!TextUtils.isEmpty(currentDbConnector?.name))
-            textGp?.setText(currentDbConnector?.name)
-        textGp?.setSelection(textGp?.text.toString().length)
+            renameEt?.setText(currentDbConnector?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
@@ -398,10 +396,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                currentDbConnector?.name = textGp?.text.toString().trim { it <= ' ' }
+                currentDbConnector?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateConnector(currentDbConnector!!)
                 toolbarTv?.text = currentDbConnector?.name
                 renameDialog.dismiss()

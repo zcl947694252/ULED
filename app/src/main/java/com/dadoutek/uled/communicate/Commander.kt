@@ -74,7 +74,7 @@ object Commander : EventListener<String> {
      * isPause 是否暂停开关窗帘
      */
     fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
-        val opcode = Opcode.CURTAIN_ON_OFF
+        val opcode = Opcode.CURTAIN_ON_OFF//0xf2
         mTargetGroupAddr = groupAddr
         val params: ByteArray = if (isPause) {
             byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)

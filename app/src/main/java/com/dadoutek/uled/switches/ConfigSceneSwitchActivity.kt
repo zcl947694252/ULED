@@ -514,10 +514,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
+                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (switchDate != null)
                     DBUtils.updateSwicth(switchDate!!)
                 else
@@ -535,7 +535,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         }
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = textGp?.text.toString().trim { it <= ' ' }
+            switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
             if (switchDate != null)
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()

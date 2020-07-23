@@ -453,6 +453,14 @@ abstract class BaseGroupFragment : BaseFragment() {
                             Commander.openOrCloseLights(dstAddr, false)
                             groupCloseSuccess(position)
                         }
+                    }else{
+                        if (currentGroup!!.status == 0) {
+                            Commander.openOrCloseCurtain(dstAddr, true,false)
+                            groupOpenSuccess(position)
+                        } else {
+                            Commander.openOrCloseCurtain(dstAddr, false,false)
+                            groupCloseSuccess(position)
+                        }
                     }
             }
 
