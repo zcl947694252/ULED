@@ -76,7 +76,7 @@ object Commander : EventListener<String> {
     fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
         val opcode = Opcode.CURTAIN_ON_OFF//0xf2
         mTargetGroupAddr = groupAddr
-        val params: ByteArray = if (isPause) {
+        val params: ByteArray = if (isPause) {// 0xe1  0xef
             byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
         } else {
             if (isOpen) {
@@ -91,8 +91,7 @@ object Commander : EventListener<String> {
     }
 
 
-    fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
-                       failedCallback: () -> Unit1) {
+    private fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         LogUtils.e("zcl---添加表 更新数据$lightList")
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3

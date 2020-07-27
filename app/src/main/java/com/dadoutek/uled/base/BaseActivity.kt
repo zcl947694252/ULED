@@ -32,6 +32,7 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -330,16 +331,54 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
+        //filter.addAction(Constant.CANCEL_CODE)
+        //filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
 
     inner class StompReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
+            when(codeBean.cmd){
+                1->{//单点登录
+                    LogUtils.e("zcl_baseMe___________收到登出消息")
+                    if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
+                    checkNetworkAndSync(this@BaseActivity)
+                }
+                2->{//推送二维码扫描解析结果
+                    makeCodeDialog(0, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
+                }
+                3->{//解除授权信息
+                    val user = DBUtils.lastUser
+                    user?.let {
+                        if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
+                                &&it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                            user.last_region_id = 1.toString()
+                            user.last_authorizer_user_id = user.id.toString()
+                            DBUtils.deleteAllData()
+                            AccountModel.initDatBase(it)
+                            //更新last—region-id
+                            DBUtils.saveUser(user)
+                            SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                        }
+                    }
+                    makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.region_name, codeBean.rid)//2代表解除授权信息type
+                    LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+                }
+                700 -> TelinkLightApplication.getApp().offLine = false
+                701 -> TelinkLightApplication.getApp().offLine = true
+                2000->{//下发标签结果
+                    if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)
+                }
+                2500->{//推送下发控制指令结果
+                    receviedGwCmd2500M(codeBean)
+                }
+            }
+
+
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
@@ -385,6 +424,10 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {

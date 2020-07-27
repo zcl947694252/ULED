@@ -13,6 +13,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils.groupList
 import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.switches.SceneMoreItemAdapter
 import kotlinx.android.synthetic.main.choose_group_scene.*
 import kotlinx.android.synthetic.main.template_recycleview.*
@@ -43,23 +44,31 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
     }
 
     private fun initData() {
-        sceneList.forEach {
-            sceneDatumms.add(CheckItemBean(it.id, it.name, false,it.imgName))
-        }
-        groupList.forEach {
-            groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
-        }
-
         //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
         type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
         when (type) {
-            0, 2 -> {//选群组
+            0 -> {//选群组
+                groupList.forEach {
+                    groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
+                }
+                template_recycleView?.adapter = groupAdapter
+                groupAdapter.bindToRecyclerView(template_recycleView)
+                toolbarTv.text = getString(R.string.select_group)
+            }
+            123->{//代表cw灯彩灯接收器
+                groupList.filter { it.deviceType !=DeviceType.SMART_CURTAIN.toLong() }.forEach {
+                    groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
+                }
                 template_recycleView?.adapter = groupAdapter
                 groupAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.select_group)
             }
             else -> {
+                sceneList.forEach {
+                    sceneDatumms.add(CheckItemBean(it.id, it.name, false,it.imgName))
+                }
+
                 template_recycleView?.adapter = sceneAdapter
                 sceneAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.choose_scene)
@@ -80,7 +89,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
         groupAdapter.onItemClickListener = this
         choose_scene_confim.setOnClickListener {
             val intent = Intent()
-            if (type == 0 || type == 2)
+            if (type == 0 || type == 123)
                 intent.putParcelableArrayListExtra("data", groupDatumms.filter { it.checked } as ArrayList)
             else
                 intent.putParcelableArrayListExtra("data", sceneDatumms.filter { it.checked } as ArrayList)
@@ -92,7 +101,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
-        if (type == 0 || type == 2) {
+        if (type == 0 || type == 123) {
             if (groupDatumms.filter { it.checked }.size==7 && !groupDatumms[position].checked){
                 ToastUtils.showShort(getString(R.string.group_max))
             }else{

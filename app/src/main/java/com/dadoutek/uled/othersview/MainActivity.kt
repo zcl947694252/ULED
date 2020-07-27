@@ -115,10 +115,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
 
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
+        //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            //TelinkLightApplication.getApp().initStompClient()
 
-        //MqttManger.initMqtt()
+        MqttManger.initMqtt()
 
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
@@ -441,6 +441,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
         mConnectDisposal?.dispose()
+        MqttManger.doDisconnect()
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 

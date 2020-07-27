@@ -33,6 +33,8 @@ import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.stomp.MqttBodyBean
+import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
@@ -604,6 +606,24 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_LIGHT_ON -> {
+                LogUtils.v("zcl-----------远程控制开灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
+                lightsData[positionCurrent].updateIcon()
+                listAdapter?.notifyDataSetChanged()
+            }
+            Constant.SER_ID_LIGHT_OFF -> {
+                LogUtils.v("zcl-----------远程控制关灯成功-------")
+                hideLoadingDialog()
+                lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
+                lightsData[positionCurrent].updateIcon()
+                listAdapter?.notifyDataSetChanged()
+            }
+        }
+    }
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_LIGHT_ON -> {
                 LogUtils.v("zcl-----------远程控制开灯成功-------")

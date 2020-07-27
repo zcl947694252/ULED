@@ -1,6 +1,8 @@
 package com.dadoutek.uled.stomp
 
+import android.content.Intent
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -28,47 +30,53 @@ object MqttManger {
     private var connection: CallbackConnection? = null
     private var mqtt: MQTT? = null
     private val imei = getIMEI(TelinkLightApplication.getApp().mContext)
-    private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id?:0).toString()+ imei) //设备唯一标识
-    private var topics = arrayOf(Topic("app/test", QoS.AT_LEAST_ONCE))
+    private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id?:0).toString()+ imei).substring(8, 24) //设备唯一标识 MD5加密一定是32位
+    private var topics = arrayOf(Topic("app/emit/${DBUtils.lastUser?.id}", QoS.AT_LEAST_ONCE))
 
     private val listener = object : Listener {
         override fun onFailure(value: Throwable?) {
-            Log.e("zcl_mqtt", "zcl******mqtt连接回调----------onFailure");
+           LogUtils.v("zcl_mqtt--******mqtt连接回调----------onFailure");
         }
 
         override fun onPublish(topic: UTF8Buffer?, body: Buffer?, ack: Runnable?) {
-            Log . e ("zcl_mqtt", "zcl******mqtt连接回调------------onPublish---${topic?.toString()}---${body?.toString()}======${body?.get(0).toString()}====${body?.get(1).toString()}");
+          LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic?.toString()}---${body?.toString()}======${body?.get(0).toString()}====${body?.get(1).toString()}");
             val bean = Gson().fromJson(body.toString(), MqttBodyBean::class.java)
+
+            val intent = Intent()
+            intent.action = Constant.LOGIN_OUT
+            intent.putExtra(Constant.LOGIN_OUT, bean)
+            TelinkLightApplication.getApp().mContext.sendBroadcast(intent)
         }
 
+
         override fun onConnected() {
-            Log.e("zcl_mqtt", "zcl******mqtt连接回调------------onConnected");
+           LogUtils.v("zcl_mqtt--******mqtt连接回调------------onConnected");
         }
 
         override fun onDisconnected() {
-            Log.e("zcl_mqtt", "zcl******mqtt连接回调----------onDisconnected");
+           LogUtils.v("zcl_mqtt--******mqtt连接回调----------onDisconnected");
         }
     }
     private val connectBack = object : Callback<Void?> {
         override fun onSuccess(value: Void?) {
-            Log.e("zcl_mqtt", "zcl******mqtt连接成功----------value")
+            LogUtils.v("zcl_mqtt******mqtt连接成功----------value")
             initTopics()
         }
 
         override fun onFailure(value: Throwable?) {
-            Log.e("zcl_mqtt", "zcl******mqtt连接失败----------value")
+            LogUtils.v("zcl_mqtt******mqtt连接失败----------value")
         }
     }
 
     private fun initTopics() {
         connection?.subscribe(topics, object : Callback<ByteArray?> {
             override fun onSuccess(value: ByteArray?) {
-                Log.v("zcl_mqtt","zclmqtt------------------订阅成功")
+               LogUtils.v("zcl_mqtt------------------订阅成功")
                 //startPublish()
             }
 
             override fun onFailure(value: Throwable?) {
-                Log.v("zcl_mqtt","zclmqtt------------------订阅失败")
+               LogUtils.v("zcl_mqtt------------------订阅失败")
                 initTopics()
             }
         })
@@ -77,7 +85,7 @@ object MqttManger {
     private fun startPublish() {
         connection?.publish("singleLogin", "你好".toByteArray(), QoS.AT_LEAST_ONCE, false, object : Callback<Void?> {
             override fun onSuccess(value: Void?) {
-                Log.v("zcl_mqtt","zclmqtt------------------发送成功")
+               LogUtils.v("zcl_mqtt------------------发送成功")
             }
 
             override fun onFailure(value: Throwable?) {
@@ -91,14 +99,14 @@ object MqttManger {
         mqtt?.setHost(Constant.HOST, Constant.PORT)
         mqtt?.setClientId(clientId)
         mqtt?.isCleanSession = false//是否记住重连时请清除缓存
-        mqtt?.keepAlive = 5//心跳时间
+        mqtt?.keepAlive = 60//心跳时间
 
         mqtt?.setUserName("APP_${DBUtils.lastUser?.id?:0}")
         mqtt?.setPassword("123456")
 
-        mqtt?.isWillRetain =true //是否在断联后发送最后消息
-        mqtt?.setWillMessage("close")
-        mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
+       // mqtt?.isWillRetain =true //是否在断联后发送最后消息
+       // mqtt?.setWillMessage("close")
+       // mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
         mqtt?.version ="3.3.0"
 
         mqtt?.connectAttemptsMax = -1//默认是-1 无重试上限
@@ -117,5 +125,16 @@ object MqttManger {
         connection = mqtt?.callbackConnection()
         connection?.listener(listener)
         connection?.connect(connectBack)
+    }
+    fun doDisconnect(){
+        connection?.disconnect(object : Callback<Void?> {
+            override fun onSuccess(value: Void?) {
+                LogUtils.v("zcl_mqtt------------------mqttt断联:onSuccess")
+            }
+
+            override fun onFailure(value: Throwable?) {
+                LogUtils.v("zcl_mqtt------------------mqttt断联:onSuccess")
+            }
+        })
     }
 }

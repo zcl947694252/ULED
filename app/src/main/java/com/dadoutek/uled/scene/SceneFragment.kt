@@ -33,6 +33,7 @@ import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
@@ -674,6 +675,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_SCENE_ON -> {
+                LogUtils.v("zcl-----------远程控制场景开启成功-------")
+                ToastUtils.showShort(getString(R.string.scene_apply_success))
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+            }
+        }
+    }  override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_SCENE_ON -> {
                 LogUtils.v("zcl-----------远程控制场景开启成功-------")

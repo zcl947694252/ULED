@@ -52,6 +52,7 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.GuideUtils
@@ -786,6 +787,22 @@ class GroupListFragment : BaseFragment() {
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ALLON -> {
+                LogUtils.v("zcl-----------远程控制群组开启成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOpenSuccess()
+            }
+            Constant.SER_ID_GROUP_ALLOFF -> {
+                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOffSuccess()
+            }
+        }
+    }
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")

@@ -50,6 +50,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
+    private var rgbGradientId: Int = 1
     private var resId: Int = R.drawable.icon_out
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
@@ -467,7 +468,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     val itemRgbGradient = data?.getSerializableExtra("data") as ItemRgbGradient
                     if (currentPosition != 1000000) {
                         sceneGroupAdapter.data[currentPosition].gradientName = itemRgbGradient.name
-                        sceneGroupAdapter.data[currentPosition].gradientId = itemRgbGradient.id
+                         rgbGradientId = itemRgbGradient.id
+                        sceneGroupAdapter.data[currentPosition].gradientId = rgbGradientId
                         sceneGroupAdapter.data[currentPosition].gradientType = itemRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
                     }
                     sceneGroupAdapter.notifyDataSetChanged()

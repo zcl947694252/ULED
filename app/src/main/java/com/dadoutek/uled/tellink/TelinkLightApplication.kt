@@ -125,6 +125,7 @@ class TelinkLightApplication : TelinkApplication() {
 
     @SuppressLint("CheckResult")
     fun initStompClient() {
+        return
         GlobalScope.launch {
             if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()

@@ -32,6 +32,7 @@ import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
@@ -314,6 +315,19 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ALLON -> {
+                LogUtils.v("zcl-----------远程控制组全开成功-------")
+                hideLoadingDialog()
+
+            }
+            Constant.SER_ID_GROUP_ALLOFF -> {
+                LogUtils.v("zcl-----------远程控制组全关成功-------")
+                hideLoadingDialog()
+            }
+        }
+    }
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")

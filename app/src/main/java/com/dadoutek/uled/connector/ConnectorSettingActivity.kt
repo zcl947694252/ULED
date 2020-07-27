@@ -168,23 +168,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         this.finish()
     }
 
-/*    private fun updateGroup() {
-        val intent = Intent(this, ConnectorGroupingActivity::class.java)
-        if (light == null) {
-            ToastUtils.showLong(getString(R.string.please_connect_normal_light))
-            TelinkLightService.Instance()?.idleMode(true)
-            TelinkLightService.Instance()?.disconnect()
-            return
-        }
-        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-        intent.putExtra("light", light)
-        intent.putExtra("gpAddress", gpAddress)
-        intent.putExtra("uuid", light!!.productUUID)
-        Log.d("窗帘升级点击的设备Light", light!!.productUUID.toString() + "," + light!!.meshAddr)
-        startActivity(intent)
-        this.finish()
-    }*/
-
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@ConnectorSettingActivity, ChooseGroupOrSceneActivity::class.java)
         val bundle = Bundle()

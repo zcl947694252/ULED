@@ -347,7 +347,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
-                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 123)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {
@@ -612,11 +612,13 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
+                finish()
             }
         }
         renameCancel?.setOnClickListener {
             if (!this.isFinishing)
                 renameDialog?.dismiss()
+            finish()
         }
 
         if (!this.isFinishing) {
@@ -624,6 +626,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             runOnUiThread {
                 renameDialog.show()
             }
+        }
+        renameDialog?.setOnDismissListener {
+            finish()
         }
     }
 
@@ -641,11 +646,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     fun autoConnect() {
         val deviceTypes = mutableListOf(DeviceType.SENSOR)
-        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-        if (size > 0) {
             ToastUtils.showLong(getString(R.string.connecting_tip))
             connectDisposable?.dispose()
-            connectDisposable = connect(meshAddress = mDeviceInfo!!.meshAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
+            connectDisposable = connect(macAddress = mDeviceInfo!!.macAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
                     ?.subscribe({
                         runOnUiThread {
                             hideLoadingDialog()
@@ -659,7 +662,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                         LogUtils.d("connect failed")
                     })
-        }
+
     }
 
     private fun sendCommandOpcode(durationTime: Int) {

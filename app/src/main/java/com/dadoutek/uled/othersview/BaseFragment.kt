@@ -25,10 +25,13 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -76,7 +79,8 @@ open class BaseFragment : Fragment() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
+        filter.addAction(Constant.LOGIN_OUT)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         context?.registerReceiver(stompRecevice, filter)
     }
@@ -84,6 +88,13 @@ open class BaseFragment : Fragment() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
+            var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
+            when(codeBean.cmd){
+                2500->{//推送下发控制指令结果
+                    receviedGwCmd2500M(codeBean)
+                }
+            }
+
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
@@ -94,6 +105,10 @@ open class BaseFragment : Fragment() {
                 }
             }
         }
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
@@ -315,4 +330,5 @@ open class BaseFragment : Fragment() {
         TelinkLightApplication.getApp().refWatcher?.watch(this)
         context?.unregisterReceiver(stompRecevice)
     }
+
 }

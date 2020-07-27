@@ -182,7 +182,7 @@
     <string name="scene_edit">修改</string>
     <string name="create_scene">添加场景</string>
     <string name="edit_scene">修改场景</string>
-    <string name="tv_scene_name">场景名称：</string>
+    <string name="tv_scene_name">输入名称：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">最少添加一个组</string>
     <string name="scene_name">场景</string>
@@ -1013,4 +1013,6 @@
     <string name="sure_delete_device2">确定删除此设备?</string>
     <string name="light_sw">光能开关</string>
     <string name="touch_sw">触摸开关</string>
+    <string name="model_list">模式列表</string>
+    <string name="seven_color">七彩渐变</string>
 </resources>

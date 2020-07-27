@@ -48,6 +48,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -415,8 +416,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         if (!LeBluetooth.getInstance().enable(applicationContext))
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
-//       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
-//           TelinkLightApplication.getApp().initStompClient()
+       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
+           TelinkLightApplication.getApp().initStompClient()
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
@@ -629,10 +630,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
+       //filter.addAction(Constant.GW_COMMEND_CODE)
+       //filter.addAction(Constant.CANCEL_CODE)
+       //filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
@@ -640,6 +641,43 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
+        var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
+            when(codeBean.cmd){
+                1->{//单点登录
+                    LogUtils.e("zcl_baseMe___________收到登出消息")
+                    loginOutMethod()
+                }
+                2->{//推送二维码扫描解析结果
+                    makeCodeDialog(0, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
+                }
+                 3->{//解除授权信息
+                     val user = DBUtils.lastUser
+                     user?.let {
+                         if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
+                                 &&it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                             user.last_region_id = 1.toString()
+                             user.last_authorizer_user_id = user.id.toString()
+                             DBUtils.deleteAllData()
+                             AccountModel.initDatBase(it)
+                             //更新last—region-id
+                             DBUtils.saveUser(user)
+                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                         }
+                     }
+                     codeBean.let { makeCodeDialog(2, it.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt()) }//2代表解除授权信息type
+                     LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+                }
+                700 -> TelinkLightApplication.getApp().offLine = false
+                701 -> TelinkLightApplication.getApp().offLine = true
+                2000->{//下发标签结果
+                    if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)
+                }
+                2500->{//推送下发控制指令结果
+                    receviedGwCmd2500M(codeBean)
+                }
+            }
+
+
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
@@ -679,7 +717,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     }
 
                     cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid, cancelBean.region_name, lastRegionId?.toInt()) }//2代表解除授权信息type
-
                     LogUtils.e("zcl_baseMe___________取消授权${cancelBean == null}")
                 }
                 Constant.PARSE_CODE -> {
@@ -689,6 +726,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {

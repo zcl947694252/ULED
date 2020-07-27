@@ -191,7 +191,7 @@
     <string name="scene_edit">Edit</string>
     <string name="create_scene">Add Scene</string>
     <string name="edit_scene">Modify scene</string>
-    <string name="tv_scene_name">Scene name:</string>
+    <string name="tv_scene_name">Input name:</string>
     <string name="plaese_input_scene_name">Please enter the scene name</string>
     <string name="scene_tip">Please add at least one group</string>
     <string name="scene_name">Scenes</string>
@@ -1095,5 +1095,7 @@
     <string name="touch_double_sw">Touch two sets of switches</string>
     <string name="bt_scene_sw">Touch scene switch</string>
     <string name="scene_sw">Scene switch</string>
+    <string name="model_list">Model list</string>
+    <string name="seven_color">Colorful gradient</string>
 
 </resources>

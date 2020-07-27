@@ -298,14 +298,20 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                              }
                          }
                      }*/
-                group.deviceType = curtain!!.productUUID.toLong()
-                DBUtils.updateGroup(group)
 
-                light.hasGroup = true
-                light.belongGroupId = group.id
-                light.name = light.name
-                DBUtils.updateCurtain(light)
-                ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                Commander.addGroup(light.meshAddr, group.meshAddr, {
+                    group.deviceType = curtain!!.productUUID.toLong()
+                    DBUtils.updateGroup(group)
+
+                    light.hasGroup = true
+                    light.belongGroupId = group.id
+                    light.name = light.name
+                    DBUtils.updateCurtain(light)
+                    ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                }, {
+                    ToastUtils.showShort(getString(R.string.grouping_fail))
+                })
+
                 //}.start()
             }
         }

@@ -11,8 +11,8 @@ object DeviceType {
     const val EIGHT_SWITCH_VERSION: String = "B8SS"
     const val SMART_CURTAIN_SWITCH: Int = 0x25
 
-    const val SENSOR: Int = 0x23//pir 版本:PS-1.1.3
-    const val NIGHT_LIGHT: Int = 0x24       //人体感应器 版本: 2.x.x以上
+    const val SENSOR: Int = 0x23//pir 版本:PS-1.1.3  35
+    const val NIGHT_LIGHT: Int = 0x24       //人体感应器 版本: 2.x.x以上  36
     const val LIGHT_NORMAL: Int = 0x04
     const val LIGHT_NORMAL_OLD: Int = 0xFF
     const val LIGHT_RGB: Int = 0x06

@@ -23,6 +23,7 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -32,12 +33,17 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.RegisterActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.facebook_btn
 import kotlinx.android.synthetic.main.activity_login.google_btn
@@ -400,60 +406,49 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
-            AccountModel.login(phone!!, editPassWord!!)
-                    .subscribe(object : NetworkObserver<DbUser>() {
-                        override fun onNext(dbUser: DbUser) {
-                            DBUtils.deleteLocalData()
-//                            ToastUtils.showLong(R.string.login_success)
-                            SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
-//                            hideLoadingDialog()
-                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-//                            showLoadingDialog(getString(R.string.sync_now))
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                            SharedPreferencesUtils.setUserLogin(true)
-                        }
+                NetworkFactory.getApi()
+                        .getAccount(phone, "dadou")
+                        .compose(NetworkTransformer())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                object : NetworkObserver<String>() {
+                                    override fun onNext(t: String) {
+                                        userLogin()
+                                    }
+                                    override fun onError(e: Throwable) {
+                                        super.onError(e)
+                                        ToastUtils.showShort(e.message)
+                                        return
+                                    }
+                                })
 
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            LogUtils.d("logging: " + "登录错误" + e.message)
-                            hideLoadingDialog()
-                        }
-                    })
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
+    }
 
+    private fun userLogin() {
+        AccountModel.login(phone!!, editPassWord!!)
+                .subscribe(object : NetworkObserver<DbUser>() {
+                    override fun onNext(dbUser: DbUser) {
+                        DBUtils.deleteLocalData()
+    //                            ToastUtils.showLong(R.string.login_success)
+                        SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
+    //                            hideLoadingDialog()
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+    //                            showLoadingDialog(getString(R.string.sync_now))
+                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                        SharedPreferencesUtils.setUserLogin(true)
+                    }
 
-        /* if (!StringUtils.isTrimEmpty(phone)) {
-             NetworkFactory.getApi()
-                     .getAccount(phone, "dadou")
-                     .compose(NetworkTransformer())
-                     .subscribeOn(Schedulers.io())
-                     .observeOn(AndroidSchedulers.mainThread())
-                     .subscribe(
-                             object : NetworkObserver<String>() {
-                                 override fun onNext(t: String) {
-                                     if (TextUtils.isEmpty(t))
-                                         startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-                                     else {
-                                         val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
-                                         intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-                                         intent.putExtra("phone", phone)
-                                         returnView()
-                                         startActivity(intent)
-                                         finish()
-                                     }
-                                 }
-
-                                 override fun onError(e: Throwable) {
-                                     super.onError(e)
-                                     returnView()
-
-                                 }
-                             })
-         } else {
-             ToastUtils.showShort(getString(R.string.phone_or_password_can_not_be_empty))
-         }*/
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                        LogUtils.d("logging: " + "登录错误" + e.message)
+                        ToastUtils.showShort(e.message)
+                        hideLoadingDialog()
+                    }
+                })
     }
 
     var isSuccess: Boolean = true

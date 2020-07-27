@@ -65,7 +65,7 @@ class SelectGradientActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.select_gradient)
+        toolbarTv.text = getString(R.string.model_list)
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->

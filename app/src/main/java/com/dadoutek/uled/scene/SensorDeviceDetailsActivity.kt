@@ -36,6 +36,7 @@ import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -317,13 +318,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 when (view.id) {
                     R.id.template_device_setting -> {
                         showLoadingDialog(getString(R.string.please_wait))
-                        val deviceTypes = mutableListOf(currentDevice?.productUUID?:DeviceType.NIGHT_LIGHT)
-                        connect(macAddress = currentDevice?.macAddr,deviceTypes = deviceTypes)?.subscribe({
-                            relocationSensor()
-                        }, {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.connect_fail))
-                        })
+                        connectAndConfig()
                     }
                     R.id.template_device_icon -> {
                         isClick = OPEN_CLOSE
@@ -338,11 +333,22 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         builder?.setMessage(string)
                         builder?.create()?.show()
                     }
-                    else -> {
-                    }
+                    else -> {}
                 }
             }
         }
+    }
+
+    private fun connectAndConfig() {
+        TelinkLightService.Instance()?.idleMode(true)
+        Thread.sleep(200)
+        val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
+        connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
+            relocationSensor()
+        }, {
+            hideLoadingDialog()
+            ToastUtils.showShort(getString(R.string.connect_fail))
+        })
     }
 
     private fun sendToGw() {
@@ -604,6 +610,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             progressBar_sensor.visibility = View.GONE
             connectSensorTimeoutDisposable?.dispose()
             if (currentDevice != null && currentDevice?.meshAddr != null) {
+                LogUtils.v("zcl------------------连接地址${currentDevice!!.meshAddr}")
                 Commander.getDeviceVersion(currentDevice!!.meshAddr)
                         .subscribe(
                                 { s ->
@@ -648,19 +655,25 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             when (deviceInfo.productUUID) {
                 DeviceType.SENSOR -> {//老版本人体感应器
                     currentDevice?.version = s
-                    if (TextUtils.isEmpty(s))
+                    if (""==s)
                         startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                     else
                         startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                    doFinish()
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
-                    if (TextUtils.isEmpty(s) || s.contains("NPR"))
-                        startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
-                    else
-                        startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
+                    if (""==s||(s.contains("N")||s.contains("PR")||s.contains("NPR"))){
+                        if (s.contains("NPR")||""==s)
+                            startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                        else
+                            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
+                        doFinish()
+                    }else{
+                        connectAndConfig()
+                    }
                 }
             }
-            doFinish()
+
         }
     }
 
@@ -805,6 +818,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        disposableTimer?.dispose()
+        when (gwStompBean.ser_id.toInt()) {
+            SER_ID_SENSOR_ON -> sendOpenIcon(positionCurrent)
+            SER_ID_SENSOR_OFF -> sendCloseIcon(positionCurrent)
+        }
+        adapter?.notifyDataSetChanged()
+    }
+
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         disposableTimer?.dispose()
         when (gwStompBean.ser_id.toInt()) {
             SER_ID_SENSOR_ON -> sendOpenIcon(positionCurrent)
