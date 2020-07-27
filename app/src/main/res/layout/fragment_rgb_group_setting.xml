@@ -120,7 +120,7 @@
                 android:layout_marginTop="@dimen/dp_40"
                 android:layout_marginEnd="@dimen/dp_30"
                 android:gravity="center"
-                android:text="@string/switch_btn"
+                android:text="@string/switch_title"
                 android:textColor="@color/blue_text"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="@+id/brightness"

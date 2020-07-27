@@ -42,7 +42,7 @@ public class OtaPrepareUtils {
         if (checkHaveNetWork(context)) {
             getServerVersionNew(context,localVersion,otaPrepareListner);
         } else {
-            ToastUtils.showLong(R.string.network_disconect);
+            ToastUtils.showLong(R.string.network_unavailable);
         }
     }
 
@@ -122,7 +122,7 @@ public class OtaPrepareUtils {
                 }
             }
         } else {
-            ToastUtils.showLong(R.string.getVsersionFail);
+            ToastUtils.showLong(R.string.the_last_version);
         }
         return false;
     }

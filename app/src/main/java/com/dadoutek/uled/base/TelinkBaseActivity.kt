@@ -786,7 +786,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
                         LogUtils.d("蓝牙未开启")
-//                        showToast(getString(R.string.close_bluetooth))
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
                         LogUtils.d("无法收到广播包以及响应包")

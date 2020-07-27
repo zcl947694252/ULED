@@ -101,7 +101,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             }
         }
 
-        supportActionBar?.title = getString(R.string.sensor_title)
+        supportActionBar?.title = getString(R.string.sensor)
         toolbarTv.text = getString(R.string.sensor)
         scanning_device_ly.visibility = View.GONE
         cancelf.setOnClickListener { popFinish?.dismiss() }

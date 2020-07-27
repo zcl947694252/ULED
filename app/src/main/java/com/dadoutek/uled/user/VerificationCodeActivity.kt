@@ -187,7 +187,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         })
             }
         } else {
-            ToastUtils.showLong(getString(R.string.net_work_error))
+            ToastUtils.showLong(getString(R.string.network_unavailable))
         }
     }
 
@@ -273,7 +273,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 SMSSDK.getVerificationCode(countryCode, phoneNum)
             }
         } else {
-            ToastUtils.showLong(getString(R.string.net_work_error))
+            ToastUtils.showLong(getString(R.string.network_unavailable))
         }
     }
 

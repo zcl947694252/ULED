@@ -192,7 +192,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 for (i in lightsData.indices)
                     lightsData[i].updateIcon()
-                toolbarTv.text = getString(R.string.normal_light_title)
+                toolbarTv.text = getString(R.string.normal_light)
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 toolbarTv.text = getString(R.string.rgb_light)

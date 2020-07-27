@@ -350,7 +350,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun initToolbar() {
-        toolbarTv.text = getString(R.string.sensor_title)
+        toolbarTv.text = getString(R.string.sensor)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { configReturn() }
         setSupportActionBar(toolbar)
@@ -481,8 +481,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.fabConfirm -> {
-                if (tietDelay.text?.isEmpty() != false || tietMinimumBrightness.text?.isEmpty() !=
-                        false) {
+                if (tietDelay.text?.isEmpty() != false || tietMinimumBrightness.text?.isEmpty() != false) {
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
                 } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
                     ToastUtils.showLong(getString(R.string.max_tip_brightness))

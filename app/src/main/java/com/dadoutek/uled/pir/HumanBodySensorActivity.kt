@@ -412,7 +412,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun initToolbar() {
-        toolbarTv.text = getString(R.string.human_body)
+        toolbarTv.text = getString(R.string.sensor)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -425,7 +425,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE
                 recyclerView_select_group_list_view.visibility = View.GONE
-                toolbarTv.text = getString(R.string.human_body)
+                toolbarTv.text = getString(R.string.sensor)
                 tv_function1.visibility = View.GONE
                 isFinish = false
             } else
@@ -1234,7 +1234,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
      */
     private fun showDataListView() {
         isFinish = false
-        toolbarTv.text = getString(R.string.human_body)
+        toolbarTv.text = getString(R.string.sensor)
         sensor_three.visibility = View.VISIBLE
         recyclerView_select_group_list_view.visibility = View.GONE
         tv_function1.visibility = View.GONE

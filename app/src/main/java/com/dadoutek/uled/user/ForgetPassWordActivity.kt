@@ -129,7 +129,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             }
 
         } else {
-            ToastUtils.showLong(getString(R.string.net_work_error))
+            ToastUtils.showLong(getString(R.string.network_unavailable))
         }
     }
 

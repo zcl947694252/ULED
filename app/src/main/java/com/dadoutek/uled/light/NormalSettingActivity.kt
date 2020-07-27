@@ -780,7 +780,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                     findItem = menu?.findItem(R.id.toolbar_f_version)
-                    findItem?.title = getString(R.string.getVsersionFail)
+                    findItem?.title = getString(R.string.the_last_version)
                     findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
                     findItemChangeGp?.isVisible = true
                 }

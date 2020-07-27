@@ -232,7 +232,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-        toolbarTv.text = getString(R.string.human_body)
+        toolbarTv.text = getString(R.string.sensor)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.icon_return)
@@ -612,13 +612,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
-                finish()
             }
         }
         renameCancel?.setOnClickListener {
             if (!this.isFinishing)
                 renameDialog?.dismiss()
-            finish()
         }
 
         if (!this.isFinishing) {
@@ -628,6 +626,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         renameDialog?.setOnDismissListener {
+            if (!isReConfirm)
             finish()
         }
     }

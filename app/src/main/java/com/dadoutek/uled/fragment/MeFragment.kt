@@ -337,7 +337,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.userIcon -> openSet()
-            R.id.chearCache -> emptyTheCache()
             R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
             R.id.oneClickReset -> showSureResetDialogByApp()
@@ -590,31 +589,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             } else
                 developer.visibility = View.GONE
         }
-    }
-
-    //清空缓存初始化APP
-    @SuppressLint("CheckResult", "SetTextI18n")
-    private fun emptyTheCache() {
-        val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
-                .setMessage(activity!!.getString(R.string.empty_cache_tip))
-                .setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
-                    TelinkLightService.Instance()?.idleMode(true)
-                    clearData()
-                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { _, _ -> }.create()
-        alertDialog.show()
-        val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-        btn.isEnabled = false
-        val text = getString(android.R.string.ok)
-        val timeout = 5
-        Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .takeWhile { t: Long -> t < timeout }
-                .doOnComplete {
-                    btn.isEnabled = true
-                    btn.text = text
-                }
-                .subscribe {
-                    btn.text = "$text (${timeout - it})"
-                }
     }
 
 

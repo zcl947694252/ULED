@@ -624,7 +624,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun save() {
         LogUtils.v("zcl-----------baocunchangjing-------")
         if (edit_name.text.toString().isEmpty()) {
-            ToastUtils.showLong(getString(R.string.name_can_not_null))
+            ToastUtils.showLong(getString(R.string.plaese_input_scene_name))
             return
         }
         saveCurrenEditResult()

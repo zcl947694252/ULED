@@ -148,14 +148,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     })
 
                 } else {
-                    ToastUtils.showLong(getString(R.string.net_work_error))
+                    ToastUtils.showLong(getString(R.string.network_unavailable))
                 }
             }
             R.id.btn_send_verification ->
                 if (NetWorkUtils.isNetworkAvalible(this)) {
                     sendVerification()
                 } else {
-                    ToastUtils.showLong(getString(R.string.net_work_error))
+                    ToastUtils.showLong(getString(R.string.network_unavailable))
                 }
 
             R.id.image_password_btn -> eyePassword()

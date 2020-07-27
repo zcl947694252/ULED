@@ -10,6 +10,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Color -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,13 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/device_setting_color" />
-
-               <View
+                <View
                     android:id="@+id/color_preview"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
@@ -42,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
 
-               <View
+                <view
                     android:id="@+id/color_picker"
                     class="com.dadoutek.uled.widget.ColorPicker"
                     android:layout_width="wrap_content"
@@ -58,6 +54,7 @@
                     android:text="Test"
                     android:visibility="gone" />
             </RelativeLayout>
+
         </LinearLayout>
 
 
@@ -137,7 +134,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_margin="10dp"
-            android:visibility="visible"
+            android:visibility="gone"
             >
             <Button
                 android:id="@+id/btn_remove_group"
@@ -161,7 +158,7 @@
                 android:layout_marginRight="38dp"
                 android:textSize="15sp"
                 android:background="@drawable/relay_setting_background"
-                android:text="@string/rename_the_group"
+                android:text="@string/update_name_gp"
                 android:visibility="visible"
                 android:layout_marginBottom="30dp"
                 android:textColor="@android:color/white" />

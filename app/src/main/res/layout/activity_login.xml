@@ -33,7 +33,7 @@
                 android:layout_marginBottom="8dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
-                android:text="@string/user_login_title"
+                android:text="@string/login_account"
                 android:textColor="@color/black_three"
                 android:textSize="30sp"
                 android:textStyle="bold"/>
@@ -186,7 +186,7 @@
             android:layout_marginBottom="8dp"
             android:background="@drawable/btn_rec_black_bt"
             android:elevation="10dp"
-            android:text="@string/login_bt_name"
+            android:text="@string/login_account"
             android:textColor="@color/black_three"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -4,17 +4,14 @@
         <item>开灯</item>
         <item>关灯</item>
     </string-array>
-
     <string-array name="switch_mode">
         <item>瞬间</item>
         <item>渐变</item>
     </string-array>
-
     <string-array name="delay_unit">
         <item>分</item>
         <item>秒</item>
     </string-array>
-
     <string-array name="light_light_time_list">
         <item>10秒</item>
         <item>20秒</item>
@@ -27,7 +24,6 @@
         <item>4分钟</item>
         <item>5分钟</item>
     </string-array>
-
     <string-array name="preset_gradient">
         <item>七彩渐变</item>
         <item>红色渐变</item>
@@ -41,70 +37,16 @@
         <item>红蓝渐变</item>
         <item>绿蓝渐变</item>
     </string-array>
-
-    <!-- Activity Labels -->
     <string name="app_name">优乐迪</string>
-    <string name="activity_device_setting_label">设备设置</string>
-    <string name="activity_device_scanning_label">设备扫描</string>
     <string name="activity_device_grouping">设备分组</string>
-    <string name="activity_group_setting">组设置</string>
-    <string name="activity_mesh_add_lable">添加Mesh</string>
-
-    <!-- Bottom Nav -->
-    <string name="header_devices">灯组</string>
-    <string name="header_account">我的</string>
-
-    <!-- DeviceSchema List -->
-    <string name="device_list_header">灯</string>
-    <string name="device_list_menu_left">Meshs</string>
-    <string name="device_list_all_on">全开</string>
-    <string name="device_list_all_off">全关</string>
-    <string name="device_list_Scene">Ota</string>
-    <string name="device_list_Scene_night">夜晚场景</string>
-    <string name="device_list_Scene_sleep">睡眠场景</string>
-
-    <!-- DeviceSchema Setting -->
-    <string name="device_setting_header">灯设置</string>
-    <string name="device_setting_brightness">亮度:</string>
-    <string name="device_setting_color">颜色</string>
     <string name="device_setting_temperature">色温:%1$s</string>
-    <string name="device_setting_music">音乐</string>
-    <string name="device_setting_sound">Playing by heart</string>
-    <string name="device_setting_remove_device">移除设备</string>
-
-    <!-- DeviceSchema Grouping -->
-    <string name="device_grouping_header">分组</string>
-
-    <!-- Scan DeviceSchema -->
-    <string name="device_scan_header">扫描网络</string>1
     <string name="device_scan_scan">扫描设备</string>
-
-    <!-- GroupSchema Setting -->
     <string name="group_setting_header">分组设置</string>
-
-    <!-- MeshSchema Add -->
-    <string name="mesh_add_header">控制设置</string>
-    <string name="mesh_add_label_mesh_setting">控制设置</string>
-    <string name="install_setting">安装设置</string>
-    <string name="mesh_add_button_share">分享</string>
-    <string name="mesh_add_button_clear">清空</string>
-    <string name="mesh_add_default_factory_name">telink_mesh1</string>
-    <string name="mesh_add_default_factory_password">123</string>
-    <string name="mesh_add_mesh_name">控制名称</string>
-    <string name="mesh_add_mesh_password">控制密码</string>
-    <string name="mesh_add_factory_mesh_name">安装Mesh名称</string>
-    <string name="mesh_add_factory_mesh_password">安装Mesh密码</string>
-
-    <string name="title_activity_group_setting">组设置</string>
-    <string name="title_activity_test">测试页面</string>
-
     <string name="select_file">选择文件(%s)</string>
     <string name="ota_prepare_title">OTA 准备</string>
     <string name="ota_update_title">OTA 正在进行</string>
     <string name="progress_ota">OTA 进度: %s </string>
     <string name="progress_mesh_ota">MeshOTA 进度: %s</string>
-    <string name="target_version">Target Version : %s</string>
-    <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
     <string name="set_group">设置分组</string>
@@ -113,11 +55,7 @@
     <string name="connecting_tip">正在连接,请稍后</string>
     <string name="grouping_completed">分组完成</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
-    <string name="quite">退出</string>
-    <string name="retry">重试</string>
-    <string name="light">灯</string>
     <string name="me">我</string>
-    <string name="fragment_name_me">我</string>
     <string name="grouping_wait_tip">当前有%1$s个灯正在分组，请稍候！</string>
     <string name="start_group_bt">开始分组</string>
     <string name="have_lamp_no_group_tip">还有灯没有分组，请完成分组操作</string>
@@ -127,108 +65,61 @@
     <string name="much_lamp_tip">最高支持32768个灯</string>
     <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机蓝牙</string>
     <string name="chear_cache">清除所有数据</string>
-    <string name="update_ite">同步ITE</string>
     <string name="clean_tip">缓存清空,App即将重启</string>
-    <string name="wait_develop">待开发</string>
-    <string name="add_mesh_save_tip1">名字不能和密码相同</string>
-    <string name="add_mesh_save_tip2">修改前后名称不能相同！</string>
-    <string name="add_mesh_save_tip3">最大长度为16</string>
-    <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
-    <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
-    <string name="delete_group">删除分组</string>
-    <string name="rename_the_group">重命名分组</string>
-    <string name="hint_input">请输入……</string>
     <string name="confirm">确定</string>
-    <string name="group_name_setting">组名设置</string>
     <string name="rename_tip_check">不允许输入特殊符号！</string>
-    <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
     <string name="title_scanned_device_num">数量: </string>
     <string name="click_double_exit">再按一次退出程序</string>
-    <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
     <string name="factory_reset">恢复出厂</string>
     <string name="add_str_group">添加组</string>
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
     <string name="create_new_group">创建一个新组</string>
     <string name="btn_rename_light">修改名称</string>
-    <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
     <string name="connect_fail">连接断开</string>
     <string name="device_not_connected">请检查蓝牙！</string>
     <string name="please_wait">请稍后…</string>
-
-    <string name="smartSwitch">开关</string>
-    <string name="select_install_device">请选择需要安装的设备</string>
     <string name="search">搜索</string>
-
     <string name="complete">完成</string>
     <string name="not_found_switch">未找到开关</string>
     <string name="searching">搜索中…</string>
-    <string name="install_failed">配置失败,请重试</string>
-    <string name="installing">安装中</string>
-    <string name="install_switch_tips1">1.把USB插入开关</string>
-    <string name="install_switch_tips2">2.按任意一个按键</string>
-    <string name="install_switch_tips3">3.开关底部右边的指示灯会常亮</string>
-    <string name="install_sensor_tips1">请先把传感器连上电源</string>
-
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
     <string name="connecting">连接中……</string>
     <string name="group_failed">分组失败,请检查要分组的设备是否已经通电</string>
     <string name="connected">已连接</string>
-    <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
     <string name="scene_edit">修改</string>
     <string name="create_scene">添加场景</string>
-    <string name="edit_scene">修改场景</string>
     <string name="tv_scene_name">输入名称：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">最少添加一个组</string>
     <string name="scene_name">场景</string>
-    <string name="title_activity_switch_group">SwitchGroupActivity</string>
-    <string name="add_scene_tip">到该场景的分请点击添加需要应用组：</string>
-    <string name="bt_add">添加</string>
     <string name="group_select">请选择需要的分组:</string>
     <string name="scene1">场景1</string>
-    <string name="scene2">场景2</string>
-    <string name="scene3">场景3</string>
-    <string name="scene4">场景4</string>
     <string name="scene_set">场景分配</string>
     <string name="setting_switch">正在配置开关……</string>
     <string name="configuring_sensor">正在配置传感器……</string>
     <string name="pace_fail">配置失败</string>
     <string name="tip_switch">请先添加场景</string>
-    <string name="tip_add_scene">已经添加了所有存在的组！</string>
-    <string name="tip_save_dialog_all">当前选择包含了所有组,只有所有组的设置会生效,仍然保存？</string>
-    <string name="copy_data_base">数据库拷贝</string>
-    <string name="copy_complete">拷贝完成</string>
     <string name="tip_add_gp">请首先添加一个组！</string>
-    <string name="empty_light">当前组没有灯！</string>
-    <string name="tip_selected_group">当前已是该组</string>
     <string name="developer_mode">进入开发者模式</string>
-    <string name="edit_user_name">用户名</string>
-    <string name="edit_password">密码</string>
     <string name="edit_phone">手机号</string>
-    <string name="register_completed">完成</string>
     <string name="registing">正在注册</string>
     <string name="register_success">注册成功</string>
     <string name="phone_input_error">手机号格式错误</string>
     <string name="tip_register_input_error">用户名或密码不能包含特殊字符</string>
-    <string name="two_password_inconsistent">两个密码不一致</string>
     <string name="register_title_name">注册</string>
-    <string name="login_bt_name">登录</string>
-    <string name="user_login_title">登录</string>
+    <string name="login_account">登录</string>
     <string name="logging_tip">正在登录</string>
     <string name="login_success">登录成功</string>
-    <string name="user_register">用户注册</string>
     <string name="login_fail">登录失败</string>
     <string name="name_or_password_error">用户名或密码错误！</string>
-    <string name="phone_current">当前手机号：%1$s</string>
     <string name="select_country">选择国家</string>
     <string name="add_timing_label">添加定时标签</string>
     <string name="open_location_service">请打开"位置服务"</string>
-    <string name="verification">验证</string>
     <string name="send_verification">发送验证码</string>
     <string name="VerificationCode">验证码</string>
     <string name="send_message_success">发送成功</string>
@@ -239,37 +130,23 @@
     <string name="forget_password">忘记密码</string>
     <string name="verification_phone">验证</string>
     <string name="update_password">修改密码</string>
-    <string name="password_input_error">密码不能包含特殊字符</string>
-    <string name="different_input">两次输入不一致,请检查</string>
-    <string name="get_account_fail">获取用户失败</string>
     <string name="tip_update_password_success">更改成功</string>
-    <string name="tip_update_password_fail">更改失败</string>
-    <string name="updating_password">正在更改</string>
     <string name="not_grouped">未分组</string>
-    <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="scanning">设备搜索中</string>
-    <string name="scanned_x_devices">已扫到:%1$d个灯</string>
-    <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
     <string name="exit_tips_in_scanning">确定要退出扫描?</string>
-    <string name="exit_tips_in_group">确定要分组退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
     <string name="account_exist">账户已存在</string>
     <string name="unknown_network_error">未知网络异常</string>
     <string name="network_error">网络异常！</string>
-
     <string name="network_unavailable">当前网络不可用，请检查网络设置</string>
-
     <string name="network_time_out">网络连接超时，请重试</string>
-
     <string name="delete_group_confirm">确定删除组:%1$s？</string>
     <string name="phone_or_password_can_not_be_empty">手机号不能为空</string>
     <string name="reconnecting">重连中……</string>
-    <string name="app_version_name">版本:</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
-    <string name="save_now">正在保存..</string>
     <string name="require_permission_reason">App使用蓝牙需要此权限</string>
     <string name="i_know">我知道了</string>
     <string name="exit">退出</string>
@@ -277,39 +154,23 @@
     <string name="connecting_please_wait">连接中，请稍候…</string>
     <string name="delete_name">删除</string>
     <string name="open_blutooth">蓝牙开启</string>
-    <string name="close_bluetooth">蓝牙关闭</string>
     <string name="empty_tip">当前还没有任何灯,点击添加</string>
     <string name="grouping_fail">分组失败</string>
     <string name="add_scene_gp_tip">请选择需要的分组</string>
     <string name="group_fail_tip">有设备分组失败，请检查要分组的设备是否通电并重试！</string>
     <string name="one_click_reset">恢复出厂设置</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
-    <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
     <string name="tip_reset_sure">确定恢复所有设备(开关、传感器除外)吗？</string>
-    <string name="delete_lamp_tip">有灯恢复出厂设置失败，请连接后重试</string>
-    <string name="error_disconnect_tip">正在恢复出厂设置，请稍后！</string>
     <string name="scene_16_tip">最多100个场景！</string>
     <string name="server_exception">服务器异常</string>
     <string name="start_sync">即将开始同步数据..</string>
-    <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">同步数据中…</string>
     <string name="tip_start_sync">开始同步..</string>
     <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请检查网络！</string>
-    <string name="devoloping">开发中——敬请期待！</string>
     <string name="regetCount">重新发送(%1$d)</string>
     <string name="reget">重新发送</string>
-    <string name="manager_verification">管理员权限验证</string>
-    <string name="manager_phone_error">管理员手机号错误</string>
-    <string name="answer_app">常见问题</string>
-    <string name="click_reset_title">一键恢复</string>
-    <string name="select_type_str">请选择恢复出厂设置的方式</string>
-    <string name="by_app_reset">通过软件</string>
-    <string name="by_light_reset">通过灯具</string>
-    <string name="by_info_reset">了解详情</string>
-    <string name="by_light_reset_title">物理恢复</string>
-    <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
     <string name="question_1">2.如何恢复出厂设置？</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源6秒，断开电源6s，重复约5-6次，直至灯闪烁。
@@ -326,10 +187,8 @@
     <string name="clear_data_now">正在清除数据…</string>
     <string name="clear_fail">清除失败</string>
     <string name="backup_failed">备份失败</string>
-    <string name="uploading_data">上传数据中…</string>
     <string name="upload_data_failed">上传数据失败…</string>
     <string name="phone_cannot_be_empty">手机号不能为空</string>
-    <string name="delete_group_failed">删除分组失败</string>
     <string name="deleting">删除中…</string>
     <string name="move_out_some_lights_in_group_failed">部分组里的设备移出组失败</string>
     <string name="delay_minute">延时(分)</string>
@@ -337,15 +196,11 @@
     <string name="minimum_brightness_percentage">最终亮度(%)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
-    <string name="sensor_title">传感器</string>
     <string name="button1">按键1</string>
     <string name="button2">按键2</string>
     <string name="button3">按键3</string>
     <string name="button4">按键4</string>
-    <string name="update_group_tip">检测到分组变动,如需场景对该灯生效,请前往场景页更新场景！</string>
     <string name="light_version">版本号</string>
-    <string name="error_tip">部分数据同步失败</string>
-    <string name="sync_error_contant">同步出错</string>
     <string name="change_account">切换账号</string>
     <string name="sync_error_exlogin">同步数据失败,可能会丢失一些数据,仍然退出？</string>
     <string name="grouping">分组中…</string>
@@ -354,12 +209,10 @@
     <string name="delete">删除</string>
     <string name="select_all">全选</string>
     <string name="cancel">取消</string>
-    <string name="search_light">搜索</string>
     <string name="input_groupAdress">请输入组名</string>
     <string name="not_find_pir">未找到传感器</string>
     <string name="max_tip_brightness">最终亮度不能大于99%</string>
     <string name="time_max_tip">延时最大不能超过255分钟或255秒</string>
-    <string name="ota_str">固件升级</string>
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">1.去哪更新APP？</string>
@@ -372,12 +225,8 @@
     <string name="updating">正在升级…</string>
     <string name="update_tip_user">升级过程中请不要退出或断开连接！</string>
     <string name="exit_update">2s后退出升级页面</string>
-    <string name="scan_and_connect">扫描连接…</string>
-    <string name="network_disconect">网络未连接</string>
-    <string name="getVsersionFail">已经是最新版本</string>
     <string name="get_server_version_fail">获取服务器版本失败！</string>
     <string name="download_pack_fail">升级包下载失败</string>
-    <string name="error_pack">升级包错误！</string>
     <string name="verification_version">正在验证版本…</string>
     <string name="verification_version_success">验证成功！</string>
     <string name="verification_version_fail">验证失败！</string>
@@ -388,7 +237,6 @@
     <string name="start_connect">连接中…</string>
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
-    <string name="btn_get_verificationCode">获取</string>
     <string name="register">注册</string>
     <string name="set_password">设置密码</string>
     <string name="update_permission_tip">请同意相关权限才能升级</string>
@@ -398,67 +246,26 @@
     <string name="long_click_select_color_tip">*长按保存,单击设置</string>
     <string name="account">账号:</string>
     <string name="rssi_low">信号太差</string>
-
-    <string name="group_list_guide0">请选择需要安装的设备</string>
-    <string name="group_list_guide1">点击此处即可添加设备</string>
-    <string name="group_list_guide2">点击选项开始安装设备</string>
-    <string name="scene_guide_1">点击此处即可添加场景</string>
-    <string name="scan_light_guide_1">首先点击这里创建一个组</string>
-    <string name="scan_light_guide_2">然后在此区域选择一个组</string>
-    <string name="scan_light_guide_3">然后勾选打算分组的灯</string>
-    <string name="scan_light_guide_4">选择完成可以点击这里确定分组</string>
-
-    <!--改好场景页面后再改-->
-    <string name="add_scene_guide_1">请选择组添加到这个场景</string>
-    <string name="add_scene_guide_2">点击这里确定选择分组</string>
-    <string name="add_scene_guide_3">这里可以设置分组亮度</string>
-    <string name="add_scene_guide_4">这里可以设置分组色温</string>
-    <string name="add_scene_guide_5">这里可以设置分组颜色</string>
-    <string name="add_scene_guide_6">点击保存场景</string>
-    <!---->
-
-    <string name="config_pir_guide_1">灯亮度变为最终亮度的延迟时间</string>
-    <string name="config_pir_guide_2">输入延迟时间过后的最终亮度</string>
-    <string name="config_pir_guide_4">选择一个组响应感应器</string>
-    <string name="config_pir_guide_5">选择开灯方式</string>
-    <string name="config_pir_guide_6">选择触发方式</string>
-    <string name="config_pir_guide_7">选择延迟时间的单位</string>
-    <string name="config_pir_guide_8">保存并生效当前配置</string>
-    <string name="change_to_scene">点击这里切换到场景页面试试吧</string>
     <string name="btn_jump_over">跳过</string>
-    <string name="reset_boot_tutorial">重新查看引导页</string>
     <string name="select_device_tip">请选择需要安装的设备</string>
     <string name="normal_light">冷暖灯</string>
     <string name="rgb_light">全彩灯</string>
-    <string name="i_know_tip">我知道了!</string>
-
     <string name="warning">警告</string>
     <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
-    <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
     <string name="dynamic_rgb">渐变</string>
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
-    <string name="stopping">停止中…</string>
     <string name="please_rename">请输入名称</string>
     <string name="firmware_version">固件版本:</string>
     <string name="ota">在线升级</string>
-    <string name="my_scene">场景一</string>
-
-    <!--通用-->
-    <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
     <string name="group">组</string>
     <string name="setting">设置</string>
-
-    <!--组列表页面-->
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="normal_light_title">冷暖灯</string>
-    <string name="rgb_title">全彩灯</string>
     <string name="switch_title">开关</string>
     <string name="apply_scene">点击此处即可应用场景</string>
-
     <string name="group_title">群组</string>
     <string name="jump_out_guide_tip">是否确定跳过引导教程？</string>
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
@@ -468,7 +275,6 @@
     <string name="install_success">安装成功</string>
     <string name="stop_scan">停止扫描</string>
     <string name="scene_name_show">场景:%1$s</string>
-    <string name="name_can_not_null">名字不能为空</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
     <string name="w_bright">白光亮度:</string>
     <string name="light_light_tip">请先把人体感应器调整到配置模式</string>
@@ -478,46 +284,28 @@
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
     <string name="rgb_gradient">动态RGB</string>
-    <string name="add_scene_guide_0">这里可以输入场景名</string>
-    <string name="click_update_scene">点击可修改场景</string>
     <string name="save_scene_tip">是否保存场景?</string>
-    <string name="not_null_scene">场景名不能为空</string>
     <string name="get_update_file">获取升级包...</string>
-    <string name="firware_version">固件版本号:%1$s</string>
     <string name="mode_preset">内置模式</string>
     <string name="mode_diy">自定义模式</string>
     <string name="please_check_group">请选择分组:</string>
-    <string name="str_gradient">渐变</string>
-    <string name="str_jump">跳变</string>
-    <string name="str_strobe">频闪</string>
     <string name="save">保存</string>
-    <string name="diy_action_tip">点击按钮修改颜色,长按删除颜色</string>
     <string name="name_not_null_tip">名称不可以为空</string>
     <string name="mode_str">模式</string>
-    <string name="save_gradient_dialog_tip">保存渐变中...</string>
+    <string name="save_gradient_dialog_tip">保存渐变中…</string>
     <string name="add_gradient_limit">最大只能添加6个渐变!</string>
     <string name="color_checked_set">颜色选择</string>
     <string name="one_click_group">一键分组</string>
-    <string name="please_select_light_type">请选灯类型</string>
-    <string name="tip_change_gp_reset_scene">检测到分组改变,建议重新绑定场景</string>
-    <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
-    <string name="install_old_device_tip">搜索已安装设备</string>
-    <string name="search_new_device">搜索新设备</string>
     <string name="update_gradient">修改渐变</string>
     <string name="add_gradient">添加渐变</string>
     <string name="config_night_light_select_group">请至少选择一个分组</string>
-    <string name="net_work_error">无可用网络</string>
-    <string name="please_check_group_tip">请选择分组:</string>
     <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
     <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
     <string name="re_upgrade">重新升级</string>
-    <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
-    <string name="get_code_ing">获取验证...</string>
-    <string name="rename_groups">重命名分组</string>
+    <string name="get_code_ing">获取验证…</string>
     <string name="create_scene_select">添加场景</string>
     <string name="normal_light_describe">例如：单色温,双色温灯</string>
     <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>
-    <string name="switch_name">开关</string>
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
     <string name="sensor">传感器</string>
     <string name="sensor_describe">例如：人体感应器,PIR</string>
@@ -528,7 +316,6 @@
     <string name="for_connector">例如：蓝牙接收器</string>
     <string name="for_gateway">例如：网关</string>
     <string name="device">设备</string>
-    <string name="install_tip1">准备工作</string>
     <string name="install_tip2">请确保设备已经接上电源</string>
     <string name="install_tip3">请确保设备未被他人扫描</string>
     <string name="install_tip4">通过“蓝牙搜索”添加设备</string>
@@ -543,26 +330,15 @@
     <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
     <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
     <!--窗帘相关-->
-
     <string name="up">上</string>
     <string name="down">下</string>
-    <string name="accelerate">加速</string>
-    <string name="slow_down">减速</string>
     <string name="pause">停止</string>
     <string name="not_type">未分类</string>
-
-    <string name="second_level">二级</string>
-    <string name="one_level">一级</string>
-    <string name="three_level">三级</string>
-    <string name="four_level">四级</string>
     <string name="commutation">电机换向</string>
     <string name="details">详情</string>
     <string name="restart">电机重启</string>
     <string name="successful_resumption">恢复出厂成功</string>
-    <string name="device_list">设备</string>
-    <string name="scan_curtain_num">总计：当前扫描出了 %1$s 个窗帘</string>
     <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
-    <string name="title_curtain_lights_num_total">扫描完毕：%1$d个窗帘</string>
     <string name="delete_switch_confirm">删除后需要手动恢复该开关的出厂设置,确定删除此开关？</string>
     <string name="delete_switch_success">删除成功,请断电后重新上电</string>
     <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
@@ -573,25 +349,17 @@
     <string name="software_restart">设备重启</string>
     <string name="slow_up_the_cache">缓起缓停</string>
     <string name="slow_up_the_cache_cancel">取消缓起缓停</string>
-
     <string name="hand_cancel">手拉取消</string>
     <string name="delete_user">确定删除该手机号？</string>
-
     <string name="relay">接收器</string>
-    <string name="scan_connector_num">总计：当前扫描出了 %1$s 个蓝牙接收器</string>
     <string name="title_connector_lights_num">已扫到 %1$d 个蓝牙接收器</string>
-    <string name="title_connector_lights_num_total">扫描完毕：%1$d个蓝牙接收器</string>
     <string name="have_connector_no_group_tip">还有蓝牙接收器没有分组，请完成分组操作</string>
     <string name="grouping_connector_wait_tip">当前有%1$s个蓝牙接收器正在分组，请稍候！</string>
-    <string name="selected_connector_tip">至少选择一个链接器进行分组</string>
-    <string name="connector_fail_tip">有链接器分组失败，请检查并重试！</string>
-
+    <string name="selected_connector_tip">至少选择一个连接器进行分组</string>
+    <string name="connector_fail_tip">有连接器分组失败，请检查并重试！</string>
     <string name="device_page">此功能已转移到设备页面!</string>
-
     <string name="batch_group">批量分组</string>
-
     <string name="developer_mode_close">关闭开发者模式</string>
-
     <string name="sms_sign">使用短信验证码登录</string>
     <string name="third_party">第三方登录</string>
     <string name="please_phone_number">请输入手机号码</string>
@@ -601,17 +369,14 @@
     <string name="color_temperature">色温</string>
     <string name="brightness_adjustment">亮度：</string>
     <string name="color_temperature_adjustment">色温：</string>
-
     <string name="welcome_register">您好，欢迎注册账号</string>
     <string name="please_code">请输入验证码</string>
     <string name="please_again_password">请再次确认登录密码</string>
     <string name="get_verification_code">获取验证码</string>
-    <string name="follow_password">按步骤操作即可找回密码</string>
     <string name="new_password">请输入您的新密码</string>
     <string name="number">数量</string>
     <string name="login_password">使用密码登录</string>
     <string name="online_upgrade">在线升级</string>
-
     <string name="tips">提示</string>
     <string name="create_now">立即创建</string>
     <string name="tips_message">您还有没有组，是否创建？</string>
@@ -619,7 +384,6 @@
     <string name="piece">个</string>
     <string name="gradient_mode">渐变模式</string>
     <string name="color_mode">颜色模式</string>
-
     <string name="stop_model">停</string>
     <string name="white_light_regulation">白光:</string>
     <string name="bright_regulation">亮度:</string>
@@ -638,18 +402,13 @@
     <string name="five_tip">5.以上问题依旧没解决，重启APP</string>
     <string name="open_it">去开启</string>
     <string name="restart_it">去重启</string>
-    <string name="i_see">我知道了</string>
     <string name="relocation">重新配置</string>
     <string name="please_rgb">请输入RGB值</string>
     <string name="cannot_rgb_null">RGB值不能为空</string>
     <string name="rgb_max">RGB值不能大于255</string>
-    <string name="switch_current">此开关当前已控制</string>
-    <string name="switch_group_switch">是否切换分组？</string>
     <string name="number_no">未获得版本号</string>
     <string name="instructions_for_use">使用说明</string>
-    <string name="account_management">账号管理</string>
     <string name="no_password">当前账号未创建密码,请使用短信登录</string>
-    <string name="account_already_exist">账号已存在</string>
     <string name="enter_confirmation_code">输入验证码</string>
     <string name="send_code">验证码已发送至</string>
     <string name="follow_the_steps">按步骤操作即可找回密码</string>
@@ -666,9 +425,6 @@
     <string name="update_name">修改名称</string>
     <string name="current_account">当前账号:</string>
     <string name="all">全部</string>
-    <string name="developer_mode_on">是否开启/关闭开发者模式</string>
-    <string name="open_mode">开启</string>
-    <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
     <string name="all_day">全天</string>
     <string name="day_time">白天</string>
@@ -679,7 +435,6 @@
     <string name="second">秒</string>
     <string name="moment">瞬间</string>
     <string name="gradient">渐变</string>
-    <string name="human_body">传感器</string>
     <string name="custom_brightness">自定义亮度</string>
     <string name="target_brightness">请输入目标亮度</string>
     <string name="triggering_conditions">触&#160;&#160;&#160;发&#160;&#160;&#160;条&#160;&#160;&#160;件&#160;&#160;&#160;:</string>
@@ -710,7 +465,6 @@
     <string name="developer">开发者模式</string>
     <string name="update_version">新版本升级</string>
     <string name="version_disabled">当前版本不可用</string>
-    <string name="syncing_relogin">同步数据中请重新登录</string>
     <string name="in_use">使用中</string>
     <string name="creater_name">创 建 者: </string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
@@ -733,7 +487,7 @@
     <string name="error_http_400">错误请求</string>
     <string name="error_socket_timeout">网络超时</string>
     <string name="error_socket_unreachable">无法连接到服务器</string>
-    <string name="error_http" >网络连接错误</string>
+    <string name="error_http">网络连接错误</string>
     <string name="QR_cancel">撤销二维码</string>
     <string name="QR_canceled">当前二维码已撤销</string>
     <string name="QR_expired">二维码已失效,请重新生成</string>
@@ -816,7 +570,6 @@
     <string name="compatibility_mode">如果勾选设备后，灯没有闪烁，请再次开启兼容模式</string>
     <string name="rename_faile">重命名失败</string>
     <string name="delete_region_tip">删除该区域请先把该区域设备恢复出厂设置…</string>
-    <string name="switch_btn">开关</string>
     <string name="no_have_bin">不存在该类型的bin文件</string>
     <string name="device_name">设备:</string>
     <string name="no_search_result">抱歉,没有发现相关内容</string>
@@ -895,7 +648,6 @@
     <string name="open_gps_tip">为扫描到设备，检测到定位未开启，是否打开定位？</string>
     <string name="go_open">去打开</string>
     <string name="config_gate_way">配置网关</string>
-    <string name="switch_tip_small">*如扫描面板开关，接上电源按任意按键后点击蓝牙搜索。</string>
     <string name="wifi_account">WIFI账号</string>
     <string name="wifi_pwd">WIFI密码</string>
     <string name="wifi_account_hinit">请输入WIFI账号</string>
@@ -974,7 +726,6 @@
     <string name="reset_gw_faile">用户复位失败</string>
     <string name="group_mode">群组模式</string>
     <string name="scene_mode">场景模式</string>
-    <string name="on_off">开关</string>
     <string name="see_help">查看帮助</string>
     <string name="group_max">最大支持7个组</string>
     <string name="dissupport">该批次设备不支持开关功能</string>
@@ -1016,5 +767,5 @@
     <string name="scene_sw">场景开关</string>
     <string name="model_list">模式列表</string>
     <string name="seven_color">七彩渐变</string>
-
+    <string name="delete_group">删除分组</string>
 </resources>

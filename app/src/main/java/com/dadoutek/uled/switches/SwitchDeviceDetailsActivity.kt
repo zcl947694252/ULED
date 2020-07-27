@@ -346,7 +346,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.switch_name)
+        toolbarTv.text = getString(R.string.switch_title)
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->

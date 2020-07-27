@@ -17,7 +17,7 @@
 
     <TextView
         android:id="@+id/kown"
-        android:text="@string/i_know_tip"
+        android:text="@string/i_know"
         android:textSize="16sp"
         android:textColor="@color/white"
         android:layout_width="100dp"

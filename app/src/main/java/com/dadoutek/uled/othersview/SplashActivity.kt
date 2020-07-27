@@ -126,7 +126,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
                     cb.setOnCheckedChangeListener { _, isChecked ->
                         iSee.text = if (isChecked)
-                            getString(R.string.i_see)
+                            getString(R.string.i_know)
                         else
                             getString(R.string.read_agreen)
                     }

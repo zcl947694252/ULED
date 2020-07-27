@@ -656,7 +656,6 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
             btn_start_update.setVisibility(View.VISIBLE);
             btn_start_update.setClickable(false);
             //            btn_start_update.setText(R.string.updating);
-            //            btn_start_update.setText(R.string.scan_and_connect);
             //            if (TelinkLightApplication.Companion.getApp().getConnectDevice() !=
             //            null) {
             //                sendGetVersionCommand();

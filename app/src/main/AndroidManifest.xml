@@ -305,7 +305,6 @@
 
         <activity
                 android:name=".othersview.DeviceBatchScanningActivity"
-                android:label="@string/activity_device_scanning_label"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
 
@@ -344,7 +343,6 @@
                 tools:ignore="LockedOrientationActivity"/>
         <activity
                 android:name=".switches.ConfigNormalSwitchActivity"
-                android:label="@string/title_activity_switch_group"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
         <activity

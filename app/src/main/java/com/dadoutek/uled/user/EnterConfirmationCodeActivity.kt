@@ -216,7 +216,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         if (NetWorkUtils.isNetworkAvalible(this)) {
             send_verification()
         } else {
-            ToastUtils.showLong(getString(R.string.net_work_error))
+            ToastUtils.showLong(getString(R.string.network_unavailable))
         }
     }
 
