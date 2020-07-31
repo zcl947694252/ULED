@@ -111,6 +111,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         scene_two.setOnClickListener(this)
         scene_three.setOnClickListener(this)
         scene_four.setOnClickListener(this)
+        scene_one_t.setOnClickListener(this)
+        scene_two_t.setOnClickListener(this)
+        scene_three_t.setOnClickListener(this)
+        scene_four_t.setOnClickListener(this)
         scene_use_botton.setOnClickListener { confirmSceneSw() }
         mApp?.removeEventListener(this)
         mApp?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -181,6 +185,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = version
         fiVersion?.title = version
     }
 
@@ -202,16 +208,16 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.scene_one -> {
+            R.id.scene_one,R.id.scene_one_t -> {
                 configTag = 0
             }
-            R.id.scene_two -> {
+            R.id.scene_two,R.id.scene_two_t -> {
                 configTag = 1
             }
-            R.id.scene_three -> {
+            R.id.scene_three,R.id.scene_three_t -> {
                 configTag = 2
             }
-            R.id.scene_four -> {
+            R.id.scene_four,R.id.scene_four_t -> {
                 configTag = 3
             }
         }
@@ -518,8 +524,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (switchDate != null)
+                if (switchDate != null){
+                 toolbarTv.text = switchDate?.name
                     DBUtils.updateSwicth(switchDate!!)
+                }
                 else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
@@ -535,10 +543,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         }
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-            if (switchDate != null)
-                DBUtils.updateSwicth(switchDate!!)
-            showConfigSuccessDialog()
+            if (!isReConfig)
+                finish()
         }
     }
 

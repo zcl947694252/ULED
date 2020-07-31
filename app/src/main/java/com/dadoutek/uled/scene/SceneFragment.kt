@@ -339,7 +339,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         img_function2?.visibility = View.GONE
         toolbar?.navigationIcon = null
         image_bluetooth?.visibility = View.VISIBLE
-        img_function1?.visibility = View.VISIBLE
+        img_function1?.visibility = View.GONE
         toolbarTv?.setText(R.string.scene_name)
     }
 
@@ -399,7 +399,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             img_function2?.visibility = View.GONE
             toolbar?.navigationIcon = null
             image_bluetooth?.visibility = View.VISIBLE
-            img_function1?.visibility = View.VISIBLE
+            img_function1?.visibility = View.GONE
             isDelete = false
             adaper!!.changeState(isDelete)
             for (i in scenesListData.indices) {

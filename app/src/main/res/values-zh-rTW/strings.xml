@@ -36,7 +36,7 @@
         <item>黄色渐变</item>
         <item>青色渐变</item>
         <item>紫色渐变</item>
-        <item>白色呼吸</item>
+        <item>白色渐变</item>
         <item>红绿渐变</item>
         <item>红蓝渐变</item>
         <item>绿蓝渐变</item>
@@ -390,8 +390,6 @@
     <string name="selected_connector_tip">至少选择一个连接器进行分组</string>
     <string name="connector_fail_tip">有连接器分组失败，请检查并重试！</string>
 
-    <string name="device_page">此功能已转移到设备页面!</string>
-
     <string name="batch_group">批量分组</string>
 
     <string name="developer_mode_close">关闭开发者模式</string>
@@ -442,7 +440,6 @@
     <string name="open_it">去开启</string>
     <string name="restart_it">去重启</string>
     <string name="relocation">重新配置</string>
-    <string name="please_rgb">请输入RGB值</string>
     <string name="cannot_rgb_null">RGB值不能为空</string>
     <string name="rgb_max">RGB值不能大于255</string>
     <string name="number_no">未获得版本号</string>

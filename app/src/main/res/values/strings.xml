@@ -43,7 +43,7 @@
         <item> Yellow Color Gradient</item>        
         <item> Cyan Color Gradient</item>        
         <item> Purple Color Gradient</item>
-        <item>white breath </item>
+        <item>white Gradient </item>
         <item> red and green gradient</item>
         <item> red and blue gradient</item>
         <item> green blue gradient</item>
@@ -441,7 +441,6 @@
     <string name="selected_connector_tip">Please Select at Least ONE Connector to Group</string>
     <string name="connector_fail_tip">There is a connector grouped failed, please check and try again!</string>
 
-    <string name="device_page">This functionality has been moved to the device page!</string>
 
     <string name="batch_group">Batch group</string>
 
@@ -500,7 +499,6 @@
     <string name="open_it">Open it</string>
     <string name="restart_it">Restart it</string>
     <string name="relocation">Afresh set</string>
-    <string name="please_rgb">Please enter RGB value</string>
     <string name="cannot_rgb_null">RGB values cannot be null</string>
     <string name="rgb_max">RGB value should not be greater than 255</string>
     <string name="number_no">Version number not obtained</string>

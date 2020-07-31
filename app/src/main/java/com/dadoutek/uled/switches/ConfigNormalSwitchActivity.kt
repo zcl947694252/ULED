@@ -138,6 +138,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     override fun setVersion() {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = localVersion
         fiVersion?.title = localVersion
     }
 
@@ -164,8 +166,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (switchDate != null)
+                if (switchDate != null){
+                    toolbarTv.text = switchDate?.name
                     DBUtils.updateSwicth(switchDate!!)
+                }
                 else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
@@ -179,10 +183,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         }
 
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-            if (switchDate != null)
-                DBUtils.updateSwicth(switchDate!!)
-            showConfigSuccessDialog()
+            if (!isReConfig)
+                finish()
         }
     }
 

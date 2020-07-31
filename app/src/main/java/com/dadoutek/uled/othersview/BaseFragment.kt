@@ -95,7 +95,7 @@ open class BaseFragment : Fragment() {
                 }
             }
 
-            when (intent?.action) {
+     /*       when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
@@ -103,7 +103,7 @@ open class BaseFragment : Fragment() {
                         2500 -> receviedGwCmd2500(gwStompBean)
                     }
                 }
-            }
+            }*/
         }
     }
 

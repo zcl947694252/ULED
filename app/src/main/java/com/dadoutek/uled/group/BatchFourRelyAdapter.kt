@@ -18,6 +18,7 @@ import com.dadoutek.uled.model.DbModel.DbConnector
  * 更新描述
  */
 class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
+    private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
@@ -31,7 +32,7 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
 
 
-        if (item?.hasGroup == true) {
+        if (item?.belongGroupId !=allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE

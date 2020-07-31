@@ -77,6 +77,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = version
         fiVersion?.title = version
     }
 
@@ -154,6 +156,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             } else {
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
+                toolbarTv.text = switchDate?.name
                 if (this != null && !this.isFinishing) {
                     renameDialog?.dismiss()
                 }

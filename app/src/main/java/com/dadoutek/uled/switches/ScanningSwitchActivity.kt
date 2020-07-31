@@ -23,6 +23,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
+import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 
@@ -80,7 +81,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         }
 
         retryConnectCount = 0
-
         isSupportInstallOldDevice = false
     }
 
@@ -132,6 +132,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun startScan() {
+        btn_stop_scan.text = getString(R.string.stop_scan)
         TelinkLightService.Instance()?.idleMode(true)
         scanning_num.text = getString(R.string.scanning)
         startAnimation()

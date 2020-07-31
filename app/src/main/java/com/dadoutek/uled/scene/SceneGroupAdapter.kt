@@ -97,8 +97,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         cb_white_light.isChecked = item.isEnableWhiteLight
 
 
-        //0x4FFFE0
-        docOne.setChecked(true, if (item.color == 16777215) {
+        //0x4FFFE0  不在使用  使用0来判断
+        docOne.setChecked(true, if (item.color == 0) {
             docOne.visibility = View.GONE
             dotRgb.visibility = View.VISIBLE
             TelinkLightApplication.getApp().resources.getColor(R.color.primary)

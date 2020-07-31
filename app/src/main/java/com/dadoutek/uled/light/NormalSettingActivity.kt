@@ -977,6 +977,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
                                     .subscribe(
                                             { s ->
+                                                if (!TextUtils.isEmpty(s))
+                                                    findItem?.title = s
                                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                                     light!!.version = s
                                                     DBUtils.saveLight(light!!, false)

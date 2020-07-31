@@ -959,16 +959,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
                 when (deviceType) {
                     DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
-                        showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
-                                deviceDataLightAll.filter { it.isSelected }.size.toString()))
+                        showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataLightAll.filter { it.isSelected }.size.toString()))
                     }
                     DeviceType.SMART_CURTAIN -> {
-                        showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
-                                deviceDataCurtainAll.filter { it.isSelected }.size.toString()))
+                        showLoadingDialog(resources.getString(R.string.grouping_curtain_wait_tip, deviceDataCurtainAll.filter { it.isSelected }.size.toString()))
                     }
                     DeviceType.SMART_RELAY -> {
-                        showLoadingDialog(resources.getString(R.string.grouping_wait_tip,
-                                deviceDataRelayAll.filter { it.isSelected }.size.toString()))
+                        showLoadingDialog(resources.getString(R.string.grouping_connector_wait_tip, deviceDataRelayAll.filter { it.isSelected }.size.toString()))
                     }
                 }
                 //将灯列表的灯循环设置分组
@@ -1098,22 +1095,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setDeviceStopBlink(deviceType: Int) {
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
-                for (i in deviceDataLightAll.filter { it.isSelected }) {
+                for (i in deviceDataLightAll.filter { it.isSelected })
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
-                }
             }
             DeviceType.SMART_CURTAIN -> {
-                for (i in deviceDataCurtainAll.filter { it.isSelected }) {
+                for (i in deviceDataCurtainAll.filter { it.isSelected })
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
-                }
             }
             DeviceType.SMART_RELAY -> {
-                for (i in deviceDataRelayAll.filter { it.isSelected }) {
+                for (i in deviceDataRelayAll.filter { it.isSelected })
                     //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
-                }
             }
         }
     }
@@ -1134,30 +1128,32 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun updateGroupResultCurtain(light: DbCurtain, group: DbGroup) {
-        for (i in deviceDataCurtainAll.filter { it.isSelected }.indices) {
-            if (light.meshAddr == deviceDataCurtainAll.filter { it.isSelected }[i].meshAddr) {
+        val filter = deviceDataCurtainAll.filter { it.isSelected }
+        for (db in filter) {
+            if (light.meshAddr ==db.meshAddr) {
                 if (light.belongGroupId != allLightId) {
-                    deviceDataCurtainAll.filter { it.isSelected }[i].hasGroup = true
-                    deviceDataCurtainAll.filter { it.isSelected }[i].belongGroupId = group.id
-                    deviceDataCurtainAll.filter { it.isSelected }[i].name = light.name
+                    db.hasGroup = true
+                    db.belongGroupId = group.id
+                    db.name = light.name
                     DBUtils.updateCurtain(light)
                 } else {
-                    deviceDataCurtainAll.filter { it.isSelected }[i].hasGroup = false
+                    db.hasGroup = false
                 }
             }
         }
     }
 
     private fun updateGroupResultRelay(light: DbConnector, group: DbGroup) {
-        for (i in deviceDataRelayAll.filter { it.isSelected }.indices) {
-            if (light.meshAddr == deviceDataRelayAll.filter { it.isSelected }[i].meshAddr) {
+        val filter = deviceDataRelayAll.filter { it.isSelected }
+        for (db in filter) {
+            if (light.meshAddr == db.meshAddr) {
                 if (light.belongGroupId != allLightId) {
-                    deviceDataRelayAll.filter { it.isSelected }[i].hasGroup = true
-                    deviceDataRelayAll.filter { it.isSelected }[i].belongGroupId = group.id
-                    deviceDataRelayAll.filter { it.isSelected }[i].name = light.name
+                    db.hasGroup = true
+                    db.belongGroupId = group.id
+                    db.name = light.name
                     DBUtils.updateConnector(light)
                 } else {
-                    deviceDataRelayAll.filter { it.isSelected }[i].hasGroup = false
+                    db.hasGroup = false
                 }
             }
         }
@@ -1477,7 +1473,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setAllSelect(isSelectAll: Boolean) {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                if (checkedNoGrouped) {
                     for (device in noGroup) {
                         for (sourceDevice in deviceDataLightAll) {
                             if (device.id == sourceDevice.id) {
@@ -1492,7 +1487,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     }
                     changeGroupingCompleteState(noGroup.filter { it.isSelected }.size, noGroup.size)
                     lightAdapter.notifyDataSetChanged()
-                } else {
+
+
                     for (device in listGroup) {
                         for (sourceDevice in deviceDataLightAll) {
                             if (device.id == sourceDevice.id) {
@@ -1507,10 +1503,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     }
                     changeGroupingCompleteState(listGroup.filter { it.isSelected }.size, noGroup.size)
                     lightGroupedAdapter.notifyDataSetChanged()
-                }
             }
             DeviceType.SMART_CURTAIN -> {
-                if (checkedNoGrouped) {
                     for (device in noGroupCutain) {
                         for (sourceDevice in deviceDataCurtainAll) {
                             if (device.id == sourceDevice.id) {
@@ -1525,9 +1519,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     }
                     changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainAdapter.notifyDataSetChanged()
-                } else {
-                    for (device in listGroupCutain) {
-                        for (sourceDevice in deviceDataCurtainAll) {
+
+                    for (device in listGroupCutain)
+                        for (sourceDevice in deviceDataCurtainAll)
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
@@ -1536,14 +1530,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                 else
                                     stopBlink(device.meshAddr, device.belongGroupId)
                             }
-                        }
-                    }
                     changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainAdapter.notifyDataSetChanged()
-                }
+                    curtainGroupedAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
-                if (checkedNoGrouped) {
                     for (device in noGroupRelay) {
                         for (sourceDevice in deviceDataRelayAll) {
                             if (device.id == sourceDevice.id) {
@@ -1557,9 +1547,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                     }
                     changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayGroupedAdapter.notifyDataSetChanged()
-                } else {
-                    for (device in listGroup) {
+                    relayAdapter.notifyDataSetChanged()
+
+                    for (device in listGroupRelay) {
                         for (sourceDevice in deviceDataRelayAll) {
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
@@ -1573,7 +1563,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     }
                     changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapter.notifyDataSetChanged()
-                }
             }
         }
     }

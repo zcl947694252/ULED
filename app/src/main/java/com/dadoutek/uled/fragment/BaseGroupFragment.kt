@@ -41,9 +41,7 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
@@ -66,6 +64,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.group_list_fragment.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.runOnUiThread
@@ -446,20 +446,24 @@ abstract class BaseGroupFragment : BaseFragment() {
                     sendToGw(true)
                 } else
                     if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            ||currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR||currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
+                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
                         if (currentGroup!!.status == 0) {
                             Commander.openOrCloseLights(dstAddr, true)
+                            currentGroup?.connectionStatus = 1
                             groupOpenSuccess(position)
                         } else {
                             Commander.openOrCloseLights(dstAddr, false)
                             groupCloseSuccess(position)
+                            currentGroup?.connectionStatus = 0
                         }
-                    }else{
+                        DBUtils.saveGroup(currentGroup!!, true)
+                        LogUtils.v("zcl所有组------------------${DBUtils.allGroups[0].connectionStatus}")
+                    } else {
                         if (currentGroup!!.status == 0) {
-                            Commander.openOrCloseCurtain(dstAddr, true,false)
+                            Commander.openOrCloseCurtain(dstAddr, true, false)
                             groupOpenSuccess(position)
                         } else {
-                            Commander.openOrCloseCurtain(dstAddr, false,false)
+                            Commander.openOrCloseCurtain(dstAddr, false, false)
                             groupCloseSuccess(position)
                         }
                     }
@@ -544,24 +548,58 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     private fun deleteSingleGroup(dbGroup: DbGroup) {
         AlertDialog.Builder(mContext)
-                .setMessage(getString(R.string.delete_group_confirm,dbGroup?.name))
+                .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    val lights = DBUtils.getLightByGroupID(dbGroup.id)
-                    showLoadingDialog(getString(R.string.please_wait))
-                    deleteGroup(lights, dbGroup,
-                            successCallback = {
-                                isDeleteSucess = true
-                                hideLoadingDialog()
-                                sendDeleteBrocastRecevicer(300)
-                                refreshData()
-                            },
-                            failedCallback = {
-                                hideLoadingDialog()
-                                ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                            })
+                    when (dbGroup.deviceType) {
+                        Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            val lights = DBUtils.getLightByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroup(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
+                        }
+                         Constant.DEVICE_TYPE_CURTAIN -> {
+                            val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroupCurtain(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
+                        } Constant.DEVICE_TYPE_CONNECTOR -> {
+                            val lights = DBUtils.getConnectorByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroupRelay(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
+                        }
+                    }
+
                     dialog.dismiss()
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    private fun deleteFailToast() {
+        hideLoadingDialog()
+        ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+    }
+
+    private fun deleteComplete() {
+        isDeleteSucess = true
+        hideLoadingDialog()
+        sendDeleteBrocastRecevicer(300)
+        refreshData()
     }
 
     private fun goConnect(ishow: Boolean = true) {
@@ -651,7 +689,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
             if (StringUtils.compileExChar(textGp?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
-            } else{//往DB里添加组数据
+            } else {//往DB里添加组数据
                 val dbGroup = DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, setGroupType())
                 dbGroup?.let {
                     groupList?.add(it)
@@ -711,6 +749,93 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     }
 
+    /**
+     * 删除组，并且把组里的灯的组也都删除。
+     */
+    private fun deleteGroupRelay(lights: MutableList<DbConnector>, group: DbGroup, retryCount: Int = 0,
+                                 successCallback: () -> Unit, failedCallback: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (lights.count() != 0) {
+                val maxRetryCount = 3
+                if (retryCount <= maxRetryCount) {
+                    val light = lights[0]
+                    val lightMeshAddr = light.meshAddr
+                    Commander.deleteGroup(lightMeshAddr, successCallback = {
+                        light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
+                        DBUtils.updateConnector(light)
+                        lights.remove(light)
+                        //修改分组成功后删除场景信息。
+                        // deleteAllSceneByLightAddr(light.meshAddr)
+                        Thread.sleep(100)
+                        if (lights.count() == 0) {
+                            //所有灯都删除了分组
+                            DBUtils.deleteGroupOnly(group)//亲删除改组
+                            runOnUiThread {
+                                successCallback.invoke()
+                            }
+                        } else //还有灯要删除分组
+                            deleteGroupRelay(lights, group, successCallback = successCallback, failedCallback = failedCallback)
+
+                        LogUtils.e("zcl删除组后" + DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
+                    }, failedCallback = {
+                        deleteGroupRelay(lights, group, retryCount = retryCount + 1, successCallback = successCallback, failedCallback = failedCallback)
+                    })
+                } else //超过了重试次数
+                    runOnUiThread {
+                        failedCallback.invoke()
+                    }
+            } else {
+                DBUtils.deleteGroupOnly(group)
+                runOnUiThread {
+                    successCallback.invoke()
+                }
+            }
+        }
+    }
+    /**
+     * 删除组，并且把组里的灯的组也都删除。
+     */
+    private fun deleteGroupCurtain(lights: MutableList<DbCurtain>, group: DbGroup, retryCount: Int = 0,
+                                 successCallback: () -> Unit, failedCallback: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (lights.count() != 0) {
+                val maxRetryCount = 3
+                if (retryCount <= maxRetryCount) {
+                    val light = lights[0]
+                    val lightMeshAddr = light.meshAddr
+                    Commander.deleteGroup(lightMeshAddr, successCallback = {
+                        light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
+                        DBUtils.updateCurtain(light)
+                        lights.remove(light)
+                        //修改分组成功后删除场景信息。
+                        // deleteAllSceneByLightAddr(light.meshAddr)
+                        Thread.sleep(100)
+                        if (lights.count() == 0) {
+                            //所有灯都删除了分组
+                            DBUtils.deleteGroupOnly(group)//亲删除改组
+                            runOnUiThread {
+                                successCallback.invoke()
+                            }
+                        } else //还有灯要删除分组
+                            deleteGroupCurtain(lights, group, successCallback = successCallback, failedCallback = failedCallback)
+
+                        LogUtils.e("zcl删除组后" + DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
+                    }, failedCallback = {
+                        deleteGroupCurtain(lights, group, retryCount = retryCount + 1, successCallback = successCallback, failedCallback = failedCallback)
+                    })
+                } else //超过了重试次数
+                    runOnUiThread {
+                        failedCallback.invoke()
+                    }
+            } else {
+                DBUtils.deleteGroupOnly(group)
+                runOnUiThread {
+                    successCallback.invoke()
+                }
+            }
+        }
+    }
+
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
@@ -750,7 +875,9 @@ abstract class BaseGroupFragment : BaseFragment() {
                 groupCloseSuccess(currentPosition)
             }
         }
-    }   override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
+    }
+
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")

@@ -612,11 +612,13 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 saveSensor(dbSensor, false)
                 if (!this.isFinishing)
                     renameDialog.dismiss()
+                toolbarTv.text = dbSensor.name
             }
         }
         renameCancel?.setOnClickListener {
             if (!this.isFinishing)
                 renameDialog?.dismiss()
+
         }
 
         if (!this.isFinishing) {

@@ -63,6 +63,7 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
  *
@@ -96,7 +97,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> { }
+                    BluetoothAdapter.STATE_OFF -> {
+                    }
                 }
             }
         }
@@ -114,11 +116,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
+        MqttManger.initMqtt()
+
 
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            //TelinkLightApplication.getApp().initStompClient()
-
-        MqttManger.initMqtt()
+        //TelinkLightApplication.getApp().initStompClient()
 
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
@@ -148,15 +150,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getRegionList() {
         val list = mutableListOf<String>()
         if (netWorkCheck(this))
-        RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-            override fun onNext(t: MutableList<RegionBean>) {
-                for (i in t) {
-                    i.controlMesh?.let { it -> list.add(it) }
-                }
-                SharedPreferencesUtils.saveRegionNameList(list)
+            RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
+                override fun onNext(t: MutableList<RegionBean>) {
+                    for (i in t) {
+                        i.controlMesh?.let { it -> list.add(it) }
+                    }
+                    SharedPreferencesUtils.saveRegionNameList(list)
 
-            }
-        })
+                }
+            })
     }
 
 
@@ -237,22 +239,22 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun checkVersionAvailable() {
         var version = packageName(this)
         if (netWorkCheck(this))
-        UpdateModel.run {
-            isVersionAvailable(0, version)
-                    .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
-                        override fun onNext(s: ResponseVersionAvailable) {
-                            if (!s.isUsable) {
-                                syncDataAndExit()
+            UpdateModel.run {
+                isVersionAvailable(0, version)
+                        .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
+                            override fun onNext(s: ResponseVersionAvailable) {
+                                if (!s.isUsable) {
+                                    syncDataAndExit()
+                                }
+                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
                             }
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
-                        }
 
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            //ToastUtils.showLong(R.string.get_server_version_fail)
-                        }
-                    })
-        }
+                            override fun onError(e: Throwable) {
+                                super.onError(e)
+                                //ToastUtils.showLong(R.string.get_server_version_fail)
+                            }
+                        })
+            }
     }
 
 
@@ -441,7 +443,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
         mConnectDisposal?.dispose()
-        MqttManger.doDisconnect()
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 
@@ -460,7 +461,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     override fun performed(event: Event<String>) {
         when (event.type) {
-            NotificationEvent.GET_ALARM -> { }
+            NotificationEvent.GET_ALARM -> {
+            }
             ServiceEvent.SERVICE_CONNECTED -> {
                 this.onServiceConnected(event as ServiceEvent)
             }

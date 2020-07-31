@@ -30,7 +30,7 @@ object DBUtils {
         get() {
             val list = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().orderDesc(DbRegionDao.Properties.Id).list()
             return when {
-                list.size>0 -> list[0]
+                list.size > 0 -> list[0]
                 else -> DbRegion()
             }
         }
@@ -46,16 +46,16 @@ object DBUtils {
 
     val allCurtain: List<DbCurtain>
         //窗帘
-        get(){
-                val arrayList = ArrayList<DbCurtain>()
-                arrayList.addAll(DaoSessionInstance.getInstance().dbCurtainDao.loadAll())
-                return arrayList
-            }
+        get() {
+            val arrayList = ArrayList<DbCurtain>()
+            arrayList.addAll(DaoSessionInstance.getInstance().dbCurtainDao.loadAll())
+            return arrayList
+        }
 
 
     val allRely: List<DbConnector>
         //蓝牙接收器
-        get()  {
+        get() {
             val arrayList = ArrayList<DbConnector>()
             arrayList.addAll(DaoSessionInstance.getInstance().dbConnectorDao.loadAll())
             return arrayList
@@ -278,14 +278,14 @@ object DBUtils {
 
     fun getAllUser(): ArrayList<DbUser> {
         val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().build()
-        var arrayList: ArrayList<DbUser> =  arrayListOf()
+        var arrayList: ArrayList<DbUser> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
 
     fun getAllRGBLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_RGB)).build()
-        var arrayList: ArrayList<DbLight> =  arrayListOf()
+        var arrayList: ArrayList<DbLight> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -294,15 +294,16 @@ object DBUtils {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
 
-        var arrayList: ArrayList<DbLight> =  arrayListOf()
+        var arrayList: ArrayList<DbLight> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
+
     fun getAllGateWay(): ArrayList<DbGateway> {
         val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
                 .where(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
 
-        var arrayList: ArrayList<DbGateway> =  arrayListOf()
+        var arrayList: ArrayList<DbGateway> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -316,7 +317,7 @@ object DBUtils {
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.EIGHT_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
 
-        var arrayList: ArrayList<DbSwitch> =  arrayListOf()
+        var arrayList: ArrayList<DbSwitch> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -326,7 +327,7 @@ object DBUtils {
                 .whereOr(DbSensorDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
                         , DbSensorDao.Properties.ProductUUID.eq(DeviceType.SENSOR)).build()
 
-        var arrayList: ArrayList<DbSensor> =  arrayListOf()
+        var arrayList: ArrayList<DbSensor> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -335,7 +336,7 @@ object DBUtils {
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
                 .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)).build()
 
-        var arrayList: ArrayList<DbCurtain> =  arrayListOf()
+        var arrayList: ArrayList<DbCurtain> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -344,7 +345,7 @@ object DBUtils {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
                 .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_RELAY)).build()
 
-        var arrayList: ArrayList<DbConnector> =  arrayListOf()
+        var arrayList: ArrayList<DbConnector> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -463,6 +464,7 @@ object DBUtils {
             dbGatewayList[0]
         } else null
     }
+
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
         val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
@@ -481,7 +483,6 @@ object DBUtils {
             dbCurtianList[0]
         } else null
     }
-
 
 
     fun getEightSwitchByMeshAddr(meshAddr: Int): DbEightSwitch? {
@@ -528,7 +529,7 @@ object DBUtils {
      */
     fun isDeviceExist(meshAddr: Int): Boolean {
         return getLightByMeshAddr(meshAddr) != null || getRelyByMeshAddr(meshAddr) != null || getCurtainByMeshAddr(meshAddr) != null
-                || getSwitchByMeshAddr(meshAddr) != null || getSensorByMeshAddr(meshAddr) != null||getGatewayByMeshAddr(meshAddr)!=null
+                || getSwitchByMeshAddr(meshAddr) != null || getSensorByMeshAddr(meshAddr) != null || getGatewayByMeshAddr(meshAddr) != null
     }
 
     fun getSwitchByMeshAddr(meshAddr: Int): DbSwitch? {
@@ -653,6 +654,7 @@ object DBUtils {
         }
         return ArrayList()
     }
+
     fun getRelayByGroupMesh(mesh: Int): ArrayList<DbConnector>? {
         val group = getGroupByMeshAddr(mesh)
         if (group != null) {
@@ -762,7 +764,7 @@ object DBUtils {
     }
 
 
-    fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3,keys: String = "") {
+    fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3, keys: String = "") {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
@@ -773,13 +775,14 @@ object DBUtils {
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             if (existList.size > 0) {
-                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_UPDATE,type,keys)
+                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_UPDATE, type, keys)
             } else {
-                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD,type,keys)
+                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD, type, keys)
             }
         }
     }
-    fun saveGateWay(db: DbGateway, isFromServer: Boolean){//添加mesh以后要改成mes地址
+
+    fun saveGateWay(db: DbGateway, isFromServer: Boolean) {//添加mesh以后要改成mes地址
         val existList = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder().where(DbGatewayDao.Properties.MeshAddr.eq(db.meshAddr)).list()
 
         //如果该mesh地址的数据已经存在，就直接修改
@@ -802,7 +805,7 @@ object DBUtils {
         }
     }
 
-    fun saveEightSwitch(db:DbEightSwitch,isFromServer: Boolean){
+    fun saveEightSwitch(db: DbEightSwitch, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
 
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
@@ -981,6 +984,7 @@ object DBUtils {
     private fun updateGate(gateway: DbGateway) {
         saveGateWay(gateway, false)
     }
+
     @Deprecated("Use saveLight()")
     fun updateLight(light: DbLight) {
         saveLight(light, false)
@@ -995,6 +999,7 @@ object DBUtils {
     fun updateSwicth(switch: DbSwitch) {
         saveSwitch(switch, false)
     }
+
     @Deprecated("Use saveEightSwitch()")
     fun updateEightSwicth(switch: DbEightSwitch) {
         saveEightSwitch(switch, false)
@@ -1139,6 +1144,7 @@ object DBUtils {
                 Constant.DB_DELETE
         )
     }
+
     fun deleteGateway(gateway: DbGateway) {
         DaoSessionInstance.getInstance().dbGatewayDao.delete(gateway)
         recordingChange(gateway.id,
@@ -1350,6 +1356,8 @@ object DBUtils {
 
     fun createAllLightControllerGroup(): DbGroup {
         val groupAllLights = DbGroup()
+        if (allGroups.size > 0)
+            groupAllLights.connectionStatus = allGroups[0].connectionStatus
         groupAllLights.name = TelinkLightApplication.getApp().getString(R.string.allLight)
         groupAllLights.meshAddr = 0xFFFF
         groupAllLights.brightness = 100
@@ -1372,11 +1380,11 @@ object DBUtils {
      * @param operating   所执行的操作
      */
 
-    fun recordingChange(changeIndex: Long?, changeTable: String, operating: String,type:Int =3,keys:String = "") {
+    fun recordingChange(changeIndex: Long?, changeTable: String, operating: String, type: Int = 3, keys: String = "") {
         val dataChangeList = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
         if (dataChangeList.size == 0) {
-            saveChange(changeIndex, operating, changeTable,type,keys)
+            saveChange(changeIndex, operating, changeTable, type, keys)
             return
         } else {
             for (i in dataChangeList.indices) {
@@ -1418,8 +1426,8 @@ object DBUtils {
         dataChange.changeId = changeIndex
         dataChange.changeType = operating
         dataChange.tableName = changeTable
-        dataChange.type =  type
-        dataChange.keys =  keys
+        dataChange.type = type
+        dataChange.keys = keys
         DaoSessionInstance.getInstance().dbDataChangeDao.insert(dataChange)
     }
 
@@ -1431,7 +1439,7 @@ object DBUtils {
         } else null
     }
 
-     fun timeStr(time: Int): String {
+    fun timeStr(time: Int): String {
         return if (time < 10)
             "0$time"
         else
@@ -1446,11 +1454,11 @@ object DBUtils {
         val sensor = getAllSensor().map { it.meshAddr }
         val addressList = mutableListOf<Int>()
 
-      /*  addressList.addAll(lights)
-        addressList.addAll(curtain)
-        addressList.addAll(relay)
-        addressList.addAll(switch)
-        addressList.addAll(sensor)*/
+        /*  addressList.addAll(lights)
+          addressList.addAll(curtain)
+          addressList.addAll(relay)
+          addressList.addAll(switch)
+          addressList.addAll(sensor)*/
 
         lights?.let {
             addressList.addAll(it)
@@ -1469,6 +1477,9 @@ object DBUtils {
         }
         addressList.sortBy { it }
 
-        return  addressList.last()
+        return when {
+            addressList.isEmpty() -> 0
+            else -> addressList.last()
+        }
     }
 }

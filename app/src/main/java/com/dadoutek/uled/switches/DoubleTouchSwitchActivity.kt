@@ -64,6 +64,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun setVersion() {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = localVersion
         fiVersion?.title =localVersion
     }
 
@@ -303,21 +305,18 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             } else {
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
-                if (this != null && !this.isFinishing) {
+                toolbarTv.text = switchDate?.name
+                if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
-                }
             }
         }
         renameCancel?.setOnClickListener {
-            if (this != null && !this.isFinishing) {
+            if (this != null && !this.isFinishing)
                 renameDialog?.dismiss()
-            }
         }
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-            if (switchDate != null)
-                DBUtils.updateSwicth(switchDate!!)
-            showConfigSuccessDialog()
+           if (!isReConfig)
+               finish()
         }
     }
 

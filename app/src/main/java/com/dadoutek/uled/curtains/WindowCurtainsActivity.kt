@@ -235,21 +235,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-    /* private fun updateGroup() {
-         val intent = Intent(this, CurtainGroupingActivity::class.java)
-         if (curtain == null) {
-             ToastUtils.showLong(getString(R.string.please_connect_curtain))
-             TelinkLightService.Instance()?.idleMode(true)
-             TelinkLightService.Instance()?.disconnect()
-             return
-         }
-         intent.putExtra("curtain", curtain)
-         intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
-         intent.putExtra("gpAddress", ctAdress)
-         intent.putExtra("uuid", curtain!!.productUUID)
-         startActivity(intent)
-
-     }*/
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@WindowCurtainsActivity, ChooseGroupOrSceneActivity::class.java)
         val bundle = Bundle()
@@ -265,7 +250,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(curtain!!, group)
-            finish()
         }
     }
 
@@ -308,11 +292,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     light.name = light.name
                     DBUtils.updateCurtain(light)
                     ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                    finish()
                 }, {
                     ToastUtils.showShort(getString(R.string.grouping_fail))
                 })
-
-                //}.start()
             }
         }
     }
@@ -330,7 +313,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         curtain!!.belongGroupId = group.id
     }
-
     /**
      * 删除指定灯的之前的分组
      * @param lightMeshAddr 灯的mesh地址
@@ -449,15 +431,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         if (!currentShowGroupSetPage) {
 
             if (curtain!!.status != null) {
-                when {
-                    curtain!!.status == 0 -> {
+                when (curtain!!.status) {
+                    0 -> {
                         pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
                         closeBtn.setImageResource(R.drawable.icon_curtain_close)
                         closeText.setTextColor(Color.parseColor("#333333"))
                         openBtn.setImageResource(R.drawable.icon_curtain_close)
                         openText.setTextColor(Color.parseColor("#333333"))
                     }
-                    curtain!!.status == 1 -> {
+                    1 -> {
                         curtainImage.setImageResource(R.drawable.curtain_close)
                         pauseBtn.setImageResource(R.drawable.icon_suspend)
                         closeBtn.setImageResource(R.drawable.icon_open_yes)
@@ -465,7 +447,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         openBtn.setImageResource(R.drawable.icon_curtain_close)
                         openText.setTextColor(Color.parseColor("#333333"))
                     }
-                    curtain!!.status == 2 -> {
+                    2 -> {
                         curtainImage.setImageResource(R.drawable.curtain)
                         pauseBtn.setImageResource(R.drawable.icon_suspend)
                         openBtn.setImageResource(R.drawable.icon_open_yes)

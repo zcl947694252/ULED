@@ -109,6 +109,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun onPostResume() {
         super.onPostResume()
         addListeners()
+        initData()
     }
 
     private fun addListeners() {
@@ -149,13 +150,16 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-        val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
+     /*   val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
         intent.putExtra("relayType", "group_relay")
         intent.putExtra("relay_group_name", group.name)
         startActivity(intent)
-        finish()
+        finish()*/
+        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+        startActivity(intent)
     }
 
 
@@ -200,17 +204,17 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun skipeBatch() {
         when {
-            DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
+            DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
             TelinkLightApplication.getApp().connectDevice != null ->
                 startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }
     private fun goOta() {
-        if (DBUtils.getAllCurtains().size == 0)
+        if (DBUtils.getAllRelay().size == 0)
             ToastUtils.showShort(getString(R.string.no_device))
         else
-            startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.SMART_CURTAIN)
+            startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.SMART_RELAY)
     }
 
     private fun editeDevice() {
@@ -267,11 +271,10 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun initParameter() {
-        val get = this.intent.extras!!.get("group")
-        if (null != get)
-            this.group = get as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
+        val get = this.intent.extras!!.get("group")?:return
+            this.group = get as DbGroup
     }
 
     override fun onResume() {
@@ -309,22 +312,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
-            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.visibility = View.GONE
-            batchGroup.setOnClickListener {
-                val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("relayType", "relayGroup")
-                intent.putExtra("group", group.id.toInt())
-                startActivity(intent)
-            }
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light_ly.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
         }
     }
 

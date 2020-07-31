@@ -27,10 +27,18 @@ data class MqttBodyBean(
 
         var meshAddr: Int = 0,
         var extend: Extend = Extend()
-) : Serializable
+) : Serializable{
+    override fun toString(): String {
+        return "MqttBodyBean(cmd=$cmd, loginStateKey='$loginStateKey', rid=$rid, type=$type, code='$code', region_name='$region_name', ref_user_phone='$ref_user_phone', authorizer_user_id=$authorizer_user_id, authorizer_user_phone='$authorizer_user_phone', ts=$ts, msg='$msg', status=$status, ser_id='$ser_id', macAddr='$macAddr', meshAddr=$meshAddr, extend=$extend)"
+    }
+}
 
 class Extend : Serializable {
     var cmd: Int = 0
     var meshAddr: Int = 0
+    override fun toString(): String {
+        return "Extend(cmd=$cmd, meshAddr=$meshAddr)"
+    }
+
 }
 

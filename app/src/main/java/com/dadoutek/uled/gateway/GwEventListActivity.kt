@@ -3,6 +3,7 @@ package com.dadoutek.uled.gateway
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.ContentUris
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
@@ -26,10 +27,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.adapter.GwEventItemAdapter
-import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.gateway.bean.GwTagBean
-import com.dadoutek.uled.gateway.bean.GwTimeAndDataBean
-import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.gateway.bean.*
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -66,10 +64,7 @@ import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.toast
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -307,22 +302,22 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun hardTimer() {
         disposableFactoryTimer?.dispose()
         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
-                    showDialogDelete?.dismiss()
-                    showDialogHardDeleteGw = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    showLoadingDialog(getString(R.string.please_wait))
+                    CoroutineScope(Dispatchers.Main).launch {
+                        showDialogDelete?.dismiss()
+                        showDialogHardDeleteGw = android.support.v7.app.AlertDialog.Builder(this@GwEventListActivity).setMessage(R.string.delete_device_hard_tip)
+                                .setPositiveButton(android.R.string.ok) { _, _ ->
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        showLoadingDialog(getString(R.string.please_wait))
+                                    }
+                                    showDialogHardDelete?.dismiss()
+                                    isRestSuccess = true
+                                    deleteGwData(isRestSuccess)
                                 }
-                                showDialogHardDelete?.dismiss()
-                                isRestSuccess = true
-                                deleteGwData(isRestSuccess)
-                            }
-                            .setNegativeButton(R.string.btn_cancel, null)
-                            .show()
+                                .setNegativeButton(R.string.btn_cancel, null)
+                                .show()
+                    }
                 }
     }
 
@@ -434,8 +429,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
                     override fun onError(e: Throwable) {
                         super.onError(e)
-                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
-                        DBUtils.saveGateWay(dbGw!!, true)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
+                        }
+                        //DBUtils.saveGateWay(dbGw!!, true)
                         finish()
                     }
                 }
@@ -1048,6 +1045,17 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                         hideLoadingDialog()
                         runOnUiThread { deleteSuceess() }
                     }
+                    GW_RESET_VOIP -> {
+                        showDialogHardDelete?.dismiss()
+                        disposableFactoryTimer?.dispose()
+                        LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                        isRestSuccess = true
+                        deleteGwData(isRestSuccess)
+                    }
+                    GW_RESET_USER_VOIP -> {
+                        disposableFactoryTimer?.dispose()
+                        resetUserGwData()
+                    }
                 }
             }
 
@@ -1096,9 +1104,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     override fun performed(event: Event<String>?) {
-        if (event is DeviceEvent) {
+        if (event is DeviceEvent)
             this.onDeviceEvent(event)
-        }
     }
 
     private fun onDeviceEvent(event: DeviceEvent) {
@@ -1116,7 +1123,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                         }
                         GW_RESET_USER_VOIP -> {
                             disposableFactoryTimer?.dispose()
-                            finish()
+                            resetUserGwData()
                         }
                     }
                 }
@@ -1125,7 +1132,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 }
                 LightAdapter.STATUS_LOGOUT -> {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                    retryConnect()
+                    if (!isRestSuccess)
+                        retryConnect()
                 }
                 LightAdapter.STATUS_SET_GW_COMPLETED -> {//Dadou   Dadoutek2018
                     val deviceInfo = event.args
@@ -1154,5 +1162,42 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 }
             }
         }
+    }
+
+    private fun resetUserGwData() {
+        GwModel.clearGwData(dbGw!!.id)?.subscribe(object : NetworkObserver<ClearGwBean?>() {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onNext(t: ClearGwBean) {
+                saveResetGwData(t)
+                hideLoadingDialog()
+                disposableFactoryTimer?.dispose()
+                ToastUtils.showShort(getString(R.string.gw_user_reset_switch_success))
+                getNewData()
+            }
+
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                disposableFactoryTimer?.dispose()
+                ToastUtils.showShort(e.message)
+            }
+        })
+    }
+
+    private fun saveResetGwData(t: ClearGwBean) {
+        dbGw?.belongRegionId = t.belongRegionId
+        dbGw?.id = t.id.toLong()
+        dbGw?.macAddr = t.macAddr
+        dbGw?.meshAddr = t.meshAddr
+        dbGw?.name = t.name
+        dbGw?.openTag = t.openTag
+        dbGw?.productUUID = t.productUUID
+        dbGw?.state = t.state
+        dbGw?.tags = t.tags.toString()
+        dbGw?.timePeriodTags = t.timePeriodTags
+        dbGw?.type = t.type
+        dbGw?.uid = t.uid
+        dbGw?.version = t.version
+        dbGw?.tags = t.tags
+        DBUtils.saveGateWay(dbGw!!, false)
     }
 }

@@ -371,7 +371,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendLabelHeadParams() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribe {
                     GlobalScope.launch(Dispatchers.Main) {
                         ToastUtils.showShort(getString(R.string.send_gate_way_label_head_fail))
@@ -666,6 +666,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
                     Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                        disposableTimer?.dispose()
                         saveOrUpdataGw(dbGw!!)
                         val intent = Intent()
                         intent.putExtra("data", dbGw)

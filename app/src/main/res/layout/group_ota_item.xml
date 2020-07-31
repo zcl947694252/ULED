@@ -4,6 +4,8 @@
         android:id="@+id/constraintLayout5"
         android:layout_width="match_parent"
         android:layout_height="64dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/device_fragment_background"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

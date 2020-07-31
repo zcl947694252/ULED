@@ -49,6 +49,7 @@ import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.region.SettingActivity
+import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
@@ -614,7 +615,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     private fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-        TelinkLightApplication.getApp().releseStomp()
+        MqttManger.doDisconnect()
         com.blankj.utilcode.util.AppUtils.relaunchApp()
     }
 

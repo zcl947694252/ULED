@@ -71,7 +71,6 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                     Constant.DEVICE_TYPE_LIGHT.toInt() -> {
                         filter = groupList.filter { it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL||
                                 it.deviceType == Constant.DEVICE_TYPE_CONNECTOR }
-                        groupList.add(0,DBUtils.allGroups[0])
                     }
                     Constant.DEVICE_TYPE_LIGHT_NORMAL.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(),
                     Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
@@ -83,6 +82,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 }
                 groupList.clear()
                 groupList.addAll(filter)
+                groupList.add(0,DBUtils.allGroups[0])
                 groupAdapter?.notifyDataSetChanged()
             }
             else -> {
@@ -119,6 +119,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
                 else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
             }
+            groupList.forEach { it.isChecked =false }
+            sceneList.forEach { it.isChecked =false }
             finish()
         }
     }

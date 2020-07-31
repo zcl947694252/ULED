@@ -153,6 +153,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                     } else {
                         currentDevice?.name = renameEt?.text.toString().trim { it <= ' ' }
                         DBUtils.updateSwicth(currentDevice!!)
+                        toolbarTv.text = currentDevice?.name
                         adapter!!.notifyDataSetChanged()
                         renameDialog.dismiss()
                     }

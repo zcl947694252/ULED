@@ -76,12 +76,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     private var mConnectDevice: DeviceInfo? = null
     private var mConnectTimer: Disposable? = null
     private var isRenameState = false
-    private var group: DbGroup? = null
+    private var currentGroup: DbGroup? = null
     private var currentShowPageGroup = true
 
     private fun renameGroup() {
-        if (!TextUtils.isEmpty(group?.name))
-            renameEt?.setText(group?.name)
+        if (!TextUtils.isEmpty(currentGroup?.name))
+            renameEt?.setText(currentGroup?.name)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
@@ -104,9 +104,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     }
                 }
                 if (canSave) {
-                    group?.name = renameEt?.text.toString().trim { it <= ' ' }
-                    DBUtils.updateGroup(group!!)
-                    toolbarTv.text = group?.name
+                    currentGroup?.name = renameEt?.text.toString().trim { it <= ' ' }
+                    DBUtils.updateGroup(currentGroup!!)
+                    toolbarTv.text = currentGroup?.name
                     renameDialog.dismiss()
                 }
             }
@@ -183,7 +183,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(currentDbConnector!!, group)
-            finish()
         }
     }
 
@@ -197,6 +196,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             ToastUtils.showShort(getString(R.string.grouping_success_tip))
             if (group != null)
                 DBUtils.updateGroup(group!!)//更新组类型
+            finish()
         }, {
             ToastUtils.showShort(getString(R.string.grouping_fail))
         })
@@ -294,7 +294,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
 
             relayName.visibility = View.VISIBLE
-            relayName.text = group?.name
+            relayName.text = currentGroup?.name
         } else {
             var canSave = true
             val groups = DBUtils.allGroups
@@ -309,8 +309,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             if (canSave) {
                 relayName.visibility = View.VISIBLE
                 relayName.text = name
-                group?.name = name
-                DBUtils.updateGroup(group!!)
+                currentGroup?.name = name
+                DBUtils.updateGroup(currentGroup!!)
             }
         }
     }
@@ -500,29 +500,16 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun initType() {
-        connector_switch?.setOnCheckedChangeListener { _, isChecked ->
-            if (TelinkLightApplication.getApp().connectDevice == null)
-                autoConnect()
-            else {
-                if (!isChecked)
-                    openOrClose(true)
-                else
-                    openOrClose(false)
-                currentDbConnector!!.updateIcon()
-                DBUtils.updateConnector(currentDbConnector!!)
-            }
-        }
-
         var type = intent.getStringExtra(Constant.TYPE_VIEW)
         isConfigGroup = type == Constant.TYPE_GROUP
         if (isConfigGroup) {
             currentShowPageGroup = true
-            this.group = this.intent.extras!!.get("group") as DbGroup
-            if (group != null)
-                if (group!!.meshAddr == 0xffff)
+            this.currentGroup = this.intent.extras!!.get("group") as DbGroup
+            if (currentGroup != null)
+                if (currentGroup!!.meshAddr == 0xffff)
                     toolbarTv!!.text = getString(R.string.allLight)
                 else
-                    toolbarTv!!.text = group!!.name
+                    toolbarTv!!.text = currentGroup!!.name
 
             img_function1.setImageResource(R.drawable.icon_editor)
             img_function1.visibility = View.VISIBLE
@@ -535,13 +522,30 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             initViewLight()
             getVersion()
         }
-
+        connector_switch.isChecked = currentDbConnector?.connectionStatus==1
+        connector_switch?.setOnCheckedChangeListener { _, isChecked ->
+            if (TelinkLightApplication.getApp().connectDevice == null)
+                autoConnect()
+            else {
+                if (isChecked)
+                    openOrClose(true)
+                else
+                    openOrClose(false)
+                if (!isConfigGroup){
+                    currentDbConnector!!.updateIcon()
+                    DBUtils.updateConnector(currentDbConnector!!)
+                }
+            }
+        }
     }
 
     private fun openOrClose(b: Boolean) {
         if (currentDbConnector?.productUUID == DeviceType.SMART_CURTAIN) {
             Commander.openOrCloseCurtain(currentDbConnector?.meshAddr ?: 0, isOpen = b, isPause = false)
         } else {
+            if (isConfigGroup)
+            Commander.openOrCloseLights(currentGroup?.meshAddr ?: 0, b)
+                else
             Commander.openOrCloseLights(currentDbConnector?.meshAddr ?: 0, b)
         }
         if (b)

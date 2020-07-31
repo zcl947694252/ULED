@@ -328,7 +328,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             when (view.id) {
                 R.id.btn_delete -> delete(adapter, position)
                 R.id.dot_rgb -> changeToColorSelect(position)
-                // R.id.dot_one -> changeToColorSelect(position)
+                 R.id.dot_one -> changeToColorSelect(position)
                 R.id.rg_xx -> open(position)
                 R.id.rg_yy -> close(position)
                 R.id.alg_text -> showPopMode(position)
@@ -679,7 +679,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val newItemGroup = ItemGroup()
         newItemGroup.brightness = 50
         newItemGroup.temperature = 50
-        newItemGroup.color = 0xffffff
+        newItemGroup.color = 0
         newItemGroup.checked = true
         newItemGroup.enableCheck = true
         newItemGroup.gpName = showCheckListData!![i].name
@@ -991,7 +991,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     val newItemGroup = ItemGroup()
                     newItemGroup.brightness = 0
                     newItemGroup.temperature = 0
-                    newItemGroup.color = 0xffffff
+                    newItemGroup.color = 0
                     newItemGroup.checked = true
                     newItemGroup.enableCheck = true
                     newItemGroup.gpName = showCheckListData!![i].name

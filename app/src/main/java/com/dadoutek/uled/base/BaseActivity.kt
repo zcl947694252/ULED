@@ -33,6 +33,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.stomp.MqttBodyBean
+import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -253,7 +254,7 @@ abstract class BaseActivity : AppCompatActivity() {
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
-        TelinkLightApplication.getApp().releseStomp()
+        MqttManger.doDisconnect()
         AppUtils.relaunchApp()
     }
 
@@ -345,11 +346,12 @@ abstract class BaseActivity : AppCompatActivity() {
             when(codeBean.cmd){
                 1->{//单点登录
                     LogUtils.e("zcl_baseMe___________收到登出消息")
-                    if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
+                    val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+                    if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
                     checkNetworkAndSync(this@BaseActivity)
                 }
                 2->{//推送二维码扫描解析结果
-                    makeCodeDialog(0, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
                 }
                 3->{//解除授权信息
                     val user = DBUtils.lastUser
@@ -379,7 +381,7 @@ abstract class BaseActivity : AppCompatActivity() {
             }
 
 
-            when (intent?.action) {
+    /*        when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     when (gwStompBean.cmd) {
@@ -422,7 +424,7 @@ abstract class BaseActivity : AppCompatActivity() {
 //                    LogUtils.e("zcl_baseMe___________解析二维码")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
                 }
-            }
+            }*/
         }
     }
 

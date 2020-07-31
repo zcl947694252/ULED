@@ -277,6 +277,9 @@ public class StringUtils {
             case DeviceType.DOUBLE_SWITCH:
                 startStr = context.getString(R.string.double_switch);
                 break;
+                case DeviceType.EIGHT_SWITCH:
+                startStr = context.getString(R.string.eight_switch);
+                break;
 
             case DeviceType.SMART_CURTAIN_SWITCH:
                 startStr = context.getString(R.string.curtain_switch);

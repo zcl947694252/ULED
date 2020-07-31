@@ -49,6 +49,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.stomp.MqttBodyBean
+import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -557,7 +558,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     open fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
-        TelinkLightApplication.getApp().releseStomp()
+        MqttManger.doDisconnect()
         AppUtils.relaunchApp()
     }
 
@@ -642,13 +643,16 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
         var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
+            LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish解析---${codeBean?.toString()}")
             when(codeBean.cmd){
                 1->{//单点登录
-                    LogUtils.e("zcl_baseMe___________收到登出消息")
-                    loginOutMethod()
+                    LogUtils.e("zcl_mqtt___收到登出消息${DBUtils.lastUser?.login_state_key==codeBean.loginStateKey}")
+                    val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+                    if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
+                        loginOutMethod()
                 }
                 2->{//推送二维码扫描解析结果
-                    makeCodeDialog(0, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
                 }
                  3->{//解除授权信息
                      val user = DBUtils.lastUser
@@ -664,7 +668,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                              SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                          }
                      }
-                     codeBean.let { makeCodeDialog(2, it.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt()) }//2代表解除授权信息type
+                     makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt())//2代表解除授权信息type
                      LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
                 }
                 700 -> TelinkLightApplication.getApp().offLine = false
@@ -677,7 +681,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }
 
-
+/*
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
@@ -724,7 +728,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 //                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
                 }
-            }
+            }*/
         }
     }
 

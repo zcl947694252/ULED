@@ -220,7 +220,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     override fun onResume() {
         super.onResume()
         inflater = this.layoutInflater
-        initData()
+        notifyData()
         this.mApp.removeEventListeners()
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
@@ -701,7 +701,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
 
     fun notifyData() {
-        val mNewDatas: ArrayList<DbGateway> = getNewData()
+        val mNewDatas: ArrayList<DbGateway> =DBUtils.getAllGateWay()
         gwDatas.clear()
         gwDatas.addAll(mNewDatas)
         if (mNewDatas.size > 0) {
@@ -737,10 +737,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     }
 
-    private fun getNewData(): ArrayList<DbGateway> {
-        return DBUtils.getAllGateWay()
-    }
-
     private fun onLogin(isConfigGw: Int) {
         hideLoadingDialog()
         var intent: Intent? = null
@@ -771,13 +767,11 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else
-                        if (dialog_relay?.visibility == View.GONE)
-                            showPopupMenu()
-                        else
-                            hidePopupMenu()
+                    when {
+                        it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                        dialog_relay?.visibility == View.GONE -> showPopupMenu()
+                        else -> hidePopupMenu()
+                    }
                 }
             }
             gwDatas.addAll(allDeviceData)

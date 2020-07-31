@@ -64,10 +64,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.startActivity
 import java.util.*
@@ -111,9 +108,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
 
-    override fun onPostResume() {
-        super.onPostResume()
+    override fun onResume() {
+        super.onResume()
         addListeners()
+        initParameter()
+        initData()
+        initView()
     }
 
     private fun addListeners() {
@@ -171,14 +171,17 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
 //        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
 //        intent.putExtra("curtain_name",group.name)
-        val intent = Intent(this,
-                CurtainBatchGroupActivity::class.java)
+       /* val intent = Intent(this, CurtainBatchGroupActivity::class.java)
         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
         intent.putExtra("curtain","group_curtain")
         intent.putExtra("curtain_group_name",group.name)
         startActivity(intent)
-        finish()
+        finish()*/
+        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+        startActivity(intent)
+
     }
 
     private fun initToolbar() {
@@ -215,36 +218,29 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
-//        val nameList : ArrayList<String> = ArrayList()
-        if (curtainList != null && curtainList.size > 0) {
+        if (curtainList != null && curtainList.size > 0)
             curtainList.clear()
-        }
-
 
         if (isSearch) {
-            for (i in list.indices) {
-                if (groupName == list[i].name || (list[i].name).startsWith(groupName!!)) {
+            for (i in list.indices)
+                if (groupName == list[i].name || (list[i].name).startsWith(groupName!!))
                     curtainList.addAll(DBUtils.getCurtainByGroupID(list[i].id))
-                }
-            }
-
         } else {
-            for (i in list.indices) {
-                if (list.get(i).meshAddr == 0xffff) {
+            for (i in list.indices)
+                if (list[i].meshAddr == 0xffff)
                     Collections.swap(list, 0, i)
-                }
-            }
 
-            for (j in list.indices) {
+            for (j in list.indices)
                 curtainList.addAll(DBUtils.getCurtainByGroupID(list[j].id))
-            }
+
         }
     }
 
     private fun initParameter() {
-        this.group = this.intent.extras!!.get("group") as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
+        val get = this.intent.extras!!.get("group") ?: return
+        this.group = get as DbGroup
     }
 
 
@@ -268,10 +264,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun initData() {
         curtainList = ArrayList()
-        if (group.meshAddr == 0xffff) {
-            filter("", false)
-        } else {
-            curtainList = DBUtils.getCurtainByGroupID(group.id)
+        when (group.meshAddr) {
+            0xffff -> filter("", false)
+            else -> curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
 
         toolbar.title = group?.name+"(${group?.deviceCount})"
@@ -279,23 +274,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
-            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.visibility = View.GONE
-            batchGroup.setOnClickListener {
-                val intent = Intent(this, CurtainBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("curtain", "curtain_group")
-                intent.putExtra("group",group.id.toInt())
-                startActivity(intent)
-                finish()
-            }
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light_ly.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 
@@ -514,25 +495,15 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
+            NotificationEvent.GET_ALARM -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
-//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
             }
         }
-    }
-
-    private fun onLogout() {
-
     }
 
     fun autoConnect() {
@@ -551,11 +522,11 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                     GlobalScope.launch(Dispatchers.Main) {
+                    CoroutineScope(Dispatchers.Main) .launch{
                         showOpenLocationServiceDialog()
                     }
                 } else {
-                     GlobalScope.launch(Dispatchers.Main) {
+                     CoroutineScope(Dispatchers.Main) .launch{
                         hideLocationServiceDialog()
                     }
                     if (TelinkLightApplication.getApp().connectDevice == null) {
@@ -574,26 +545,20 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
-
                 }
             }
-
         }
 
         val deviceInfo = this.mApplication?.connectDevice
-
-        if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
-                    ?: 0x00) and 0xFF
-        }
+        if (deviceInfo != null)
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
     }
 
     @SuppressLint("CheckResult")
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                //"startScanLight_LightOfGroup")
+            if (acitivityIsAlive || mScanDisposal?.isDisposed != true) {
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -603,11 +568,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
                                 val account = DBUtils.lastUser?.account
-
                                 val scanFilters = java.util.ArrayList<ScanFilter>()
-                                val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
-                                        .build()
+                                val scanFilter = ScanFilter.Builder().setDeviceName(account).build()
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()

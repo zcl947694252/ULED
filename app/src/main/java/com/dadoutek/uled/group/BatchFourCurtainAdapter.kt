@@ -18,6 +18,7 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
  * 更新描述
  */
 class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
+    private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
@@ -31,11 +32,11 @@ class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : 
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
-        if (item?.hasGroup == true) {
+        if (item?.belongGroupId != allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item.groupName
+            groupName.text = item?.groupName
 
             icon.setImageResource(R.drawable.icon_curtain_s)
         } else {

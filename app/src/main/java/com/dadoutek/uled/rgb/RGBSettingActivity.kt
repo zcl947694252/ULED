@@ -13,12 +13,13 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
-import android.widget.*
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -51,10 +52,7 @@ import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
 import kotlinx.android.synthetic.main.template_add_help.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import top.defaults.colorpicker.ColorObserver
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -69,7 +67,8 @@ import kotlin.collections.ArrayList
  * 更新时间   $Date$
  * 更新描述   ${
  */
-class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.OnTouchListener */ {
+class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
+    private var lastTime: Long = 0
     private var fiChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
@@ -123,7 +122,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                .setMessage(getString(R.string.delete_group_confirm,group?.name))
+                .setMessage(getString(R.string.delete_group_confirm, group?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
                     deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
@@ -152,19 +151,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
                                 .subscribe({
                                     //deleteData()
                                 }, {
-                                  GlobalScope.launch(Dispatchers.Main) {
-                                      /*   showDialogHardDelete?.dismiss()
-                                       showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                               .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                   showLoadingDialog(getString(R.string.please_wait))
-                                                   deleteData()
-                                               }
-                                               .setNegativeButton(R.string.btn_cancel, null)
-                                               .show()
-                                       */
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        /*   showDialogHardDelete?.dismiss()
+                                         showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                 .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                     showLoadingDialog(getString(R.string.please_wait))
+                                                     deleteData()
+                                                 }
+                                                 .setNegativeButton(R.string.btn_cancel, null)
+                                                 .show()
+                                         */
                                     }
                                 })
-                                      deleteData()
+                        deleteData()
 
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
@@ -498,7 +497,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
 
         color_picker.reset()
         color_picker.subscribe(colorObserver)
-//        this.color_picker!!.setOnTouchListener(this)
 
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
@@ -973,9 +971,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)
                 if (currentShowGroupSetPage) {
-                  //  menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+                    //  menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
                     //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
-                   // toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
+                    // toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                     findItem = menu?.findItem(R.id.toolbar_f_version)
@@ -1611,11 +1609,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         this.group = this.intent.extras!!.get("group") as DbGroup
     }
 
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        v?.parent?.requestDisallowInterceptTouchEvent(true)
-        return false
-    }
-
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initViewGroup() {
         if (group != null) {
@@ -2225,21 +2218,23 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         } else {
             group?.meshAddr!!
         }
-        GlobalScope.launch {
-            val opcode = Opcode.SET_TEMPERATURE
+        if (System.currentTimeMillis() - lastTime > 500)
+            CoroutineScope(Dispatchers.IO).launch {
+                val opcode = Opcode.SET_TEMPERATURE
 
-            val params = byteArrayOf(0x04, red, green, blue)
+                val params = byteArrayOf(0x04, red, green, blue)
 
-            val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-            Log.d("RGBCOLOR", logStr)
-            if (isOnceSet) {
-                delay(50)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
-            } else {
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+                val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
+                Log.d("RGBCOLOR", logStr)
+                if (isOnceSet) {
+                    delay(50)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+                } else {
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+                }
+                lastTime = System.currentTimeMillis()
+                reSetWhiteAndBrightness()
             }
-            reSetWhiteAndBrightness()
-        }
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
@@ -2328,7 +2323,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
-            } else  {
+            } else {
                 var name = renameEt?.text.toString().trim { it <= ' ' }
                 var canSave = true
                 val groups = DBUtils.allGroups
@@ -2370,5 +2365,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener/*, View.On
         val params: ByteArray = byteArrayOf(color.toByte())
 
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        v?.parent?.requestDisallowInterceptTouchEvent(true)
+        return false
     }
 }

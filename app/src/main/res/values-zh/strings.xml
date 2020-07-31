@@ -32,7 +32,7 @@
         <item>黄色渐变</item>
         <item>青色渐变</item>
         <item>紫色渐变</item>
-        <item>白色呼吸</item>
+        <item>白色渐变</item>
         <item>红绿渐变</item>
         <item>红蓝渐变</item>
         <item>绿蓝渐变</item>
@@ -329,7 +329,6 @@
     <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
     <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
     <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
-    <!--窗帘相关-->
     <string name="up">上</string>
     <string name="down">下</string>
     <string name="pause">停止</string>
@@ -357,7 +356,6 @@
     <string name="grouping_connector_wait_tip">当前有%1$s个蓝牙接收器正在分组，请稍候！</string>
     <string name="selected_connector_tip">至少选择一个连接器进行分组</string>
     <string name="connector_fail_tip">有连接器分组失败，请检查并重试！</string>
-    <string name="device_page">此功能已转移到设备页面!</string>
     <string name="batch_group">批量分组</string>
     <string name="developer_mode_close">关闭开发者模式</string>
     <string name="sms_sign">使用短信验证码登录</string>
@@ -403,7 +401,6 @@
     <string name="open_it">去开启</string>
     <string name="restart_it">去重启</string>
     <string name="relocation">重新配置</string>
-    <string name="please_rgb">请输入RGB值</string>
     <string name="cannot_rgb_null">RGB值不能为空</string>
     <string name="rgb_max">RGB值不能大于255</string>
     <string name="number_no">未获得版本号</string>

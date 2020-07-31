@@ -50,6 +50,7 @@
                     android:id="@+id/region_dialog_me_recycleview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                        android:minHeight="@dimen/dp_50"
                     android:background="@color/white"
                     android:descendantFocusability="blocksDescendants" />
                 
@@ -70,6 +71,7 @@
                     android:id="@+id/region_dialog_authorize_recycleview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                        android:minHeight="@dimen/dp_50"
                     android:background="@color/white"
                     android:descendantFocusability="blocksDescendants" />
             </LinearLayout>

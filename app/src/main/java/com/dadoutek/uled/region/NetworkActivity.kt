@@ -149,7 +149,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         toolbarTv.text = getString(R.string.area)
         img_function1.visibility = View.VISIBLE
         image_bluetooth.visibility = View.VISIBLE
-        image_bluetooth.setImageResource(R.drawable.icon_scanning)
+        image_bluetooth.setImageResource(R.drawable.scan_qr)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
     }

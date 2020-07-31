@@ -9,7 +9,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -44,7 +43,6 @@ import kotlinx.android.synthetic.main.toolbar.toolbarTv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -264,8 +262,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         val addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
         addBtn.visibility = View.INVISIBLE
         val serializableExtra = intent.getSerializableExtra("group")
-         if(serializableExtra!=null)
-             dbGroup =  serializableExtra as DbGroup
+        if (serializableExtra != null)
+            dbGroup = serializableExtra as DbGroup
 
         deviceType = intent.getIntExtra("DeviceType", 0)
         isGroup = dbGroup != null
@@ -273,7 +271,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 template_recycleView.adapter = lightAdaper
-                lightAdaper.setDeviceType(deviceType==DeviceType.LIGHT_RGB)
+                lightAdaper.setDeviceType(deviceType == DeviceType.LIGHT_RGB)
                 lightAdaper.bindToRecyclerView(template_recycleView)
                 lightAdaper.emptyView = emptyView
             }
@@ -292,10 +290,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 switchAdaper.bindToRecyclerView(template_recycleView)
                 switchAdaper.emptyView = emptyView
             }
-                DeviceType.SENSOR -> {
+            DeviceType.SENSOR -> {
                 template_recycleView.adapter = sensorAdaper
-                    sensorAdaper.bindToRecyclerView(template_recycleView)
-                    sensorAdaper.emptyView = emptyView
+                sensorAdaper.bindToRecyclerView(template_recycleView)
+                sensorAdaper.emptyView = emptyView
             }
             DeviceType.GATE_WAY -> {
                 template_recycleView.adapter = gwAdaper
@@ -316,7 +314,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             relayList.addAll(DBUtils.allRely)
 
         relayAdaper.onItemClickListener = onItemClickListener
-       supportAndUNConnector()
+        supportAndUNConnector()
     }
 
     private fun setCurtainData() {
@@ -337,7 +335,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (isGroup)
             lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
         else {
-            when(deviceType){
+            when (deviceType) {
                 DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
                 DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
             }
@@ -402,6 +400,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         lightList.removeAll(unsupport)
         lightList.addAll(unsupport)
     }
+
     private fun supportAndUNSwitch() {
         switchList.forEach {
             it.version?.let { itv ->
@@ -424,6 +423,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         switchList.removeAll(unsupport)
         switchList.addAll(unsupport)
     }
+
     private fun supportAndUNSensor() {
         sensorList.forEach {
             it.version?.let { itv ->
@@ -446,6 +446,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         sensorList.removeAll(unsupport)
         sensorList.addAll(unsupport)
     }
+
     private fun supportAndUNCurtain() {
         curtainList.forEach {
             it.version?.let { itv ->
@@ -468,6 +469,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         curtainList.removeAll(unsupport)
         curtainList.addAll(unsupport)
     }
+
     private fun supportAndUNConnector() {
         relayList.forEach {
             it.version?.let { itv ->
@@ -489,6 +491,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         relayList.addAll(unsupport)
         relayAdaper.notifyDataSetChanged()
     }
+
     private fun supportAndUNGateway() {
         lightList.forEach {
             it.version?.let { itv ->
@@ -577,7 +580,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                         showLoadingDialog(getString(R.string.please_wait))
 
                         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
-                            getDeviceVersion(dbLight)
+                            getDeviceVersionLight(dbLight)
                         } else {
                             showLoadingDialog(getString(R.string.please_wait))
                             val idleMode = TelinkLightService.Instance()?.idleMode(true)
@@ -588,7 +591,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                                         connect(dbLight.meshAddr, true)
                                     }?.subscribe({
                                         hideLoadingDialog()
-                                        getDeviceVersion(dbLight)
+                                        getDeviceVersionLight(dbLight)
                                     }
                                             , {
                                         hideLoadingDialog()
@@ -606,7 +609,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                                     ToastUtils.showShort(getString(R.string.connect_fail))
                                 })
                     } else
-                        getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, DeviceType.LIGHT_NORMAL)
+                        getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, dbLight.productUUID)
                 else {
                     if (dbLight.isMostNew)
                         ToastUtils.showShort(getString(R.string.the_last_version))
@@ -615,8 +618,212 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 }
             }
             DeviceType.SMART_CURTAIN -> {
+                val dbLight = curtainList[position]
+                if (dbLight.isSupportOta)
+                    if (TextUtils.isEmpty(dbLight.version)) {
+                        showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersionCurtain(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersionCurtain(dbLight)
+                                    }
+                                            , {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
+                        connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({
+
+                                }, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                })
+                    } else
+                         getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, dbLight.productUUID)
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
             }
             DeviceType.SMART_RELAY -> {
+                val dbLight = relayList[position]
+                if (dbLight.isSupportOta)
+                    if (TextUtils.isEmpty(dbLight.version)) {
+                        showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersionConnector(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersionConnector(dbLight)
+                                    }, {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
+                        connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({}, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                })
+                    } else
+                         getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, dbLight.productUUID)
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
+            }
+            DeviceType.NORMAL_SWITCH -> {
+                val dbLight = switchList[position]
+                if (dbLight.isSupportOta)
+                    if (TextUtils.isEmpty(dbLight.version)) {
+                        showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersionSwitch(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersionSwitch(dbLight)
+                                    }, {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
+                        connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({}, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                })
+                    } else
+                         getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, dbLight.productUUID)
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
+            }
+            DeviceType.SENSOR -> {
+                val dbLight = sensorList[position]
+                if (dbLight.isSupportOta)
+                    if (TextUtils.isEmpty(dbLight.version)) {
+                        showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersionSensor(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersionSensor(dbLight)
+                                    }, {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
+                        connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({}, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                })
+                    } else
+                         getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, dbLight.productUUID)
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
+            }
+            DeviceType.GATE_WAY -> {
+                val dbLight = gwList[position]
+                if (dbLight.isSupportOta)
+                    if (TextUtils.isEmpty(dbLight.version)) {
+                        showLoadingDialog(getString(R.string.please_wait))
+
+                        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr) {
+                            getDeviceVersionGw(dbLight)
+                        } else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .flatMap {
+                                        connect(dbLight.meshAddr, true)
+                                    }?.subscribe({
+                                        hideLoadingDialog()
+                                        getDeviceVersionGw(dbLight)
+                                    }, {
+                                        hideLoadingDialog()
+                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                        LogUtils.d(it)
+                                    })
+                        }
+                        connect(meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({}, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                })
+                    } else
+                        getFilePath(dbLight.meshAddr, dbLight.macAddr, dbLight.version, DeviceType.GATE_WAY)
+                else {
+                    if (dbLight.isMostNew)
+                        ToastUtils.showShort(getString(R.string.the_last_version))
+                    else
+                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+                }
             }
         }
     }
@@ -627,7 +834,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         updataDevice()
     }
 
-    private fun getDeviceVersion(dbLight: DbLight) {
+    private fun getDeviceVersionLight(dbLight: DbLight) {
         val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
                 { s: String ->
                     dbLight!!.version = s
@@ -640,6 +847,77 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             ToastUtils.showLong(getString(R.string.get_version_fail))
         })
     }
+
+    private fun getDeviceVersionCurtain(dbLight: DbCurtain) {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                { s: String ->
+                    dbLight!!.version = s
+                    DBUtils.saveCurtain(dbLight!!, true)
+                    setLightData()
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_version_success))
+                }, {
+            hideLoadingDialog()
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+    }
+
+    private fun getDeviceVersionConnector(dbLight: DbConnector) {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                { s: String ->
+                    dbLight!!.version = s
+                    DBUtils.saveConnector(dbLight!!, true)
+                    setLightData()
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_version_success))
+                }, {
+            hideLoadingDialog()
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+    }
+
+    private fun getDeviceVersionSwitch(dbLight: DbSwitch) {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                { s: String ->
+                    dbLight!!.version = s
+                    DBUtils.saveSwitch(dbLight!!, true)
+                    setLightData()
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_version_success))
+                }, {
+            hideLoadingDialog()
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+    }
+
+    private fun getDeviceVersionSensor(dbLight: DbSensor) {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                { s: String ->
+                    dbLight!!.version = s
+                    DBUtils.saveSensor(dbLight!!, true)
+                    setLightData()
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_version_success))
+                }, {
+            hideLoadingDialog()
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+    }
+    
+    private fun getDeviceVersionGw(dbLight: DbGateway) {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                { s: String ->
+                    dbLight!!.version = s
+                    DBUtils.saveGateWay(dbLight!!, true)
+                    setLightData()
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_version_success))
+                }, {
+            hideLoadingDialog()
+            ToastUtils.showLong(getString(R.string.get_version_fail))
+        })
+    }
+
 
     private fun getFilePath(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
         OtaPrepareUtils.instance().gotoUpdateView(this@GroupOTAListActivity, version, object : OtaPrepareListner {

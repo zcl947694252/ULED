@@ -45,7 +45,6 @@ class StompManager private constructor() {
         val headers = ArrayList<StompHeader>()
         headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
         headers.add(StompHeader("host", Constant.WS_HOST))
-
         //如果已经初始化过了就不初始化了
         if (mStompClient == null) {
             mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_STOMP_URL)

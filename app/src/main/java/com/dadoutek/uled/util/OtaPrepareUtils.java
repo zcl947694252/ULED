@@ -51,6 +51,8 @@ public class OtaPrepareUtils {
     }
 
     private String getServerVersionNew(Context context,String localVersion, OtaPrepareListner otaPrepareListner) {
+        if (localVersion==null) return "";
+
         otaPrepareListner.startGetVersion();
         DownLoadFileModel.INSTANCE.getUrlNew(localVersion).subscribe(new NetworkObserver<Object>() {
             @Override
@@ -246,20 +248,20 @@ public class OtaPrepareUtils {
     public Boolean checkSupportOta(String localVersion) {//LA\LAS    CC\CCS   LX\LXS
         if (!localVersion.contains("-"))
             return false;
-        int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
+        long l = Long.parseLong(StringUtils.versionResolution(localVersion, 1));
+        int localVersionNum = (int) l;
         boolean oldSuportVersion = (localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
                 || localVersion.contains("CR-") || localVersion.contains("LC-")||localVersion.contains("LA-")
                 || localVersion.contains("LA-") || localVersion.contains("LAS-")||localVersion.contains("CC-")
                 || localVersion.contains("CCS-") || localVersion.contains("LX-")||localVersion.contains("LXS-")
-                || localVersion.contains("LG-")
-                || localVersion.contains("LCS-") || localVersion.contains("L36-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
+                || localVersion.contains("LG-") || localVersion.contains("LCS-") || localVersion.contains("L36-"))
+                && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
         boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")||localVersion.contains("NPR");
         if (oldSuportVersion||newSuport) {
             return true;
         } else {
             return false;
         }
-
     }
 }

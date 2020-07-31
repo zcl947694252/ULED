@@ -367,7 +367,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             getRegioninfo()
         }
     }
-
     @SuppressLint("CheckResult")
     private fun getRegioninfo(){//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
         NetworkFactory.getApi()
@@ -375,37 +374,37 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                 .compose(NetworkTransformer())
                 .subscribe(object : NetworkObserver<DbRegion?>() {
                     override fun onNext(it: DbRegion) {
-                            //保存最后的区域信息到application
-                            val application = DeviceHelper.getApplication() as TelinkLightApplication
-                            val mesh = application.mesh
-                            mesh.name = it.controlMesh
-                            mesh.password = it.controlMeshPwd
-                            mesh.factoryName = it.installMesh
-                            mesh.factoryPassword = it.installMeshPwd
+                        //保存最后的区域信息到application
+                        val application = DeviceHelper.getApplication() as TelinkLightApplication
+                        val mesh = application.mesh
+                        mesh.name = it.controlMesh
+                        mesh.password = it.controlMeshPwd
+                        mesh.factoryName = it.installMesh
+                        mesh.factoryPassword = it.installMeshPwd
 
-                            DBUtils.lastUser?.controlMeshName = it.controlMesh
-                            DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+                        DBUtils.lastUser?.controlMeshName = it.controlMesh
+                        DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
-                            SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
-                            application.setupMesh(mesh)
-                            val lastUser = DBUtils.lastUser!!
-                            DBUtils.saveUser(lastUser)
+                        SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
+                        application.setupMesh(mesh)
+                        val lastUser = DBUtils.lastUser!!
+                        DBUtils.saveUser(lastUser)
 
-                            DBUtils.deleteLocalData()
-                            DBUtils.deleteAllData()
-                            //创建数据库
-                            AccountModel.initDatBase(lastUser)
+                        DBUtils.deleteLocalData()
+                        DBUtils.deleteAllData()
+                        //创建数据库
+                        AccountModel.initDatBase(lastUser)
 
-                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
 
-                            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+                        Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
 
-                            SharedPreferencesUtils.setUserLogin(true)
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-                            hideLoadingDialog()
-                            ActivityUtils.finishAllActivities(true)
-                            ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
+                        SharedPreferencesUtils.setUserLogin(true)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+                        hideLoadingDialog()
+                        ActivityUtils.finishAllActivities(true)
+                        ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
                     }
 
                     override fun onError(it: Throwable) {
@@ -416,6 +415,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                     }
                 })
     }
+
 
 
 

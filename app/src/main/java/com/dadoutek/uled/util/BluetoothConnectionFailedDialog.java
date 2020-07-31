@@ -115,7 +115,6 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
 
     //重启app并杀死原进程
     private void restartApplication() {
-//        TelinkLightApplication.Companion.getApp().releseStomp();
         ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
         TelinkLightApplication.Companion.getApp().doDestroy();

@@ -177,6 +177,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
+        device_stop_scan.text = getString(R.string.stop_scan)
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {

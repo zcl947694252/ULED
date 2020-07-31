@@ -630,10 +630,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 else -> {
                     val scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                     //var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
-                   scene?.let {
-                       sceneMap[configButtonTag] = it
-                       name = it.name
-                   }
+                    scene?.let {
+                        sceneMap[configButtonTag] = it
+                        name = it.name
+                    }
                 }
             }
 
@@ -653,6 +653,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun setVersion() {
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = version
         fiVersion?.title = version
     }
 
@@ -690,6 +692,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener { finishAc() }
         makePop()
     }
+
     override fun setToolBar(): android.support.v7.widget.Toolbar {
         return toolbar
     }
@@ -776,6 +779,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 switchData?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (switchData == null)
                     switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
+                toolbarTv.text = switchData?.name
                 if (switchData != null)
                     DBUtils.updateSwicth(switchData!!)
                 else
@@ -791,14 +795,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog?.setOnDismissListener {
-            switchData?.name = renameEt?.text.toString().trim { it <= ' ' }
-            if (switchData != null)
-                DBUtils.updateSwicth(switchData!!)
-            SyncDataPutOrGetUtils.syncPutDataStart(this!!, object : SyncCallback {
-                override fun complete() {}
-                override fun error(msg: String) {}
-                override fun start() {}
-            })
+            if (!isReConfig)
             finishAc()
         }
     }
@@ -849,9 +846,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         }
         if (isCanClick) {
-           /* if (configSwitchType == 1){
-                startActivityForResult(Intent(this@GwTimerPeriodListActivity, SelectSceneListActivity::class.java), requestCodes)
-            }else{*/
+            /* if (configSwitchType == 1){
+                 startActivityForResult(Intent(this@GwTimerPeriodListActivity, SelectSceneListActivity::class.java), requestCodes)
+             }else{*/
             val intent = Intent(this@ConfigEightSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
             bundle.putInt(Constant.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组

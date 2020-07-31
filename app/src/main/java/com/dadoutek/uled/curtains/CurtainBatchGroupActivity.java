@@ -1413,12 +1413,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> this.mApplication.getMesh().saveOrUpdate(this)).start();
 
-                if (scanCURTAIN) {
-                    if (checkIsCurtain(dadouDeviceInfo1.productUUID) && dadouDeviceInfo1.productUUID == DeviceType.SMART_CURTAIN) {
-                        addDevice(deviceInfo);
-                    }
-                } else {
-                }
+                if (scanCURTAIN && checkIsCurtain(dadouDeviceInfo1.productUUID) && dadouDeviceInfo1.productUUID == DeviceType.SMART_CURTAIN)
+                    addDevice(deviceInfo);
+
 
                 //扫描出灯就设置为非首次进入
                 if (isFirtst) {
@@ -1450,8 +1447,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             case LightAdapter.STATUS_LOGIN:
                 Log.d("ScanningTest", "mConnectTimer = " + mConnectTimer);
                 if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
-                    Log.d("ScanningTest",
-                            " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
+                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
                     mConnectTimer.dispose();
                     isLoginSuccess = true;
                     //进入分组
