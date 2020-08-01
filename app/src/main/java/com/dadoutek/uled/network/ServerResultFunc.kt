@@ -23,18 +23,18 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
             var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
 
-            when {
-                response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
+            when (response.errorCode) {
+                NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
                     if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)){
 
-                    SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
-                    ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
-                    AppUtils.relaunchApp()
+                        SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
+                        ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
+                        AppUtils.relaunchApp()
                     }else{
                         ServerResultException.handleException(response)
                     }
                 }
-                response.errorCode == NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
+                NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
                     response.t = "" as T
                 }
                 else -> {

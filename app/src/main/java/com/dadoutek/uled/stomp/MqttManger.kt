@@ -25,6 +25,7 @@ import kotlin.synchronized as synchronized
  * 更新描述
  */
 object MqttManger {
+    private var isconnect: Boolean = false
     private var connection: CallbackConnection? = null
     private var mqtt: MQTT? = null
     private val imei = getIMEI(TelinkLightApplication.getApp().mContext)
@@ -55,14 +56,16 @@ object MqttManger {
             // LogUtils.v("zcl_mqtt--******mqtt连接回调----------onDisconnected");
         }
     }
-     private val connectBack = object : Callback<Void?> {
+    private val connectBack = object : Callback<Void?> {
         override fun onSuccess(value: Void?) {
-            LogUtils.v("zcl_mqtt******mqtt连接成功----------value")
+            LogUtils.v("zcl_mqtt******mqtt连接成功----------$value")
+            isconnect = true
             initTopics()
         }
 
         override fun onFailure(value: Throwable?) {
-            LogUtils.v("zcl_mqtt******mqtt连接失败----------value")
+            LogUtils.v("zcl_mqtt******mqtt连接失败----------$value")
+            initMqtt()
         }
     }
 
@@ -82,12 +85,12 @@ object MqttManger {
     private fun startPublish() {
         connection?.publish("singleLogin", "你好".toByteArray(), QoS.AT_LEAST_ONCE, false, object : Callback<Void?> {
             override fun onSuccess(value: Void?) {
-                LogUtils.v("zcl_mqtt------------------发送成功")
+                LogUtils.v("zcl_mqtt------------------发送成功$value")
             }
 
             override fun onFailure(value: Throwable?) {
                 // connection?.disconnect(null)
-                LogUtils.v("zcl_mqtt------------------发送失败")
+                LogUtils.v("zcl_mqtt------------------发送失败$value")
             }
         })
     }
@@ -98,7 +101,7 @@ object MqttManger {
                 mqtt = MQTT()
             mqtt?.setHost(Constant.HOST, Constant.PORT)
             mqtt?.setClientId(clientId)
-            mqtt?.isCleanSession = false//当客户端掉线时 ，服务器端会清除 客户端 session 。 重连后 客户端会有一个新的session。
+            mqtt?.isCleanSession = true//当客户端掉线时 ，服务器端会清除 客户端 session 。 重连后 客户端会有一个新的session。
             mqtt?.keepAlive = 10//心跳时间
 
             mqtt?.setUserName("APP_${DBUtils.lastUser?.id ?: 0}")
@@ -107,10 +110,10 @@ object MqttManger {
             // mqtt?.setWillMessage("close")
             //mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
 
-            mqtt?.connectAttemptsMax = -1//默认是-1 无重试上限
-            mqtt?.reconnectDelay = 10 //首次重连间隔时间毫秒
-            mqtt?.reconnectAttemptsMax =-1//设置为-1以使用无限尝试。默认为-1
-            mqtt?.reconnectDelayMax = 30000 //在重连接尝试之间等待ms的最大时间。缺省值为30,000。
+            mqtt?.connectAttemptsMax = 0//默认是-1 无重试上限
+            mqtt?.reconnectDelay = 1000 //首次重连间隔时间毫秒
+            mqtt?.reconnectAttemptsMax =0//设置为-1以使用无限尝试。默认为-1
+            mqtt?.reconnectDelayMax = 5000 //在重连接尝试之间等待ms的最大时间。缺省值为30,000。
 
 
             //socket设置
@@ -121,23 +124,13 @@ object MqttManger {
             //带宽限制
             mqtt?.maxReadRate = 0 //设置连接的最大接收速率单位bytes/s  0 无限制
             mqtt?.maxWriteRate = 0 //设置发送的最大接收速率单位bytes/s  0 无限制
-            if (connection==null)
-            connection = mqtt?.callbackConnection()
+            if (connection == null)
+                connection = mqtt?.callbackConnection()
             connection?.listener(listener)
-            connection?.connect(connectBack)
+            if (!isconnect)
+                connection?.connect(connectBack)
         }
     }
 
-    fun doDisconnect() {
-    /*    connection?.kill(null)
-        connection?.disconnect(object : Callback<Void?> {
-            override fun onSuccess(value: Void?) {
-                LogUtils.v("zcl_mqtt------------------mqttt断联:onSuccess")
-            }
-
-            override fun onFailure(value: Throwable?) {
-                LogUtils.v("zcl_mqtt------------------mqttt断联:onSuccess")
-            }
-        })*/
-    }
+    fun doDisconnect() {}
 }

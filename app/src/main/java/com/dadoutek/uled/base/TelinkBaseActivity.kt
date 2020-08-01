@@ -643,10 +643,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
         var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
-            LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish解析---${codeBean?.toString()}")
+            //LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish解析---${codeBean?.toString()}")
             when(codeBean.cmd){
                 1->{//单点登录
-                    LogUtils.e("zcl_mqtt___收到登出消息${DBUtils.lastUser?.login_state_key==codeBean.loginStateKey}")
+//                    LogUtils.e("zcl_mqtt___收到登出消息${DBUtils.lastUser?.login_state_key==codeBean.loginStateKey}")
                     val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
                     if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
                         loginOutMethod()
