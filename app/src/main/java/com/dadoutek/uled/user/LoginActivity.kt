@@ -2,9 +2,12 @@ package com.dadoutek.uled.user
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.backup.BackupHelper
 import android.content.Intent
+import android.database.Observable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Looper
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -47,11 +50,13 @@ import com.dadoutek.uled.region.adapter.RegionAuthorizeDialogAdapter
 import com.dadoutek.uled.region.adapter.RegionDialogAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
+import io.reactivex.Observable.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
@@ -61,6 +66,7 @@ import kotlinx.android.synthetic.main.activity_login.qq_btn
 import kotlinx.android.synthetic.main.activity_login.third_party_text
 import org.jetbrains.anko.toast
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by hejiajun on 2018/5/15.
@@ -535,29 +541,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
-                NetworkFactory.getApi()
-                        .getAccount(phone, "dadou")
-                        .compose(NetworkTransformer())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                object : NetworkObserver<String>() {
-                                    override fun onNext(t: String) {
-                                        userLogin()
-                                    }
-                                    override fun onError(e: Throwable) {
-                                        super.onError(e)
-                                        ToastUtils.showShort(e.message)
-                                        return
-                                    }
-                                })
-
+             userLogin()
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun userLogin() {
+        val subscribe = timer(15000, TimeUnit.MILLISECONDS).subscribe {
+            hideLoadingDialog()
+        }
         AccountModel.login(phone!!, editPassWord!!)
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {

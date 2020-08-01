@@ -204,7 +204,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mWakeLock?.release()
+        if (mWakeLock?.isHeld == true)
+            mWakeLock?.release()
         compositeDisposable.dispose()
     }
 

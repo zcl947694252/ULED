@@ -1167,6 +1167,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     R.id.slow_rg_middle -> currentGroup?.slowUpSlowDownSpeed = 3
                     R.id.slow_rg_fast -> currentGroup?.slowUpSlowDownSpeed = 1
                 }
+                for (i in 0..2)
                 TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
                         ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
                 DBUtils.updateGroup(currentGroup!!)
