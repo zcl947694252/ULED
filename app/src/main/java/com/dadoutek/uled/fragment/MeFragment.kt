@@ -616,7 +616,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     private fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-        MqttManger.doDisconnect()
         com.blankj.utilcode.util.AppUtils.relaunchApp()
     }
 

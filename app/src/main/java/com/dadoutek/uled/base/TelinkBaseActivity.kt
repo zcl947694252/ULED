@@ -558,7 +558,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     open fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
-        MqttManger.doDisconnect()
         AppUtils.relaunchApp()
     }
 
