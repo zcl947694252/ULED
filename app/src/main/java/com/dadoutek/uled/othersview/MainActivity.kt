@@ -26,6 +26,9 @@ import androidx.annotation.RequiresApi
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
+import com.dadoutek.uled.IGetMessageCallBack
+import com.dadoutek.uled.MqttService
+import com.dadoutek.uled.MyServiceConnection
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
@@ -42,7 +45,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -69,7 +71,8 @@ import kotlinx.coroutines.launch
  *
  * 首页设备
  */
-class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
+class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment, IGetMessageCallBack {
+    private lateinit var serviceConnection: MyServiceConnection
     private val REQUEST_ENABLE_BT: Int = 1200
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
@@ -116,8 +119,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
-        MqttManger.initMqtt()
-
+        //MqttManger.initMqtt()
+        serviceConnection = MyServiceConnection()
+        serviceConnection?.setIGetMessageCallBack(this)
+        val intent = Intent(this, MqttService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
@@ -518,6 +524,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun setMessage(cmd: Int, extCmd: Int, message: String) {
     }
 }
 

@@ -210,7 +210,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             positionCurrent = position
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    ToastUtils.showLong(getString(R.string.connecting_tip))
                     autoConnectAll()
                 }
                 sendToGw()
@@ -484,8 +483,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         GlobalScope.launch {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2000)
-            val b = this@DeviceDetailAct == null || this@DeviceDetailAct.isDestroyed || this@DeviceDetailAct.isFinishing || !acitivityIsAlive
-            if (!b)
+            if (TelinkLightApplication.getApp().connectDevice==null)
                 autoConnectAll()
         }
     }

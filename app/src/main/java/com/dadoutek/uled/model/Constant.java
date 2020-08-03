@@ -31,6 +31,7 @@ public class Constant implements Serializable {
      * tcp://smart.dadoutek.com:1883
      */
     public static String HOST =isDebug ? "47.107.227.130":"smart.dadoutek.com";
+    public static String HOST2 =isDebug ? "tcp://47.107.227.130":"tcp://smart.dadoutek.com";
     public static int PORT = isDebug ?1885:1883;
 
     public static final long downTime = isDebug ? 3 : 11;

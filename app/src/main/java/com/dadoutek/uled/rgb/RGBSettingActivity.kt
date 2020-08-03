@@ -410,9 +410,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     .subscribe({ s ->
                         if (!TextUtils.isEmpty(s)) {
                             localVersion = s
-                            if (TextUtils.isEmpty(localVersion))
-                                localVersion = getString(R.string.number_no)
-                            light!!.version = localVersion
+                            if (!TextUtils.isEmpty(localVersion)) {
+                                light!!.version = localVersion
+                                findItem?.title = localVersion
+                            }
                             DBUtils.saveLight(light!!, false)
                         }
                         null
@@ -441,6 +442,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         rgb_switch.setOnCheckedChangeListener { _, isChecked ->
             if (light != null)
                 openOrClose(isChecked)
+        }
+
+        localVersion = when {
+            TextUtils.isEmpty(light!!.version) -> getString(R.string.number_no)
+            else -> light!!.version
         }
 
         rgb_switch.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
@@ -979,8 +985,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     findItem = menu?.findItem(R.id.toolbar_f_version)
                     fiChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
                     fiChangeGp?.isVisible = true
-                    if (TextUtils.isEmpty(localVersion))
-                        localVersion = getString(R.string.number_no)
                     findItem!!.title = localVersion
                 }
         }

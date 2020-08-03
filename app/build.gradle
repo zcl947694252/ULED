@@ -189,7 +189,10 @@ dependencies {
     implementation 'com.github.maning0303:MNPasswordEditText:V1.0.2'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor  'com.github.bumptech.glide:compiler:4.9.0'
-    implementation 'org.fusesource.mqtt-client:mqtt-client:1.12'
+    //implementation 'org.fusesource.mqtt-client:mqtt-client:1.12'
+
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
 }
 String getBuildTime() {
     Date date = new Date();

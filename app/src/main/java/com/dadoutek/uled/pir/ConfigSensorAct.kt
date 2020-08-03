@@ -52,7 +52,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.fusesource.hawtdispatch.Dispatch
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 import kotlin.collections.ArrayList

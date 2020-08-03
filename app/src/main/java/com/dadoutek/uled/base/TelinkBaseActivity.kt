@@ -73,7 +73,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
-import org.fusesource.mqtt.client.MQTT
 import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
 

@@ -52,29 +52,40 @@
                 android:text="@string/slow_up_slowly"
                 android:textColor="@color/gray_3"
                 android:textSize="14sp" />
-
+<!--
         <CheckBox
-                android:id="@+id/slow_switch"
-                android:layout_width="35dp"
-                android:layout_height="match_parent"
+                android:id="@+id/slow_rg_ly"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_30"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="1dp"
-                android:background="@drawable/select_check"
-                android:button="@null" />
-
+                android:layout_marginEnd="@dimen/dp_5"
+                android:background="@drawable/rect_solid_radius5_e"
+                android:gravity="center"
+                android:orientation="horizontal">-->
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp_30">
 
             <RadioGroup
                     android:id="@+id/slow_rg_ly"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp_30"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="@dimen/dp_5"
-                    android:background="@drawable/rect_solid_radius5_e"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/select_radius5_w_e"
                     android:gravity="center"
                     android:orientation="horizontal">
+                <RadioButton
+                        android:id="@+id/slow_rg_close"
+                        android:layout_width="60dp"
+                        android:layout_height="23dp"
+                        android:layout_marginStart="@dimen/dp_5"
+                        android:background="@drawable/select_radius5_w_e"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:text="@string/close" />
 
                 <RadioButton
                         android:id="@+id/slow_rg_slow"

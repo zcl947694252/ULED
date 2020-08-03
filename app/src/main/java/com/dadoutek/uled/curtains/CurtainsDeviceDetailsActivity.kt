@@ -356,8 +356,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentDevice = curtainDatas?.get(position)
         positionCurrent = position
-        if (TelinkLightApplication.getApp().connectDevice == null)
-            ToastUtils.showLong(getString(R.string.connecting_tip))
+        if (TelinkLightApplication.getApp().connectDevice == null){
+            autoConnectAll()
+        }
         else {
             when (view.id) {
                 R.id.template_device_card_delete -> {

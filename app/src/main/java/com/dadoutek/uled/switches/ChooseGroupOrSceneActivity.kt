@@ -77,12 +77,12 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                         filter = groupList.filter { it.deviceType == deviceType.toLong() }
                     }
                 }
-                filter.forEach {
-                    it.isChecked = false
-                }
                 groupList.clear()
                 groupList.addAll(filter)
                 groupList.add(0,DBUtils.allGroups[0])
+                groupList.forEach {
+                    it.isChecked = false
+                }
                 groupAdapter?.notifyDataSetChanged()
             }
             else -> {

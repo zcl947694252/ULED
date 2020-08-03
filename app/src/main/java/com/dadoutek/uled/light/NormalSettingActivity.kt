@@ -65,7 +65,7 @@ import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener, OnClickListener {
     private var findItemChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
     private val requestCodeNum: Int = 1000
@@ -98,8 +98,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private val clickListener = OnClickListener { v ->
         when (v.id) {
-            R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
+            R.id.slow_rg_close -> slowOrUpClose()
             R.id.btnRename -> renameLight()
+            R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
             R.id.updateGroup -> updateGroup()
             R.id.btnRemove -> remove()
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
@@ -120,7 +121,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
-            R.id.btn_rename -> renameGroup()
+            R.id.btn_rename, R.id.img_function1 -> renameGroup()
             R.id.light_switch -> lightSwitch()
             R.id.brightness_btn -> setBrightness()
             R.id.temperature_btn -> setTemperature()
@@ -780,9 +781,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 } else {
                     menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
                     findItem = menu?.findItem(R.id.toolbar_f_version)
-                    findItem?.title = getString(R.string.the_last_version)
                     findItemChangeGp = menu?.findItem(R.id.toolbar_fv_change_group)
                     findItemChangeGp?.isVisible = true
+                    findItem?.title = localVersion
                 }
         }
         LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
@@ -977,10 +978,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
                                     .subscribe(
                                             { s ->
-                                                if (!TextUtils.isEmpty(s))
+                                                if (!TextUtils.isEmpty(s)) {
+                                                    localVersion = s
+                                                    light?.version = s
                                                     findItem?.title = s
+                                                }
                                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                    light!!.version = s
                                                     DBUtils.saveLight(light!!, false)
                                                     transformView()
                                                 } else {
@@ -1110,7 +1113,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
-        slow_rg_view.setOnClickListener { }
+        slow_rg_view.setOnClickListener(clickListener)
         currentShowPageGroup = typeStr == Constant.TYPE_GROUP
         LogUtils.v("zclmenu----------currentShowPageGroup--------$currentShowPageGroup----${DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id}")
         if (currentShowPageGroup) {
@@ -1119,9 +1122,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             img_function1.setImageResource(R.drawable.icon_editor)
             if (group?.meshAddr != 0xffff)
                 img_function1.visibility = VISIBLE
-            img_function1.setOnClickListener {
-                renameGroup()
-            }
+            img_function1.setOnClickListener(clickListener)
         } else {
             img_function1.visibility = GONE
             slow_ly.visibility = GONE
@@ -1137,47 +1138,42 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (group!!.meshAddr != 0xFFFF)
             toolbarTv.text = group!!.name
 
-        slow_switch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) { //开 关 上电 场景 1是打开 0 是关闭
-                val currentGroup = DBUtils.getGroupByID(group!!.id)
-                currentGroup?.slowUpSlowDownStatus = 1
-                slow_rg_view.visibility = GONE
-                DBUtils.updateGroup(currentGroup!!)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
-                        byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1))//1是开 2是关
-            } else {
-                val currentGroup = DBUtils.getGroupByID(group!!.id)
-                currentGroup?.slowUpSlowDownStatus = 0
-                slow_rg_view.visibility = VISIBLE
-                DBUtils.updateGroup(currentGroup!!)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
-                        byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 2, 2, 2, 2, 0, 0, 0))
-            }
-        }
-        slow_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-            LogUtils.v("zcl-----------${slow_rg_slow.id}---${slow_rg_middle.id}----${slow_rg_fast.id}")
+        /* slow_rg_close.setOnClickListener {
+             if (isChecked)  //开 关 上电 场景 1是打开 0 是关闭
+                 slowOrUpOpen()
+              else
+                 slowOrUpClose()
+         }
+       slow_rg_ly.setOnCheckedChangeListener { _, checkedId ->
             val currentGroup = DBUtils.getGroupByID(group!!.id)
             if (currentGroup?.slowUpSlowDownStatus == 1) {
                 when (checkedId) {
-                    R.id.slow_rg_slow -> currentGroup?.slowUpSlowDownSpeed = 5
-                    R.id.slow_rg_middle -> currentGroup?.slowUpSlowDownSpeed = 3
-                    R.id.slow_rg_fast -> currentGroup?.slowUpSlowDownSpeed = 1
-                }
-                for (i in 0..2)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                        ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
-                DBUtils.updateGroup(currentGroup!!)
-            }
-        }
+                    R.id.slow_rg_slow -> {
+                        currentGroup?.slowUpSlowDownSpeed = 5
+                        sendSlowAndOld(currentGroup)
+                    }
+                    R.id.slow_rg_middle -> {
+                        currentGroup?.slowUpSlowDownSpeed = 3
+                        sendSlowAndOld(currentGroup)
+                    }
+                    R.id.slow_rg_fast -> {
+                        currentGroup?.slowUpSlowDownSpeed = 1
+                        sendSlowAndOld(currentGroup)
+                    }
+                    R.id.slow_rg_close -> slowOrUpClose()
+                }}
+        }*/
+
+        slow_rg_slow?.setOnClickListener(this)
+        slow_rg_middle?.setOnClickListener(this)
+        slow_rg_fast?.setOnClickListener(this)
+
+        slow_rg_close?.setOnClickListener(clickListener)
         btn_remove_group?.setOnClickListener(clickListener)
         btn_rename?.setOnClickListener(clickListener)
-        brightness_btn.setOnClickListener(this.clickListener)
-        light_switch.setOnClickListener(this.clickListener)
-        temperature_btn.setOnClickListener(this.clickListener)
+        brightness_btn.setOnClickListener(clickListener)
+        light_switch.setOnClickListener(clickListener)
+        temperature_btn.setOnClickListener(clickListener)
 
         if (group!!.isSeek) {
             adjustment.text = getString(R.string.brightness_adjustment)
@@ -1305,6 +1301,36 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.light_sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
+    private fun sendSlowAndOld(currentGroup: DbGroup?) {
+        slowOrUpOpen()
+        for (i in 0..2)
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                    ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, (currentGroup?.slowUpSlowDownSpeed ?: 0).toByte()))
+        DBUtils.updateGroup(currentGroup!!)
+    }
+
+    private fun slowOrUpClose() {
+        val currentGroup = DBUtils.getGroupByID(group!!.id)
+        currentGroup?.slowUpSlowDownStatus = 0
+        //slow_rg_view.visibility = VISIBLE  关成为四个功能中的一个 点击后不再屏蔽快中慢
+        DBUtils.updateGroup(currentGroup!!)
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 2, 2, 2, 2, 0, 0, 0))
+    }
+
+    private fun slowOrUpOpen() {
+        val currentGroup = DBUtils.getGroupByID(group!!.id)
+        currentGroup?.slowUpSlowDownStatus = 1
+        slow_rg_view.visibility = GONE
+        DBUtils.updateGroup(currentGroup!!)
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+                ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1))//1是开 2是关
+    }
+
     private fun setLightGUIImg(iconLight: Int = R.mipmap.round, progress: Int = 0, temperatureValue: Int = 0, isClose: Boolean = false) {
         var bitmap = BitmapFactory.decodeResource(resources, iconLight)
         light_image.setImage(bitmap)
@@ -1329,14 +1355,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.group = groupString as DbGroup
         isAllGroup = 1 == (group?.id ?: 0).toInt()
         if (isAllGroup) {
-            val b = (group?.slowUpSlowDownStatus ?: 0) == 1
-            slow_switch.isChecked = b
-
-            if (b)
-                slow_rg_view.visibility = GONE
-            else
-                slow_rg_view.visibility = VISIBLE
-
+            /* val b = (group?.slowUpSlowDownStatus ?: 0) == 1
+             slow_rg_close.isChecked = b
+             if (b)
+                 slow_rg_view.visibility = GONE
+             else
+                 slow_rg_view.visibility = VISIBLE*/
+            slow_rg_view.visibility = GONE
             when (group?.slowUpSlowDownSpeed) {
                 1 -> slow_rg_slow.isChecked = true
                 3 -> slow_rg_middle.isChecked = true
@@ -1355,7 +1380,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         var opcode = Opcode.SET_TEMPERATURE
         var params = byteArrayOf(0x05, colorNum.toByte())
         setLightGUIImg(temperatureValue = colorNum)
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+        when (typeStr) {
+            Constant.TYPE_GROUP -> {
+                if (group?.status == 1)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+            }
+            else -> {
+                if (light?.status == 1)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+            }
+        }
     }
 
     private fun setLightBrightnessNum(num: Int, meshAddr: Int) {
@@ -1363,7 +1397,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         var params = byteArrayOf(num.toByte())
         light_sbBrightness.progress = num
         setLightGUIImg(progress = num)
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+        if (typeStr == Constant.TYPE_GROUP) {
+            if (group?.status == 1)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+        } else {
+            if (light?.status == 1)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
+        }
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
@@ -1434,9 +1474,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         toolbarTv.text = light?.name
 
         mRxPermission = RxPermissions(this)
-        brightness_btn.setOnClickListener(this.clickListener)
-        light_switch.setOnClickListener(this.clickListener)
-        temperature_btn.setOnClickListener(this.clickListener)
+        brightness_btn.setOnClickListener(clickListener)
+        light_switch.setOnClickListener(clickListener)
+        temperature_btn.setOnClickListener(clickListener)
+
+        localVersion = when {
+            TextUtils.isEmpty(light.version) -> getString(R.string.number_no)
+            else -> light.version
+        }
 
         if (light?.status == 1)
             light_switch.setImageResource(R.drawable.icon_light_open)
@@ -1566,7 +1611,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
-        this.light_sbBrightness?.setOnSeekBarChangeListener(this.barChangeListener)
+        light_sbBrightness?.setOnSeekBarChangeListener(barChangeListener)
     }
 
     private fun renameLight() {
@@ -1576,7 +1621,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         renameEt?.setText(light.name)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
-        if (this != null && !this.isFinishing) {
+        if (this != null && !isFinishing) {
             renameDialog?.dismiss()
             renameDialog?.show()
         }
@@ -1676,13 +1721,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            this.onValueChange(seekBar, seekBar.progress, true)
+            onValueChange(seekBar, seekBar.progress, true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             isProcessChange = 1
-            this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar!!.progress, false)
+            preTime = System.currentTimeMillis()
+            onValueChange(seekBar, seekBar!!.progress, false)
         }
 
         @SuppressLint("SetTextI18n")
@@ -1690,9 +1735,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val currentTime = System.currentTimeMillis()
             tv_Brightness.text = seekBar!!.progress.toString() + "%"
             isProcessChange = 1
-            if (currentTime - this.preTime > this.delayTime) {
-                this.onValueChange(seekBar, progress, false)
-                this.preTime = currentTime
+            if (currentTime - preTime > delayTime) {
+                onValueChange(seekBar, progress, false)
+                preTime = currentTime
             }
         }
 
@@ -1896,7 +1941,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             deleteData()
                         } else {
                             ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
-                            this.finish()
+                            finish()
                         }
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -1912,10 +1957,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
 
         if (mConnectDevice != null) {
-            Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-            Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
+            Log.d(javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+            Log.d(javaClass.simpleName, "light.getMeshAddr() = " + light?.meshAddr)
             if (light?.meshAddr == mConnectDevice?.meshAddress) {
-                this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+                setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
             }
         }
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
@@ -1925,7 +1970,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
             override fun error(msg: String?) {}
         })
-        this.finish()
+        finish()
     }
 
 
@@ -1933,5 +1978,30 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         super.onBackPressed()
         setResult(Constant.RESULT_OK)
         finish()
+    }
+
+    override fun onClick(v: View?) {
+        val currentGroup = DBUtils.getGroupByID(group!!.id)
+        when (v?.id) {
+            R.id.slow_rg_slow -> {
+                currentGroup?.slowUpSlowDownSpeed = 5
+                sendSlowAndOld(currentGroup)
+                ToastUtils.showShort("慢")
+            }
+            R.id.slow_rg_middle -> {
+                currentGroup?.slowUpSlowDownSpeed = 3
+                sendSlowAndOld(currentGroup)
+                ToastUtils.showShort("中")
+            }
+            R.id.slow_rg_fast -> {
+                currentGroup?.slowUpSlowDownSpeed = 1
+                sendSlowAndOld(currentGroup)
+                ToastUtils.showShort("快")
+            }
+            R.id.slow_rg_close -> {
+                slowOrUpClose()
+                ToastUtils.showShort("关")
+            }
+        }
     }
 }

@@ -9,9 +9,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DeviceUtils.getIMEI
 import com.google.gson.Gson
-import org.fusesource.hawtbuf.Buffer
-import org.fusesource.hawtbuf.UTF8Buffer
-import org.fusesource.mqtt.client.*
 import kotlin.synchronized as synchronized
 
 
@@ -25,7 +22,7 @@ import kotlin.synchronized as synchronized
  * 更新描述
  */
 object MqttManger {
-    private var isconnect: Boolean = false
+  /*  private var isconnect: Boolean = false
     private var connection: CallbackConnection? = null
     private var mqtt: MQTT? = null
     private val imei = getIMEI(TelinkLightApplication.getApp().mContext)
@@ -60,12 +57,12 @@ object MqttManger {
         override fun onSuccess(value: Void?) {
             LogUtils.v("zcl_mqtt******mqtt连接成功----------$value")
             isconnect = true
-            initTopics()
+            //initTopics()
         }
 
         override fun onFailure(value: Throwable?) {
             LogUtils.v("zcl_mqtt******mqtt连接失败----------$value")
-            initMqtt()
+            //initMqtt()
         }
     }
 
@@ -108,7 +105,7 @@ object MqttManger {
             mqtt?.setPassword("123456")
             // mqtt?.isWillRetain =true //是否在断联后发送最后消息
             // mqtt?.setWillMessage("close")
-            //mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
+            mqtt?.willQos = QoS.AT_LEAST_ONCE//至少一次
 
             mqtt?.connectAttemptsMax = 0//默认是-1 无重试上限
             mqtt?.reconnectDelay = 1000 //首次重连间隔时间毫秒
@@ -129,8 +126,13 @@ object MqttManger {
             connection?.listener(listener)
             if (!isconnect)
                 connection?.connect(connectBack)
+            initTopics()
         }
     }
 
-    fun doDisconnect() {}
+    fun doDisconnect() {
+        //切换账号后会导致无法定下  可能是由于当时上一个连接的没有断开
+        connection?.kill(null)
+        connection?.failure()
+    }*/
 }

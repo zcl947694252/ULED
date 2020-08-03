@@ -74,6 +74,8 @@
         <service
                 android:name=".service.SendLightsInfo"
                 android:enabled="true" />
+        <service android:name=".MqttService" android:enabled="true" />
+        <service android:name="org.eclipse.paho.android.service.MqttService"/>
         <activity
                 android:name=".othersview.SelectDeviceTypeActivity"
                 android:screenOrientation="portrait"
@@ -379,10 +381,6 @@
         <!-- android:name=".scene.SetSceneAct" -->
         <!--  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/> -->
-        <activity
-                android:name=".user.ManagerVerificationActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
         <activity
                 android:name=".pir.ConfigSensorAct"
                  android:screenOrientation="portrait"
