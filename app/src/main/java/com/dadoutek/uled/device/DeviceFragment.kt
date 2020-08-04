@@ -345,6 +345,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         when(v?.id){
             R.id.main_go_help->{
                 var intent = Intent(context, InstructionsForUsActivity::class.java)
+                intent.putExtra(Constant.WB_TYPE,"#add-and-configure")
                 startActivity(intent)
             }
             R.id.main_add_device->{

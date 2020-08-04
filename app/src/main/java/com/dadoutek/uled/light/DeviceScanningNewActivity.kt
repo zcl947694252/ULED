@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.util.SparseArray
@@ -28,7 +27,6 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
-import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
 import com.dadoutek.uled.model.*
@@ -810,7 +808,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun initClick() {
         scanning_no_factory_btn.setOnClickListener {
-            seeHelpe()
+            seeHelpe("#QA1")
         }
 
         btn_start_scan.setOnClickListener {

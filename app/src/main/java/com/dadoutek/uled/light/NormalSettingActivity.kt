@@ -548,16 +548,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             } else {
                 when {
                     isBrightness -> {//亮度
-                        light_sbBrightness.progress--
+                        if (isBrightness) {
+                            if (light_sbBrightness.progress > 1)
+                                light_sbBrightness.progress--
+                        } else
+                            light_sbBrightness.progress--
+
                         when {
                             light_sbBrightness.progress < 1 ->
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
                             light_sbBrightness.progress <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+
                                 if (currentShowPageGroup) {
                                     val lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                    tv_Brightness.text = group!!.brightness.toString() + "%"
+                                    light_sbBrightness.progress = group!!.brightness
                                     if (lightCurrent != null) {
                                         lightCurrent.brightness = light_sbBrightness.progress
                                         DBUtils.updateGroup(lightCurrent)
@@ -565,6 +572,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                 } else {
                                     val lightCurrent = DBUtils.getLightByID(light!!.id)
+                                    tv_Brightness.text = light.brightness.toString() + "%"
+                                    light_sbBrightness.progress = light!!.brightness
                                     if (lightCurrent != null) {
                                         lightCurrent.brightness = light_sbBrightness.progress
                                         DBUtils.updateLight(lightCurrent)
@@ -594,16 +603,17 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         if (light_sbBrightness.progress < 100)
                             device_light_add.setImageResource(R.drawable.icon_puls)
                     }
-                    else -> {
+                    else -> {//色温
                         light_sbBrightness.progress--
                         when {
                             light_sbBrightness.progress < 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
                             light_sbBrightness.progress <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                 if (currentShowPageGroup) {
                                     var lightCurrent = DBUtils.getGroupByID(group!!.id)
+                                    light_sbBrightness.progress = group!!.colorTemperature
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                     if (lightCurrent != null) {
                                         lightCurrent.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateGroup(lightCurrent)
@@ -612,11 +622,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 } else {
                                     var lightCurrent = DBUtils.getLightByID(light!!.id)
                                     if (lightCurrent != null) {
+                                        light_sbBrightness.progress = light!!.colorTemperature
                                         lightCurrent.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateLight(lightCurrent)
                                     }
                                 }
-
                             }
                             else -> {
                                 tv_Brightness.text = light_sbBrightness.progress.toString() + "%"

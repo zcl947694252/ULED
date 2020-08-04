@@ -297,8 +297,16 @@ abstract class BaseGroupFragment : BaseFragment() {
         groupAdapter!!.bindToRecyclerView(recyclerView)
     }
 
-    fun seeHelpe() {
+    open fun seeHelpe() {
+       var wbType =  when(setGroupType()){
+           Constant.DEVICE_TYPE_LIGHT_NORMAL->"#control-normal-group"
+           Constant.DEVICE_TYPE_LIGHT_RGB->"#control-color-light-group"
+           Constant.DEVICE_TYPE_CURTAIN->"#control-curtain-group"
+           Constant.DEVICE_TYPE_CONNECTOR->"#control-relay-group"
+           else -> "#control-normal-group"
+       }
         var intent = Intent(mContext, InstructionsForUsActivity::class.java)
+        intent.putExtra(Constant.WB_TYPE,wbType)
         startActivity(intent)
     }
 

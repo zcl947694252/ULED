@@ -852,7 +852,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             val intent = Intent(this@ConfigEightSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
             bundle.putInt(Constant.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组
-            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT.toInt())
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             //}

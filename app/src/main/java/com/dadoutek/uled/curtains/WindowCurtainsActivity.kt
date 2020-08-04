@@ -153,6 +153,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initMeshDresData() {
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
         this.curtain = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbCurtain
+        localVersion = curtain?.version
         versionText.text = ""
         toolbarTv.text = curtain?.name
     }

@@ -50,7 +50,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
 
      fun initListener() {
          install_see_helpe.setOnClickListener {
-             seeHelpe()
+             seeHelpe("#add-and-configure")
          }
         deviceAdapter.setOnItemClickListener { _, _, position ->
             when (position) {

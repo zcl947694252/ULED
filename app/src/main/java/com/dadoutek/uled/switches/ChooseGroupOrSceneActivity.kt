@@ -68,9 +68,11 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
                 var filter: List<DbGroup> = mutableListOf()
                 when (deviceType) {
-                    Constant.DEVICE_TYPE_LIGHT.toInt() -> {
-                        filter = groupList.filter { it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL||
-                                it.deviceType == Constant.DEVICE_TYPE_CONNECTOR }
+                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_SW.toInt() -> {
+                        filter = groupList.filter {
+                            it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL ||
+                                    it.deviceType == Constant.DEVICE_TYPE_CONNECTOR
+                        }
                     }
                     Constant.DEVICE_TYPE_LIGHT_NORMAL.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(),
                     Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
@@ -79,7 +81,9 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 }
                 groupList.clear()
                 groupList.addAll(filter)
-                groupList.add(0,DBUtils.allGroups[0])
+                if (deviceType == Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+
+                    groupList.add(0, DBUtils.allGroups[0])
                 groupList.forEach {
                     it.isChecked = false
                 }
@@ -119,8 +123,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
                 else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
             }
-            groupList.forEach { it.isChecked =false }
-            sceneList.forEach { it.isChecked =false }
+            groupList.forEach { it.isChecked = false }
+            sceneList.forEach { it.isChecked = false }
             finish()
         }
     }

@@ -56,7 +56,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
                 groupAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.select_group)
             }
-            123->{//代表cw灯彩灯接收器
+            123->{//代表cw灯彩灯接收器 用于传感器开关  目前仅此再用
                 groupList.filter { it.deviceType !=DeviceType.SMART_CURTAIN.toLong() }.forEach {
                     groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
                 }

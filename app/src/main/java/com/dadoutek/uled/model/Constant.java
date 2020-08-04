@@ -222,6 +222,8 @@ public class Constant implements Serializable {
 
     //灯的相关分组
     public static final Long DEVICE_TYPE_LIGHT = 2L;
+    //灯的相关分组 不带所有组
+    public static final Long DEVICE_TYPE_LIGHT_SW = 3L;
 
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
@@ -416,4 +418,8 @@ public class Constant implements Serializable {
     public static final int SER_ID_SENSOR_OFF = 0x67;
 
     public static final String LAST_MESS_ADDR="LAST_MESS_ADDR";
+    /**
+     * 网页锚点
+     */
+    public static final String WB_TYPE="wb_type";
 }

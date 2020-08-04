@@ -1,6 +1,5 @@
 package com.dadoutek.uled.rgb
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,10 +9,8 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
-import android.widget.SeekBar
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -29,7 +26,6 @@ import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SpeedDialog
-import com.dadoutek.uled.widget.ActionSheetDialog
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -154,7 +150,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 //        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
 //            mDetector?.onTouchEvent(event)
@@ -329,7 +325,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList = DBUtils.diyGradientList
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         isDelete = false
         rgbDiyGradientAdapter!!.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

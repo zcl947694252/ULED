@@ -23,7 +23,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
-import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 
@@ -102,7 +101,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         }
         scanning_num.setOnClickListener {
             if (isScanning)
-                seeHelpe()
+                seeHelpe("#QA8")
         }
     }
 

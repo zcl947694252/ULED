@@ -411,7 +411,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             login_isTeck.visibility = View.VISIBLE
             sms_login_btn.visibility = View.VISIBLE
             third_party_text.visibility = View.VISIBLE
-            sms_password_login.visibility = View.VISIBLE
+            sms_password_login.visibility = View.GONE
             edit_user_password.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
             list_phone.visibility = View.GONE
@@ -453,25 +453,27 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(message[1])
             edit_user_password!!.visibility = View.GONE
+
+            if (currentUser?.phone == message!![0]) {
+                SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
+                edit_user_phone_or_email!!.setText("")
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
+                edit_user_password!!.setText("")
+                list_phone.visibility = View.GONE
+                edit_user_password.visibility = View.GONE
+                btn_login.visibility = View.VISIBLE
+                forget_password.visibility = View.GONE
+                eye_btn.visibility = View.GONE
+                sms_password_login.visibility = View.GONE
+                third_party_text.visibility = View.VISIBLE
+                qq_btn.visibility = View.VISIBLE
+                google_btn.visibility = View.VISIBLE
+                facebook_btn.visibility = View.VISIBLE
+                isPhone = true
+                date_phone.setImageResource(R.drawable.icon_down_arr)
+            }
         }
-        if (currentUser!!.phone == message!![0]) {
-            SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
-            edit_user_phone_or_email!!.setText("")
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
-            edit_user_password!!.setText("")
-            list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-            sms_password_login.visibility = View.VISIBLE
-            third_party_text.visibility = View.VISIBLE
-            qq_btn.visibility = View.VISIBLE
-            google_btn.visibility = View.VISIBLE
-            facebook_btn.visibility = View.VISIBLE
-            isPhone = true
-            date_phone.setImageResource(R.drawable.icon_down_arr)
-        }
+
         notifyData()
     }
 
@@ -504,11 +506,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phoneList = (mNewDatas as ArrayList<DbUser>?)!!
         if (phoneList!!.size == 0) {
             list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
+            edit_user_password.visibility = View.VISIBLE
             btn_login.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
+            forget_password.visibility = View.VISIBLE
             isPhone = true
-            date_phone.visibility = View.GONE
+            date_phone.visibility = View.VISIBLE
         } else {
             adapter!!.setNewData(phoneList)
         }

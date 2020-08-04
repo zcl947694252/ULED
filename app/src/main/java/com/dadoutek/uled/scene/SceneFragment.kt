@@ -622,6 +622,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
     private fun seeHelpe() {
         var intent = Intent(context, InstructionsForUsActivity::class.java)
+        intent.putExtra(Constant.WB_TYPE,"#control-scene")
         startActivity(intent)
     }
 

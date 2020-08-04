@@ -371,9 +371,31 @@ class SettingActivity : BaseActivity() {
 
         setNormalPopSetting()
 
+        cancel.let {
+            it.setOnClickListener { PopUtil.dismiss(pop) }
+        }
+        confirm.setOnClickListener {
+            PopUtil.dismiss(pop)
+            //恢复出厂设置
+            when (isResetFactory) {
+                1 -> clearData()
+                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                2 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
+                    resetAllLights()
+                else
+                    ToastUtils.showLong(R.string.device_not_connected)
+            }
+        }
+
+
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
+                when (isResetFactory){
+                    2->  intent.putExtra(Constant.WB_TYPE,"#user-reset")
+                    3->  intent.putExtra(Constant.WB_TYPE,"#light-reset")
+                }
+
                 startActivity(intent)
             }
 
@@ -392,21 +414,6 @@ class SettingActivity : BaseActivity() {
         hinitThree.text = ss
         hinitThree.movementMethod = LinkMovementMethod.getInstance()
 
-        cancel.let {
-            it.setOnClickListener { PopUtil.dismiss(pop) }
-        }
-        confirm.setOnClickListener {
-            PopUtil.dismiss(pop)
-            //恢复出厂设置
-            when (isResetFactory) {
-                1 -> clearData()
-                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
-                2 -> if (TelinkLightApplication.getApp().connectDevice != null)
-                    resetAllLights()
-                else
-                    ToastUtils.showLong(R.string.device_not_connected)
-            }
-        }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         confirm.isClickable = false
         pop.isOutsideTouchable = false

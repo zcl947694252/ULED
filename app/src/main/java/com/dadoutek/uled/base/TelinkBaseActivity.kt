@@ -21,7 +21,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -49,9 +48,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.stomp.MqttBodyBean
-import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.stomp.StompManager
-import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -1084,7 +1081,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
         when (it.id) {
             R.id.close_install_list -> installDialog?.dismiss()
-            R.id.install_see_helpe -> seeHelpe()
+            R.id.install_see_helpe -> seeHelpe("#add-and-configure")
 
             R.id.search_bar -> {
                 if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
@@ -1153,8 +1150,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    fun seeHelpe() {
+    fun seeHelpe(webIndex: String) {
         var intent = Intent(this, InstructionsForUsActivity::class.java)
+        intent.putExtra(Constant.WB_TYPE,webIndex)
+
         startActivity(intent)
     }
 

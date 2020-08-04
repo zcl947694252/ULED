@@ -261,6 +261,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                intent.putExtra(Constant.WB_TYPE,"#user-reset")
                 startActivity(intent)
             }
 
@@ -346,6 +347,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                intent.putExtra(Constant.WB_TYPE,"")
                 startActivity(intent)
             }
 

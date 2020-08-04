@@ -1,13 +1,16 @@
 package com.dadoutek.uled.group
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
+import org.greenrobot.greendao.DbUtils
 
 
 /**
@@ -30,17 +33,21 @@ class BatchFourLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : Base
         helper.setText(R.id.template_device_batch_title, item?.name)
 
         if (item?.isSelected == true) {
-            helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.template_device_batch_selected,R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
 
-        if (item?.belongGroupId !=allLightId) {
+        if (item?.belongGroupId != allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item?.groupName
+            if (TextUtils.isEmpty(item?.groupName)) {
+                if (item?.belongGroupId != 1L)
+                    groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
+            } else
+                groupName.text = item?.groupName
 
             if (item?.productUUID == DeviceType.LIGHT_RGB) {
                 icon.setImageResource(R.drawable.icon_rgb_n)

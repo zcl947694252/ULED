@@ -15,7 +15,6 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.SeekBar
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -31,7 +30,6 @@ import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
-import kotlinx.android.synthetic.main.template_see_help.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -183,7 +181,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-        see_help_ly.setOnClickListener { seeHelpe() }
+        see_help_ly.setOnClickListener { seeHelpe("#control-color-light-custom-gradient") }
     }
 
     private fun lessSpeed(event: MotionEvent?) {

@@ -1,15 +1,18 @@
 package com.dadoutek.uled.othersview
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
-import android.text.*
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
 import android.widget.CheckBox
@@ -21,13 +24,11 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.user.LoginActivity
 import com.dadoutek.uled.util.PopUtil
 import com.telink.bluetooth.TelinkLog
-import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_splash.*
 import java.util.*
 
@@ -41,9 +42,29 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        changeLanguage()
         init()
         initListener()
     }
+
+    private fun changeLanguage() {
+        val dm: DisplayMetrics = resources.displayMetrics
+        val config: Configuration = resources.configuration
+        // 应用用户选择语言
+        //zcl---获取语言locale-----ru_RU--------------ru---RU=====русский----------русский (Россия)
+        //zcl---获取语言locale-----zh_CN_#Hans--------zh---CN=====中文----------中文 (简体中文,中国)
+        //zcl---获取语言locale-----en_US--------------en---US=====English----------English (UnitedStates)
+        //zcl---获取语言locale-----zh_TW_#Hant--------zh---TW=====中文----------中文 (繁體中文,台灣)
+        val locale: Locale = config.locale
+        LogUtils.v("zcl-获取语言locale--" + config.locale.toString() + "--" + locale.language.toString() + "-" + locale.country.toString() + "=====" + locale.displayLanguage.toString() + "--" + locale.displayName)
+        val b = locale.language.contains("zh") || locale.language.contains("en") || locale.language.contains("ru")
+        LogUtils.v("zcl-----------语言是否包含------\$b-$b")
+        if (b) config.locale = Locale.getDefault() //Locale.getDefault()代表获取手机默认语言
+        else config.locale = Locale.ENGLISH
+        LogUtils.v("zcl-获取语言locale--" + config.locale.toString() + "--" + locale.language.toString() + "-" + locale.country.toString() + "=====" + locale.displayLanguage.toString() + "--" + locale.displayName)
+        resources.updateConfiguration(config, dm)
+    }
+
 
     private fun initListener() {
         splash_to_login.setOnClickListener(this)

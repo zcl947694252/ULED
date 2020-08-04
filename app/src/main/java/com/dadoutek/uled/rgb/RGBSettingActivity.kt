@@ -68,6 +68,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
+    private var addr: Int = 0
     private var lastTime: Long = 0
     private var fiChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
@@ -439,6 +440,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         tvRename.visibility = View.GONE
         toolbarTv.text = light?.name
 
+        openOrClose(light?.connectionStatus ==1)
+
         rgb_switch.setOnCheckedChangeListener { _, isChecked ->
             if (light != null)
                 openOrClose(isChecked)
@@ -552,7 +555,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         layoutmanagers.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanagers
         //渐变模式自定义
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 
         val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -620,9 +623,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
 
     private fun openOrClose(currentLight: Boolean) {
-        LogUtils.e("currentLight" + currentLight)
+        LogUtils.e("currentLight$currentLight")
 
-        var addr = 0
         if (currentLight) {
             enableAllUI(true)
             if (typeStr == Constant.TYPE_GROUP) {
@@ -697,6 +699,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         sbBrightness.isEnabled = isEnabled
         sbBrightness_add.isEnabled = isEnabled
         sbBrightness_less.isEnabled = isEnabled
+
+        cb_brightness_enable.isEnabled = isEnabled
+        cb_brightness_rgb_enable.isEnabled = isEnabled
 
         ll_r.isEnabled = isEnabled
         ll_g.isEnabled = isEnabled
@@ -1032,7 +1037,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 changeToBuildInPage()
             }
             R.id.main_go_help -> {
-                seeHelpe()
+                seeHelpe("#color-light")
             }
             R.id.btnAdd, R.id.main_add_device -> {
                 transAddAct()
@@ -1169,7 +1174,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         } else {
             diyGradientList = DBUtils.diyGradientList
 
-            this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+            this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
             isDelete = false
             rgbDiyGradientAdapter!!.changeState(isDelete)
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
@@ -1225,7 +1230,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun applyDiyView() {
         builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
@@ -1611,6 +1616,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun initDataGroup() {
         this.mApplication = this.application as TelinkLightApplication
         this.group = this.intent.extras!!.get("group") as DbGroup
+        openOrClose(group?.connectionStatus ==1)
     }
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
@@ -1673,7 +1679,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         val layoutmanagers = LinearLayoutManager(this)
         layoutmanagers.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanagers
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 
         val decorations = DividerItemDecoration(this,

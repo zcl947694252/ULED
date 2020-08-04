@@ -358,8 +358,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 intent.putExtras(bundle)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
-            R.id.pir_config_see_help -> {
+            R.id.pir_config_see_help -> {//新版传感器设置隐藏查看帮助
                 var intent = Intent(this@PirConfigActivity, InstructionsForUsActivity::class.java)
+                intent.putExtra(Constant.WB_TYPE,"#sensor-scene-mode")
                 startActivity(intent)
             }
 

@@ -1,11 +1,13 @@
 package com.dadoutek.uled.group
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 
 
@@ -36,7 +38,11 @@ class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : 
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item?.groupName
+            if (TextUtils.isEmpty(item?.groupName)) {
+                if (item?.belongGroupId != 1L)
+                    groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
+            } else
+                groupName.text = item?.groupName
 
             icon.setImageResource(R.drawable.icon_acceptor_s)
         } else {

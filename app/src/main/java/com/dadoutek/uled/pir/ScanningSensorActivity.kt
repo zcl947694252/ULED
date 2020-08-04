@@ -22,7 +22,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
-import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -47,7 +46,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -116,7 +114,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initListener() {
         tv_tip.setOnClickListener {
             if (!isScanning)
-                seeHelpe()
+                seeHelpe("#QA7")
         }
         device_stop_scan.setOnClickListener {
             if (isScanning) {
