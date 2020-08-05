@@ -112,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
         </RelativeLayout>
 
@@ -145,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
             <TextView
@@ -191,7 +191,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
         </RelativeLayout>
@@ -230,7 +230,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="23dp"
+                        android:layout_marginRight="20dp"
                         android:src="@drawable/icon_arrow" />
             </RelativeLayout>
 
@@ -276,7 +276,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
         </RelativeLayout>
@@ -315,7 +315,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
         </RelativeLayout>
@@ -353,7 +353,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
         </RelativeLayout>
 
@@ -392,15 +392,16 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
                 android:id="@+id/user_agreenment"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:gravity="center"
                 android:background="@color/white"
                 android:foreground="?android:attr/selectableItemBackground">
 
@@ -412,30 +413,26 @@
                     android:src="@drawable/icon_description" />
 
             <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="38dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="15dp"
                     android:text="@string/user_agreement"
                     android:textColor="@color/black_e"
                     android:textSize="13sp" />
 
-            <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/background_color" />
-
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
 
-        </RelativeLayout>
-
+        </LinearLayout>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/background_color" />
         <RelativeLayout
                 android:id="@+id/constantQuestion"
                 android:layout_width="match_parent"
@@ -471,7 +468,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
         </RelativeLayout>
 
@@ -521,7 +518,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="23dp"
+                        android:layout_marginRight="20dp"
                         android:text="1.0.0"
                         android:textColor="@color/primary"
                         android:textSize="13sp" />
@@ -569,7 +566,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
         </RelativeLayout>
 
@@ -608,7 +605,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="23dp"
+                    android:layout_marginRight="20dp"
                     android:src="@drawable/icon_arrow" />
         </RelativeLayout>
 

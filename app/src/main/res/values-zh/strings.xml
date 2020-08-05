@@ -765,4 +765,5 @@
     <string name="model_list">模式列表</string>
     <string name="seven_color">七彩渐变</string>
     <string name="delete_group">删除分组</string>
+    <string name="bluetooth_scan">开始扫描</string>
 </resources>

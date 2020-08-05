@@ -33,7 +33,7 @@
         android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center|bottom"
         android:visibility="gone"
-        android:textSize="15sp"
+        android:textSize="12sp"
         android:textColor="#ffffff"
         app:layout_constraintBottom_toBottomOf="@+id/btn_diy_preset"
         app:layout_constraintEnd_toEndOf="@+id/btn_diy_preset"

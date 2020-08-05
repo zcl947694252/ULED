@@ -991,7 +991,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                                 if (!TextUtils.isEmpty(s)) {
                                                     localVersion = s
                                                     light?.version = s
-                                                    findItem?.title = s
+                                                    findItem?.title = localVersion
                                                 }
                                                 if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
                                                     DBUtils.saveLight(light!!, false)
@@ -1056,8 +1056,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     @SuppressLint("CheckResult")
     private fun getVersion() {
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
+        val connectDevice = TelinkApplication.getInstance().connectDevice
+        if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/) {
+                val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
                     .subscribe(
                             { s ->
                                 localVersion = s

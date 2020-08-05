@@ -248,7 +248,7 @@
     <string name="rssi_low">Очень слабый сигнал.</string>
     <string name="btn_jump_over">Пропустить</string>
     <string name="select_device_tip">Выберите ваши устройства</string>
-    <string name="normal_light">Белый свет</string>
+    <string name="normal_light">Cвет</string>
     <string name="rgb_light">RGB свет</string>
     <string name="warning">Предупреждение</string>
     <string name="is_exit_ota">OTA выполняется, выход или нет?</string>
@@ -262,8 +262,8 @@
     <string name="group">Группы</string>
     <string name="setting">Конфигурация</string>
     <string name="allLight">Все светильники</string>
-    <string name="group_list_on">Включить</string>
-    <string name="group_list_off">Выключить</string>
+    <string name="group_list_on">Вкл</string>
+    <string name="group_list_off">Выкл</string>
     <string name="switch_title">Выключатель</string>
     <string name="apply_scene">Нажмите здесь, чтобы применить режим</string>
     <string name="group_title">Группы</string>
@@ -371,7 +371,7 @@
     <string name="please_again_password">введите пароль еще раз</string>
     <string name="get_verification_code">Получить SMS код</string>
     <string name="new_password">введите новый пароль</string>
-    <string name="number">Количество</string>
+    <string name="number">Кол-во</string>
     <string name="login_password">Войдите используя пароль</string>
     <string name="online_upgrade">Обновление</string>
     <string name="tips">Примечания</string>
@@ -386,7 +386,7 @@
     <string name="bright_regulation">Яркость:</string>
     <string name="mode_name">Название:</string>
     <string name="please_mode_name">Пожалуйста введите название:</string>
-    <string name="no_color">Отсутствуют настройки</string>
+    <string name="no_color">В без</string>
     <string name="speed_regulation">Скорость:</string>
     <string name="delete_model">Удалить Режим?</string>
     <string name="choose_color">Цвет:</string>
@@ -424,7 +424,7 @@
     <string name="password_cannot">Пароль не может быть пустым</string>
     <string name="all_day">Любое окружение</string>
     <string name="day_time">Темное окружение</string>
-    <string name="night">Очень темное окружение</string>
+    <string name="night">ночью</string>
     <string name="light_on">Включить свет</string>
     <string name="light_off">Выключить свет</string>
     <string name="startMinute">Минуты</string>
@@ -550,7 +550,7 @@
     <string name="choose_device">Список устройств</string>
     <string name="choose_group_change">Список групп</string>
     <string name="no_group_device_num">Без группы(%1$s)</string>
-    <string name="grouped_num">Сгруппированные(%1$s）</string>
+    <string name="grouped_num">Разделимся(%1$s）</string>
     <string name="author_region_warm">В настоящее время используемая сеть не имеет разрешения на добавление, изменение или удаление данных.</string>
     <string name="beta_version">（Внутренняя бета-версия）：https://www.pgyer.com/dadou</string>
     <string name="no_device">Временно отсутствуют устройства</string>
@@ -763,4 +763,5 @@
     <string name="model_list">Список режимов</string>
     <string name="seven_color">RGB градиент</string>
     <string name="delete_group">Удалить группу</string>
+    <string name="bluetooth_scan">Начинайте сканирование</string>
 </resources>

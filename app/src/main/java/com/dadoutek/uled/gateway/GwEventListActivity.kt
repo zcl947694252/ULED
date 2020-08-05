@@ -1092,6 +1092,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)//赋值时一定要转换为gson字符串
         }
         DBUtils.saveGateWay(dbGw!!, true)
+        TelinkLightService.Instance()?.idleMode(true)
     }
 
     override fun receviedGwCmd2000(serId: String) {

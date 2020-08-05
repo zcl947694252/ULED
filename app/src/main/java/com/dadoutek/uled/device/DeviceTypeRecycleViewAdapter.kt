@@ -13,12 +13,14 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 class DeviceTypeRecycleViewAdapter(layoutResId: Int, data: List<DeviceItem>?) : BaseItemDraggableAdapter<DeviceItem, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DeviceItem?) {
-        helper.setText(R.id.template_device_num, TelinkLightApplication.getApp().getString(R.string.number) + "：" + item?.number)
-        .setText(R.id.template_device_group_name, item?.name)
+       helper.setText(R.id.template_device_num, TelinkLightApplication.getApp().getString(R.string.number)+":${item?.number}")
+        helper.setText(R.id.template_device_group_name, item?.name)
+
         val deviceNum = helper.getView<TextView>(R.id.template_device_num)
-        deviceNum.visibility = View.VISIBLE
         val moreLy = helper.getView<LinearLayout>(R.id.template_device_more_ly)
+        deviceNum.visibility = View.VISIBLE
         moreLy.visibility = View.GONE
+
         when (item?.productUUID) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
                 helper.setImageResource(R.id.template_device_icon, R.drawable.icon_light_no_circle)

@@ -7,10 +7,13 @@
 
     <TextView
             android:id="@+id/splash_to_login"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:gravity="center"
+
+
             android:layout_marginBottom="100dp"
             android:textColor="@color/gray_e"
             android:text="@string/have_account"
@@ -27,5 +30,5 @@
             android:background="@drawable/rect_e_w"
             android:gravity="center"
             android:text="@string/create_account"
-            android:textSize="18sp" />
+            android:textSize="15sp" />
 </RelativeLayout>

@@ -876,5 +876,6 @@
     <string name="model_list">Model list</string>
     <string name="seven_color">Colorful gradient</string>
     <string name="delete_group">Delete Group</string>
+    <string name="bluetooth_scan">Start scan</string>
 
 </resources>

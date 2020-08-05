@@ -575,6 +575,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         when (deviceType.toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 val dbLight = lightList[position]
+
                 if (dbLight.isSupportOta)
                     if (TextUtils.isEmpty(dbLight.version)) {
                         showLoadingDialog(getString(R.string.please_wait))
