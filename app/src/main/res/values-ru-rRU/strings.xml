@@ -681,7 +681,7 @@
     <string name="startTime">7:40</string>
     <string name="user_reset">Сброс устройства</string>
     <string name="reset_user_success">Сброс устройства завершен успешно</string>
-    <string name="slow_up_slowly">Постепенно сгорает и постепенно угаснет:</string>
+    <string name="slow_up_slowly">Плавное выкл:</string>
     <string name="slow">Медленно</string>
     <string name="mid">Уместно</string>
     <string name="fast">Быстро</string>

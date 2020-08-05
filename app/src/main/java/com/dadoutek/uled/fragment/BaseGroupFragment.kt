@@ -207,6 +207,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun makeRenamePopuwindow() {
         popReNameView = View.inflate(mContext, R.layout.pop_rename, null)
         textGp = popReNameView?.findViewById(R.id.pop_rename_edt)
+        textGp?.hint = getString(R.string.please_rename)
         renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         StringUtils.initEditTextFilter(textGp)
