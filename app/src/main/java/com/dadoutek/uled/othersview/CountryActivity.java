@@ -166,7 +166,7 @@ public class CountryActivity extends Activity {
      * 获取国家列表
      */
     private void getCountryList() {
-        String[] countryList = getResources().getStringArray(R.array.country_code_list_ch);
+        String[] countryList = getResources().getStringArray(R.array.country_code_list);
 
         for (int i = 0, length = countryList.length; i < length; i++) {
             String[] country = countryList[i].split("\\*");

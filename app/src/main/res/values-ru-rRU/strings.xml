@@ -37,6 +37,204 @@
         <item>Красный Синий градиент</item>
         <item>Зеленый Синий градиент</item>
     </string-array>
+
+    <string-array name="country_code_list">
+        <item>Ангола    *+244  </item>
+       <item>Афганистан     *+93   </item>
+        <item>Албания   *+355  </item>
+        <item>Алжир  *+213  </item>
+        <item>Республика андор  *+376  </item>
+        <item>ангуилла    *+1264 </item>
+        <item>Антигуа и барбуда *+1268 </item>
+        <item>Аргентина     *+54   </item>
+        <item>армения    *+374  </item>
+        <item>Асунсьон     *+247  </item>
+        <item>Австралия    *+61   </item>
+        <item>Австрия     *+43   </item>
+        <item>Азербайджан    *+994  </item>
+        <item>Багамы     *+1242 </item>
+        <item>бахрейн      *+973  </item>
+        <item>бангладеш    *+880  </item>
+        <item>барбадос    *+1246 </item>
+        <item>беларус    *+375  </item>
+        <item>Бельгия     *+32   </item>
+        <item>белиз     *+501  </item>
+        <item>бенин      *+229  </item>
+        <item>бермуды   *+1441 </item>
+        <item>болив    *+591  </item>
+        <item>ботсва    *+267  </item>
+        <item>бразил         *+55   </item>
+        <item>брун         *+673  </item>
+        <item>болгар       *+359  </item>
+        <item>Буркин-фас      *+226  </item>
+        <item>бирм         *+95   </item>
+        <item>Бурунди        *+257  </item>
+        <item>Камерун        *+237  </item>
+        <item>канад        *+1    </item>
+        <item>На кайманов остров       *+1345 </item>
+        <item>Центральноафриканская республика      *+236  </item>
+        <item>Чад         *+235  </item>
+        <item>чил         *+56   </item>
+        <item>кита         *+86   </item>
+        <item>колумбийск       *+57   </item>
+        <item>конг         *+242  </item>
+        <item>Остров кук       *+682  </item>
+        <item>Коста рика      *+506  </item>
+        <item>кубинск         *+53   </item>
+        <item>Кипр       *+357  </item>
+        <item>чешск         *+420  </item>
+        <item>Дан         *+45   </item>
+        <item>джибут        *+253  </item>
+        <item>Доминиканск республик    *+1890 </item>
+        <item>Эквадор       *+593  </item>
+        <item>египетск         *+20   </item>
+        <item>Сальвадор       *+503  </item>
+        <item>Эстония       *+372  </item>
+        <item>Эфиопия      *+251  </item>
+        <item>фидж         *+679  </item>
+        <item>финлянд         *+358  </item>
+        <item>Франц         *+33   </item>
+        <item>Французская гайана      *+594  </item>
+        <item>Габон         *+241  </item>
+        <item>гамб        *+220  </item>
+        <item>Джорджия       *+995  </item>
+        <item>Герман         *+49   </item>
+        <item>ган         *+233  </item>
+        <item>Гибралтар       *+350  </item>
+        <item>греческ         *+30   </item>
+        <item>гренад       *+1809 </item>
+        <item>гу         *+1671 </item>
+        <item>Гватемала       *+502  </item>
+        <item>гвин        *+224  </item>
+        <item>гайа        *+592  </item>
+        <item>гаит         *+509  </item>
+        <item>Гондурас       *+504  </item>
+        <item>Гонконг         *+852  </item>
+        <item>Венгрия        *+36   </item>
+        <item>исланд         *+354  </item>
+        <item>инд         *+91   </item>
+        <item>Индонезия      *+62   </item>
+        <item>ира         *+98   </item>
+        <item>Ирак        *+964  </item>
+        <item>Ирландия        *+353  </item>
+        <item>Израиль        *+972  </item>
+        <item>Италия        *+39   </item>
+        <item>Д ивуар       *+225  </item>
+        <item>Ямайка        *+1876 </item>
+        <item>япон         *+81   </item>
+        <item>Иордан         *+962  </item>
+        <item>камбодж        *+855  </item>
+        <item>казахста      *+327  </item>
+        <item>кен        *+254  </item>
+        <item>корейск         *+82   </item>
+        <item>Кувейт        *+965  </item>
+        <item>Гилгистан      *+331  </item>
+        <item>Лаос         *+856  </item>
+        <item>латв       *+371  </item>
+        <item>Ливан        *+961  </item>
+        <item>лесот        *+266  </item>
+        <item>либер       *+231  </item>
+        <item>лив        *+218  </item>
+        <item>лихтенштейн      *+423  </item>
+        <item>литв        *+370  </item>
+        <item>Люксембург        *+352  </item>
+        <item>мака         *+853  </item>
+        <item>Мадагаскар      *+261  </item>
+        <item>Малави        *+265  </item>
+        <item>малайз       *+60   </item>
+        <item>На мальдив       *+960  </item>
+        <item>мал         *+223  </item>
+        <item>Мальта        *+356  </item>
+        <item>Марианские острова     *+1670 </item>
+        <item>мартиник       *+596  </item>
+        <item>маврик       *+230  </item>
+        <item>мексик        *+52   </item>
+        <item>молдов       *+373  </item>
+        <item>монак        *+377  </item>
+        <item>монгольск         *+976  </item>
+        <item>Монтсеррат остр     *+1664 </item>
+        <item>марокк        *+212  </item>
+        <item>мозамбик       *+258  </item>
+        <item>намиб       *+264  </item>
+        <item>наур         *+674  </item>
+        <item>Непал        *+977  </item>
+        <item>Голландский антильес     *+599  </item>
+        <item>голландск         *+31   </item>
+        <item>Нов зеланд        *+64   </item>
+        <item>Никарагуа       *+505  </item>
+        <item>Нигер        *+227  </item>
+        <item>Нигер       *+234  </item>
+        <item>Северн кор         *+850  </item>
+        <item>норвег         *+47   </item>
+        <item>ома         *+968  </item>
+        <item>Пакистан       *+92   </item>
+        <item>панам        *+507  </item>
+        <item>Папуа-новая Гвинея    *+675  </item>
+        <item>парагва        *+595  </item>
+        <item>пер         *+51   </item>
+        <item>Филиппины        *+63   </item>
+        <item>польш         *+48   </item>
+        <item>Французск болив, никас    *+689  </item>
+        <item>португальск        *+351  </item>
+        <item>Пуэрт-рик       *+1787 </item>
+        <item>катар        *+974  </item>
+        <item>реюньон        *+262  </item>
+        <item>румын       *+40   </item>
+        <item>Россия        *+7    </item>
+        <item>Сент-люс       *+1758 </item>
+        <item>Сент-Винсент остр      *+1784 </item>
+        <item>Восточн само (красив)      *+684  </item>
+        <item>Западн само       *+685  </item>
+        <item>Сан-марин       *+378  </item>
+        <item>Сан-Том и принсип          *+239  </item>
+        <item>Саудовск арав              *+966  </item>
+        <item>сенега                      *+221  </item>
+        <item>Сейшельск остров         *+248  </item>
+        <item>Сьерр-леон                  *+232  </item>
+        <item>сингапур                 *+65   </item>
+        <item>словак                  *+421  </item>
+        <item>словен             *+386  </item>
+        <item>Соломонов остров      *+677  </item>
+        <item>сома                   *+252  </item>
+        <item>Южн африк         *+27   </item>
+        <item>Испания        *+34   </item>
+        <item>Шри-ланк       *+94   </item>
+        <item>Сент-люс       *+1758 </item>
+        <item>Сент-Винсент       *+1784 </item>
+        <item>суда         *+249  </item>
+        <item>суринам        *+597  </item>
+        <item>свазиленд       *+268  </item>
+        <item>шведск         *+46   </item>
+        <item>швейцарск         *+41   </item>
+        <item>сир        *+963  </item>
+        <item>Провинц тайван        *+886  </item>
+        <item>таджикиста      *+992  </item>
+        <item>танзан       *+255  </item>
+        <item>Таиланд         *+66   </item>
+        <item>тог         *+228  </item>
+        <item>тонг         *+676  </item>
+        <item>Тринидад и тобаг   *+1809 </item>
+        <item>тунис        *+216  </item>
+        <item>турц        *+90   </item>
+        <item>туркмениста      *+993  </item>
+        <item>уганд        *+256  </item>
+        <item>Украина        *+380  </item>
+        <item>Объединен арабск эмират   *+971  </item>
+        <item>британск         *+44   </item>
+        <item>американск         *+1    </item>
+        <item>уругв        *+598  </item>
+        <item>узбекистан     *+233  </item>
+        <item>венесуэл       *+58   </item>
+        <item>Вьетнам         *+84   </item>
+        <item>йем         *+967  </item>
+        <item>югослав       *+381  </item>
+        <item>Южн африк         *+27   </item>
+        <item>зимбабв       *+263  </item>
+        <item>заир        *+243  </item>
+        <item>замб        *+260  </item>
+    </string-array>
+
+
     <string name="app_name">ULED</string>
     <string name="activity_device_grouping">Перегруппировывать</string>
     <string name="device_setting_temperature">Температура:%1$s</string>
