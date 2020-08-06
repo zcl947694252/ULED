@@ -710,7 +710,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun initListener() {
         //先取消，这样可以确保不会重复添加监听
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
+        batch_see_help.setOnClickListener {
+            seeHelpe("#regroup-batch")
+        }
         swipe_refresh_ly.setOnRefreshListener {
             findMeshDevice(DBUtils.lastUser?.controlMeshName)
             disposableTimerResfresh?.dispose()
