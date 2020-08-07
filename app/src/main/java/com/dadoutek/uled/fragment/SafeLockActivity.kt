@@ -114,7 +114,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getApp().connectDevice == null) {
-                ToastUtils.showShort(getString(R.string.connecting))
+                ToastUtils.showShort(getString(R.string.connecting_tip))
                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
                         DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                 mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)

@@ -198,7 +198,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 R.id.toolbar_f_delete -> deleteDevice()
             }
         } else {
-            showLoadingDialog(getString(R.string.connecting))
+            showLoadingDialog(getString(R.string.connecting_tip))
             connect(dbGw!!.meshAddr, true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())
                     ?.subscribe({

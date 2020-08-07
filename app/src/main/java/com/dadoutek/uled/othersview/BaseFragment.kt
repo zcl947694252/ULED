@@ -255,7 +255,7 @@ open class BaseFragment : Fragment() {
             }
 
             LightAdapter.STATUS_CONNECTING -> {
-                ToastUtils.showLong(R.string.connecting_please_wait)
+                ToastUtils.showLong(R.string.connecting_tip)
             }
         }
     }

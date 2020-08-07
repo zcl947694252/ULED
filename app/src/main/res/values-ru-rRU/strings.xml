@@ -285,7 +285,6 @@
     <string name="searching">проходит…</string>
     <string name="select_group">Выберите группу</string>
     <string name="please_select_group">Выберите хотя бы одну группу</string>
-    <string name="connecting">Подключение……</string>
     <string name="group_failed">Группировка прекращена. Убедитесь, что устройства, которое вы хотите сгруппировать, уже включены</string>
     <string name="connected">Подключено</string>
     <string name="scene_apply">Применить</string>
@@ -343,13 +342,11 @@
     <string name="network_time_out">Тайм-аут подключения к сети, повторите попытку</string>
     <string name="delete_group_confirm">Вы уверены, что хотите удалить эту группу:%1$s?</string>
     <string name="phone_or_password_can_not_be_empty">Номер телефона не может быть пустым</string>
-    <string name="reconnecting">Повторно подключается…</string>
     <string name="group_not_change_tip">Группировка не изменилось, Вы хотите выйти?</string>
     <string name="require_permission_reason">Требуется это разрешение для использования блютуза в  App</string>
     <string name="i_know">Выполнено</string>
     <string name="exit">Выйти</string>
     <string name="saving">Сохраняет…</string>
-    <string name="connecting_please_wait">Соединяются, пожалуйста, подождите…</string>
     <string name="delete_name">Удалить</string>
     <string name="open_blutooth">Блютуз  включено</string>
     <string name="empty_tip">На данный момент нет ни одного светильника, щелкните кнопку и добавьте</string>
@@ -432,7 +429,6 @@
     <string name="local_version">текущая версия:%1$s</string>
     <string name="server_version">новая версия:%1$s</string>
     <string name="start_scan">Поиск…</string>
-    <string name="start_connect">Подключение…</string>
     <string name="update_firmware_tip2">будьте как можно ближе к устройству при обновлении！</string>
     <string name="trigger_mode">Выберите условие</string>
     <string name="register">Регистрация</string>

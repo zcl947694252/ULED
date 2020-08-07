@@ -324,7 +324,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         refreshNotifyParams.setRefreshInterval(1000)
         //开启自动刷新Notify
         TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
-        showLoadingDialog(getString(R.string.connecting))
+        showLoadingDialog(getString(R.string.connecting_tip))
     }
 
     private fun getVersion(version: String) {
@@ -490,7 +490,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     Thread {
                         val mode = getModeValue()
                         if (TelinkLightApplication.getApp().connectDevice == null) {
-                            showLoadingDialog(getString(R.string.connecting))
+                            showLoadingDialog(getString(R.string.connecting_tip))
                             connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.connect_success))

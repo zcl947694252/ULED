@@ -167,7 +167,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                 if (isRightPos()) return@setOnClickListener
                 if (currentDevice != null) {
                     TelinkLightService.Instance()?.idleMode(true)
-                    showLoadingDialog(getString(R.string.connecting))
+                    showLoadingDialog(getString(R.string.connecting_tip))
                     connect(macAddress = currentDevice?.macAddr, retryTimes = 3)
                             ?.subscribe(
                                     {
@@ -219,7 +219,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
         if (isRightPos()) return
         if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
-            showLoadingDialog(getString(R.string.connecting))
+            showLoadingDialog(getString(R.string.connecting_tip))
             val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
                     ?.subscribe({
                         onLogin(it)//判断进入那个开关设置界面

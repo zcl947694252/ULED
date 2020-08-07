@@ -614,7 +614,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun goConnect(ishow: Boolean = true) {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         if (ishow)
-            ToastUtils.showShort(getString(R.string.connecting))
+            ToastUtils.showShort(getString(R.string.connecting_tip))
         mConnectDisposable?.dispose()
         mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                 ?.subscribe({}, { LogUtils.d("connect failed") })

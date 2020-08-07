@@ -456,7 +456,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_on_line -> renameGroup()
             }
         } else {
-            showLoadingDialog(getString(R.string.connecting))
+            showLoadingDialog(getString(R.string.connecting_tip))
             val subscribe = connect(currentDbConnector!!.meshAddr, true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())?.subscribe({
                         ToastUtils.showShort(getString(R.string.connect_success))
@@ -555,7 +555,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     fun autoConnect() {
-        val subscribe = connect()?.subscribe({ ToastUtils.showShort(getString(R.string.connecting)) },
+        val subscribe = connect()?.subscribe({ ToastUtils.showShort(getString(R.string.connecting_tip)) },
                 { ToastUtils.showShort(getString(R.string.device_disconnected)) }
         )
     }

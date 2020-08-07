@@ -18,13 +18,12 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-    public static Boolean isDebug = true;
+    public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
+
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
-     */
-    /**
      * 测试mqtt服务器地址
      * tcp://47.107.227.130:1885
      * 正式mqtt服务器地址

@@ -760,7 +760,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         isScanning = false
         //mAutoConnectDisposable = connect(deviceTypes = elements,retryTimes = 2)
         if (mAddDeviceType == DeviceType.GATE_WAY)
-            mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, retryTimes = 2)
+            mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, fastestMode = true,retryTimes = 2)
                     ?.subscribe(
                             {
                                 TelinkLightApplication.getApp().isConnectGwBle = true
@@ -772,7 +772,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         LogUtils.d(it)*/
                     })
         else
-            mAutoConnectDisposable = connect(deviceTypes = elements, retryTimes = 2)
+            mAutoConnectDisposable = connect(deviceTypes = elements, fastestMode = true,retryTimes = 2)
                     ?.subscribe(
                             {
                                 onLogin()
@@ -1390,9 +1390,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             DeviceType.SCENE_SWITCH -> {
                 if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
                     startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "version" to version)
-                else {
+                else
                     startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "version" to version)
-                }
             }
 
             DeviceType.EIGHT_SWITCH -> {

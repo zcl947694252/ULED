@@ -45,7 +45,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 273
-        versionName "3.5.6"
+        versionName "4.0.0"
 
         multiDexEnabled true
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }

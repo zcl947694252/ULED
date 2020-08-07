@@ -359,9 +359,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     private fun showDisconnectSnackBar() {
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.device_disconnected), getString(R.string.reconnect)) {
-            reconnect()
-        }
+        reconnect()
+        //mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.device_disconnected), getString(R.string.reconnect)) {}
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -475,8 +474,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting))
-
+       // mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting_tip))
+        ToastUtils.showShort(getString(R.string.connecting_tip))
         TelinkLightService.Instance()?.autoConnect(connectParams)
     }
 

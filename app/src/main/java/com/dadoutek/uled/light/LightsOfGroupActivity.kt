@@ -386,7 +386,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 } else {
-                    ToastUtils.showLong(R.string.reconnecting)
+                    ToastUtils.showLong(R.string.connecting_tip)
                 }
             }
             R.id.template_device_card_delete -> showDeleteSingleDialog(currentLight!!)

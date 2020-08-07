@@ -397,7 +397,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
                                 if (size > 0) {
-                                    ToastUtils.showLong(R.string.connecting_please_wait)
+                                    ToastUtils.showLong(R.string.connecting_tip)
                                     mConnectDisposal?.dispose()
                                     mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                                             ?.subscribe(

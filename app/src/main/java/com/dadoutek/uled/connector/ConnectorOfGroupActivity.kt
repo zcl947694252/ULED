@@ -427,7 +427,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         } else {
-                            ToastUtils.showLong(R.string.reconnecting)
+                            ToastUtils.showLong(R.string.connecting_tip)
                         }
                     }
                 }

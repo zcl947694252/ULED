@@ -420,7 +420,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 } else {
-                    ToastUtils.showLong(R.string.reconnecting)
+                    ToastUtils.showLong(R.string.connecting_tip)
                 }
             }
             R.id.template_device_card_delete -> showDeleteSingleDialog(currentCurtain!!)

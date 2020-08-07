@@ -280,7 +280,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                 builder?.setMessage(string)
                 builder?.create()?.show()
             }
-            else -> ToastUtils.showLong(R.string.reconnecting)
+            else -> ToastUtils.showLong(R.string.connecting_tip)
         }
     }
 

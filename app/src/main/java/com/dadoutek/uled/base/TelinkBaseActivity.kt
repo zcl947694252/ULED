@@ -394,7 +394,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
             LightAdapter.STATUS_CONNECTING -> {
                 if (!isScanning)
-                    ToastUtils.showLong(R.string.connecting_please_wait)
+                    ToastUtils.showLong(R.string.connecting_tip)
             }
         }
     }

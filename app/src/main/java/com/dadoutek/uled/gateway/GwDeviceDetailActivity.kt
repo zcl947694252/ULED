@@ -577,7 +577,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         popupWindow.dismiss()
         if (currentGw != null) {
             TelinkLightService.Instance()?.idleMode(true)
-            showLoadingDialog(getString(R.string.connecting))
+            showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()
             disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 8L)?.subscribe({
                 disposableTimer?.dispose()

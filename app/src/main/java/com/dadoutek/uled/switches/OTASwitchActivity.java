@@ -514,7 +514,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
 
     public void connectDevice(String mac) {
         log("connectDevice :" + mac);
-        btn_start_update.setText(R.string.start_connect);
+        btn_start_update.setText(R.string.connecting_tip);
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance!=null)
             instance.connect(mac, TIME_OUT_CONNECT);

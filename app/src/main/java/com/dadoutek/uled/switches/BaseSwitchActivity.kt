@@ -140,7 +140,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 R.id.toolbar_f_delete -> deleteDevice()
             }
         } else {
-            showLoadingDialog(getString(R.string.connecting))
+            showLoadingDialog(getString(R.string.connecting_tip))
             connect(setConnectMeshAddr(), true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())
                     ?.subscribe({

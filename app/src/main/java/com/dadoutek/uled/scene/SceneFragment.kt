@@ -383,7 +383,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 img_function1?.visibility = View.GONE
                 img_function2?.visibility = View.GONE
                 image_bluetooth?.visibility = View.GONE
-                toolbarTv?.text = ""
                 setBack()
                 adaper!!.notifyDataSetChanged()
             }

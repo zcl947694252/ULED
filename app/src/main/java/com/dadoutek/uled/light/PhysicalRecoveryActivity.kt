@@ -191,7 +191,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     }
 
     private fun setConnectText() {
-        physical_recovery_state_warm.text = getString(R.string.connecting)
+        physical_recovery_state_warm.text = getString(R.string.connecting_tip)
         physical_recovery_state_warm.textColor = getColor(R.color.blue_text)
     }
 

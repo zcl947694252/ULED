@@ -82,8 +82,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 groupList.clear()
                 groupList.addAll(filter)
                 if (deviceType == Constant.DEVICE_TYPE_LIGHT_SW.toInt())
-
                     groupList.add(0, DBUtils.allGroups[0])
+
                 groupList.forEach {
                     it.isChecked = false
                 }

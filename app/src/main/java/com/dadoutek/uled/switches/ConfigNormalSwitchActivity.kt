@@ -85,9 +85,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
-        deviceConfigType = intent.getIntExtra("deviceType",0)
+        deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        when (deviceConfigType) {
+        when (mDeviceInfo.productUUID) {
             DeviceType.NORMAL_SWITCH -> {
                 sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
                 toolbarTv.text = getString(R.string.light_sw)
@@ -114,11 +114,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         isReConfig = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfig
 
-        if (isReConfig){
+        if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
             toolbarTv.text = switchDate?.name
-        } else{
-            toolbarTv.text = switchDate?.name
+        } else {
             groupName = "false"
         }
 
@@ -144,7 +143,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     override fun setConnectMeshAddr(): Int {
-        return mDeviceInfo?.meshAddress?:0
+        return mDeviceInfo?.meshAddress ?: 0
     }
 
     override fun deleteDevice() {
@@ -166,11 +165,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (switchDate != null){
+                if (switchDate != null) {
                     toolbarTv.text = switchDate?.name
                     DBUtils.updateSwicth(switchDate!!)
-                }
-                else
+                } else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
                 if (this != null && !this.isFinishing)
@@ -345,25 +343,33 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> { }
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                    }
                 }
                 showDisconnectSnackBar()
 
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> { }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {}
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> { }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {}
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {}
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
@@ -372,10 +378,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     private fun showDisconnectSnackBar() {
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
-                .string.device_disconnected), getString(R.string.reconnect)) {
-            reconnect()
-        }
+        reconnect()
+        //mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.device_disconnected), getString(R.string.reconnect)) {}
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -496,9 +500,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
-                .string.connecting))
-
+        //  mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting))
+        ToastUtils.showShort(getString(R.string.connecting_tip))
         TelinkLightService.Instance()?.autoConnect(connectParams)
     }
 

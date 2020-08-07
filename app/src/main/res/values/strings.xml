@@ -291,7 +291,7 @@
     <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone bluetooth</string>
     <string name="chear_cache">Clear all Data</string>
     <string name="clean_tip">Cache empty, App Reboot soon</string>
-    <string name="confirm">OK</string>
+    <string name="confirm">Confirm</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
     <string name="title_scanned_device_num">Num:</string>
@@ -302,7 +302,6 @@
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
     <string name="create_new_group">Create a new group</string>
     <string name="btn_rename_light">Rename</string>
-    <string name="connecting_please_wait">connecting, please wait…</string>
     <string name="connect_success">Connection succeeded!</string>
     <string name="connect_fail">Disconnect </string>
     <string name="device_not_connected">Please check bluetooth!</string>
@@ -315,7 +314,6 @@
     <string name="searching">Searching…</string>
     <string name="select_group">Select group</string>
     <string name="please_select_group">Please select a group at least</string>
-    <string name="connecting">Connecting…</string>
     <string name="group_failed">Grouping failed, please check whether the equipment to be grouped is powered on</string>
     <string name="connected">Connected</string>
     <string name="scene_apply">Apply</string>
@@ -374,10 +372,9 @@
     <string name="network_time_out">Network connection timed out, please try again.</string>
     <string name="delete_group_confirm">Sure delete group :%1$s?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number cannot be empty!</string>
-    <string name="reconnecting">Reconnecting…</string>
     <string name="group_not_change_tip">Group unchanged, determine to exit?</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
-    <string name="i_know">OK</string>
+    <string name="i_know">I konw</string>
     <string name="exit">Exit</string>
     <string name="saving">Saving…</string>
     <string name="delete_name">delete</string>
@@ -443,7 +440,7 @@
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">1.Where can I update my app?</string>
-    <string name="update_group">Change group</string>
+    <string name="update_group">Edit Group</string>
     <string name="the_last_version">It is the latest version!</string>
     <string name="updateSuccess">Update succeed!</string>
     <string name="update_fail">Update failed!</string>
@@ -461,7 +458,6 @@
     <string name="local_version">Current firmware version: %1$s</string>
     <string name="server_version">New firmware version: %1$s</string>
     <string name="start_scan">Scanning…</string>
-    <string name="start_connect">Connecting…</string>
     <string name="update_firmware_tip2">Please be close to the lights when updating!</string>
     <string name="trigger_mode">Trigger mode</string>
     <string name="register">Register</string>
@@ -481,9 +477,9 @@
         
     <string name="select_device_tip">Choose your devices </string>
         
-    <string name="normal_light">CW light </string>
+    <string name="normal_light">CW Light </string>
         
-    <string name="rgb_light">RGB light</string>
+    <string name="rgb_light">RGB Light</string>
         
         
         
@@ -501,7 +497,7 @@
         
     <string name="stop">Stop</string>
         
-    <string name="please_rename">Please enter the name </string>
+    <string name="please_rename">Please enter a name </string>
         
         
     <string name="firmware_version">Firmware version: </string>
@@ -579,7 +575,7 @@
     <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
     <string name="sensor">Sensor </string>
     <string name="sensor_describe">Night light, PIR</string>
-    <string name="add_device_new">Add new device </string>
+    <string name="add_device_new">Add New Device </string>
     <string name="update_name_gp"> modify the group name </string>
     <string name="curtain">Curtain </string>    
     <string name="smart_curtain">Smart Curtains</string>
@@ -596,7 +592,7 @@
     <string name="guide_tip_reset_sensor">Sensor (with key) : press and hold the side reset key until the light flashes.\n Sensor (no button) : turn on the power for 3 seconds, turn off the power for 3 seconds, repeat about 5-6 times until the sensor flashes. </string>
     <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
     <string name="guide_tip_reset_relay">Bluetooth receiver: long press the white button of the receiver for 5 seconds, until the bluetooth receiver flashes. </string>
-    <string name="guide_tip_reset_gateway">网关：长按网关的白色按钮5秒，直至网关闪烁。</string>
+    <string name="guide_tip_reset_gateway">Gateway: Long press the white button of the gateway for 5 seconds until the gateway blinks.</string>
     <!--窗帘相关-->
     <string name="up">up</string>
     <string name="down">down</string>
@@ -629,7 +625,7 @@
 
     <string name="delete_user">Make sure to delete the phone number？</string>
 
-    <string name="relay">Relay</string>
+    <string name="relay">BTReceiver</string>
 
 
     <string name="title_connector_lights_num">Scanning %1$d</string>
@@ -639,7 +635,7 @@
     <string name="connector_fail_tip">There is a connector grouped failed, please check and try again!</string>
 
 
-    <string name="batch_group">Batch group</string>
+    <string name="batch_group">Regroup</string>
 
     <string name="developer_mode_close">Enter developer mode close</string>
 
@@ -650,8 +646,8 @@
     <string name="no_account">No account yet, please</string>
 
 
-    <string name="brightness">brightness</string>
-    <string name="color_temperature">Color temperature</string>
+    <string name="brightness">Brightness</string>
+    <string name="color_temperature">Color temp</string>
     <string name="brightness_adjustment">Brightness：</string>
     <string name="color_temperature_adjustment">Color Temperature：</string>
 
@@ -660,11 +656,11 @@
     <string name="please_again_password">Please the login password again.</string>
     <string name="get_verification_code">get code</string>
     <string name="new_password">Please enter your new password</string>
-    <string name="number">Num</string>
+    <string name="number">Qty</string>
     <string name="for_connector">Connector</string>
     <string name="for_gateway">Gateway</string>
-    <string name="login_password">Log in with a password</string>
-    <string name="online_upgrade">Upgrade</string>
+    <string name="login_password">Login with a password</string>
+    <string name="online_upgrade">OTA</string>
 
     <string name="tips">Tips</string>
     <string name="create_now">create now</string>
@@ -699,7 +695,7 @@
     <string name="cannot_rgb_null">RGB values cannot be null</string>
     <string name="rgb_max">RGB value should not be greater than 255</string>
     <string name="number_no">Version number not obtained</string>
-    <string name="instructions_for_use">Instructions for use</string>
+    <string name="instructions_for_use">APP instruction manual</string>
     <string name="no_password">The current account has not created a password. Please log in using SMS.</string>
     <string name="enter_confirmation_code">Verification code</string>
     <string name="send_code">Verification code sent to</string>
@@ -760,7 +756,7 @@
 
     <string name="trigger_mode_text">Trigger mode :</string>
     <string name="delay_time_unit_text">Delay time unit :</string>
-    <string name="area">area</string>
+    <string name="area">Region</string>
     <string name="refresh_qr_code">Refresh qr code</string>
     <string name="cur_network_owner">Current network owner:</string>
     <string name="developer">Developer model</string>
@@ -854,13 +850,13 @@
     <string name="authorization_warm">The receiver will have only control, not management</string>
     <string name="get_version_fail">Failed to get device version number</string>
     <string name="please_select_update_file">Select OTA files to upgrade</string>
-    <string name="choose_device">Select device <!--(Long press change name)--></string>
-    <string name="choose_group_change">Select group</string>
+    <string name="choose_device">Device List <!--(Long press change name)--></string>
+    <string name="choose_group_change">Group List</string>
     <string name="no_group_device_num">Ungrouped (%1$s)</string>
     <string name="grouped_num">grouped(%1$s)</string>
     <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>
     <string name="beta_version">(beta version) : https://www.pgyer.com/dadou</string>
-    <string name="no_device">No equipment</string>
+    <string name="no_device">No Device</string>
     <string name="compatible_mode">compatible_mode</string>
     <string name="direck_light">Direct light:</string>
     <string name="get_data_please_wait">Loading data, please wait</string>
@@ -1030,7 +1026,7 @@
     <string name="physical_recovery_two">This operation will reset all energized devices (switch, except sensor) in the region of the device that interacts with the APP.</string>
     <string name="group_mode">Group mode</string>
     <string name="scene_mode">Scene mode</string>
-    <string name="see_help">See the help</string>
+    <string name="see_help">View help</string>
     <string name="group_max">Maximum 7 groups are supported</string>
     <string name="dissupport">This batch of equipment does not support switching function</string>
     <string name="china_code">China+86</string>
@@ -1046,14 +1042,14 @@
     <string name="verification_code_login">Verification code Login</string>
     <string name="no_connect_device">No automatic connection!</string>
     <string name="select_icon_dot">Select the icon:</string>
-    <string name="select_icon">Select the icon</string>
+    <string name="select_icon">Choose lcon</string>
     <string name="group_ota">Group to upgrade</string>
     <string name="get_bin_fail">Failed to get the  file</string>
     <string name="dissupport_ota">Otas are not supported in this release</string>
     <string name="get_version_success">This version does not support OTA capture of device version success</string>
     <string name="delete_device_fail">Device deletion failed</string>
     <string name="delete_success">deleted successfully</string>
-    <string name="edite_device">Edit equipment</string>
+    <string name="edite_device">Edit Device</string>
     <string name="cancel_edite">Cancel the editor</string>
     <string name="sure_delete_device">Are you sure to delete  device:%1$s?</string>
     <string name="confim_stop_scan">Are you sure you want to exit the scan?</string>

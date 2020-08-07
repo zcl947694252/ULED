@@ -417,10 +417,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     private fun showDisconnectSnackBar() {//java.lang.ClassCastException: android.widget.LinearLayout cannot be cast to android.support.design.widget.CoordinatorLayout
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
-                .string.device_disconnected), getString(R.string.reconnect)) {
-            reconnect()
-        }
+        reconnect()
+       // mDisconnectSnackBar = indefiniteSnackbar(config_scene_switch, getString(R.string.device_disconnected), getString(R.string.reconnect)) {}
     }
 
     private fun reconnect() {
@@ -430,23 +428,21 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
-        } else {
-            NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
-                    .substring(0, 16)
-        }
+         else
+            NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName).substring(0, 16)
+
         connectParams.setPassword(pwd)
         connectParams.autoEnableNotification(true)
         connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(config_scene_switch, getString(R
-                .string.connecting))
+        //mConnectingSnackBar = indefiniteSnackbar(config_scene_switch, getString(R.string.connecting_tip))
+        ToastUtils.showShort(getString(R.string.connecting_tip))
 
         TelinkLightService.Instance()?.autoConnect(connectParams)
-
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -457,12 +453,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 mConnectedSnackBar = snackbar(config_scene_switch, R.string.connect_success)
             }
 
-
             LightAdapter.STATUS_LOGOUT -> {
                 when {
                     mIsDisconnecting -> {
                         mApp?.removeEventListener(this)
-
                         GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
                             pb_ly.visibility = View.GONE
