@@ -252,7 +252,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             //传入0代表是群组
             val bundle = Bundle()
             bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT.toInt())
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             setResult(Constant.RESULT_OK)
@@ -284,8 +284,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                 disconnect()
                                 if (switchDate == null)
                                     switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                                ToastUtils.showShort(getString(R.string.config_success))
                                 if (!isReConfig)
                                     showRenameDialog(switchDate)
+                                else
+                                    finish()
                             },
                             failedCallback = {
                                 mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
@@ -343,33 +346,25 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                    }
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> { }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> { }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> { }
                 }
                 showDisconnectSnackBar()
 
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                    }
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> { }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> { }
                 }
                 showDisconnectSnackBar()
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                    }
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> { }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> { }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> { }
                 }
                 showDisconnectSnackBar()
             }
@@ -391,7 +386,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
                 sw_progressBar.visibility = View.GONE
             }
-
 
             LightAdapter.STATUS_LOGOUT -> {
                 when {

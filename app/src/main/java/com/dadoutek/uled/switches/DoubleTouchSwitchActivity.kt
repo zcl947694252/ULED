@@ -162,8 +162,11 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     if (switchDate == null)
                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                     GlobalScope.launch(Dispatchers.Main) {
+                        ToastUtils.showShort(getString(R.string.config_success))
                         if (!isReConfig)
                         showRenameDialog(switchDate)
+                        else
+                            finish()
                     }
                 },
                 failedCallback = {

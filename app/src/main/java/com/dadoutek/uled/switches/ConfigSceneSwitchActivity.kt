@@ -169,6 +169,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                     if (!isReConfig)
                         showRenameDialog(switchDate)
+                    else
+                        finish()
 
                 }, failedCallback = {
                     mConfigFailSnackbar = snackbar(config_scene_switch, getString(R.string.pace_fail))

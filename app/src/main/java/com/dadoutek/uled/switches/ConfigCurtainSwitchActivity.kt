@@ -272,10 +272,13 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                         mDeviceInfo.meshAddress = newMeshAddr
                         mIsConfiguring = true
                         updateSwitch()
+                        ToastUtils.showShort(getString(R.string.config_success))
                         if (switchDate == null)
                             switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                         if (!isReConfig)
                             showRenameDialog(switchDate)
+                        else
+                            finish()
                     },
                             failedCallback = {
                                 mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
