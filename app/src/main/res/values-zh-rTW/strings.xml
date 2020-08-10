@@ -266,7 +266,7 @@
     <string name="connecting_tip">正在连接,请稍后</string>
     <string name="grouping_completed">分组完成</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
-    <string name="me">我</string>
+    <string name="me">我的</string>
     <string name="grouping_wait_tip">当前有%1$s个灯正在分组，请稍候！</string>
     <string name="start_group_bt">开始分组</string>
     <string name="have_lamp_no_group_tip">还有灯没有分组，请完成分组操作</string>

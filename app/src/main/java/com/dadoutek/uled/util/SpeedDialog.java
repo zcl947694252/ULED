@@ -56,7 +56,7 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
         if (speed==0)
             speed =1;
 
-        speedText.setText(speed + "%");
+        speedText.setText(speed + "");
 
         addSpeenBtn = findViewById(R.id.speed_add);
         lessSpeedBtn = findViewById(R.id.speed_less);
@@ -151,7 +151,7 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
             @Override
             public void onSeeking(SeekParams seekParams) {
                 speed = seekParams.progress;
-                speedText.setText(speed + 1 +  "%");
+                speedText.setText(speed+"");
                 if (speed >= 100) {
                     addSpeenBtn.setEnabled(false);
                     lessSpeedBtn.setEnabled(true);
@@ -183,17 +183,16 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
                 onBtnTouch = false;
             } else if (speedBar.getProgress() == 1) {
                 onBtnTouch = false;
-                speedText.setText(speedBar.getProgress() + 1 + "%");
+                speedText.setText(speedBar.getProgress() + 1+"");
                 speed = speedBar.getProgress();
             } else {
                 lessSpeedBtn.setEnabled(true);
-                speedText.setText(speedBar.getProgress() + 1 +"%");
+                speedText.setText(speedBar.getProgress() + 1+"");
                 speed = speedBar.getProgress();
             }
 
-            if (speedBar.getProgress() < 100) {
+            if (speedBar.getProgress() < 100)
                 addSpeenBtn.setEnabled(true);
-            }
         }
     };
 
@@ -212,11 +211,11 @@ public class SpeedDialog extends AlertDialog implements View.OnClickListener {
             } else if (speedBar.getProgress() == 100) {
                 addSpeenBtn.setEnabled(false);
                 onBtnTouch = false;
-                speedText.setText(speedBar.getProgress() + 1 +  "%");
+                speedText.setText(speedBar.getProgress() + 1+"");
                 speed = speedBar.getProgress();
             } else {
                 addSpeenBtn.setEnabled(true);
-                speedText.setText(speedBar.getProgress() + 1 +  "%");
+                speedText.setText(speedBar.getProgress() + 1+"" );
                 speed = speedBar.getProgress();
             }
 

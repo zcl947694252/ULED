@@ -113,16 +113,16 @@ class SettingActivity : BaseActivity() {
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else
                     when (position) {
-                        1 -> emptyTheCache()
-                        3 -> showSureResetDialogByApp()
                         0 -> startToRecoverDevices()
-                        2 -> physicalRecovery()
+                        1 -> emptyTheCache()            //清除数据
+                        2 -> showSureResetDialogByApp()      //qingzhi物理恢复
+                        3 -> physicalRecovery()    //物理恢复
                         //3 -> userReset()
                         //1 -> checkNetworkAndSyncs(this)
                     }
             }
         }
-        setting_masking.setOnClickListener { }
+        setting_masking.setOnClickListener {}
     }
 
     override fun onResume() {
@@ -133,8 +133,8 @@ class SettingActivity : BaseActivity() {
         }
     }
 
-    private fun physicalRecovery() {
-        isResetFactory = 3;
+    private fun physicalRecovery() {  //物理恢复
+        isResetFactory = 3
         setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,
                 R.string.user_reset_all3, isResetFactory)
     }
@@ -201,8 +201,8 @@ class SettingActivity : BaseActivity() {
     }
 
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
-    private fun showSureResetDialogByApp() {
-        isResetFactory = 2
+    private fun showSureResetDialogByApp() {//物理复位
+        isResetFactory = 2;
         setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
                 , R.string.have_question_look_notice, isResetFactory)
     }
@@ -273,7 +273,7 @@ class SettingActivity : BaseActivity() {
         tvTwo.visibility = View.INVISIBLE
 
         when (isResetFactory) {
-            1 -> {
+            3 -> {
                 hinitTwo.visibility = View.VISIBLE
                 hinitOne.text = getString(R.string.tip_reset_sure)
                 hinitTwo.setTextColor(resources.getColor(R.color.red))
@@ -282,11 +282,11 @@ class SettingActivity : BaseActivity() {
                 tvThree.visibility = View.GONE
                 hinitThree.visibility = View.GONE
             }
-            2 -> {
+            1 -> {
                 hinitTwo.visibility = View.GONE
                 hinitOne.text = getString(R.string.empty_cache_tip)
                 hinitTwo.textSize = 13F
-                hinitTwo.text = getString(R.string.reset_warm_red)
+                hinitTwo.text = getString(R.string.reset_warm_red)//在恢复出厂设置之后可以通过添加设备重新添加
                 tvThree.visibility = View.GONE
                 hinitThree.visibility = View.GONE
             }
@@ -309,7 +309,7 @@ class SettingActivity : BaseActivity() {
 
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
-    private fun emptyTheCache() {
+    private fun emptyTheCache() {//清除数据
         isResetFactory = 1
         setFirstePopAndShow(R.string.clear_one, R.string.clear_two,
                 R.string.clear_one, isResetFactory)
@@ -379,8 +379,8 @@ class SettingActivity : BaseActivity() {
             //恢复出厂设置
             when (isResetFactory) {
                 1 -> clearData()
-                2 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
-                3 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
+                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                2 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
                     resetAllLights()
                 else
                     ToastUtils.showLong(R.string.device_not_connected)

@@ -83,7 +83,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 if (speed == 0)
                     speed = 1
 
-                speed_num.text = "$speed%"
+                speed_num.text = "$speed"
                 when {
                     speed >= 100 -> {
                         speed_add.isEnabled = false

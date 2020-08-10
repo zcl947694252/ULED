@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".user.VerificationCodeActivity">
+
     <LinearLayout
             android:id="@+id/textView"
             android:layout_width="match_parent"
@@ -18,8 +20,8 @@
         <ImageView
                 android:id="@+id/return_image"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="25dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
                 android:src="@drawable/icon_return" />
 
         <TextView
@@ -40,36 +42,11 @@
                 app:layout_constraintVertical_bias="0.043" />
     </LinearLayout>
 
-    <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/no_account"
-            android:textColor="@color/black_three"
-            android:textSize="15sp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/imageView"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/imageView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <TextView
-            android:id="@+id/btn_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/register_title_name"
-            android:textColor="@color/blue_background"
-            android:textSize="15sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/textView2"
-            app:layout_constraintStart_toEndOf="@+id/textView2"
-            app:layout_constraintTop_toTopOf="@+id/textView2" />
-
     <LinearLayout
             android:id="@+id/phone_area_num_ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             app:layout_constraintBottom_toTopOf="@+id/login_phone_tv"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_register">
@@ -113,56 +90,61 @@
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:layout_constraintVertical_bias="0.219" />
 
-
-    <TextView
-            android:id="@+id/login_phone_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:text="@string/edit_phone"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.094"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:layout_constraintVertical_bias="0.234" />
-
-    <EditText
-            android:id="@+id/edit_user_phone"
-            android:layout_width="260dp"
-            android:layout_height="41dp"
-            android:hint="@string/please_phone_number"
-            android:inputType="phone"
-            android:maxLength="16"
-            android:maxLines="1"
-            android:textColor="@color/black_three"
-            android:textColorHint="@color/black_ee"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@+id/login_phone_tv"
-            app:layout_constraintStart_toEndOf="@+id/login_phone_tv"
-            app:layout_constraintTop_toBottomOf="@+id/phone_area_num_ly"
-            app:layout_constraintVertical_bias="1.0" />
-
-    <ImageView
-            android:id="@+id/date_phone_list"
-            android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:src="@drawable/icon_down"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/edit_user_phone"
-            app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
-            app:layout_constraintTop_toTopOf="@+id/edit_user_phone" />
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal">
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/list_phone_code"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
-            app:layout_constraintStart_toStartOf="@+id/country_code_picker"
-            app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
+        <TextView
+                android:id="@+id/login_phone_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:text="@string/edit_phone"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.094"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                app:layout_constraintVertical_bias="0.234" />
+
+        <EditText
+                android:id="@+id/edit_user_phone"
+                android:layout_width="260dp"
+                android:layout_height="41dp"
+                android:hint="@string/please_phone_number"
+                android:inputType="phone"
+                android:maxLength="16"
+                android:maxLines="1"
+                android:textColor="@color/black_three"
+                android:textColorHint="@color/black_ee"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/login_phone_tv"
+                app:layout_constraintStart_toEndOf="@+id/login_phone_tv"
+                app:layout_constraintVertical_bias="1.0" />
+
+        <ImageView
+                android:id="@+id/date_phone_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:src="@drawable/icon_down"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/edit_user_phone"
+                app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
+                app:layout_constraintTop_toTopOf="@+id/edit_user_phone" />
+
+        <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_phone_code"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
+                app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
+    </android.support.constraint.ConstraintLayout>
+
 
     <EditText
             android:id="@+id/edit_verification"
@@ -208,18 +190,18 @@
             android:id="@+id/sms_login"
             android:layout_width="320dp"
             android:layout_height="44dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="60dp"
             android:background="@drawable/btn_rec_black_c8"
+            android:layout_gravity="center_horizontal"
             android:text="@string/get_verification_code"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/edit_verification"
-            app:layout_constraintHorizontal_bias="0.484"
-            app:layout_constraintStart_toStartOf="@+id/edit_verification"
-            app:layout_constraintTop_toBottomOf="@+id/edit_verification"
-            app:layout_constraintVertical_bias="0.207" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.494"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView"
+            app:layout_constraintVertical_bias="1.0" />
 
     <TextView
             android:id="@+id/password_login"
@@ -227,9 +209,9 @@
             android:layout_height="20dp"
             android:layout_marginTop="20dp"
             android:text="@string/login_password"
-            android:visibility="gone"
             android:textColor="@color/black_six"
             android:textSize="15sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/sms_login"
             app:layout_constraintStart_toStartOf="@+id/sms_login"
             app:layout_constraintTop_toBottomOf="@+id/sms_login" />
@@ -286,4 +268,4 @@
                 app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

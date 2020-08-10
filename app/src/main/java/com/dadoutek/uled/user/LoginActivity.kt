@@ -272,11 +272,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initView() {
-        if (Constant.isDebug) {
-            login_isTeck.visibility = View.VISIBLE
-        } else {
-            login_isTeck.visibility = View.GONE
-        }
+        isDebugVisible()
+
         initToolbar()
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
@@ -408,7 +405,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             btn_login.visibility = View.VISIBLE
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
-            login_isTeck.visibility = View.VISIBLE
+            isDebugVisible()
             sms_login_btn.visibility = View.VISIBLE
             third_party_text.visibility = View.VISIBLE
             sms_password_login.visibility = View.GONE
@@ -429,7 +426,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password.visibility = View.VISIBLE
             btn_login.visibility = View.VISIBLE
             eye_btn.visibility = View.VISIBLE
-            login_isTeck.visibility = View.VISIBLE
+            isDebugVisible()
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
             login()
         }
@@ -442,6 +439,13 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
         }
+    }
+
+    private fun isDebugVisible() {
+        if (Constant.isDebug)
+            login_isTeck.visibility = View.VISIBLE
+        else
+            login_isTeck.visibility = View.GONE
     }
 
     private fun newPhoneList() {

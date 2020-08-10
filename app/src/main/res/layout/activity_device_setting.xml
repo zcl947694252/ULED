@@ -164,6 +164,7 @@
             android:layout_marginStart="@dimen/dp_10"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
+            android:min="1"
             android:padding="5dp"
             android:progress="1" />
 

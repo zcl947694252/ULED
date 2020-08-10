@@ -538,7 +538,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             super.handleMessage(msg)
 
             if (isProcessChange == 0) {
-                light_sbBrightness.progress--
+                if (light_sbBrightness.progress > 1)
+                    light_sbBrightness.progress--
                 when {
                     light_sbBrightness.progress <= 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     else -> tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
@@ -552,6 +553,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             if (light_sbBrightness.progress > 1)
                                 light_sbBrightness.progress--
                         } else
+                            if (light_sbBrightness.progress > 1)
                             light_sbBrightness.progress--
 
                         when {
@@ -604,6 +606,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             device_light_add.setImageResource(R.drawable.icon_puls)
                     }
                     else -> {//色温
+                        if (light_sbBrightness.progress > 1)
                         light_sbBrightness.progress--
                         when {
                             light_sbBrightness.progress < 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
@@ -1058,7 +1061,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun getVersion() {
         val connectDevice = TelinkApplication.getInstance().connectDevice
         if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/) {
-                val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
+            val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
                     .subscribe(
                             { s ->
                                 localVersion = s

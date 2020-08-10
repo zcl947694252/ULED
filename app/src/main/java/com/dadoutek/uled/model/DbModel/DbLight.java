@@ -24,8 +24,8 @@ public class DbLight implements Serializable {
     private int meshAddr;
     private String name;
     private String groupName;
-    private int brightness;
-    private int colorTemperature;
+    private int brightness =1;
+    private int colorTemperature= 1;
     private String macAddr;
     private int meshUUID;
     private int productUUID;
@@ -142,10 +142,14 @@ public class DbLight implements Serializable {
     }
 
     public int getColorTemperature() {
+        if (colorTemperature==0)
+            colorTemperature = 1;
         return colorTemperature;
     }
 
     public void setColorTemperature(int colorTemperature) {
+        if (colorTemperature==0)
+            colorTemperature = 1;
         this.colorTemperature = colorTemperature;
     }
 

@@ -62,7 +62,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
               countryCode = country_code_picker?.selectedCountryCode
           }*/
 
-        btn_register.setOnClickListener(this)
+        //btn_register.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         sms_login.setOnClickListener(this)
         edit_user_phone.addTextChangedListener(this)
@@ -90,57 +90,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 verificationCode()
             }
             R.id.password_login -> passwordLogin()
-            R.id.date_phone_list -> phoneList()
+            //R.id.date_phone_list -> phoneList()
         }
-    }
-
-    private fun phoneList() {
-//        if (isPhone) {
-////            list_phone_code.visibility = View.VISIBLE
-////            edit_verification.visibility = View.GONE
-////            btn_login.visibility = View.GONE
-////            eye_btn.visibility = View.GONE
-//////            btn_register.visibility=View.GONE
-////            forget_password.visibility = View.GONE
-////            sms_password_login.visibility = View.GONE
-////            third_party_text.visibility = View.GONE
-////            qq_btn.visibility = View.GONE
-////            google_btn.visibility = View.GONE
-////            facebook_btn.visibility = View.GONE
-////            val layoutmanager = LinearLayoutManager(this)
-////            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-////            rvDevice!!.layoutManager = layoutmanager
-////            this.adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
-////
-////            val decoration = DividerItemDecoration(this,
-////                    DividerItemDecoration
-////                            .VERTICAL)
-////            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-////                    .divider)))
-////            //添加分割线
-////            rvDevice?.addItemDecoration(decoration)
-////            rvDevice?.itemAnimator = DefaultItemAnimator()
-////
-//////        adapter!!.addFooterView(getFooterView())
-////            adapter!!.bindToRecyclerView(rvDevice)
-////            adapter!!.onItemChildClickListener = onItemChildClickListener
-////            isPhone = false
-////            date_phone.setImageResource(R.drawable.icon_up)
-////        } else {
-////            list_phone.visibility = View.GONE
-////            edit_user_password.visibility = View.VISIBLE
-////            btn_login.visibility = View.VISIBLE
-////            btn_register.visibility = View.VISIBLE
-////            forget_password.visibility = View.VISIBLE
-////            eye_btn.visibility = View.VISIBLE
-////            sms_password_login.visibility = View.VISIBLE
-////            third_party_text.visibility = View.VISIBLE
-////            qq_btn.visibility = View.VISIBLE
-////            google_btn.visibility = View.VISIBLE
-////            facebook_btn.visibility = View.VISIBLE
-////            isPhone = true
-////            date_phone.setImageResource(R.drawable.icon_down)
-////        }
     }
 
     private fun passwordLogin() {
