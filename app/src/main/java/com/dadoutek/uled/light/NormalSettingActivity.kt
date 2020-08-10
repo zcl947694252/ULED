@@ -279,7 +279,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
                         when {
-                            currentGroup!!.brightness <= 0 -> {
+                            currentGroup!!.brightness <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
@@ -294,7 +294,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     } else {
                         when {
-                            currentGroup!!.colorTemperature <= 0 -> {
+                            currentGroup!!.colorTemperature <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
@@ -414,7 +414,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     light_sbBrightness.isEnabled = true
                     if (isBrightness) {
                         when {
-                            lightCurrent!!.brightness <= 0 -> {
+                            lightCurrent!!.brightness <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
@@ -429,7 +429,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     } else {
                         when {
-                            lightCurrent!!.colorTemperature <= 0 -> {
+                            lightCurrent!!.colorTemperature <= 1 -> {
                                 device_light_minus.setImageResource(R.drawable.icon_minus_no)
                                 device_light_add.setImageResource(R.drawable.icon_puls)
                             }
@@ -1229,7 +1229,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             light_sbBrightness.isEnabled = true
             isSwitch = true
             when {
-                lightCurrent!!.brightness <= 0 -> {
+                lightCurrent!!.brightness <= 1 -> {
                     device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     device_light_add.setImageResource(R.drawable.icon_puls)
                 }
@@ -1531,11 +1531,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_close)
             light_sbBrightness!!.setOnTouchListener { _, _ -> true }
-            device_light_add.setImageResource(R.drawable.icon_puls_no)
-            device_light_minus.setImageResource(R.drawable.icon_minus_no)
             light_sbBrightness.isEnabled = false
+            device_light_add.setImageResource(R.drawable.icon_puls_no)
             device_light_add.setOnTouchListener { _, _ -> false }
             device_light_minus.setOnTouchListener { _, _ -> false }
+            device_light_minus.setImageResource(R.drawable.icon_minus_no)
             isSwitch = false
         } else {
             isSwitch = true

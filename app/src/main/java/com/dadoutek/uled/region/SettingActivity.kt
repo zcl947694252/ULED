@@ -379,8 +379,8 @@ class SettingActivity : BaseActivity() {
             //恢复出厂设置
             when (isResetFactory) {
                 1 -> clearData()
-                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
-                2 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
+                2 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                3 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
                     resetAllLights()
                 else
                     ToastUtils.showLong(R.string.device_not_connected)
@@ -391,9 +391,9 @@ class SettingActivity : BaseActivity() {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
-                when (isResetFactory){
-                    2->  intent.putExtra(Constant.WB_TYPE,"#user-reset")
-                    3->  intent.putExtra(Constant.WB_TYPE,"#light-reset")
+                when (isResetFactory) {
+                    2 -> intent.putExtra(Constant.WB_TYPE, "#user-reset")
+                    3 -> intent.putExtra(Constant.WB_TYPE, "#light-reset")
                 }
 
                 startActivity(intent)
