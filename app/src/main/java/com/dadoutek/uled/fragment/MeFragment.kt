@@ -66,6 +66,7 @@ import kotlinx.android.synthetic.main.fragment_me.*
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
+import com.dadoutek.uled.model.Constant.IS_ROUTE_MODE as IS_ROUTE_MODE
 
 
 /**
@@ -224,6 +225,11 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         updata?.setOnClickListener(this)
         user_reset?.setOnClickListener(this)
         save_lock_ly?.setOnClickListener(this)
+        modle_rgp.setOnCheckedChangeListener { _, checkedId ->
+            val isRouteMode = checkedId == mode_route.id
+            IS_ROUTE_MODE = isRouteMode
+            SharedPreferencesHelper.putBoolean(context,Constant.ROUTE_MODE, isRouteMode)
+        }
     }
 
     private fun initView(view: View) {
@@ -234,11 +240,15 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
-        Glide
-                .with(context!!)
+        Glide.with(context!!)
                 .load(R.drawable.ic_launcher)
                 .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .into(userIcon)
+        if (IS_ROUTE_MODE)
+            modle_rgp.check(R.id.mode_route)
+        else
+            modle_rgp.check(R.id.mode_ble)
+
         makePop()
         makePop2()
     }

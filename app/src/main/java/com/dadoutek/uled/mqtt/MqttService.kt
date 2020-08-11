@@ -1,4 +1,4 @@
-package com.dadoutek.uled
+package com.dadoutek.uled.mqtt
 
 import android.app.Service
 import android.content.Context
@@ -9,6 +9,7 @@ import android.os.IBinder
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.EncryptUtils
 import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
@@ -27,7 +28,6 @@ class MqttService : Service() {
     private val imei = com.dadoutek.uled.util.DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
     private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id ?: 0).toString() + imei).substring(8, 24) //客户端标识MD5加密一定是32位
     private var topics = "app/emit/${DBUtils.lastUser?.id}"
-
     private val host = "${Constant.HOST2}:${Constant.PORT}"
     private val passWord = EncryptUtils.encryptMD5("123456".toByteArray())
     private val userName="APP_${DBUtils.lastUser?.id ?: 0}"
@@ -57,11 +57,9 @@ class MqttService : Service() {
         override fun messageArrived(topic: String, message: MqttMessage) {
             val data = message.payload
             LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
-            val bean =Gson().fromJson(message.toString(), MqttBodyBean::class.java)
-
             val intent = Intent()
             intent.action = Constant.LOGIN_OUT
-            intent.putExtra(Constant.LOGIN_OUT, bean)
+            intent.putExtra(Constant.LOGIN_OUT, message.toString())
             TelinkLightApplication.getApp().mContext.sendBroadcast(intent)
         }
 
@@ -167,6 +165,18 @@ class MqttService : Service() {
     inner class CustomBinder : Binder() {
         val service: MqttService
             get() = this@MqttService
+    }
+
+
+    fun sendAckOfReceivingProgramsFromServer(programTaskId: Int, serId: String, extSerId: String) {
+        val cmdByteArray = byteArrayOf()
+        client?.publish("主题", cmdByteArray, 1, true)
+    }
+
+
+    fun <T> sendAck(cmd: Cmd) {
+        val cmdByteArray = byteArrayOf()
+        client?.publish("upStreamTopic", cmdByteArray, 1, true)
     }
 
 }

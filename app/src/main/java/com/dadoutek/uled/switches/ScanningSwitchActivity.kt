@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.ble.RxBleManager.initData
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
@@ -48,6 +49,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         this.mApplication = this.application as TelinkLightApplication
         mRxPermission = RxPermissions(this)
         initView()
+        initData()
         initListener()
         startScan()
     }
@@ -78,9 +80,12 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                 finish()
             }
         }
-
         retryConnectCount = 0
         isSupportInstallOldDevice = false
+    }
+
+    private fun initData() {
+
     }
 
     private fun initListener() {

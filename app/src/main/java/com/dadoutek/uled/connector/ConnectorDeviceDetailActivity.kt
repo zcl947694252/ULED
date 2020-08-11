@@ -20,6 +20,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -215,7 +216,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+        val routeBean = RouteScanResultBean()
+        routeBean.data.scanType  = DeviceType.SMART_RELAY
+        intent.putExtra(Constant.DEVICE_TYPE, routeBean)
         startActivityForResult(intent, 0)
     }
 

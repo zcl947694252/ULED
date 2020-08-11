@@ -23,6 +23,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.ItemTypeGroup
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -348,7 +349,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addCurtainDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+        val routeBean = RouteScanResultBean()
+        routeBean.data.scanType  = DeviceType.SMART_CURTAIN
+        intent.putExtra(Constant.DEVICE_TYPE, routeBean)
         startActivityForResult(intent, 0)
     }
 

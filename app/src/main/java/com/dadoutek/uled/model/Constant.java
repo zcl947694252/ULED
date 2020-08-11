@@ -18,7 +18,7 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-    public static Boolean isDebug = false;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
 
@@ -421,4 +421,9 @@ public class Constant implements Serializable {
      * 网页锚点
      */
     public static final String WB_TYPE="wb_type";
+    /**
+     * 网页锚点
+     */
+    public static final String ROUTE_MODE="ROUTE_MODE";
+    public static  Boolean IS_ROUTE_MODE=false;
 }

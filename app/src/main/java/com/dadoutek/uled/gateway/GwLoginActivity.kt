@@ -20,8 +20,10 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.HttpModel.RouteModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -280,7 +282,10 @@ class GwLoginActivity : TelinkBaseActivity(){
 
     @SuppressLint("CheckResult")
     private fun initData() {
-        dbGw = intent.getParcelableExtra("data")
+        if (Constant.IS_ROUTE_MODE)
+            dbGw =  intent.getParcelableExtra("data")
+       else
+            getScanResult()//获取路由扫描的网关
 
         val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
         if (boolean)
@@ -289,8 +294,7 @@ class GwLoginActivity : TelinkBaseActivity(){
             gw_login_skip.visibility = View.VISIBLE
 
         if (TelinkLightApplication.getApp().isConnectGwBle) {
-            getDeviceVersion(dbGw!!.meshAddr).subscribe(
-                    { s: String ->
+            getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
                         dbGw!!.version = s
                         bottom_version_number.text = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, false)
@@ -309,6 +313,21 @@ class GwLoginActivity : TelinkBaseActivity(){
 
         bottom_version_number.text = dbGw?.version
         // sendDeviceMacParmars()
+    }
+
+    private fun getScanResult() {
+        showLoadingDialog(getString(R.string.please_wait))
+        val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
+        val subscribe = RouteModel.routeScanningResult()?.subscribe({
+            timeDisposable.dispose()
+            if (it.data!=null&&it.data.data.isNotEmpty()){
+                dbGw = DbGateway()
+            }else{
+                //好像不支持网关
+            }
+        }, {
+            getScanResult()
+        })
     }
 
     private fun setWIFI() {

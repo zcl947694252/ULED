@@ -74,7 +74,7 @@
         <service
                 android:name=".service.SendLightsInfo"
                 android:enabled="true" />
-        <service android:name=".MqttService" android:enabled="true" />
+        <service android:name=".mqtt.MqttService" android:enabled="true" />
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
         <activity
                 android:name=".othersview.SelectDeviceTypeActivity"

@@ -958,4 +958,6 @@
     <string name="seven_color">RGB градиент</string>
     <string name="delete_group">Удалить группу</string>
     <string name="bluetooth_scan">Начинайте сканирование</string>
+    <string name="bluetooth_mode">蓝牙模式</string>
+    <string name="route_mode">路由模式</string>
 </resources>

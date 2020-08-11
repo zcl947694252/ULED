@@ -997,4 +997,6 @@
     <string name="seven_color">七彩渐变</string>
     <string name="delete_group">删除分组</string>
     <string name="bluetooth_scan">开始扫描</string>
+    <string name="bluetooth_mode">蓝牙模式</string>
+    <string name="route_mode">路由模式</string>
 </resources>

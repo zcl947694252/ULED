@@ -1070,5 +1070,7 @@
     <string name="seven_color">Colorful gradient</string>
     <string name="delete_group">Delete Group</string>
     <string name="bluetooth_scan">Start scan</string>
+    <string name="bluetooth_mode">Bluetooth Mode</string>
+    <string name="route_mode">Route Mode</string>
 
 </resources>

@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -413,10 +414,15 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun addDeviceLight() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
+        val routeBean = RouteScanResultBean()
+
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-            Constant.INSTALL_RGB_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+            Constant.INSTALL_NORMAL_LIGHT ->
+            routeBean.data.scanType  = DeviceType.LIGHT_NORMAL
+            Constant.INSTALL_RGB_LIGHT ->
+            routeBean.data.scanType  = DeviceType.LIGHT_RGB
         }
+        intent.putExtra(Constant.DEVICE_TYPE, routeBean)
         startActivityForResult(intent, 0)
     }
 

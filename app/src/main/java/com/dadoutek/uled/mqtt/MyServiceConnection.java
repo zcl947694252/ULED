@@ -1,4 +1,4 @@
-package com.dadoutek.uled;
+package com.dadoutek.uled.mqtt;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
@@ -8,7 +8,7 @@ import android.os.IBinder;
 public class MyServiceConnection implements ServiceConnection {
 
     private MqttService mqttService;
-    private IGetMessageCallBack IGetMessageCallBack;
+    private com.dadoutek.uled.mqtt.IGetMessageCallBack IGetMessageCallBack;
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {

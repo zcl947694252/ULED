@@ -38,13 +38,11 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.InstallDeviceModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -53,6 +51,7 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.google.gson.Gson
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -71,6 +70,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
@@ -413,8 +413,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         if (!LeBluetooth.getInstance().enable(applicationContext))
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
-       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
-           TelinkLightApplication.getApp().initStompClient()
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
@@ -627,9 +627,9 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
         filter.addAction(Constant.LOGIN_OUT)
-       //filter.addAction(Constant.GW_COMMEND_CODE)
-       //filter.addAction(Constant.CANCEL_CODE)
-       //filter.addAction(Constant.PARSE_CODE)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
+        //filter.addAction(Constant.CANCEL_CODE)
+        //filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
@@ -637,45 +637,55 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-        var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
-            //LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish解析---${codeBean?.toString()}")
-            when(codeBean.cmd){
-                1->{//单点登录
-//                    LogUtils.e("zcl_mqtt___收到登出消息${DBUtils.lastUser?.login_state_key==codeBean.loginStateKey}")
-                    val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
-                    if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
-                        loginOutMethod()
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            var jsonObject = JSONObject(msg)
+            when (val cmd = jsonObject.getInt("cmd")) {
+                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                    val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                    when (cmd) {
+                        Cmd.singleLogin -> singleDialog(codeBean)//单点登录
+                        Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
+                        Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
+                        Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
+                        Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
+                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                    }
                 }
-                2->{//推送二维码扫描解析结果
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
                 }
-                 3->{//解除授权信息
-                     val user = DBUtils.lastUser
-                     user?.let {
-                         if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
-                                 &&it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
-                             user.last_region_id = 1.toString()
-                             user.last_authorizer_user_id = user.id.toString()
-                             DBUtils.deleteAllData()
-                             AccountModel.initDatBase(it)
-                             //更新last—region-id
-                             DBUtils.saveUser(user)
-                             SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
-                         }
-                     }
-                     makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt())//2代表解除授权信息type
-                     LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+                Cmd.routeStartScann -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
                 }
-                700 -> TelinkLightApplication.getApp().offLine = false
-                701 -> TelinkLightApplication.getApp().offLine = true
-                2000->{//下发标签结果
-                    if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)
+                Cmd.routeScanDeviceInfo -> {
+                    val scanResultBean = Gson().fromJson(msg, RouteScanResultBean::class.java)
+                    receivedRouteDeviceNum(scanResultBean)
                 }
-                2500->{//推送下发控制指令结果
-                    receviedGwCmd2500M(codeBean)
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
                 }
             }
-
 /*
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -725,6 +735,35 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }*/
         }
+    }
+
+    open fun receivedRouteDeviceNum(scanResultBean: RouteScanResultBean) {
+
+    }
+
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
+    private fun unbindDialog(codeBean: MqttBodyBean) {
+        val user = DBUtils.lastUser
+        user?.let {
+            if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
+                    && it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                user.last_region_id = 1.toString()
+                user.last_authorizer_user_id = user.id.toString()
+                DBUtils.deleteAllData()
+                AccountModel.initDatBase(it)
+                //更新last—region-id
+                DBUtils.saveUser(user)
+                SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+            }
+        }
+        makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt())//2代表解除授权信息type
+        LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+    }
+
+    private fun singleDialog(codeBean: MqttBodyBean) {
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
+            loginOutMethod()
     }
 
     open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
@@ -1085,24 +1124,28 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
             R.id.search_bar -> {
                 if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                    val routeBean = RouteScanResultBean()
                     when (installId) {
                         INSTALL_NORMAL_LIGHT -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            routeBean.data.scanType = DeviceType.LIGHT_NORMAL
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_RGB_LIGHT -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            routeBean.data.scanType = DeviceType.LIGHT_RGB
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_CURTAIN -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            routeBean.data.scanType = DeviceType.SMART_CURTAIN
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
@@ -1126,14 +1169,16 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                         }
                         INSTALL_CONNECTOR -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)       //connector也叫relay
+                            routeBean.data.scanType = DeviceType.SMART_RELAY//connector也叫relay
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_GATEWAY -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            routeBean.data.scanType = DeviceType.GATE_WAY
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
@@ -1152,7 +1197,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     fun seeHelpe(webIndex: String) {
         var intent = Intent(this, InstructionsForUsActivity::class.java)
-        intent.putExtra(Constant.WB_TYPE,webIndex)
+        intent.putExtra(Constant.WB_TYPE, webIndex)
 
         startActivity(intent)
     }

@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -137,7 +138,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     else {
                         if (DBUtils.getAllRelay().size == 0) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            val routeBean = RouteScanResultBean()
+                            routeBean.data.scanType  = DeviceType.SMART_RELAY
+                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
                             startActivityForResult(intent, 0)
                         } else {
                             addDevice()

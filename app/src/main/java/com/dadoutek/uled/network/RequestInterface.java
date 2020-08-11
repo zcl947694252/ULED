@@ -689,4 +689,44 @@ public interface RequestInterface {
 
     @GET("bin/latest/version")
     Observable<Response<Map<String,Integer>>> getBinList();
+
+    /**
+     * 获取未确认扫描结果
+     * https://dev.dadoutek.com/xxxx/scan/result/get
+     * GET
+     * (从该接口开始未注明这条信息的接口不需要加region-id和authorizer-user-id)
+     * region-id : 1(例)
+     * authorizer-user-id : 300460(例)
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * 请求参数&请求地址示例&传参示例
+     * https://dev.dadoutek.com/smartlight_test/scan/result/get
+     */
+    @GET("scan/result/get")
+    Observable<RouteScanResultBean> getScanResult();
+
+    /**
+     * 请求开始扫描设备
+     * https://dev.dadoutek.com/xxxx/router/scan-device
+     * POST
+     * https://dev.dadoutek.com/smartlight_test/router/scan-device
+     * 参数名	必选	类型	说明
+     * scanType	是	int	扫描设备类型
+     * scanName	是	string	扫描设备的蓝牙名
+     * ser_id	是	string	会话id，推送中回传
+     * scanType参考
+     * 扫描普通灯 = 4
+     * 扫描彩灯 = 6
+     * 扫描蓝牙连接器 = 5
+     * 扫描窗帘 = 16
+     * 扫描开关 = 99
+     * 扫描传感器 = 98
+     *
+     * {
+     *     "scanType": 4,
+     *     "scanName": "dadousmart"
+     *     "ser_id": "app会话id，自己维护"
+     * }
+     */
+    @POST("router/scan-device")
+    Observable<Response<Long>> routeScanDevcie();
 }

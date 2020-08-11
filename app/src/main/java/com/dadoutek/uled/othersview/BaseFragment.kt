@@ -23,6 +23,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
+import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.AccountModel
@@ -32,6 +33,7 @@ import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.google.gson.Gson
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -40,6 +42,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 open class BaseFragment : Fragment() {
 
@@ -88,12 +91,17 @@ open class BaseFragment : Fragment() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-            var  codeBean =  (intent?.getSerializableExtra(Constant.LOGIN_OUT)?:"") as MqttBodyBean
-            when(codeBean.cmd){
-                2500->{//推送下发控制指令结果
-                    receviedGwCmd2500M(codeBean)
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            var jsonObject = JSONObject(msg)
+            when (val cmd = jsonObject.getInt("cmd")) {
+                Cmd.singleLogin, Cmd.parseQR,Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                    val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                    when (cmd) {
+                        Cmd.gwControlCallback-> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                    }
                 }
             }
+
 
      /*       when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {

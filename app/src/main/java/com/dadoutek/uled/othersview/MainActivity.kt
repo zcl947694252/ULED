@@ -23,12 +23,13 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import cn.smssdk.gui.util.Const
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
-import com.dadoutek.uled.IGetMessageCallBack
-import com.dadoutek.uled.MqttService
-import com.dadoutek.uled.MyServiceConnection
+import com.dadoutek.uled.mqtt.IGetMessageCallBack
+import com.dadoutek.uled.mqtt.MqttService
+import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
@@ -36,10 +37,12 @@ import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.HttpModel.RouteModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -57,6 +60,7 @@ import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.event.ServiceEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -65,6 +69,8 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
@@ -82,14 +88,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
     private lateinit var sceneFragment: SceneFragment
-
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
     private var mConnectDisposal: Disposable? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
-    private var guideShowCurrentPage = false
+    //记录用户首次点击返回键的时间
+    private var firstTime: Long = 0
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -100,15 +106,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> {
-                    }
+                    BluetoothAdapter.STATE_OFF -> { }
                 }
             }
         }
     }
-
-    //记录用户首次点击返回键的时间
-    private var firstTime: Long = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("InvalidWakeLockTag")
@@ -128,6 +130,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this,Constant.ROUTE_MODE,false)
+
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
@@ -143,7 +147,24 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.setOnClickListener {}
         initBottomNavigation()
         checkVersionAvailable()
+        showLoadingDialog(getString(R.string.please_wait))
+        getScanResult()
         getRegionList()
+    }
+
+    private fun getScanResult() {
+        val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
+        val subscribe = RouteModel.routeScanningResult()?.subscribe({
+            //status	int	状态。0扫描结束，1仍在扫描
+            if (it.data!=null&&it.data.status==1){
+                val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, it)
+                startActivity(intent)
+            }
+        }, {
+            getScanResult()
+            timeDisposable?.dispose()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

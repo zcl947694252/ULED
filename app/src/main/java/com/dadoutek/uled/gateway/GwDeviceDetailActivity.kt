@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -248,7 +249,9 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     private fun addDevice() {//添加网关
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(DEVICE_TYPE, DeviceType.GATE_WAY)
+        val routeBean = RouteScanResultBean()
+        routeBean.data.scanType  = DeviceType.GATE_WAY
+        intent.putExtra(Constant.DEVICE_TYPE, routeBean)
         startActivity(intent)
     }
 

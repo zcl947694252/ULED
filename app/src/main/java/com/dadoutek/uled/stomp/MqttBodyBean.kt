@@ -25,8 +25,15 @@ data class MqttBodyBean(
         var ser_id: String = "",
         var macAddr: String = "",
 
+        //网关控制命令下发
         var meshAddr: Int = 0,
-        var extend: Extend = Extend()
+        var extend: Extend = Extend(),
+
+        //网关离线
+        var name: String = "",
+        var productUUID: Int = 0,
+        var state: Int = 0
+
 ) : Serializable{
     override fun toString(): String {
         return "MqttBodyBean(cmd=$cmd, loginStateKey='$loginStateKey', rid=$rid, type=$type, code='$code', region_name='$region_name', ref_user_phone='$ref_user_phone', authorizer_user_id=$authorizer_user_id, authorizer_user_phone='$authorizer_user_phone', ts=$ts, msg='$msg', status=$status, ser_id='$ser_id', macAddr='$macAddr', meshAddr=$meshAddr, extend=$extend)"

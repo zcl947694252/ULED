@@ -16,8 +16,10 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
     override fun apply(response: Response<T>): T {
 
         if (response.errorCode == OK) {
-            if (response.t == null) {
-                response.t = "" as T
+            try {
+                response.t as T
+            }catch (ex:Exception){
+                ex.printStackTrace()
             }
         } else {
             var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
