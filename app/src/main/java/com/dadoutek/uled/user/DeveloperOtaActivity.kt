@@ -4,15 +4,15 @@ import android.os.Bundle
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import kotlinx.android.synthetic.main.activtiy_devloper.*
+import kotlinx.android.synthetic.main.activtiy_devloper_ota.*
 import kotlinx.android.synthetic.main.toolbar.*
 
-class DeveloperActivity : TelinkBaseActivity() {
+class DeveloperOtaActivity : TelinkBaseActivity() {
     var array: ArrayList<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activtiy_devloper)
+        setContentView(R.layout.activtiy_devloper_ota)
         initView()
         //initData()
         initListener()

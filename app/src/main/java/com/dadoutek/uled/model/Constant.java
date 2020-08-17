@@ -1,4 +1,6 @@
 package com.dadoutek.uled.model;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 
 /**
@@ -426,4 +428,7 @@ public class Constant implements Serializable {
      */
     public static final String ROUTE_MODE="ROUTE_MODE";
     public static  Boolean IS_ROUTE_MODE=false;
+    @Nullable
+    public static final String ONE_QR="one_qr";
+    public static final String AUXFUN_IS_OPEN="AUXFUN_IS_OPEN";
 }

@@ -1,14 +1,18 @@
 package com.dadoutek.uled.util;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.provider.Settings;
-import android.widget.TextView;
+import android.text.BidiFormatter;
+import android.text.TextDirectionHeuristics;
+import android.text.TextUtils;
+import android.view.View;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class NetWorkUtils {
     /**
@@ -38,4 +42,33 @@ public class NetWorkUtils {
         }
         return false;
     }
+
+    public static String getTimeZone(){
+        Calendar mDummyDate;
+        mDummyDate = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        mDummyDate.setTimeZone(now.getTimeZone());
+        mDummyDate.set(now.get(Calendar.YEAR), 11, 31, 13, 0, 0);
+        return getTimeZoneText(now.getTimeZone(),true);
+    }
+
+    public static String getTimeZoneText(TimeZone tz, boolean includeName) {
+        Date now = new Date();
+
+        SimpleDateFormat gmtFormatter = new SimpleDateFormat("ZZZZ");
+        gmtFormatter.setTimeZone(tz);
+        String gmtString = gmtFormatter.format(now);
+        BidiFormatter bidiFormatter = BidiFormatter.getInstance();
+        Locale l = Locale.getDefault();
+        boolean isRtl = TextUtils.getLayoutDirectionFromLocale(l) == View.LAYOUT_DIRECTION_RTL;
+        gmtString = bidiFormatter.unicodeWrap(gmtString,
+                isRtl ? TextDirectionHeuristics.RTL : TextDirectionHeuristics.LTR);
+
+        if (!includeName) {
+            return gmtString;
+        }
+
+        return gmtString;
+    }
+
 }

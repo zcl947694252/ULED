@@ -3,12 +3,12 @@ package com.dadoutek.uled.model.DbModel;
 import com.google.gson.annotations.Expose;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -56,14 +56,15 @@ public class DbGroup implements Serializable{
     public int deviceCount = 0;
     public int slowUpSlowDownStatus = 0;//1开0关;
     public int slowUpSlowDownSpeed = 1; //慢中快 1-3-5
+    public  String routerName;
+    public  String routerId;
 
 
-
-    @Generated(hash = 1331076635)
+    @Generated(hash = 1075427773)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, int belongRegionId, Long deviceType, int index,
             int color, int status, int slowUpSlowDownStatus,
-            int slowUpSlowDownSpeed) {
+            int slowUpSlowDownSpeed, String routerName, String routerId) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -76,6 +77,8 @@ public class DbGroup implements Serializable{
         this.status = status;
         this.slowUpSlowDownStatus = slowUpSlowDownStatus;
         this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
+        this.routerName = routerName;
+        this.routerId = routerId;
     }
 
     @Generated(hash = 1966413977)
@@ -270,6 +273,22 @@ public class DbGroup implements Serializable{
                 ", slowUpSlowDownStatus=" + slowUpSlowDownStatus +
                 ", slowUpSlowDownSpeed=" + slowUpSlowDownSpeed +
                 '}';
+    }
+
+    public String getRouterName() {
+        return this.routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public String getRouterId() {
+        return this.routerId;
+    }
+
+    public void setRouterId(String routerId) {
+        this.routerId = routerId;
     }
 
 }

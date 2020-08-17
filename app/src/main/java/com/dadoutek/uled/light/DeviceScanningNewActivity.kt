@@ -34,7 +34,7 @@ import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DbModel.DBUtils.lastRegion
 import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.HttpModel.GwModel
-import com.dadoutek.uled.model.HttpModel.RouteModel
+import com.dadoutek.uled.model.HttpModel.RouterModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
@@ -1118,7 +1118,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startScan() {
         if (Constant.IS_ROUTE_MODE) {
             //发送命令
-            RouteModel.routeStartScan()?.subscribe({
+            RouterModel.routeStartScan()?.subscribe({
                 routeScanTimeoutTime = it
                 startAnimation()
                 startRouteTimer()

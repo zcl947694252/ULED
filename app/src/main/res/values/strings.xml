@@ -1072,5 +1072,22 @@
     <string name="bluetooth_scan">Start scan</string>
     <string name="bluetooth_mode">Bluetooth Mode</string>
     <string name="route_mode">Route Mode</string>
+    <string name="work_mode">Work Mode</string>
+    <string name="bind_reouter">Bind router</string>
+    <string name="please_select_router">Please select a router</string>
+    <string name="please_select_sw_at_leaset">Please select at least one switch</string>
+    <string name="please_select_sensor_at_leaset">Please select at least one sensor</string>
+    <string name="router">Router</string>
+    <string name="qr_not_null">One-dimensional code cannot be empty</string>
+    <string name="routing_network">Router access</string>
+    <string name="please_check_device_code">Please check the equipment code:</string>
+    <string name="router_offline">Router offline</string>
+    <string name="router_added">The router has been added</string>
+    <string name="route_code_error">The router has been added that the device code is not a router device code, please contact the supplier that the device code is not a router device code, please contact the supplier</string>
+    <string name="route_other_add">The router has been added by others</string>
+    <string name="device_code_cannot_be_empty">The router device code cannot be empty</string>
+    <string name="router_access_in_fail">The router failed to connect</string>
+    <string name="router_access_in_success">The router has successfully connected</string>
+    <string name="auxfun">Auxfun</string>
 
 </resources>

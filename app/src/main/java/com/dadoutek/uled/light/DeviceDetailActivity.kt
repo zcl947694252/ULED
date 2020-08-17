@@ -35,7 +35,6 @@ import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
-import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils

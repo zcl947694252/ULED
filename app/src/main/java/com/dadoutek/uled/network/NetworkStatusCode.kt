@@ -208,6 +208,14 @@ object NetworkStatusCode {
 
     //服务崩溃 502
     const val ERROR_SERVER_CRASH= 502
+    //路由未上线 90001
+    const val ROUTER_OFFLINE= 90001
+    //该设备不是路由设备，请联系生产方 90010
+    const val ROUTER_NOT_RIGHT= 90010
+    //路由已添加 90002
+    const val ROUTER_IS_EXITE= 90002
+    //路由已被其他人添加，你不能添加
+    const val ROUTER_OTHER_ADD= 90003
 
     /**
      * 请求成功处理: 0

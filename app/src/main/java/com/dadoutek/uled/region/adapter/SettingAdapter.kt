@@ -5,10 +5,12 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.region.bean.SettingItemBean
 
-class SettingAdapter(layoutResId: Int, data: MutableList<SettingItemBean>) : BaseQuickAdapter<SettingItemBean,BaseViewHolder>(layoutResId, data){
+class SettingAdapter(layoutResId: Int, data: MutableList<SettingItemBean>,var isSetting: Boolean = false) : BaseQuickAdapter<SettingItemBean,BaseViewHolder>(layoutResId, data){
     override fun convert(helper: BaseViewHolder?, item: SettingItemBean?) {
         helper!!.setImageResource(R.id.item_setting_icon, item!!.icon)
                 .setText(R.id.item_setting_text,item.title)
+            if (isSetting){
 
+            }
     }
 }

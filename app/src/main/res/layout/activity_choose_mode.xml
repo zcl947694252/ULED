@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+<include layout="@layout/toolbar"/>
+    <LinearLayout
+            android:id="@+id/choose_mode_ble"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/white"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center">
+
+        <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="11dp"
+                android:src="@drawable/icon_bluetooth" />
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="@string/bluetooth_mode"
+                android:textColor="@color/black_e"
+                android:textSize="13sp" />
+
+        <ImageView
+                android:id="@+id/choose_mode_ble_iv"
+                android:padding="@dimen/dp_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/choice_on" />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/choose_mode_router"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/white"
+            android:layout_marginTop="@dimen/dp_10"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center">
+
+        <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="11dp"
+                android:src="@drawable/icon_cloud" />
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="@string/route_mode"
+                android:textColor="@color/black_e"
+                android:textSize="13sp" />
+
+        <ImageView
+                android:id="@+id/choose_mode_router_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:padding="@dimen/dp_5"
+                android:src="@drawable/choice_off" />
+    </LinearLayout>
+
+</LinearLayout>

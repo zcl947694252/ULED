@@ -37,7 +37,6 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * 创建者     zcl

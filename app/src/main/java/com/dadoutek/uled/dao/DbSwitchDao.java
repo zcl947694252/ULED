@@ -41,8 +41,11 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
         public final static Property IsMostNew = new Property(15, boolean.class, "isMostNew", false, "IS_MOST_NEW");
         public final static Property BoundMac = new Property(16, String.class, "boundMac", false, "BOUND_MAC");
-        public final static Property IsSupportOta = new Property(17, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property Type = new Property(18, int.class, "type", false, "TYPE");
+        public final static Property RouterName = new Property(17, String.class, "routerName", false, "ROUTER_NAME");
+        public final static Property RouterId = new Property(18, long.class, "routerId", false, "ROUTER_ID");
+        public final static Property IsChecked = new Property(19, Boolean.class, "isChecked", false, "IS_CHECKED");
+        public final static Property IsSupportOta = new Property(20, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Type = new Property(21, int.class, "type", false, "TYPE");
     }
 
 
@@ -75,8 +78,11 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"VERSION\" TEXT," + // 14: version
                 "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 15: isMostNew
                 "\"BOUND_MAC\" TEXT," + // 16: boundMac
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 17: isSupportOta
-                "\"TYPE\" INTEGER NOT NULL );"); // 18: type
+                "\"ROUTER_NAME\" TEXT," + // 17: routerName
+                "\"ROUTER_ID\" INTEGER NOT NULL ," + // 18: routerId
+                "\"IS_CHECKED\" INTEGER," + // 19: isChecked
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 20: isSupportOta
+                "\"TYPE\" INTEGER NOT NULL );"); // 21: type
     }
 
     /** Drops the underlying database table. */
@@ -149,8 +155,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (boundMac != null) {
             stmt.bindString(17, boundMac);
         }
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getType());
+ 
+        String routerName = entity.getRouterName();
+        if (routerName != null) {
+            stmt.bindString(18, routerName);
+        }
+        stmt.bindLong(19, entity.getRouterId());
+ 
+        Boolean isChecked = entity.getIsChecked();
+        if (isChecked != null) {
+            stmt.bindLong(20, isChecked ? 1L: 0L);
+        }
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(22, entity.getType());
     }
 
     @Override
@@ -217,8 +234,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (boundMac != null) {
             stmt.bindString(17, boundMac);
         }
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getType());
+ 
+        String routerName = entity.getRouterName();
+        if (routerName != null) {
+            stmt.bindString(18, routerName);
+        }
+        stmt.bindLong(19, entity.getRouterId());
+ 
+        Boolean isChecked = entity.getIsChecked();
+        if (isChecked != null) {
+            stmt.bindLong(20, isChecked ? 1L: 0L);
+        }
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(22, entity.getType());
     }
 
     @Override
@@ -246,8 +274,11 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
             cursor.getShort(offset + 15) != 0, // isMostNew
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // boundMac
-            cursor.getShort(offset + 17) != 0, // isSupportOta
-            cursor.getInt(offset + 18) // type
+            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // routerName
+            cursor.getLong(offset + 18), // routerId
+            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // isChecked
+            cursor.getShort(offset + 20) != 0, // isSupportOta
+            cursor.getInt(offset + 21) // type
         );
         return entity;
     }
@@ -271,8 +302,11 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
         entity.setIsMostNew(cursor.getShort(offset + 15) != 0);
         entity.setBoundMac(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
-        entity.setIsSupportOta(cursor.getShort(offset + 17) != 0);
-        entity.setType(cursor.getInt(offset + 18));
+        entity.setRouterName(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
+        entity.setRouterId(cursor.getLong(offset + 18));
+        entity.setIsChecked(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 20) != 0);
+        entity.setType(cursor.getInt(offset + 21));
      }
     
     @Override

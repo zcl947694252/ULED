@@ -23,7 +23,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import cn.smssdk.gui.util.Const
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
@@ -42,7 +41,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.model.HttpModel.RouteModel
+import com.dadoutek.uled.model.HttpModel.RouterModel
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -69,7 +68,6 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -154,7 +152,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun getScanResult() {
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouteModel.routeScanningResult()?.subscribe({
+        val subscribe = RouterModel.routeScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
             if (it.data!=null&&it.data.status==1){
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)

@@ -14,6 +14,7 @@ class DeviceTypeRecycleViewAdapter(layoutResId: Int, data: List<DeviceItem>?) : 
 
     override fun convert(helper: BaseViewHolder, item: DeviceItem?) {
        helper.setText(R.id.template_device_num, TelinkLightApplication.getApp().getString(R.string.number)+":${item?.number}")
+               .setVisible(R.id.template_gp_name, false)
         helper.setText(R.id.template_device_group_name, item?.name)
 
         val deviceNum = helper.getView<TextView>(R.id.template_device_num)

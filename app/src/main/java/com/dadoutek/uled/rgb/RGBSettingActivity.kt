@@ -2020,127 +2020,137 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
          * 亮度白光监听
          */
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
-            var addr: Int = if (currentShowGroupSetPage) {
-                group!!.meshAddr
-            } else {
-                light!!.meshAddr
+            var addr: Int = when {
+                currentShowGroupSetPage -> group!!.meshAddr
+                else -> light!!.meshAddr
             }
 
             var opcode: Byte
             var params: ByteArray
             var brightness = 1
             var w = 1
-            if (view == sbBrightness) {
-                brightness = if (progress > Constant.MAX_VALUE) {
-                    Constant.MAX_VALUE
-                } else {
-                    /*if (progress>0) */progress /*else 1*/
-                }
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(brightness.toByte())
-                if (currentShowGroupSetPage) {
-                    group!!.brightness = progress
+            when (view) {
+                sbBrightness -> {
+                    brightness = when {
+                        progress > Constant.MAX_VALUE -> Constant.MAX_VALUE
+                        else -> /*if (progress>0) */progress
+                    } /*else 1*/
+
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(brightness.toByte())
                     when {
-                        group!!.brightness >= 100 -> {
-                            sbBrightness_add.isEnabled = false
-                            sbBrightness_less.isEnabled = true
-                        }
-                        group!!.brightness <= 1 -> {
-                            sbBrightness_less.isEnabled = false
-                            sbBrightness_add.isEnabled = true
+                        currentShowGroupSetPage -> {
+                            group!!.brightness = progress
+                            when {
+                                group!!.brightness >= 100 -> {
+                                    sbBrightness_add.isEnabled = false
+                                    sbBrightness_less.isEnabled = true
+                                }
+                                group!!.brightness <= 1 -> {
+                                    sbBrightness_less.isEnabled = false
+                                    sbBrightness_add.isEnabled = true
+                                }
+                                else -> {
+                                    sbBrightness_less.isEnabled = true
+                                    sbBrightness_add.isEnabled = true
+                                }
+                            }
                         }
                         else -> {
-                            sbBrightness_less.isEnabled = true
-                            sbBrightness_add.isEnabled = true
+                            light!!.brightness = progress
+                            when {
+                                light!!.brightness >= 100 -> {
+                                    sbBrightness_add.isEnabled = false
+                                    sbBrightness_less.isEnabled = true
+                                }
+                                light!!.brightness <= 1 -> {
+                                    sbBrightness_less.isEnabled = false
+                                    sbBrightness_add.isEnabled = true
+                                }
+                                else -> {
+                                    sbBrightness_less.isEnabled = true
+                                    sbBrightness_add.isEnabled = true
+                                }
+                            }
                         }
                     }
-                } else {
-                    light!!.brightness = progress
+
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+
                     when {
-                        light!!.brightness >= 100 -> {
-                            sbBrightness_add.isEnabled = false
-                            sbBrightness_less.isEnabled = true
-                        }
-                        light!!.brightness <= 1 -> {
-                            sbBrightness_less.isEnabled = false
-                            sbBrightness_add.isEnabled = true
-                        }
-                        else -> {
-                            sbBrightness_less.isEnabled = true
-                            sbBrightness_add.isEnabled = true
+                        stopTracking -> {
+                            if (currentShowGroupSetPage) {
+                                DBUtils.updateGroup(group!!)
+                                updateLights(progress, "brightness", group!!)
+                            } else {
+                                DBUtils.updateLight(light!!)
+                            }
                         }
                     }
                 }
-
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
-
-                if (stopTracking) {
-                    if (currentShowGroupSetPage) {
-                        DBUtils.updateGroup(group!!)
-                        updateLights(progress, "brightness", group!!)
+                sb_w_bright -> {
+                    opcode = Opcode.SET_W_LUM
+                    w = if (progress > Constant.MAX_VALUE) {
+                        Constant.MAX_VALUE
                     } else {
-                        DBUtils.updateLight(light!!)
+                        /* if (progress>0) */progress /*else 1*/
                     }
-                }
-            } else if (view == sb_w_bright) {
-                opcode = Opcode.SET_W_LUM
-                w = if (progress > Constant.MAX_VALUE) {
-                    Constant.MAX_VALUE
-                } else {
-                    /* if (progress>0) */progress /*else 1*/
-                }
-                params = byteArrayOf(w.toByte())
-                var color: Int
-                if (currentShowGroupSetPage) {
-                    color = group?.color!!
+                    params = byteArrayOf(w.toByte())
+                    var color: Int
                     when {
-                        progress >= 100 -> {
-                            sb_w_bright_add.isEnabled = false
-                            sb_w_bright_less.isEnabled = true
-                        }
-                        progress <= 1 -> {
-                            sb_w_bright_less.isEnabled = false
-                            sb_w_bright_add.isEnabled = true
+                        currentShowGroupSetPage -> {
+                            color = group?.color!!
+                            when {
+                                progress >= 100 -> {
+                                    sb_w_bright_add.isEnabled = false
+                                    sb_w_bright_less.isEnabled = true
+                                }
+                                progress <= 1 -> {
+                                    sb_w_bright_less.isEnabled = false
+                                    sb_w_bright_add.isEnabled = true
+                                }
+                                else -> {
+                                    sb_w_bright_add.isEnabled = true
+                                    sb_w_bright_less.isEnabled = true
+                                }
+                            }
                         }
                         else -> {
-                            sb_w_bright_add.isEnabled = true
-                            sb_w_bright_less.isEnabled = true
+                            color = light?.color!!
+                            when {
+                                progress >= 100 -> {
+                                    sb_w_bright_add.isEnabled = false
+                                    sb_w_bright_less.isEnabled = true
+                                }
+                                progress <= 1 -> {
+                                    sb_w_bright_less.isEnabled = false
+                                    sb_w_bright_add.isEnabled = true
+                                }
+                                else -> {
+                                    sb_w_bright_add.isEnabled = true
+                                    sb_w_bright_less.isEnabled = true
+                                }
+                            }
                         }
                     }
-                } else {
-                    color = light?.color!!
-                    when {
-                        progress >= 100 -> {
-                            sb_w_bright_add.isEnabled = false
-                            sb_w_bright_less.isEnabled = true
-                        }
-                        progress <= 1 -> {
-                            sb_w_bright_less.isEnabled = false
-                            sb_w_bright_add.isEnabled = true
-                        }
-                        else -> {
-                            sb_w_bright_add.isEnabled = true
-                            sb_w_bright_less.isEnabled = true
-                        }
-                    }
-                }
 
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
-                if (stopTracking) {
-                    val red = (color and 0xff0000) shr 16
-                    val green = (color and 0x00ff00) shr 8
-                    val blue = color and 0x0000ff
-                    if (currentShowGroupSetPage) {
-                        group?.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
-                    } else {
-                        light?.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
-                    }
-                    if (currentShowGroupSetPage) {
-                        DBUtils.updateGroup(group!!)
-                        updateLights(progress, "colorTemperature", group!!)
-                    } else {
-                        DBUtils.updateLight(light!!)
+                    if (stopTracking) {
+                        val red = (color and 0xff0000) shr 16
+                        val green = (color and 0x00ff00) shr 8
+                        val blue = color and 0x0000ff
+                        if (currentShowGroupSetPage) {
+                            group?.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
+                        } else {
+                            light?.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
+                        }
+                        if (currentShowGroupSetPage) {
+                            DBUtils.updateGroup(group!!)
+                            updateLights(progress, "colorTemperature", group!!)
+                        } else {
+                            DBUtils.updateLight(light!!)
+                        }
                     }
                 }
             }
@@ -2363,7 +2373,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
         val params: ByteArray = byteArrayOf(brightness.toByte())
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
     }
 
     private fun sendColorMsg(color: Int) {

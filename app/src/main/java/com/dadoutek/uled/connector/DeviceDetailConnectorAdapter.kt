@@ -1,14 +1,18 @@
 package com.dadoutek.uled.connector
 
+import android.content.SharedPreferences
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.SharedPreferencesUtils
 
 class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
     private var isDelete: Boolean = false
@@ -35,7 +39,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)
-                    .setVisible(R.id.template_gp_name, false)
+                    .setVisible(R.id.template_gp_name, SharedPreferencesHelper.getBoolean(mContext,Constant.AUXFUN_IS_OPEN,false))
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .setImageResource(R.id.template_device_icon, dbConnector.icon)
                     .addOnClickListener(R.id.template_device_icon)

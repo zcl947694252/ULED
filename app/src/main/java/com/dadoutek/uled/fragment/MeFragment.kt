@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context.POWER_SERVICE
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.*
@@ -47,12 +46,13 @@ import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.UserAgreementActivity
+import com.dadoutek.uled.region.DeveloperActivity
 import com.dadoutek.uled.region.NetworkActivity
-import com.dadoutek.uled.region.SettingActivity
-import com.dadoutek.uled.stomp.MqttManger
+import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.ChooseModeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.user.DeveloperActivity
+import com.dadoutek.uled.user.DeveloperOtaActivity
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -66,7 +66,6 @@ import kotlinx.android.synthetic.main.fragment_me.*
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
-import com.dadoutek.uled.model.Constant.IS_ROUTE_MODE as IS_ROUTE_MODE
 
 
 /**
@@ -179,7 +178,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         else
             200
 
-        b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
+//        if (IS_ROUTE_MODE)
+//            work_mode_tv.text = getString(R.string.route_mode)
+//        else
+//            work_mode_tv.text = getString(R.string.bluetooth_mode)
 
         makePop()
     }
@@ -225,18 +227,13 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         updata?.setOnClickListener(this)
         user_reset?.setOnClickListener(this)
         save_lock_ly?.setOnClickListener(this)
-        modle_rgp.setOnCheckedChangeListener { _, checkedId ->
-            val isRouteMode = checkedId == mode_route.id
-            IS_ROUTE_MODE = isRouteMode
-            SharedPreferencesHelper.putBoolean(context,Constant.ROUTE_MODE, isRouteMode)
-        }
+        modle_chose?.setOnClickListener(this)
+        bind_router?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
-
-        setting.visibility = View.GONE
 
         userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
@@ -244,10 +241,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 .load(R.drawable.ic_launcher)
                 .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .into(userIcon)
-        if (IS_ROUTE_MODE)
-            modle_rgp.check(R.id.mode_route)
-        else
-            modle_rgp.check(R.id.mode_ble)
+
 
         makePop()
         makePop2()
@@ -271,7 +265,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE,"#user-reset")
+                intent.putExtra(Constant.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
 
@@ -357,7 +351,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE,"")
+                intent.putExtra(Constant.WB_TYPE, "")
                 startActivity(intent)
             }
 
@@ -412,11 +406,19 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.developer -> {
-                var intent = Intent(activity, DeveloperActivity::class.java)
+                var intent = Intent(activity, DeveloperOtaActivity::class.java)
                 startActivity(intent)
             }
             R.id.save_lock_ly -> {
                 var intent = Intent(activity, SafeLockActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.modle_chose -> {
+                var intent = Intent(activity, ChooseModeActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.bind_router -> {
+                var intent = Intent(activity, BindRouterActivity::class.java)
                 startActivity(intent)
             }
             R.id.setting -> {
@@ -441,7 +443,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-            var intent = Intent(activity, SettingActivity::class.java)
+            var intent = Intent(activity, DeveloperActivity::class.java)
             startActivity(intent)
         }
     }
@@ -598,7 +600,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 TmtUtils.midToastLong(activity, getString(R.string.developer_mode_close))
 
             if (SharedPreferencesUtils.isDeveloperModel()) {
-                startActivity(Intent(context, DeveloperActivity::class.java))
+                startActivity(Intent(context, DeveloperOtaActivity::class.java))
                 developer.visibility = View.VISIBLE
             } else
                 developer.visibility = View.GONE

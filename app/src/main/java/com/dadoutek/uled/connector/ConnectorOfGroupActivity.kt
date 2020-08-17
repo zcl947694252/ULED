@@ -17,8 +17,6 @@ import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
-import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -48,7 +46,6 @@ import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.*
 import com.telink.util.Event

@@ -32,7 +32,10 @@ public class DbSensor implements Serializable {
     private int setType = 1; //0代表群组模式 1代表场景模式
     private int sceneId = 0; //场景id
     private String boundMac ="";
-
+    @NotNull
+    public  boolean isSelected  =false;
+    public  String routerName ="";
+    public Boolean isChecked;
     public String getBoundMac() {
         return boundMac;
     }
@@ -56,11 +59,12 @@ public class DbSensor implements Serializable {
     public boolean isSupportOta =true;
 
 
-    @Generated(hash = 193683612)
+    @Generated(hash = 474504528)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId, String version,
             int rssi, int openTag, int setType, int sceneId, String boundMac,
-            boolean isMostNew, boolean isSupportOta) {
+            boolean isSelected, String routerName, Boolean isChecked, boolean isMostNew,
+            boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -75,6 +79,9 @@ public class DbSensor implements Serializable {
         this.setType = setType;
         this.sceneId = sceneId;
         this.boundMac = boundMac;
+        this.isSelected = isSelected;
+        this.routerName = routerName;
+        this.isChecked = isChecked;
         this.isMostNew = isMostNew;
         this.isSupportOta = isSupportOta;
     }
@@ -230,5 +237,29 @@ public class DbSensor implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public boolean getIsSelected() {
+        return this.isSelected;
+    }
+
+    public void setIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
+
+    public String getRouterName() {
+        return this.routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public Boolean getIsChecked() {
+        return this.isChecked;
+    }
+
+    public void setIsChecked(Boolean isChecked) {
+        this.isChecked = isChecked;
     }
 }

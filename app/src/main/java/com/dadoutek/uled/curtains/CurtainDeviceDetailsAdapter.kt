@@ -48,7 +48,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
                     .addOnClickListener(R.id.template_device_icon)
                     .addOnClickListener(R.id.template_device_card_delete)
                     .setVisible(R.id.template_device_card_delete,isDelete)
-                    .setVisible(R.id.template_gp_name,false)
+                    .setVisible(R.id.template_gp_name,true)
                     .setText(R.id.template_gp_name, DBUtils.getGroupNameByID(dbCurtain.belongGroupId))
         }
     }

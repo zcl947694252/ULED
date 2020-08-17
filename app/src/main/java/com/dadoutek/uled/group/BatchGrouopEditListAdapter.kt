@@ -17,13 +17,16 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbGroup
 
-class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
+class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
         val tv = helper.getView<TextView>(R.id.template_device_batch_title_blow)
         tv.visibility = View.GONE
         helper.setText(R.id.template_device_batch_title, item.name)
-                .setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
+        if (isRouterBind)
+                helper.setText(R.id.template_device_batch_title_blow, item.routerName)
+            else
+                helper.setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
         if (item.isCheckedInGroup) {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)

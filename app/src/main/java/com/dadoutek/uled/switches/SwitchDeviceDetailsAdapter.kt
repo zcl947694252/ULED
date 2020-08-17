@@ -27,9 +27,8 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,interna
 //            helper.setText(R.id.name, StringUtils.getSwitchName(dbSwitch))
 //                    .setVisible(R.id.name,false)
 
-            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch_device)
-            helper
-            .setVisible(R.id.template_device_card_delete,isDelete)
+            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch)
+            helper.setVisible(R.id.template_device_card_delete,isDelete)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)

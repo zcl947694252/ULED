@@ -20,10 +20,9 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.RouteModel
+import com.dadoutek.uled.model.HttpModel.RouterModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -56,8 +55,10 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $
  * 更新描述
  */
-class GwLoginActivity : TelinkBaseActivity(){
-    private  var receiver: GwBrocasetReceiver? = null
+class GwLoginActivity : TelinkBaseActivity() {
+    private var isRouter: Boolean = false
+    private var mac: String? = null
+    private var receiver: GwBrocasetReceiver? = null
     private var disposableTimer: Disposable? = null
     private var dbGw: DbGateway? = null
 
@@ -66,7 +67,7 @@ class GwLoginActivity : TelinkBaseActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gw_login)
 
-         receiver = GwBrocasetReceiver()
+        receiver = GwBrocasetReceiver()
         val filter = IntentFilter()
         filter.addAction(LightService.ACTION_STATUS_CHANGED)
         registerReceiver(receiver, filter)
@@ -147,9 +148,19 @@ class GwLoginActivity : TelinkBaseActivity(){
             } else {
                 // sendWIFIParmars("Dadou", "Dadoutek2018")
                 showLoadingDialog(getString(R.string.config_setting_gw_wifi))
-                sendWIFIParmars(account, pwd)
+                if (isRouter)
+                    sendRouterWifi()
+                 else
+                    sendWIFIParmars(account, pwd)
             }
         }
+    }
+
+    /**
+     * 配置路由器wifi
+     */
+    private fun sendRouterWifi() {
+
     }
 
     private fun skipEvent() {
@@ -248,8 +259,8 @@ class GwLoginActivity : TelinkBaseActivity(){
                 //11-18 11位labelId
                 val offset = i * 8
                 val bytesArray = listParmars[i]
-                var params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0],
-                        bytesArray[1], bytesArray[2], bytesArray[3], bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
+                var params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0], bytesArray[1], bytesArray[2], bytesArray[3],
+                        bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
 
                 if (isPwd) {
                     LogUtils.v("zcl----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
@@ -280,49 +291,60 @@ class GwLoginActivity : TelinkBaseActivity(){
         return list
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("CheckResult")
     private fun initData() {
-        if (Constant.IS_ROUTE_MODE)
-            dbGw =  intent.getParcelableExtra("data")
-       else
-            getScanResult()//获取路由扫描的网关
+        isRouter = intent.getBooleanExtra("is_router", false)
+        when {
+            isRouter -> {
+                mac = intent.getStringExtra("mac")
 
-        val boolean = SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
-        if (boolean)
-            gw_login_skip.visibility = View.GONE
-        else
-            gw_login_skip.visibility = View.VISIBLE
+                LogUtils.v("zcl路由器-----------$mac-------")
+            }
+            else -> {
+                if (TelinkLightApplication.getApp().isConnectGwBle)
+                    sendTimeZoneParmars()
 
-        if (TelinkLightApplication.getApp().isConnectGwBle) {
-            getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
+                if (Constant.IS_ROUTE_MODE)
+                    dbGw = intent.getParcelableExtra("data")
+                else
+                    getScanResult()//获取路由扫描的网关
+
+                if (SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false))
+                    gw_login_skip.visibility = View.GONE
+                else
+                    gw_login_skip.visibility = View.VISIBLE
+
+                if (TelinkLightApplication.getApp().isConnectGwBle) {
+                    getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
                         dbGw!!.version = s
                         bottom_version_number.text = dbGw?.version
                         DBUtils.saveGateWay(dbGw!!, false)
                     }, {
-                ToastUtils.showLong(getString(R.string.get_version_fail))
-            })
+                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                    })
+                }
+                bottom_version_number.text = dbGw?.version
+                // sendDeviceMacParmars()
+            }
         }
         setWIFI()
-
-        val disposable = RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
+        RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread())
                 .subscribe({
                     if (it) setWIFI()
                 }, { LogUtils.d(it) })
-
-        bottom_version_number.text = dbGw?.version
-        // sendDeviceMacParmars()
     }
 
     private fun getScanResult() {
         showLoadingDialog(getString(R.string.please_wait))
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouteModel.routeScanningResult()?.subscribe({
+        val subscribe = RouterModel.routeScanningResult()?.subscribe({
             timeDisposable.dispose()
-            if (it.data!=null&&it.data.data.isNotEmpty()){
+            if (it.data != null && it.data.data.isNotEmpty()) {
                 dbGw = DbGateway()
-            }else{
+            } else {
                 //好像不支持网关
             }
         }, {
@@ -347,7 +369,6 @@ class GwLoginActivity : TelinkBaseActivity(){
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun initView() {
         disableConnectionStatusListener()
         toolbarTv.text = getString(R.string.config_net)
@@ -355,18 +376,12 @@ class GwLoginActivity : TelinkBaseActivity(){
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        if (TelinkLightApplication.getApp().isConnectGwBle)
-            sendTimeZoneParmars()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
         disposableTimer?.dispose()
-    }
-
-    override fun receviedGwCmd2000(serId: String) {
-
     }
 }
 

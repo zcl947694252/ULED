@@ -1,11 +1,9 @@
 package com.dadoutek.uled.region
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
-import android.provider.Settings
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearLayoutManager.VERTICAL
 import android.text.SpannableString
@@ -67,7 +65,7 @@ import java.util.concurrent.TimeUnit
  * 更新者     $Author$
  * 更新时间   $Date$
  */
-class SettingActivity : BaseActivity() {
+class DeveloperActivity : BaseActivity() {
     override fun setLayoutID(): Int {
         this.mApplication = this.application as TelinkLightApplication
         return R.layout.activity_setting
@@ -330,7 +328,7 @@ class SettingActivity : BaseActivity() {
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
             override fun onNext(s: String) {
                 LogUtils.e("zcl-----------$s")
-                SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
                 CleanUtils.cleanExternalCache()
@@ -379,7 +377,7 @@ class SettingActivity : BaseActivity() {
             //恢复出厂设置
             when (isResetFactory) {
                 1 -> clearData()
-                3 -> startActivity(Intent(this@SettingActivity, PhysicalRecoveryActivity::class.java))
+                3 -> startActivity(Intent(this@DeveloperActivity, PhysicalRecoveryActivity::class.java))
                 2 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
                     resetAllLights()
                 else
@@ -390,7 +388,7 @@ class SettingActivity : BaseActivity() {
 
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
+                var intent = Intent(this@DeveloperActivity, InstructionsForUsActivity::class.java)
                 when (isResetFactory) {
                     2 -> intent.putExtra(Constant.WB_TYPE, "#user-reset")
                     3 -> intent.putExtra(Constant.WB_TYPE, "#light-reset")
@@ -449,12 +447,12 @@ class SettingActivity : BaseActivity() {
         }
 
         Commander.resetAllDevices(meshAdre, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.DELETEING, false)
             syncData()
-            this@SettingActivity.bnve?.currentItem = 0
+            this@DeveloperActivity.bnve?.currentItem = 0
             null
         }, {
-            SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
+            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.DELETEING, false)
             null
         })
         if (meshAdre.isEmpty()) {
@@ -464,7 +462,7 @@ class SettingActivity : BaseActivity() {
 
 
     private fun syncData() {
-        SyncDataPutOrGetUtils.syncPutDataStart(this@SettingActivity!!, object : SyncCallback {
+        SyncDataPutOrGetUtils.syncPutDataStart(this@DeveloperActivity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()
                 //时间太短会导致无法删除数据库数据故此设置1500秒

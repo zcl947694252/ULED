@@ -125,6 +125,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
     val INSTALL_GATEWAY = 6
+    val INSTALL_ROUTER = 7
     var isGuide: Boolean = false
     lateinit var hinitOne: TextView
     lateinit var popFinish: PopupWindow
@@ -652,7 +653,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                    routerAccessIn()
                 }
                 Cmd.routeStartScann -> {
                     ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
@@ -735,6 +736,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }*/
         }
+    }
+
+    open fun routerAccessIn() {
+
     }
 
     open fun receivedRouteDeviceNum(scanResultBean: RouteScanResultBean) {
@@ -867,7 +872,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     fun showOpenLocationServiceDialog() {
         val builder = android.support.v7.app.AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
@@ -882,7 +886,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
     }
-
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
@@ -952,7 +955,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     inner class ChangeRecevicer : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
@@ -1010,7 +1012,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             }
         }
     }
-
 
     fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
         this.clickRgb = clickRgb

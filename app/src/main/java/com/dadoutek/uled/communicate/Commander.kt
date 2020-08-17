@@ -53,13 +53,20 @@ object Commander : EventListener<String> {
     //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
     private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
 
+    //发送所有灯开关指令时,第15位添加0x01标识来规避蓝牙接收器做出响应
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
         mTargetGroupAddr = groupAddr
         val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
-            byteArrayOf(0x01, 0x64, 0x00)
+            if (groupAddr == 0xffff)//是否是所有组
+                byteArrayOf(0x01, 0x64, 0x00, 0x01)
+            else
+                byteArrayOf(0x01, 0x64, 0x00)
         } else {
+            if (groupAddr == 0xffff)
+                byteArrayOf(0x00, 0x64, 0x00, 0x01)
+            else
             byteArrayOf(0x00, 0x64, 0x00)
         }
 

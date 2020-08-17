@@ -960,4 +960,21 @@
     <string name="bluetooth_scan">Начинайте сканирование</string>
     <string name="bluetooth_mode">蓝牙模式</string>
     <string name="route_mode">路由模式</string>
+    <string name="work_mode">工作模式</string>
+    <string name="bind_reouter">绑定路由器</string>
+    <string name="please_select_router">请选择路由器</string>
+    <string name="please_select_sw_at_leaset">请至少选择一个开关</string>
+    <string name="please_select_sensor_at_leaset">请至少选择一个传感器</string>
+    <string name="router">路由器</string>
+    <string name="qr_not_null">一维码不能为空</string>
+    <string name="routing_network">路由器入网</string>
+    <string name="please_check_device_code">请核对设备码:</string>
+    <string name="router_offline">路由已离线</string>
+    <string name="router_added">该路由已被添加</string>
+    <string name="route_code_error">该设备码不是路由器设备码,请联系供应商</string>
+    <string name="route_other_add">该路由器已被其他人添加了</string>
+    <string name="device_code_cannot_be_empty">路由器设备码不能为空</string>
+    <string name="router_access_in_fail">路由器入网失败</string>
+    <string name="router_access_in_success">路由器入网成功</string>
+    <string name="auxfun">辅助功能</string>
 </resources>

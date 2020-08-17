@@ -6,10 +6,10 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -299,6 +299,15 @@ object DBUtils {
         return arrayList
     }
 
+    fun getAllRouter(): ArrayList<DbRouter> {
+        val query = DaoSessionInstance.getInstance().dbRouterDao.queryBuilder()
+                .where(DbRouterDao.Properties.ProductUUID.eq(DeviceType.ROUTER)).build()
+
+        var arrayList: ArrayList<DbRouter> = arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
+    }
+
     fun getAllGateWay(): ArrayList<DbGateway> {
         val query = DaoSessionInstance.getInstance().dbGatewayDao.queryBuilder()
                 .where(DbGatewayDao.Properties.ProductUUID.eq(DeviceType.GATE_WAY)).build()
@@ -407,8 +416,12 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbCurtainDao.load(mesAddr.toLong())
     }
 
-    fun getGatewayByID(id: Long): DbGateway? {
-        return DaoSessionInstance.getInstance().dbGatewayDao.load(id)
+    fun getRouterByID(id: Long): DbRouter? {
+        return DaoSessionInstance.getInstance().dbRouterDao.load(id)
+    }
+
+    fun getGatewayByID(id: Long): DbRouter? {
+        return DaoSessionInstance.getInstance().dbRouterDao.load(id)
     }
 
     fun getConnectorByID(id: Long): DbConnector? {
@@ -805,8 +818,30 @@ object DBUtils {
         }
     }
 
+    fun saveRouter(db: DbRouter, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbRouterDao.queryBuilder().where(DbRouterDao.Properties.Id.eq(db.id)).list()
+        if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
+            //如果该mesh地址的数据已经存在，就直接修改
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbRouterDao.insert(db)
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            if (existList.size > 0) {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbRouterDao.tablename,
+                        Constant.DB_UPDATE)
+            } else {
+                recordingChange(db.id,
+                        DaoSessionInstance.getInstance().dbRouterDao.tablename,
+                        Constant.DB_ADD)
+            }
+        }
+    }
+
     fun saveEightSwitch(db: DbEightSwitch, isFromServer: Boolean) {
-        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.
+        Properties.MeshAddr.eq(db.meshAddr)).list()
 
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
@@ -980,6 +1015,10 @@ object DBUtils {
         }
     }
 
+    @Deprecated("Use saveRouter()")
+    fun updateRouter(router: DbRouter) {
+        saveRouter(router, false)
+    }
     @Deprecated("Use saveGateWay()")
     private fun updateGate(gateway: DbGateway) {
         saveGateWay(gateway, false)
@@ -1065,6 +1104,13 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
+
+    fun deleteAllRouter() {
+        val gateways = getAllGateWay()
+        for (g in gateways) {
+            deleteGateway(g)
+        }
+    }
 
     fun deleteAllGateway() {
         val gateways = getAllGateWay()
@@ -1482,4 +1528,5 @@ object DBUtils {
             else -> addressList.last()
         }
     }
+
 }

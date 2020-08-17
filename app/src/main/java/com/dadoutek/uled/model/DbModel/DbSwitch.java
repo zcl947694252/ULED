@@ -40,6 +40,11 @@ public class DbSwitch implements Serializable {
     public String version;
     public boolean isMostNew = false;
     private String boundMac ="";
+    @Nullable
+    public  String routerName;
+    @Nullable
+    public  long routerId = 1;
+    public Boolean isChecked;
 
     public String getBoundMac() {
         return boundMac;
@@ -84,12 +89,13 @@ public class DbSwitch implements Serializable {
     public int type;
 
 
-    @Generated(hash = 760809352)
+    @Generated(hash = 362553851)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
             String sceneIds, String controlGroupAddrs, String version,
-            boolean isMostNew, String boundMac, boolean isSupportOta, int type) {
+            boolean isMostNew, String boundMac, String routerName, long routerId,
+            Boolean isChecked, boolean isSupportOta, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -107,6 +113,9 @@ public class DbSwitch implements Serializable {
         this.version = version;
         this.isMostNew = isMostNew;
         this.boundMac = boundMac;
+        this.routerName = routerName;
+        this.routerId = routerId;
+        this.isChecked = isChecked;
         this.isSupportOta = isSupportOta;
         this.type = type;
     }
@@ -313,5 +322,29 @@ public class DbSwitch implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public String getRouterName() {
+        return this.routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public long getRouterId() {
+        return this.routerId;
+    }
+
+    public void setRouterId(long routerId) {
+        this.routerId = routerId;
+    }
+
+    public Boolean getIsChecked() {
+        return this.isChecked;
+    }
+
+    public void setIsChecked(Boolean isChecked) {
+        this.isChecked = isChecked;
     }
 }

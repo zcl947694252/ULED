@@ -12,6 +12,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DensityUtil
 import org.jetbrains.anko.startActivity
@@ -49,7 +50,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         helper.setText(R.id.template_device_group_name,dbLight.name)
         helper.setVisible(R.id.template_device_card_delete,isDelete)
         .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbLight.belongGroupId))
-                .setVisible(R.id.template_gp_name,false)
+                .setVisible(R.id.template_gp_name, SharedPreferencesHelper.getBoolean(mContext,Constant.AUXFUN_IS_OPEN,false))
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)
