@@ -8,8 +8,8 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.util.OtherUtils
 import com.telink.TelinkApplication

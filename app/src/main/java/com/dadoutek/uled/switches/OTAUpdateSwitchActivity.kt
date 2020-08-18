@@ -24,9 +24,9 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbSwitch
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.Mesh
 import com.dadoutek.uled.model.OtaDevice
 import com.dadoutek.uled.network.NetworkFactory

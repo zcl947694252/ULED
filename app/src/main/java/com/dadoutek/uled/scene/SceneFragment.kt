@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -25,9 +24,9 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbScene
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver

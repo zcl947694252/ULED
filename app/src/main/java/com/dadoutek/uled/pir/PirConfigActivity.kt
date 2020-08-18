@@ -30,10 +30,10 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DBUtils.saveSensor
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils.saveSensor
+import com.dadoutek.uled.model.dbModel.DbScene
+import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity

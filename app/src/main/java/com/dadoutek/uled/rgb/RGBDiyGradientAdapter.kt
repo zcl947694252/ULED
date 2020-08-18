@@ -3,12 +3,10 @@ package com.dadoutek.uled.rgb
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
-import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 
 class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,internal var isDelete: Boolean) : BaseQuickAdapter<DbDiyGradient, BaseViewHolder>(layoutResId, data) {
 

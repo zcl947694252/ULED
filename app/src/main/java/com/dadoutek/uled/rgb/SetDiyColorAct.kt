@@ -20,9 +20,9 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbColorNode
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbColorNode
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils

@@ -21,6 +21,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.CmdBodyBean
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
@@ -30,11 +31,11 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.VENDOR_ID
-import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.model.DbModel.DBUtils.lastRegion
-import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
-import com.dadoutek.uled.model.HttpModel.GwModel
-import com.dadoutek.uled.model.HttpModel.RouterModel
+import com.dadoutek.uled.model.dbModel.*
+import com.dadoutek.uled.model.dbModel.DBUtils.lastRegion
+import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
+import com.dadoutek.uled.model.httpModel.GwModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
@@ -80,6 +81,8 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var routerScanCount: Int = 0
+    private val TAG = "zcl-DeviceScanningNewActivity"
     private var routeScanTimeoutTime: Long = 60
     private var routeScanResult: RouteScanResultBean? = null
     private var disposableFind: Disposable? = null
@@ -845,14 +848,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         addListerner()
 
         this.inflater = this.layoutInflater
-
         this.grouping_completed?.setBackgroundColor(resources.getColor(R.color.gray))
 
         list_devices.adapter = mAddedDevicesAdapter
         list_devices.layoutManager = GridLayoutManager(this, 2)
 
         this.updateList.clear()
-
         initVisiable()
     }
 
@@ -1096,9 +1097,32 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             scanFail()
     }
 
-    override fun receivedRouteDeviceNum(scanResultBean: RouteScanResultBean) {
-        routeScanResult = scanResultBean
-       startRouteTimer()
+    override fun startRouterScan(cmdBodyBean: CmdBodyBean) {//收到路由是否开始扫描的回调
+        if (cmdBodyBean.ser_id == TAG) {
+            disposableTimer?.dispose()
+            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
+                startRouteTimer()
+            } else {
+                ToastUtils.showShort(cmdBodyBean.msg)
+                closeAnimation()
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun receivedRouteDeviceNum(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
+        if (cmdBodyBean.ser_id == TAG) {
+            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
+                routerScanCount = cmdBodyBean.count
+                startRouteTimer()
+                if (mAddDeviceType == DeviceType.LIGHT_NORMAL||mAddDeviceType == DeviceType.LIGHT_RGB||mAddDeviceType == DeviceType.SMART_RELAY||
+                        mAddDeviceType==DeviceType.SMART_CURTAIN)
+                    scanning_num.text = getString(R.string.title_scanned_device_num) + routerScanCount
+                else
+                    scanning_num.text = getString(R.string.scanning)
+            }
+        }
+
     }
 
     private fun startRouteTimer() {
@@ -1120,8 +1144,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             //发送命令
             RouterModel.routeStartScan()?.subscribe({
                 routeScanTimeoutTime = it
+                disposableTimer?.dispose()
+                disposableTimer = Observable.timer(it, TimeUnit.MILLISECONDS)
+                        .subscribe {
+                            showLoadingDialog(getString(R.string.router_scan_faile))
+                        }
                 startAnimation()
-                startRouteTimer()
             }, {
                 ToastUtils.showShort(it.message)
             })

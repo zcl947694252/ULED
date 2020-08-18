@@ -29,8 +29,8 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.PhysicalRecoveryActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.downTime
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver

@@ -1,10 +1,15 @@
 package com.dadoutek.uled.router
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.httpModel.UserModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_choose_mode.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -45,11 +50,17 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.choose_mode_ble_iv->Constant.IS_ROUTE_MODE = false
-            R.id.choose_mode_router_iv->Constant.IS_ROUTE_MODE = true
+        when (v?.id) {
+            R.id.choose_mode_ble_iv -> Constant.IS_ROUTE_MODE = false
+            R.id.choose_mode_router_iv -> Constant.IS_ROUTE_MODE = true
         }
         updateUi()
+        UserModel.updateModeStatus().subscribe({
+                    ToastUtils.showShort(it.message)
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
     }
 }

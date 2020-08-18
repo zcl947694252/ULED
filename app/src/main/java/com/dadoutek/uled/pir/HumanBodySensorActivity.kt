@@ -19,7 +19,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -32,9 +31,9 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.NightLightEditGroupAdapter
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity

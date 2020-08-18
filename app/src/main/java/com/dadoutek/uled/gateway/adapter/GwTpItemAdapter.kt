@@ -5,7 +5,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
-import com.dadoutek.uled.model.DbModel.DBUtils.timeStr
+import com.dadoutek.uled.model.dbModel.DBUtils.timeStr
 
 
 /**

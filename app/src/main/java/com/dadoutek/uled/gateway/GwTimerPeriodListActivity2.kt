@@ -28,8 +28,8 @@ import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DbScene
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver

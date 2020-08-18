@@ -2,7 +2,7 @@ package com.dadoutek.uled.util
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.polidea.rxandroidble2.RxBleClient

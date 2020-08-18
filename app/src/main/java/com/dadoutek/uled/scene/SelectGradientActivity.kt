@@ -5,8 +5,8 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*

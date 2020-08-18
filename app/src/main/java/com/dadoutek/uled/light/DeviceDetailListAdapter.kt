@@ -1,21 +1,14 @@
 package com.dadoutek.uled.light
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
-import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DensityUtil
-import org.jetbrains.anko.startActivity
 
 /**
  * 创建者     zcl
@@ -50,7 +43,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         helper.setText(R.id.template_device_group_name,dbLight.name)
         helper.setVisible(R.id.template_device_card_delete,isDelete)
         .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbLight.belongGroupId))
-                .setVisible(R.id.template_gp_name, SharedPreferencesHelper.getBoolean(mContext,Constant.AUXFUN_IS_OPEN,false))
+                .setVisible(R.id.template_gp_name, Constant.IS_OPEN_AUXFUN)
                 .setImageResource(R.id.template_device_icon,dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)

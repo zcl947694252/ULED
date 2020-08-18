@@ -19,10 +19,10 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -46,7 +46,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
 

@@ -29,10 +29,10 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication

@@ -2,7 +2,7 @@ package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
@@ -60,12 +60,12 @@ object Commander : EventListener<String> {
         val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
             if (groupAddr == 0xffff)//是否是所有组
-                byteArrayOf(0x01, 0x64, 0x00, 0x01)
+                byteArrayOf(0x01, 0x64, 0x00,0x00, 0x01)
             else
                 byteArrayOf(0x01, 0x64, 0x00)
         } else {
             if (groupAddr == 0xffff)
-                byteArrayOf(0x00, 0x64, 0x00, 0x01)
+                byteArrayOf(0x00, 0x64, 0x00,0x00, 0x01)
             else
             byteArrayOf(0x00, 0x64, 0x00)
         }

@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.region.adapter.UnbindNetWorkAdapter
 import com.dadoutek.uled.region.bean.RegionBean

@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.Toolbar
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
-import android.widget.GridView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -19,9 +17,9 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication

@@ -1,6 +1,6 @@
 package com.dadoutek.uled.util
 
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.util.MeshUtils
 import java.util.concurrent.atomic.AtomicInteger

@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.HttpModel.DownLoadFileModel;
+import com.dadoutek.uled.model.httpModel.DownLoadFileModel;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;

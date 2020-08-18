@@ -5,7 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 import org.jetbrains.anko.padding

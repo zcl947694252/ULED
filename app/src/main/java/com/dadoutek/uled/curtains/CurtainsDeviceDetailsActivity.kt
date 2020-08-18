@@ -19,8 +19,8 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.network.RouteScanResultBean

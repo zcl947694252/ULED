@@ -10,7 +10,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.ble.RxBleManager

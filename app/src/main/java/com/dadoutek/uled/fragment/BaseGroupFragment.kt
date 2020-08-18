@@ -41,9 +41,9 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody

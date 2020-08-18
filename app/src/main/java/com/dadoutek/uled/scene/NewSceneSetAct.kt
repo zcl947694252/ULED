@@ -22,7 +22,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
 import com.dadoutek.uled.model.DeviceType.SMART_RELAY

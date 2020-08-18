@@ -253,6 +253,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/white"
+                    android:visibility="gone"
                     android:foreground="?android:attr/selectableItemBackground">
 
                 <ImageView
@@ -293,6 +294,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/white"
+                    android:visibility="gone"
                     android:foreground="?android:attr/selectableItemBackground">
 
                 <ImageView
@@ -332,6 +334,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/white"
+                    android:visibility="gone"
                     android:foreground="?android:attr/selectableItemBackground">
 
                 <ImageView
@@ -488,6 +491,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/white"
+                    android:visibility="gone"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:gravity="center">
 
@@ -532,6 +536,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/white"
+                    android:visibility="gone"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:gravity="center">
 
@@ -563,6 +568,44 @@
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
                     android:background="@color/gray_e" />
+            <RelativeLayout
+                    android:id="@+id/setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/white"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:visibility="visible">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="11dp"
+                        android:src="@drawable/icon_setting" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="38dp"
+                        android:text="@string/setting"
+                        android:textColor="@color/black_e"
+                        android:textSize="13sp" />
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/background_color" />
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="20dp"
+                        android:src="@drawable/icon_arrow" />
+            </RelativeLayout>
 
             <RelativeLayout
                     android:id="@+id/about"
@@ -644,45 +687,6 @@
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="38dp"
                         android:text="@string/developer"
-                        android:textColor="@color/black_e"
-                        android:textSize="13sp" />
-
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentBottom="true"
-                        android:background="@color/background_color" />
-
-                <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="20dp"
-                        android:src="@drawable/icon_arrow" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                    android:id="@+id/setting"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/white"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:visibility="visible">
-
-                <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="11dp"
-                        android:src="@drawable/icon_setting" />
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="38dp"
-                        android:text="@string/setting"
                         android:textColor="@color/black_e"
                         android:textSize="13sp" />
 

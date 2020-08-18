@@ -1,6 +1,6 @@
 package com.dadoutek.uled.model;
 
-import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbGroup;
 
 import java.util.List;
 

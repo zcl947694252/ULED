@@ -1,15 +1,12 @@
 package com.dadoutek.uled.router
 
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.DeviceType
 
 class BatchSensorAdapter(layoutResId: Int, data: MutableList<DbSensor>) : BaseQuickAdapter<DbSensor, BaseViewHolder>(layoutResId, data) {

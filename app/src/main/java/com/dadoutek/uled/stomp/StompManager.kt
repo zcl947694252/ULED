@@ -3,7 +3,7 @@ package com.dadoutek.uled.stomp
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.google.gson.Gson
 import io.reactivex.Flowable

@@ -38,11 +38,11 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDeviceName
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDeviceName
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody

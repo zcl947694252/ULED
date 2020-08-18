@@ -1,12 +1,11 @@
 package com.dadoutek.uled.group
 
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 import org.jetbrains.anko.padding

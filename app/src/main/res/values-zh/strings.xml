@@ -977,4 +977,6 @@
     <string name="router_access_in_fail">路由器入网失败</string>
     <string name="router_access_in_success">路由器入网成功</string>
     <string name="auxfun">辅助功能</string>
+    <string name="config_WIFI_success">配置wifi成功</string>
+    <string name="router_scan_faile">路由扫描失败,请检查路由后重试</string>
 </resources>

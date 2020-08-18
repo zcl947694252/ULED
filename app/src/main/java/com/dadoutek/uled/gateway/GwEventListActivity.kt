@@ -3,7 +3,6 @@ package com.dadoutek.uled.gateway
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
-import android.content.ContentUris
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PorterDuff
@@ -32,9 +31,9 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant.*
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody

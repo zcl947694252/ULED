@@ -21,8 +21,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SpeedDialog

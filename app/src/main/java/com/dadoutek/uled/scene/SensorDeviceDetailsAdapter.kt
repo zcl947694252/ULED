@@ -1,11 +1,10 @@
 package com.dadoutek.uled.scene
 
 import android.widget.ImageView
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.util.DensityUtil
 
 class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : BaseQuickAdapter<DbSensor, BaseViewHolder>(layoutResId, data) {

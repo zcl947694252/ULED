@@ -3,7 +3,7 @@ package com.dadoutek.uled.rgb
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbColorNode
+import com.dadoutek.uled.model.dbModel.DbColorNode
 
 class RGBDiyColorListAdapter(layoutResId: Int, data: List<DbColorNode>?) : BaseQuickAdapter<DbColorNode, BaseViewHolder>(layoutResId, data) {
 

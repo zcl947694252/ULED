@@ -15,7 +15,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
@@ -28,7 +28,6 @@ import kotlinx.android.synthetic.main.activity_forget_password.*
 import kotlinx.android.synthetic.main.activity_forget_password.ccp_tv
 import kotlinx.android.synthetic.main.activity_forget_password.edit_user_phone
 import kotlinx.android.synthetic.main.activity_forget_password.phone_area_num_ly
-import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.jetbrains.anko.toast
 import java.util.*
 

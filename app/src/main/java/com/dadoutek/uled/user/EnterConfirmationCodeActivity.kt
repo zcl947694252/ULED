@@ -20,9 +20,9 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbUser
+import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
@@ -35,7 +35,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
 import kotlinx.android.synthetic.main.activity_verification_code.*
-import kotlinx.android.synthetic.main.toolbar.*
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 

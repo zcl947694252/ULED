@@ -16,6 +16,7 @@ public class Cmd implements Serializable {
     public static final int routeScanDeviceInfo = 3002;
     public static final int routeStartScann = 3001;
     public static final int routeInAccount = 3000;
+    public static final int routeConfigWifi = 3022;
 
 
     public static final int gwControlCallback = 2500;

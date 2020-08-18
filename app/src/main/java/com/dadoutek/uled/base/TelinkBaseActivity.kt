@@ -39,8 +39,8 @@ import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
@@ -70,7 +70,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
@@ -82,7 +81,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     private var authorStompClient: Disposable? = null
-    var pop: PopupWindow? = null
+    lateinit var pop: PopupWindow
     var popView: View? = null
     private var codeWarmDialog: AlertDialog? = null
     private var singleLogin: AlertDialog? = null
@@ -175,7 +174,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
                         override fun start() {}
                         override fun complete() {
-                            LogUtils.v("zcl-----------默认上传成功-------")
+                          //  LogUtils.v("zcl-----------默认上传成功-------")
                         }
 
                         override fun error(msg: String?) {}
@@ -519,11 +518,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                         activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallbackUp)
         }
     }
 
-    internal var syncCallbackGet: SyncCallback = object : SyncCallback {
+    open var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {}
 
@@ -535,7 +534,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     /**
      * 上传回调
      */
-    private var syncCallback: SyncCallback = object : SyncCallback {
+    open var syncCallbackUp: SyncCallback = object : SyncCallback {
         override fun start() {
             showLoadingDialog(getString(R.string.tip_start_sync))
         }
@@ -639,11 +638,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
-            var jsonObject = JSONObject(msg)
-            when (val cmd = jsonObject.getInt("cmd")) {
+            val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+            //var jsonObject = JSONObject(msg)
+            when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
-                    when (cmd) {
+                    when (cmdBean.cmd) {
                         Cmd.singleLogin -> singleDialog(codeBean)//单点登录
                         Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
                         Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
@@ -653,14 +653,13 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 Cmd.routeInAccount -> {
-                    routerAccessIn()
+                    routerAccessIn(cmdBean)
                 }
-                Cmd.routeStartScann -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
+                Cmd.routeConfigWifi ->routerConfigWIFI(cmdBean)
+                Cmd.routeStartScann ->startRouterScan(cmdBean)
                 Cmd.routeScanDeviceInfo -> {
-                    val scanResultBean = Gson().fromJson(msg, RouteScanResultBean::class.java)
-                    receivedRouteDeviceNum(scanResultBean)
+                    //val scanResultBean = Gson().fromJson(msg, RouteScanResultBean::class.java)
+                    receivedRouteDeviceNum(cmdBean)
                 }
                 Cmd.routeInAccount -> {
                     ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
@@ -738,11 +737,18 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun routerAccessIn() {
+    open fun startRouterScan(cmdBodyBean: CmdBodyBean) {
+    }
+
+    open fun routerConfigWIFI(cmdBody: CmdBodyBean) {
 
     }
 
-    open fun receivedRouteDeviceNum(scanResultBean: RouteScanResultBean) {
+    open fun routerAccessIn(cmdBody: CmdBodyBean) {
+
+    }
+
+    open fun receivedRouteDeviceNum(scanResultBean: CmdBodyBean) {
 
     }
 

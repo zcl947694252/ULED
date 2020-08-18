@@ -6,12 +6,12 @@ import android.widget.EditText;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbSensor;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbSensor;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 

@@ -13,20 +13,24 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.NetworkUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.CmdBodyBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.RouterModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.NetWorkUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightService
@@ -42,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +61,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GwLoginActivity : TelinkBaseActivity() {
+    private val TAG = "GwLoginActivity"
     private var isRouter: Boolean = false
     private var mac: String? = null
     private var receiver: GwBrocasetReceiver? = null
@@ -149,8 +155,8 @@ class GwLoginActivity : TelinkBaseActivity() {
                 // sendWIFIParmars("Dadou", "Dadoutek2018")
                 showLoadingDialog(getString(R.string.config_setting_gw_wifi))
                 if (isRouter)
-                    sendRouterWifi()
-                 else
+                    sendRouterWifi(account, pwd)
+                else
                     sendWIFIParmars(account, pwd)
             }
         }
@@ -159,9 +165,40 @@ class GwLoginActivity : TelinkBaseActivity() {
     /**
      * 配置路由器wifi
      */
-    private fun sendRouterWifi() {
-
+    @SuppressLint("CheckResult")
+    private fun sendRouterWifi(account: String, pwd: String) {
+        val timeZone = NetWorkUtils.getTimeZone()
+        val split = timeZone.replace("GMT+", "").split(":")
+        RouterModel.routerConfigWifi(mac!!, account, pwd, split[0].toInt(), split[1].toInt(), TAG)
+                ?.subscribe({
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(it.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
+                            }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
     }
+
+    override fun routerConfigWIFI(cmdBody: CmdBodyBean) {
+        if (TAG == cmdBody.ser_id) {
+            if (cmdBody.status == Constant.ALL_SUCCESS) {
+                ToastUtils.showShort(getString(R.string.config_WIFI_success))
+                SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
+                ActivityUtils.finishAllActivities()
+                ActivityUtils.startActivity(MainActivity::class.java)
+            } else {
+                ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
+            }
+
+            hideLoadingDialog()
+            disposableTimer?.dispose()
+        }
+    }
+
 
     private fun skipEvent() {
         val intent = Intent(this@GwLoginActivity, GwEventListActivity::class.java)

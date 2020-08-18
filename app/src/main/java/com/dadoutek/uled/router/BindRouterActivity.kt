@@ -9,9 +9,9 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.group.*
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.RouterModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.TitleBean
 import kotlinx.android.synthetic.main.activity_device_bind_router.*
 import kotlinx.android.synthetic.main.toolbar.*

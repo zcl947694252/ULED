@@ -1,15 +1,12 @@
 package com.dadoutek.uled.router
 
-import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 
 class BatchSwAdapter(layoutResId: Int, data: MutableList<DbSwitch>) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {

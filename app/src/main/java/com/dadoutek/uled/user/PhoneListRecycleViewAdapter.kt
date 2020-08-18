@@ -4,7 +4,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.dbModel.DbUser
 
 class PhoneListRecycleViewAdapter(layoutResId: Int,data: List<DbUser>?) : BaseQuickAdapter<DbUser, BaseViewHolder>(layoutResId, data) {
 

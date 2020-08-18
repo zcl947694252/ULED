@@ -22,20 +22,17 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.model.dbModel.DbUser
+import com.dadoutek.uled.model.httpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.user.EnterConfirmationCodeActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
-import kotlinx.android.synthetic.main.activity_forget_password.*
-import kotlinx.android.synthetic.main.activity_forget_password.ccp_tv
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.btn_send_verification
 import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
 import kotlinx.android.synthetic.main.activity_register.return_image
-import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.json.JSONObject
 
 /**

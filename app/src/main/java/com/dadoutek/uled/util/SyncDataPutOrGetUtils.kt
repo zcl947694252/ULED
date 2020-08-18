@@ -7,8 +7,8 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.model.HttpModel.*
+import com.dadoutek.uled.model.dbModel.*
+import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory

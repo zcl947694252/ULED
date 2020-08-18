@@ -5,9 +5,9 @@ import android.graphics.Color;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.model.InstallDeviceModel;
 
 import org.jetbrains.annotations.NotNull;

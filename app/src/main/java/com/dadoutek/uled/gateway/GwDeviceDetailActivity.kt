@@ -26,8 +26,8 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.RouteScanResultBean
@@ -46,8 +46,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_device_detail.*
-import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.empty_view.add_device_btn
 import kotlinx.android.synthetic.main.empty_view.no_device_relativeLayout
 import kotlinx.android.synthetic.main.template_device_detail_list.*

@@ -1,13 +1,10 @@
 package com.dadoutek.uled.switches
 
 import android.content.Context
-import android.widget.ImageView
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbSwitch
-import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.util.StringUtils
 
 class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,internal var context: Context) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {

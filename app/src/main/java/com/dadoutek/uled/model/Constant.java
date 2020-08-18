@@ -428,7 +428,11 @@ public class Constant implements Serializable {
      */
     public static final String ROUTE_MODE="ROUTE_MODE";
     public static  Boolean IS_ROUTE_MODE=false;
+    public static  Boolean IS_OPEN_AUXFUN=false;
     @Nullable
     public static final String ONE_QR="one_qr";
-    public static final String AUXFUN_IS_OPEN="AUXFUN_IS_OPEN";
+    @Nullable//-1：全部失败；0：全部成功；1：部分成功
+    public static final int ALL_SUCCESS =0;
+    public static final int ALL_FAILE =-1;
+    public static final int SOME_SUCCESS =1;
 }

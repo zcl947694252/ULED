@@ -9,7 +9,7 @@ import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
 
 class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var mContext: Context) : BaseAdapter() {
     private val inflater: LayoutInflater = LayoutInflater.from(mContext)

@@ -3,12 +3,11 @@ package com.dadoutek.uled.switches
 import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.OtherUtils
 

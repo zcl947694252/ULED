@@ -11,8 +11,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils.groupList
-import com.dadoutek.uled.model.DbModel.DBUtils.sceneList
+import com.dadoutek.uled.model.dbModel.DBUtils.groupList
+import com.dadoutek.uled.model.dbModel.DBUtils.sceneList
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.switches.SceneMoreItemAdapter
 import kotlinx.android.synthetic.main.choose_group_scene.*

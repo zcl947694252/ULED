@@ -13,10 +13,9 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.startActivity
 
 abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {

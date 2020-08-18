@@ -15,7 +15,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.util.OtherUtils
 
 

@@ -1,18 +1,13 @@
 package com.dadoutek.uled.device
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
-import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -25,7 +20,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
@@ -36,7 +31,6 @@ import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.popwindow_install_deive_list.*

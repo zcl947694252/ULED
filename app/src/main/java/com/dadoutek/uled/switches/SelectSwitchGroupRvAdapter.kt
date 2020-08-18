@@ -3,7 +3,7 @@ package com.dadoutek.uled.switches
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
 
 class SelectSwitchGroupRvAdapter(layoutResId: Int, data: MutableList<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
     var selectedPos = -1

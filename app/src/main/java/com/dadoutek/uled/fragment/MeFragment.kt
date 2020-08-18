@@ -33,12 +33,12 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbConnector
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.UserModel
+import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
@@ -177,12 +177,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             500
         else
             200
-
-//        if (IS_ROUTE_MODE)
-//            work_mode_tv.text = getString(R.string.route_mode)
-//        else
-//            work_mode_tv.text = getString(R.string.bluetooth_mode)
-
         makePop()
     }
 

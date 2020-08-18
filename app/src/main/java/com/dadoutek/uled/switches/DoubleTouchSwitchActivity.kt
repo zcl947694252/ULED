@@ -16,9 +16,9 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity

@@ -39,10 +39,11 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.model.HttpModel.RouterModel
-import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.RegionModel
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.model.httpModel.UpdateModel
+import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.region.bean.RegionBean
@@ -148,6 +149,18 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         showLoadingDialog(getString(R.string.please_wait))
         getScanResult()
         getRegionList()
+        getAllStatus()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getAllStatus() {
+        UserModel.getModeStatus()?.subscribe({
+            Constant.IS_ROUTE_MODE = it.mode==1//0蓝牙，1路由
+            Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
+        },{
+            Constant.IS_ROUTE_MODE = false
+            Constant.IS_OPEN_AUXFUN = false
+        })
     }
 
     private fun getScanResult() {

@@ -3,21 +3,21 @@ package com.dadoutek.uled.network;
 import com.dadoutek.uled.gateway.bean.ClearGwBean;
 import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.DbRouter;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
-import com.dadoutek.uled.model.DbModel.DbDiyGradient;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbRegion;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSensor;
-import com.dadoutek.uled.model.DbModel.DbSensorChild;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
-import com.dadoutek.uled.model.DbModel.DbSwitchChild;
-import com.dadoutek.uled.model.DbModel.DbUser;
-import com.dadoutek.uled.model.HttpModel.BatchRemove8kBody;
-import com.dadoutek.uled.model.HttpModel.RemoveCodeBody;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
+import com.dadoutek.uled.model.dbModel.DbDiyGradient;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbRegion;
+import com.dadoutek.uled.model.dbModel.DbScene;
+import com.dadoutek.uled.model.dbModel.DbSensor;
+import com.dadoutek.uled.model.dbModel.DbSensorChild;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DbSwitchChild;
+import com.dadoutek.uled.model.dbModel.DbUser;
+import com.dadoutek.uled.model.httpModel.BatchRemove8kBody;
+import com.dadoutek.uled.model.httpModel.RemoveCodeBody;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
@@ -833,7 +833,7 @@ public interface RequestInterface {
     @POST("router/access-in")
     Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field(
             "timeZoneHour")
-            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") Long ser_id);
+            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
 
     /**
      * 配置路由wifi信息。路由可以配置wifi也可以接网线
@@ -856,5 +856,28 @@ public interface RequestInterface {
     @POST("router/wifi-configure")
     Observable<Response<Integer>> routerConfigWifi(@Field("macAddr") String macAddr, @Field("ssid") String ssid
             , @Field("pwd") String pwd, @Field("timeZoneHour") int timeZoneHour,
-                                                   @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") Long ser_id);
+                                                   @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+    /**
+     * 获取模式，不同账号不同区域有不同的模式。比如300460用户区域1是蓝牙模式，区域2可能是路由模式
+     * https://dev.dadoutek.com/xxxx/auth/settings GET
+     * https://dev.dadoutek.com/smartlight_test/auth/settings
+     */
+    @GET("auth/settings")
+    Observable<Response<ModeStatusBean>> getAllModeStatus();
+    /**
+     * 0.保存用户喜好设置
+     * https://dev.dadoutek.com/xxxx/auth/settings/save  GET
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?auxiliaryFunction=false //
+     * auxiliaryFunction设置为false
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?mode=0 // mode设置为0
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?auxiliaryFunction=false&mode=0
+     * // auxiliaryFunction和false分别设置为false和0,支持多个
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?lalala=rarara // 以后可能的用户配置
+     *     "data": null,
+     *     "errorCode": 0,
+     *     "message": "save settings succeed!"
+     */
+    @GET("auth/settings/save")
+    Observable<Response> updateAllModeStatus( @Query("auxiliaryFunction") boolean auxiliaryFunction,
+                                                           @Query("modeNum") int modeNum );
 }

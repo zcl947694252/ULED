@@ -17,7 +17,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
@@ -26,15 +25,14 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper

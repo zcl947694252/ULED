@@ -3,7 +3,6 @@ package com.dadoutek.uled.othersview
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
@@ -12,13 +11,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
-import com.dadoutek.uled.region.bean.ParseCodeBean
 import com.dadoutek.uled.router.RoutingNetworkActivity
 import com.dadoutek.uled.util.StringUtils
 import com.uuzuche.lib_zxing.activity.CaptureActivity

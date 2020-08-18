@@ -29,9 +29,9 @@ import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver

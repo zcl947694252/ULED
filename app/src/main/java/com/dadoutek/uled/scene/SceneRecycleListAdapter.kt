@@ -2,14 +2,13 @@ package com.dadoutek.uled.scene
 
 import android.annotation.SuppressLint
 import android.text.TextUtils
-import android.view.View
 import android.widget.TextView
 
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.OtherUtils

@@ -25,9 +25,9 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbSensor
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver

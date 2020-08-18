@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils.regionAll
-import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.dbModel.DBUtils.regionAll
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkObserver
 import com.jakewharton.rx.ReplayingShare

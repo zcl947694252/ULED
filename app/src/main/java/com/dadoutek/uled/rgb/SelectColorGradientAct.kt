@@ -16,7 +16,7 @@ import android.widget.SeekBar
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbColorNode
+import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog

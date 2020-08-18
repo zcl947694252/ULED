@@ -28,11 +28,11 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbRegion
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbRegion
+import com.dadoutek.uled.model.dbModel.DbUser
+import com.dadoutek.uled.model.httpModel.AccountModel
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver

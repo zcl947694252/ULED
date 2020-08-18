@@ -1,14 +1,11 @@
 package com.dadoutek.uled.fragment
 
-import android.widget.ImageView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DensityUtil
 import com.telink.bluetooth.light.ConnectionStatus
 
 /**
@@ -74,7 +71,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                         .setVisible(R.id.template_gp_name, false)
             else
                 helper.setText(R.id.template_device_group_name, group.name)
-                        .setVisible(R.id.template_gp_name,  SharedPreferencesHelper.getBoolean(mContext,Constant.AUXFUN_IS_OPEN,false))
+                        .setVisible(R.id.template_gp_name, Constant.IS_OPEN_AUXFUN)
                         .setText(R.id.template_gp_name, mContext.getString(R.string.title_scanned_device_num)+ group.deviceCount)
 
             if (helper.adapterPosition != 0)

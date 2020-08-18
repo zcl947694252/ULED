@@ -19,7 +19,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
