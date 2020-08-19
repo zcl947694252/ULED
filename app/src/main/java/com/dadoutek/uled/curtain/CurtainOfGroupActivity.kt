@@ -37,7 +37,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.RouteScanResultBean
+import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -155,9 +155,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     else {
                         if(DBUtils.getAllCurtains().size ==0){
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            val routeBean = RouteScanResultBean()
-                            routeBean.data.scanType  = DeviceType.SMART_CURTAIN
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         }else{
                             addDevice()

@@ -459,7 +459,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         var dbSensor = DbSensor()
         if (isReConfirm) {
             dbSensor.index = mDeviceInfo!!.id.toInt()
-            if ("none" != mDeviceInfo!!.id)
+            if (100000000 != mDeviceInfo!!.id)
                 dbSensor.id = mDeviceInfo!!.id.toLong()
         } else {//如果不是重新配置就保存进服务器
             saveSensor(dbSensor, isReConfirm)

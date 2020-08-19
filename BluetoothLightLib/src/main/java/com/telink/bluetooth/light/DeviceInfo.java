@@ -14,7 +14,6 @@ import java.util.Arrays;
  */
 
 public class DeviceInfo implements Parcelable {
-
     /**
      * Mac地址
      */
@@ -50,7 +49,7 @@ public class DeviceInfo implements Parcelable {
      * 是否是重新配置 以及 desenor的id
      */
 
-    public String id = "none";
+    public int id = 100000000;
     public int isConfirm = 0;
 
     public byte[] longTermKey = new byte[20];
@@ -66,6 +65,17 @@ public class DeviceInfo implements Parcelable {
      * 获取返回的业务数据
      */
     public int gwVoipState;
+    public int index = 0;
+    public int uid =0;
+    public int colorTemperature;
+    public int color;
+    public int brightness;
+    public String boundMac;
+    public int belongRegionId;
+    public long belongGroupId;
+
+    public DeviceInfo() {}
+
     protected DeviceInfo(Parcel in) {
         macAddress = in.readString();
         sixByteMacAddress = in.readString();
@@ -76,36 +86,20 @@ public class DeviceInfo implements Parcelable {
         productUUID = in.readInt();
         status = in.readInt();
         rssi = in.readInt();
-        id = in.readString();
+        id = in.readInt();
         isConfirm = in.readInt();
         longTermKey = in.createByteArray();
         firmwareRevision = in.readString();
         gwWifiState = in.readInt();
         gwVoipState = in.readInt();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(macAddress);
-        dest.writeString(sixByteMacAddress);
-        dest.writeString(deviceName);
-        dest.writeString(meshName);
-        dest.writeInt(meshAddress);
-        dest.writeInt(meshUUID);
-        dest.writeInt(productUUID);
-        dest.writeInt(status);
-        dest.writeInt(rssi);
-        dest.writeString(id);
-        dest.writeInt(isConfirm);
-        dest.writeByteArray(longTermKey);
-        dest.writeString(firmwareRevision);
-        dest.writeInt(gwWifiState);
-        dest.writeInt(gwVoipState);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        index = in.readInt();
+        uid = in.readInt();
+        colorTemperature = in.readInt();
+        color = in.readInt();
+        brightness = in.readInt();
+        boundMac = in.readString();
+        belongRegionId = in.readInt();
+        belongGroupId = in.readLong();
     }
 
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
@@ -120,14 +114,65 @@ public class DeviceInfo implements Parcelable {
         }
     };
 
-    public DeviceInfo() {
+    @Override
+    public String toString() {
+        return "DeviceInfo{" +
+                "macAddress='" + macAddress + '\'' +
+                ", sixByteMacAddress='" + sixByteMacAddress + '\'' +
+                ", deviceName='" + deviceName + '\'' +
+                ", meshName='" + meshName + '\'' +
+                ", meshAddress=" + meshAddress +
+                ", meshUUID=" + meshUUID +
+                ", productUUID=" + productUUID +
+                ", status=" + status +
+                ", rssi=" + rssi +
+                ", id=" + id +
+                ", isConfirm=" + isConfirm +
+                ", longTermKey=" + Arrays.toString(longTermKey) +
+                ", firmwareRevision='" + firmwareRevision + '\'' +
+                ", gwWifiState=" + gwWifiState +
+                ", gwVoipState=" + gwVoipState +
+                ", index=" + index +
+                ", uid=" + uid +
+                ", colorTemperature=" + colorTemperature +
+                ", color=" + color +
+                ", brightness=" + brightness +
+                ", boundMac='" + boundMac + '\'' +
+                ", belongRegionId=" + belongRegionId +
+                ", belongGroupId=" + belongGroupId +
+                '}';
     }
 
 
     @Override
-    public String toString() {
-        return "DeviceInfo{" + "macAddress='" + macAddress + '\'' + ", sixByteMacAddress='" + sixByteMacAddress + '\'' + ", deviceName='" + deviceName + '\'' + ", meshName='" + meshName + '\'' + ", meshAddress=" + meshAddress + ", meshUUID=" + meshUUID + ", productUUID=" + productUUID + ", status=" + status + ", rssi=" + rssi + ", id='" + id + '\'' + ", isConfirm=" + isConfirm + ", longTermKey=" + Arrays.toString(longTermKey) + ", firmwareRevision='" + firmwareRevision + '\'' + ", gwWifiState=" + gwWifiState + ", gwVoipState=" + gwVoipState + '}';
+    public int describeContents() {
+        return 0;
     }
 
-
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(macAddress);
+        dest.writeString(sixByteMacAddress);
+        dest.writeString(deviceName);
+        dest.writeString(meshName);
+        dest.writeInt(meshAddress);
+        dest.writeInt(meshUUID);
+        dest.writeInt(productUUID);
+        dest.writeInt(status);
+        dest.writeInt(rssi);
+        dest.writeInt(id);
+        dest.writeInt(isConfirm);
+        dest.writeByteArray(longTermKey);
+        dest.writeString(firmwareRevision);
+        dest.writeInt(gwWifiState);
+        dest.writeInt(gwVoipState);
+        dest.writeInt(index);
+        dest.writeInt(uid);
+        dest.writeInt(colorTemperature);
+        dest.writeInt(color);
+        dest.writeInt(brightness);
+        dest.writeString(boundMac);
+        dest.writeInt(belongRegionId);
+        dest.writeLong(belongGroupId);
+    }
 }

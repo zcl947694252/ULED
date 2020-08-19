@@ -566,8 +566,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         var dbSensor = DbSensor()
 
         if (isReConfirm) {
-            dbSensor.index = mDeviceInfo.id.toInt()
-            if ("none" != mDeviceInfo.id)
+            dbSensor.index = mDeviceInfo.id
+            if (100000000!= mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
             DBUtils.saveSensor(dbSensor, isReConfirm)

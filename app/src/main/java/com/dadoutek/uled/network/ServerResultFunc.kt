@@ -9,6 +9,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkStatusCode.ERROR_CANCEL_AUHORIZE
 import com.dadoutek.uled.network.NetworkStatusCode.ERROR_REGION_NOT_EXIST
 import com.dadoutek.uled.network.NetworkStatusCode.OK
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_STOP
 import com.telink.TelinkApplication
 import io.reactivex.functions.Function
 
@@ -17,8 +18,9 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
 
         if (response.errorCode == OK) {
             try {
-                response.t as T
-            }catch (ex:Exception){
+                if (response.t != null)
+                    response.t as T
+            } catch (ex: Exception) {
                 ex.printStackTrace()
             }
         } else {
@@ -27,12 +29,12 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
 
             when (response.errorCode) {
                 NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
-                    if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)){
+                    if (SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)) {
 
                         SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_LOGIN, false)
                         ToastUtils.showLong(TelinkApplication.getInstance().mContext.getString(R.string.author_account_receviced))
                         AppUtils.relaunchApp()
-                    }else{
+                    } else {
                         ServerResultException.handleException(response)
                     }
                 }

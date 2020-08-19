@@ -31,8 +31,8 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -225,8 +225,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         DBUtils.updateLight(currentDevice!!)
                         adapter?.notifyDataSetChanged()
                     }
-                    R.id.template_device_card_delete ->{
-                          val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                    R.id.template_device_card_delete -> {
+                        val string = getString(R.string.sure_delete_device, currentDevice?.name)
                         builder?.setMessage(string)
                         builder?.create()?.show()
                     }
@@ -413,15 +413,13 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun addDeviceLight() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        val routeBean = RouteScanResultBean()
 
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT ->
-            routeBean.data.scanType  = DeviceType.LIGHT_NORMAL
+                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
             Constant.INSTALL_RGB_LIGHT ->
-            routeBean.data.scanType  = DeviceType.LIGHT_RGB
+                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         }
-        intent.putExtra(Constant.DEVICE_TYPE, routeBean)
         startActivityForResult(intent, 0)
     }
 
@@ -488,7 +486,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         GlobalScope.launch {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2000)
-            if (TelinkLightApplication.getApp().connectDevice==null)
+            if (TelinkLightApplication.getApp().connectDevice == null)
                 autoConnectAll()
         }
     }
@@ -626,6 +624,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             }
         }
     }
+
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_LIGHT_ON -> {

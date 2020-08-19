@@ -3,6 +3,8 @@ package com.dadoutek.uled.network;
 import com.dadoutek.uled.gateway.bean.ClearGwBean;
 import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.DbRouter;
+import com.dadoutek.uled.model.Response;
+import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.model.dbModel.DbConnector;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
 import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
@@ -18,14 +20,14 @@ import com.dadoutek.uled.model.dbModel.DbSwitchChild;
 import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.httpModel.BatchRemove8kBody;
 import com.dadoutek.uled.model.httpModel.RemoveCodeBody;
-import com.dadoutek.uled.model.Response;
-import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.model.routerModel.RouteStasusBean;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
 import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
+import com.dadoutek.uled.router.bean.RouteScanResultBean;
 
 import java.util.List;
 import java.util.Map;
@@ -708,70 +710,82 @@ public interface RequestInterface {
     Observable<Response<Map<String, Integer>>> getBinList();
 
     /**
+     * 获取路由模式下状态，用来恢复一些状态。比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待页面
+     * https://dev.dadoutek.com/xxxx/router/status/get GET
+     */
+    @GET("router/status/get")
+    Observable<RouteStasusBean> getRouterStatus();
+
+    /**
      * 获取未确认扫描结果
-     * https://dev.dadoutek.com/xxxx/scan/result/get
-     * GET
-     * (从该接口开始未注明这条信息的接口不需要加region-id和authorizer-user-id)
-     * region-id : 1(例)
-     * authorizer-user-id : 300460(例)
-     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
-     * 请求参数&请求地址示例&传参示例
-     * https://dev.dadoutek.com/smartlight_test/scan/result/get
+     * https://dev.dadoutek.com/xxxx/scan/result/get GET
      */
     @GET("scan/result/get")
     Observable<RouteScanResultBean> getScanResult();
 
     /**
      * 请求开始扫描设备
-     * https://dev.dadoutek.com/xxxx/router/scan-device
-     * POST
-     * https://dev.dadoutek.com/smartlight_test/router/scan-device
-     * 参数名	必选	类型	说明
-     * scanType	是	int	扫描设备类型
+     * https://dev.dadoutek.com/xxxx/router/scan-device POST
+     * scanType	是	int	扫描设备类型 普通灯 = 4彩灯 = 6蓝牙连接器 = 5窗帘 = 16开关 = 99 传感器 = 98
      * scanName	是	string	扫描设备的蓝牙名
      * ser_id	是	string	会话id，推送中回传
-     * scanType参考
-     * 扫描普通灯 = 4
-     * 扫描彩灯 = 6
-     * 扫描蓝牙连接器 = 5
-     * 扫描窗帘 = 16
-     * 扫描开关 = 99
-     * 扫描传感器 = 98
-     * <p>
-     * {
      * "scanType": 4,
      * "scanName": "dadousmart"
      * "ser_id": "app会话id，自己维护"
-     * }
      */
     @POST("router/scan-device")
     Observable<Response<Long>> routeScanDevcie();
 
     /**
+     * 停止扫描
+     * https://dev.dadoutek.com/xxxx/router/stop-scan POST
+     * ser_id	是	string	app会话id，推送时回传
+     * scanSerId	是	int	扫描关联id。可以在成功开始扫描推送和获取未确认扫描结果时获得
+     *     "ser_id": "app会话id，自己维护",
+     *     "scanSerId": -1000000
+     */
+    @FormUrlEncoded
+    @POST("router/stop-scan")
+    Observable<Response<Long>> routeStopScanDevcie(@Field("ser_id") String ser_id,@Field("scanSerId") long scanSerId);
+
+    /**
+     *确认扫描结果，如果有未确认的扫描结果是不能再扫描的
+     * https://dev.dadoutek.com/xxxx/scan/result/confirm  DELETE
+     */
+    @DELETE("scan/result/confirm")
+    Observable<Response> tellServerClearScanning();
+
+    /**
+     * 通过路由进行设备分组
+     * https://dev.dadoutek.com/xxxx/router/regroup POST
+     * targetGroupMeshAddr	是	int	目标组meshAddr
+     * deviceMeshAddrs	是	list	需要分组的设备meshAddr列表
+     * meshType	是	int	设备类型  普通灯 = 4  彩灯 = 6 连接器 = 5 窗帘 = 16
+     * ser_id	是	string	app会话id，推送时回传
+     *     "targetGroupMeshAddr" : 32769,
+     *     "deviceMeshAddrs": [1, 2, 3, 4, 5],
+     *     "meshType": 4,
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @POST("router/regroup")
+    Observable<Response<Long>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
+                                       @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
+                                       @Field("meshType") long meshType,@Field("ser_id") String ser_id );
+    /**
      * 获取路由列表
-     * https://dev.dadoutek.com/xxxx/router/list
-     * GET
-     * content-type : application/text
-     * (从该接口开始未注明这条信息的接口不需要加region-id和authorizer-user-id)
-     * region-id : 1(例)
-     * authorizer-user-id : 300460(例)
-     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
-     * 请求参数&请求地址示例&传参示例
-     * https://dev.dadoutek.com/smartlight_test/router/list
+     * https://dev.dadoutek.com/xxxx/router/list GET
      */
     @GET("router/list")
     Observable<Response<List<DbRouter>>> getRouterList();
 
     /**
-     * 路由软件恢复出厂
-     * DELETE
+     * 路由软件恢复出厂 DELETE
      * https://dev.dadoutek.com/smartlight_test/router/router-reset
      * ser_id	是	string	app会话id，推送时回传
      * macAddr	是	string	需要恢复出厂的路由mac地址
-     * {
      * "ser_id": "app会话id，自己维护",
      * "macAddr": "0102030405",
-     * }
      */
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "router/router-reset")

@@ -731,7 +731,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             deviceInfo.meshAddress = it.meshAddr
             deviceInfo.macAddress = it.macAddr
             deviceInfo.productUUID = it.productUUID
-            deviceInfo.id = it.id.toString()
+            deviceInfo.id = it.id.toInt()
             deviceInfo.isConfirm = 1
         }
         settingType = NORMAL_SENSOR

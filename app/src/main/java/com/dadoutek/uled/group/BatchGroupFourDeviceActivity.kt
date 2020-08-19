@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -67,6 +68,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private  val TAG = "zcl-BatchGroupFourDeviceActivity"
     private var gpMeshAddr: Int = 0
     private var isAll: Boolean = false
     private var disposableScan: Disposable? = null
@@ -129,7 +131,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_batch_group_four)
         this.mApplication = this.application as TelinkLightApplication
-
         initView()
         initData()
         initListener()
@@ -760,11 +761,41 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_group_add_group.setOnClickListener { addNewGroup() }
         grouping_completed.setOnClickListener {
             if (!isComplete) {
-                if (TelinkLightApplication.getApp().connectDevice != null)
-                    sureGroups()
-                else
-                    autoConnect()
-            } else {
+                if (!Constant.IS_ROUTE_MODE) {
+                    if (TelinkLightApplication.getApp().connectDevice != null)
+                        sureGroups()
+                    else
+                        autoConnect()
+                } else {
+                    val list = arrayListOf<Int>()
+                    when (deviceType) {
+                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                            val dbLights = deviceDataLightAll.filter { it.isSelected }
+                            dbLights.forEach {
+                                list.add(it.meshAddr)
+                            }
+                        }
+                        DeviceType.SMART_CURTAIN -> {
+                            val dbCurtains = deviceDataCurtainAll.filter { it.isSelected }
+                            dbCurtains.forEach {
+                                list.add(it.meshAddr)
+                            }
+                        }
+                        DeviceType.SMART_RELAY -> {
+                            val dbRelays = deviceDataRelayAll.filter { it.isSelected }
+                            dbRelays.forEach {
+                                list.add(it.meshAddr)
+                            }
+                        }
+                    }
+                    RouterModel.routeBatchGp(currentGroup!!.meshAddr.toLong(),list,deviceType.toLong(),TAG)
+                            ?.subscribe({
+                                //多种状态判断
+                            },{
+
+                            })
+                }
+            } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃
                 finish()
             }
         }
@@ -1098,17 +1129,17 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         when (deviceType) {
             DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                 for (i in deviceDataLightAll.filter { it.isSelected })
-                    //让选中的灯停下来别再发闪的命令了。
+                //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
             }
             DeviceType.SMART_CURTAIN -> {
                 for (i in deviceDataCurtainAll.filter { it.isSelected })
-                    //让选中的灯停下来别再发闪的命令了。
+                //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
             }
             DeviceType.SMART_RELAY -> {
                 for (i in deviceDataRelayAll.filter { it.isSelected })
-                    //让选中的灯停下来别再发闪的命令了。
+                //让选中的灯停下来别再发闪的命令了。
                     stopBlink(i.meshAddr, i.belongGroupId)
             }
         }
@@ -1132,7 +1163,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun updateGroupResultCurtain(light: DbCurtain, group: DbGroup) {
         val filter = deviceDataCurtainAll.filter { it.isSelected }
         for (db in filter) {
-            if (light.meshAddr ==db.meshAddr) {
+            if (light.meshAddr == db.meshAddr) {
                 if (light.belongGroupId != allLightId) {
                     db.hasGroup = true
                     db.belongGroupId = group.id
@@ -1475,96 +1506,96 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setAllSelect(isSelectAll: Boolean) {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                    for (device in noGroup) {
-                        for (sourceDevice in deviceDataLightAll) {
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
+                for (device in noGroup) {
+                    for (sourceDevice in deviceDataLightAll) {
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
                         }
                     }
-                    changeGroupingCompleteState(noGroup.filter { it.isSelected }.size, noGroup.size)
-                    lightAdapterm.notifyDataSetChanged()
+                }
+                changeGroupingCompleteState(noGroup.filter { it.isSelected }.size, noGroup.size)
+                lightAdapterm.notifyDataSetChanged()
 
 
-                    for (device in listGroup) {
-                        for (sourceDevice in deviceDataLightAll) {
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
+                for (device in listGroup) {
+                    for (sourceDevice in deviceDataLightAll) {
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
                         }
                     }
-                    changeGroupingCompleteState(listGroup.filter { it.isSelected }.size, noGroup.size)
-                    lightGroupedAdapterm.notifyDataSetChanged()
+                }
+                changeGroupingCompleteState(listGroup.filter { it.isSelected }.size, noGroup.size)
+                lightGroupedAdapterm.notifyDataSetChanged()
             }
             DeviceType.SMART_CURTAIN -> {
-                    for (device in noGroupCutain) {
-                        for (sourceDevice in deviceDataCurtainAll) {
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
+                for (device in noGroupCutain) {
+                    for (sourceDevice in deviceDataCurtainAll) {
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
                         }
                     }
-                    changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainAdapter.notifyDataSetChanged()
+                }
+                changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
+                curtainAdapter.notifyDataSetChanged()
 
-                    for (device in listGroupCutain)
-                        for (sourceDevice in deviceDataCurtainAll)
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
-                    changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainGroupedAdapter.notifyDataSetChanged()
+                for (device in listGroupCutain)
+                    for (sourceDevice in deviceDataCurtainAll)
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
+                        }
+                changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
+                curtainGroupedAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
-                    for (device in noGroupRelay) {
-                        for (sourceDevice in deviceDataRelayAll) {
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
+                for (device in noGroupRelay) {
+                    for (sourceDevice in deviceDataRelayAll) {
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
                         }
                     }
-                    changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayAdapter.notifyDataSetChanged()
+                }
+                changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
+                relayAdapter.notifyDataSetChanged()
 
-                    for (device in listGroupRelay) {
-                        for (sourceDevice in deviceDataRelayAll) {
-                            if (device.id == sourceDevice.id) {
-                                sourceDevice.selected = isSelectAll
-                                device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
-                            }
+                for (device in listGroupRelay) {
+                    for (sourceDevice in deviceDataRelayAll) {
+                        if (device.id == sourceDevice.id) {
+                            sourceDevice.selected = isSelectAll
+                            device.selected = isSelectAll
+                            if (isSelectAll)
+                                startBlink(device.belongGroupId, device.meshAddr)
+                            else
+                                stopBlink(device.meshAddr, device.belongGroupId)
                         }
                     }
-                    changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayGroupedAdapter.notifyDataSetChanged()
+                }
+                changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
+                relayGroupedAdapter.notifyDataSetChanged()
             }
         }
     }

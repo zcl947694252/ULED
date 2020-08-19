@@ -1,4 +1,4 @@
-package com.dadoutek.uled.network
+package com.dadoutek.uled.router.bean
 
 import java.io.Serializable
 
@@ -12,7 +12,6 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
-
 data class RouteScanResultBean(
     var `data`: Data = Data(),
     var errorCode: Int = 0,

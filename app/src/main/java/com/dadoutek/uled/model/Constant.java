@@ -435,4 +435,21 @@ public class Constant implements Serializable {
     public static final int ALL_SUCCESS =0;
     public static final int ALL_FAILE =-1;
     public static final int SOME_SUCCESS =1;
+    /**
+     * 路由器闲置状态
+     */
+    public static final int ROUTER_IDLE =0;
+    /**
+     * 路由器正在扫描 有未确认扫描数据
+     */
+    public static final int ROUTER_SCANNING =1;
+    /**
+     * 扫描结束，有未确认扫描数据
+     */
+    public static final int ROUTER_SCAN_END =2;
+    /**
+     * 路由器OTA中
+     */
+    public static final int ROUTER_OTA_ING =3;
+    public static  long SCAN_SERID =0;
 }

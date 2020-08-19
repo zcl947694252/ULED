@@ -148,8 +148,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         checkVersionAvailable()
         showLoadingDialog(getString(R.string.please_wait))
         getScanResult()
+
+        getRouterStatus()
         getRegionList()
         getAllStatus()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getRouterStatus() {
+        RouterModel.routerStatus()
+                ?.subscribe({
+                    when (it.data.status) {
+                        Constant.ROUTER_OTA_ING -> { }
+                        Constant.ROUTER_SCANNING -> {
+                            val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, it.data.data.scanType)
+                            startActivity(intent)
+                        }
+                    }
+                }, {
+                    getScanResult()
+                })
     }
 
     @SuppressLint("CheckResult")
@@ -167,7 +186,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
         val subscribe = RouterModel.routeScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
-            if (it.data!=null&&it.data.status==1){
+            if (it!=null&&it.data.status==1){
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, it)
                 startActivity(intent)

@@ -42,9 +42,9 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.RouteScanResultBean
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -1131,28 +1131,24 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
             R.id.search_bar -> {
                 if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                    val routeBean = RouteScanResultBean()
                     when (installId) {
                         INSTALL_NORMAL_LIGHT -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            routeBean.data.scanType = DeviceType.LIGHT_NORMAL
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_RGB_LIGHT -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            routeBean.data.scanType = DeviceType.LIGHT_RGB
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_CURTAIN -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            routeBean.data.scanType = DeviceType.SMART_CURTAIN
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
@@ -1176,16 +1172,14 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                         }
                         INSTALL_CONNECTOR -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            routeBean.data.scanType = DeviceType.SMART_RELAY//connector也叫relay
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_GATEWAY -> {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            routeBean.data.scanType = DeviceType.GATE_WAY
-                            intent.putExtra(Constant.DEVICE_TYPE, routeBean)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
                             startActivityForResult(intent, 0)
                             installDialog?.show()
                             finish()

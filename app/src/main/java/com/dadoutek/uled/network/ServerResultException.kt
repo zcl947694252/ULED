@@ -141,6 +141,10 @@ object ServerResultException {
                 ToastUtils.showShort(TelinkLightApplication.getApp().getString(R.string.route_other_add))
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_other_add))
             }
+            NetworkStatusCode.ROUTER_CAN_NOT_STOP -> {//该路由器已被其他人添加
+                ToastUtils.showShort(TelinkLightApplication.getApp().getString(R.string.route_can_not_stop))
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_can_not_stop))
+            }
             else -> {
                 //throw RuntimeException(response.message)
                 LogUtils.e("zcl-------RuntimeException---${response.message}")

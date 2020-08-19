@@ -379,7 +379,7 @@ class GwLoginActivity : TelinkBaseActivity() {
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
         val subscribe = RouterModel.routeScanningResult()?.subscribe({
             timeDisposable.dispose()
-            if (it.data != null && it.data.data.isNotEmpty()) {
+            if (it != null && it.data.data.isNotEmpty()) {
                 dbGw = DbGateway()
             } else {
                 //好像不支持网关
