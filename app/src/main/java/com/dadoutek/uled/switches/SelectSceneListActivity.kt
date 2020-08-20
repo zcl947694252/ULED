@@ -43,6 +43,7 @@ class SelectSceneListActivity : TelinkBaseActivity() {
             finish()
         }
         template_recycleView.layoutManager = GridLayoutManager(this, 5)
+        mSceneList.forEach { it.isChecked =false }
         template_recycleView.adapter = adpterDevice
         adpterDevice.bindToRecyclerView(template_recycleView)
         adpterDevice.setOnItemClickListener { _, _, position ->

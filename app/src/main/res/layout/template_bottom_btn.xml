@@ -7,7 +7,7 @@
         android:orientation="horizontal">
 
     <Button
-            android:id="@+id/btn_cancel"
+            android:id="@+id/tip_cancel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -16,13 +16,13 @@
             android:textColor="@color/black_six" />
 
     <View
-            android:id="@+id/cancel_confirm_vertical"
+            android:id="@+id/tip_center_vertical"
             android:layout_width="0.5dp"
             android:layout_height="match_parent"
             android:background="@color/gray" />
 
     <Button
-            android:id="@+id/btn_confirm"
+            android:id="@+id/tip_confirm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

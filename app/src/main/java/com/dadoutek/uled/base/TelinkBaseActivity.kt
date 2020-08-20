@@ -44,7 +44,6 @@ import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -173,9 +172,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 CoroutineScope(Dispatchers.IO).launch {
                     SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
                         override fun start() {}
-                        override fun complete() {
-                          //  LogUtils.v("zcl-----------默认上传成功-------")
-                        }
+                        override fun complete() {}
 
                         override fun error(msg: String?) {}
                     })
@@ -652,16 +649,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                         Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                     }
                 }
-                Cmd.routeInAccount -> {
-                    routerAccessIn(cmdBean)
-                }
+                Cmd.routeInAccount -> routerAccessIn(cmdBean)
                 Cmd.routeConfigWifi ->routerConfigWIFI(cmdBean)
                 Cmd.routeStartScann ->startRouterScan(cmdBean)
-                Cmd.routeScanDeviceInfo -> {
-                    //val scanResultBean = Gson().fromJson(msg, RouteScanResultBean::class.java)
-                    receivedRouteDeviceNum(cmdBean)
-                }
-                Cmd.routeInAccount -> {
+                Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
+
+                Cmd.routeGroupingDevice -> {
                     ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
                 }
                 Cmd.routeInAccount -> {
@@ -1207,8 +1200,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
 
         hinitOne = popView.findViewById(R.id.pop_warm_tv)
-        cancelf = popView.findViewById(R.id.btn_cancel)
-        confirmf = popView.findViewById(R.id.btn_confirm)
+        cancelf = popView.findViewById(R.id.tip_cancel)
+        confirmf = popView.findViewById(R.id.tip_confirm)
         hinitOne.text = getString(R.string.exit_tips_in_scanning)
 
         popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

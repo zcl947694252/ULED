@@ -31,9 +31,9 @@ abstract class NetworkObserver<T> : Observer<T> {
                 if (e.message != null && e.message != "null")
                     ToastUtils.showLong(e.message)  //服务器接口报错
             }
-            else -> //未知错误
-                if (!TextUtils.isEmpty(e.message))
-                    ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
+            else -> {}//未知错误
+                //if (!TextUtils.isEmpty(e.message))
+                   // ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
         }
     }
 

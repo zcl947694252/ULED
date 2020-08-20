@@ -5,6 +5,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.router.bean.RouteScanResultBean
+import com.dadoutek.uled.router.bean.RouterBatchGpBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -107,7 +108,7 @@ object RouterModel {
     /**
      * 路由批量分组
      */
-    fun routeBatchGp( targetGroupMeshAddr:Long, deviceMeshAddrs:  List<Int>, meshType:Long,  ser_id:String ): Observable<Response<Long>>? {
+    fun routeBatchGp( targetGroupMeshAddr:Long, deviceMeshAddrs:  List<Int>, meshType:Long,  ser_id:String ): Observable<Response<RouterBatchGpBean>>? {
         return NetworkFactory.getApi().routerBatchGp( targetGroupMeshAddr, deviceMeshAddrs, meshType,ser_id )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

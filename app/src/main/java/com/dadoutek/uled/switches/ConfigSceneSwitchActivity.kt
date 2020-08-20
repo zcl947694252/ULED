@@ -60,7 +60,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
     private var mConnectingSnackBar: Snackbar? = null
-    val map = mutableMapOf<Int, DbScene>()
+    private val mapConfig = mutableMapOf<Int, DbScene>()
     private var configTag: Int = 0
     private var mIsDisconnecting: Boolean = false
     private var mIsConfiguring: Boolean = false
@@ -86,7 +86,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         }
         fiVersion?.title = version
         //scene_tvLightVersion?.text = version
-        map.clear()
+        mapConfig.clear()
 
         groupName = intent.getStringExtra("group")
         isReConfig = groupName != null && groupName == "true"
@@ -154,6 +154,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 showDisconnectSnackBar()
             }
         } else {
+            if (mapConfig.size<4){
+                ToastUtils.showShort(getString(R.string.please_config_all))
+                return
+            }
             pb_ly.visibility = View.VISIBLE
             GlobalScope.launch {
                 setSceneForSwitch()
@@ -498,18 +502,16 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum = 0
-        val map: Map<Int, DbScene> =/* mAdapter.sceneMap*/map
-        for (key in map.keys) {
+        for (key in mapConfig.keys) {
             when (key) {
                 0 -> keyNum = 0x05          //左上按键
                 1 -> keyNum = 0x03          //右上按键
                 2 -> keyNum = 0x06          //左下按键
                 3 -> keyNum = 0x04          //右下按键
             }
-            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, map.getValue(key).id.toByte(), 0x00)
-
+            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, mapConfig.getValue(key).id.toByte(), 0x00)
+            LogUtils.v("zcl-----------配置场景参数-------$paramBytes")
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, paramBytes)
-            Thread.sleep(200)
         }
     }
 
@@ -549,8 +551,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodes) {
             val scene = data?.getParcelableExtra<DbScene>("data")
             scene.let {
-                map[configTag] = scene!!
-                LogUtils.v("zcl---返回结果$configTag-----$scene-----$map")
+                mapConfig[configTag] = scene!!
+                LogUtils.v("zcl---返回结果$configTag-----$scene-----$mapConfig")
                 when (configTag) {
                     0 -> {
                         scene_one.text = scene.name

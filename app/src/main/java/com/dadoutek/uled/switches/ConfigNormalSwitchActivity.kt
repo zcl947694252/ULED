@@ -86,17 +86,13 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        when (mDeviceInfo.productUUID) {
-            DeviceType.NORMAL_SWITCH -> {
-                sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
-                toolbarTv.text = getString(R.string.light_sw)
-            }
-            DeviceType.NORMAL_SWITCH2 -> {
-                toolbarTv.text = getString(R.string.touch_sw)
-                sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
-            }
-
-            //tvLightVersion.text = localVersion
+        if (!localVersion.contains("BTS")) {
+            sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
+            toolbarTv.text = getString(R.string.light_sw)
+        } else {
+            toolbarTv.text = getString(R.string.touch_sw)
+            sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+            //tLightVersion.text = localVersion
         }
 
 
@@ -345,25 +341,33 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> { }
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                    }
                 }
                 showDisconnectSnackBar()
 
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> { }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> { }
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> { }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> { }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> { }
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
@@ -500,8 +504,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     private fun setGroupForSwitch() {
         val groupAddress = currentGroup!!.meshAddr
-        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
-                (groupAddress shr 8 and 0xFF).toByte())
+        val paramBytes = byteArrayOf(0x01, (groupAddress shr 8 and 0xFF).toByte(), (groupAddress and 0xFF).toByte())
+        //0x01 代表添加组
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
 

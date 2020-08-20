@@ -94,15 +94,14 @@ class SettingActivity : TelinkBaseActivity() {
                             var intent = Intent(this, SafeLockActivity::class.java)
                             startActivity(intent)
                         }
-                        2 -> {
+                        3 -> {
                             var intent = Intent(this, ChooseModeActivity::class.java)
                             startActivity(intent)
                         }
-                        3 -> {
-                            Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
-                            adapter.notifyDataSetChanged()
+                        2 -> {
                             UserModel.updateModeStatus().subscribe({
-                                ToastUtils.showShort(it.message)
+                                Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
+                                adapter.notifyDataSetChanged()
                             }, {
                                 ToastUtils.showShort(it.message)
                             })
@@ -130,10 +129,10 @@ class SettingActivity : TelinkBaseActivity() {
         list.clear()
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        if (DBUtils.getAllRouter().size > 1)
-            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+        //list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+//        if (DBUtils.getAllRouter().size > 1)
+//            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")
@@ -217,10 +216,10 @@ class SettingActivity : TelinkBaseActivity() {
         hinitTwo = popView.findViewById(R.id.hinit_two)
         hinitThree = popView.findViewById(R.id.hinit_three)
         readTimer = popView.findViewById(R.id.read_timer)
-        cancel = popView.findViewById(R.id.btn_cancel)
-        confirm = popView.findViewById(R.id.btn_confirm)
+        cancel = popView.findViewById(R.id.tip_cancel)
+        confirm = popView.findViewById(R.id.tip_confirm)
         cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
-        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+        cancelConfirmVertical = popView.findViewById(R.id.tip_center_vertical)
 
         hinitOne?.text = getString(R.string.user_reset_all1)
         hinitTwo?.text = getString(R.string.user_reset_all2)

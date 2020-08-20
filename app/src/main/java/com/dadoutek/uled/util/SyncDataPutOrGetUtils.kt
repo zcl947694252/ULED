@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.*
@@ -66,25 +67,20 @@ class SyncDataPutOrGetUtils {
                 observableList.toArray(observables)
 
                 if (observables.isNotEmpty()) {
-                    Observable.mergeArrayDelayError<String>(*observables)
+                    Observable.mergeArrayDelayError(*observables)
                             .subscribe(object : NetworkObserver<String?>() {
                                 override fun onComplete() {
                                     GlobalScope.launch(Dispatchers.Main) {
                                         syncCallback.complete()
                                     }
                                 }
-
-                                override fun onSubscribe(d: Disposable) {
-                                }
-
-                                override fun onNext(t: String) {
-                                }
-
+                                override fun onSubscribe(d: Disposable) {}
+                                override fun onNext(t: String) {}
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {
                                         if (e.message != "")
-                                            syncCallback.error(e.cause.toString())
+                                            syncCallback.error(context.getString(R.string.upload_data_failed))
                                     }
                                 }
                             })
@@ -228,7 +224,6 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
-
                                 return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
@@ -283,7 +278,6 @@ class SyncDataPutOrGetUtils {
                             body.belongRegionId = scene.belongRegionId
                             body.imgName = scene.imgName
                             body.actions = DBUtils.getActionsBySceneId(changeId)
-
                             postInfoStr = gson.toJson(body)
 
                             bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
@@ -294,14 +288,12 @@ class SyncDataPutOrGetUtils {
                                 val scene = DBUtils.getSceneByID(changeId)
                                 //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
-                                    return SceneModel.add(token, bodyScene
-                                            , id, changeId)
+                                    return SceneModel.add(token, bodyScene, id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
                                 //("scene_delete--id==" + changeId)
-                                return SceneModel.delete(token,
-                                        changeId.toInt(), id)
+                                return SceneModel.delete(token, changeId.toInt(), id)
                             }
                             Constant.DB_UPDATE -> {
                                 //("scene_update--id==" + changeId)
@@ -315,7 +307,6 @@ class SyncDataPutOrGetUtils {
 
                     "DB_DIY_GRADIENT" -> {
                         val gradient = DBUtils.getGradientByID(changeId)
-
                         lateinit var postInfoStr: String
                         var bodyGradient: RequestBody? = null
                         if (gradient != null && type != Constant.DB_DELETE) {
@@ -336,16 +327,14 @@ class SyncDataPutOrGetUtils {
                             Constant.DB_ADD -> {
                                 val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
                                 if (bodyGradient != null) {
-                                    return GradientModel.add(token, bodyGradient
-                                            , id, changeId)
+                                    return GradientModel.add(token, bodyGradient, id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
-                                return GradientModel.delete(token,
-                                        body, id)
+                                return GradientModel.delete(token, body, id)
                             }
                             Constant.DB_UPDATE -> {
                                 if (bodyGradient != null) {

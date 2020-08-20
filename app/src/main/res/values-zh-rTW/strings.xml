@@ -1020,4 +1020,7 @@
     <string name="router_scan_faile">路由扫描失败,请检查路由后重试</string>
     <string name="stop_scan_fail">停止扫描失败</string>
     <string name="route_can_not_stop">此时无法停止，请稍等</string>
+    <string name="gp_not_exit">目标组不存在，重新刷新组数据</string>
+    <string name="device_type_not_match">设备无法分入该组，设备的productUUID与组的deviceType不匹配</string>
+    <string name="please_config_all">请完成所有按键配置</string>
 </resources>

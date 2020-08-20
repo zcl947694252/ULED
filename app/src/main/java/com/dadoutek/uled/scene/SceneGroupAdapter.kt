@@ -62,7 +62,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     @SuppressLint("ClickableViewAccessibility")
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
-        val position = helper.layoutPosition
+        val position = helper.adapterPosition
         sbBrightnessCW = helper.getView(R.id.cw_sbBrightness)
         sbtemperature = helper.getView(R.id.temperature)
         addBrightnessCW = helper.getView(R.id.cw_brightness_add)

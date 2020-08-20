@@ -1381,7 +1381,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 3 -> slow_rg_middle.isChecked = true
                 5 -> slow_rg_fast.isChecked = true
             }
-
+           slow_rg_close.isChecked =  group?.slowUpSlowDownStatus==1
             slow_ly.visibility = VISIBLE
         } else
             slow_ly.visibility = GONE

@@ -247,10 +247,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         hinitTwo = popView.findViewById(R.id.hinit_two)
         hinitThree = popView.findViewById(R.id.hinit_three)
         readTimer = popView.findViewById(R.id.read_timer)
-        cancel = popView.findViewById(R.id.btn_cancel)
-        confirm = popView.findViewById(R.id.btn_confirm)
+        cancel = popView.findViewById(R.id.tip_cancel)
+        confirm = popView.findViewById(R.id.tip_confirm)
         cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
-        cancelConfirmVertical = popView.findViewById(R.id.cancel_confirm_vertical)
+        cancelConfirmVertical = popView.findViewById(R.id.tip_center_vertical)
 
         hinitOne?.text = getString(R.string.user_reset_all1)
         hinitTwo?.text = getString(R.string.user_reset_all2)
@@ -294,8 +294,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     private fun makePop() {
         // 恢复出厂设置
         var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
-        cancel = popView.findViewById(R.id.btn_cancel)
-        confirm = popView.findViewById(R.id.btn_confirm)
+        cancel = popView.findViewById(R.id.tip_cancel)
+        confirm = popView.findViewById(R.id.tip_confirm)
 
         cancel?.let {
             it.setOnClickListener { PopUtil.dismiss(pop) }

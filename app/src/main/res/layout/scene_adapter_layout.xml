@@ -681,6 +681,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:paddingBottom="@dimen/dp_10"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/temperature">
 
@@ -703,11 +704,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:background="@drawable/add_enabled" />
-
-
             </LinearLayout>
-
-
         </android.support.constraint.ConstraintLayout>
         <!--开关场景-->
         <android.support.constraint.ConstraintLayout
@@ -726,7 +723,7 @@
                     android:layout_marginTop="13dp"
                     android:src="@drawable/scene_curtain_yes"
                     android:visibility="gone"
-                    android:layout_marginBottom="@dimen/dp_15"
+                    android:paddingBottom="@dimen/dp_15"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -739,7 +736,7 @@
                     android:layout_marginTop="13dp"
                     android:src="@drawable/scene_acceptor_yes"
                     android:visibility="gone"
-                    android:layout_marginBottom="@dimen/dp_15"
+                    android:paddingBottom="@dimen/dp_15"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

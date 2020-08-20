@@ -102,10 +102,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     var typeStr: String = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
-    private var buildInModeList: ArrayList<ItemRgbGradient>? = null
-    private var diyGradientList: MutableList<DbDiyGradient>? = null
-    private var rgbGradientAdapter: RGBGradientAdapter? = null
-    private var rgbDiyGradientAdapter: RGBDiyGradientAdapter? = null
+    private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
+    private var diyGradientList: MutableList<DbDiyGradient> = ArrayList()
+    private var rgbGradientAdapter: RGBGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
+    private var rgbDiyGradientAdapter: RGBDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
     private var applyDisposable: Disposable? = null
     private var downTime: Long = 0//Button被按下时的时间
     private var thisTime: Long = 0//while每次循环时的时间
@@ -307,7 +307,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-
         override fun downLoadFileStart() {
             showLoadingDialog(getString(R.string.get_update_file))
         }
@@ -383,6 +382,16 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         main_add_device?.text = getString(R.string.mode_diy)
         main_go_help?.visibility = View.VISIBLE
 
+        if (Constant.IS_OPEN_AUXFUN){
+            ll_r.visibility = View.VISIBLE
+            ll_g.visibility = View.VISIBLE
+            ll_b.visibility = View.VISIBLE
+        }else{
+            ll_r.visibility = View.GONE
+            ll_g.visibility = View.GONE
+            ll_b.visibility = View.GONE
+        }
+
 
         if (typeStr == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
@@ -440,7 +449,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         tvRename.visibility = View.GONE
         toolbarTv.text = light?.name
 
-        openOrClose(light?.connectionStatus ==1)
+        openOrClose(light?.connectionStatus == 1)
 
         rgb_switch.setOnCheckedChangeListener { _, isChecked ->
             if (light != null)
@@ -469,19 +478,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         cb_brightness_rgb_enable.setOnClickListener(cbOnClickListener)
         main_add_device?.setOnClickListener(clickListener)
         main_go_help?.setOnClickListener(clickListener)
-
-        buildInModeList = ArrayList()
-        val presetGradientList = resources.getStringArray(R.array.preset_gradient)
-
-        for (i in 0..10) {
-            var item = ItemRgbGradient()
-            item.name = presetGradientList[i]
-            item.select = postionAndNum?.position == i
-            buildInModeList?.add(item)
-        }
-
-        diyGradientList = DBUtils.diyGradientList
-
 
         sb_w_bright_add!!.setOnTouchListener { _, event ->
             addWhiteBright(event)
@@ -538,34 +534,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
-        val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        builtInModeRecycleView!!.layoutManager = layoutmanager
-        //渐变标准模式
-        this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
-        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        //添加分割线
-        builtInModeRecycleView?.addItemDecoration(decoration)
-        rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
-        rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
-
-        val layoutmanagers = LinearLayoutManager(this)
-        layoutmanagers.orientation = LinearLayoutManager.VERTICAL
-        builtDiyModeRecycleView!!.layoutManager = layoutmanagers
-        //渐变模式自定义
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
-        builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
-
-        val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
-        //添加分割线
-        builtDiyModeRecycleView?.addItemDecoration(decorations)
-        // rgbDiyGradientAdapter!!.addFooterView(lin)
-        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
-        rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
-        rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
+        setColorMode()
+        setDiyColorMode()
 
         val brightness = if (light!!.brightness >= 1) light!!.brightness else 1
         sbBrightness!!.progress = brightness
@@ -619,6 +589,35 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_picker.setInitialColor((light?.color ?: 1 and 0xffffff) or 0xff000000.toInt())
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+    }
+
+    private fun setDiyColorMode() {
+        diyGradientList.clear()
+        diyGradientList.addAll(DBUtils.diyGradientList)
+        builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //渐变模式自定义
+        rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
+        builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
+        val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
+        //添加分割线
+        builtDiyModeRecycleView?.addItemDecoration(decorations)
+        // rgbDiyGradientAdapter!!.addFooterView(lin)
+        rgbDiyGradientAdapter.onItemChildClickListener = onItemChildClickListenerDiy
+        //rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
+        rgbDiyGradientAdapter.bindToRecyclerView(builtDiyModeRecycleView)
+    }
+
+    private fun setColorMode() {
+        setDIyModeData()
+        builtInModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        //渐变标准模式  添加分割线
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+        builtInModeRecycleView?.addItemDecoration(decoration)
+        rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
+        rgbGradientAdapter.onItemChildClickListener = onItemChildClickListener
+        rgbGradientAdapter.bindToRecyclerView(builtInModeRecycleView)
     }
 
 
@@ -1030,10 +1029,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
 
             }
-            R.id.mode_diy_layout -> {
+            R.id.mode_diy_layout -> {//自定义模式
                 changeToDiyPage()
             }
-            R.id.mode_preset_layout -> {
+            R.id.mode_preset_layout -> {//内置模式按钮
                 changeToBuildInPage()
             }
             R.id.main_go_help -> {
@@ -1068,7 +1067,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 dialog.show()
 
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-
             }
         }
     }
@@ -1089,21 +1087,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun applyPresetView() {
-        val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        builtInModeRecycleView!!.layoutManager = layoutmanager
-        this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
-        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        //添加分割线
-        builtInModeRecycleView?.addItemDecoration(decoration)
-        rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
-        rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
+        setColorMode()
+        setDiyColorMode()
     }
 
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
-
         when (view!!.id) {
             R.id.gradient_mode_on -> {
                 //应用内置渐变
@@ -1172,9 +1160,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             if (light != null)
                 updateGroupResult(light!!, group)
         } else {
-            diyGradientList = DBUtils.diyGradientList
+            diyGradientList.clear()
+            diyGradientList.addAll(DBUtils.diyGradientList)
 
-            this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
             isDelete = false
             rgbDiyGradientAdapter!!.changeState(isDelete)
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
@@ -1206,11 +1194,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun setDate() {
-        for (i in diyGradientList!!.indices) {
-            if (diyGradientList!![i].isSelected) {
+        for (i in diyGradientList!!.indices)
+            if (diyGradientList!![i].isSelected)
                 diyGradientList!![i].isSelected = false
-            }
-        }
     }
 
     private fun changeToDiyPage() {
@@ -1222,7 +1208,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         } else {
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
-            layoutModeDiy.visibility = View.GONE
+            layoutModeDiy.visibility = View.VISIBLE
             isDiyMode = true
         }
         applyDiyView()
@@ -1230,7 +1216,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun applyDiyView() {
         builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
+        rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
@@ -1324,7 +1310,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         var batchGroup = toolbar.findViewById<ImageView>(R.id.img_function2)
 
         batchGroup.setOnClickListener {
-
             var listSize: ArrayList<DbDiyGradient>? = null
             listSize = ArrayList()
 
@@ -1433,7 +1418,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             isDiyMode = false
-            changeToDiyPage()
+            //changeToDiyPage()
         }
     }
 
@@ -1616,7 +1601,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun initDataGroup() {
         this.mApplication = this.application as TelinkLightApplication
         this.group = this.intent.extras!!.get("group") as DbGroup
-        openOrClose(group?.connectionStatus ==1)
+        openOrClose(group?.connectionStatus == 1)
     }
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
@@ -1651,47 +1636,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         cb_brightness_enable.setOnClickListener(cbOnClickListener)
         cb_brightness_rgb_enable.setOnClickListener(cbOnClickListener)
 
-        buildInModeList = ArrayList()
-        val presetGradientList = resources.getStringArray(R.array.preset_gradient)
-        for (i in 0..10) {
-            var item = ItemRgbGradient()
-            item.name = presetGradientList[i]
-            item.select = i == postionAndNum?.position ?: 100//如果等于该postion则表示选中
-            buildInModeList?.add(item)
-        }
 
-        diyGradientList = DBUtils.diyGradientList
-
-        val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        builtInModeRecycleView!!.layoutManager = layoutmanager
-        this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
-        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
-
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
-        //添加分割线
-        builtInModeRecycleView?.addItemDecoration(decoration)
-        rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
-        rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
-
-        val layoutmanagers = LinearLayoutManager(this)
-        layoutmanagers.orientation = LinearLayoutManager.VERTICAL
-        builtDiyModeRecycleView!!.layoutManager = layoutmanagers
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
-        builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
-
-        val decorations = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .black_ee)))
-        //添加分割线
-        builtDiyModeRecycleView?.addItemDecoration(decorations)
-        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
-        rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
-        rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
+        setColorMode()
+        setDiyColorMode()
 
         sb_w_bright_add!!.setOnTouchListener { v, event ->
             addWhiteBright(event)
@@ -1793,6 +1740,17 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_picker.subscribe(colorObserver)
         color_picker.setInitialColor((group?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
         checkGroupIsSystemGroup()
+    }
+
+    private fun setDIyModeData() {
+        buildInModeList.clear()
+        val presetGradientList = resources.getStringArray(R.array.preset_gradient)
+        for (i in 0..10) {
+            var item = ItemRgbGradient()
+            item.name = presetGradientList[i]
+            item.select = i == postionAndNum?.position//如果等于该postion则表示选中
+            buildInModeList?.add(item)
+        }
     }
 
     @SuppressLint("SetTextI18n")

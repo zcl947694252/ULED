@@ -23,6 +23,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import cn.smssdk.gui.util.Const
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
@@ -87,12 +88,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
     private lateinit var sceneFragment: SceneFragment
+
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
     private var mConnectDisposal: Disposable? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
+
     //记录用户首次点击返回键的时间
     private var firstTime: Long = 0
 
@@ -105,7 +108,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> { }
+                    BluetoothAdapter.STATE_OFF -> {
+                    }
                 }
             }
         }
@@ -129,7 +133,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
-        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this,Constant.ROUTE_MODE,false)
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
 
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
@@ -156,27 +160,29 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     private fun getRouterStatus() {
-        RouterModel.routerStatus()
-                ?.subscribe({
-                    when (it.data.status) {
-                        Constant.ROUTER_OTA_ING -> { }
-                        Constant.ROUTER_SCANNING -> {
-                            val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, it.data.data.scanType)
-                            startActivity(intent)
+        if (Constant.IS_ROUTE_MODE)
+            RouterModel.routerStatus()
+                    ?.subscribe({
+                        when (it.data.status) {
+                            Constant.ROUTER_OTA_ING -> {
+                            }
+                            Constant.ROUTER_SCANNING -> {
+                                val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, it.data.data.scanType)
+                                startActivity(intent)
+                            }
                         }
-                    }
-                }, {
-                    getScanResult()
-                })
+                    }, {
+                        getScanResult()
+                    })
     }
 
     @SuppressLint("CheckResult")
     private fun getAllStatus() {
         UserModel.getModeStatus()?.subscribe({
-            Constant.IS_ROUTE_MODE = it.mode==1//0蓝牙，1路由
+            Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
             Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
-        },{
+        }, {
             Constant.IS_ROUTE_MODE = false
             Constant.IS_OPEN_AUXFUN = false
         })
@@ -186,7 +192,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
         val subscribe = RouterModel.routeScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
-            if (it!=null&&it.data.status==1){
+            if (it?.data != null &&it.data.status == 1) {
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, it)
                 startActivity(intent)

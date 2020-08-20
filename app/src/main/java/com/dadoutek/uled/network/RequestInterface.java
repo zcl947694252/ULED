@@ -28,6 +28,7 @@ import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
+import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 
 import java.util.List;
 import java.util.Map;
@@ -769,9 +770,9 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/regroup")
-    Observable<Response<Long>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
-                                       @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
-                                       @Field("meshType") long meshType,@Field("ser_id") String ser_id );
+    Observable<Response<RouterBatchGpBean>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
+                                                          @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
+                                                          @Field("meshType") long meshType, @Field("ser_id") String ser_id );
     /**
      * 获取路由列表
      * https://dev.dadoutek.com/xxxx/router/list GET

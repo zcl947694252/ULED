@@ -889,7 +889,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         }
         viewAdd?.let {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
-            it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
+            it.findViewById<Button>(R.id.tip_confirm).setOnClickListener {
                 if (com.blankj.utilcode.util.StringUtils.isTrimEmpty(name.text.toString())) {
                     ToastUtils.showLong(getString(R.string.please_input_region_name))
                     return@setOnClickListener
@@ -898,7 +898,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 addRegion(name.text)
                 PopUtil.dismiss(popAdd)
             }
-            it.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
+            it.findViewById<Button>(R.id.tip_cancel).setOnClickListener {
                 PopUtil.dismiss(popAdd)
             }
         }
