@@ -1591,22 +1591,59 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("CheckResult")
     private fun skipeBatchActivity() {
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-        DBUtils.saveRegion(lastMyRegion, true)
-        var meshAddress = 0
-        for (item in mAddedDevices) {
-            val deviceInfo = item.deviceInfo
-            if (meshAddress == 0)
-                meshAddress = deviceInfo.meshAddress
-            else if (meshAddress < item.deviceInfo.meshAddress)
-                meshAddress = deviceInfo.meshAddress
-            mAddedDevicesInfos.add(item.deviceInfo)
+        if (Constant.IS_ROUTE_MODE) {//获取扫描数据
+            RouterModel.routeScanningResult()?.subscribe({ it ->
+                val data = it.data
+                if (data.status == 0) {
+                    mAddedDevicesInfos.clear()
+                    when {
+                        data != null && data.data.isNotEmpty() -> {
+                            showLoadingDialog(resources.getString(R.string.please_wait))
+                            data.data.forEach { x ->
+                                val deviceInfo = DeviceInfo()
+                                deviceInfo.id = x.id
+                                deviceInfo.index = x.index
+                                deviceInfo.sixByteMacAddress = x.macAddr
+                                deviceInfo.macAddress = x.macAddr
+                                deviceInfo.meshAddress = x.meshAddr
+                                deviceInfo.meshUUID = x.meshUUID
+                                deviceInfo.deviceName = x.name
+                                deviceInfo.productUUID = x.productUUID
+                                deviceInfo.uid = x.uid
+                                deviceInfo.firmwareRevision = x.version
+                                deviceInfo.colorTemperature = x.colorTemperature
+                                deviceInfo.color = x.color
+                                deviceInfo.brightness = x.brightness
+                                deviceInfo.boundMac = x.boundMac
+                                deviceInfo.belongRegionId = x.belongRegionId
+                                deviceInfo.belongGroupId = x.belongGroupId.toLong()
+                                mAddedDevicesInfos.add(deviceInfo)
+                            }
+                            tellServerClear()
+                        }
+                        else -> scanFail()
+                    }
+                } else {//如果还在扫描则重新计算超时时间
+                    routeTimerOut()
+                }
+            }, {
+
+            })
+        } else {
+            DBUtils.saveRegion(lastMyRegion, true)
+            var meshAddress = 0
+            for (item in mAddedDevices) {
+                val deviceInfo = item.deviceInfo
+                when {
+                    meshAddress == 0 -> meshAddress = deviceInfo.meshAddress
+                    meshAddress < item.deviceInfo.meshAddress -> meshAddress = deviceInfo.meshAddress
+                }
+                mAddedDevicesInfos.add(item.deviceInfo)
+            }
+            lastMyRegion.lastGenMeshAddr = meshAddress
+            skipeActivity(intent)
         }
 
-        lastMyRegion.lastGenMeshAddr = meshAddress
-        intent.putParcelableArrayListExtra(Constant.DEVICE_NUM, mAddedDevicesInfos)
-        intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
-        startActivity(intent)
-        finish()
         LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
     }
 
