@@ -835,7 +835,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                     }
                                 }
                             }, {
-
+                                    ToastUtils.showShort(it.message)
                             })
                 }
             } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃

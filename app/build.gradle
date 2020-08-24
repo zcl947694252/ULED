@@ -36,7 +36,10 @@ android {
             storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
-            keyPassword 'dadoutek2018'
+
+
+
+           keyPassword 'dadoutek2018'
         }
     }
     compileSdkVersion 28
