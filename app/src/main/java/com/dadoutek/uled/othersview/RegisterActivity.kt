@@ -132,17 +132,15 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         return
                     }
 
-                    UpdateModel.isRegister(userName!!)?.subscribe(object : NetworkObserver<Boolean?>() {
-                        override fun onNext(t: Boolean) {
-                            if (!t) {
+                    UpdateModel.isRegister(userName!!)?.subscribe({
+                            if (!it) {
                                 regist_frist_progress.visibility = View.GONE
                                 SMSSDK.getVerificationCode(countryCode, userName)
 
                             } else {
                                 ToastUtils.showLong(getString(R.string.account_exist))
                             }
-                        }
-                    })
+                        },{})
 
                 } else {
                     ToastUtils.showLong(getString(R.string.network_unavailable))

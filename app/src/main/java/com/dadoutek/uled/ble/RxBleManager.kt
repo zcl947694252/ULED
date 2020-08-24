@@ -55,12 +55,10 @@ object RxBleManager {
 
     @SuppressLint("CheckResult")
     private fun getRegionList() {
-        RegionModel.getRegionName().subscribe(object : NetworkObserver<Response<MutableList<String>>?>() {
-            override fun onNext(t: Response<MutableList<String>>) {
-                regionList = t.t
-                LogUtils.v("zcl获取区域contromes名列表-------------$t")
-            }
-        })
+        RegionModel.getRegionName().subscribe({
+                regionList = it.t
+                LogUtils.v("zcl获取区域contromes名列表-------------$it")
+            },{})
     }
 
     private fun getLocalRegionName() {

@@ -86,7 +86,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        if (!localVersion.contains("BTS")) {
+        if (!localVersion.contains("BT")) {
             sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {

@@ -7,6 +7,7 @@ apply plugin: 'com.mob.sdk'
 
 // 在MobSDK的扩展中注册SMSSDK的相关信息
 MobSDK {
+
     appKey "260b846a2a8f8"
     appSecret "886a329e066cc1fba6db79e0d5a299bf"
 
@@ -44,8 +45,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 274
-        versionName "4.0.1"
+        versionCode 275
+        versionName "4.0.2"
 
         multiDexEnabled true
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }

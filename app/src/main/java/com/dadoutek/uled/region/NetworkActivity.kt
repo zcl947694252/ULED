@@ -131,16 +131,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun getQrInfo() {
-        val disposable = RegionModel.lookTransferCodeState().subscribe(object : NetworkObserver<TransferBean?>() {
-            override fun onNext(it: TransferBean) {
+        val disposable = RegionModel.lookTransferCodeState().subscribe( {
                 val isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
                 transfer_account_tv.text = if (isNewQr) getString(R.string.transfer_accounts) else getString(R.string.to_receive)
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showLong(e.message)
-            }
+            }, {
+                ToastUtils.showLong(it.message)
         })
     }
 
@@ -223,15 +218,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             dbRegion.id = regionBean?.id
         }
 
-        val disposable = RegionModel.addRegions(lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe(object : NetworkObserver<Any?>() {
-            override fun onNext(t: Any) {
+        val disposable = RegionModel.addRegions(lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe( {
                  initData()
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showLong(e.message)
-            }
+            },{
+                ToastUtils.showLong(it.message)
         })
     }
 
@@ -243,50 +233,31 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             region_account_num.text = lastUser!!.phone
 //            LogUtils.e(TAG, "zcl******isShowType****$isShowType" + "user${lastUser.toString()}")
             when (isShowType) {
-                1 -> RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-                    override fun onNext(it: MutableList<RegionBean>) {
-                        setMeData(it)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        ToastUtils.showLong(e.message)
+                1 -> RegionModel.get()?.subscribe({
+                    setMeData(it)
+                }, {
+                    ToastUtils.showLong(it.message)
+                    hideLoadingDialog()
+                })
+                2 -> RegionModel.getAuthorizerList()?.subscribe({
+                        setAuthorizeData(it)
+                    }, {
+                        ToastUtils.showLong(it.message)
                         hideLoadingDialog()
                     }
-                })
-                2 -> RegionModel.getAuthorizerList()?.subscribe(object : NetworkObserver<MutableList<RegionAuthorizeBean>?>() {
-                    override fun onNext(t: MutableList<RegionAuthorizeBean>) {
-                        setAuthorizeData(t)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        ToastUtils.showLong(e.message)
-                        hideLoadingDialog()
-                    }
-                })
+                )
                 3 -> {
-                    RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-                        override fun onNext(it: MutableList<RegionBean>) {
+                    RegionModel.get()?.subscribe({
                             setMeData(it)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.message)
+                        }, {
+                            ToastUtils.showLong(it.message)
                             hideLoadingDialog()
-                        }
-                    })
-                    RegionModel.getAuthorizerList()?.subscribe(object : NetworkObserver<MutableList<RegionAuthorizeBean>?>() {
-                        override fun onNext(t: MutableList<RegionAuthorizeBean>) {
-                            setAuthorizeData(t)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.message)
+                        })
+                    RegionModel.getAuthorizerList()?.subscribe({
+                            setAuthorizeData(it)
+                        },{
+                            ToastUtils.showLong(it.message)
                             hideLoadingDialog()
-                        }
                     })
                 }
             }
@@ -504,15 +475,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_qr_cancel -> {//取消弹框
                 if (qrCodeType == 1)
-                    RegionModel.removeTransferCode()!!.subscribe(object : NetworkObserver<String?>() {
-                        override fun onNext(t: String) {
+                    RegionModel.removeTransferCode()!!.subscribe({
                             setCancel()
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.message)
-                        }
+                        },{
+                            ToastUtils.showLong(it.message)
                     })
                 PopUtil.dismiss(pop)
             }
@@ -524,10 +490,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 if (isShowType == 1 && regionBean?.count_all ?: 0 > 0)
                     ToastUtils.showLong(getString(R.string.delete_region_tip))
                 else
-                    RegionModel.removeRegion(regionBean!!.id)!!.subscribe(object : NetworkObserver<String?>() {
-                        override fun onNext(t: String) {
+                    RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
 
-                            LogUtils.e("zcl====删除区域$t----删除信息$regionBean")
+                            LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
                             PopUtil.dismiss(pop)
                             regionBean?.let {itr->
                                 val dbRegion = DbRegion()
@@ -541,12 +506,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                 DBUtils.deleteRegion(dbRegion)
                             }
                             initData()
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.message)
-                        }
+                        },{
+                            ToastUtils.showLong(it.message)
                     })
             }
             R.id.pop_transfer_region -> {
@@ -624,17 +585,12 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             transfer_account_tv.text = getString(R.string.transfer_accounts)
                             setCancel()
                         }
-                        2 -> RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe(object : NetworkObserver<String?>() {
-                            override fun onNext(t: String) {
+                        2 -> RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
                                 LogUtils.e("zcl取消网络授权成功id" + regionBean!!.id + "=======type" + regionBean!!.code_info!!.type)
                                 setCancel()
                                 setCreatShareCodeState()
-                            }
-
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                ToastUtils.showLong(e.message)
-                            }
+                            },{
+                                ToastUtils.showLong(it.message)
                         })
                         3 -> /*RegionModel.removeQrCode(transferRegionCode)
                                 ?.subscribe({
@@ -642,16 +598,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                     ToastUtils.showShort(getString(R.string.QR_canceled))
                                 }, { ToastUtils.showShort(it.message) })*/
                             RegionModel.removeTransferRegionCode(regionBean!!.id)
-                                        ?.subscribe(object : NetworkObserver<Response<TransferRegionBean>?>() {
-                                            override fun onNext(t: Response<TransferRegionBean>) {
+                                        ?.subscribe( {
                                                 PopUtil.dismiss(pop)
                                                 ToastUtils.showShort(getString(R.string.QR_canceled))
-                                            }
-
-                                            override fun onError(e: Throwable) {
-                                                super.onError(e)
-                                                ToastUtils.showShort(e.message)
-                                            }
+                                            },{
+                                                ToastUtils.showShort(it.message)
                                         })
                     }
 
@@ -664,8 +615,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 生成区域移交码
      */
     private fun lookAndMakeTransferRegionCode() {
-        val disposable = lookAndMakeRegionQR(regionBean!!.id)?.subscribe(object : NetworkObserver<TransferRegionBean?>() {
-            override fun onNext(it: TransferRegionBean) {
+        val disposable = lookAndMakeRegionQR(regionBean!!.id)?.subscribe( {
                     mExpire = it.expire.toLong()
                     regionBean!!.code_info!!.type = it.type
                     transferRegionCode = it.code
@@ -679,12 +629,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     downTimer(expire)
                     view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
 
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showLong(e.message)
-            }
+            },{
+                ToastUtils.showLong(it.message)
         })
     }
 
@@ -692,8 +638,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 生成区域授权码
      */
     private fun lookAndMakeAuthorCode() {
-        val disposable = lookAuthorizeCode(regionBean!!.id).subscribe(object : NetworkObserver<ShareCodeBean?>() {
-            override fun onNext(it: ShareCodeBean) {
+        val disposable = lookAuthorizeCode(regionBean!!.id).subscribe( {
                     mExpire = it.expire.toLong()
                     regionBean!!.code_info!!.type = it.type
                     authorizeCode = it.code
@@ -707,12 +652,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     downTimer(expire)
                     view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
 
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showLong(e.message)
-            }
+            }, {
+                ToastUtils.showLong(it.message)
         })
     }
 
@@ -720,8 +661,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 生成账户移交码
      */
     private fun lookAndMakeTransferCode() {
-        val disposable = lookTransferCode().subscribe(object : NetworkObserver<TransferBean?>() {
-            override fun onNext(it: TransferBean) {
+        val disposable = lookTransferCode().subscribe( {
                     //0没有 1账户移交码  2账户授权码  3 区域移交码
                     qrCodeType = 1
                     view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = getString(R.string.region_warm)
@@ -734,12 +674,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.GONE
                     showPop(pop!!, Gravity.BOTTOM)
                     transfer_account_tv.text = getString(R.string.to_receive)
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showLong(e.message)
-            }
+            },{
+                ToastUtils.showLong(it.message)
         })
     }
 
@@ -973,8 +909,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun trsansferCodeUsefulOrUnuseful(itView: View) {
          RegionModel.lookTransforRegionCode(regionBean!!.id)
-                ?.subscribe(object : NetworkObserver<TransferRegionBean?>() {
-                    override fun onNext(it: TransferRegionBean) {
+                ?.subscribe( {
                         var isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
                         if (!isNewQr){
                             itView.findViewById<ImageView>(R.id.pop_transfer_region).setImageResource(R.drawable.icon_code)
@@ -983,13 +918,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             itView.findViewById<ImageView>(R.id.pop_transfer_region).setImageResource(R.drawable.icon_single)
                             itView.findViewById<TextView>(R.id.pop_transfer_region_tv)?.text = getString(R.string.transfer_region)
                         }
-                    }
-
-                    override fun onError(it: Throwable) {
-                        super.onError(it)
+                    },{
                         itView.findViewById<ImageView>(R.id.pop_transfer_region).setImageResource(R.drawable.icon_single)
                         itView.findViewById<TextView>(R.id.pop_transfer_region_tv)?.text = getString(R.string.transfer_region)
-                    }
                 })
     }
 
@@ -998,8 +929,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 查看收授权qr是否过期
      */
     private fun authorCodeUsefulOrUnuseful(itView: View) {
-         RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe(object : NetworkObserver<ShareCodeBean?>() {
-             override fun onNext(it: ShareCodeBean) {
+         RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe( {
                      LogUtils.e("zcl_network-------授权码信息是否可用-------$it")
                      mExpire = it.expire.toLong()
 
@@ -1014,13 +944,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                      }
                      showPop(pop!!, Gravity.BOTTOM)
 
-             }
-
-             override fun onError(it: Throwable) {
-                 super.onError(it)
+             },{
                  ToastUtils.showLong(it.message)
                  showPop(pop!!, Gravity.BOTTOM)
-             }
          })
     }
 
@@ -1114,19 +1040,13 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //解除授权
             //authorizer_id授权用户id  rid区域id
             RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)
-                    ?.subscribe(object : NetworkObserver<String?>() {
-                        override fun onNext(t: String) {
+                    ?.subscribe( {
                                 isShowType = 2
                                 initData()
                                 ToastUtils.showLong(getString(R.string.unbundling_success))
                                 PopUtil.dismiss(pop)
-
-                        }
-
-                        override fun onError(it: Throwable) {
-                            super.onError(it)
+                        },{
                             ToastUtils.showLong(it.message)
-                        }
                     })
             dialog.dismiss()
         }
@@ -1180,13 +1100,12 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun postParseCode(result: String?) {
         result?.let { it1 ->
-            RegionModel.parseQRCode(it1, NetworkFactory.md5(lastUser!!.password))?.subscribe(object : NetworkObserver<ParseCodeBean>() {
-                override fun onNext(t: ParseCodeBean) {
-                    initData()
-                    setChangeDialog(t)
-                    ToastUtils.showLong(getString(R.string.scan_success))
-                }
-            })
+            val subscribe = RegionModel.parseQRCode(it1, NetworkFactory.md5(lastUser!!.password))?.subscribe({
+                initData()
+                setChangeDialog(it)
+                ToastUtils.showLong(getString(R.string.scan_success))
+            }, {})
+            subscribe
         }
     }
 
@@ -1233,16 +1152,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
 
             1 -> {//分享的区域已被接收
-                RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-                    override fun onNext(it: MutableList<RegionBean>) {
+                RegionModel.get()?.subscribe({
                         setMeData(it)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        ToastUtils.showLong(e.message)
+                    }, {
+                        ToastUtils.showLong(it.message)
                         hideLoadingDialog()
-                    }
                 })
             }
         }
@@ -1252,11 +1166,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onBackPressed()
         hideLoadingDialog()
         if (qrCodeType == 3)
-            RegionModel.removeTransferRegionCode(regionBean!!.id)?.subscribe(object : NetworkObserver<Response<TransferRegionBean>?>() {
-                override fun onNext(t: Response<TransferRegionBean>) {
-
-                }
-            })
+            RegionModel.removeTransferRegionCode(regionBean!!.id)?.subscribe({},{})
     }
 
 }

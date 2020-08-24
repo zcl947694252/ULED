@@ -207,6 +207,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
 
@@ -446,15 +447,14 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+            @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
         if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
+        GwModel.getGwList()?.subscribe({
                 TelinkLightApplication.getApp().offLine = true
                 hideLoadingDialog()
-                t.forEach { db ->
+            it.forEach { db ->
                     //网关在线状态，1表示在线，0表示离线
                     if (db.state == 1)
                         TelinkLightApplication.getApp().offLine = false
@@ -487,34 +487,26 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+            }, {
                 hideLoadingDialog()
                 ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
         })
     }
 
+    @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe({
                 disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+                LogUtils.v("zcl-----------远程控制-------$it")
+            },{
                 disposableTimer?.dispose()
-                ToastUtils.showShort(e.message)
-
-                LogUtils.v("zcl-----------远程控制-------${e.message}")
-            }
+                ToastUtils.showShort(it.message)
+                LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val onClick = View.OnClickListener {
         var intent: Intent?
         //点击任何一个选项跳转页面都隐藏引导

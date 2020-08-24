@@ -813,21 +813,20 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 var blue = color and 0x0000ff
                 var w = color shr 24
                 var type = list[i].deviceType
-                when (type) {
+                params = when (type) {
                     SMART_CURTAIN, SMART_RELAY -> {
-                        params = when {
+                        when {
                             list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01) //接收器开是1
                             else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02) //接收器关是2
                         }
                     }
                     LIGHT_RGB -> {
-                        params = if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
+                        if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
                             byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
                         else//11:新增场景1添加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
-                            byteArrayOf(0x03, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(),
-                                    0, list[i].gradientType.toByte())
+                            byteArrayOf(0x03, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
                     }
-                    else -> params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
+                    else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 }
                 //dest address
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
@@ -942,11 +941,18 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //窗帘开是1
                         else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
                     }
+//                    LIGHT_RGB -> if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
+//                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
+//                    else//11:新增场景1添 加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
+//                        byteArrayOf(0x01, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
 
-                    LIGHT_RGB -> if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
-                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
-                    else//11:新增场景1添 加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
-                        byteArrayOf(0x01, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
+                    LIGHT_RGB -> {
+                        if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
+                            byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                        else//11:新增场景1添加2删除  12:场景id 13:渐变id  14:渐变速度 15:直连灯低八位 16:高八 17:无 18:渐变类型 1 自定义的 2系统的
+                            byteArrayOf(0x03, id.toByte(), list[i].gradientId.toByte(), list[i].gradientSpeed.toByte(), mesL.toByte(), mesH.toByte(), 0, list[i].gradientType.toByte())
+                    }
+
 
                     else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 }

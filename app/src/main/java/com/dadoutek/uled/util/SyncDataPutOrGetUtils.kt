@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -67,6 +68,14 @@ class SyncDataPutOrGetUtils {
                 observableList.toArray(observables)
 
                 if (observables.isNotEmpty()) {
+                    observables.forEach {
+                        it!!.subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                                    LogUtils.v("zcl合并----------正确-$it-------")
+                                },{
+                                    LogUtils.v("zcl合并-----------错误-------$it")
+                                })
+                    }
                     Observable.mergeArrayDelayError(*observables)
                             .subscribe(object : NetworkObserver<String?>() {
                                 override fun onComplete() {
@@ -347,7 +356,6 @@ class SyncDataPutOrGetUtils {
 
                     "DB_USER" -> {
                         val user = DBUtils.getUserByID(changeId)
-
                         if (user == null && type != Constant.DELETEING) {
                             Log.d("用户数据出错", "")
                         }

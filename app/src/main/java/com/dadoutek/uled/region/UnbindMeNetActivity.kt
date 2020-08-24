@@ -60,18 +60,13 @@ class UnbindMeNetActivity : BaseActivity() {
         builder.setNegativeButton(getString(R.string.confirm)) { dialog, _ ->
             unbindBean?.id?.let {
                 regionbBean?.id?.let { it1 ->
-                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe(object : NetworkObserver<String?>() {
-                        override fun onNext(t: String) {
+                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe( {
                             adapter?.remove(position)
                             adapter!!.notifyDataSetChanged()
                             recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
                             ToastUtils.showLong(getString(R.string.unbundling_success))
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.localizedMessage)
-                        }
+                        }, {
+                            ToastUtils.showLong(it.localizedMessage)
                     })
                 }
             }

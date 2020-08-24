@@ -215,20 +215,15 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
             AccountModel.login(phone!!, editPassWord!!)
-                    .subscribe(object : NetworkObserver<DbUser>() {
-                        override fun onNext(dbUser: DbUser) {
+                    .subscribe({
                             Log.e("zcl", "zcl登录成功返回******$dbUser")
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            Log.e("zcl", "zcl登录******${e.localizedMessage}")
+                        }, {
+                            Log.e("zcl", "zcl登录******${it.localizedMessage}")
                             hideLoadingDialog()
-                        }
                     })
         } else {
             ToastUtils.showShort(getString(R.string.password_cannot))
@@ -264,28 +259,18 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     @SuppressLint("CheckResult")
     private fun initAuthor() {
-        RegionModel.getAuthorizerList()?.subscribe(object : NetworkObserver<MutableList<RegionAuthorizeBean>?>() {
-            override fun onNext(it: MutableList<RegionAuthorizeBean>) {
+        RegionModel.getAuthorizerList()?.subscribe( {
                 setAuthorizeRegion(it)
-            }
-
-            override fun onError(it: Throwable) {
-                super.onError(it)
+            }, {
                 ToastUtils.showLong(it.message)
-            }
         })
     }
 
     private fun initMe() {
-        val disposable = RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-            override fun onNext(t: MutableList<RegionBean>) {
-                    setMeRegion(t)
-            }
-
-            override fun onError(it: Throwable) {
-                super.onError(it)
+        val disposable = RegionModel.get()?.subscribe({
+                    setMeRegion(it)
+            }, {
                 ToastUtils.showLong(it.message)
-            }
         })
     }
 
@@ -372,8 +357,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         NetworkFactory.getApi()
                 .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
                 .compose(NetworkTransformer())
-                .subscribe(object : NetworkObserver<DbRegion?>() {
-                    override fun onNext(it: DbRegion) {
+                .subscribe({
                         //保存最后的区域信息到application
                         val application = DeviceHelper.getApplication() as TelinkLightApplication
                         val mesh = application.mesh
@@ -405,14 +389,10 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                         hideLoadingDialog()
                         ActivityUtils.finishAllActivities(true)
                         ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
-                    }
-
-                    override fun onError(it: Throwable) {
-                        super.onError(it)
+                    }, {
                         LogUtils.v("zcl-------$it")
                         hideLoadingDialog()
                         ToastUtils.showLong(it.localizedMessage)
-                    }
                 })
     }
 

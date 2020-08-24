@@ -150,10 +150,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.setOnClickListener {}
         initBottomNavigation()
         checkVersionAvailable()
-        showLoadingDialog(getString(R.string.please_wait))
-        getScanResult()
+       // getScanResult()
 
-        getRouterStatus()
+       // getRouterStatus()
         getRegionList()
         getAllStatus()
     }
@@ -189,6 +188,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun getScanResult() {
+        showLoadingDialog(getString(R.string.please_wait))
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
         val subscribe = RouterModel.routeScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
@@ -213,14 +213,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getRegionList() {
         val list = mutableListOf<String>()
         if (netWorkCheck(this))
-            RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-                override fun onNext(t: MutableList<RegionBean>) {
-                    for (i in t) {
+            RegionModel.get()?.subscribe( {
+                    for (i in it) {
                         i.controlMesh?.let { it -> list.add(it) }
                     }
                     SharedPreferencesUtils.saveRegionNameList(list)
-
-                }
+                },{
             })
     }
 
@@ -304,18 +302,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (netWorkCheck(this))
             UpdateModel.run {
                 isVersionAvailable(0, version)
-                        .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
-                            override fun onNext(s: ResponseVersionAvailable) {
-                                if (!s.isUsable) {
+                        .subscribe({
+                                if (!it.isUsable) {
                                     syncDataAndExit()
                                 }
-                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
-                            }
-
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
+                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
+                            }, {
                                 //ToastUtils.showLong(R.string.get_server_version_fail)
-                            }
                         })
             }
     }

@@ -13,6 +13,13 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 object ServerResultException {
     fun handleException(response: Response<*>) {
         when (response.errorCode) {
+            0 -> {
+                //成功无数据
+                throw   ServerException("请求成功")
+            }  NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
+                //token 过期
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.login_timeout))
+            }
             NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
                 //token 过期
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.login_timeout))

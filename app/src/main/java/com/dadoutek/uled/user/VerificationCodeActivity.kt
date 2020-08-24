@@ -117,10 +117,9 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         .subscribeOn(Schedulers.io())
                         .compose(NetworkTransformer())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : NetworkObserver<String?>() {
-                            override fun onNext(t: String) {
+                        .subscribe( {
                                 hideLoadingDialog()
-                                dbUser.account = t
+                                dbUser.account = it
 
                                 val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
                                 intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
@@ -128,13 +127,9 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                 intent.putExtra("phone", userName)
                                 intent.putExtra("account", dbUser.account)
                                 startActivity(intent)
-                            }
-
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
+                            }, {
                                 hideLoadingDialog()
-                                ToastUtils.showLong(e.localizedMessage)
-                            }
+                                ToastUtils.showLong(it.localizedMessage)
                         })
             }
         } else {

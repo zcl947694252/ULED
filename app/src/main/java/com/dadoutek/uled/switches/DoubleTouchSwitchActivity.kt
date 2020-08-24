@@ -145,7 +145,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         //传入0代表是群组
         val bundle = Bundle()
         bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT.toInt())
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
         intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
     }

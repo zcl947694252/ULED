@@ -179,16 +179,11 @@ class SettingActivity : TelinkBaseActivity() {
 
     private fun userSet() {
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
-        UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {  //删除服务器数据
+        UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe({  //删除服务器数据
                 clearData()//删除本地数据
                 ToastUtils.showShort(getString(R.string.reset_user_success))
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                ToastUtils.showShort(e.message)
-            }
+            }, {
+                ToastUtils.showShort(it.message)
         })
     }
 

@@ -20,9 +20,12 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
             try {
                 if (response.t != null)
                     response.t as T
-            } catch (ex: Exception) {
-                ex.printStackTrace()
+                else
+                    response.t = "" as T//为了上传的时候返回null的兼容
+            }catch (e :Exception){
+                e.printStackTrace()
             }
+
         } else {
             var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
@@ -41,9 +44,13 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
                 NetworkStatusCode.ERROR_CONTROL_ACCOUNT_NOT -> {
                     response.t = "" as T
                 }
+                0 -> {//无数据责走错误通道  但是提示成功
+                    ServerResultException.handleException(response)
+                }
                 else -> {
                     ServerResultException.handleException(response)
                 }
+
             }
         }
         return response.t

@@ -587,15 +587,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun addGw(dbGw: DbGateway) {
-        GwModel.add(dbGw)?.subscribe(object : NetworkObserver<DbGateway?>() {
-            override fun onNext(t: DbGateway) {
-                LogUtils.v("zcl-----网关失添成功返回-------------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
-                LogUtils.v("zcl-------网关失添加败-----------" + e.message)
-            }
+        GwModel.add(dbGw)?.subscribe( {
+                LogUtils.v("zcl-----网关失添成功返回-------------$it")
+            }, {
+                LogUtils.v("zcl-------网关失添加败-----------" + it.message)
         })
     }
 

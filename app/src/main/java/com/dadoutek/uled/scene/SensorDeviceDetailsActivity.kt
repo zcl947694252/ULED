@@ -307,6 +307,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
         currentDevice = sensorDatas[position]
         positionCurrent = position
@@ -339,6 +340,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun connectAndConfig() {
         TelinkLightService.Instance()?.idleMode(true)
         Thread.sleep(200)
@@ -351,13 +353,13 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("CheckResult")
     private fun sendToGw() {
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
+        GwModel.getGwList()?.subscribe({
                 TelinkLightApplication.getApp().offLine = true
                 hideLoadingDialog()
-                t.forEach { db ->
+            it.forEach { db ->
                     //网关在线状态，1表示在线，0表示离线
                     if (db.state == 1)
                         TelinkLightApplication.getApp().offLine = false
@@ -392,19 +394,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+            }, {
                 hideLoadingDialog()
                 ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
         })
     }
 
+    @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe({
                 disposableTimer?.dispose()
                 if (currentDevice?.openTag == 1) {
                     sendCloseIcon(positionCurrent)
@@ -416,15 +414,11 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 hideLoadingDialog()
 
                 disposableTimer?.dispose()
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+            }, {
                 disposableTimer?.dispose()
-                ToastUtils.showShort(e.message)
+                ToastUtils.showShort(it.message)
                 hideLoadingDialog()
-                LogUtils.v("zcl-----------远程控制-------${e.message}")
-            }
+                LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 

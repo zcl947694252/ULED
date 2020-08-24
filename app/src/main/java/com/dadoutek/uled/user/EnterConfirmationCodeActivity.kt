@@ -229,25 +229,21 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
 
+    @SuppressLint("CheckResult")
     private fun verificationLogin() {
         if (!StringUtils.isTrimEmpty(phone)) {
             showLoadingDialog(getString(R.string.logging_tip))
             //("logging: " + "登录错误")
             AccountModel.smsLoginTwo(phone!!)
-                    .subscribe(object : NetworkObserver<DbUser>() {
-                        override fun onNext(dbUser: DbUser) {
+                    .subscribe( {
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             showLoadingDialog(getString(R.string.sync_now))
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SyncDataPutOrGetUtils.syncGetDataStart(it, this.syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
+                        },{
                             //("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
-                        }
                     })
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()

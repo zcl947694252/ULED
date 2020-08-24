@@ -310,4 +310,5 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         else
             finish()
     }
+
 }

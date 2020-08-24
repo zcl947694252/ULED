@@ -43,7 +43,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), 0, DeviceType.SMART_CURTAIN))
         deviceTypeList.add(DeviceItem(getString(R.string.relay), 0, DeviceType.SMART_RELAY))
         deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), 0, DeviceType.GATE_WAY))
-        deviceTypeList.add(DeviceItem(getString(R.string.router), 0, DeviceType.ROUTER))
+        //deviceTypeList.add(DeviceItem(getString(R.string.router), 0, DeviceType.ROUTER))
 
         deviceAdapter.notifyDataSetChanged()
     }
@@ -98,7 +98,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                     installId = INSTALL_CONNECTOR
                     showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.relay))
                 }
-                INSTALL_ROUTER -> openScan()
+                //INSTALL_ROUTER -> openScan()
             }
         }
     }

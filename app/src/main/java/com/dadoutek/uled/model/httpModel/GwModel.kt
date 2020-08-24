@@ -34,7 +34,6 @@ object GwModel {
         return NetworkFactory.getApi().gwList.compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { }
     }
 
     fun deleteGwList(gattBody: GwGattBody): Observable<String>? {

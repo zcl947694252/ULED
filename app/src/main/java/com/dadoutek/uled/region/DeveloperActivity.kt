@@ -172,16 +172,10 @@ class DeveloperActivity : BaseActivity() {
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
         builder.setPositiveButton(getString(R.string.confirm)) { _, _ ->
             clearData()//删除本地数据
-            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe(object : NetworkObserver<String?>() {
-                //删除服务器数据
-                override fun onNext(t: String) {
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe( {
                     ToastUtils.showShort(getString(R.string.reset_user_success))
-                }
-
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    ToastUtils.showShort(e.message)
-                }
+                }, {
+                    ToastUtils.showShort(it.message)
             })
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
@@ -316,6 +310,7 @@ class DeveloperActivity : BaseActivity() {
     /**
      * 清除数据
      */
+    @SuppressLint("CheckResult")
     private fun clearData() {
         val dbUser = DBUtils.lastUser
 
@@ -325,9 +320,8 @@ class DeveloperActivity : BaseActivity() {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
-            override fun onNext(s: String) {
-                LogUtils.e("zcl-----------$s")
+        UserModel.deleteAllData(dbUser.token)!!.subscribe({
+                LogUtils.e("zcl-----------$it")
                 SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
@@ -340,13 +334,9 @@ class DeveloperActivity : BaseActivity() {
                     delay(300)
                     restartApplication()
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+            }, {
                 ToastUtils.showLong(R.string.clear_fail)
                 hideLoadingDialog()
-            }
         })
     }
 

@@ -266,6 +266,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 if (mAdapter.selectedPos != -1) {
                     sw_progressBar.visibility = View.VISIBLE
                     setGroupForSwitch()
+                    Thread.sleep(300)
                     newMeshAddr = MeshAddressGenerator().meshAddress.get()
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mDeviceInfo.meshAddress = newMeshAddr

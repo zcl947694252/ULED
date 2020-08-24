@@ -1053,8 +1053,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         LogUtils.d(it)
                     })
         }
-
-
     }
 
     @SuppressLint("CheckResult")
@@ -1376,12 +1374,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
              else
                  slow_rg_view.visibility = VISIBLE*/
             slow_rg_view.visibility = GONE
-            when (group?.slowUpSlowDownSpeed) {
-                1 -> slow_rg_slow.isChecked = true
-                3 -> slow_rg_middle.isChecked = true
-                5 -> slow_rg_fast.isChecked = true
-            }
-           slow_rg_close.isChecked =  group?.slowUpSlowDownStatus==1
+            slow_rg_close.isChecked =  group?.slowUpSlowDownStatus==1
+            if (group?.slowUpSlowDownStatus==0)
+                slow_rg_close.isChecked = true
+            else
+                when (group?.slowUpSlowDownSpeed) {
+                        5 -> slow_rg_slow.isChecked = true
+                        3 -> slow_rg_middle.isChecked = true
+                        1 -> slow_rg_fast.isChecked = true
+                    }
+
             slow_ly.visibility = VISIBLE
         } else
             slow_ly.visibility = GONE
@@ -1998,16 +2000,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         val currentGroup = DBUtils.getGroupByID(group!!.id)
         when (v?.id) {
             R.id.slow_rg_slow -> {
+                currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 5
                 sendSlowAndOld(currentGroup)
                 ToastUtils.showShort("慢")
             }
             R.id.slow_rg_middle -> {
+                currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 3
                 sendSlowAndOld(currentGroup)
                 ToastUtils.showShort("中")
             }
             R.id.slow_rg_fast -> {
+                currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 1
                 sendSlowAndOld(currentGroup)
                 ToastUtils.showShort("快")

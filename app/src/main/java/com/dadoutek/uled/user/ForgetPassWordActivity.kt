@@ -95,12 +95,11 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                         .getAccount(userName, dbUser!!.channel)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : NetworkObserver<Response<String>?>() {
-                            override fun onNext(t: Response<String>) {
+                        .subscribe({
                                 hideLoadingDialog()
-                                if (t.errorCode == 0) {
-                                    LogUtils.e("logging" + t.errorCode + "获取成功account")
-                                    dbUser!!.account = t.t
+                                if (it.errorCode == 0) {
+                                    LogUtils.e("logging" + it.errorCode + "获取成功account")
+                                    dbUser!!.account = it.t
                                     //正式代码走短信验证
                                     val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
                                     intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
@@ -115,15 +114,11 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                                     // startActivity(intent)
                                     // finish()
                                 } else {
-                                    ToastUtils.showLong(t.message)
+                                    ToastUtils.showLong(it.message)
                                 }
-                            }
-
-                            override fun onError(it: Throwable) {
-                                super.onError(it)
+                            },{
                                 hideLoadingDialog()
                                 Toast.makeText(this@ForgetPassWordActivity, "onError:$it", Toast.LENGTH_SHORT).show()
-                            }
                         })
             }
 

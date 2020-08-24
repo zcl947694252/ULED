@@ -1,5 +1,6 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -110,34 +111,30 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun upDatePwd() {
         //toast("账户$phone----密码$password")
-        NetworkFactory.getApi()
+        val subscribe = NetworkFactory.getApi()
                 .putPassword(phone, NetworkFactory.md5(password))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<Response<DbUser>?>() {
-                    override fun onNext(t: Response<DbUser>) {
+                .subscribe({
 
-                            hideLoadingDialog()
-                            if (t.errorCode == 0) {
-                                //("logging" + stringResponse.errorCode + "更改成功")
-                                ToastUtils.showLong(R.string.tip_update_password_success)
-                                startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
-                                setResult(RESULT_FIRST_USER)
-                                finish()
-                            } else {
-                                //ToastUtils.showLong(R.string.tip_update_password_fail)
-                                ToastUtils.showLong(t.message)
-                            }
+                    hideLoadingDialog()
+                    if (it.errorCode == 0) {
+                        //("logging" + stringResponse.errorCode + "更改成功")
+                        ToastUtils.showLong(R.string.tip_update_password_success)
+                        startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
+                        setResult(RESULT_FIRST_USER)
+                        finish()
+                    } else {
+                        //ToastUtils.showLong(R.string.tip_update_password_fail)
+                        ToastUtils.showLong(it.message)
                     }
-
-                    override fun onError(it: Throwable) {
-                        super.onError(it)
-                        hideLoadingDialog()
-                        Toast.makeText(this@InputPwdActivity, "onError:${it.message}", Toast.LENGTH_SHORT).show()
-                    }
+                }, {
+                    hideLoadingDialog()
+                    Toast.makeText(this@InputPwdActivity, "onError:${it.message}", Toast.LENGTH_SHORT).show()
                 })
     }
 
+    @SuppressLint("CheckResult")
     private fun register() {
         NetworkFactory.getApi()
                 .register(phone, NetworkFactory.md5(password), phone)
@@ -149,21 +146,16 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<DbUser>() {
-                    override fun onNext(dbUser: DbUser) {
+                .subscribe( {
                        //("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
                         hideLoadingDialog()
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         showLoadingDialog(getString(R.string.sync_now))
-                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                        SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
                         SharedPreferencesUtils.setUserLogin(true)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
+                    },{
                         hideLoadingDialog()
-                    }
                 })
     }
 

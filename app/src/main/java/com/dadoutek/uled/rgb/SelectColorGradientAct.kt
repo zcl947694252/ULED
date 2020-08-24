@@ -20,7 +20,20 @@ import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
+import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_b
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_g
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_picker
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_r
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_add
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_less
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_num
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_add
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_less
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_num
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -85,6 +98,16 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+
+        if (Constant.IS_OPEN_AUXFUN){
+            ll_r_r.visibility = View.VISIBLE
+            ll_g_g.visibility = View.VISIBLE
+            ll_b_b.visibility = View.VISIBLE
+        }else{
+            ll_r_r.visibility = View.GONE
+            ll_g_g.visibility = View.GONE
+            ll_b_b.visibility = View.GONE
+        }
         ll_r_r.setOnClickListener(this)
         ll_g_g.setOnClickListener(this)
         ll_b_b.setOnClickListener(this)

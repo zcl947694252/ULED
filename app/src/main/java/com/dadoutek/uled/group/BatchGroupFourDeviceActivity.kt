@@ -224,7 +224,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         swipe_refresh_ly.setColorSchemeColors(Color.BLACK, Color.GREEN, Color.RED, Color.YELLOW, Color.BLUE)
         //设置触发刷新的距离
         swipe_refresh_ly.setDistanceToTriggerSync(200)
-
         setAdapterAndSubscribleData()
         autoConnect()
     }
@@ -235,102 +234,88 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 lightAdapterm.bindToRecyclerView(batch_four_device_recycle)
                 lightGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)
-
-                val observableNoGroup = deviceDataLightAll.getObservable { it.belongGroupId == allLightId }
-                val disposableNoGrouped = observableNoGroup.subscribe({ list ->
-                    sortList(list)
-                    noGroup.clear()
-                    noGroup.addAll(list)
-                    if (checkedNoGrouped)
-                        setDeviceListAndEmpty(noGroup.size)
-                    setTitleTexts(noGroup.size, listGroup.size)
-                    batch_four_no_group.text = getString(R.string.no_group_device_num, noGroup.size)
-                    lightAdapterm.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableNoGrouped)
-
-                val observableGrouped = deviceDataLightAll.getObservable { it.belongGroupId != allLightId }
-                val disposableGrouped = observableGrouped.subscribe({ list ->
-                    sortList(list)
-                    listGroup.clear()
-                    listGroup.addAll(list)
-                    if (!checkedNoGrouped)
-                        setDeviceListAndEmpty(listGroup.size)
-                    setTitleTexts(noGroup.size, listGroup.size)
-                    lightGroupedAdapterm.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableGrouped)
             }
+
             DeviceType.SMART_CURTAIN -> {
                 curtainAdapter.bindToRecyclerView(batch_four_device_recycle)
                 curtainGroupedAdapter.bindToRecyclerView(batch_four_device_recycle_grouped)//默认是隐藏的显示未分组的界面
 
-                val observableNoGroup = deviceDataCurtainAll.getObservable { it.belongGroupId == allLightId }
-                val disposableNoGrouped = observableNoGroup.subscribe({ list ->
-                    sortCurtain(list)
-                    noGroupCutain.clear()
-                    noGroupCutain.addAll(list)
-                    if (checkedNoGrouped)
-                        setDeviceListAndEmpty(noGroupCutain.size)
-                    setTitleTexts(noGroupCutain.size, listGroupCutain.size)
-                    curtainAdapter.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableNoGrouped)
-
-                val observableGrouped = deviceDataCurtainAll.getObservable { it.belongGroupId != allLightId }
-                val disposableGrouped = observableGrouped.subscribe({ list ->
-                    sortCurtain(list)
-                    listGroupCutain.clear()
-                    listGroupCutain.addAll(list)
-                    if (!checkedNoGrouped)
-                        setDeviceListAndEmpty(listGroupCutain.size)
-                    setTitleTexts(noGroupCutain.size, listGroupCutain.size)
-                    curtainGroupedAdapter.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableGrouped)
+                //subCurtainData()
             }
+
             DeviceType.SMART_RELAY -> {
                 relayAdapter.bindToRecyclerView(batch_four_device_recycle)
                 relayGroupedAdapter.bindToRecyclerView(batch_four_device_recycle_grouped)
 
-                val observableNoGroup = deviceDataRelayAll.getObservable { it.belongGroupId == allLightId }
-                val disposableNoGrouped = observableNoGroup.subscribe({ list ->
-                    sortRelay(list)
-                    noGroupRelay.clear()
-                    noGroupRelay.addAll(list)
-                    if (checkedNoGrouped)
-                        setDeviceListAndEmpty(noGroupRelay.size)
-                    setTitleTexts(noGroupRelay.size, listGroupRelay.size)
-                    relayAdapter.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableNoGrouped)
-
-                val observableGrouped = deviceDataRelayAll.getObservable { it.belongGroupId != allLightId }
-                val disposableGrouped = observableGrouped.subscribe({ list ->
-                    sortRelay(list)
-                    listGroupRelay.clear()
-                    listGroupRelay.addAll(list)
-                    if (!checkedNoGrouped)
-                        setDeviceListAndEmpty(listGroupRelay.size)
-                    setTitleTexts(noGroupRelay.size, listGroupRelay.size)
-                    relayGroupedAdapter.notifyDataSetChanged()
-                }, {
-                    LogUtils.e("zcl---订阅频道${it.localizedMessage}")
-                })
-                compositeDisposable.add(disposableGrouped)
+                //subRelayData()
             }
         }
         groupAdapter.bindToRecyclerView(batch_four_group_recycle)
+    }
+
+    private fun subRelayData() {
+        val observableNoGroup = deviceDataRelayAll.filter {  it.belongGroupId==0L||it.belongGroupId==1L }
+        sortRelay(observableNoGroup)
+        noGroupRelay.clear()
+        noGroupRelay.addAll(observableNoGroup)
+        if (checkedNoGrouped)
+            setDeviceListAndEmpty(noGroupRelay.size)
+        setTitleTexts(noGroupRelay.size, listGroupRelay.size)
+        relayAdapter.notifyDataSetChanged()
+
+
+        val observableGrouped = deviceDataRelayAll.filter {  it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        sortRelay(observableGrouped)
+        listGroupRelay.clear()
+        listGroupRelay.addAll(observableGrouped)
+        if (!checkedNoGrouped)
+            setDeviceListAndEmpty(listGroupRelay.size)
+        setTitleTexts(noGroupRelay.size, listGroupRelay.size)
+        relayGroupedAdapter.notifyDataSetChanged()
+    }
+
+    private fun subCurtainData() {
+        val observableNoGroup = deviceDataCurtainAll.filter { it.belongGroupId==0L||it.belongGroupId==1L}
+        sortCurtain(observableNoGroup)
+        noGroupCutain.clear()
+        noGroupCutain.addAll(observableNoGroup)
+
+
+        listGroupCutain.clear()
+        val observableGrouped = deviceDataCurtainAll.filter {  it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        sortCurtain(observableGrouped)
+        listGroupCutain.addAll(observableGrouped)
+
+            if (checkedNoGrouped)
+                setDeviceListAndEmpty(noGroupCutain.size)
+            else
+                setDeviceListAndEmpty(listGroupCutain.size)
+
+        setTitleTexts(noGroupCutain.size, listGroupCutain.size)
+
+        curtainAdapter.notifyDataSetChanged()
+        curtainGroupedAdapter.notifyDataSetChanged()
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private fun subLightData() {
+        val observableNoGroup = deviceDataLightAll.filter {  it.belongGroupId==0L||it.belongGroupId==1L }
+        val observableGrouped = deviceDataLightAll.filter { it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        sortList(observableNoGroup)
+        sortList(observableGrouped)
+
+        noGroup.clear()
+        listGroup.clear()
+        noGroup.addAll(observableNoGroup)
+        listGroup.addAll(observableGrouped)
+        if (checkedNoGrouped)
+            setDeviceListAndEmpty(noGroup.size)
+        else
+            setDeviceListAndEmpty(listGroup.size)
+        setTitleTexts(noGroup.size, listGroup.size)
+
+        lightAdapterm.notifyDataSetChanged()
+        lightGroupedAdapterm.notifyDataSetChanged()
     }
 
     private fun sortRelay(list: List<DbConnector>?) {
@@ -468,6 +453,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         deviceDataLightAll.add(light)
                     }
                 }
+                subLightData()
             }
             DeviceType.LIGHT_RGB -> {
                 deviceDataLightAll.clear()
@@ -490,7 +476,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         deviceDataLightAll.add(light)
                     }
                 }
-
+                subLightData()
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtainAll.clear()
@@ -511,6 +497,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     device.rssi = item.rssi
                     deviceDataCurtainAll.add(device)
                 }
+                subCurtainData()
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelayAll.clear()
@@ -532,6 +519,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         device.rssi = item.rssi
                         deviceDataRelayAll.add(device)
                     }
+                subRelayData()
             }
         }
     }
@@ -1144,6 +1132,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         refreshData()
         setGroupData()
         changeSourceData()
+        updateGroupResult()
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {}
 
@@ -1155,6 +1144,23 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 hideLoadingDialog()
             }
         })
+    }
+
+    private fun updateGroupResult() {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL -> {
+                subLightData()
+            }
+            DeviceType.LIGHT_RGB -> {
+                subLightData()
+            }
+            DeviceType.SMART_CURTAIN -> {
+                subCurtainData()
+            }
+            DeviceType.SMART_RELAY -> {
+                subRelayData()
+            }
+        }
     }
 
     private fun changeSourceData() {
