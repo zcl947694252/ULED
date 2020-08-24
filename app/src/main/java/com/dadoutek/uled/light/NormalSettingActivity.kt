@@ -2003,23 +2003,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 5
                 sendSlowAndOld(currentGroup)
-                ToastUtils.showShort("慢")
+                ToastUtils.showShort(getString(R.string.slow))
             }
             R.id.slow_rg_middle -> {
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 3
                 sendSlowAndOld(currentGroup)
-                ToastUtils.showShort("中")
+                ToastUtils.showShort(getString(R.string.mid))
             }
             R.id.slow_rg_fast -> {
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 1
                 sendSlowAndOld(currentGroup)
-                ToastUtils.showShort("快")
+                ToastUtils.showShort(getString(R.string.fast))
             }
             R.id.slow_rg_close -> {
                 slowOrUpClose()
-                ToastUtils.showShort("关")
+                ToastUtils.showShort(getString(R.string.close))
             }
         }
     }
