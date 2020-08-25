@@ -96,6 +96,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var isProcessChange = 0
     private var isSwitch: Boolean = false
 
+    @SuppressLint("StringFormatInvalid")
     private val clickListener = OnClickListener { v ->
         when (v.id) {
             R.id.slow_rg_close -> slowOrUpClose()

@@ -464,7 +464,6 @@
     <string name="jump_out_guide_tip">пропустить руководство?</string>
     <string name="do_you_really_want_to_cancel">Уверен, что хочешь выйти из установки? </string>
     <string name="device_disconnected">Устройство отключено</string>
-    <string name="reconnect">Повторное подключение</string>
     <string name="tip_config_switch_success">После успешной установки синий индикатор внизу в коммутаторе начнет мигать, затем отключится. Отключите коммутатор USB-кабель от коммутатора перед использованием.</string>
     <string name="install_success">Установка выполнена</string>
     <string name="stop_scan">Остановить поиск</string>
@@ -477,7 +476,6 @@
     <string name="current_select_group">выбранная группировка:</string>
     <string name="selected">ДА</string>
     <string name="unSelect">НЕТ</string>
-    <string name="rgb_gradient">Dynamic RGB</string>
     <string name="save_scene_tip">Сохранить сцену?</string>
     <string name="get_update_file">Получает пакета обновления…</string>
     <string name="mode_preset">По умолчанию</string>

@@ -42,8 +42,10 @@ import java.util.concurrent.TimeUnit
  * 忘记密码设置新密码/短信登录
  */
 class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var num: Long = 0
     private var account: String? = null
     private val TIME_INTERVAL: Long = 60
+
     private val mCompositeDisposable = CompositeDisposable()
     private var countryCode: String = "86"
     private var phone: String? = null
@@ -83,16 +85,18 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         verCodeInputView.setOnCompleteListener { verificationLogin() }
         verCodeInputView.setOnCompleteListener { it ->
             var code = it
-            submitCode(countryCode ?: "", phone!!, code.toString().trim { it <= ' ' })
+            submitCode(countryCode, phone!!, code.toString().trim { it <= ' ' })
         }
-        verCodeInputView_line.setOnTextChangeListener { s, b ->
-            if (s.length >= 6) {
+        verCodeInputView_line.setOnTextChangeListener { s, _ ->
+            if (s.length >= 6)
                 submitCode(countryCode, phone!!, s)
                 // verificationLogin()
-            }
         }
         image_return.setOnClickListener(this)
-
+        reacquireCode.setOnClickListener {
+            if (num == 0L)
+                verificationCode()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -200,12 +204,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    val num = 59 - it as Long
+                    num = 59 - it as Long
                     if (num == 0L) {
                         reacquireCode.text = resources.getString(R.string.reget)
                         reacquireCode.setTextColor(Color.parseColor("#18B4ED"))
                     } else {
-                        reacquireCode.text = getString(R.string.regetCount,num)
+                        reacquireCode.text = getString(R.string.regetCount, num)
                         reacquireCode.setTextColor(Color.parseColor("#999999"))
                     }
                 })
@@ -235,15 +239,15 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             showLoadingDialog(getString(R.string.logging_tip))
             //("logging: " + "登录错误")
             AccountModel.smsLoginTwo(phone!!)
-                    .subscribe( {
-                            DBUtils.deleteLocalData()
-                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            showLoadingDialog(getString(R.string.sync_now))
-                            SyncDataPutOrGetUtils.syncGetDataStart(it, this.syncCallback)
-                            SharedPreferencesUtils.setUserLogin(true)
-                        },{
-                            //("logging: " + "登录错误" + e.message)
-                            hideLoadingDialog()
+                    .subscribe({
+                        DBUtils.deleteLocalData()
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        showLoadingDialog(getString(R.string.sync_now))
+                        SyncDataPutOrGetUtils.syncGetDataStart(it, this.syncCallback)
+                        SharedPreferencesUtils.setUserLogin(true)
+                    }, {
+                        //("logging: " + "登录错误" + e.message)
+                        hideLoadingDialog()
                     })
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()

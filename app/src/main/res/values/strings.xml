@@ -330,7 +330,7 @@
 
     <string name="tip_add_gp">Please add a group first!</string>
     <string name="developer_mode">Enter developer mode</string>
-    <string name="edit_phone">phone number</string>
+    <string name="edit_phone">PhoneNumber</string>
     <string name="registing">Registering</string>
     <string name="register_success">Registration success</string>
     <string name="phone_input_error">Malformed phone number</string>
@@ -532,7 +532,6 @@
         installation</string>
     <string name="scene_name_show">Scene:%1$s</string>
     <string name="device_disconnected">device disconnected</string>
-    <string name="reconnect">Reconnect</string>
     <string name="tip_config_switch_success">After successful installation, the blue light at the bottom of the switch will blink and disconnect.
         Please unplug the USB cable on the switch before using the switch. If the switch does not have a USB interface,
         it is not necessary to perform the operation of unplugging the USB cable.</string>
@@ -546,7 +545,6 @@
     <string name="current_select_group">Selected Group:</string>
     <string name="selected">YES</string>
     <string name="unSelect">NO</string>
-    <string name="rgb_gradient">Gradient</string>
     <string name="save_scene_tip">Do you want to save the scene?</string>
     <string name="get_update_file">Get the upgrade package…</string>
     <string name="mode_preset">Built-in mode</string>

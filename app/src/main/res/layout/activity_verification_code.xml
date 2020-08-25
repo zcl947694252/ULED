@@ -99,7 +99,7 @@
         <TextView
                 android:id="@+id/login_phone_tv"
                 android:layout_width="wrap_content"
-                android:layout_height="20dp"
+                android:layout_height="@dimen/dp_40"
                 android:gravity="center"
                 android:text="@string/edit_phone"
                 android:visibility="visible"

@@ -22,8 +22,7 @@
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
-            android:visibility="gone"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/pwd_title"
         app:layout_constraintEnd_toEndOf="@+id/pwd_title"
         app:layout_constraintStart_toStartOf="@+id/pwd_title" />

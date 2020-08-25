@@ -85,14 +85,14 @@
             app:mnPsw_text_color="#393939" />
 
 
-        <TextView
-                android:id="@+id/reacquireCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/reacquire"
-                android:layout_marginTop="@dimen/dp_30"
-                android:layout_marginStart="@dimen/dp_30"
-                android:textColor="@color/black_nine"
-                android:textSize="@dimen/sp_15" />
+    <TextView
+            android:id="@+id/reacquireCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_30"
+            android:layout_marginTop="@dimen/dp_30"
+            android:text="@string/reacquire"
+            android:textColor="@color/black_nine"
+            android:textSize="@dimen/sp_15" />
 
 </LinearLayout>
