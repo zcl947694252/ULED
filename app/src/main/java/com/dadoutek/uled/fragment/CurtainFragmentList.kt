@@ -1,8 +1,8 @@
 package com.dadoutek.uled.fragment
 
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 
 class CurtainFragmentList : BaseGroupFragment() {
@@ -21,6 +21,8 @@ class CurtainFragmentList : BaseGroupFragment() {
     }
 
  /*   private var inflater: LayoutInflater? = null
+
+
 
     private var recyclerView: RecyclerView? = null
 

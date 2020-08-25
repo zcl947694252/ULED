@@ -26,9 +26,10 @@ import com.dadoutek.uled.gateway.adapter.GwTpItemAdapter
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DbScene
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
@@ -305,10 +306,9 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                         if (i == it.size - 1) {
 //                            LogUtils.v("zcl-----------发送到服务器时间段小时间命令-------$os")
                             setTimerDelay(7500L)
-                            val byteArray = os.toByteArray()
+                            val gattPar = os.toByteArray()
 
-                            val encoder = Base64.getEncoder()
-                            val s = encoder.encodeToString(byteArray)
+                            val s = Base64Utils.encodeToStrings(gattPar)
                             val gattBody = GwGattBody()
 
                             gattBody.data = s
@@ -366,13 +366,13 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             if (!TelinkLightApplication.getApp().isConnectGwBle) {
                 //如果是网络离线通过服务器
                 setHeadTimerDelay(6500L)
-                var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
+                var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
-                LogUtils.v("zcl-----------发送到服务器-------循环时间段标签头$labHeadPar")
-                val encoder = Base64.getEncoder()
-                val s = encoder.encodeToString(labHeadPar)
+                LogUtils.v("zcl-----------发送到服务器-------循环时间段标签头$gattPar")
+
+                val s = Base64Utils.encodeToStrings(gattPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD

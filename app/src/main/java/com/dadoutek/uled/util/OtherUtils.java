@@ -5,9 +5,9 @@ import android.graphics.Color;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.model.InstallDeviceModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +18,42 @@ import java.util.List;
 public class OtherUtils {
 
     /**
-     * 判断灯进行的分组是否成立
-     *
-     * @param productUUID 预分组灯的UUID
-     * @param dbGroup     分组
+     * 获取图片名称获取图片的资源id的方法
+     * @param imageName
      * @return
      */
+    public static int  getResourceId(String imageName,Context context) {
+        int resId;
+        try {
+            resId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+        }catch (Exception e){
+            resId = 0;
+        }
+        return resId;
+    }
+
+
+    /**
+     * 获取图片名称
+     * @param resid
+     * @return
+     */
+    public static String getResourceName(int resid, Context context){
+        try {
+            return   context.getResources().getResourceName(resid);
+        }catch (Exception e){
+            return   "";
+        }
+
+    }
+
+    /**
+         * 判断灯进行的分组是否成立
+         *
+         * @param productUUID 预分组灯的UUID
+         * @param dbGroup     分组
+         * @return
+         */
     public static boolean whetherTheGroupIsEstablished(int productUUID, DbGroup dbGroup) {
         if (groupIsEmpty(dbGroup)) {
             //如果当前组没有任何灯，直接返回分组成立
@@ -133,8 +163,8 @@ public class OtherUtils {
         ArrayList<InstallDeviceModel> list = new ArrayList<>();
         InstallDeviceModel installDeviceModel1=new InstallDeviceModel(context.getString(R.string.normal_light),context.getString(R.string.normal_light_describe));
         InstallDeviceModel installDeviceModel2=new InstallDeviceModel(context.getString(R.string.rgb_light),context.getString(R.string.rgb_light_describe));
-        InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
-        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensoR),context.getString(R.string.sensor_describe));
+        InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_title),context.getString(R.string.switch_describe));
+        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
         InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
         InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.relay),context.getString(R.string.for_connector));
         InstallDeviceModel installDeviceModel7=new InstallDeviceModel(context.getString(R.string.Gate_way),context.getString(R.string.for_connector));

@@ -2,14 +2,14 @@ package com.dadoutek.uled.group
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v7.widget.Toolbar
+import android.support.v4.content.ContextCompat
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
-import android.widget.GridView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -17,9 +17,9 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -30,6 +30,9 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.activity_device_grouping.*
+import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.singleLine
 import java.lang.Thread.sleep
 import java.util.*
 
@@ -43,7 +46,6 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private var curtain: DbCurtain? = null
     private var gpAdress: Int = 0
 
-    private var listView: GridView? = null
     private var isStartGroup = false
     private val itemClickListener = OnItemClickListener { parent, view, position, id ->
         val group = adapter!!.getItem(position)
@@ -108,7 +110,6 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var mApplication: TelinkLightApplication? = null
 
-
     private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
         val sceneIds = ArrayList<Long>()
         val dbSceneList = DBUtils.sceneList
@@ -123,7 +124,6 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         }
         return sceneIds
     }
-
 
     /**
      * 删除指定灯里的所有场景
@@ -170,17 +170,20 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initView() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.activity_device_grouping)
+        toolbarTv.text = getString(R.string.activity_device_grouping)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.overflowIcon = moreIcon;
+        }
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
         this.inflater = this.layoutInflater
-        listView = this.findViewById<View>(R.id.list_groups) as GridView
-        listView!!.onItemClickListener = this.itemClickListener
-
+        list_groups!!.onItemClickListener = this.itemClickListener
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
-        listView!!.adapter = adapter
+        list_groups!!.adapter = adapter
     }
 
     private fun initData() {
@@ -293,6 +296,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
          //设置光标默认在最后
@@ -321,7 +325,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         filter(list)
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
-        listView!!.adapter = this.adapter
+        list_groups!!.adapter = this.adapter
         adapter!!.notifyDataSetChanged()
     }
 

@@ -1,12 +1,15 @@
 package com.dadoutek.uled.switches
 
 import android.os.Bundle
+import android.text.TextUtils
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.ble.RxBleManager.initData
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
@@ -19,6 +22,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
+import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
@@ -31,7 +35,6 @@ import org.jetbrains.anko.startActivity
  * 更新描述   ${为类添加标识}$
  */
 class ScanningSwitchActivity : TelinkBaseActivity() {
-    private var isSeachedDevice: Boolean = false
     private lateinit var mApplication: TelinkLightApplication
     private var mRxPermission: RxPermissions? = null
     private var bestRSSIDevice: DeviceInfo? = null
@@ -46,6 +49,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         this.mApplication = this.application as TelinkLightApplication
         mRxPermission = RxPermissions(this)
         initView()
+        initData()
         initListener()
         startScan()
     }
@@ -65,56 +69,90 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
     private fun initView() {
         mIsInited = false
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.switch_title)
+        toolbarTv?.text = getString(R.string.switch_title)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener {
+            if (isScanning) {
+                cancelf.isClickable = true
+                confirmf.isClickable = true
+                popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+            } else {
+                finish()
+            }
+        }
         retryConnectCount = 0
         isSupportInstallOldDevice = false
     }
 
+    private fun initData() {
+
+    }
+
     private fun initListener() {
+        cancelf.setOnClickListener { popFinish?.dismiss() }
+        confirmf.setOnClickListener {
+            popFinish?.dismiss()
+            stopConnectTimer()
+            closeAnimation()
+            doFinish()
+        }
         btn_stop_scan.setOnClickListener {
-            if (!isSeachedDevice)
+            if (isScanning){
                 scanFail()
+                doFinish()
+            }
             else
-                ToastUtils.showLong(getString(R.string.connecting_tip))
+                startScan()
+        }
+        scanning_num.setOnClickListener {
+            if (isScanning)
+                seeHelpe("#QA8")
         }
     }
 
     //扫描失败处理方法
     private fun scanFail() {
+        scanning_num.text = getString(R.string.see_help)
         showToast(getString(R.string.scan_end))
         stopConnectTimer()
-        doFinish()
+        closeAnimation()
+        //  doFinish()
+        btn_stop_scan.text = getString(R.string.scan_retry)
+        image_no_group.visibility = View.VISIBLE
     }
 
     private fun startAnimation() {
+        isScanning = true
         lottieAnimationView?.playAnimation()
         lottieAnimationView?.visibility = View.VISIBLE
     }
 
 
     private fun closeAnimation() {
+        isScanning = false
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
 
 
     private fun startScan() {
+        btn_stop_scan.text = getString(R.string.stop_scan)
         TelinkLightService.Instance()?.idleMode(true)
-            startAnimation()
-            val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                    DeviceType.SCENE_SWITCH,DeviceType.DOUBLE_SWITCH ,DeviceType.SMART_CURTAIN_SWITCH,DeviceType.EIGHT_SWITCH)
-            mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                    retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                    ?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
-                    ?.subscribe({
-                        bestRSSIDevice = it
-                        onLogin()
-                    }, {
-                        scanFail()
-                    })
+        scanning_num.text = getString(R.string.scanning)
+        startAnimation()
+        image_no_group.visibility = View.GONE
+        val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+                DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
+        mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+                retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe({
+                    bestRSSIDevice = it
+                    onLogin()
+                }, {
+                    scanFail()
+                })
     }
 
     override fun onResume() {
@@ -140,19 +178,26 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     skipSwitch(version)
                                     finish()
                                 } else {
-                                    skipSwitch(bestRSSIDevice!!.firmwareRevision)
-                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    val version1 = bestRSSIDevice?.firmwareRevision ?: ""
+
+                                    if (TextUtils.isEmpty(version1))
+                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    else
+                                        skipSwitch(version1)
                                     finish()
                                 }
                                 closeAnimation()
-                            }
-                            ,
-                            {
-                                //showToast(getString(R.string.get_version_fail))
-                                closeAnimation()
-                                skipSwitch(bestRSSIDevice!!.firmwareRevision)
-                                finish()
-                            })
+                            }, {
+                        //showToast(getString(R.string.get_version_fail))
+                        closeAnimation()
+                        val version1 = bestRSSIDevice?.firmwareRevision ?: ""
+
+                        if (TextUtils.isEmpty(version1))
+                            ToastUtils.showLong(getString(R.string.get_version_fail))
+                        else
+                            skipSwitch(version1)
+                        finish()
+                    })
 
         }
     }

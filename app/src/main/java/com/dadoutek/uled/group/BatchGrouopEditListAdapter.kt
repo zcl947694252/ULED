@@ -10,21 +10,28 @@ package com.dadoutek.uled.group
  * 更新时间   $
  * 更新描述
  */
+import android.view.View
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
 
-class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
+class BatchGrouopEditListAdapter(layoutResId: Int, data: List<DbGroup>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        helper.setText(R.id.batch_four_group_name, item.name)
-                .setText(R.id.batch_four_group_num, mContext.getString(R.string.number) + ":${item.deviceCount}")
+        val tv = helper.getView<TextView>(R.id.template_device_batch_title_blow)
+        tv.visibility = View.GONE
+        helper.setText(R.id.template_device_batch_title, item.name)
+        if (isRouterBind)
+                helper.setText(R.id.template_device_batch_title_blow, item.routerName)
+            else
+                helper.setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number) + ":${item.deviceCount}")
 
         if (item.isCheckedInGroup) {
-            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_selected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
-            helper.setImageResource(R.id.batch_four_select, R.drawable.icon_checkbox_unselected)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
     }
 }

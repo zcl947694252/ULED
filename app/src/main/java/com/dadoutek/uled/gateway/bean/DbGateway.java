@@ -59,8 +59,27 @@ public class DbGateway implements Parcelable {
     private int openTag = 1; //1代表开 0代表关
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public int icon = R.drawable.icon_gw_open;//灯状态显示图
+    public int icon = R.drawable.icon_gateway;//灯状态显示图
+    public boolean isMostNew = false;
 
+    public int getRssi() {
+        return rssi;
+    }
+
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
+    }
+
+    public int rssi =1000;
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
+
+    public boolean isSupportOta =true;
     public DbGateway(Long id) {
         this.id = id;
     }
@@ -87,11 +106,8 @@ public class DbGateway implements Parcelable {
     }
 
 
-    @Generated(hash = 874974623)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr,
-                     int type, int productUUID, String version, int belongRegionId, int pos,
-                     int uid, String tags, String timePeriodTags, int addTag, int state,
-                     int openTag) {
+    @Generated(hash = 1702964759)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, int openTag, boolean isMostNew, int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -108,8 +124,10 @@ public class DbGateway implements Parcelable {
         this.addTag = addTag;
         this.state = state;
         this.openTag = openTag;
+        this.isMostNew = isMostNew;
+        this.rssi = rssi;
+        this.isSupportOta = isSupportOta;
     }
-
 
     @Generated(hash = 1696080529)
     public DbGateway() {
@@ -158,9 +176,9 @@ public class DbGateway implements Parcelable {
 
     public void updateIcon() {
         if (this.state == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_gw_close;
+            this.icon = R.drawable.icon_gateway_off;
         } else if (this.state == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_gw_open;
+            this.icon = R.drawable.icon_gateway;
         }
     }
 
@@ -305,5 +323,21 @@ public class DbGateway implements Parcelable {
 
     public void setOpenTag(int openTag) {
         this.openTag = openTag;
+    }
+
+    public boolean getIsSupportOta() {
+        return this.isSupportOta;
+    }
+
+    public void setIsSupportOta(boolean isSupportOta) {
+        this.isSupportOta = isSupportOta;
+    }
+
+    public boolean getIsMostNew() {
+        return this.isMostNew;
+    }
+
+    public void setIsMostNew(boolean isMostNew) {
+        this.isMostNew = isMostNew;
     }
 }

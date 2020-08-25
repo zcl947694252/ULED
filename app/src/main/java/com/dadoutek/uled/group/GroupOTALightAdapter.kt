@@ -1,12 +1,11 @@
 package com.dadoutek.uled.group
 
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 import org.jetbrains.anko.padding
@@ -23,6 +22,11 @@ import org.jetbrains.anko.textColor
  * 更新描述
  */
 class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAdapter<DbLight, BaseViewHolder>(resId, data) {
+    private var isRgb = false
+    fun setDeviceType(b: Boolean) {
+        isRgb = b
+    }
+
     override fun convert(helper: BaseViewHolder, item: DbLight?) {
         val groupName = helper.getView<TextView>(R.id.group_ota_group_name)
         val deviceName = helper.getView<TextView>(R.id.group_ota_name)
@@ -43,13 +47,24 @@ class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAd
             groupName.textColor = mContext.getColor(R.color.gray_3)
             version.textColor = mContext.getColor(R.color.gray_3)
         }
+        if (isRgb)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_n)
+        else
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_n)
 
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
-                    .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+            if (isRgb)
+                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_no_circle)
+            else
+                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_no_circle)
+            helper.setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
-                    .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
+            if (isRgb)
+                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_close)
+            else
+                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_close_g)
+            helper.setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }
+
 }

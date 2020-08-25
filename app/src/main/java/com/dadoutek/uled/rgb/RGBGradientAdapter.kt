@@ -15,20 +15,20 @@ class RGBGradientAdapter(layoutResId: Int, data: List<ItemRgbGradient>?) : BaseI
 
         var gpOn = helper.getView<ImageView>(R.id.gradient_mode_on)
         var gpOff = helper.getView<ImageView>(R.id.gradient_mode_off)
-        var gpOnText = helper.getView<TextView>(R.id.textOn)
-        var gpOffText = helper.getView<TextView>(R.id.textStop)
+        //var gpOnText = helper.getView<TextView>(R.id.textOn)
+       // var gpOffText = helper.getView<TextView>(R.id.textStop)
 
 
         if (item.select) {
-            gpOn.setImageResource(R.drawable.icon_open_group)
-            gpOff.setImageResource(R.drawable.icon_down_group)
-            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
-            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+            gpOn.setImageResource(R.drawable.icon_open_blue)
+            gpOff.setImageResource(R.drawable.icon_stop2_back)
+            //gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+           // gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
         } else {
-            gpOn.setImageResource(R.drawable.icon_down_group)
-            gpOff.setImageResource(R.drawable.icon_open_group)
-            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+            gpOn.setImageResource(R.drawable.icon_open2_back)
+            gpOff.setImageResource(R.drawable.icon_stop_blue)
+            //gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+           // gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
         }
 
         helper.setText(R.id.modeName, item.name)

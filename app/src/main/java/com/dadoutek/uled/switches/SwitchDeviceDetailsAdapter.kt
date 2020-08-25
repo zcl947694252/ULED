@@ -4,27 +4,35 @@ import android.content.Context
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.util.StringUtils
 
 class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?,internal var context: Context) : BaseQuickAdapter<DbSwitch, BaseViewHolder>(layoutResId, data) {
+    private var isDelete: Boolean = false
 
-    override fun convert(helper: BaseViewHolder, scene: DbSwitch) {
-        if (scene != null) {
-            if(scene.name!=null&&scene.name!=""){
-                helper.setText(R.id.tv_device_name, scene.name)
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
+    }
+    override fun convert(helper: BaseViewHolder, dbSwitch: DbSwitch) {
+        if (dbSwitch != null) {
+            if(dbSwitch.name!=null&&dbSwitch.name!=""){
+                helper.setText(R.id.template_device_group_name, dbSwitch.name)
             }else{
-               helper.setText(R.id.tv_device_name, StringUtils.getSwitchPirDefaultName(scene.productUUID, context)+"-"+helper.position)
+               helper.setText(R.id.template_device_group_name, StringUtils.getSwitchPirDefaultName(dbSwitch.productUUID, context)+"-"+helper.position)
             }
 
-            helper.setText(R.id.name, StringUtils.getSwitchGroupName(scene))
-                    .setVisible(R.id.name,false)
+//            helper.setText(R.id.name, StringUtils.getSwitchName(dbSwitch))
+//                    .setVisible(R.id.name,false)
 
-            helper.setImageResource(R.id.img_light, R.drawable.icon_switch)
-            helper.addOnClickListener(R.id.tv_setting)
-                    .setTag(R.id.tv_setting, helper.adapterPosition)
-                    .setTag(R.id.img_light, helper.adapterPosition)
-                    .addOnClickListener(R.id.img_light)
+            helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch)
+            helper.setVisible(R.id.template_device_card_delete,isDelete)
+                    .setTag(R.id.template_device_setting, helper.adapterPosition)
+                    .setTag(R.id.template_device_icon, helper.adapterPosition)
+                    .setVisible(R.id.template_device_more, false)
+                    .setVisible(R.id.template_gp_name, false)
+                    .addOnClickListener(R.id.template_device_icon)
+                    .addOnClickListener(R.id.template_device_card_delete)
+                    .addOnClickListener(R.id.template_device_setting)
         }
     }
 }

@@ -16,6 +16,9 @@ object NetworkStatusCode {
     const val OK = 0
     //成功
 
+//    "message": "该ScanSerId的扫描不存在或已经停止"    "errorCode": 90026,
+    const val ROUTER_STOP = 90026
+
     const val ERROR_PARAMETER = 61000
     //参数不合法
 
@@ -208,6 +211,21 @@ object NetworkStatusCode {
 
     //服务崩溃 502
     const val ERROR_SERVER_CRASH= 502
+    //路由未上线 90001
+    const val ROUTER_OFFLINE= 90001
+    //该设备不是路由设备，请联系生产方 90010
+    const val ROUTER_NOT_RIGHT= 90010
+    //路由已添加 90002
+    const val ROUTER_IS_EXITE= 90002
+    //路由已被其他人添加，你不能添加
+    const val ROUTER_OTHER_ADD= 90003
+    //此时无法停止，请稍等
+    const val ROUTER_CAN_NOT_STOP= 90027
+
+    const val CURRENT_GP_NOT_EXITE= 90007
+    const val ROUTER_ALL_OFFLINE= 90005
+    const val DEVICE_NOT_BINDROUTER= 90008
+    const val DEVICETYPE_NOT_IS_ROUTER_TYPE= 90016
 
     /**
      * 请求成功处理: 0

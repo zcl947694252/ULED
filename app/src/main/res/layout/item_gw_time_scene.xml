@@ -5,12 +5,12 @@
         android:layout_height="55dp"
         android:orientation="horizontal">
     <!--時間定時title的顔色是黑3 時間段時黑9-->
-    <View
+   <View
             android:id="@+id/item_gw_timer_line_top"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray_e"/>
-    <View
+   <View
             android:id="@+id/item_gw_timer_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"

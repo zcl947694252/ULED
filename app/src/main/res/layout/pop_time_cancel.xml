@@ -34,7 +34,7 @@ android:gravity="center"
                 android:textColor="@color/red"
                 android:textSize="18sp" />
 
-            <View
+           <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
                 android:background="@color/gray" />
@@ -139,7 +139,7 @@ android:gravity="center"
                     app:layout_constraintTop_toBottomOf="@+id/tv_two" />
             </android.support.constraint.ConstraintLayout>
         </LinearLayout>
-        <View
+       <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:background="@color/gray" />
@@ -154,7 +154,7 @@ android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:background="@drawable/rect_r15_w"
+                android:background="@drawable/rect_r15_graye"
                 android:gravity="center"
                 android:text="@string/please_read_carefully"
                 android:textColor="@color/text_red"

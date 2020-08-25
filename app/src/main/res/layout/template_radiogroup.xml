@@ -17,7 +17,7 @@
             android:text="@string/color_mode"
             android:textColor="@color/selector_batch_group_color" />
 
-    <View
+   <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="@color/gray_e"

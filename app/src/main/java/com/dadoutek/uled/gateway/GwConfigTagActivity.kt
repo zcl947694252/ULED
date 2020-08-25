@@ -2,7 +2,6 @@ package com.dadoutek.uled.gateway
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -14,7 +13,6 @@ import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -28,11 +26,12 @@ import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
@@ -103,28 +102,27 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setOnClickListener {
-             val textGp = EditText(this)
-                         StringUtils.initEditTextFilter(textGp)
-            tagBean?.tagName
-                         val s = tagBean?.tagName ?: ""
-                         textGp.setText(s)
-                         textGp.setSelection(s.length)
-                         AlertDialog.Builder(this)
-                                 .setTitle(getString(R.string.update_name))
-                                 .setIcon(android.R.drawable.ic_dialog_info)
-                                 .setView(textGp)
-                                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                                         ToastUtils.showLong(getString(R.string.rename_tip_check))
-                                     } else {
-                                         val trim = textGp.text.toString().trim { it <= ' ' }
-                                         tagBean?.tagName = trim
-                                         toolbarTv.text = trim
-                                     }
-                                 }
-                                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+
+            StringUtils.initEditTextFilter(renameEt)
+                renameEt?.setText(tagBean?.tagName ?: "")
+            renameEt?.setSelection(renameEt?.text.toString().length)
+
+            if (this != null && !this.isFinishing) {
+                renameDialog?.dismiss()
+                renameDialog?.show()
+            }
+
+            renameConfirm?.setOnClickListener {    // 获取输入框的内容
+                if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else{
+                    val trim = renameEt?.text.toString().trim { it <= ' ' }
+                    tagBean?.tagName = trim
+                    toolbarTv.text = trim
+                }
+            }
         }
         toolbar.setNavigationOnClickListener {
             val intent = Intent()
@@ -132,6 +130,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
+        if (TelinkLightApplication.getApp().isConnectGwBle)
+            image_bluetooth.setImageResource(R.drawable.cloud)
         tv_function1.text = getString(R.string.complete)
         tv_function1.visibility = View.VISIBLE
         gate_way_repete_mode.text = getString(R.string.only_one)
@@ -268,6 +268,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun saveOrUpdataGw(it: DbGateway) {
+        if (!netWorkCheck(this))
+            return
         it.productUUID = DeviceType.GATE_WAY
         val toJson = GsonUtils.toJson(listTask)//获取tasks字符串
         LogUtils.v("zcl网关---$toJson")
@@ -336,11 +338,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             TelinkLightService.Instance().sendCommandResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer, "1")
         } else {
             setTimerDelay(6500L, gwTaskBean)
-            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
+            var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
                     id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
-            LogUtils.v("zcl-----------发送到服务器删除标签-------$labHeadPar")
-            val encoder = Base64.getEncoder()
-            val s = encoder.encodeToString(labHeadPar)
+            LogUtils.v("zcl-----------发送到服务器删除标签-------$gattPar")
+
+            val s =  Base64Utils.encodeToStrings(gattPar)
             val gattBody = GwGattBody()
             gattBody.ser_id = Constant.GW_GATT_DELETE_LABEL_TASK
             gattBody.data = s
@@ -369,7 +371,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendLabelHeadParams() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribe {
                     GlobalScope.launch(Dispatchers.Main) {
                         ToastUtils.showShort(getString(R.string.send_gate_way_label_head_fail))
@@ -402,8 +404,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
                 LogUtils.v("zcl-----------发送到服务器标签头-------$labHeadPar")
-                val encoder = Base64.getEncoder()
-                val s = encoder.encodeToString(labHeadPar)
+
+                val s = Base64Utils.encodeToStrings(labHeadPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
                 gattBody.ser_id = Constant.GW_GATT_SAVE_LABEL_HEAD
@@ -664,6 +666,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
                     Constant.GW_CONFIG_TIMER_LABEL_VOIP, Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {//目前此界面只有保标签头时发送头命令
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
+                        disposableTimer?.dispose()
                         saveOrUpdataGw(dbGw!!)
                         val intent = Intent()
                         intent.putExtra("data", dbGw)

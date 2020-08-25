@@ -83,7 +83,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
                     android:layout_toEndOf="@+id/imageView8"
-                    android:text="@string/create_group"
+                    android:text="@string/add_groups"
                     android:textColor="@color/black_three"
                     android:textSize="15sp" />
 
@@ -220,6 +220,7 @@
                 android:orientation="horizontal"
                 android:visibility="visible">
 
+<!--
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -227,15 +228,16 @@
                     android:text="@string/please"
                     android:textColor="@color/gray_3"
                     android:textSize="15sp" />
+-->
 
             <TextView
                     android:id="@+id/scanning_no_factory_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/physical_recovery"
-                    android:textColor="@color/blue_text"
-                    android:textSize="15sp" />
+                    android:text="@string/see_help"
+                    android:textColor="@color/black_three"
+                    android:textSize="18sp" />
         </LinearLayout>
 
         <TextView
@@ -247,6 +249,7 @@
                 android:gravity="center"
                 android:text="@string/no_found_device"
                 android:textColor="@color/gray_3"
+                android:visibility="gone"
                 android:textSize="15sp" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

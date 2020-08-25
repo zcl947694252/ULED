@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils.regionAll
-import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.dbModel.DBUtils.regionAll
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkObserver
 import com.jakewharton.rx.ReplayingShare
@@ -55,12 +55,10 @@ object RxBleManager {
 
     @SuppressLint("CheckResult")
     private fun getRegionList() {
-        RegionModel.getRegionName().subscribe(object : NetworkObserver<Response<MutableList<String>>?>() {
-            override fun onNext(t: Response<MutableList<String>>) {
-                regionList = t.t
-                LogUtils.v("zcl获取区域contromes名列表-------------$t")
-            }
-        })
+        RegionModel.getRegionName().subscribe({
+                regionList = it.t
+                LogUtils.v("zcl获取区域contromes名列表-------------$it")
+            },{})
     }
 
     private fun getLocalRegionName() {

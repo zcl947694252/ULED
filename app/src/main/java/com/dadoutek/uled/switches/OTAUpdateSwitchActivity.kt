@@ -24,9 +24,9 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbSwitch
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.Mesh
 import com.dadoutek.uled.model.OtaDevice
 import com.dadoutek.uled.network.NetworkFactory
@@ -52,6 +52,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_ota_update.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
@@ -290,10 +291,9 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
     }
 
     private fun initToolbar() {
-        toolbar!!.setTitle(R.string.ota_update_title)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbarTv!!.setText(R.string.ota_update_title)
+        toolbar?.setNavigationIcon(R.drawable.icon_return)
+        toolbar?.setNavigationOnClickListener { finish() }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -386,7 +386,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
 
     fun connectDevice(mac: String) {
         log("connectDevice :$mac")
-        btn_start_update.setText(R.string.start_connect)
+        btn_start_update.setText(R.string.connecting_tip)
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT)
     }
 

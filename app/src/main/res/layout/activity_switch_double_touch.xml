@@ -37,17 +37,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
+<!-- android:background="@mipmap/icon_panel_slices"-->
             <ImageView
                     android:id="@+id/switch_double_touch_config"
                     android:layout_width="wrap_content"
-                    android:layout_height="282dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="35dp"
-                    android:layout_marginTop="25dp"
+                    android:layout_marginTop="35dp"
                     android:layout_marginEnd="35dp"
-                    android:layout_marginBottom="26.5dp"
-                    android:background="@mipmap/icon_panel_slices"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/sw_double"
                     android:visibility="visible" />
 
             <LinearLayout
@@ -156,7 +156,7 @@
                     android:layout_marginBottom="15dp"
                     android:background="@drawable/rect_gray_22"
                     android:gravity="center"
-                    android:text="@string/use"
+                    android:text="@string/confirm"
                     android:textColor="@color/gray_3"
                     android:textSize="18sp" />
 

@@ -12,13 +12,16 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
+import com.warkiz.widget.IndicatorSeekBar
+import com.warkiz.widget.OnSeekChangeListener
+import com.warkiz.widget.SeekParams
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +35,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private var algText: TextView? = null
     private var addAlgSpeed: ImageView? = null
     private var lessAlgSpeed: ImageView? = null
-    private var speedSeekbar: SeekBar? = null
+    private var speedSeekbar: IndicatorSeekBar? = null
     private var algLy: LinearLayout? = null
     private var topRgLy: RadioGroup? = null
     private var preTime: Long = 0
@@ -59,7 +62,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     @SuppressLint("ClickableViewAccessibility")
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
-        val position = helper.layoutPosition
+        val position = helper.adapterPosition
         sbBrightnessCW = helper.getView(R.id.cw_sbBrightness)
         sbtemperature = helper.getView(R.id.temperature)
         addBrightnessCW = helper.getView(R.id.cw_brightness_add)
@@ -94,9 +97,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         cb_white_light.isChecked = item.isEnableWhiteLight
 
 
-        //0x4FFFE0
-        docOne.setChecked(true, if (item.color == 16777215) {
+        //0x4FFFE0  不在使用  使用0来判断
+        docOne.setChecked(true, if (item.color == 0) {
             docOne.visibility = View.GONE
+            dotRgb.visibility = View.VISIBLE
             TelinkLightApplication.getApp().resources.getColor(R.color.primary)
         } else {
             //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
@@ -115,16 +119,15 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setProgress(R.id.sbBrightness, item.brightness)
                         .setProgress(R.id.sb_w_bright, item.temperature)
-                        .setProgress(R.id.speed_seekbar, item.gradientSpeed)
+                        //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
-                        .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress+1).toString() + "%")
+                        .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
+                speedSeekbar?.setProgress(item.gradientSpeed.toFloat())
                 when (item.rgbType) {
                     0 -> {
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
-
-                        //LogUtils.e(item.toString())
 
                         if (item.isEnableBright) {
                             sbBrightnessRGB.isEnabled = true
@@ -146,54 +149,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             lessWhiteLightRGB.isEnabled = false
                         }
 
-                        /* when {
-                             item.brightness <= 0 -> {
-                                 addBrightnessRGB!!.isEnabled = true
-                                 lessBrightnessRGB!!.isEnabled = false
-                             }
-                             item.brightness >= 100 -> {
-                                 addBrightnessRGB!!.isEnabled = false
-                                 lessBrightnessRGB!!.isEnabled = true
-                             }
-                             else -> {
-                                 addBrightnessRGB!!.isEnabled = true
-                                 lessBrightnessRGB!!.isEnabled = true
-                             }
-                         }
-                         when {
-                             item.temperature <= 0 -> {
-                                 addWhiteLightRGB!!.isEnabled = true
-                                 lessWhiteLightRGB!!.isEnabled = false
-                             }
-                             item.temperature >= 100 -> {
-                                 addWhiteLightRGB!!.isEnabled = false
-                                 lessWhiteLightRGB!!.isEnabled = true
-                             }
-                             else -> {
-                                 addWhiteLightRGB!!.isEnabled = true
-                                 lessWhiteLightRGB!!.isEnabled = true
-                             }
-                         }*/
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
                             algText?.text = item.gradientName
                         visiableMode(helper, false)
                         setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
-                        /*   when {
-                               item.gradientSpeed <= 0 -> {
-                                   addAlgSpeed!!.isEnabled = true
-                                   lessAlgSpeed!!.isEnabled = false
-                               }
-                               item.gradientSpeed >= 100 -> {
-                                   addAlgSpeed!!.isEnabled = false
-                                   lessAlgSpeed!!.isEnabled = true
-                               }
-                               else -> {
-                                   addAlgSpeed!!.isEnabled = true
-                                   lessAlgSpeed!!.isEnabled = true
-                               }
-                           }*/
                     }
                 }
             }
@@ -204,34 +165,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
-                /*  when {
-                      item.brightness <= 0 -> {
-                          addBrightnessCW!!.isEnabled = true
-                          lessBrightnessCW!!.isEnabled = false
-                      }
-                      item.brightness >= 100 -> {
-                          addBrightnessCW!!.isEnabled = false
-                          lessBrightnessCW!!.isEnabled = true
-                      }
-                      else -> {
-                          addBrightnessCW!!.isEnabled = true
-                          lessBrightnessCW!!.isEnabled = true
-                      }
-                  }
-                  when {
-                      item.temperature <= 0 -> {
-                          addTemperatureCW!!.isEnabled = true
-                          lessTemperatureCW!!.isEnabled = false
-                      }
-                      item.temperature >= 100 -> {
-                          addTemperatureCW!!.isEnabled = false
-                          lessTemperatureCW!!.isEnabled = true
-                      }
-                      else -> {
-                          addTemperatureCW!!.isEnabled = true
-                          lessTemperatureCW!!.isEnabled = true
-                      }
-                  }*/
             }
         }
         when {
@@ -258,6 +191,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, false)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, false)
+                topRgLy?.visibility = View.GONE
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.oval, true)
@@ -271,6 +205,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
+                topRgLy?.visibility = View.GONE
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
@@ -291,6 +226,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_relay, false)
                         .setGone(R.id.scene_curtain, true)
+                topRgLy?.visibility = View.GONE
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
@@ -309,6 +245,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.alg_ly, false)
                         .setGone(R.id.cw_scene, true)
                         .setGone(R.id.switch_scene, false)
+                topRgLy?.visibility = View.GONE
             }
         }
 
@@ -322,25 +259,30 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbtemperature!!.setOnSeekBarChangeListener(this)
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
-        speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        speedSeekbar!!.onSeekChangeListener = object : OnSeekChangeListener {
+            override fun onSeeking(seekParams: SeekParams?){
                 //解决seekbar 设置min 为1时,滑动不到100%
-                var value = progress + 1;
+                var value = seekParams?.progress?:0
                 helper.setText(R.id.speed_seekbar_alg_tv, "$value%")
                 data[position].gradientSpeed = value
-                if (value >= 100) {
-                    lessAlgSpeed?.isEnabled = true
-                    addAlgSpeed?.isEnabled = false
-                } else if (value <= 1) {
-                    lessAlgSpeed?.isEnabled = false
-                    addAlgSpeed?.isEnabled = true
+                when {
+                    value >= 100 -> {
+                        lessAlgSpeed?.isEnabled = true
+                        addAlgSpeed?.isEnabled = false
+                    }
+                    value <= 1 -> {
+                        lessAlgSpeed?.isEnabled = false
+                        addAlgSpeed?.isEnabled = true
+                    }
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
+        }
+
+
 
         topRgLy!!.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -909,11 +851,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1006,11 +948,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             seekBar!!.progress--
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1102,11 +1044,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1136,20 +1078,21 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as SeekBar?
+            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
             var speedTv = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
             var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
             var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
-            seekBar!!.progress++
+            //seekBar!!.progress++
+            seekBar?.progress?.toFloat()?.plus(1f)?.let { speedSeekbar?.setProgress(it) }
 
             val itemGroup = data[pos]
 
             when {
-                seekBar!!.progress > 100 -> {
+                seekBar!!.progress > 5 -> {
                     addImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 100 -> {
+                seekBar!!.progress ==5 -> {
                     addImage!!.isEnabled = false
                     speedTv!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1162,7 +1105,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
 
-            if (seekBar!!.progress < 100)
+            if (seekBar!!.progress < 5)
                 lessImage!!.isEnabled = true
         }
     }
@@ -1172,12 +1115,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as SeekBar?
+            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
             var brightnText = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
             var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
             var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
-
-            seekBar!!.progress--
+            //seekBar!!.progress--
+            seekBar?.progress?.toFloat()?.minus(1f)?.let { speedSeekbar?.setProgress(it) }
 
             val address = data[pos].groupAddress
             val opcode: Byte
@@ -1185,11 +1128,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar.progress < 0 -> {
+                seekBar?.progress!! < 1f -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar.progress == 0 -> {
+                seekBar?.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1232,11 +1175,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             var params: ByteArray
 
             when {
-                seekBar!!.progress < 0 -> {
+                seekBar!!.progress < 1 -> {
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress == 0 -> {
+                seekBar!!.progress == 1 -> {
                     lessImage!!.isEnabled = false
                     brightnText!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false

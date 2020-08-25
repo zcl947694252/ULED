@@ -185,7 +185,7 @@
             android:layout_marginRight="18dp"
             android:layout_marginBottom="14dp"
             android:background="@drawable/bluetooth_button"
-            android:text="@string/i_see"
+            android:text="@string/i_know"
             android:textColor="@color/white"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

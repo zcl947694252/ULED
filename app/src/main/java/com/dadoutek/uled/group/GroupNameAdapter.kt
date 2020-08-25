@@ -1,22 +1,10 @@
 package com.dadoutek.uled.group
 
-import android.graphics.Color
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 
 import com.dadoutek.uled.R
-import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
-import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener
-import com.dadoutek.uled.model.DbModel.DbDeviceName
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.Group
-import com.dadoutek.uled.model.Groups
+import com.dadoutek.uled.model.dbModel.DbDeviceName
 
 class GroupNameAdapter(layoutResId: Int, data: MutableList<DbDeviceName>): BaseQuickAdapter<DbDeviceName, BaseViewHolder>(layoutResId, data){
     override fun convert(helper: BaseViewHolder?, item: DbDeviceName?) {

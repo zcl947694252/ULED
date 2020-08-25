@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager.NameNotFoundException
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
@@ -16,51 +17,41 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.text.method.ScrollingMovementMethod
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import cn.smssdk.gui.util.Const
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
-import com.allenliu.versionchecklib.v2.builder.UIData
-import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.AppUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
+import com.dadoutek.uled.mqtt.IGetMessageCallBack
+import com.dadoutek.uled.mqtt.MqttService
+import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.group.GroupListFragment
-import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.RegionModel
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.model.httpModel.UpdateModel
+import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -70,7 +61,6 @@ import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.event.ServiceEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -79,30 +69,21 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
-
-private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
  *
  * 首页设备
  */
-class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
-    private var recoverDispose: Disposable? = null
+class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment, IGetMessageCallBack {
+    private lateinit var serviceConnection: MyServiceConnection
     private val REQUEST_ENABLE_BT: Int = 1200
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
-    private var retryDisposable: Disposable? = null
     private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
-
     private lateinit var deviceFragment: DeviceFragment
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
@@ -115,16 +96,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
 
-    private var guideShowCurrentPage = false
-    private var installId = 0
-
-    private lateinit var stepOneText: TextView
-    private lateinit var stepTwoText: TextView
-    private lateinit var stepThreeText: TextView
-    private lateinit var switchStepOne: TextView
-    private lateinit var switchStepTwo: TextView
-    private lateinit var swicthStepThree: TextView
-    private lateinit var stepThreeTextSmall: TextView
+    //记录用户首次点击返回键的时间
+    private var firstTime: Long = 0
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -142,9 +115,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    //记录用户首次点击返回键的时间
-    private var firstTime: Long = 0
-
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,9 +124,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
+        //MqttManger.initMqtt()
+        serviceConnection = MyServiceConnection()
+        serviceConnection?.setIGetMessageCallBack(this)
+        val intent = Intent(this, MqttService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
+        //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+        //TelinkLightApplication.getApp().initStompClient()
+
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
 
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
@@ -169,59 +147,79 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener {
-            //如果没打开蓝牙，就提示用户打开
-            //val intent = Intent(this@MainActivity, DoubleTouchSwitchActivity::class.java)
-            // startActivity<ConfigEightSwitchActivity>("deviceInfo" to DeviceInfo(), "group" to "true", "switch" to DbSwitch(), "version" to "123")
-            //startActivity(intent)
-//            installId++
-//            mBluetoothAdapter?.enable()
-//            var enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
+        main_toast.setOnClickListener {}
         initBottomNavigation()
         checkVersionAvailable()
+       // getScanResult()
+
+       // getRouterStatus()
         getRegionList()
+        getAllStatus()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getRouterStatus() {
+        if (Constant.IS_ROUTE_MODE)
+            RouterModel.routerStatus()
+                    ?.subscribe({
+                        when (it.data.status) {
+                            Constant.ROUTER_OTA_ING -> {
+                            }
+                            Constant.ROUTER_SCANNING -> {
+                                val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, it.data.data.scanType)
+                                startActivity(intent)
+                            }
+                        }
+                    }, {
+                        getScanResult()
+                    })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getAllStatus() {
+        UserModel.getModeStatus()?.subscribe({
+            Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
+            Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
+        }, {
+            Constant.IS_ROUTE_MODE = false
+            Constant.IS_OPEN_AUXFUN = false
+        })
+    }
+
+    private fun getScanResult() {
+        showLoadingDialog(getString(R.string.please_wait))
+        val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
+        val subscribe = RouterModel.routeScanningResult()?.subscribe({
+            //status	int	状态。0扫描结束，1仍在扫描
+            if (it?.data != null &&it.data.status == 1) {
+                val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, it)
+                startActivity(intent)
+            }
+        }, {
+            getScanResult()
+            timeDisposable?.dispose()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT)
-            ToastUtils.showShort("打开蓝牙")
+            ToastUtils.showShort(getString(R.string.open_blutooth_tip))
     }
-
 
     @SuppressLint("CheckResult")
     private fun getRegionList() {
         val list = mutableListOf<String>()
-        RegionModel.get()?.subscribe(object : NetworkObserver<MutableList<RegionBean>?>() {
-            override fun onNext(t: MutableList<RegionBean>) {
-                for (i in t) {
-                    i.controlMesh?.let { it -> list.add(it) }
-                }
-                SharedPreferencesUtils.saveRegionNameList(list)
-
-            }
-        })
-    }
-
-
-    private fun startToRecoverDevices() {
-        LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
-        val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
-                .subscribeOn(Schedulers.io())
-                .subscribe({ deviceFragment.refreshView() },
-                        { LogUtils.d(it) })
-        mCompositeDisposable.add(disposable)
-    }
-
-    /**
-     * 检查App是否有新版本
-     */
-    @Deprecated("we don't need call this function manually")
-    private fun detectUpdate() {
-//        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
-//        XiaomiUpdateAgent.update(this)
+        if (netWorkCheck(this))
+            RegionModel.get()?.subscribe( {
+                    for (i in it) {
+                        i.controlMesh?.let { it -> list.add(it) }
+                    }
+                    SharedPreferencesUtils.saveRegionNameList(list)
+                },{
+            })
     }
 
 
@@ -281,237 +279,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ex.printStackTrace()
         }
         return super.dispatchTouchEvent(ev)
-
     }
 
-    var installDialog: AlertDialog? = null
-    var isGuide: Boolean = false
-    var clickRgb: Boolean = false
-    private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
-        this.clickRgb = clickRgb
-        val view = View.inflate(
-                this, R.layout.dialog_install_list, null)
-        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
-        val installDeviceRecyclerview = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        closeInstallList.setOnClickListener { v -> installDialog?.dismiss() }
-
-        val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
-
-        val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        installDeviceRecyclerview?.layoutManager = layoutManager
-        installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
-        installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
-
-        installDialog = AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
-        installDialog?.setOnShowListener {}
-
-        if (isGuide) {
-            installDialog?.setCancelable(false)
-        }
-
-        installDialog?.show()
-
-        GlobalScope.launch {
-            delay(100)
-            GlobalScope.launch(Dispatchers.Main) {
-                guide3(installDeviceRecyclerview)
-            }
-        }
-    }
-
-    private fun showInstallDeviceDetail(describe: String, position: Int) {
-        val view = View.inflate(this, R.layout.dialog_install_detail, null)
-        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
-        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-        stepOneText = view.findViewById(R.id.step_one)
-        stepTwoText = view.findViewById(R.id.step_two)
-        stepThreeText = view.findViewById(R.id.step_three)
-        stepThreeTextSmall = view.findViewById(R.id.step_three_small)
-        switchStepOne = view.findViewById(R.id.switch_step_one)
-        switchStepTwo = view.findViewById(R.id.switch_step_two)
-        swicthStepThree = view.findViewById(R.id.switch_step_three)
-        val installTipQuestion = view.findViewById<TextView>(R.id.install_tip_question)
-        val searchBar = view.findViewById<Button>(R.id.search_bar)
-        closeInstallList.setOnClickListener(dialogOnclick)
-        btnBack.setOnClickListener(dialogOnclick)
-        searchBar.setOnClickListener(dialogOnclick)
-
-        if (position == Constant.INSTALL_SWITCH)
-            stepThreeTextSmall.visibility = VISIBLE
-        else
-            stepThreeTextSmall.visibility = GONE
-
-        val title = view.findViewById<TextView>(R.id.textView5)
-        if (position == INSTALL_NORMAL_LIGHT) {
-            title.visibility = GONE
-            installTipQuestion.visibility = GONE
-        } else {
-            title.visibility = VISIBLE
-            installTipQuestion.visibility = VISIBLE
-        }
-
-
-        installTipQuestion.text = describe
-        installTipQuestion.movementMethod = ScrollingMovementMethod.getInstance()
-        installDialog = AlertDialog.Builder(this).setView(view).create()
-        installDialog?.setOnShowListener {}
-        installDialog?.show()
-    }
-
-    private val dialogOnclick = View.OnClickListener {
-        var medressData = 0
-        var allData = DBUtils.allLight
-        var sizeData = DBUtils.allLight.size
-        if (sizeData != 0) {
-            var lightData = allData[sizeData - 1]
-            medressData = lightData.meshAddr
-        }
-        when (it.id) {
-            R.id.close_install_list -> {
-                installDialog?.dismiss()
-            }
-            R.id.search_bar -> {
-                when (installId) {
-                    INSTALL_NORMAL_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_RGB_LIGHT -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_CURTAIN -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                    INSTALL_SWITCH -> {
-                        //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)
-                        //startActivityForResult(intent, 0)
-                        startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                    }
-                    INSTALL_SENSOR -> {
-                        startActivity(Intent(this, ScanningSensorActivity::class.java))
-                    }
-                    INSTALL_CONNECTOR -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-
-                    INSTALL_GATEWAY -> {
-                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
-                            startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
-                    }
-                }
-                installDialog?.dismiss()
-            }
-            R.id.btnBack -> {
-                installDialog?.dismiss()
-                showInstallDeviceList(isGuide, clickRgb)
-            }
-        }
-    }
-
-    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
-        installDialog?.layoutInflater
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            installDialog?.layoutInflater
-            var guide3: View? = null
-            if (clickRgb) {
-                guide3 = install_device_recyclerView.getChildAt(1)
-            } else {
-                guide3 = install_device_recyclerView.layoutManager!!.findViewByPosition(0)
-            }
-
-            return GuideUtils.guideBuilder(this, installDialog!!.window.decorView, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
-                        guide3.performClick()
-                        GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, true)
-                    }, GuideUtils.END_GROUPLIST_KEY, this))
-                    .show()
-        }
-        return null
-    }
-
-    private val INSTALL_NORMAL_LIGHT = 0
-    private val INSTALL_RGB_LIGHT = 1
-    private val INSTALL_SWITCH = 2
-    private val INSTALL_SENSOR = 3
-    private val INSTALL_CURTAIN = 4
-    private val INSTALL_CONNECTOR = 5
-    val INSTALL_GATEWAY = 6
-
-    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        isGuide = false
-        installDialog?.dismiss()
-        when (position) {
-            INSTALL_GATEWAY -> {
-                installId = INSTALL_GATEWAY
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_NORMAL_LIGHT -> {
-                installId = INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_RGB_LIGHT -> {
-                installId = INSTALL_RGB_LIGHT
-
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_CURTAIN -> {
-                installId = INSTALL_CURTAIN
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_SWITCH -> {
-                installId = INSTALL_SWITCH
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-                stepOneText.visibility = GONE
-                stepTwoText.visibility = GONE
-                stepThreeText.visibility = GONE
-                switchStepOne.visibility = VISIBLE
-                switchStepTwo.visibility = VISIBLE
-                swicthStepThree.visibility = VISIBLE
-            }
-            INSTALL_SENSOR -> {
-                installId = INSTALL_SENSOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-            INSTALL_CONNECTOR -> {
-                installId = INSTALL_CONNECTOR
-                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position)
-            }
-        }
-    }
 
     override fun showDeviceListDialog(isGuide: Boolean, isClickRgb: Boolean) {
         showInstallDeviceList(isGuide, isClickRgb)
@@ -527,47 +296,23 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     /**
      * 检查App版本是否可用  报用户不存在  版本失败
-     *  <-- 200  http://47.107.227.130/smartlight_test/app/isAvailable?platform=0&currentVersion=3.3.1 (26ms)
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Server: nginx/1.14.0 (Ubuntu)
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Date: Sat, 12 Oct 2019 07:29:57 GMT
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Type: application/json;charset=UTF-8
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Content-Length: 92
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: Connection: keep-alive
-    2019-10-12 15:29:57.077 7283-11765/com.dadoutek.uled D/OkHttp: {"data":null,"errorCode":20001,"serverTime":1570865397299,"message":"20001 用户不存在"}
      */
     private fun checkVersionAvailable() {
         var version = packageName(this)
-        UpdateModel.run {
-            isVersionAvailable(0, version)
-                    .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
-                        override fun onNext(s: ResponseVersionAvailable) {
-                            if (!s.isUsable) {
-                                syncDataAndExit()
-                            }
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(R.string.get_server_version_fail)
-                        }
-                    })
-        }
+        if (netWorkCheck(this))
+            UpdateModel.run {
+                isVersionAvailable(0, version)
+                        .subscribe({
+                                if (!it.isUsable) {
+                                    syncDataAndExit()
+                                }
+                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
+                            }, {
+                                //ToastUtils.showLong(R.string.get_server_version_fail)
+                        })
+            }
     }
 
-    /**
-     * @return
-     * @important 使用请求版本功能，可以在这里设置downloadUrl
-     * 这里可以构造UI需要显示的数据
-     * UIData 内部是一个Bundle
-     */
-    private fun crateUIData(v: VersionBean): UIData {
-        val uiData = UIData.create()
-        uiData.title = getString(R.string.update_version)
-        uiData.downloadUrl = v.url
-        uiData.content = v.description
-        return uiData
-    }
 
     private fun packageName(context: Context): String {
         val manager = context.packageManager
@@ -600,11 +345,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {
-            }
+            override fun onPageScrollStateChanged(p0: Int) {}
 
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-            }
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
 
             override fun onPageSelected(p0: Int) {
                 val intent = Intent("isDelete")
@@ -642,9 +385,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
-         recoverDispose = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName, false)
-                .subscribeOn(Schedulers.io())
-                .subscribe({}, {})
         checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
@@ -658,7 +398,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
-//      LogUtils.v("zcl--重加---------onPostResume")
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
@@ -691,7 +430,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     fun autoConnect() {
-        //如果支持蓝牙就打开蓝牙
         // if (LeBluetooth.getInstance().isSupport(applicationContext))
         //LeBluetooth.getInstance().enable(applicationContext)    //如果没打开蓝牙，就提示用户打开
         //如果位置服务没打开，则提示用户打开位置服务，bleScan必须
@@ -699,7 +437,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             showOpenLocationServiceDialog()
         } else {
             hideLocationServiceDialog()
-            //LogUtils.v("zcl--重加---------isstart"+TelinkApplication.getInstance()?.serviceStarted)
             if (TelinkApplication.getInstance()?.serviceStarted == true) {
                 RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
                         .subscribeOn(Schedulers.io())
@@ -710,7 +447,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
                                 if (size > 0) {
-                                    ToastUtils.showLong(R.string.connecting_please_wait)
+                                    ToastUtils.showLong(R.string.connecting_tip)
                                     mConnectDisposal?.dispose()
                                     mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                                             ?.subscribe(
@@ -744,27 +481,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-    /**
-     * 重试
-     * 先扫描到信号比较好的，再连接。
-     */
-    private fun retryConnect() {
-        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
-            retryConnectCount++
-            TelinkLightService.Instance().idleMode(true)
-            ToastUtils.showLong(getString(R.string.reconnecting))
-            retryDisposable?.dispose()
-            retryDisposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
-                    .subscribe {
-                        autoConnect()
-                    }
-        } else {
-            LogUtils.d("exceed max retry time, show connection error")
-            //不调用断开，这样它就会在后台一直重连
-//            TelinkLightService.Instance()?.idleMode(true)
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         TelinkLightService.Instance()?.disableAutoRefreshNotify()
@@ -777,7 +493,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         TelinkLightApplication.getApp().releseStomp()
         //移除事件
         TelinkLightService.Instance()?.idleMode(true)
-        recoverDispose?.dispose()
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()
@@ -802,15 +517,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     override fun performed(event: Event<String>) {
         when (event.type) {
-//            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             NotificationEvent.GET_ALARM -> {
             }
-//            DeviceEvent.STATUS_CHANGED -> {
-//                progressBar.visibility = GONE
-//                this.onDeviceStatusChanged(event as DeviceEvent)
-//            }
             ServiceEvent.SERVICE_CONNECTED -> {
                 this.onServiceConnected(event as ServiceEvent)
             }
@@ -866,6 +574,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun setMessage(cmd: Int, extCmd: Int, message: String) {
     }
 }
 

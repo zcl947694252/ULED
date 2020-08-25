@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.PowerManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
@@ -18,8 +17,11 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.view.MenuItem
-import android.view.View
+import android.util.Log
+import android.view.*
+import android.widget.PopupWindow
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
@@ -29,24 +31,35 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbRegion
+import com.dadoutek.uled.model.dbModel.DbUser
+import com.dadoutek.uled.model.httpModel.AccountModel
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
-import com.dadoutek.uled.network.VersionBean
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.region.adapter.RegionAuthorizeDialogAdapter
+import com.dadoutek.uled.region.adapter.RegionDialogAdapter
+import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Observable.*
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.activity_login.facebook_btn
+import kotlinx.android.synthetic.main.activity_login.google_btn
+import kotlinx.android.synthetic.main.activity_login.qq_btn
+import kotlinx.android.synthetic.main.activity_login.third_party_text
 import org.jetbrains.anko.toast
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by hejiajun on 2018/5/15.
@@ -60,15 +73,29 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var phone: String? = null
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
-    private var mWakeLock: PowerManager.WakeLock? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: PhoneListRecycleViewAdapter? = null
     private var phoneList: ArrayList<DbUser>? = null
     private var isPhone = true
     private var currentUser: DbUser? = null
     private var isPassword = false
-
     private var lastClickTime: Long = 0
+    private var popConfirm: TextView? = null
+    private var mAuthorList: MutableList<RegionAuthorizeBean>? = null
+    private var mList: MutableList<RegionBean>? = null
+    private var regionBeanAuthorize: RegionAuthorizeBean? = null
+    private var regionBean: RegionBean? = null
+    private var poptitle: TextView? = null
+    private var poptitleAuthorize: TextView? = null
+    private var popAuthor: PopupWindow? = null
+    private var popRecycle: RecyclerView? = null
+    private var popRecycleAuthorize: RecyclerView? = null
+    private var whoClick: Int = 0
+    private var itemAdapter: RegionDialogAdapter? = null
+    private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
+    private var NONE: Int = 0
+    private var ME: Int = 1
+    private var AUTHOR: Int = 2
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,32 +104,109 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phoneList = DBUtils.getAllUser()
         if (phoneList!!.size == 0)
             date_phone.visibility = View.GONE
+        makePop()
         initData()
         initView()
         initListener()
     }
 
-    /**
-     * 检查App是否有新版本
-     */
-    @Deprecated("we don't need call this function manually")
-    private fun detectUpdate() {
-//        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
-//        XiaomiUpdateAgent.update(this)
+    private fun makePop() {
+        var popView = LayoutInflater.from(this).inflate(R.layout.pop_region_check, null)
+        poptitle = popView.findViewById(R.id.region_dialog_me_net_num)
+        poptitleAuthorize = popView.findViewById(R.id.region_dialog_authorize_net_num)
+        popRecycle = popView.findViewById(R.id.region_dialog_me_recycleview)
+        popRecycleAuthorize = popView.findViewById(R.id.region_dialog_authorize_recycleview)
 
-        //已用index
-        val list = mutableListOf(1, 3, 5, 7)
+        popConfirm = popView.findViewById(R.id.region_dialog_confirm)
 
-        for (i in 0..50) {
-            for (j in 0 until list.size)
-                if (i == j)
-                    TelinkLightApplication.getApp().useIndex.add(i)
-                else
-                    TelinkLightApplication.getApp().freeIndex.add(i)
+        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
+        popAuthor = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        popConfirm?.setOnClickListener {
+            showLoadingDialog(getString(R.string.logging_tip))
+            downLoadDataAndChangeDbUser()
+        }
+        popAuthor?.let {
+            it.isFocusable = true // 设置PopupWindow可获得焦点
+            it.isTouchable = true // 设置PopupWindow可触摸补充：
+            it.isOutsideTouchable = false
         }
     }
 
+    private fun downLoadDataAndChangeDbUser() {
+        if (regionBean == null && regionBeanAuthorize == null) {
+            ToastUtils.showLong(getString(R.string.please_select_area))
+            hideLoadingDialog()
+            return
+        }
+
+        var lastUser = DBUtils.lastUser
+
+        lastUser?.let { //更新user
+            when (whoClick) {
+                1 -> {
+                    it.last_region_id = regionBean?.id.toString()
+                    it.last_authorizer_user_id = regionBean?.authorizer_id.toString()
+                }
+                2 -> {
+                    it.last_region_id = regionBeanAuthorize?.id.toString()
+                    it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
+                }
+            }
+
+            PopUtil.dismiss(popAuthor)
+            //更新last—region-id
+            DBUtils.saveUser(it)
+            getRegioninfo()
+        }
+    }
+
+
+    @SuppressLint("CheckResult")
+    private fun getRegioninfo(){//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
+        NetworkFactory.getApi()
+                .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
+                .compose(NetworkTransformer())
+                .subscribe( {
+                        //保存最后的区域信息到application
+                        val application = DeviceHelper.getApplication() as TelinkLightApplication
+                        val mesh = application.mesh
+                        mesh.name = it.controlMesh
+                        mesh.password = it.controlMeshPwd
+                        mesh.factoryName = it.installMesh
+                        mesh.factoryPassword = it.installMeshPwd
+
+                        DBUtils.lastUser?.controlMeshName = it.controlMesh
+                        DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+
+                        SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
+                        application.setupMesh(mesh)
+                        val lastUser = DBUtils.lastUser!!
+                        DBUtils.saveUser(lastUser)
+
+                        DBUtils.deleteLocalData()
+                        DBUtils.deleteAllData()
+                        //创建数据库
+                        AccountModel.initDatBase(lastUser)
+
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+
+                        Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+
+                        SharedPreferencesUtils.setUserLogin(true)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+                        hideLoadingDialog()
+                        ActivityUtils.finishAllActivities(true)
+                        ActivityUtils.startActivity(this@LoginActivity, MainActivity::class.java)
+                    },{
+                        LogUtils.v("zcl-------$it")
+                        hideLoadingDialog()
+                        ToastUtils.showLong(it.localizedMessage)
+                })
+    }
     private fun initData() {
         dbUser = DbUser()
         val intent = intent
@@ -118,46 +222,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         edit_user_phone_or_email.setSelection(s.length)
                 }
                 SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
-
             }
         }
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.user_login_title)
-    }
-
-    @SuppressLint("WakelockTimeout")
-    override fun onPause() {
-        super.onPause()
-        if (this.mWakeLock != null) {
-            mWakeLock!!.acquire()
+        return_image.setOnClickListener {
+            finish()
         }
-    }
-
-    @SuppressLint("WakelockTimeout")
-    override fun onResume() {
-        super.onResume()
-        detectUpdate()
-        haveNewVersion()
-
-        if (mWakeLock != null) {
-            mWakeLock!!.acquire()
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun haveNewVersion() {
-        val info = this.packageManager.getPackageInfo(this.packageName, 0)
-        UpdateModel.getVersion(info.versionName)!!.subscribe({
-            object : NetworkObserver<VersionBean>() {
-                override fun onNext(t: VersionBean) {
-                    LogUtils.e("zcl**********************VersionBean$t")
-                }
-            }
-        }, {})
     }
 
     private fun initListener() {
@@ -178,28 +250,22 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
         }
         btn_login.setOnClickListener(this)
-        btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)
         date_phone.setOnClickListener(this)
         eye_btn.setOnClickListener(this)
-        sms_password_login.setOnClickListener(this)
+        sms_login_btn.setOnClickListener(this)
         edit_user_phone_or_email.addTextChangedListener(this)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
     }
 
     private fun initView() {
-        if (Constant.isDebug) {
-            login_isTeck.visibility = View.VISIBLE
-        } else {
-            login_isTeck.visibility = View.GONE
-        }
+        isDebugVisible()
+
         initToolbar()
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
         }
-
-        linearLayout_1.setOnClickListener(this)
 
         recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
@@ -225,32 +291,31 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     toast(getString(R.string.please_phone_number))
                     return
                 }
+                if (TextUtils.isEmpty(edit_user_password.editableText.toString())) {
+                    toast(getString(R.string.please_password))
+                    return
+                }
+
                 val currentTime = Calendar.getInstance().timeInMillis
+
                 if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
                     lastClickTime = currentTime
                     login()
                 }
             }
-            R.id.btn_register -> {
-                returnView()
-                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                intent.putExtra("fromLogin", "register")
-                startActivityForResult(intent, 0)
-            }
             R.id.forget_password -> forgetPassword()
             R.id.date_phone -> phoneList()
             R.id.eye_btn -> eyePassword()
             R.id.sms_password_login -> verificationCode()
+            R.id.sms_login_btn -> verificationCode()
             R.id.linearLayout_1 -> {
                 list_phone.visibility = View.GONE
                 edit_user_password.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
-                btn_register.visibility = View.VISIBLE
                 forget_password.visibility = View.GONE
                 eye_btn.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
-                btn_register.visibility = View.VISIBLE
-                sms_password_login.visibility = View.VISIBLE
+                sms_password_login.visibility = View.GONE
                 third_party_text.visibility = View.VISIBLE
                 qq_btn.visibility = View.VISIBLE
                 google_btn.visibility = View.VISIBLE
@@ -290,78 +355,85 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun phoneList() {
         if (isPhone) {
-            list_phone.visibility = View.VISIBLE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-//            btn_register.visibility=View.GONE
-            forget_password.visibility = View.GONE
-            sms_password_login.visibility = View.GONE
-            third_party_text.visibility = View.GONE
-            qq_btn.visibility = View.GONE
-            google_btn.visibility = View.GONE
-            facebook_btn.visibility = View.GONE
-            val layoutmanager = LinearLayoutManager(this)
-            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = layoutmanager
-            this.adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
+            isShowPhoneList(true)
 
-            val decoration = DividerItemDecoration(this,
-                    DividerItemDecoration
-                            .VERTICAL)
-            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                    .divider)))
+            val layoutmanager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            recyclerView!!.layoutManager = layoutmanager
+            adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
+            val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
             recyclerView?.itemAnimator = DefaultItemAnimator()
-
-//        adapter!!.addFooterView(getFooterView())
             adapter!!.bindToRecyclerView(recyclerView)
             adapter!!.onItemChildClickListener = onItemChildClickListener
-            isPhone = false
+        } else {
+            isShowPhoneList(false)
+        }
+    }
+
+    private fun isShowPhoneList(b: Boolean) {
+        eye_btn.visibility = View.GONE
+        forget_password.visibility = View.GONE
+        edit_user_password.visibility = View.GONE
+        isPhone = !b
+        if (b) {
+            qq_btn.visibility = View.GONE
+            btn_login.visibility = View.GONE
+            google_btn.visibility = View.GONE
+            facebook_btn.visibility = View.GONE
+            login_isTeck.visibility = View.GONE
+            sms_login_btn.visibility = View.GONE
+            third_party_text.visibility = View.GONE
+            sms_password_login.visibility = View.GONE
+            list_phone.visibility = View.VISIBLE
             date_phone.setImageResource(R.drawable.icon_up)
         } else {
-            list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-//            edit_user_password.visibility = View.VISIBLE
-            btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-//            forget_password.visibility = View.VISIBLE
-//            eye_btn.visibility = View.VISIBLE
-            sms_password_login.visibility = View.VISIBLE
-            third_party_text.visibility = View.VISIBLE
             qq_btn.visibility = View.VISIBLE
+            btn_login.visibility = View.VISIBLE
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
-            isPhone = true
+            isDebugVisible()
+            sms_login_btn.visibility = View.VISIBLE
+            third_party_text.visibility = View.VISIBLE
+            sms_password_login.visibility = View.GONE
+            edit_user_password.visibility = View.VISIBLE
+            forget_password.visibility = View.VISIBLE
+            list_phone.visibility = View.GONE
             date_phone.setImageResource(R.drawable.icon_down_arr)
         }
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentUser = phoneList?.get(position)
         if (view.id == R.id.phone_text) {
             edit_user_phone_or_email!!.setText(currentUser!!.phone)
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(currentUser!!.password)
-            edit_user_password!!.visibility = View.GONE
             list_phone?.visibility = View.GONE
+            edit_user_password.visibility = View.VISIBLE
+            btn_login.visibility = View.VISIBLE
+            eye_btn.visibility = View.VISIBLE
+            isDebugVisible()
             SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
             login()
         }
         if (view.id == R.id.delete_image) {
             AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_user)
-                    .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         DBUtils.deleteUser(currentUser!!)
                         newPhoneList()
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
         }
+    }
+
+    private fun isDebugVisible() {
+        if (Constant.isDebug)
+            login_isTeck.visibility = View.VISIBLE
+        else
+            login_isTeck.visibility = View.GONE
     }
 
     private fun newPhoneList() {
@@ -373,26 +445,27 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
             edit_user_password!!.setText(message[1])
             edit_user_password!!.visibility = View.GONE
+
+            if (currentUser?.phone == message!![0]) {
+                SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
+                edit_user_phone_or_email!!.setText("")
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
+                edit_user_password!!.setText("")
+                list_phone.visibility = View.GONE
+                edit_user_password.visibility = View.GONE
+                btn_login.visibility = View.VISIBLE
+                forget_password.visibility = View.GONE
+                eye_btn.visibility = View.GONE
+                sms_password_login.visibility = View.GONE
+                third_party_text.visibility = View.VISIBLE
+                qq_btn.visibility = View.VISIBLE
+                google_btn.visibility = View.VISIBLE
+                facebook_btn.visibility = View.VISIBLE
+                isPhone = true
+                date_phone.setImageResource(R.drawable.icon_down_arr)
+            }
         }
-        if (currentUser!!.phone == message!![0]) {
-            SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
-            edit_user_phone_or_email!!.setText("")
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
-            edit_user_password!!.setText("")
-            list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
-            btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
-            eye_btn.visibility = View.GONE
-            sms_password_login.visibility = View.VISIBLE
-            third_party_text.visibility = View.VISIBLE
-            qq_btn.visibility = View.VISIBLE
-            google_btn.visibility = View.VISIBLE
-            facebook_btn.visibility = View.VISIBLE
-            isPhone = true
-            date_phone.setImageResource(R.drawable.icon_down_arr)
-        }
+
         notifyData()
     }
 
@@ -425,12 +498,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phoneList = (mNewDatas as ArrayList<DbUser>?)!!
         if (phoneList!!.size == 0) {
             list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.GONE
+            edit_user_password.visibility = View.VISIBLE
             btn_login.visibility = View.VISIBLE
-            btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.GONE
+            forget_password.visibility = View.VISIBLE
             isPhone = true
-            date_phone.visibility = View.GONE
+            date_phone.visibility = View.VISIBLE
         } else {
             adapter!!.setNewData(phoneList)
         }
@@ -438,7 +510,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun getNewData(): MutableList<DbUser> {
         phoneList = DBUtils.getAllUser()
-
         return phoneList as ArrayList<DbUser>
     }
 
@@ -462,36 +533,31 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phone = edit_user_phone_or_email!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
-        if (!StringUtils.isTrimEmpty(phone)) {
-            NetworkFactory.getApi()
-                    .getAccount(phone, "dadou")
-                    .compose(NetworkTransformer())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                    if (TextUtils.isEmpty(t))
-                                        startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-                                    else {
-                                        val intent = Intent(this@LoginActivity, EnterPasswordActivity::class.java)
-                                        intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
-                                        intent.putExtra("phone", phone)
-                                        returnView()
-                                        startActivity(intent)
-                                        finish()
-                                    }
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    returnView()
-
-                                }
-                            })
+        if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
+            showLoadingDialog(getString(R.string.logging_tip))
+             userLogin()
         } else {
-            ToastUtils.showShort(getString(R.string.phone_or_password_can_not_be_empty))
+            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun userLogin() {
+        val subscribe = timer(15000, TimeUnit.MILLISECONDS).subscribe {
+            hideLoadingDialog()
+        }
+        AccountModel.login(phone!!, editPassWord!!)
+                .subscribe({
+                        DBUtils.deleteLocalData()
+                        SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
+                        SharedPreferencesUtils.setUserLogin(true)
+                    },{
+                        LogUtils.d("logging: " + "登录错误" + it.message)
+                        ToastUtils.showShort(it.message)
+                        hideLoadingDialog()
+                })
     }
 
     var isSuccess: Boolean = true
@@ -506,20 +572,91 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
 
         override fun error(msg: String) {
+            val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, false)
+            if (ishowRegionDialog) {
+                initMe()
+                initAuthor()
+                popAuthor?.showAtLocation(window.decorView, Gravity.CENTER, 0, 100)
+            }
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         }
     }
 
+    private fun initMe() {
+        val disposable = RegionModel.get()?.subscribe({
+                setMeRegion(it)
+            }, {
+                ToastUtils.showLong(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun initAuthor() {
+        RegionModel.getAuthorizerList()?.subscribe({
+                setAuthorizeRegion(it)
+            }, {
+                ToastUtils.showLong(it.message)
+        })
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private fun setAuthorizeRegion(authorList: MutableList<RegionAuthorizeBean>) {
+        poptitleAuthorize?.text = getString(R.string.received_net_num, authorList.size)
+        mAuthorList = authorList
+            itemAdapterAuthor = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
+            popRecycleAuthorize?.adapter = itemAdapterAuthor
+            itemAdapterAuthor?.setOnItemClickListener { _, _, position ->
+                regionBeanAuthorize = authorList[position]
+                when (whoClick) {
+                    NONE -> itemAdapterAuthor?.data?.get(position)?.is_selected = true
+                    //上次点击的自己不用便利其他人
+                    AUTHOR ->
+                        if (itemAdapterAuthor != null)
+                            for (i in itemAdapterAuthor!!.data.indices)
+                                itemAdapterAuthor!!.data[i].is_selected = i == position
+                    //上次点击个人区域 这次自己 个人全是false
+                    ME -> initMe()
+                }
+                itemAdapterAuthor?.notifyDataSetChanged()
+                whoClick = AUTHOR
+            }
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    private fun setMeRegion(list: MutableList<RegionBean>) {
+        poptitle?.text = getString(R.string.me_net_num, list.size)
+        mList = list
+            itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
+            popRecycle?.adapter = itemAdapter
+            itemAdapter?.setOnItemClickListener { _, _, position ->
+                regionBean = list[position]
+                if (itemAdapter != null)
+                    when (whoClick) {//更新UI
+                        NONE -> itemAdapter!!.data[position].is_selected = true
+                        //上次点击的自己不用便利其他人 更改状态
+                        ME -> for (i in itemAdapter!!.data.indices)
+                            itemAdapter!!.data[i].is_selected = i == position
+
+                        //上次点击收授权区域 这次自己 授权全是false
+                        AUTHOR -> initAuthor()
+                    }
+                itemAdapter?.notifyDataSetChanged()
+                whoClick = ME
+            }
+    }
+
     private fun syncComplet() {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         transformView()
         hideLoadingDialog()
+        TelinkLightApplication.getApp().lastMeshAddress = DBUtils.getlastDeviceMesh()
     }
 
     private fun transformView() {
-        startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
+        ActivityUtils.finishAllActivities(true)
+        ActivityUtils.startActivityForResult(this@LoginActivity, MainActivity::class.java, 0)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -533,14 +670,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     companion object {
-        private val REQ_MESH_SETTING = 0x01
         val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
     }
-
-    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-    }
-
-    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun afterTextChanged(p0: Editable?) {
         if (TextUtils.isEmpty(p0.toString())) {
@@ -552,5 +683,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
     }
 
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
     override fun loginOutMethod() {}
 }

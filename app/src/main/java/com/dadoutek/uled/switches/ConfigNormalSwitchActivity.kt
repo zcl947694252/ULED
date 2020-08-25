@@ -1,31 +1,28 @@
 package com.dadoutek.uled.switches
 
-import android.annotation.SuppressLint
-import android.app.Dialog
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbSwitch
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -34,7 +31,6 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -44,101 +40,130 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_switch_group.*
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
 
 private const val CONNECT_TIMEOUT = 5
 
-class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
-    private var popReNameView: View? = null
-    private var renameDialog: Dialog? = null
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
+class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
+    private var deviceConfigType: Int = 0
+    private var groupName: String? = null
+    private var currentGroup: DbGroup? = null
+    private val requestCodeNum: Int = 1000
     private lateinit var mDeviceInfo: DeviceInfo
-    private lateinit var mApplication: TelinkLightApplication
-    private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
-    private var mRxPermission: RxPermissions? = null
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
     private var mConfigFailSnackbar: Snackbar? = null
     private var isGlassSwitch = false
-    private var groupName: String? = null
     private var switchDate: DbSwitch? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_switch_group)
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.select_group)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        mApplication = application as TelinkLightApplication
-
-        initView()
-        initListener()
+    override fun setLayoutId(): Int {
+        return R.layout.activity_switch_group
     }
 
-    private fun initView() {
-        makePop()
+    override fun setToolBar(): Toolbar {
+        return toolbar
+    }
 
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
+    override fun initView() {
+        toolbar?.title = getString(R.string.select_group)
+        makePop()
+    }
+
+    override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
+        deviceConfigType = intent.getIntExtra("deviceType", 0)
+
+        if (!localVersion.contains("BT")) {
+            sw_normal_iv.setImageResource(R.mipmap.sw_normal_add_minus)
+            toolbarTv.text = getString(R.string.light_sw)
+        } else {
+            toolbarTv.text = getString(R.string.touch_sw)
+            sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+            //tLightVersion.text = localVersion
+        }
+
+
         if (TextUtils.isEmpty(localVersion))
             localVersion = mDeviceInfo.firmwareRevision
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        fiVersion?.title = localVersion
 
-        tvLightVersion.text = localVersion
+        //tvLightVersion.text = localVersion
         if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
             isGlassSwitch = true
 
-        if (groupName != null && groupName == "true") {
+        isReConfig = groupName != null && groupName == "true"
+        fiRename?.isVisible = isReConfig
+
+        if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
         } else {
             groupName = "false"
         }
+
         mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList
 
-        for (group in groupList) {
+        for (group in groupList)
             if (OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group) || OtherUtils.isConnector(group)) {
                 group.checked = false
                 mGroupArrayList.add(group)
             }
-        }
-        if (mGroupArrayList.size > 0) {
-            mGroupArrayList[0].checked = true
-        }
 
-        mRxPermission = RxPermissions(this)
-        mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mAdapter.bindToRecyclerView(recyclerView)
+        if (mGroupArrayList.size > 0)
+            mGroupArrayList[0].checked = true
+    }
+
+    override fun setVersion() {
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = localVersion
+        fiVersion?.title = localVersion
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return mDeviceInfo?.meshAddress ?: 0
+    }
+
+    override fun deleteDevice() {
+        deleteSwitch(mDeviceInfo.macAddress)
+    }
+
+    override fun goOta() {
+        deviceOta(mDeviceInfo)
+    }
+
+    override fun reName() {
+        showRenameDialog(switchDate)
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById<EditText>(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById<TextView>(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById<TextView>(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-                if (switchDate != null)
+                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
+                if (switchDate != null) {
+                    toolbarTv.text = switchDate?.name
                     DBUtils.updateSwicth(switchDate!!)
-                else
+                } else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
                 if (this != null && !this.isFinishing)
@@ -150,37 +175,9 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 renameDialog?.dismiss()
         }
 
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
-
         renameDialog?.setOnDismissListener {
-
-            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            if (switchDate != null)
-                DBUtils.updateSwicth(switchDate!!)
-            showConfigSuccessDialog()
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        hideLoadingDialog()
-        StringUtils.initEditTextFilter(renameEditText)
-
-        if (switchDate != null && switchDate?.name != "")
-            renameEditText?.setText(switchDate?.name)
-        else {
-            if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
-                renameEditText?.setText(switchDate?.name)
-            else
-                renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
-                        + DBUtils.getAllSwitch().size)
-        }
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            if (!isReConfig)
+                finish()
         }
     }
 
@@ -189,7 +186,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (TelinkLightApplication.getApp().connectDevice != null) {
-                        progressBar.visibility = View.VISIBLE
+                        sw_progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
                     } else {
@@ -202,7 +199,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                showCancelDialog()
+                //showCancelDialog()
+                configReturn()
                 return true
             }
         }
@@ -213,9 +211,9 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun disconnect() {
         if (mIsConfiguring) {
-            this.mApplication.removeEventListener(this)
+            mApp?.removeEventListener(this)
             GlobalScope.launch(Dispatchers.Main) {
-                progressBar.visibility = View.GONE
+                sw_progressBar.visibility = View.GONE
             }
         } else {
             TelinkLightService.Instance()?.idleMode(true)
@@ -224,79 +222,107 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun onBackPressed() {
-        showCancelDialog()
+        //showCancelDialog()
+        configReturn()
     }
 
     private var mIsConfiguring: Boolean = false
 
-    private fun initListener() {
-        mApplication.removeEventListener(this)
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            currentGroup = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            group_name.text = currentGroup?.name
+        }
+    }
 
-        fab.setOnClickListener { view ->
+    override fun initListener() {
+        mApp?.removeEventListener(this)
+        mApp?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        mApp?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        select_group.setOnClickListener {
+            val intent = Intent(this@ConfigNormalSwitchActivity, ChooseGroupOrSceneActivity::class.java)
+            //传入0代表是群组
+            val bundle = Bundle()
+            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+            intent.putExtras(bundle)
+            startActivityForResult(intent, requestCodeNum)
+            setResult(Constant.RESULT_OK)
+        }
+        fab.setOnClickListener {
+            if (currentGroup == null) {
+                ToastUtils.showShort(getString(R.string.please_select_group))
+                return@setOnClickListener
+            }
+
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
                 }
             } else {
-                if (mAdapter.selectedPos != -1) {
-                    progressBar.visibility = View.VISIBLE
-                    Thread(Runnable {
-                        setGroupForSwitch()
-                        Thread.sleep(800)
-                        //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-                        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
-                        Commander.updateMeshName(newMeshAddr = newMeshAddr,
-                                successCallback = {
-                                    mDeviceInfo.meshAddress = newMeshAddr
-                                    mIsConfiguring = true
-                                    updateSwitch()
-                                    disconnect()
-                                    if (switchDate == null)
-                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                                    showRenameDialog()
-                                },
-                                failedCallback = {
-                                    mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        progressBar.visibility = View.GONE
-                                        mIsConfiguring = false
-                                    }
-                                })
-                    }).start()
-                } else {
-                    snackbar(view, getString(R.string.please_select_group))
-                }
+                // (mAdapter.selectedPos != -1) {
+                sw_progressBar.visibility = View.VISIBLE
+                Thread(Runnable {
+                    setGroupForSwitch()
+                    Thread.sleep(800)
+                    //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
+                    val newMeshAddr = MeshAddressGenerator().meshAddress.get()
+                    Commander.updateMeshName(newMeshAddr = newMeshAddr,
+                            successCallback = {
+                                mDeviceInfo.meshAddress = newMeshAddr
+                                mIsConfiguring = true
+                                updateSwitch()
+                                disconnect()
+                                if (switchDate == null)
+                                    switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                                ToastUtils.showShort(getString(R.string.config_success))
+                                if (!isReConfig)
+                                    showRenameDialog(switchDate)
+                                else
+                                    finish()
+                            },
+                            failedCallback = {
+                                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    sw_progressBar.visibility = View.GONE
+                                    mIsConfiguring = false
+                                }
+                            })
+                }).start()
+                /*  } else {
+                      snackbar(view, getString(R.string.please_select_group))
+                  }*/
             }
         }
 
-        mAdapter.setOnItemChildClickListener { _, view, position ->
-            when (view.id) {
-                R.id.checkBox -> {
-                    if (mAdapter.selectedPos != position) {
-                        //取消上个Item的勾选状态
-                        mGroupArrayList[mAdapter.selectedPos].checked = false
-                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
+        /*      mAdapter.setOnItemChildClickListener { _, view, position ->
+                  when (view.id) {
+                      R.id.checkBox -> {
+                          if (mAdapter.selectedPos != position) {
+                              //取消上个Item的勾选状态
+                              currentGroup!!.checked = false
+                              mAdapter.notifyItemChanged(mAdapter.selectedPos)
 
-                        //设置新的item的勾选状态
-                        mAdapter.selectedPos = position
-                        mGroupArrayList[mAdapter.selectedPos].checked = true
-                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
-                    } else {
-                        mGroupArrayList[mAdapter.selectedPos].checked = true
-                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
-                    }
-                }
-            }
-        }
-
+                              //设置新的item的勾选状态
+                              mAdapter.selectedPos = position
+                              currentGroup!!.checked = true
+                              mAdapter.notifyItemChanged(mAdapter.selectedPos)
+                          } else {
+                              currentGroup!!.checked = true
+                              mAdapter.notifyItemChanged(mAdapter.selectedPos)
+                          }
+                      }
+                  }
+              }*/
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        this.mApplication?.removeEventListener(this)
+        mApp?.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
     }
 
@@ -316,13 +342,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        //("未扫到目标设备")
                     }
                 }
                 showDisconnectSnackBar()
@@ -331,10 +354,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        //("未建立物理连接")
                     }
                 }
                 showDisconnectSnackBar()
@@ -342,16 +363,12 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        //("write login data 没有收到response")
                     }
                 }
-                //("onError login")
                 showDisconnectSnackBar()
             }
         }
@@ -359,10 +376,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun showDisconnectSnackBar() {
         TelinkLightService.Instance()?.idleMode(true)
-        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
-                .string.device_disconnected), getString(R.string.reconnect)) {
-            reconnect()
-        }
+        reconnect()
+        //mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.device_disconnected), getString(R.string.reconnect)) {}
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -372,25 +387,23 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
                 mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
-                progressBar.visibility = View.GONE
+                sw_progressBar.visibility = View.GONE
             }
-
 
             LightAdapter.STATUS_LOGOUT -> {
                 when {
                     mIsDisconnecting -> {
-                        this.mApplication.removeEventListener(this)
-
+                        this.mApp?.removeEventListener(this)
                         GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
-                            progressBar.visibility = View.GONE
+                            sw_progressBar.visibility = View.GONE
                             finish()
                         }
                     }
                     mIsConfiguring -> {
-                        this.mApplication.removeEventListener(this)
+                        mApp?.removeEventListener(this)
                         GlobalScope.launch(Dispatchers.Main) {
-                            progressBar.visibility = View.GONE
+                            sw_progressBar.visibility = View.GONE
                             showConfigSuccessDialog()
                         }
                     }
@@ -430,38 +443,35 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
-                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
-                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+                dbSwitch.belongGroupId = currentGroup!!.id
+                dbSwitch.controlGroupAddr = currentGroup!!.meshAddr
                 dbSwitch.version = mDeviceInfo.firmwareRevision
-                //Log.e("zcl", "zcl*****设置新的开关使用更新$dbSwitch")
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
+                dbSwitch.belongGroupId = currentGroup!!.id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.version = mDeviceInfo.firmwareRevision
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+                dbSwitch.controlGroupAddr = currentGroup!!.meshAddr
 
                 Log.e("zcl", "zcl*****设置新的开关使用插入替换$dbSwitch")
                 DBUtils.saveSwitch(dbSwitch, false)
 
                 LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-                recordingChange(gotSwitchByMac?.id,
-                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
                 switchDate = dbSwitch
             }
 
             switchDate = dbSwitch
         } else {
-            switchDate!!.belongGroupId = mGroupArrayList[mAdapter.selectedPos].id
-            switchDate!!.controlGroupAddr = mGroupArrayList[mAdapter.selectedPos].meshAddr
+            switchDate!!.belongGroupId = currentGroup!!.id
+            switchDate!!.controlGroupAddr = currentGroup!!.meshAddr
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -487,23 +497,21 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
-                .string.connecting))
-
+        //  mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting))
+        ToastUtils.showShort(getString(R.string.connecting_tip))
         TelinkLightService.Instance()?.autoConnect(connectParams)
     }
 
     private fun setGroupForSwitch() {
-        val groupAddress = mGroupArrayList[mAdapter.selectedPos].meshAddr
-        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
-                (groupAddress shr 8 and 0xFF).toByte())
+        val groupAddress = currentGroup!!.meshAddr
+        val paramBytes = byteArrayOf(0x01, (groupAddress shr 8 and 0xFF).toByte(), (groupAddress and 0xFF).toByte())
+        //0x01 代表添加组
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (KeyEvent.KEYCODE_BACK == keyCode) {
+        if (KeyEvent.KEYCODE_BACK == keyCode)
             finish()
-        }
         return super.onKeyDown(keyCode, event)
     }
 }

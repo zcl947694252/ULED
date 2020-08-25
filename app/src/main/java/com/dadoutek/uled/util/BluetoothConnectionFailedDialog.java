@@ -14,7 +14,7 @@ import com.blankj.utilcode.util.AppUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
@@ -115,7 +115,6 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
 
     //重启app并杀死原进程
     private void restartApplication() {
-//        TelinkLightApplication.Companion.getApp().releseStomp();
         ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
         TelinkLightApplication.Companion.getApp().doDestroy();

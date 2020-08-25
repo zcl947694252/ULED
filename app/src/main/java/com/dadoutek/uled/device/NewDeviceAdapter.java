@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.light.LightsOfGroupRecyclerViewAdapter;
-import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbLight;
 
 import java.util.ArrayList;
 import java.util.List;

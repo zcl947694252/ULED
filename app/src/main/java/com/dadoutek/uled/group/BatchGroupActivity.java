@@ -1,13 +1,14 @@
 package com.dadoutek.uled.group;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,11 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -40,10 +39,10 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -51,7 +50,6 @@ import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
-import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
@@ -72,8 +70,6 @@ import com.telink.util.EventListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -99,6 +95,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.toolbarTv)
+    TextView toolbarTv;
     @BindView(R.id.recycler_view_groups)
     RecyclerView recyclerViewGroups;
     @BindView(R.id.add_group_layout)
@@ -169,13 +167,13 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         DbLight light = this.adapter.getItem(position);
         light.selected = !light.selected;
         DeviceItemHolder holder = (DeviceItemHolder) view.getTag();
-        holder.selected.setChecked(light.selected);
+        holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
 
         if (light.selected) {
             this.updateList.add(light);
             nowLightList.get(position).selected = true;
 
-            btnAddGroups.setText(R.string.set_group);
+            btnAddGroups.setText(R.string.sure_group);
 
             if (hasGroup()) {
                 startBlink(light);
@@ -198,7 +196,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 this.updateList.add(nowLightList.get(j));
                 nowLightList.get(j).selected = true;
 
-                btnAddGroups.setText(R.string.set_group);
+                btnAddGroups.setText(R.string.sure_group);
 
                 if (hasGroup()) {
                     startBlink(nowLightList.get(j));
@@ -292,7 +290,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     //处理扫描成功后
     private void scanSuccess() {
-        toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
+        toolbarTv.setText(getString(R.string.title_scanned_device_num)+adapter.getCount());
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -630,6 +628,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void changeGroupView() {
         grouping = true;
         toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+
         toolbar.setOnMenuItemClickListener(this);
         deviceListView.setOnItemClickListener(this);
         deviceListView.setAdapter(adapter);
@@ -673,7 +672,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 //        //设置光标默认在最后
         textGp.setSelection(textGp.getText().toString().length());
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_name_gp))
+                .setTitle(getString(R.string.update_group))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
                 .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
@@ -722,67 +721,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
     }
 
-    private void addNewGroup() {
-        final EditText textGp = new EditText(this);
-        textGp.setText(DBUtils.INSTANCE.getDefaultNewGroupName());
-        StringUtils.initEditTextFilter(textGp);
-        AlertDialog.Builder builder = new AlertDialog.Builder(BatchGroupActivity.this);
-        builder.setTitle(R.string.create_new_group);
-        builder.setIcon(android.R.drawable.ic_dialog_info);
-        builder.setView(textGp);
-        builder.setCancelable(false);
-        builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
-            // 获取输入框的内容
-            if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                ToastUtils.showLong(getString(R.string.rename_tip_check));
-            } else {
-                //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_NORMAL);
-                refreshView();
-                dialog.dismiss();
-                InputMethodManager imm = (InputMethodManager) BatchGroupActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                guideStep2();
-            }
-        });
-        if (!isGuide) {
-            builder.setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
-                dialog.dismiss();
-            });
-        }
-        textGp.setFocusable(true);
-        textGp.setFocusableInTouchMode(true);
-        textGp.requestFocus();
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                InputMethodManager inputManager = (InputMethodManager) textGp.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(textGp, 0);
-            }
-        }, 200);
-        builder.show();
-    }
-
-    private void refreshView() {
-        currentGroupIndex = groups.size() - 1;
-        for (int i = groups.size() - 1; i >= 0; i--) {
-            if (i == groups.size() - 1) {
-                groups.get(i).checked = true;
-            } else {
-                groups.get(i).checked = false;
-            }
-        }
-
-        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
-        add_relativeLayout.setVisibility(View.GONE);
-        add_group.setVisibility(View.VISIBLE);
-        recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
-        groupsRecyclerViewAdapter.notifyDataSetChanged();
-        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-    }
-
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
         @Override
         public void onItemClickListener(View v, int position) {
@@ -806,8 +744,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         groups.get(position).checked = checkStateChange;
     }
 
-    private boolean startConnect = false;
-
     /**
      * 自动重连
      * 此处用作设备登录
@@ -820,8 +756,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 TelinkLightService instance = TelinkLightService.Instance();
                 if (instance != null)
                     instance.idleMode(true);
-
-                startConnect = true;
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
@@ -880,70 +814,6 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         initClick();
     }
 
-    public void lazyLoad() {
-        guideStep1();
-    }
-
-
-    //第一步添加组
-    private void guideStep1() {
-        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
-        if (guideShowCurrentPage) {
-            GuideUtils.INSTANCE.resetDeviceScanningGuide(this);
-            LinearLayout guide1 = addGroupLayout;
-            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP3_GUIDE_CREATE_GROUP())
-                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
-                        isGuide = true;
-                        //addNewGroup();
-                        popMain.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
-                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
-                    .show();
-        }
-    }
-
-    //第二部选择组
-    private void guideStep2() {
-        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
-        if (guideShowCurrentPage) {
-            View guide2 = recyclerViewGroups;
-            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP4_GUIDE_SELECT_GROUP())
-                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_2),
-                            v -> {
-                                guideStep3();
-                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
-                    .show();
-        }
-    }
-
-    //第三部选择灯
-    private void guideStep3() {
-        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
-        if (guideShowCurrentPage) {
-            View guide3 = listDevices.getChildAt(0);
-            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP5_GUIDE_SELECT_SOME_LIGHT())
-                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3, R.layout.view_guide_scan2, getString(R.string.scan_light_guide_3)
-                            , v -> {
-                                listDevices.performItemClick(guide3, 0, listDevices.getItemIdAtPosition(0));
-                                guideStep4();
-                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
-                    .show();
-        }
-    }
-
-    //第四部确定分组
-    private void guideStep4() {
-        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
-        if (guideShowCurrentPage) {
-            Button guide4 = btnAddGroups;
-            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP6_GUIDE_SURE_GROUP())
-                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4, R.layout.view_guide_scan3, getString(R.string.scan_light_guide_4), v -> {
-                        guide4.performClick();
-                        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), true);
-                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
-                    .show();
-        }
-
-    }
 
     private void initClick() {
         this.btnScan.setOnClickListener(this.clickListener);
@@ -1040,24 +910,21 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
+        Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.abc_ic_menu_overflow_material);
+        if(moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.getContext(), R.color.black), PorterDuff.Mode.SRC_ATOP);
+            toolbar.setOverflowIcon(moreIcon);
+        }
         if (lightType.equals("cw_light")) {
-            toolbar.setTitle(groupLight);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+            toolbarTv.setText(getString(R.string.activity_device_grouping));
         } else {
-            toolbar.setTitle(R.string.batch_group);
-            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
-            toolbar.setOnMenuItemClickListener(this);
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+            toolbarTv.setText(R.string.batch_group);
         }
     }
 
@@ -1081,12 +948,14 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
-        if ("cw_light".equals(lightType)) {
-            groupLight = intent.getStringExtra("cw_light_group_name");
-        } else if ("cw_light_group".equals(lightType)) {
-            selectGroupId = intent.getIntExtra("group", 0);
-        } else if ("rgb_light_group".equals(lightType)) {
-            selectGroupId = intent.getIntExtra("group", 0);
+        switch (lightType) {
+            case "cw_light":
+                groupLight = intent.getStringExtra("cw_light_group_name");
+                break;
+            case "cw_light_group":
+            case "rgb_light_group":
+                selectGroupId = intent.getIntExtra("group", 0);
+                break;
         }
 
         if (DBUtils.INSTANCE.getGroupByMeshAddr(0xffff) != null) {
@@ -1211,7 +1080,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private static class DeviceItemHolder {
         public ImageView icon;
         public TextView txtName;
-        public CheckBox selected;
+        public ImageView selected;
         public TextView lightName;
     }
 
@@ -1243,11 +1112,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             DeviceItemHolder holder;
 
-            convertView = inflater.inflate(R.layout.device_item, null);
-            ImageView icon = convertView.findViewById(R.id.img_icon);
-            TextView txtName = convertView.findViewById(R.id.tv_group_name);
-            CheckBox selected = convertView.findViewById(R.id.selected);
-            TextView lightName = convertView.findViewById(R.id.tv_device_name);
+            convertView = inflater.inflate(R.layout.template_batch_small_item, null);
+            ImageView icon = convertView.findViewById(R.id.template_device_icon_n);
+            TextView txtName = convertView.findViewById(R.id.template_group_name_s);
+            ImageView selected = convertView.findViewById(R.id.template_device_batch_selected);
+            TextView lightName = convertView.findViewById(R.id.template_device_name_n);
 
             holder = new DeviceItemHolder();
 
@@ -1268,7 +1137,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 holder.icon.setImageResource(R.drawable.icon_device_open);
             }
 
-            holder.selected.setChecked(light.selected);
+            holder.selected.setImageResource(light.selected?R.drawable.icon_checkbox_selected:R.drawable.icon_checkbox_unselected);
 
             holder.lightName.setText(light.getName());
             holder.txtName.setText(getDeviceName(light));

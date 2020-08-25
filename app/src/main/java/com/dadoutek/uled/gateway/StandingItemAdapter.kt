@@ -16,7 +16,7 @@ import com.dadoutek.uled.R
  */
 class StandingItemAdapter(layoutId: Int, data: MutableList<Int>) :BaseQuickAdapter<Int,BaseViewHolder>(layoutId,data){
     override fun convert(helper: BaseViewHolder?, item: Int?) {
-       helper?.setText(R.id.standing_time_tv,item.toString())
+       helper?.setText(R.id.standing_time_tv,item.toString()+mContext.getString(R.string.minute))
     }
 
 }

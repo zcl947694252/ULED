@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/tv_group_name"
+            android:id="@+id/template_group_name_s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
@@ -47,8 +47,8 @@
             android:text="@string/total"
             android:textColor="@color/black_nine"
             android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@+id/tv_group_name"
-            app:layout_constraintTop_toBottomOf="@+id/tv_group_name" />
+            app:layout_constraintStart_toStartOf="@+id/template_group_name_s"
+            app:layout_constraintTop_toBottomOf="@+id/template_group_name_s" />
 
     </android.support.constraint.ConstraintLayout>
 

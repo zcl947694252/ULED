@@ -5,10 +5,12 @@ import android.content.Context
 import android.util.Log
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.model.HttpModel.*
+import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.model.dbModel.*
+import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
@@ -55,35 +57,39 @@ class SyncDataPutOrGetUtils {
                 for (data in dbDataChangeList) {
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
-                    var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys
-                            ?: "")
-                    observable?.let { observableList.add(it) }
+                    data?.let {
+                        var observable: Observable<String>? = this.sendDataToServer(data.tableName,
+                                data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
+                        observable?.let { observableList.add(it) }
+                    }
                 }
 
                 val observables = arrayOfNulls<Observable<String>>(observableList.size)
                 observableList.toArray(observables)
 
                 if (observables.isNotEmpty()) {
-                    Observable.mergeArrayDelayError<String>(*observables)
+                    observables.forEach {
+                        it!!.subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                                    LogUtils.v("zcl合并----------正确-$it-------")
+                                },{
+                                    LogUtils.v("zcl合并-----------错误-------$it")
+                                })
+                    }
+                    Observable.mergeArrayDelayError(*observables)
                             .subscribe(object : NetworkObserver<String?>() {
                                 override fun onComplete() {
                                     GlobalScope.launch(Dispatchers.Main) {
                                         syncCallback.complete()
                                     }
                                 }
-
-                                override fun onSubscribe(d: Disposable) {
-                                }
-
-                                override fun onNext(t: String) {
-                                }
-
+                                override fun onSubscribe(d: Disposable) {}
+                                override fun onNext(t: String) {}
                                 override fun onError(e: Throwable) {
                                     LogUtils.d(e)
                                     GlobalScope.launch(Dispatchers.Main) {
                                         if (e.message != "")
-                                            syncCallback.error(e.cause.toString())
+                                            syncCallback.error(context.getString(R.string.upload_data_failed))
                                     }
                                 }
                             })
@@ -117,22 +123,22 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_GATEWAY" -> {
                         when (type) {
-                         /*   Constant.DB_ADD -> {
-                                val gw = DBUtils.getGatewayByID(changeId)
-                                return gw?.let { GwModel.add(it) }
-                            }*/
+                            /*   Constant.DB_ADD -> {
+                                   val gw = DBUtils.getGatewayByID(changeId)
+                                   return gw?.let { GwModel.add(it) }
+                               }*/
                             Constant.DB_DELETE -> {
                                 val list = arrayListOf(changeId.toInt())
                                 val gattBody = GwGattBody()
                                 gattBody.idList = list
                                 return GwModel.deleteGwList(gattBody)
                             }
-                           /* Constant.DB_UPDATE -> {
-                                val gw = DBUtils.getGatewayByID(changeId)
-                                gw?.let {
-                                    return GwModel.add(gw)
-                                }
-                            }*/
+                            /* Constant.DB_UPDATE -> {
+                                 val gw = DBUtils.getGatewayByID(changeId)
+                                 gw?.let {
+                                     return GwModel.add(gw)
+                                 }
+                             }*/
                         }
                     }
                     "DB_LIGHT" -> {
@@ -227,7 +233,6 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
-
                                 return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
@@ -280,8 +285,8 @@ class SyncDataPutOrGetUtils {
                             val gson = Gson()
                             body.name = scene.name
                             body.belongRegionId = scene.belongRegionId
+                            body.imgName = scene.imgName
                             body.actions = DBUtils.getActionsBySceneId(changeId)
-
                             postInfoStr = gson.toJson(body)
 
                             bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
@@ -292,14 +297,12 @@ class SyncDataPutOrGetUtils {
                                 val scene = DBUtils.getSceneByID(changeId)
                                 //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
-                                    return SceneModel.add(token, bodyScene
-                                            , id, changeId)
+                                    return SceneModel.add(token, bodyScene, id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
                                 //("scene_delete--id==" + changeId)
-                                return SceneModel.delete(token,
-                                        changeId.toInt(), id)
+                                return SceneModel.delete(token, changeId.toInt(), id)
                             }
                             Constant.DB_UPDATE -> {
                                 //("scene_update--id==" + changeId)
@@ -313,7 +316,6 @@ class SyncDataPutOrGetUtils {
 
                     "DB_DIY_GRADIENT" -> {
                         val gradient = DBUtils.getGradientByID(changeId)
-
                         lateinit var postInfoStr: String
                         var bodyGradient: RequestBody? = null
                         if (gradient != null && type != Constant.DB_DELETE) {
@@ -334,16 +336,14 @@ class SyncDataPutOrGetUtils {
                             Constant.DB_ADD -> {
                                 val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
                                 if (bodyGradient != null) {
-                                    return GradientModel.add(token, bodyGradient
-                                            , id, changeId)
+                                    return GradientModel.add(token, bodyGradient, id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
-                                return GradientModel.delete(token,
-                                        body, id)
+                                return GradientModel.delete(token, body, id)
                             }
                             Constant.DB_UPDATE -> {
                                 if (bodyGradient != null) {
@@ -356,7 +356,6 @@ class SyncDataPutOrGetUtils {
 
                     "DB_USER" -> {
                         val user = DBUtils.getUserByID(changeId)
-
                         if (user == null && type != Constant.DELETEING) {
                             Log.d("用户数据出错", "")
                         }
@@ -442,12 +441,16 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .gwList
                                 .compose(NetworkTransformer())
-                    }
-                    .flatMap {
+                    }.flatMap {
                         for (item in it) {
                             DBUtils.saveGateWay(item, true)
                         }
-
+                        NetworkFactory.getApi().routerList.compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveRouter(item, true)
+                        }
 
                         NetworkFactory.getApi()
                                 .getSwitchList(token)
@@ -518,21 +521,21 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
-                    {
-                        //登录后同步数据完成再上传一次数据
-                        syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
-                        SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                            {
+                                //登录后同步数据完成再上传一次数据
+                                syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
+                                SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    syncCallBack.complete()
+                                }
+                            }, {
                         GlobalScope.launch(Dispatchers.Main) {
-                            syncCallBack.complete()
+                            it ?: return@launch
+                            syncCallBack.error(it.message ?: "")
+                            ToastUtils.showLong(it.message ?: "")
                         }
-                    }, {
-                GlobalScope.launch(Dispatchers.Main) {
-                    it ?: return@launch
-                    syncCallBack.error(it.message ?: "")
-                    ToastUtils.showLong(it.message ?: "")
-                }
-            }
-            )
+                    }
+                    )
         }
 
 

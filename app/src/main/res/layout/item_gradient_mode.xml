@@ -29,14 +29,15 @@
 
         <ImageView
             android:id="@+id/gradient_mode_on"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginRight="12dp"
-            android:src="@drawable/icon_open_group"
+            android:src="@drawable/icon_open_blue"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+<!--
         <TextView
             android:id="@+id/textOn"
             android:layout_width="wrap_content"
@@ -48,9 +49,10 @@
             app:layout_constraintEnd_toEndOf="@+id/gradient_mode_on"
             app:layout_constraintStart_toStartOf="@+id/gradient_mode_on"
             app:layout_constraintTop_toTopOf="@+id/gradient_mode_on" />
+-->
 
 
-        <View
+       <View
             android:id="@+id/view3"
             android:layout_width="1dp"
             android:layout_height="18dp"
@@ -60,16 +62,7 @@
             app:layout_constraintEnd_toStartOf="@+id/gradient_mode_on"
             app:layout_constraintTop_toTopOf="@+id/gradient_mode_on" />
 
-        <ImageView
-            android:id="@+id/gradient_mode_off"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginRight="6dp"
-            android:background="@drawable/icon_down_group"
-            app:layout_constraintBottom_toBottomOf="@+id/gradient_mode_on"
-            app:layout_constraintEnd_toStartOf="@+id/view3"
-            app:layout_constraintTop_toTopOf="@+id/gradient_mode_on" />
-
+        <!--
         <TextView
             android:id="@+id/textStop"
             android:layout_width="wrap_content"
@@ -81,7 +74,19 @@
             app:layout_constraintEnd_toEndOf="@+id/gradient_mode_off"
             app:layout_constraintStart_toStartOf="@+id/gradient_mode_off"
             app:layout_constraintTop_toTopOf="@+id/gradient_mode_off" />
+-->
 
+
+        <ImageView
+                android:id="@+id/gradient_mode_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/icon_stop_blue"
+                app:layout_constraintBottom_toBottomOf="@+id/gradient_mode_on"
+                app:layout_constraintEnd_toStartOf="@+id/view3"
+                app:layout_constraintTop_toTopOf="@+id/gradient_mode_on"
+                app:layout_constraintVertical_bias="0.0" />
 
         <View
             android:id="@+id/view4"
@@ -96,12 +101,12 @@
 
         <ImageView
             android:id="@+id/gradient_mode_set"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginRight="6dp"
             app:layout_constraintBottom_toBottomOf="@+id/gradient_mode_off"
             app:layout_constraintEnd_toStartOf="@+id/view4"
-            android:src="@drawable/icon_setting_group"
+            android:src="@drawable/icon_setting_blue"
             app:layout_constraintTop_toTopOf="@+id/gradient_mode_off" />
     </android.support.constraint.ConstraintLayout>
 

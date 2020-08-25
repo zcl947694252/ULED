@@ -2,25 +2,19 @@ package com.dadoutek.uled.fragment
 
 import android.os.Bundle
 import android.view.View
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_save_lock.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 /**
@@ -47,7 +41,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         toolbarTv.text = getString(R.string.safe_lock)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -79,7 +73,6 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_close.setBackgroundResourc
                     // rawable.rect_gray_60)
                     //safe_close_arrow.setImageResource(R.mipmap.icon_arrow_safe)
-
                 }
 
                 R.id.safe_lock -> {
@@ -115,7 +108,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getApp().connectDevice == null) {
-                ToastUtils.showShort(getString(R.string.connecting))
+                ToastUtils.showShort(getString(R.string.connecting_tip))
                 val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
                         DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                 mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)

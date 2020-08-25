@@ -1,18 +1,15 @@
 package com.dadoutek.uled.group
 
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
-
 
 /**
  * 创建者     ZCL
@@ -46,10 +43,10 @@ class GroupOTARelayAdapter(resId: Int, data: MutableList<DbConnector>) : BaseQui
         }
 
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

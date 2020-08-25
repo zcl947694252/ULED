@@ -63,7 +63,6 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
     private var isHaveNew: Boolean = false
     private var isHaveOld: Boolean = false
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -192,7 +191,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
     }
 
     private fun setConnectText() {
-        physical_recovery_state_warm.text = getString(R.string.connecting)
+        physical_recovery_state_warm.text = getString(R.string.connecting_tip)
         physical_recovery_state_warm.textColor = getColor(R.color.blue_text)
     }
 
@@ -327,6 +326,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                 style.setSpan(ForegroundColorSpan1(getColor(R.color.blue_text)), style.length - 3, style.length - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             else
                 style.setSpan(ForegroundColorSpan1(getColor(R.color.blue_text)), style.length - 2, style.length - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         physical_recovery_state_warm.text = style
     }
 
@@ -406,7 +406,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }

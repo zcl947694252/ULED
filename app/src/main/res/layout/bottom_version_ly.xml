@@ -10,7 +10,7 @@
         android:background="@color/primary"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="visible"
+        android:visibility="gone"
         tools:showIn="@layout/eight_switch">
 
     <TextView
@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:textColor="@color/white"
+            android:visibility="gone"
             android:textSize="12sp" />
 </LinearLayout>
 

@@ -1,8 +1,8 @@
 package com.dadoutek.uled.fragment
 
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 
 class CWLightFragmentList : BaseGroupFragment() {
@@ -16,6 +16,7 @@ class CWLightFragmentList : BaseGroupFragment() {
 
     override fun getGroupData(): Collection<DbGroup> {
         val list = mutableListOf<DbGroup>()
+        list.add(0,DBUtils.allGroups[0])
         list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
         list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL_OLD))
         return list

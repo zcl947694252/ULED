@@ -13,7 +13,7 @@
 
     <include layout="@layout/template_radiogroup" />
 
-    <View
+   <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray_e" />
@@ -49,7 +49,7 @@
 
                 <RadioGroup
                         android:id="@+id/pir_config_switch"
-                        android:layout_width="190dp"
+                        android:layout_width="200dp"
                         android:layout_height="30dp"
                         android:background="@drawable/rect_gray_five"
                         android:gravity="center"
@@ -85,16 +85,20 @@
                 </RadioGroup>
             </android.support.constraint.ConstraintLayout>-->
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
                     android:visibility="visible" />
             <!--触发条件-->
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/pir_config_triggering_model_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:orientation="horizontal"
                     android:visibility="visible">
 
                 <TextView
@@ -103,23 +107,14 @@
                         android:text="@string/triggering_conditions"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_weight="1"/>
 
 
                 <android.support.constraint.ConstraintLayout
                         android:id="@+id/pir_config_trigger_conditions"
-                        android:layout_width="190dp"
+                        android:layout_width="200dp"
                         android:layout_height="30dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.84"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:background="@drawable/human_body_sensor">
 
                     <TextView
                             android:id="@+id/pir_config_triggering_conditions_text"
@@ -143,18 +138,22 @@
                             app:layout_constraintTop_toTopOf="parent" />
                 </android.support.constraint.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
                     android:visibility="visible" />
             <!--触发后-->
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/pir_config_trigger_after_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:visibility="visible">
 
                 <TextView
@@ -162,26 +161,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/trigger_after"
+                        android:layout_weight="1"
                         android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:textSize="15sp" />
 
 
                 <android.support.constraint.ConstraintLayout
                         android:id="@+id/pir_config_trigger_after"
-                        android:layout_width="190dp"
+                        android:layout_width="200dp"
                         android:layout_height="30dp"
-                        android:layout_marginLeft="8dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.84"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:background="@drawable/human_body_sensor">
 
                     <TextView
                             android:id="@+id/trigger_time_text"
@@ -205,9 +194,9 @@
                             app:layout_constraintTop_toTopOf="parent" />
                 </android.support.constraint.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
 
-            <View
+           <View
                     android:id="@+id/pir_config_trigger_after_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -216,59 +205,55 @@
                     app:layout_constraintTop_toBottomOf="@+id/trigger_after_ly" />
 
             <!--持续时间 超时时间-->
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/pir_config_overtime_ly"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:visibility="visible">
 
                 <TextView
+                        android:id="@+id/during_time_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="@string/duration_time"
                         android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
+                        android:textSize="15sp" />
 
                 <EditText
                         android:id="@+id/pir_config_overtime_tv"
-                        android:layout_width="107dp"
+                        android:layout_width="100dp"
                         android:layout_height="30dp"
-                        android:layout_marginRight="13dp"
                         android:background="@drawable/human_body_sensor"
                         android:gravity="center"
                         android:inputType="number"
+                        android:maxWidth="80dp"
                         android:maxLength="4"
+                        android:layout_marginEnd="@dimen/dp_10"
                         android:text="10"
+                        android:layout_toStartOf="@+id/pir_config_time_type"
                         android:textColor="@color/blue_background"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/pir_config_time_type"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:textSize="15sp"/>
 
 
-                <android.support.constraint.ConstraintLayout
+                <LinearLayout
                         android:id="@+id/pir_config_time_type"
-                        android:layout_width="70dp"
+                        android:layout_width="90dp"
                         android:layout_height="30dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.91"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:background="@drawable/human_body_sensor">
 
                     <TextView
                             android:id="@+id/pir_config_time_type_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="13dp"
-                            android:text="@string/minute"
+                            android:text="@string/second"
                             android:textColor="@color/blue_background"
                             android:textSize="15sp"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -283,9 +268,11 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </LinearLayout>
 
-            </android.support.constraint.ConstraintLayout>
+
+
+            </LinearLayout>
 
             <!-- <android.support.constraint.ConstraintLayout
                      android:id="@+id/pir_config_overtime_down_ly"
@@ -308,7 +295,7 @@
 
                  <android.support.constraint.ConstraintLayout
                          android:id="@+id/pir_config_overtime_down_time"
-                         android:layout_width="190dp"
+                         android:layout_width="200dp"
                          android:layout_height="30dp"
                          android:background="@drawable/human_body_sensor"
                          app:layout_constraintBottom_toBottomOf="parent"
@@ -341,21 +328,26 @@
 
              </android.support.constraint.ConstraintLayout>-->
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee"
                     android:visibility="visible" />
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/pir_config_choose_scene_ly"
                     android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
                     android:layout_height="45dp">
 
 
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="@string/choose_scene_dot"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
@@ -368,14 +360,9 @@
 
                 <android.support.constraint.ConstraintLayout
                         android:id="@+id/pir_config_choose_scene"
-                        android:layout_width="190dp"
+                        android:layout_width="200dp"
                         android:layout_height="30dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.84"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:background="@drawable/human_body_sensor">
 
                     <TextView
                             android:id="@+id/pir_config_choose_scene_tv"
@@ -391,38 +378,32 @@
 
                 </android.support.constraint.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:id="@+id/pir_config_choose_group_ly"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp">
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:orientation="horizontal">
 
 
                 <TextView
                         android:id="@+id/choose_group_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="@string/choose_group"
                         android:textColor="@color/black_three"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.09"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
+                        android:textSize="15sp"/>
 
                 <android.support.constraint.ConstraintLayout
                         android:id="@+id/pir_config_choose_group"
-                        android:layout_width="190dp"
+                        android:layout_width="200dp"
                         android:layout_height="30dp"
-                        android:background="@drawable/human_body_sensor"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.84"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:background="@drawable/human_body_sensor">
 
                     <TextView
                             android:layout_width="wrap_content"
@@ -437,9 +418,9 @@
 
                 </android.support.constraint.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
 
-            <View
+           <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/black_ee" />
@@ -453,9 +434,10 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/select_group"
+                    android:text="@string/selected_group"
                     android:textColor="@color/black_nine"
                     android:textSize="15sp" />
+
 
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/pir_config_recyclerGroup"
@@ -464,12 +446,22 @@
                     android:layout_weight="1" />
 
             <TextView
+                    android:id="@+id/pir_confir_tvPSVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:background="@color/blue_text"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            <TextView
                     android:id="@+id/pir_config_see_help"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/dp_5"
                     android:gravity="center"
                     android:textSize="@dimen/sp_15"
+                    android:visibility="gone"
                     android:layout_marginBottom="@dimen/dp_10"
                     android:textColor="@color/black_three"
                     android:text="@string/see_help" />
@@ -481,20 +473,11 @@
                     android:layout_marginLeft="38dp"
                     android:layout_marginRight="38dp"
                     android:layout_marginBottom="30dp"
-                    android:background="@drawable/btn_rec_blue_bt"
+                    android:background="@drawable/rect_blue_5"
                     android:elevation="10dp"
                     android:text="@string/confirm"
                     android:textColor="@color/black_three"
                     android:textSize="18sp" />
-
-            <TextView
-                    android:id="@+id/pir_confir_tvPSVersion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:background="@color/blue_text"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout

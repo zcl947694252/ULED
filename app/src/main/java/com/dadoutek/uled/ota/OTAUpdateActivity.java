@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,11 +28,13 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbEightSwitch;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
@@ -70,9 +71,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -100,22 +98,14 @@ import io.reactivex.schedulers.Schedulers;
  * <p>
  * Created by Administrator on 2017/4/20.
  */
-public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
-    @BindView(R.id.progress_view)
+public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements EventListener<String>, View.OnClickListener {
     CircleProgressBar progress_view;
-    @BindView(R.id.text_info)
     TextView text_info;
-    @BindView(R.id.select)
     LinearLayout select;
-    @BindView(R.id.btn_start_update)
     Button btn_start_update;
-    @BindView(R.id.tvFile)
     TextView tvFile;
-    @BindView(R.id.local_version)
     TextView local_version;
-    @BindView(R.id.server_version)
     TextView server_version;
-    @BindView(R.id.open_device)
     CheckBox open_device;
 
     private int mode = MODE_IDLE;
@@ -138,6 +128,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     DbUser user;
     private TextView otaProgress;
     private Toolbar toolbar;
+    private TextView toolbarTv;
     private TextView meshOtaProgress;
     private TextView tv_log, tv_version;
     private ScrollView sv_log;
@@ -218,7 +209,17 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_update);
-        ButterKnife.bind(this);
+         progress_view = findViewById(R.id.progress_view);
+         text_info= findViewById(R.id.text_info);
+         select= findViewById(R.id.select);
+         btn_start_update= findViewById(R.id.btn_start_update);
+         tvFile= findViewById(R.id.tvFile);
+         local_version= findViewById(R.id.local_version);
+         server_version= findViewById(R.id.server_version);
+         open_device= findViewById(R.id.open_device);
+
+        btn_start_update.setOnClickListener(this);
+        select.setOnClickListener(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
@@ -279,6 +280,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
         toolbar = findViewById(R.id.toolbar);
+        toolbarTv = findViewById(R.id.toolbarTv);
         initToolbar();
         otaProgress = findViewById(R.id.progress_ota);
         meshOtaProgress = findViewById(R.id.progress_mesh_ota);
@@ -305,11 +307,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.ota_update_title);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbarTv.setText(R.string.ota_update_title);
+        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationIcon(R.drawable.icon_return);
     }
 
     @Override
@@ -322,23 +322,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick({R.id.select, R.id.btn_start_update})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.select:
-                chooseFile();
-                break;
-            case R.id.btn_start_update:
-                LogUtils.e("zcl 升级路径--" + mPath);
-                if (SharedPreferencesUtils.isDeveloperModel() && mPath == null) {
-                    TmtUtils.midToastLong(this, getString(R.string.please_select_update_file));
-                    return;
-                } else {
-                    beginToOta();
-                }
-                break;
-        }
-    }
 
     @Override
     protected void onStart() {
@@ -351,17 +334,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void addEventListener() {
         TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
-        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT,
-                this);
-        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED,
-                this);
+        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
+        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
         TelinkLightApplication.Companion.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
     }
 
 
     public void connectDevice(String mac) {
         log("connectDevice :" + mac);
-        btn_start_update.setText(R.string.start_connect);
+        btn_start_update.setText(R.string.connecting_tip);
         btn_start_update.setClickable(false);
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
     }
@@ -443,6 +424,16 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 DbConnector rely = DBUtils.INSTANCE.getRelyByMeshAddr(lightMeshAddr);
                 rely.version =StringUtils.versionResolutionURL(mPath, 2);
                 DBUtils.INSTANCE.saveConnector(rely,true);
+                break;
+            case DeviceType.NORMAL_SWITCH:
+                DbSwitch dbSwitch = DBUtils.INSTANCE.getSwitchByMeshAddr(lightMeshAddr);
+                dbSwitch.version =StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveSwitch(dbSwitch,true,lightType,dbSwitch.getKeys());
+                break;
+            case DeviceType.EIGHT_SWITCH:
+                DbEightSwitch dbSwitch8 = DBUtils.INSTANCE.getEightSwitchByMeshAddr(lightMeshAddr);
+                dbSwitch8.setFirmwareVersion(StringUtils.versionResolutionURL(mPath, 2));
+                DBUtils.INSTANCE.saveEightSwitch(dbSwitch8,true);
                 break;
         }
         ToastUtils.showLong(R.string.exit_update);
@@ -863,6 +854,24 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             mPath = b.getString("path");//str即为回传的值
             tvFile.setText(mPath);
             Log.e("zcl", "返回数据是:" + requestCode + "---" + resultCode + "---mPath-" + mPath);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.select:
+                chooseFile();
+                break;
+            case R.id.btn_start_update:
+                LogUtils.e("zcl 升级路径--" + mPath);
+                if (SharedPreferencesUtils.isDeveloperModel() && mPath == null) {
+                    TmtUtils.midToastLong(this, getString(R.string.please_select_update_file));
+                    return;
+                } else {
+                    beginToOta();
+                }
+                break;
         }
     }
 }

@@ -10,7 +10,7 @@
             android:id="@+id/pop_view"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/rect_r15_w"
+            android:background="@drawable/rect_r15_graye"
             android:minHeight="150dp"
             android:orientation="vertical">
 
@@ -88,7 +88,7 @@
                 android:layout_marginTop="@dimen/dp_15"
                 android:gravity="center"
                 android:padding="@dimen/dp_10"
-                android:text="@string/i_see"
+                android:text="@string/i_know"
                 android:textColor="@color/blue_background"
                 android:textSize="15sp"
                 android:textStyle="bold" />

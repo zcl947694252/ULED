@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model;
 
+import com.dadoutek.uled.R;
+
 import java.io.Serializable;
 
 /**
@@ -10,7 +12,7 @@ public class ItemGroup implements Serializable {
     public int groupAddress = 0;
     public int brightness = 50;
     public int temperature = 50;
-    public int color = 0x4FFFE0;
+    public int color = 0;
     public String gpName = "";
     public boolean enableCheck=false;
     public boolean checked=false;
@@ -24,7 +26,8 @@ public class ItemGroup implements Serializable {
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
     public int gradientId = 0  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
-    public String gradientName  ;//渐变速度
+    public String gradientName  ;//变速度
+    public int icon = R.drawable.icon_group ;//图标
 
 
     @Override

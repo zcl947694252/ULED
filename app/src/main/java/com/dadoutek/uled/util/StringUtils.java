@@ -6,12 +6,12 @@ import android.widget.EditText;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbSensor;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbSensor;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 
@@ -259,7 +259,7 @@ public class StringUtils {
             case Constant.INSTALL_CONNECTOR:
                 return context.getString(R.string.guide_tip_reset_relay);
             case Constant.INSTALL_GATEWAY:
-                return context.getString(R.string.guide_tip_reset_relay);
+                return context.getString(R.string.guide_tip_reset_gateway);
         }
         return "";
     }
@@ -277,6 +277,9 @@ public class StringUtils {
             case DeviceType.DOUBLE_SWITCH:
                 startStr = context.getString(R.string.double_switch);
                 break;
+                case DeviceType.EIGHT_SWITCH:
+                startStr = context.getString(R.string.eight_switch);
+                break;
 
             case DeviceType.SMART_CURTAIN_SWITCH:
                 startStr = context.getString(R.string.curtain_switch);
@@ -285,7 +288,7 @@ public class StringUtils {
                 startStr = context.getString(R.string.night_light);
                 break;
             case DeviceType.SENSOR:
-                startStr = context.getString(R.string.sensoR);
+                startStr = context.getString(R.string.sensor);
                 break;
         }
 

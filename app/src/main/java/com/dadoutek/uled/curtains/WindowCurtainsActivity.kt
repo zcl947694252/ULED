@@ -4,35 +4,39 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.CurtainGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -46,10 +50,15 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_window_curtains.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var fiVersion: MenuItem? = null
+    private val requestCodeNum: Int = 1000
     private var disposable: Disposable? = null
     private var mConnectDeviceDisposable: Disposable? = null
     private var localVersion: String? = null
@@ -61,10 +70,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var commutationBoolean: Boolean = true
     private var slowBoolean: Boolean = true
     private var handBoolean: Boolean = true
-    private var type: String? = null
-    private lateinit var group_delete: Button
-    private lateinit var updateGroup: Button
-    private lateinit var otaButton: Button
+    private var typeStr: String? = null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
     private lateinit var openBtn: ImageView
@@ -83,127 +89,73 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initViewType() {
-        this.type = this.intent.extras!!.getString(Constant.TYPE_VIEW)
-        if (type == Constant.TYPE_GROUP) {
-            initGroupData()
-            initViewGroup()
-            initToolGroupBar()
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        toolbar.setNavigationOnClickListener { finish() }
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
+        this.typeStr = this.intent.extras!!.getString(Constant.TYPE_VIEW)
+        if (typeStr == Constant.TYPE_GROUP) {
+            this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
+            if (curtainGroup != null)
+                when (curtainGroup!!.meshAddr) {
+                    0xffff -> toolbarTv.text = getString(R.string.allLight)
+                    else -> toolbarTv.text = curtainGroup?.name
+                }
+
+            img_function1.setImageResource(R.drawable.icon_editor)
+            img_function1.visibility = View.VISIBLE
+            img_function1.setOnClickListener {
+                renameGp()
+            }
         } else {
+            img_function1.visibility = View.GONE
             currentShowGroupSetPage = false
-            initToolbar()
             initMeshDresData()
             getVersion()
         }
     }
 
-    private fun initViewGroup() {
-        if (curtainGroup != null) {
-            if (curtainGroup!!.meshAddr == 0xffff) {
-                toolbar.title = getString(R.string.allLight)
-            } else {
-                toolbar.title = curtainGroup?.name
-            }
-        }
-    }
 
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null) {
             Log.e("TAG", curtain!!.meshAddr.toString())
             val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
-                    .subscribe(
-                            { s ->
-                                localVersion = s
-                                if (localVersion != "") {
-                                    if (versionText != null) {
-                                        if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                                            curtain!!.version = localVersion
-                                            this.versionText.visibility = View.VISIBLE
-                                        } else {
-                                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                                            curtain!!.version = localVersion
-                                            this.versionText.visibility = View.VISIBLE
-                                        }
-                                        DBUtils.saveCurtain(curtain!!,false)
-                                    }
+                    .subscribe({ s ->
+                        localVersion = s
+                        if (localVersion != "") {
+                            if (versionText != null) {
+                                if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                    versionText.text = resources.getString(R.string.firmware_version) + localVersion
+                                    curtain!!.version = localVersion
+                                    this.versionText.visibility = View.GONE
+                                } else {
+                                    versionText.text = resources.getString(R.string.firmware_version) + localVersion
+                                    curtain!!.version = localVersion
+                                    this.versionText.visibility = View.GONE
                                 }
-                                null
-
-                            },
-                            {
-                                LogUtils.d(it)
+                                DBUtils.saveCurtain(curtain!!, false)
                             }
-                    )
+                        }
+                        null
+                    }, {
+                        LogUtils.d(it)
+                    })
         }
     }
 
-    private fun initToolGroupBar() {
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
-    }
 
     private fun initMeshDresData() {
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
         this.curtain = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbCurtain
+        localVersion = curtain?.version
         versionText.text = ""
-        toolbar.title = curtain?.name
-    }
-
-    private fun initGroupData() {
-        this.curtainGroup = this.intent.extras!!.get("group") as DbGroup
-    }
-
-
-    fun remove() {
-        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(android.R.string.ok) { dialog, which ->
-
-                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
-                        val opcode = Opcode.KICK_OUT
-
-                        Commander.resetDevice(curtain!!.meshAddr)
-                                .subscribe(
-                                        {
-                                            LogUtils.v("zcl-----恢复出厂成功")
-                                        }, {
-                                    LogUtils.v("zcl-----恢复出厂失败")
-                                })
-
-                        DBUtils.deleteCurtain(curtain!!)
-                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr)) {
-                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
-                        }
-                        if (mConnectDevice != null) {
-                            Log.d(this!!.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
-                            Log.d(this!!.javaClass.simpleName, "light.getMeshAddr() = " + curtain!!.meshAddr)
-                            if (curtain!!.meshAddr == mConnectDevice!!.meshAddress) {
-                                this!!.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                            }
-                        }
-                        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                            override fun start() {}
-
-                            override fun complete() {}
-
-                            override fun error(msg: String?) {}
-                        })
-                        this!!.finish()
-
-
-                    } else {
-                        ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
-                        this!!.finish()
-                    }
-                }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+        toolbarTv.text = curtain?.name
     }
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
@@ -212,36 +164,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             } else {
                 when (item?.itemId) {
-                    R.id.toolbar_delete_group -> {
-                        removeGroup()
-                    }
-                    R.id.toolbar_rename_group -> {
-                        renameGp()
-                    }
-                    R.id.toolbar_rename_light -> {
-                        renameLight()
-                    }
-                    R.id.toolbar_reset -> {
-                        onceReset()
-                    }
-                    R.id.toolbar_update_group -> {
-                        updateGroup()
-                    }
-                    R.id.toolbar_commutation -> {
-                        electricCommutation()
-                    }
-                    R.id.toolbar_hand_recovery -> {
-                        handRecovery()
-                    }
-                    R.id.toolbar_software_restart -> {
-                        sofwareRestart()
-                    }
-                    R.id.toolbar_slow_up -> {
-                        slowUp()
-                    }
-                    R.id.toolbar_ota -> {
-                        updateOTA()
-                    }
+                    R.id.toolbar_batch_gp -> removeGroup()
+                    R.id.toolbar_on_line -> renameGp()
+                    R.id.toolbar_c_rename -> renameLight()
+                    R.id.toolbar_c_factory -> /*onceReset()*/remove()
+                    R.id.toolbar_c_change_group -> updateGroup()
+                    R.id.toolbar_c_commutation -> electricCommutation()
+                    R.id.toolbar_c_hand_recovery -> handRecovery()
+                    R.id.toolbar_c_software_restart -> sofwareRestart()
+                    R.id.toolbar_c_slow_up -> slowUp()
+                    R.id.toolbar_c_ota -> updateOTA()
                 }
             }
         }
@@ -249,47 +181,46 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun renameGp() {
-        val textGp = EditText(this)
-        textGp.setText(curtainGroup?.name)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this@WindowCurtainsActivity)
-                .setTitle(R.string.rename)
-                .setView(textGp)
+        if (!TextUtils.isEmpty(curtainGroup?.name))
+            renameEt?.setText(curtainGroup?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        var name = textGp.text.toString().trim { it <= ' ' }
-                        var canSave = true
-                        val groups = DBUtils.allGroups
-                        for (i in groups.indices) {
-                            if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
-                                canSave = false
-                                break
-                            }
-                        }
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
 
-                        if (canSave) {
-                            curtainGroup?.name = textGp.text.toString().trim { it <= ' ' }
-                            DBUtils.updateGroup(curtainGroup!!)
-                            toolbar.title = curtainGroup?.name
-                            dialog.dismiss()
-                        }
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                var name = renameEt?.text.toString().trim { it <= ' ' }
+                var canSave = true
+                val groups = DBUtils.allGroups
+                for (i in groups.indices) {
+                    if (groups[i].name == name) {
+                        ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
+                        canSave = false
+                        break
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+
+                if (canSave) {
+                    curtainGroup?.name = renameEt?.text.toString().trim { it <= ' ' }
+                    DBUtils.updateGroup(curtainGroup!!)
+                    toolbarTv.text = curtainGroup?.name
+                    renameDialog.dismiss()
+                }
+            }
+        }
     }
 
 
     private fun removeGroup() {
-        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
+        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+                .setMessage(getString(R.string.delete_group_confirm, curtainGroup?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    this.showLoadingDialog(getString(R.string.deleting))
-
+                    showLoadingDialog(getString(R.string.deleting))
                     deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
                             successCallback = {
                                 this.hideLoadingDialog()
@@ -305,65 +236,148 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-    private fun updateGroup() {
-        val intent = Intent(this, CurtainGroupingActivity::class.java)
-        if (curtain == null) {
-            ToastUtils.showLong(getString(R.string.please_connect_curtain))
-            TelinkLightService.Instance()?.idleMode(true)
-            TelinkLightService.Instance()?.disconnect()
-            return
-        }
-        intent.putExtra("curtain", curtain)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
-        intent.putExtra("gpAddress", ctAdress)
-        intent.putExtra("uuid", curtain!!.productUUID)
-        startActivity(intent)
+    private fun updateGroup() {//更新分组 断开提示
+        val intent = Intent(this@WindowCurtainsActivity, ChooseGroupOrSceneActivity::class.java)
+        val bundle = Bundle()
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CURTAIN.toInt())
+        intent.putExtras(bundle)
+        startActivityForResult(intent, requestCodeNum)
+        setResult(Constant.RESULT_OK)
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            updateGroupResult(curtain!!, group)
+        }
+    }
+
+    private fun updateGroupResult(light: DbCurtain, group: DbGroup) {
+        if (group != null) {
+            if (TelinkApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(R.string.group_fail)
+            } else {
+                /* showLoadingDialog(getString(R.string.grouping))
+                 Thread {
+                     val sceneIds = getRelatedSceneIds(group.meshAddr)
+                     for (i in 0..1) {
+                         deletePreGroup(curtain!!.meshAddr)
+                         Thread.sleep(100)
+                     }
+                     for (i in 0..1) {
+                         deleteAllSceneByLightAddr(curtain!!.meshAddr)
+                         Thread.sleep(100)
+                     }
+                     for (i in 0..1) {
+                         allocDeviceGroup(group)
+                         Thread.sleep(100)
+                     }
+                     for (sceneId in sceneIds) {
+                         val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
+                         if (action != null) {
+                             for (i in 0..1) {
+                                 Commander.addScene(sceneId, curtain!!.meshAddr, action.color)
+                                 Thread.sleep(100)
+                             }
+                         }
+                     }*/
+
+                Commander.addGroup(light.meshAddr, group.meshAddr, {
+                    group.deviceType = curtain!!.productUUID.toLong()
+                    DBUtils.updateGroup(group)
+
+                    light.hasGroup = true
+                    light.belongGroupId = group.id
+                    light.name = light.name
+                    DBUtils.updateCurtain(light)
+                    ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                    finish()
+                }, {
+                    ToastUtils.showShort(getString(R.string.grouping_fail))
+                })
+            }
+        }
+    }
+
+    /**
+     * start to group
+     *  设置设备分组
+     */
+    private fun allocDeviceGroup(group: DbGroup) {
+        val groupAddress = group.meshAddr
+        val dstAddress = curtain!!.meshAddr
+        val opcode = 0xD7.toByte()
+        val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
+        params[0] = 0x01
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
+        curtain!!.belongGroupId = group.id
+    }
+    /**
+     * 删除指定灯的之前的分组
+     * @param lightMeshAddr 灯的mesh地址
+     */
+    private fun deletePreGroup(lightMeshAddr: Int) {
+        if (DBUtils.getGroupByID(curtain!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(curtain!!.belongGroupId!!)?.meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
+                    (groupAddress shr 8 and 0xFF).toByte())
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
+        }
+    }
+
+    private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
+        val sceneIds = ArrayList<Long>()
+        val dbSceneList = DBUtils.sceneList
+        sceneLoop@ for (dbScene in dbSceneList) {
+            val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
+            for (action in dbActions) {
+                if (groupAddress == action.groupAddr || 0xffff == action.groupAddr) {
+                    sceneIds.add(dbScene.id)
+                    continue@sceneLoop
+                }
+            }
+        }
+        return sceneIds
     }
 
     private fun renameLight() {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(curtain?.name)
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this@WindowCurtainsActivity)
-                .setTitle(R.string.rename)
-                .setView(textGp)
+        if (!TextUtils.isEmpty(curtain?.name))
+            renameEt?.setText(curtain?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        curtain?.name = textGp.text.toString().trim { it <= ' ' }
-                        DBUtils.updateCurtain(curtain!!)
-                        toolbar.title = curtain?.name
-                        dialog.dismiss()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
-
-
-    private fun initToolbar() {
-        toolbar.title = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener {
-            finish()
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
         }
+
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                curtain?.name = renameEt?.text.toString().trim { it <= ' ' }
+                DBUtils.updateCurtain(curtain!!)
+                toolbarTv.text = curtain?.name
+                renameDialog.dismiss()
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (currentShowGroupSetPage) {
-            menuInflater.inflate(R.menu.menu_curtain_group, menu)
+            //menuInflater.inflate(R.menu.menu_curtain_group, menu)
+            // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
+            //toolbar.menu?.findItem(R.id.toolbar_batch_gp)?.isVisible = false
+            //toolbar.menu?.findItem(R.id.toolbar_delete_device)?.isVisible = false
         } else {
             menuInflater.inflate(R.menu.menu_curtain_setting, menu)
+            fiVersion = menu?.findItem(R.id.toolbar_c_version)
+            if (TextUtils.isEmpty(localVersion))
+                localVersion = getString(R.string.number_no)
+            fiVersion?.title = localVersion
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -371,30 +385,30 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         if (handBoolean) {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_recovery)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
             } else {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_recovery)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
             }
         } else {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_cancel)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
             } else {
-                menu?.findItem(R.id.toolbar_hand_recovery)?.setTitle(R.string.hand_cancel)
+                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
             }
         }
 
         if (slowBoolean) {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
             } else {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
             }
 
         } else {
             if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
             } else {
-                menu?.findItem(R.id.toolbar_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
+                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
             }
         }
 
@@ -418,15 +432,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         if (!currentShowGroupSetPage) {
 
             if (curtain!!.status != null) {
-                when {
-                    curtain!!.status == 0 -> {
+                when (curtain!!.status) {
+                    0 -> {
                         pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
                         closeBtn.setImageResource(R.drawable.icon_curtain_close)
                         closeText.setTextColor(Color.parseColor("#333333"))
                         openBtn.setImageResource(R.drawable.icon_curtain_close)
                         openText.setTextColor(Color.parseColor("#333333"))
                     }
-                    curtain!!.status == 1 -> {
+                    1 -> {
                         curtainImage.setImageResource(R.drawable.curtain_close)
                         pauseBtn.setImageResource(R.drawable.icon_suspend)
                         closeBtn.setImageResource(R.drawable.icon_open_yes)
@@ -434,7 +448,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         openBtn.setImageResource(R.drawable.icon_curtain_close)
                         openText.setTextColor(Color.parseColor("#333333"))
                     }
-                    curtain!!.status == 2 -> {
+                    2 -> {
                         curtainImage.setImageResource(R.drawable.curtain)
                         pauseBtn.setImageResource(R.drawable.icon_suspend)
                         openBtn.setImageResource(R.drawable.icon_open_yes)
@@ -445,26 +459,22 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
 
-            if (curtain!!.inverse != null) {
+            if (curtain!!.inverse != null)
                 curtain!!.inverse = commutationBoolean
-            }
 
-            if (curtain!!.closeSlowStart != null) {
+            if (curtain!!.closeSlowStart != null)
                 curtain!!.closeSlowStart = slowBoolean
-            }
 
-            if (curtain!!.closePull != null) {
+            if (curtain!!.closePull != null)
                 curtain!!.closePull = handBoolean
-            }
 
-            if (curtain!!.speed != null) {
+            if (curtain!!.speed != null)
                 indicatorSeekBar.setProgress(curtain!!.speed.toFloat())
-            }
         }
     }
 
     private fun setSpeed() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
                 override fun onSeeking(seekParams: SeekParams) {
                     val i = seekParams.progress
@@ -493,13 +503,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {
+                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
 
-                }
-
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {
-
-                }
+                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
             }
         } else {
             indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
@@ -538,13 +544,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {
+                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
 
-                }
-
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {
-
-                }
+                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
             }
         }
     }
@@ -558,10 +560,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun updateOTA() {
-        if (versionText.text != null && versionText.text != "") {
-            checkPermission()
-        } else {
-            Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+        when {
+            versionText.text != null && versionText.text != "" -> checkPermission()
+            else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -589,13 +590,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isDirectConnectDevice() {
-
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
-            if (isBoolean) {
-                transformView()
-            } else {
-                OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
+            when {
+                isBoolean -> transformView()
+                else -> OtaPrepareUtils.instance().gotoUpdateView(this@WindowCurtainsActivity, localVersion, otaPrepareListner)
             }
         } else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -667,7 +666,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun slowUp() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             slowBoolean = if (slowBoolean) {
                 val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
                 val opcode = Opcode.CURTAIN_ON_OFF
@@ -700,7 +699,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun sofwareRestart() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -713,17 +712,20 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun handRecovery() {
-        if (type == Constant.TYPE_GROUP) {
-            if (handBoolean) {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                handBoolean = false
-            } else {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                handBoolean = true
+        if (typeStr == Constant.TYPE_GROUP) {
+            when {
+                handBoolean -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    handBoolean = false
+                }
+                else -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    handBoolean = true
+                }
             }
         } else {
             if (handBoolean) {
@@ -745,8 +747,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun onceReset() {
-        if (type == Constant.TYPE_GROUP) {
-
+        if (typeStr == Constant.TYPE_GROUP) {
             val subscribe = Commander.resetDevice(curtainGroup!!.meshAddr)
                     .subscribe(
                             {
@@ -773,8 +774,61 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+
+    fun remove() {
+        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device, curtain?.name))
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                        val deviceMeshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
+                        showLoadingDialog(getString(R.string.please_wait))
+                        val dispose = Commander.resetDevice(deviceMeshAddr ?: 0)
+                                .subscribe({
+                                    LogUtils.v("zcl-----恢复出厂成功")
+                                    //  deleteData()
+                                }, {
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        /*    showDialogHardDelete?.dismiss()
+                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                      showLoadingDialog(getString(R.string.please_wait))
+                                                      deleteData()
+                                                  }
+                                                  .setNegativeButton(R.string.btn_cancel, null)
+                                                  .show()*/
+
+                                    }
+                                })
+
+                        deleteData()
+
+                    } else ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
+
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+    fun deleteData() {
+        hideLoadingDialog()
+        if (typeStr == Constant.TYPE_GROUP) {
+            if (curtainGroup != null)
+                DBUtils.deleteGroupOnly(curtainGroup!!)
+        } else
+            if (curtain != null) {
+                DBUtils.deleteCurtain(curtain!!)
+                if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(curtain!!.meshAddr))
+                    TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                if (mConnectDevice != null) {
+                    if (curtain!!.meshAddr == mConnectDevice!!.meshAddress)
+                        setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+                }
+            }
+        finish()
+    }
+
+
     private fun electricCommutation() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             if (commutationBoolean) {
                 val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
                 val opcode = Opcode.CURTAIN_ON_OFF
@@ -808,7 +862,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun pauseWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -833,7 +887,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun offWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -859,7 +913,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun openWindow() {
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)

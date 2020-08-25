@@ -12,7 +12,6 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -25,19 +24,21 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbConnector
+import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.google.gson.Gson
 import com.telink.TelinkApplication
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -45,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -68,14 +70,14 @@ abstract class BaseActivity : AppCompatActivity() {
     private var singleLogin: AlertDialog? = null
     protected var foreground = false
     private var mApplication: TelinkLightApplication? = null
-    private  var netWorkChangReceiver: TelinkBaseActivity.NetWorkChangReceiver? = null
+    private var netWorkChangReceiver: TelinkBaseActivity.NetWorkChangReceiver? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutID())
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
         //注册网络状态监听广播
-         netWorkChangReceiver = TelinkBaseActivity.NetWorkChangReceiver()
+        netWorkChangReceiver = TelinkBaseActivity.NetWorkChangReceiver()
         var filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
@@ -252,7 +254,6 @@ abstract class BaseActivity : AppCompatActivity() {
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
-        TelinkLightApplication.getApp().releseStomp()
         AppUtils.relaunchApp()
     }
 
@@ -330,61 +331,108 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
+        //filter.addAction(Constant.CANCEL_CODE)
+        //filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
 
     inner class StompReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                Constant.GW_COMMEND_CODE -> {
-                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
-                    when (gwStompBean.cmd) {
-                        700 -> TelinkLightApplication.getApp().offLine = false
-                        701 -> TelinkLightApplication.getApp().offLine = true
-                        2000 -> receviedGwCmd2000(gwStompBean.ser_id)
-                        2500 -> receviedGwCmd2500(gwStompBean)
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            var jsonObject = JSONObject(msg)
+            when (val cmd = jsonObject.getInt("cmd")) {
+                Cmd.singleLogin, Cmd.parseQR,Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                    val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                    when (cmd) {
+                        Cmd.singleLogin -> singleDialog(codeBean)//单点登录
+                        Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
+                        Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
+                        Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
+                        Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
+                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                     }
                 }
-                Constant.LOGIN_OUT -> {
-                    checkNetworkAndSync(this@BaseActivity)
-                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
-                }
-                Constant.CANCEL_CODE -> {
-                    val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
-                    var cancelBean: CancelAuthorMsg? = null
-                    if (extra != null)
-                        cancelBean = extra as CancelAuthorMsg
-                    val user = DBUtils.lastUser
-                    user?.let {
-                        if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
-                                && user.last_region_id == cancelBean?.rid.toString()) {
-                            user.last_region_id = 1.toString()
-                            user.last_authorizer_user_id = user.id.toString()
-                            DBUtils.deleteAllData()
-                            AccountModel.initDatBase(it)
-                            //更新last—region-id
-                            DBUtils.saveUser(user)
-                            Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
-                            SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+
+            }
+
+
+            /*        when (intent?.action) {
+                        Constant.GW_COMMEND_CODE -> {
+                            val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                            when (gwStompBean.cmd) {
+                                700 -> TelinkLightApplication.getApp().offLine = false
+                                701 -> TelinkLightApplication.getApp().offLine = true
+                                2000 -> receviedGwCmd2000(gwStompBean.ser_id)
+                                2500 -> receviedGwCmd2500(gwStompBean)
+                            }
                         }
-                    }
+                        Constant.LOGIN_OUT -> {
+                            checkNetworkAndSync(this@BaseActivity)
+                            LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
+                        }
+                        Constant.CANCEL_CODE -> {
+                            val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
+                            var cancelBean: CancelAuthorMsg? = null
+                            if (extra != null)
+                                cancelBean = extra as CancelAuthorMsg
+                            val user = DBUtils.lastUser
+                            user?.let {
+                                if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
+                                        && user.last_region_id == cancelBean?.rid.toString()) {
+                                    user.last_region_id = 1.toString()
+                                    user.last_authorizer_user_id = user.id.toString()
+                                    DBUtils.deleteAllData()
+                                    AccountModel.initDatBase(it)
+                                    //更新last—region-id
+                                    DBUtils.saveUser(user)
+                                    Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                                    SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                                }
+                            }
 
-                    LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
-                    cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
+                            LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
+                            cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
 
-                }
-                Constant.PARSE_CODE -> {
-                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-//                    LogUtils.e("zcl_baseMe___________解析二维码")
-                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
-                }
+                        }
+                        Constant.PARSE_CODE -> {
+                            val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
+        //                    LogUtils.e("zcl_baseMe___________解析二维码")
+                            makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
+                        }
+                    }*/
+        }
+    }
+
+    private fun singleDialog(codeBean: MqttBodyBean) {
+        LogUtils.e("zcl_baseMe___________收到登出消息")
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
+            checkNetworkAndSync(this@BaseActivity)
+    }
+
+    private fun unbindDialog(codeBean: MqttBodyBean) {
+        val user = DBUtils.lastUser
+        user?.let {
+            if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
+                    && it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                user.last_region_id = 1.toString()
+                user.last_authorizer_user_id = user.id.toString()
+                DBUtils.deleteAllData()
+                AccountModel.initDatBase(it)
+                //更新last—region-id
+                DBUtils.saveUser(user)
+                SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
             }
         }
+        makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.region_name, codeBean.rid)//2代表解除授权信息type
+        LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {

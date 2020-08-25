@@ -81,7 +81,7 @@
                 android:id="@+id/rb_slow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-        <View
+       <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1"
@@ -90,7 +90,7 @@
                 android:id="@+id/rb_mid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-        <View
+       <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1"

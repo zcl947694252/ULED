@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import retrofit2.HttpException
@@ -17,10 +18,6 @@ abstract class NetworkObserver<T> : Observer<T> {
     }
 
     override fun onError(e: Throwable) {
-        if ((e.message ?: "").contains("Null is not a valid element") || (e.message
-                        ?: "").contains("The mapper function returned a null value.")||TextUtils.isEmpty(e.message ?: ""))
-            return
-
         Log.e("zcl", "zcl_NetworkObserver******onError${e.localizedMessage}")
         //HTTP错误
         when (e) {
@@ -31,9 +28,14 @@ abstract class NetworkObserver<T> : Observer<T> {
                 if (e.message != null && e.message != "null")
                     ToastUtils.showLong(e.message)  //服务器接口报错
             }
-            else -> //未知错误
-                if (!TextUtils.isEmpty(e.message))
-                    ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
+            else -> {
+                if ((e.message ?: "").contains("Null is not a valid element") || (e.localizedMessage
+                                ?: "").contains("The mapper function returned a null value") ||
+                        (e.message ?: "").contains("The mapper function returned a null value") || TextUtils.isEmpty(e.message ?: ""))
+                    return
+            }//未知错误
+            //if (!TextUtils.isEmpty(e.message))
+            // ToastUtils.showLong(/*R.string.unknown_network_error*/e.message)
         }
     }
 

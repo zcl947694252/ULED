@@ -1,5 +1,6 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -14,9 +15,9 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbUser
+import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
@@ -33,7 +34,7 @@ import org.jetbrains.anko.toast
  * 登录不共享此界面 登录在EnterPasswordActivity
  */
 class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
-    var type: String? = null
+    var typeStr: String? = null
     var isPassword = false
     var password: String? = null
     var phone: String? = null
@@ -42,20 +43,20 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_pwd)
         phone = intent.getStringExtra("phone")
-        type = intent.getStringExtra(Constant.USER_TYPE)
+        typeStr = intent.getStringExtra(Constant.USER_TYPE)
         initView()
         initListener()
     }
 
     private fun initView() {
-        if (type == Constant.TYPE_REGISTER) {
+        if (typeStr == Constant.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
             pwd_btn.text = getString(R.string.register)
-        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
+        } else if (typeStr == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
-            pwd_title.text = getString(R.string.forget_password)
-            pwd_btn.text = getString(R.string.next)
+            pwd_title.text = getString(R.string.set_password)
+            pwd_btn.text = getString(R.string.complete)
         }
     }
 
@@ -71,41 +72,38 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             R.id.pwd_eye -> eyePassword()
 
             R.id.pwd_return -> {
-                if (pwd_btn.text.toString().equals(getString(R.string.next)) || pwd_btn.text.toString().equals(getString(R.string.register))) {
-                    finish()
-                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
-                    pwd_input.hint = getString(R.string.please_password)
-                    pwd_input.setText(password)
-                    pwd_notice.text = getString(R.string.please_password)
-                    pwd_btn.text = getString(R.string.next)
+                when {
+                    pwd_btn.text.toString() == getString(R.string.complete) || pwd_btn.text.toString() == getString(R.string.register) -> {
+                        finish()
+                    }
+                    pwd_btn.text.toString() == getString(R.string.complete) -> {
+                        pwd_input.hint = getString(R.string.please_password)
+                        pwd_input.setText(password)
+                        pwd_notice.text = getString(R.string.please_password)
+                        pwd_btn.text = getString(R.string.next)
+                    }
                 }
             }
 
             R.id.pwd_btn -> {
                 var pwd = pwd_input.editableText.toString()
-                if (pwd_btn.text.toString().equals(getString(R.string.next))) {
-                    if (TextUtils.isEmpty(pwd)) {
-                        toast(getString(R.string.please_password))
-                        return
+                password = pwd
+                when {
+                    pwd_btn.text.toString() == getString(R.string.complete) -> {
+                        if (!TextUtils.isEmpty(password)) {
+                            upDatePwd()
+                        } else {
+                            toast(getString(R.string.new_password))
+                        }
                     }
-                    pwd_btn.text = getString(R.string.complete)
-                    password = pwd
-                    pwd_input.text.clear()
-                    pwd_input.hint = getString(R.string.please_again_password)
-                    pwd_notice.text = getString(R.string.please_again_password)
-                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
-                    if (pwd.equals(password) && !TextUtils.isEmpty(password)) {
-                        upDatePwd()
-                    } else {
-                        toast(getString(R.string.different_input))
+                    pwd_btn.text.toString() == getString(R.string.register) -> {
+                        if (TextUtils.isEmpty(pwd)) {
+                            toast(getString(R.string.please_password))
+                            return
+                        }
+                        password = pwd
+                        register()
                     }
-                } else if (pwd_btn.text.toString().equals(getString(R.string.register))) {
-                    if (TextUtils.isEmpty(pwd)) {
-                        toast(getString(R.string.please_password))
-                        return
-                    }
-                    password = pwd
-                    register()
                 }
             }
         }
@@ -113,34 +111,30 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun upDatePwd() {
         //toast("账户$phone----密码$password")
-
-        NetworkFactory.getApi()
+        val subscribe = NetworkFactory.getApi()
                 .putPassword(phone, NetworkFactory.md5(password))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<Response<DbUser>?>() {
-                    override fun onNext(t: Response<DbUser>) {
+                .subscribe({
 
-                            hideLoadingDialog()
-                            if (t.errorCode == 0) {
-                                //("logging" + stringResponse.errorCode + "更改成功")
-                                ToastUtils.showLong(R.string.tip_update_password_success)
-                                startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
-                                finish()
-                            } else {
-                                //ToastUtils.showLong(R.string.tip_update_password_fail)
-                                ToastUtils.showLong(t.message)
-                            }
+                    hideLoadingDialog()
+                    if (it.errorCode == 0) {
+                        //("logging" + stringResponse.errorCode + "更改成功")
+                        ToastUtils.showLong(R.string.tip_update_password_success)
+                        startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
+                        setResult(RESULT_FIRST_USER)
+                        finish()
+                    } else {
+                        //ToastUtils.showLong(R.string.tip_update_password_fail)
+                        ToastUtils.showLong(it.message)
                     }
-
-                    override fun onError(it: Throwable) {
-                        super.onError(it)
-                        hideLoadingDialog()
-                        Toast.makeText(this@InputPwdActivity, "onError:${it.message}", Toast.LENGTH_SHORT).show()
-                    }
+                }, {
+                    hideLoadingDialog()
+                    Toast.makeText(this@InputPwdActivity, "onError:${it.message}", Toast.LENGTH_SHORT).show()
                 })
     }
 
+    @SuppressLint("CheckResult")
     private fun register() {
         NetworkFactory.getApi()
                 .register(phone, NetworkFactory.md5(password), phone)
@@ -152,21 +146,16 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<DbUser>() {
-                    override fun onNext(dbUser: DbUser) {
+                .subscribe( {
                        //("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
                         hideLoadingDialog()
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         showLoadingDialog(getString(R.string.sync_now))
-                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                        SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
                         SharedPreferencesUtils.setUserLogin(true)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
+                    },{
                         hideLoadingDialog()
-                    }
                 })
     }
 
@@ -191,6 +180,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun complete() {
             hideLoadingDialog()
+            setResult(RESULT_FIRST_USER)
             startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
             finish()
         }

@@ -1,6 +1,6 @@
 package com.dadoutek.uled.util
 
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.util.MeshUtils
 import java.util.concurrent.atomic.AtomicInteger
@@ -32,12 +32,15 @@ class MeshAddressGenerator {
         addressList.addAll(curtain)
         addressList.addAll(relay)
         addressList.sortBy { it }
-        val i = when {
+        if (meshAddress.get()==0||meshAddress.get()<addressList.size){
+            val i = when {
             addressList.isEmpty() -> MeshUtils.DEVICE_ADDRESS_MIN
             else -> {
                 addressList.last()
             }
         }
-        meshAddress =AtomicInteger(i)
+            meshAddress =AtomicInteger(i)
+        }
+
     }
 }

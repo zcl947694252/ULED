@@ -2,7 +2,7 @@ package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
@@ -53,13 +53,20 @@ object Commander : EventListener<String> {
     //val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
     private val paramsKickOut = byteArrayOf('d'.toByte(), 'a'.toByte(), 'd'.toByte(), 'o'.toByte(), 'u'.toByte())
 
+    //发送所有灯开关指令时,第15位添加0x01标识来规避蓝牙接收器做出响应
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
         mTargetGroupAddr = groupAddr
         val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
-            byteArrayOf(0x01, 0x64, 0x00)
+            if (groupAddr == 0xffff)//是否是所有组
+                byteArrayOf(0x01, 0x64, 0x00,0x00, 0x01)
+            else
+                byteArrayOf(0x01, 0x64, 0x00)
         } else {
+            if (groupAddr == 0xffff)
+                byteArrayOf(0x00, 0x64, 0x00,0x00, 0x01)
+            else
             byteArrayOf(0x00, 0x64, 0x00)
         }
 
@@ -74,9 +81,9 @@ object Commander : EventListener<String> {
      * isPause 是否暂停开关窗帘
      */
     fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
-        val opcode = Opcode.CURTAIN_ON_OFF
+        val opcode = Opcode.CURTAIN_ON_OFF//0xf2
         mTargetGroupAddr = groupAddr
-        val params: ByteArray = if (isPause) {
+        val params: ByteArray = if (isPause) {// 0xe1  0xef
             byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
         } else {
             if (isOpen) {
@@ -91,16 +98,13 @@ object Commander : EventListener<String> {
     }
 
 
-    fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
-                       failedCallback: () -> Unit1) {
-
+    private fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         LogUtils.e("zcl---添加表 更新数据$lightList")
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
-                ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
@@ -625,13 +629,15 @@ object Commander : EventListener<String> {
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
-                if (macAddress != null && macAddress != "0")
-                    connectParams.setConnectMac(macAddress)
-                else if (meshAddr != 0)
-                    connectParams.setConnectMeshAddress(meshAddr)
+                when {
+                    macAddress != null && macAddress != "0" -> connectParams.setConnectMac(macAddress)
+                    meshAddr != 0 -> connectParams.setConnectMeshAddress(meshAddr)
+                    //true == 快速模式(不会扫几秒去找信号最好的)   //1367540967
+                }
 
                 if (deviceTypes != null)
                     connectParams.setConnectDeviceType(deviceTypes)
+
                 connectParams.setPassword(meshPwd)
                 connectParams.autoEnableNotification(true)
                 connectParams.setFastestMode(fastestMode)      //true == 快速模式(不会扫几秒去找信号最好的)
@@ -639,7 +645,7 @@ object Commander : EventListener<String> {
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
                 LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
-                    TelinkLightService.Instance()?.autoConnect(connectParams)
+                TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
@@ -661,9 +667,7 @@ object Commander : EventListener<String> {
             mGetVersionObservable = it
             mDstAddr = dstAddr
             var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
-
             val params: ByteArray
-
             if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
                 params = byteArrayOf(0x00, 0x00)
             } else {
@@ -672,8 +676,7 @@ object Commander : EventListener<String> {
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-        }
-                .retry(retryTimes)
+        }.retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS) {

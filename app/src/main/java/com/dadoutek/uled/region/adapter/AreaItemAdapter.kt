@@ -6,7 +6,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.region.bean.RegionBean
 
 
@@ -38,7 +38,7 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))
                             .setTextColor(R.id.item_area_share_person, mContext.getColor(R.color.blue_background))
                 } else {
-                    it.setText(R.id.item_area_state, mContext.getString(R.string.use))
+                    it.setText(R.id.item_area_state, mContext.getString(R.string.confirm))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_three))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.black_three))
                             .setTextColor(R.id.item_area_share_person, mContext.getColor(R.color.black_three))

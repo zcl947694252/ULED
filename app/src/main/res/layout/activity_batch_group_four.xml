@@ -45,9 +45,9 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:padding="5dp"
-                android:paddingStart="16dp"
+                android:paddingStart="5dp"
                 android:paddingEnd="8dp"
-                android:text="@string/install_device"
+                android:text="@string/add_device_new"
                 android:textColor="@color/white"
                 android:visibility="gone" />
 
@@ -67,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
                 android:layout_gravity="end"
+                android:visibility="gone"
                 android:layout_marginEnd="@dimen/dp_10"
                 android:background="@drawable/select_compatiable_bg"
                 android:button="@null"
@@ -96,11 +97,13 @@
                 <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="33dp"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                     <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="35dp"
+                            android:layout_width="0dp"
+                            android:layout_height="38dp"
+                            android:layout_weight="1"
                             android:background="@color/gray_e"
                             android:gravity="center_vertical"
                             android:paddingStart="@dimen/dp_10"
@@ -108,19 +111,12 @@
                             android:textColor="@color/gray_6"
                             android:textSize="13sp" />
 
-                    <TextView
+                    <ImageView
                             android:id="@+id/batch_four_device_all"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@color/gray_e"
-                            android:gravity="center_vertical|end"
-                            android:paddingStart="10dp"
-                            android:paddingLeft="@dimen/dp_10"
-                            android:paddingEnd="@dimen/dp_10"
-                            android:text="@string/select_all"
-                            android:textColor="@color/black_three"
-                            android:textSize="15sp" />
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginEnd="@dimen/dp_10"
+                            android:src="@drawable/icon_all_check" />
                 </LinearLayout>
 
                 <RadioGroup
@@ -142,7 +138,7 @@
                             android:textColor="@color/selector_batch_group_color"
                             android:textSize="18sp" />
 
-                    <View
+                   <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:background="@color/gray_e" />
@@ -170,10 +166,10 @@
                             android:id="@+id/batch_four_no_group_line_ly"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="2"
+                            android:layout_weight="3"
                             android:gravity="center">
 
-                        <View
+                       <View
                                 android:id="@+id/batch_four_no_group_line"
                                 android:layout_width="25dp"
                                 android:layout_height="2dp"
@@ -182,7 +178,7 @@
                                 android:scaleType="fitXY" />
                     </LinearLayout>
 
-                    <View
+                   <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:background="@color/gray_e" />
@@ -191,10 +187,10 @@
                             android:id="@+id/batch_four_grouped_line_ly"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
+                            android:layout_weight="2"
                             android:gravity="center">
 
-                        <View
+                       <View
                                 android:id="@+id/batch_four_grouped_line"
                                 android:layout_width="25dp"
                                 android:layout_height="2dp"
@@ -205,7 +201,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <View
+               <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/gray_e" />
@@ -215,7 +211,7 @@
                     android:id="@+id/batch_four_device_empety_ly"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
                     android:orientation="vertical">
 
                 <android.support.v7.widget.RecyclerView
@@ -232,7 +228,7 @@
                         android:id="@+id/image_no_device"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginBottom="10dp"
                         android:drawableTop="@drawable/no_device"
                         android:drawablePadding="10dp"
                         android:gravity="center"
@@ -248,8 +244,9 @@
 
                 <TextView
                         android:id="@+id/batch_four_group_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="33dp"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
                         android:background="@color/gray_e"
                         android:gravity="center_vertical"
                         android:paddingStart="10dp"
@@ -258,40 +255,50 @@
                         android:textColor="@color/gray_6"
                         android:textSize="13sp" />
 
-                <TextView
+                <ImageView
                         android:id="@+id/batch_four_group_add_group"
-                        android:layout_width="0dp"
+                        android:layout_width="45dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:background="@color/gray_e"
+                        android:padding="8dp"
                         android:gravity="center_vertical|end"
-                        android:paddingStart="10dp"
-                        android:paddingLeft="@dimen/dp_10"
-                        android:paddingEnd="@dimen/dp_10"
-                        android:text="@string/add_groups"
-                        android:textColor="@color/black_three"
-                        android:textSize="15sp" />
+                        android:src="@drawable/icon_addition" />
             </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                    android:id="@+id/batch_four_group_recycle"
+            <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:background="@color/white"
-                    android:minHeight="150dp" />
+                    android:layout_height="wrap_content">
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/batch_four_group_recycle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_5"
+                        android:layout_marginBottom="@dimen/dp_5"
+                        android:background="@color/white" />
+            </ScrollView>
+
+            <TextView
+                    android:id="@+id/batch_see_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/dp_5"
+                    android:text="@string/see_help"
+                    android:textColor="@color/black_three"
+                    android:textSize="17sp" />
 
             <Button
                     android:id="@+id/grouping_completed"
                     android:layout_width="match_parent"
                     android:layout_height="46dp"
                     android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="8dp"
                     android:background="@drawable/btn_rec_black_bt"
                     android:clickable="false"
-                    android:text="@string/set_group"
+                    android:text="@string/sure_group"
                     android:textColor="@android:color/white"
                     android:visibility="visible" />
         </LinearLayout>

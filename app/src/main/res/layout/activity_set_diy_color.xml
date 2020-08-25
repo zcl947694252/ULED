@@ -1,202 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/set_diy_color"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background_color">
-
-    <include layout="@layout/toolbar" android:id="@+id/topView"/>
-    
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/mode_name_layout"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/set_diy_color"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        app:layout_constraintTop_toBottomOf="@id/topView"
-        >
+        android:layout_height="match_parent"
+        android:background="@color/background_color">
+
+    <include
+            android:id="@+id/topView"
+            layout="@layout/toolbar" />
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/mode_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:layout_constraintTop_toBottomOf="@id/topView">
 
         <TextView
-            android:id="@+id/nameTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/mode_name"
-            android:textSize="18sp"
-            android:textColor="@color/black_three"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/nameTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_name"
+                android:textColor="@color/black_three"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         <!--<ImageView-->
-            <!--android:id="@+id/imageView11"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:src="@drawable/icon_arrow"-->
-            <!--app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintTop_toTopOf="parent" />-->
+        <!--android:id="@+id/imageView11"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@drawable/icon_arrow"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
         <EditText
-            android:id="@+id/editName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:hint="@string/please_mode_name"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/black_three"
-            android:textSize="14sp"
-            android:layout_marginRight="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/editName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:hint="@string/please_mode_name"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/black_three"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/layout_01"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="#eeeeee"
-        app:layout_constraintTop_toBottomOf="@id/mode_name_layout"
-        app:layout_constraintStart_toStartOf="parent">
+            android:id="@+id/layout_01"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="#eeeeee"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mode_name_layout">
 
         <TextView
-            android:id="@+id/tip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/diy_action_tip"
-            android:textSize="15sp"
-            android:layout_marginLeft="9dp"
-            android:textColor="@color/black_nine"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="9dp"
+                android:text="@string/set_color"
+                android:textColor="@color/black_nine"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>
-    
+
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/layout_02"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/layout_01">
+            android:id="@+id/layout_02"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/layout_01">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/selectColorRecyclerView"
-            android:layout_width="320dp"
-            android:layout_height="160dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+                android:id="@+id/selectColorRecyclerView"
+                android:layout_width="320dp"
+                android:layout_height="160dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
-    
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/layout_03"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_02"
-        android:layout_marginTop="20dp"
-        android:background="#eeeeee"
-        android:layout_height="35dp">
+
+    <LinearLayout
+            android:id="@+id/layout_03"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_marginTop="20dp"
+            android:background="#eeeeee"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/layout_02">
 
         <TextView
-            android:id="@+id/tvSpeed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/speed_regulation"
-            android:textSize="15sp"
-            android:layout_marginLeft="9dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/tvSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="9dp"
+                android:text="@string/speed_regulation"
+                android:textSize="15sp" />
 
-    </android.support.constraint.ConstraintLayout>
+        <TextView
+                android:id="@+id/speed_num"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="@dimen/dp_10"
+                android:layout_weight="1"
+                android:text="100%"
+                android:visibility="gone"
+                android:gravity="center_vertical|end"
+                android:textColor="@color/black_three"
+                android:textSize="15sp" />
+
+    </LinearLayout>
 
 
-        <SeekBar
-            android:id="@+id/sbSpeed"
-            app:layout_constraintTop_toBottomOf="@id/layout_03"
+    <LinearLayout
+            android:id="@+id/sbSpeed_ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:max="100"
-            android:min="1"
-            style="@style/SeekBarStyle"
-            />
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layout_03">
 
-    <android.support.constraint.ConstraintLayout
+
+        <com.warkiz.widget.IndicatorSeekBar
+                android:id="@+id/sbSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/dp_10"
+                app:isb_indicator_color="@color/color_gray"
+                app:isb_indicator_text_size="0sp"
+                app:isb_max="5"
+                app:isb_min="1"
+                app:isb_only_thumb_draggable="false"
+                app:isb_progress="1"
+                app:isb_seek_smoothly="true"
+                app:isb_show_indicator="rounded_rectangle"
+                app:isb_show_tick_marks_type="oval"
+                app:isb_show_tick_texts="true"
+                app:isb_thumb_color="#1E90FF"
+                app:isb_thumb_size="20dp"
+                app:isb_tick_marks_color="@color/color_gray"
+                app:isb_tick_marks_drawable="@null"
+                app:isb_tick_marks_size="13dp"
+                app:isb_tick_texts_color="#333333"
+                app:isb_tick_texts_size="15sp"
+                app:isb_ticks_count="5"
+                app:isb_track_background_color="#C8C8C8"
+                app:isb_track_background_size="2dp"
+                app:isb_track_progress_color="#0080EA"
+                app:isb_track_progress_size="2dp"
+                android:layout_marginTop="2dp" />
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:visibility="gone"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                    android:id="@+id/speed_less"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/less_enabled" />
+
+           <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.1dp"
+                    android:layout_weight="1" />
+
+            <ImageView
+                    android:id="@+id/speed_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/add_enabled" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+<include layout="@layout/template_see_help"
+        android:id="@+id/see_help_ly"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sbSpeed">
-
-        <ImageView
-            android:id="@+id/speed_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="25dp"
-            android:background="@drawable/add_enabled"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/speed_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:text="100%"
-            android:textColor="@color/black_three"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/speed_add"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/speed_less"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/less_enabled"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/speed_num"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    </android.support.constraint.ConstraintLayout>
-
-    <Button
-        android:id="@+id/saveNode"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="38dp"
-        android:layout_marginRight="38dp"
-        android:text="@string/save"
-        android:background="@drawable/btn_rec_blue_bt"
-        android:textColor="@color/black_three"
-        android:textSize="18sp"
-        android:elevation="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/sbSpeed" />
-
-
-    <TextView
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/saveNode"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/sbSpeed_ly"/>
+    <Button
+            android:id="@+id/saveNode"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginLeft="38dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="38dp"
+            android:background="@drawable/rect_blue_5"
+            android:elevation="20dp"
+            android:text="@string/save"
+            android:textColor="@color/black_three"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/see_help_ly"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

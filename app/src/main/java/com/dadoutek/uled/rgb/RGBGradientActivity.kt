@@ -1,6 +1,5 @@
 package com.dadoutek.uled.rgb
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -10,13 +9,9 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
-import android.view.GestureDetector
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.ImageView
-import android.widget.SeekBar
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -26,12 +21,11 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SpeedDialog
-import com.dadoutek.uled.widget.ActionSheetDialog
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -42,6 +36,9 @@ import java.util.concurrent.TimeUnit
 
 class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var seeHelp: TextView? = null
+    private var addGroupTv: TextView? = null
+    private var lin: View? = null
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
     private var diyGradientList: MutableList<DbDiyGradient>? = null
     private var rgbGradientAdapter: RGBGradientAdapter? = null
@@ -50,7 +47,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
     private var currentShowIsDiy = false
-    var type = Constant.TYPE_GROUP
+    var typeStr = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
     protected val FLIP_DISTANCE = 50f
@@ -73,66 +70,15 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 //        initGesture()
     }
 
-    private fun initGesture() {
-        mDetector = GestureDetector(this, object : GestureDetector.OnGestureListener {
-            override fun onShowPress(e: MotionEvent?) {
-
-            }
-
-            override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                return false
-            }
-
-            override fun onDown(e: MotionEvent?): Boolean {
-                return false
-            }
-
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-                try {
-                    if (e1!!.getX() - e2!!.getX() > FLIP_DISTANCE) {
-                        if (!currentShowIsDiy) {
-                            changeToDiyPage()
-                        }
-                        Log.i("TAG", "<--- left, left, go go go");
-                        return true;
-                    }
-                    if (e2?.getX() - e1?.getX() > FLIP_DISTANCE) {
-                        if (currentShowIsDiy) {
-                            changeToBuildInPage()
-                        }
-                        Log.i("TAG", "right, right, go go go --->");
-                        return true;
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                return false
-            }
-
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-                return false
-            }
-
-            override fun onLongPress(e: MotionEvent?) {
-
-            }
-        }, null)
-    }
-
-//    override fun onTouchEvent(event: MotionEvent?): Boolean {
-//        return mDetector!!.onTouchEvent(event)
-//    }
-
     override fun onPause() {
         super.onPause()
         applyDisposable?.dispose()
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.dynamic_gradient)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbarTv.text = getString(R.string.dynamic_gradient)
+       toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
 //        btnStopGradient.visibility = View.VISIBLE
 //        btnStopGradient.setOnClickListener(this)
 //        normal_rgb.setOnClickListener(this)
@@ -140,9 +86,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         val intent = intent
-        type = intent.getStringExtra(Constant.TYPE_VIEW)
+        typeStr = intent.getStringExtra(Constant.TYPE_VIEW)
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
-        if (type == Constant.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val lightList = DBUtils.getLightByGroupMesh(dstAddress)
             if (lightList != null) {
                 if (lightList.size > 0) {
@@ -164,8 +110,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
+        lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
+        addGroupTv = lin?.findViewById(R.id.main_add_device)
+        addGroupTv?.text = getString(R.string.mode_diy)
+        seeHelp = lin?.findViewById(R.id.main_go_help)
+        seeHelp?.visibility = View.GONE
 //        changeToBuildInPage()
         btnAdd.setOnClickListener(this)
+        addGroupTv?.setOnClickListener(this)
         mode_preset_layout.setOnClickListener(this)
         mode_diy_layout.setOnClickListener(this)
 //        btnStopGradient.visibility = View.VISIBLE
@@ -185,14 +137,12 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 ////            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         builtInModeRecycleView?.addItemDecoration(decoration)
         rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
+        //rgbGradientAdapter!!.addFooterView(lin)
         rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
     }
 
@@ -200,55 +150,20 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 //        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
 //            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .black_ee)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
         rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
-
-//        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildDiyClickListener
-    }
-
-    private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
-
-
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-            this.onValueChange(seekBar, seekBar.progress, true)
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-
-        }
-
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int,
-                                       fromUser: Boolean) {
-//            tvSpeed.text = getString(R.string.speed_text, progress.toString())
-        }
-
-        @SuppressLint("StringFormatInvalid")
-        private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
-            speed = progress
-            if (speed == 0) {
-                speed = 1
-            }
-//            tvSpeed.text = getString(R.string.speed_text, speed.toString())
-            if (positionState != 0) {
-                stopGradient()
-                Thread.sleep(200)
-                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
-            }
-        }
+        rgbDiyGradientAdapter!!.addFooterView(lin)
     }
 
     var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
@@ -288,24 +203,11 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             builder.setNeutralButton(R.string.cancel) { dialog, which -> }
             builder.create().show()
         }
-
-
-//        batchGroup.setOnClickListener(View.OnClickListener {
-//            for(i in diyGradientList!!.indices){
-//                if(diyGradientList!![i].isSelected){
-//                    startDeleteGradientCmd(diyGradientList!![i].id)
-//                    DBUtils.deleteGradient(diyGradientList!![i])
-//                    DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
-//                    rgbDiyGradientAdapter!!.notifyDataSetChanged()
-//                }
-//            }
-//        })
     }
 
 
     private var onItemChildClickListenerDiy = OnItemChildClickListener { adapter, view, position ->
-
-        when (view!!.getId()) {
+        when (view!!.id) {
             R.id.diy_mode_on -> {
                 //应用自定义渐变
                 Thread {
@@ -351,36 +253,6 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 diyGradientList!![position].isSelected = !diyGradientList!![position].isSelected
             }
         }
-
-    }
-
-//    private var onItemChildDiyClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-//        when (view.id) {
-//            R.id.more -> {
-//                showMoreSetDialog(adapter, position)
-//            }
-//        }
-//    }
-
-    private fun showMoreSetDialog(adapter: BaseQuickAdapter<Any, BaseViewHolder>, position: Int) {
-        val dialog = ActionSheetDialog.ActionSheetBuilder(this@RGBGradientActivity, R.style.ActionSheetDialogBase)
-                .setItems(arrayOf<CharSequence>(getString(R.string.delete), getString(R.string.edit)), object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface, which: Int) {
-                        when (which) {
-                            0 -> {
-                                deleteGradient(position, adapter, dialog)
-                            }
-                            1 -> {
-                                transChangeAct(diyGradientList!![position])
-                                dialog.dismiss()
-                            }
-                        }
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), { dialog, which -> })
-                .setCancelable(true)
-                .create()
-        dialog.show()
     }
 
     fun deleteGradient(position: Int, adapter: BaseQuickAdapter<Any, BaseViewHolder>, dialog: DialogInterface) {
@@ -396,8 +268,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private var onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
-
-        when (view!!.getId()) {
+        when (view!!.id) {
             R.id.gradient_mode_on -> {
                 //应用内置渐变
                 applyDisposable?.dispose()
@@ -441,31 +312,20 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     }
 
-
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.mode_diy_layout -> {
-                changeToDiyPage()
-            }
-            R.id.mode_preset_layout -> {
-                changeToBuildInPage()
-            }
-            R.id.btnStopGradient -> {
-                stopGradient()
-            }
-            R.id.normal_rgb -> {
-                finish()
-            }
-            R.id.btnAdd -> {
-                transAddAct()
-            }
+            R.id.mode_diy_layout -> changeToDiyPage()
+            R.id.mode_preset_layout -> changeToBuildInPage()
+            R.id.btnStopGradient -> stopGradient()
+            R.id.normal_rgb -> finish()
+            R.id.btnAdd, R.id.main_add_device -> transAddAct()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList = DBUtils.diyGradientList
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         isDelete = false
         rgbDiyGradientAdapter!!.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

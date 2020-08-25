@@ -23,7 +23,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -35,14 +34,15 @@ import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDeviceName
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.HttpModel.GwModel
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDeviceName
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
@@ -51,6 +51,7 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.GuideUtils
@@ -81,6 +82,7 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
+    private var toolbarTv: TextView? = null
     private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 100
@@ -140,7 +142,7 @@ class GroupListFragment : BaseFragment() {
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.title = ""
                     changeEnableBackToolbar()
                 } else {
@@ -159,10 +161,10 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun setBluetoothAndAddVisableDeleteGone() {
-        toolbar!!.setTitle(R.string.group_title)
+        toolbarTv!!.setText(R.string.group_title)
         toolbar!!.navigationIcon = null
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE//加号
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE//删除
         SharedPreferencesUtils.setDelete(false)
     }
@@ -174,7 +176,7 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun changeEnableBackToolbar() {
-        toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar!!.setNavigationIcon(R.drawable.icon_return)
         toolbar!!.setNavigationOnClickListener {
             sendGroupResterNormal()
             setBluetoothAndAddVisableDeleteGone()
@@ -205,21 +207,23 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
 
         viewContent = inflater.inflate(R.layout.fragment_group_list, null)
 
         viewPager = viewContent.findViewById(R.id.list_groups)
-        groupAllLy = viewContent.findViewById(R.id.group_all_ly)
+        //groupAllLy = viewContent.findViewById(R.id.group_all_ly)
 
         toolbar = viewContent.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.group_title)
+        toolbarTv = viewContent.findViewById(R.id.toolbarTv)
+        toolbarTv!!.setText(R.string.group_title)
 
-        allLightText = viewContent.findViewById(R.id.textView6)
+       // allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
             val lastUser = DBUtils.lastUser
             lastUser?.let {
@@ -238,29 +242,26 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
-        btnOn = viewContent.findViewById(R.id.btn_on)
+        /*btnOn = viewContent.findViewById(R.id.btn_on)
         btnOff = viewContent.findViewById(R.id.btn_off)
         btnSet = viewContent.findViewById(R.id.btn_set)
         onText = viewContent.findViewById(R.id.tv_on)
         offText = viewContent.findViewById(R.id.tv_off)
-
-
         totalNum = viewContent.findViewById(R.id.total_num)
-
-        install_device = viewContent.findViewById(R.id.install_device)
-        create_group = viewContent.findViewById(R.id.create_group)
-        create_scene = viewContent.findViewById(R.id.create_scene)
-        install_device?.setOnClickListener(onClick)
-        create_group?.setOnClickListener(onClick)
-        create_scene?.setOnClickListener(onClick)
+         install_device = viewContent.findViewById(R.id.install_device)
+         create_group = viewContent.findViewById(R.id.create_group)
+         create_scene = viewContent.findViewById(R.id.create_scene)
+         install_device?.setOnClickListener(onClick)
+         create_group?.setOnClickListener(onClick)
+         create_scene?.setOnClickListener(onClick)
         btnOn?.setOnClickListener(onClick)
-        btnOff?.setOnClickListener(onClick)
-        btnSet?.setOnClickListener(onClick)
-        onText?.setOnClickListener(onClick)
-        offText?.setOnClickListener(onClick)
+         btnOff?.setOnClickListener(onClick)
+         btnSet?.setOnClickListener(onClick)
+         onText?.setOnClickListener(onClick)
+         offText?.setOnClickListener(onClick)*/
         btnDelete.setOnClickListener(onClick)
-        allLightText?.setOnClickListener(onClick)
-        groupAllLy?.setOnClickListener(onClick)
+       // allLightText?.setOnClickListener(onClick)
+       // groupAllLy?.setOnClickListener(onClick)
         return viewContent
     }
 
@@ -349,12 +350,11 @@ class GroupListFragment : BaseFragment() {
                 setBluetoothAndAddVisableDeleteGone()
             }
 
-            override fun onPageScrollStateChanged(i: Int) {
-
-            }
+            override fun onPageScrollStateChanged(i: Int) {}
         })
-        viewPager
-        bnve.setTextSize(16f)
+
+        bnve.setLargeTextSize(15f)
+        bnve.setSmallTextSize(15f)
         bnve.setIconVisibility(false)
         bnve.enableAnimation(false)
         bnve.enableShiftingMode(false)
@@ -439,23 +439,22 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
             allGroup = DBUtils.getGroupByMeshAddr(0xFFFF)
-            toolbar!!.setTitle(R.string.group_title)
+            toolbarTv!!.setText(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 
         }
     }
 
+            @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
         if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe(object : NetworkObserver<List<DbGateway>?>() {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onNext(t: List<DbGateway>) {
+        GwModel.getGwList()?.subscribe({
                 TelinkLightApplication.getApp().offLine = true
                 hideLoadingDialog()
-                t.forEach { db ->
+            it.forEach { db ->
                     //网关在线状态，1表示在线，0表示离线
                     if (db.state == 1)
                         TelinkLightApplication.getApp().offLine = false
@@ -480,8 +479,7 @@ class GroupListFragment : BaseFragment() {
                         gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
                     }
 
-                    val encoder = Base64.getEncoder()
-                    val s = encoder.encodeToString(gattPar)
+                    val s =  Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = allGroup!!.meshAddr
@@ -489,40 +487,32 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
                 }
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+            }, {
                 hideLoadingDialog()
                 ToastUtils.showShort(getString(R.string.gw_not_online))
-            }
         })
     }
 
+    @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendDeviceToGatt(gattBody)?.subscribe(object : NetworkObserver<String?>() {
-            override fun onNext(t: String) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe({
                 disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$t")
-            }
-
-            override fun onError(e: Throwable) {
-                super.onError(e)
+                LogUtils.v("zcl-----------远程控制-------$it")
+            },{
                 disposableTimer?.dispose()
-                ToastUtils.showShort(e.message)
-
-                LogUtils.v("zcl-----------远程控制-------${e.message}")
-            }
+                ToastUtils.showShort(it.message)
+                LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val onClick = View.OnClickListener {
         var intent: Intent?
         //点击任何一个选项跳转页面都隐藏引导
         hidePopupMenu()
         when (it.id) {
-            R.id.group_all_ly -> {
+          /*  R.id.group_all_ly -> {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
                     val intentSetting = Intent(context, NormalSettingActivity::class.java)
                     intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -533,7 +523,7 @@ class GroupListFragment : BaseFragment() {
                     val activity = activity as MainActivity
                     activity.autoConnect()
                 }
-            }
+            }*/
             R.id.install_device -> {
                 showInstallDeviceList()
             }
@@ -616,7 +606,8 @@ class GroupListFragment : BaseFragment() {
                 deleteList.addAll(relayFragment.getGroupDeleteList())
 
                 if (deleteList.size > 0) {
-                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
+                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?))
+                            .setMessage(getString(R.string.delete_group_confirm,deleteList[0].name))
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 //showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
@@ -627,9 +618,9 @@ class GroupListFragment : BaseFragment() {
                             .show()
                 }
             }
-            R.id.textView6 -> {
+         /*   R.id.textView6 -> {
                 Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
-            }
+            }*/
         }
     }
 
@@ -786,6 +777,22 @@ class GroupListFragment : BaseFragment() {
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
+        when (gwStompBean.ser_id.toInt()) {
+            Constant.SER_ID_GROUP_ALLON -> {
+                LogUtils.v("zcl-----------远程控制群组开启成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOpenSuccess()
+            }
+            Constant.SER_ID_GROUP_ALLOFF -> {
+                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
+                disposableTimer?.dispose()
+                hideLoadingDialog()
+                allGroupOffSuccess()
+            }
+        }
+    }
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")

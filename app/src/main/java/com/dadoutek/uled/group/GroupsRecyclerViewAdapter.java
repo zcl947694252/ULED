@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
-import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 

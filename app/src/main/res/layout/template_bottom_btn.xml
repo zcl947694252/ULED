@@ -1,35 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:id="@+id/cancel_confirm_ly"
-    android:layout_height="50dp"
-    android:orientation="horizontal"
-    tools:showIn="@layout/popwindown_add_region">
+        android:id="@+id/cancel_confirm_ly"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btn_cancel"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/bottom_left"
-        android:text="@string/cancel"
-        android:textColor="@color/black_six" />
+            android:id="@+id/tip_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_left"
+            android:text="@string/cancel"
+            android:textColor="@color/black_six" />
 
     <View
-        android:id="@+id/cancel_confirm_vertical"
-        android:layout_width="0.5dp"
-        android:layout_height="match_parent"
-        android:background="@color/gray" />
+            android:id="@+id/tip_center_vertical"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray" />
 
     <Button
-        android:id="@+id/btn_confirm"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/bottom_right"
-        android:text="@string/confirm"
-        android:textColor="@color/blue_background"/>
+            android:id="@+id/tip_confirm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_right"
+            android:text="@string/confirm"
+            android:textColor="@color/blue_background"/>
 </LinearLayout>

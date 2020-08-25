@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.HttpModel.DownLoadFileModel;
+import com.dadoutek.uled.model.httpModel.DownLoadFileModel;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -42,7 +42,7 @@ public class OtaPrepareUtils {
         if (checkHaveNetWork(context)) {
             getServerVersionNew(context,localVersion,otaPrepareListner);
         } else {
-            ToastUtils.showLong(R.string.network_disconect);
+            ToastUtils.showLong(R.string.network_unavailable);
         }
     }
 
@@ -51,6 +51,8 @@ public class OtaPrepareUtils {
     }
 
     private String getServerVersionNew(Context context,String localVersion, OtaPrepareListner otaPrepareListner) {
+        if (localVersion==null) return "";
+
         otaPrepareListner.startGetVersion();
         DownLoadFileModel.INSTANCE.getUrlNew(localVersion).subscribe(new NetworkObserver<Object>() {
             @Override
@@ -61,7 +63,8 @@ public class OtaPrepareUtils {
                 JSONObject jsonObject=new JSONObject((Map) s);
                 try {
                     String data=jsonObject.getString("url");
-                    localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(data, 2);
+                    String name=jsonObject.getString("name");
+                    localPath = context.getFilesDir()+ "/" +name /*StringUtils.versionResolutionURL(data, 2)*/;
                     LogUtils.e("zcl版本升级localPath-----------"+localVersion);
                     compareServerVersion(data, otaPrepareListner, context);
                 } catch (JSONException e) {
@@ -91,6 +94,7 @@ public class OtaPrepareUtils {
                 File file = new File(localPath);
                 if (file.exists()) {
                     SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    SharedPreferencesUtils.saveUpdateVersionName(localPath);
                     otaPrepareListner.downLoadFileSuccess();
                 } else {
 //                    otaPrepareListner.getVersionSuccess("");
@@ -120,7 +124,7 @@ public class OtaPrepareUtils {
                 }
             }
         } else {
-            ToastUtils.showLong(R.string.getVsersionFail);
+            ToastUtils.showLong(R.string.the_last_version);
         }
         return false;
     }
@@ -242,20 +246,22 @@ public class OtaPrepareUtils {
 
     //检查是否支持OTA 返回true支持  返回false不支持
     public Boolean checkSupportOta(String localVersion) {//LA\LAS    CC\CCS   LX\LXS
-        int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
+        if (!localVersion.contains("-"))
+            return false;
+        long l = Long.parseLong(StringUtils.versionResolution(localVersion, 1));
+        int localVersionNum = (int) l;
         boolean oldSuportVersion = (localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
                 || localVersion.contains("CR-") || localVersion.contains("LC-")||localVersion.contains("LA-")
                 || localVersion.contains("LA-") || localVersion.contains("LAS-")||localVersion.contains("CC-")
                 || localVersion.contains("CCS-") || localVersion.contains("LX-")||localVersion.contains("LXS-")
-                || localVersion.contains("LG-")
-                || localVersion.contains("LCS-") || localVersion.contains("L36-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
+                || localVersion.contains("LG-") || localVersion.contains("LCS-") || localVersion.contains("L36-"))
+                && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
         boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")||localVersion.contains("NPR");
         if (oldSuportVersion||newSuport) {
             return true;
         } else {
             return false;
         }
-
     }
 }

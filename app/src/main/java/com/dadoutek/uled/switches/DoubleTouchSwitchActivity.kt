@@ -1,27 +1,24 @@
 package com.dadoutek.uled.switches
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity
@@ -29,7 +26,6 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -48,13 +44,7 @@ import kotlinx.coroutines.launch
  * 更新描述
  */
 
-class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
-    private var mConnectDisposable: Disposable? = null
-    private var popReNameView: View? = null
-    private var renameDialog: Dialog? = null
-    private var renameCancel: TextView? = null
-    private var renameConfirm: TextView? = null
-    private var renameEditText: EditText? = null
+class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var switchDate: DbSwitch? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
@@ -63,23 +53,56 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     private var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_switch_double_touch)
-        initView()
-        initData()
-        initListener()
+    override fun setToolBar(): Toolbar {
+        return  toolbar
     }
 
-    fun initData() {
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
+    override fun setVersion() {
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = localVersion
+        fiVersion?.title =localVersion
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return  mDeviceInfo?.meshAddress?:0
+    }
+
+    override fun deleteDevice() {
+        deleteSwitch(mDeviceInfo.macAddress)
+    }
+
+    override fun goOta() {
+        deviceOta(mDeviceInfo)
+    }
+
+    override fun reName() {
+        showRenameDialog(switchDate)
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_switch_double_touch
+    }
+
+    override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         isRetryConfig = intent.getStringExtra("group")
         localVersion = intent.getStringExtra("version")
         eight_switch_versionLayout.setBackgroundColor(getColor(R.color.transparent))
-        bottom_version_number.text = localVersion
-        if (isRetryConfig != null && isRetryConfig == "true") {
+//        bottom_version_number.text = localVersion
+        toolbarTv.text = getString(R.string.touch_sw)
+
+        isReConfig = isRetryConfig != null && isRetryConfig == "true"
+        fiRename?.isVisible = isReConfig
+
+        if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
                 if (stringToList == null || stringToList.size < 2) {
@@ -100,7 +123,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
             }
-
         }
     }
 
@@ -120,7 +142,11 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun skipSelectGroup() {
         val intent = Intent(this@DoubleTouchSwitchActivity, ChooseGroupOrSceneActivity::class.java)
-        intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        //传入0代表是群组
+        val bundle = Bundle()
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+        intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
     }
 
@@ -136,7 +162,11 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (switchDate == null)
                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                     GlobalScope.launch(Dispatchers.Main) {
-                        showRenameDialog()
+                        ToastUtils.showShort(getString(R.string.config_success))
+                        if (!isReConfig)
+                        showRenameDialog(switchDate)
+                        else
+                            finish()
                     }
                 },
                 failedCallback = {
@@ -176,24 +206,6 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
             switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
             switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
             DBUtils.updateSwicth(switchDate!!)
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun showRenameDialog() {
-        DBUtils.getAllSwitch()
-        hideLoadingDialog()
-        StringUtils.initEditTextFilter(renameEditText)
-        if (switchDate != null && switchDate?.name != "" && switchDate != null && switchDate?.name != null)
-            renameEditText?.setText(switchDate?.name)
-        else
-            renameEditText?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-"
-                    + DBUtils.getAllSwitch().size)
-        renameEditText?.setSelection(renameEditText?.text.toString().length)
-
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
         }
     }
 
@@ -258,10 +270,8 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
-    fun initListener() {
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
+    override  fun initListener() {
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)
         switch_double_touch_right.setOnClickListener(this)
@@ -291,47 +301,34 @@ class DoubleTouchSwitchActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun makePop() {
-        popReNameView = View.inflate(this, R.layout.pop_rename, null)
-        renameEditText = popReNameView?.findViewById(R.id.pop_rename_edt)
-        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
-        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
+                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
-                if (this != null && !this.isFinishing) {
+                toolbarTv.text = switchDate?.name
+                if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
-                }
             }
         }
         renameCancel?.setOnClickListener {
-            if (this != null && !this.isFinishing) {
+            if (this != null && !this.isFinishing)
                 renameDialog?.dismiss()
-            }
         }
-
-        renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
-        renameDialog!!.setCanceledOnTouchOutside(false)
-
         renameDialog?.setOnDismissListener {
-            switchDate?.name = renameEditText?.text.toString().trim { it <= ' ' }
-            if (switchDate != null)
-                DBUtils.updateSwicth(switchDate!!)
-            showConfigSuccessDialog()
+           if (!isReConfig)
+               finish()
         }
     }
 
-    fun initView() {
+    override  fun initView() {
         switch_double_touch_mb.visibility = View.VISIBLE
         switch_double_touch_set.visibility = View.GONE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
-        toolbar.title = getString(R.string.double_switch)
-        toolbar.setNavigationIcon(R.drawable.icon_top_tab_back)
+        toolbarTv.text = getString(R.string.double_switch)
 
         makePop()
     }

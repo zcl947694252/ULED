@@ -2,29 +2,33 @@ package com.dadoutek.uled.network;
 
 import com.dadoutek.uled.gateway.bean.ClearGwBean;
 import com.dadoutek.uled.gateway.bean.DbGateway;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
-import com.dadoutek.uled.model.DbModel.DbDiyGradient;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbRegion;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSensor;
-import com.dadoutek.uled.model.DbModel.DbSensorChild;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
-import com.dadoutek.uled.model.DbModel.DbSwitchChild;
-import com.dadoutek.uled.model.DbModel.DbUser;
-import com.dadoutek.uled.model.HttpModel.BatchRemove8kBody;
-import com.dadoutek.uled.model.HttpModel.RemoveCodeBody;
+import com.dadoutek.uled.gateway.bean.DbRouter;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
+import com.dadoutek.uled.model.dbModel.DbDiyGradient;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbRegion;
+import com.dadoutek.uled.model.dbModel.DbScene;
+import com.dadoutek.uled.model.dbModel.DbSensor;
+import com.dadoutek.uled.model.dbModel.DbSensorChild;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DbSwitchChild;
+import com.dadoutek.uled.model.dbModel.DbUser;
+import com.dadoutek.uled.model.httpModel.BatchRemove8kBody;
+import com.dadoutek.uled.model.httpModel.RemoveCodeBody;
+import com.dadoutek.uled.model.routerModel.RouteStasusBean;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
 import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
+import com.dadoutek.uled.router.bean.RouteScanResultBean;
+import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 
 import java.util.List;
 import java.util.Map;
@@ -87,7 +91,8 @@ public interface RequestInterface {
 
     //登录蓝牙使用
     @GET("auth/account")
-    Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
+    Observable<Response<String>> getAccount(@Query("phone") String phone,
+                                            @Query("channel") String channel);
 
     //区域相关接口
 
@@ -98,7 +103,8 @@ public interface RequestInterface {
 
     //添加区域
     @POST("region/add/{rid}")
-    Observable<Response<Object>> addRegionNew(@Header("token") String token, @Body DbRegion dbRegion,
+    Observable<Response<Object>> addRegionNew(@Header("token") String token,
+                                              @Body DbRegion dbRegion,
                                               @Path("rid") long rid);
 
     // http://47.107.227.130/smartlight/ auth/authorization/code/generate/{rid}
@@ -110,7 +116,8 @@ public interface RequestInterface {
     //使一个授权码过期
     //请求URL：DELETE  http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
-    Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path("type") long type);
+    Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path(
+            "type") long type);
 
     //获取区域列表 (已过期) 仅用于获取自己的区域
     @GET("region/list")
@@ -149,7 +156,8 @@ public interface RequestInterface {
     //区域id和码种类type，在url中
     //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
-    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid, @Path("type") int type); //57、授权码过期
+    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid,
+                                                     @Path("type") int type); //57、授权码过期
 
     /**
      * 58、移交码过期
@@ -182,10 +190,11 @@ public interface RequestInterface {
     @POST("group/add/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,
                                           @Body DbGroup dbGroup,
-//                                          @Field("meshAddr") int meshAddr,
-//                                          @Field("name") String name,
-//                                          @Field("brightness") int brightness,
-//                                          @Field("colorTemperature") int colorTemperature,
+            //                                          @Field("meshAddr") int meshAddr,
+            //                                          @Field("name") String name,
+            //                                          @Field("brightness") int brightness,
+            //                                          @Field("colorTemperature") int
+                                          //                                          colorTemperature,
                                           //@Path("region_id") int region_id,
                                           @Path("gid") int gid);
 
@@ -198,9 +207,9 @@ public interface RequestInterface {
     Observable<Response<String>> updateGroup(@Header("token") String token,
                                              @Path("rid") int rid,
                                              @Body DbGroup dbGroup
-//                                             @Query("name") String name,
-//                                             @Query("brightness") int brightness,
-//                                             @Query("colorTemperature") int colorTemperature
+            //                                             @Query("name") String name,
+            //                                             @Query("brightness") int brightness,
+            //                                             @Query("colorTemperature") int colorTemperature
     );
 
     //删除组
@@ -215,14 +224,15 @@ public interface RequestInterface {
     @POST("light/add/{lid}")
     Observable<Response<String>> addLight(@Header("token") String token,
                                           @Body DbLight dbLight,
-//                                          @Field("meshAddr") int meshAddr,
-//                                          @Field("name") String name,
-//                                          @Field("brightness") int brightness,
-//                                          @Field("colorTemperature") int colorTemperature,
-//                                          @Field("macAddr") String macAddr,
-//                                          @Field("meshUUID") int meshUUID,
-//                                          @Field("productUUID") int productUUID,
-//                                          @Field("belongGroupId") int belongGroupId,
+            //                                          @Field("meshAddr") int meshAddr,
+            //                                          @Field("name") String name,
+            //                                          @Field("brightness") int brightness,
+            //                                          @Field("colorTemperature") int
+                                          //                                          colorTemperature,
+            //                                          @Field("macAddr") String macAddr,
+            //                                          @Field("meshUUID") int meshUUID,
+            //                                          @Field("productUUID") int productUUID,
+            //                                          @Field("belongGroupId") int belongGroupId,
                                           @Path("lid") int lid);
 
     //获取灯列表
@@ -234,10 +244,10 @@ public interface RequestInterface {
     Observable<Response<String>> updateLight(@Header("token") String token,
                                              @Path("lid") int lid,
                                              @Body DbLight dbLight
-//                                             @Query("name") String name,
-//                                             @Query("brightness") int brightness,
-//                                             @Query("colorTemperature") int colorTemperature,
-//                                             @Query("belongGroupId") int belongGroupId
+            //                                             @Query("name") String name,
+            //                                             @Query("brightness") int brightness,
+            //                                             @Query("colorTemperature") int colorTemperature,
+            //                                             @Query("belongGroupId") int belongGroupId
     );
 
     //删除灯
@@ -288,7 +298,7 @@ public interface RequestInterface {
 
     //删除渐变
     @HTTP(method = "DELETE", path = "dynamic-change/remove", hasBody = true)
-//    @DELETE("api/ext/soybean/dynamic-changeToScene/remove")
+    //    @DELETE("api/ext/soybean/dynamic-changeToScene/remove")
     Observable<Response<String>> deleteGradients(@Header("token") String token,
                                                  @Body DbDeleteGradientBody body);
 
@@ -305,11 +315,12 @@ public interface RequestInterface {
                                             @Query("introduction") String introduction);
 
     @DELETE("auth/clear")
-//    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
+        //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
     /**
      * https://dev.dadoutek.com/xxxx/auth/reset/{rid}
+     *
      * @param regionId
      * @return
      */
@@ -418,7 +429,7 @@ public interface RequestInterface {
                                                @Path("lid") int lid);
 
     @GET("app/isAvailable")
-//    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)   todo 此处报错  用户不存在
+        //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)   todo 此处报错  用户不存在
     Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
                                                                @Query("currentVersion") String version);
 
@@ -433,11 +444,14 @@ public interface RequestInterface {
     //token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
     //code	是	string	码的值
     //password	是	string
-    //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
+    //{"code":"dadoueyJhbGciOiJIUzI1NiJ9
+    // .eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0
+    // .ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
 
     @FormUrlEncoded
     @POST("auth/code/parse")
-    Observable<Response<ParseCodeBean>> parseQRCode(@Field("code") String code, @Field("password") String password);
+    Observable<Response<ParseCodeBean>> parseQRCode(@Field("code") String code,
+                                                    @Field("password") String password);
 
     /**
      * 62、取消授权(主动方:授权者)
@@ -461,7 +475,8 @@ public interface RequestInterface {
      * http://dev.dadoutek.com/smartlight/auth/authorization/release/300430/1
      */
     @DELETE("auth/authorization/release/{authorizer_id}/{rid}")
-    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id, @Path("rid") int rid);
+    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id, @Path(
+            "rid") int rid);
 
     /**
      * 56、生成移交码
@@ -524,7 +539,7 @@ public interface RequestInterface {
      */
     @HTTP(method = "DELETE", path = "auth/code/remove", hasBody = true)
     //@DELETE("auth/code/remove")
-//添加数据进body 少量参数可以使用field
+    //添加数据进body 少量参数可以使用field
     Observable<Response> allCodeRemove(@Body() RemoveCodeBody body);
 
     /**
@@ -564,8 +579,12 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("switch/8ks/add/{swid}")
     Observable<Response<String>> addSwitch8k(@Path("swid") Long swid,
-                                             @Field("firmwareVersion") String firmwareVersion, @Field("meshAddr") int meshAddr, @Field("name") String name,
-                                             @Field("macAddr") String macAddr, @Field("productUUID") int productUUID, @Field("index") int index,
+                                             @Field("firmwareVersion") String firmwareVersion,
+                                             @Field("meshAddr") int meshAddr,
+                                             @Field("name") String name,
+                                             @Field("macAddr") String macAddr, @Field(
+                                                     "productUUID") int productUUID, @Field(
+                                                             "index") int index,
                                              @Field("keys") String keys);
 
     /**
@@ -611,7 +630,7 @@ public interface RequestInterface {
     /**
      * 6、添加网关（new）
      * 简要描述：添加一条网关信息
-     *https://dev.dadoutek.com/xxxx/gateway/add/{gatewayId}
+     * https://dev.dadoutek.com/xxxx/gateway/add/{gatewayId}
      * 请求方式： POST
      * 参数：
      * meshAddr	是	int	mesh地址
@@ -658,6 +677,7 @@ public interface RequestInterface {
      */
     @POST("mqtt/tag/pub")
     Observable<Response<String>> sendGwToService(@Body GwGattBody body);
+
     /**
      * 10、下发控制指令让网关转发（new）
      * 简要描述：下发一条控制指令，网关接受后转发至对应的mesh网络
@@ -688,5 +708,191 @@ public interface RequestInterface {
     Observable<Response<ClearGwBean>> clearGwInfo(@Path("gid") long gwId);
 
     @GET("bin/latest/version")
-    Observable<Response<Map<String,Integer>>> getBinList();
+    Observable<Response<Map<String, Integer>>> getBinList();
+
+    /**
+     * 获取路由模式下状态，用来恢复一些状态。比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待页面
+     * https://dev.dadoutek.com/xxxx/router/status/get GET
+     */
+    @GET("router/status/get")
+    Observable<RouteStasusBean> getRouterStatus();
+
+    /**
+     * 获取未确认扫描结果
+     * https://dev.dadoutek.com/xxxx/scan/result/get GET
+     */
+    @GET("scan/result/get")
+    Observable<RouteScanResultBean> getScanResult();
+
+    /**
+     * 请求开始扫描设备
+     * https://dev.dadoutek.com/xxxx/router/scan-device POST
+     * scanType	是	int	扫描设备类型 普通灯 = 4彩灯 = 6蓝牙连接器 = 5窗帘 = 16开关 = 99 传感器 = 98
+     * scanName	是	string	扫描设备的蓝牙名
+     * ser_id	是	string	会话id，推送中回传
+     * "scanType": 4,
+     * "scanName": "dadousmart"
+     * "ser_id": "app会话id，自己维护"
+     */
+    @POST("router/scan-device")
+    Observable<Response<Long>> routeScanDevcie();
+
+    /**
+     * 停止扫描
+     * https://dev.dadoutek.com/xxxx/router/stop-scan POST
+     * ser_id	是	string	app会话id，推送时回传
+     * scanSerId	是	int	扫描关联id。可以在成功开始扫描推送和获取未确认扫描结果时获得
+     *     "ser_id": "app会话id，自己维护",
+     *     "scanSerId": -1000000
+     */
+    @FormUrlEncoded
+    @POST("router/stop-scan")
+    Observable<Response<Long>> routeStopScanDevcie(@Field("ser_id") String ser_id,@Field("scanSerId") long scanSerId);
+
+    /**
+     *确认扫描结果，如果有未确认的扫描结果是不能再扫描的
+     * https://dev.dadoutek.com/xxxx/scan/result/confirm  DELETE
+     */
+    @DELETE("scan/result/confirm")
+    Observable<Response> tellServerClearScanning();
+
+    /**
+     * 通过路由进行设备分组
+     * https://dev.dadoutek.com/xxxx/router/regroup POST
+     * targetGroupMeshAddr	是	int	目标组meshAddr
+     * deviceMeshAddrs	是	list	需要分组的设备meshAddr列表
+     * meshType	是	int	设备类型  普通灯 = 4  彩灯 = 6 连接器 = 5 窗帘 = 16
+     * ser_id	是	string	app会话id，推送时回传
+     *     "targetGroupMeshAddr" : 32769,
+     *     "deviceMeshAddrs": [1, 2, 3, 4, 5],
+     *     "meshType": 4,
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @POST("router/regroup")
+    Observable<Response<RouterBatchGpBean>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
+                                                          @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
+                                                          @Field("meshType") long meshType, @Field("ser_id") String ser_id );
+    /**
+     * 获取路由列表
+     * https://dev.dadoutek.com/xxxx/router/list GET
+     */
+    @GET("router/list")
+    Observable<Response<List<DbRouter>>> getRouterList();
+
+    /**
+     * 路由软件恢复出厂 DELETE
+     * https://dev.dadoutek.com/smartlight_test/router/router-reset
+     * ser_id	是	string	app会话id，推送时回传
+     * macAddr	是	string	需要恢复出厂的路由mac地址
+     * "ser_id": "app会话id，自己维护",
+     * "macAddr": "0102030405",
+     */
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "router/router-reset")
+    Observable<Response<Long>> routerReset(@Field("macAddr") String macAddr,
+                                           @Field("ser_id") long ser_id);
+
+    /**
+     * 路由更新
+     * https://dev.dadoutek.com/xxxx/router/update/{id}
+     * Post
+     * name	否	string	名称
+     * {"name": "sdasdadas"}
+     */
+    @FormUrlEncoded
+    @PUT("router/update/{id}")
+    Observable<Response> updateRouter(@Path("id") long id, @Field("name") String name);
+
+    /**
+     * 设备绑定路由
+     * https://dev.dadoutek.com/xxxx/router/device/bound   POST
+     * meshAddrs	是	int	需要绑定设备的meshAddr
+     * meshType	是	int	meshAddr类型
+     * macAddr	是	int	绑定目标路由的macAddr
+     * {
+     * "meshAddrs": [1, 2, 3],
+     * "meshType": 4,
+     * "macAddr": "0102030405",
+     * }
+     * meshType
+     * 普通灯 = 4
+     * 彩灯 = 6
+     * 蓝牙连接器 = 5
+     * 窗帘 = 16
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
+     * 传感器 = 98 或 0x23 或 0x24
+     */
+    @FormUrlEncoded
+    @POST("router/device/bound")
+    Observable<Response> bindRouter(@Field("meshAddrs") List meshAddrs,
+                                    @Field("meshType") int meshType,
+                                    @Field("macAddr") String macAddr);
+
+    /**
+     * 路由入账号
+     * https://dev.dadoutek.com/xxxx/router/access-in
+     * POST
+     * macAddr	是	string	扫码得到的macAddr
+     * ser_id	是	string	会话id，推送中回传
+     * timeZoneHour	是	int	时区小时数。+8:00北京时区就是8，-4:30委内瑞拉时区就是-4
+     * timeZoneMin	是	int	时区分钟数。+8:00北京时区就是0，-4:30委内瑞拉时区就是30
+     * {
+     * "macAddr": "0102030405",
+     * "timeZoneHour": 8,
+     * "timeZoneMin": 0,
+     * "ser_id": "app会话id，自己维护"
+     * }
+     */
+    @FormUrlEncoded
+    @POST("router/access-in")
+    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field(
+            "timeZoneHour")
+            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+
+    /**
+     * 配置路由wifi信息。路由可以配置wifi也可以接网线
+     * https://dev.dadoutek.com/xxxx/router/wifi-configure  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * macAddr	是	string	目标路由macAddr
+     * ssid	是	string	wifi账号，只支持英文字母
+     * pwd	是	string	wifi密码
+     * timeZoneHour	是	int	时区小时数。+8:00北京时区就是8，-4:30委内瑞拉时区就是-4
+     * timeZoneMin	是	int	时区分钟数。+8:00北京时区就是0，-4:30委内瑞拉时区就是30
+     * "ser_id": "app会话id，自己维护",
+     * "macAddr": "010203040506",
+     * "ssid": "dadou",
+     * "pwd": "Dadoutek2018",
+     * "timeZoneHour": 8,
+     * "timeZoneMin": 0
+     */
+
+    @FormUrlEncoded
+    @POST("router/wifi-configure")
+    Observable<Response<Integer>> routerConfigWifi(@Field("macAddr") String macAddr, @Field("ssid") String ssid
+            , @Field("pwd") String pwd, @Field("timeZoneHour") int timeZoneHour,
+                                                   @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+    /**
+     * 获取模式，不同账号不同区域有不同的模式。比如300460用户区域1是蓝牙模式，区域2可能是路由模式
+     * https://dev.dadoutek.com/xxxx/auth/settings GET
+     * https://dev.dadoutek.com/smartlight_test/auth/settings
+     */
+    @GET("auth/settings")
+    Observable<Response<ModeStatusBean>> getAllModeStatus();
+    /**
+     * 0.保存用户喜好设置
+     * https://dev.dadoutek.com/xxxx/auth/settings/save  GET
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?auxiliaryFunction=false //
+     * auxiliaryFunction设置为false
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?mode=0 // mode设置为0
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?auxiliaryFunction=false&mode=0
+     * // auxiliaryFunction和false分别设置为false和0,支持多个
+     * https://dev.dadoutek.com/smartlight_test/auth/settings/save?lalala=rarara // 以后可能的用户配置
+     *     "data": null,
+     *     "errorCode": 0,
+     *     "message": "save settings succeed!"
+     */
+    @GET("auth/settings/save")
+    Observable<Response> updateAllModeStatus( @Query("auxiliaryFunction") boolean auxiliaryFunction,
+                                                           @Query("modeNum") int modeNum );
 }

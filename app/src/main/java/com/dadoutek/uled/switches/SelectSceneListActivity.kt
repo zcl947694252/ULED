@@ -3,10 +3,12 @@ package com.dadoutek.uled.switches
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.GridLayoutManager
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
+import kotlinx.android.synthetic.main.choose_group_scene.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -21,41 +23,51 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新描述
  */
 class SelectSceneListActivity : TelinkBaseActivity() {
+    private val noPo = 100000
+    private var currentPosition: Int = noPo
     private val mSceneList = DBUtils.sceneAll
-    private val adpter = SceneListAdapter(R.layout.item_group, mSceneList)
+    private val adpterDevice = SceneListAdapter(R.layout.template_batch_small_item2, mSceneList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.template_activity_list)
+        setContentView(R.layout.choose_group_scene)
         initView()
-        initData()
         initListener()
     }
 
-    private fun initListener() {
-    }
-
-    private fun initData() {
-
-    }
 
     private fun initView() {
         toolbarTv.text = getString(R.string.scene_list)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
+        template_recycleView.layoutManager = GridLayoutManager(this, 5)
+        mSceneList.forEach { it.isChecked =false }
+        template_recycleView.adapter = adpterDevice
+        adpterDevice.bindToRecyclerView(template_recycleView)
+        adpterDevice.setOnItemClickListener { _, _, position ->
+            currentPosition= position
+            for (i in mSceneList.indices)
+                mSceneList[i].isChecked = i == currentPosition
+                    adpterDevice.notifyDataSetChanged()
+        }
+    }
 
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        template_recycleView.adapter = adpter
-        adpter.bindToRecyclerView(template_recycleView)
-        adpter.setOnItemClickListener { _, _, position ->
-            val dbScene = mSceneList[position]
+    private fun initListener() {
+        choose_scene_confim.setOnClickListener {
+            if (currentPosition == noPo) {
+                ToastUtils.showShort(getString(R.string.please_setting_least_one_scene))
+                return@setOnClickListener
+            }
+            val dbScene = mSceneList[currentPosition]
             val intent = Intent()
             intent.putExtra("data", dbScene)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
     }
+
+
 }
 

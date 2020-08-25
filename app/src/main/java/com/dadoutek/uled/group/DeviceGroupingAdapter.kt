@@ -9,7 +9,7 @@ import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
 
 class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var mContext: Context) : BaseAdapter() {
     private val inflater: LayoutInflater = LayoutInflater.from(mContext)
@@ -38,11 +38,11 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
     @SuppressLint("ViewHolder")
     @Deprecated("")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var convertView: View? = inflater.inflate(R.layout.grouping_item, null)
+        var convertView: View? = inflater.inflate(R.layout.template_batch_small_item, null)
 
         val holder: GroupItemHolder = GroupItemHolder()
 
-        val txtName = convertView?.findViewById<View>(R.id.tv_group_name) as TextView
+        val txtName = convertView?.findViewById<View>(R.id.template_device_batch_title) as TextView
 
         holder.name = txtName
 

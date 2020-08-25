@@ -1,20 +1,33 @@
 package com.dadoutek.uled.scene
 
+import android.widget.ImageView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.util.DensityUtil
 
 class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : BaseQuickAdapter<DbSensor, BaseViewHolder>(layoutResId, data) {
+    private var isDelete: Boolean = false
 
-    override fun convert(helper: BaseViewHolder, scene: DbSensor) {
-        if (scene != null) {
-            helper.setText(R.id.name, scene.name)
-            helper.setBackgroundRes(R.id.img_light, scene.icon)
-            helper.addOnClickListener(R.id.tv_setting)
-                    .setTag(R.id.tv_setting, helper.adapterPosition)
-                    .setTag(R.id.img_light, helper.adapterPosition)
-                    .addOnClickListener(R.id.img_light)
+    fun changeState(isDelete: Boolean) {
+        this.isDelete = isDelete
+    }
+    override fun convert(helper: BaseViewHolder, dbSensor: DbSensor) {
+        if (dbSensor != null) {
+            helper.setText(R.id.template_device_group_name, dbSensor.name)
+            helper.setImageResource(R.id.template_device_icon, dbSensor.icon)
+            val iv = helper.getView<ImageView>(R.id.template_device_icon)
+            iv.layoutParams.height = DensityUtil.dip2px(mContext, 60f)
+            iv.layoutParams.width = DensityUtil.dip2px(mContext, 60f)
+            helper.setVisible(R.id.template_device_card_delete,isDelete)
+                    .setTag(R.id.template_device_setting, helper.adapterPosition)
+                    .setTag(R.id.template_device_icon, helper.adapterPosition)
+                    .setVisible(R.id.template_device_more, false)
+                    .setVisible(R.id.template_gp_name, false)
+                    .addOnClickListener(R.id.template_device_icon)
+                    .addOnClickListener(R.id.template_device_card_delete)
+                    .addOnClickListener(R.id.template_device_setting)
         }
     }
 }

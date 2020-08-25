@@ -152,18 +152,18 @@
     <style name="Dialog" parent="@android:style/Theme.Dialog">
         <!-- 边框 -->
         <!--<item name="android:windowFrame">@null</item>-->
-        <!--&lt;!&ndash; 是否浮现在activity之上 &ndash;&gt;-->
+        <!--&lt<!&ndash; 是否浮现在activity之上 &ndash;&gt;-->
         <!--<item name="android:windowIsFloating">true</item>-->
-        <!--&lt;!&ndash; 半透明 &ndash;&gt;-->
+        <!--&lt<!&ndash; 半透明 &ndash;&gt;-->
         <!--<item name="android:windowIsTranslucent">true</item>-->
-        <!--&lt;!&ndash; 无标题 &ndash;&gt;-->
+        <!--&lt<!&ndash; 无标题 &ndash;&gt;-->
         <!--<item name="android:windowNoTitle">true</item>-->
         <!--<item name="android:background">@android:color/transparent</item>-->
-        <!--&lt;!&ndash; 背景透明 &ndash;&gt;-->
+        <!--&lt<!&ndash; 背景透明 &ndash;&gt;-->
         <item name="android:windowBackground">@android:color/transparent</item>
-        <!--&lt;!&ndash; 模糊 &ndash;&gt;-->
+        <!--&lt<!&ndash; 模糊 &ndash;&gt;-->
         <!--<item name="android:backgroundDimEnabled">true</item>-->
-        <!--&lt;!&ndash; 遮罩层 &ndash;&gt;-->
+        <!--&lt<!&ndash; 遮罩层 &ndash;&gt;-->
         <!--<item name="android:backgroundDimAmount">0.5</item>-->
     </style>
 
@@ -175,26 +175,27 @@
     <style name="MyDialogStyleBottom" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:windowAnimationStyle">@style/AnimBottom</item>
         <item name="android:windowFrame">@null</item>
-        ;!-- 边框 -->
+        <!-- 边框 -->
         <item name="android:windowIsFloating">true</item>
-        ;!-- 是否浮现在activity之上 -->
+        <!-- 是否浮现在activity之上 -->
         <item name="android:windowIsTranslucent">true</item>
-        ;!-- 半透明 -->
+        <!-- 半透明 -->
         <item name="android:windowNoTitle">true</item>
-        ;!-- 无标题 -->
+        <!-- 无标题 -->
         <item name="android:windowBackground">@android:color/transparent</item>
-        ;!-- 背景透明 -->
+        <!-- 背景透明 -->
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        ;!-- 模糊 -->
+        <!-- 模糊 -->
     </style>
 
     <style name="ButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/blue_background</item>
         <item name="android:textSize">18sp</item>
         <item name="android:background">@drawable/device_list</item>
-        <item name="android:layout_width">140dp</item>
-        <item name="android:layout_height">38dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:padding">@dimen/dp_10</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">60dp</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>

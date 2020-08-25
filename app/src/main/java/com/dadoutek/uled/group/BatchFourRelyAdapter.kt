@@ -1,12 +1,14 @@
 package com.dadoutek.uled.group
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbConnector
 
 
 /**
@@ -18,40 +20,35 @@ import com.dadoutek.uled.model.DbModel.DbConnector
  * 更新描述
  */
 class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
-    private val bestRssi: Long = -70
-    private val normalRssi: Long = -80
+    private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
-        val icon = helper.getView<ImageView>(R.id.batch_img_icon)
-        val groupName = helper.getView<TextView>(R.id.batch_tv_group_name)
+        val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
+        val groupName = helper.getView<TextView>(R.id.template_device_batch_title_blow)
 
-        val rssiIcon = helper.getView<ImageView>(R.id.batch_img_rssi)
-        when {
-            item?.rssi?:-1000>=bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_blue)
-            item?.rssi?:-1000 in normalRssi..bestRssi -> rssiIcon.setBackgroundResource(R.drawable.rect_yellow)
-            else -> rssiIcon.setBackgroundResource(R.drawable.btn_rectangle_circle_red)
-        }
+        helper.setText(R.id.template_device_batch_title, item?.name)
 
-        helper.setText(R.id.batch_tv_device_name, item?.name)
+        if (item?.isSelected == true)
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
+         else
+            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
 
-        if (item?.isSelected == true) {
-            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_selected)
-        } else {
-            helper.setImageResource(R.id.batch_selected, R.drawable.icon_checkbox_unselected)
-        }
 
-        if (item?.hasGroup == true) {
-            helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.blue_text))
-                    .setTextColor(R.id.batch_tv_group_name, mContext.getColor(R.color.blue_text))
+        if (item?.belongGroupId !=allLightId) {
+            helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
+                    .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            groupName.text = item?.groupName
+            if (TextUtils.isEmpty(item?.groupName)) {
+                if (item?.belongGroupId != 1L)
+                    groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
+            } else
+                groupName.text = item?.groupName
 
-            icon.setImageResource(R.drawable.icon_controller_open)
+            icon.setImageResource(R.drawable.icon_acceptor_s)
         } else {
-            helper.setTextColor(R.id.batch_tv_device_name, mContext.getColor(R.color.gray_3))
+            helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-           // groupName.text ="==="+item?.rssi
-            icon.setImageResource(R.drawable.icon_controller)
+            icon.setImageResource(R.drawable.icon_acceptor_s)
         }
     }
 }

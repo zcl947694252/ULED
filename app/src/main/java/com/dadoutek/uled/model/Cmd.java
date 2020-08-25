@@ -7,15 +7,24 @@ import java.io.Serializable;
  */
 
 public class Cmd implements Serializable {
-    public static final int SCANCOMPLET = 0X01;
-    public static final int SCANSUCCESS = 0X02;
-    public static final int SCANFAIL = 0X03;
-    public static final int UPDATEDATA = 0X04;
-    public static final int BLEOPEN = 0X05;
-    public static final int GETACCOUNT = 0X06;
-    public static final int GETSALT = 0X07;
-    public static final int STLOGIN = 0X08;
-    public static final int SYNCCMD = 0X09;
-    public static final int SYNCCOMPLETCMD = 0X10;
-    public static final int SYNCERRORCMD = 0X11;
+    public static final int routeUpdateDeviceVersion = 3007;
+    public static final int routeUpdateScenes = 3008;
+    public static final int routeDeleteScenes = 3006;
+    public static final int routeAddScenes = 3005;
+    public static final int routeDeleteGroup = 3004;
+    public static final int routeGroupingDevice = 3003;
+    public static final int routeScanDeviceInfo = 3002;
+    public static final int routeStartScann = 3001;
+    public static final int routeInAccount = 3000;
+    public static final int routeConfigWifi = 3022;
+
+
+    public static final int gwControlCallback = 2500;
+    public static final int gwCreateCallback = 2000;
+    public static final int gwON = 701;
+    public static final int gwStatus = 700;
+
+    public static final int unbindRegion = 3;
+    public static final int parseQR = 2;
+    public static final int singleLogin = 1;
 }

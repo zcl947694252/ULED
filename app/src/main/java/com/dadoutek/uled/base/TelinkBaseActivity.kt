@@ -9,42 +9,48 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.annotation.RequiresApi
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.*
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
-import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
+import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.google.gson.Gson
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -55,24 +61,26 @@ import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.EventListener
+import com.telink.util.MeshUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
 
-open class TelinkBaseActivity : AppCompatActivity() {
+abstract class TelinkBaseActivity : AppCompatActivity() {
+    private var viewInstall: View? = null
+    private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
     private var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     private var authorStompClient: Disposable? = null
-    var pop: PopupWindow? = null
+    lateinit var pop: PopupWindow
     var popView: View? = null
     private var codeWarmDialog: AlertDialog? = null
     private var singleLogin: AlertDialog? = null
@@ -97,6 +105,39 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
     private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
+    var installDialog: AlertDialog? = null
+    var isRgbClick = false
+    var clickRgb: Boolean = false
+    var installId = 0
+    var stepOneText: TextView? = null
+    var stepTwoText: TextView? = null
+    var stepThreeText: TextView? = null
+    var switchStepOne: TextView? = null
+    var switchStepTwo: TextView? = null
+    var swicthStepThree: TextView? = null
+    private var installHelpe: TextView? = null
+    val INSTALL_NORMAL_LIGHT = 0
+    val INSTALL_RGB_LIGHT = 1
+    val INSTALL_SWITCH = 2
+    val INSTALL_SENSOR = 3
+    val INSTALL_CURTAIN = 4
+    val INSTALL_CONNECTOR = 5
+    val INSTALL_GATEWAY = 6
+    val INSTALL_ROUTER = 7
+    var isGuide: Boolean = false
+    lateinit var hinitOne: TextView
+    lateinit var popFinish: PopupWindow
+    lateinit var cancelf: Button
+    lateinit var confirmf: Button
+    var isEdite: Boolean = false
+    var type: Int? = null
+    var showDialogHardDelete: AlertDialog? = null
+
+    var renameCancel: TextView? = null
+    var renameConfirm: TextView? = null
+    var renameEt: EditText? = null
+    var popReNameView: View? = null
+    lateinit var renameDialog: Dialog
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,13 +149,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
         var filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
-
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
+        makeRenamePopuwindow()
+        makeStopScanPop()
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-
     }
 
     private fun initChangeRecevicer() {
@@ -125,22 +166,50 @@ open class TelinkBaseActivity : AppCompatActivity() {
 //        registerReceiver(changeRecevicer, filter)
     }
 
-    fun startTimerUpdate() {
+    private fun startTimerUpdate() {
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
-            SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
-                override fun start() {}
-                override fun complete() {
-                    LogUtils.v("zcl-----------默认上传成功-------")
-                }
+            if (netWorkCheck(this))//oom溢出
+                CoroutineScope(Dispatchers.IO).launch {
+                    SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
+                        override fun start() {}
+                        override fun complete() {}
 
-                override fun error(msg: String?) {}
-            })
+                        override fun error(msg: String?) {}
+                    })
+                }
         }
     }
+
+    // 网络连接判断
+    open fun netWorkCheck(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val info: NetworkInfo? = cm.activeNetworkInfo
+        return info?.isConnected ?: false
+    }
+
 
     fun stopTimerUpdate() {
         upDateTimer?.dispose()
         upDateTimer = null
+    }
+
+    /**
+     * 自动重连
+     */
+    fun autoConnectAll() {
+        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
+        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+        if (size > 0) {
+            ToastUtils.showLong(getString(R.string.connecting_tip))
+            mConnectDisposable?.dispose()
+            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                    ?.subscribe({
+                        LogUtils.d("connection success")
+                    }, {
+                        LogUtils.d("connect failed")
+                    }
+                    )
+        }
     }
 
     private fun makeDialogAndPop() {
@@ -322,7 +391,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             LightAdapter.STATUS_CONNECTING -> {
                 if (!isScanning)
-                    ToastUtils.showLong(R.string.connecting_please_wait)
+                    ToastUtils.showLong(R.string.connecting_tip)
             }
         }
     }
@@ -341,9 +410,15 @@ open class TelinkBaseActivity : AppCompatActivity() {
         if (!LeBluetooth.getInstance().enable(applicationContext))
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
-//       if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected !=true)
-//           TelinkLightApplication.getApp().initStompClient()
-        startTimerUpdate()
+        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+            TelinkLightApplication.getApp().initStompClient()
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
+                startTimerUpdate()
+        }
+
+
         if (LeBluetooth.getInstance().isEnabled) {
             if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
                 changeDisplayImgOnToolbar(true)
@@ -395,7 +470,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             return
 
         //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing && !this.isFinishing) {
+        if (!this.isFinishing && !loadDialog!!.isShowing) {
             loadDialog!!.setCancelable(false)
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
@@ -406,7 +481,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        if (loadDialog != null && loadDialog!!.isShowing && !this@TelinkBaseActivity.isFinishing) {
+        if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing) {
             loadDialog?.dismiss()
         }
     }
@@ -419,6 +494,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         stopTimerUpdate()
+        showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
         isResume = false
     }
@@ -439,11 +515,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallbackUp)
         }
     }
 
-    internal var syncCallbackGet: SyncCallback = object : SyncCallback {
+    open var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {}
 
@@ -455,7 +531,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     /**
      * 上传回调
      */
-    private var syncCallback: SyncCallback = object : SyncCallback {
+    open var syncCallbackUp: SyncCallback = object : SyncCallback {
         override fun start() {
             showLoadingDialog(getString(R.string.tip_start_sync))
         }
@@ -475,7 +551,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     open fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
-        TelinkLightApplication.getApp().releseStomp()
         AppUtils.relaunchApp()
     }
 
@@ -548,10 +623,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
         filter.addAction(Constant.LOGIN_OUT)
-        filter.addAction(Constant.CANCEL_CODE)
-        filter.addAction(Constant.PARSE_CODE)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
+        //filter.addAction(Constant.CANCEL_CODE)
+        //filter.addAction(Constant.PARSE_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
@@ -559,6 +634,52 @@ open class TelinkBaseActivity : AppCompatActivity() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+            //var jsonObject = JSONObject(msg)
+            when (cmdBean.cmd) {
+                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                    val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                    when (cmdBean.cmd) {
+                        Cmd.singleLogin -> singleDialog(codeBean)//单点登录
+                        Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
+                        Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
+                        Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
+                        Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
+                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                    }
+                }
+                Cmd.routeInAccount -> routerAccessIn(cmdBean)
+                Cmd.routeConfigWifi ->routerConfigWIFI(cmdBean)
+                Cmd.routeStartScann ->startRouterScan(cmdBean)
+                Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
+
+                Cmd.routeGroupingDevice -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+                Cmd.routeInAccount -> {
+                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                }
+            }
+/*
             when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
@@ -598,7 +719,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
 
                     cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean.rid, cancelBean.region_name, lastRegionId?.toInt()) }//2代表解除授权信息type
-
                     LogUtils.e("zcl_baseMe___________取消授权${cancelBean == null}")
                 }
                 Constant.PARSE_CODE -> {
@@ -606,8 +726,52 @@ open class TelinkBaseActivity : AppCompatActivity() {
 //                    LogUtils.e("zcl_baseMe___________收到消息***解析二维码***")
                     makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.rid.toString(), codeBean.region_name)
                 }
+            }*/
+        }
+    }
+
+    open fun startRouterScan(cmdBodyBean: CmdBodyBean) {
+    }
+
+    open fun routerConfigWIFI(cmdBody: CmdBodyBean) {
+
+    }
+
+    open fun routerAccessIn(cmdBody: CmdBodyBean) {
+
+    }
+
+    open fun receivedRouteDeviceNum(scanResultBean: CmdBodyBean) {
+
+    }
+
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
+    private fun unbindDialog(codeBean: MqttBodyBean) {
+        val user = DBUtils.lastUser
+        user?.let {
+            if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
+                    && it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                user.last_region_id = 1.toString()
+                user.last_authorizer_user_id = user.id.toString()
+                DBUtils.deleteAllData()
+                AccountModel.initDatBase(it)
+                //更新last—region-id
+                DBUtils.saveUser(user)
+                SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
             }
         }
+        makeCodeDialog(2, codeBean.authorizer_user_phone, codeBean.rid, codeBean.region_name, user?.last_region_id?.toInt())//2代表解除授权信息type
+        LogUtils.e("zcl_baseMe___________取消授权${codeBean == null}")
+    }
+
+    private fun singleDialog(codeBean: MqttBodyBean) {
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
+            loginOutMethod()
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
@@ -664,7 +828,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
                         LogUtils.d("蓝牙未开启")
-//                        showToast(getString(R.string.close_bluetooth))
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
                         LogUtils.d("无法收到广播包以及响应包")
@@ -708,7 +871,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     fun showOpenLocationServiceDialog() {
         val builder = android.support.v7.app.AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
@@ -723,7 +885,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
     }
-
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
@@ -793,7 +954,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     inner class ChangeRecevicer : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val deviceInfo = intent?.getParcelableExtra("STATUS_CHANGED") as DeviceInfo
@@ -834,9 +994,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 var networkInfo = connectivityManager.activeNetworkInfo
                 if (networkInfo != null && networkInfo.isAvailable) {
                     if (!isHaveNetwork) {
+
                         val connected = TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected
                         if (connected != true)
                             TelinkLightApplication.getApp().initStompClient()
+
                         LogUtils.v("zcl-----------telinbase收到监听有网状态-------$connected")
                         isHaveNetwork = true
                     }
@@ -848,6 +1010,219 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 //ignore
             }
         }
+    }
+
+    fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
+        this.clickRgb = clickRgb
+        val view = View.inflate(this, R.layout.dialog_install_list, null)
+        val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
+        val installDeviceRecyclerview = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        closeInstallList.setOnClickListener { v -> installDialog?.dismiss() }
+
+        val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
+
+        val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
+        val layoutManager = LinearLayoutManager(this)
+        installDeviceRecyclerview?.layoutManager = layoutManager
+        installDeviceRecyclerview?.adapter = installDeviceListAdapter
+        installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+        //添加分割线
+        installDeviceRecyclerview?.addItemDecoration(decoration)
+        installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
+
+        installDialog = AlertDialog.Builder(this).setView(view).create()
+        installDialog?.setOnShowListener {}
+        if (isGuide) installDialog?.setCancelable(false)
+        installDialog?.show()
+    }
+
+    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+        isGuide = false
+        installDialog?.dismiss()
+        when (position) {
+            INSTALL_GATEWAY -> {
+                installId = INSTALL_GATEWAY
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.Gate_way))
+            }
+            INSTALL_NORMAL_LIGHT -> {
+                installId = INSTALL_NORMAL_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.normal_light))
+            }
+            INSTALL_RGB_LIGHT -> {
+                installId = INSTALL_RGB_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.rgb_light))
+            }
+            INSTALL_CURTAIN -> {
+                installId = INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.curtain))
+            }
+            INSTALL_SWITCH -> {
+                installId = INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
+                stepOneText?.visibility = View.GONE
+                stepTwoText?.visibility = View.GONE
+                stepThreeText?.visibility = View.GONE
+                switchStepOne?.visibility = View.VISIBLE
+                switchStepTwo?.visibility = View.VISIBLE
+                swicthStepThree?.visibility = View.VISIBLE
+            }
+            INSTALL_SENSOR -> {
+                installId = INSTALL_SENSOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.sensor))
+            }
+            INSTALL_CONNECTOR -> {
+                installId = INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.relay))
+            }
+        }
+    }
+
+    fun showInstallDeviceDetail(describe: String, position: Int, string: String) {
+        makeInstallView()
+        installTitleTv?.text = string
+        installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
+        installDialog?.setOnShowListener {}
+        installDialog?.dismiss()
+        installDialog?.show()
+    }
+
+    private fun makeInstallView() {
+        viewInstall = View.inflate(this, R.layout.dialog_install_detail, null)
+        val closeInstallList = viewInstall?.findViewById<ImageView>(R.id.close_install_list)
+        val btnBack = viewInstall?.findViewById<ImageView>(R.id.btnBack)
+
+        installTitleTv = viewInstall?.findViewById(R.id.install_title_tv)
+        stepOneText = viewInstall?.findViewById(R.id.step_one)
+        stepTwoText = viewInstall?.findViewById(R.id.step_two)
+        stepThreeText = viewInstall?.findViewById(R.id.step_three)
+        switchStepOne = viewInstall?.findViewById(R.id.switch_step_one)
+        switchStepTwo = viewInstall?.findViewById(R.id.switch_step_two)
+        swicthStepThree = viewInstall?.findViewById(R.id.switch_step_three)
+        installHelpe = viewInstall?.findViewById(R.id.install_see_helpe)
+
+        installHelpe?.setOnClickListener(dialogOnclick)
+        val searchBar = viewInstall?.findViewById<Button>(R.id.search_bar)
+        closeInstallList?.setOnClickListener(dialogOnclick)
+        btnBack?.setOnClickListener(dialogOnclick)
+        searchBar?.setOnClickListener(dialogOnclick)
+    }
+
+    private val dialogOnclick = View.OnClickListener {
+        var medressData = 0
+        var allData = DBUtils.allLight
+        var sizeData = DBUtils.allLight.size
+        if (sizeData != 0) {
+            var lightData = allData[sizeData - 1]
+            medressData = lightData.meshAddr
+        }
+
+        when (it.id) {
+            R.id.close_install_list -> installDialog?.dismiss()
+            R.id.install_see_helpe -> seeHelpe("#add-and-configure")
+
+            R.id.search_bar -> {
+                if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                    when (installId) {
+                        INSTALL_NORMAL_LIGHT -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_RGB_LIGHT -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_CURTAIN -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+
+                        }
+                        INSTALL_SWITCH -> {
+                            startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            //intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)       //connector也叫relay
+                            // startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_SENSOR -> {
+                            startActivity(Intent(this, ScanningSensorActivity::class.java))
+                            // intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SENSOR)       //connector也叫relay
+                            // startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_CONNECTOR -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                        INSTALL_GATEWAY -> {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
+                            startActivityForResult(intent, 0)
+                            installDialog?.show()
+                            finish()
+                        }
+                    }
+                } else ToastUtils.showLong(getString(R.string.much_lamp_tip))
+
+
+            }
+            R.id.btnBack -> {
+                installDialog?.dismiss()
+                showInstallDeviceList(isGuide, clickRgb)
+            }
+        }
+    }
+
+    fun seeHelpe(webIndex: String) {
+        var intent = Intent(this, InstructionsForUsActivity::class.java)
+        intent.putExtra(Constant.WB_TYPE, webIndex)
+
+        startActivity(intent)
+    }
+
+    private fun makeStopScanPop() {
+        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
+
+        hinitOne = popView.findViewById(R.id.pop_warm_tv)
+        cancelf = popView.findViewById(R.id.tip_cancel)
+        confirmf = popView.findViewById(R.id.tip_confirm)
+        hinitOne.text = getString(R.string.exit_tips_in_scanning)
+
+        popFinish = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        popFinish.isOutsideTouchable = false
+        popFinish.isFocusable = true // 设置PopupWindow可获得焦点
+        popFinish.isTouchable = true // 设置PopupWindow可触摸补充：
+    }
+
+    private fun makeRenamePopuwindow() {
+        popReNameView = View.inflate(this, R.layout.pop_rename, null)
+        renameEt = popReNameView?.findViewById(R.id.pop_rename_edt)
+        renameCancel = popReNameView?.findViewById(R.id.pop_rename_cancel)
+        renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
+        StringUtils.initEditTextFilter(renameEt)
+        renameEt?.singleLine = true
+
+        renameDialog = Dialog(this)
+        renameDialog?.setContentView(popReNameView)
+        renameDialog?.setCanceledOnTouchOutside(false)
+        renameCancel?.setOnClickListener { renameDialog?.dismiss() }
+        //确定回调 单独写
     }
 
 }

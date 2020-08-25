@@ -2,9 +2,11 @@ package com.dadoutek.uled.connector
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
@@ -18,9 +20,9 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.DeviceGroupingAdapter
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbConnector
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -32,6 +34,8 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.singleLine
 import java.util.*
 
 
@@ -46,8 +50,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var listView: GridView? = null
     private var isStartGroup = false
-
-    private var type:String?=null
 
 //    private var curtain:DbCurtain?=null
 //
@@ -207,12 +209,20 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initView() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle(R.string.activity_device_grouping)
+
+        toolbarTv?.text = getString(R.string.activity_device_grouping)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
+        if (moreIcon != null) {
+            moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
+            toolbar.overflowIcon = moreIcon
+        }
 
         this.inflater = this.layoutInflater
-        listView = this.findViewById<View>(R.id.list_groups) as GridView
+        listView = this.findViewById(R.id.list_groups)
         listView!!.onItemClickListener = this.itemClickListener
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
@@ -227,7 +237,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 //            this.light = this.intent.extras?.get("light") as DbLight
 //        }
 
-        this.type=this.intent.getStringExtra(Constant.TYPE_VIEW)
 //        this.productUuid=this.intent.getIntExtra("uuid",0)
 //        this.address=this.intent.getIntExtra("gpAddress",0)
 //        this.beLongId=this.intent.getLongExtra("belongId",0)
@@ -348,6 +357,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun addNewGroup() {
         val textGp = EditText(this)
+        textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后

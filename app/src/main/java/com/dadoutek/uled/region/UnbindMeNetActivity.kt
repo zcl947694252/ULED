@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.region.adapter.UnbindNetWorkAdapter
 import com.dadoutek.uled.region.bean.RegionBean
@@ -27,7 +27,7 @@ class UnbindMeNetActivity : BaseActivity() {
 
     override fun initView() {
         image_bluetooth.visibility = View.GONE
-        toolbar.title = getString(R.string.unbind_network)
+        toolbarTv.text = getString(R.string.unbind_network)
         toolbar.setNavigationIcon(R.mipmap.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
     }
@@ -60,18 +60,13 @@ class UnbindMeNetActivity : BaseActivity() {
         builder.setNegativeButton(getString(R.string.confirm)) { dialog, _ ->
             unbindBean?.id?.let {
                 regionbBean?.id?.let { it1 ->
-                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe(object : NetworkObserver<String?>() {
-                        override fun onNext(t: String) {
+                    RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe( {
                             adapter?.remove(position)
                             adapter!!.notifyDataSetChanged()
                             recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
                             ToastUtils.showLong(getString(R.string.unbundling_success))
-                        }
-
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            ToastUtils.showLong(e.localizedMessage)
-                        }
+                        }, {
+                            ToastUtils.showLong(it.localizedMessage)
                     })
                 }
             }

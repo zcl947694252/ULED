@@ -10,7 +10,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.ble.RxBleManager
@@ -32,7 +32,7 @@ import java.util.*
 class TelinkLightApplication : TelinkApplication() {
     companion object {
         private var app: TelinkLightApplication? = null
-        fun getApp(): TelinkLightApplication {
+        fun getApp(): TelinkLightApplication{
             return app!!
         }
     }
@@ -43,8 +43,6 @@ class TelinkLightApplication : TelinkApplication() {
     private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> = ArrayList()
-    val useIndex = mutableListOf<Int>()
-    val freeIndex = mutableListOf<Int>()
     private var stompLifecycleDisposable: Disposable? = null
     open var mStompManager: StompManager? = null
     private var singleLoginTopicDisposable: Disposable? = null
@@ -78,9 +76,9 @@ class TelinkLightApplication : TelinkApplication() {
     /*    val inAnalyzerProcess = LeakCanary.isInAnalyzerProcess(this)
         if (!inAnalyzerProcess)
             refWatcher = LeakCanary.install(this)*/
-
         Utils.init(this)
-        Bugly.init(applicationContext, "ea665087a5", false)
+        Beta.autoCheckUpgrade = false
+        //Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
         RxBleManager.init(this)
         DaoSessionUser.checkAndUpdateDatabase()
@@ -127,6 +125,7 @@ class TelinkLightApplication : TelinkApplication() {
 
     @SuppressLint("CheckResult")
     fun initStompClient() {
+        return
         GlobalScope.launch {
             if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()

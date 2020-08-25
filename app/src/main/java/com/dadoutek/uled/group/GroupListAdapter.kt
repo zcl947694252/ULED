@@ -4,7 +4,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
 
 /**
  * Created by hejiajun on 2018/5/10.
@@ -14,10 +14,10 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
 
-        helper.setText(R.id.tv_group_name, item.name)
+        helper.setText(R.id.template_group_name_s, item.name)
 
         if(item.meshAddr==0xffff){
-            helper.setText(R.id.tv_group_name, R.string.allLight)
+            helper.setText(R.id.template_group_name_s, R.string.allLight)
         }
 
         if (item.checked) {

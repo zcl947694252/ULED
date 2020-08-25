@@ -18,17 +18,19 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
+import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
+import com.google.gson.Gson
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -37,6 +39,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 open class BaseFragment : Fragment() {
 
@@ -76,7 +79,8 @@ open class BaseFragment : Fragment() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.GW_COMMEND_CODE)
+        filter.addAction(Constant.LOGIN_OUT)
+        //filter.addAction(Constant.GW_COMMEND_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         context?.registerReceiver(stompRecevice, filter)
     }
@@ -84,7 +88,19 @@ open class BaseFragment : Fragment() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            var jsonObject = JSONObject(msg)
+            when (val cmd = jsonObject.getInt("cmd")) {
+                Cmd.singleLogin, Cmd.parseQR,Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                    val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                    when (cmd) {
+                        Cmd.gwControlCallback-> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                    }
+                }
+            }
+
+
+     /*       when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
@@ -92,8 +108,12 @@ open class BaseFragment : Fragment() {
                         2500 -> receviedGwCmd2500(gwStompBean)
                     }
                 }
-            }
+            }*/
         }
+    }
+
+    open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {
+
     }
 
     open fun receviedGwCmd2500(gwStompBean: GwStompBean) {
@@ -240,7 +260,7 @@ open class BaseFragment : Fragment() {
             }
 
             LightAdapter.STATUS_CONNECTING -> {
-                ToastUtils.showLong(R.string.connecting_please_wait)
+                ToastUtils.showLong(R.string.connecting_tip)
             }
         }
     }
@@ -315,4 +335,5 @@ open class BaseFragment : Fragment() {
         TelinkLightApplication.getApp().refWatcher?.watch(this)
         context?.unregisterReceiver(stompRecevice)
     }
+
 }

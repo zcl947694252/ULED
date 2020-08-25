@@ -18,9 +18,9 @@ import com.dadoutek.uled.dao.DbSceneDao;
 import com.dadoutek.uled.dao.DbSensorDao;
 import com.dadoutek.uled.dao.DbSwitchDao;
 import com.dadoutek.uled.dao.DbUserDao;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.github.yuweiguocn.library.greendao.MigrationHelper;
 

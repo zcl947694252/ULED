@@ -1,6 +1,6 @@
 package com.dadoutek.uled.model
 
-import com.dadoutek.uled.model.DbModel.DbColorNode
+import com.dadoutek.uled.model.dbModel.DbColorNode
 import org.greenrobot.greendao.annotation.ToMany
 import java.io.Serializable
 

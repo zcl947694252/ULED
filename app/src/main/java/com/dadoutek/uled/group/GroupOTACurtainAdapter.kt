@@ -1,13 +1,11 @@
 package com.dadoutek.uled.group
 
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 import org.jetbrains.anko.padding
@@ -45,10 +43,10 @@ class GroupOTACurtainAdapter(resId: Int, data: MutableList<DbCurtain>) : BaseQui
             version.textColor = mContext.getColor(R.color.gray_3)
         }
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_open)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_curtain_device)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_device_down)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_curtain_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

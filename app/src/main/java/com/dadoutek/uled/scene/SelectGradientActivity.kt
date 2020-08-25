@@ -5,8 +5,8 @@ import android.content.Intent
 import android.support.v7.widget.LinearLayoutManager
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -61,11 +61,11 @@ class SelectGradientActivity : BaseActivity() {
     }
 
     override fun initView() {
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.select_gradient)
+        toolbarTv.text = getString(R.string.model_list)
         template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->

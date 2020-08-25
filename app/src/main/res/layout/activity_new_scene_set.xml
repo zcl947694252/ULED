@@ -51,10 +51,11 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-            <android.support.constraint.ConstraintLayout
+            <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:background="@color/white"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                 <TextView
@@ -72,6 +73,7 @@
                 <EditText
                         android:id="@+id/edit_name"
                         android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="20dp"
                         android:background="@null"
@@ -85,7 +87,41 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
-            </android.support.constraint.ConstraintLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/select_icon_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/select_icon_dot"
+                        android:textColor="@color/black_three"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                        android:id="@+id/scene_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="@dimen/dp_40"
+                        android:src="@drawable/icon_out" />
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:src="@drawable/icon_arrow" />
+            </LinearLayout>
 
             <TextView
                     android:layout_width="match_parent"

@@ -4,7 +4,7 @@
     android:id="@+id/configPirRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/gray_e"
     android:orientation="vertical">
 
     <include
@@ -15,9 +15,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/no_light"
+        android:id="@+id/no_light_ly"
         android:layout_width="0dp"
         android:layout_height="0dp"
+            android:background="@color/gray_e"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +40,7 @@
         <Button
             android:id="@+id/light_add_device_btns"
             style="@style/ButtonStyle"
-            android:text="@string/device_scan_add"
+            android:text="@string/add_device"
             app:layout_constraintEnd_toEndOf="@+id/image_no_device"
             app:layout_constraintStart_toStartOf="@+id/image_no_device"
             app:layout_constraintTop_toBottomOf="@+id/image_no_device" />

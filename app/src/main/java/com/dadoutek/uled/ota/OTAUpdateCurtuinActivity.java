@@ -19,7 +19,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,10 +34,10 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
@@ -292,11 +291,8 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
 
     private void initToolbar() {
         toolbar.setTitle(R.string.ota_update_title);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        toolbar.setNavigationIcon(R.drawable.icon_return);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     @Override
@@ -508,7 +504,7 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
 
     public void connectDevice(String mac) {
         log("connectDevice :" + mac);
-        btn_start_update.setText(R.string.start_connect);
+        btn_start_update.setText(R.string.connecting_tip);
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance!=null)
         instance.connect(mac, TIME_OUT_CONNECT);
@@ -664,7 +660,6 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
             btn_start_update.setVisibility(View.VISIBLE);
             btn_start_update.setClickable(false);
 //            btn_start_update.setText(R.string.updating);
-//            btn_start_update.setText(R.string.scan_and_connect);
 //            if (TelinkLightApplication.Companion.getApp().getConnectDevice() != null) {
 //                sendGetVersionCommand();
 //            } else {

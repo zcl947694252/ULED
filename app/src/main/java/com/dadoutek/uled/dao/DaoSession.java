@@ -9,23 +9,25 @@ import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
 import com.dadoutek.uled.gateway.bean.DbGateway;
-import com.dadoutek.uled.model.DbModel.DbColorNode;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
-import com.dadoutek.uled.model.DbModel.DbDataChange;
-import com.dadoutek.uled.model.DbModel.DbDeleteGroup;
-import com.dadoutek.uled.model.DbModel.DbDiyGradient;
-import com.dadoutek.uled.model.DbModel.DbEightSwitch;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbRegion;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
-import com.dadoutek.uled.model.DbModel.DbSensor;
-import com.dadoutek.uled.model.DbModel.DbSwitch;
-import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.gateway.bean.DbRouter;
+import com.dadoutek.uled.model.dbModel.DbColorNode;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbDataChange;
+import com.dadoutek.uled.model.dbModel.DbDeleteGroup;
+import com.dadoutek.uled.model.dbModel.DbDiyGradient;
+import com.dadoutek.uled.model.dbModel.DbEightSwitch;
+import com.dadoutek.uled.model.dbModel.DbGroup;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbRegion;
+import com.dadoutek.uled.model.dbModel.DbScene;
+import com.dadoutek.uled.model.dbModel.DbSceneActions;
+import com.dadoutek.uled.model.dbModel.DbSensor;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DbUser;
 
 import com.dadoutek.uled.dao.DbGatewayDao;
+import com.dadoutek.uled.dao.DbRouterDao;
 import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbConnectorDao;
 import com.dadoutek.uled.dao.DbCurtainDao;
@@ -52,6 +54,7 @@ import com.dadoutek.uled.dao.DbUserDao;
 public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig dbGatewayDaoConfig;
+    private final DaoConfig dbRouterDaoConfig;
     private final DaoConfig dbColorNodeDaoConfig;
     private final DaoConfig dbConnectorDaoConfig;
     private final DaoConfig dbCurtainDaoConfig;
@@ -69,6 +72,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig dbUserDaoConfig;
 
     private final DbGatewayDao dbGatewayDao;
+    private final DbRouterDao dbRouterDao;
     private final DbColorNodeDao dbColorNodeDao;
     private final DbConnectorDao dbConnectorDao;
     private final DbCurtainDao dbCurtainDao;
@@ -91,6 +95,9 @@ public class DaoSession extends AbstractDaoSession {
 
         dbGatewayDaoConfig = daoConfigMap.get(DbGatewayDao.class).clone();
         dbGatewayDaoConfig.initIdentityScope(type);
+
+        dbRouterDaoConfig = daoConfigMap.get(DbRouterDao.class).clone();
+        dbRouterDaoConfig.initIdentityScope(type);
 
         dbColorNodeDaoConfig = daoConfigMap.get(DbColorNodeDao.class).clone();
         dbColorNodeDaoConfig.initIdentityScope(type);
@@ -138,6 +145,7 @@ public class DaoSession extends AbstractDaoSession {
         dbUserDaoConfig.initIdentityScope(type);
 
         dbGatewayDao = new DbGatewayDao(dbGatewayDaoConfig, this);
+        dbRouterDao = new DbRouterDao(dbRouterDaoConfig, this);
         dbColorNodeDao = new DbColorNodeDao(dbColorNodeDaoConfig, this);
         dbConnectorDao = new DbConnectorDao(dbConnectorDaoConfig, this);
         dbCurtainDao = new DbCurtainDao(dbCurtainDaoConfig, this);
@@ -155,6 +163,7 @@ public class DaoSession extends AbstractDaoSession {
         dbUserDao = new DbUserDao(dbUserDaoConfig, this);
 
         registerDao(DbGateway.class, dbGatewayDao);
+        registerDao(DbRouter.class, dbRouterDao);
         registerDao(DbColorNode.class, dbColorNodeDao);
         registerDao(DbConnector.class, dbConnectorDao);
         registerDao(DbCurtain.class, dbCurtainDao);
@@ -174,6 +183,7 @@ public class DaoSession extends AbstractDaoSession {
     
     public void clear() {
         dbGatewayDaoConfig.clearIdentityScope();
+        dbRouterDaoConfig.clearIdentityScope();
         dbColorNodeDaoConfig.clearIdentityScope();
         dbConnectorDaoConfig.clearIdentityScope();
         dbCurtainDaoConfig.clearIdentityScope();
@@ -193,6 +203,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public DbGatewayDao getDbGatewayDao() {
         return dbGatewayDao;
+    }
+
+    public DbRouterDao getDbRouterDao() {
+        return dbRouterDao;
     }
 
     public DbColorNodeDao getDbColorNodeDao() {
