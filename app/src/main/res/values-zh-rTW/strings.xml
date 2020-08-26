@@ -1133,4 +1133,7 @@
     <string name="gp_not_exit">目标组不存在，重新刷新组数据</string>
     <string name="device_type_not_match">设备无法分入该组，设备的productUUID与组的deviceType不匹配</string>
     <string name="please_config_all">请完成所有按键配置</string>
+    <string name="right_phone_num">请填写正确的手机号码</string>
+    <string name="submit_error_code">用户提交校验的验证码错误</string>
+    <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
 </resources>

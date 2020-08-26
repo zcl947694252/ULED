@@ -3,6 +3,7 @@ package com.dadoutek.uled.othersview
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import cn.smssdk.EventHandler
@@ -34,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
 import kotlinx.android.synthetic.main.activity_register.return_image
 import org.json.JSONObject
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/16.
@@ -63,7 +66,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         image_again_password_btn.setOnClickListener(this)
         return_image.setOnClickListener(this)
         regist_country_code_arrow.setOnClickListener(this)
-}
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -80,11 +83,11 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     return
                 LogUtils.v("zcl------------------countryCode接收后$countryCode")
                 countryCode = toString
-                regist_ccp_tv.text = countryName+countryNumber
+                regist_ccp_tv.text = countryName + countryNumber
                 LogUtils.v("zcl------------------countryCode$countryCode")
             }
-            0->{
-                if ( resultCode == Activity.RESULT_FIRST_USER) {
+            0 -> {
+                if (resultCode == Activity.RESULT_FIRST_USER) {
                     setResult(Activity.RESULT_FIRST_USER)
                     finish()
                 }
@@ -133,14 +136,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     }
 
                     UpdateModel.isRegister(userName!!)?.subscribe({
-                            if (!it) {
-                                regist_frist_progress.visibility = View.GONE
-                                SMSSDK.getVerificationCode(countryCode, userName)
+                        if (!it) {
+                            regist_frist_progress.visibility = View.GONE
+                            SMSSDK.getVerificationCode(countryCode, userName)
 
-                            } else {
-                                ToastUtils.showLong(getString(R.string.account_exist))
-                            }
-                        },{})
+                        } else {
+                            ToastUtils.showLong(getString(R.string.account_exist))
+                        }
+                    }, {})
 
                 } else {
                     ToastUtils.showLong(getString(R.string.network_unavailable))
@@ -189,14 +192,20 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                                 val a = (data as Throwable)
                                 val jsonObject = JSONObject(a.localizedMessage)
                                 val message = jsonObject.opt("detail").toString()
-                                ToastUtils.showLong(message)
+                                when{
+                                    message.contains("请填写正确的")->ToastUtils.showShort(getString(R.string.right_phone_num))
+                                    message.contains("提交校验的验证")->ToastUtils.showShort(getString(R.string.submit_error_code))
+                                    message.contains("验证码失效")->ToastUtils.showShort(getString(R.string.verification_code_invalid))
+                                    else-> ToastUtils.showLong(message)
+                                }
                             } catch (ex: Exception) {
                                 ex.printStackTrace()
                             }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
-                            ToastUtils.showLong(a.message)
+                            ToastUtils.showShort(getString(R.string.send_message_fail))
+                            //ToastUtils.showLong(a.message)
                         }
                     }
                 }
@@ -212,8 +221,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         intent.putExtra("country_code", countryCode)
         intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
 
-        startActivityForResult(intent,0)
+        startActivityForResult(intent, 0)
     }
+
     private fun eyePasswordAgain() {
         if (isPasswordAgain) {
             image_again_password_btn.setImageResource(R.drawable.icon_turn)

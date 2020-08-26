@@ -1,5 +1,6 @@
 package com.dadoutek.uled.rgb;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -319,10 +320,11 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     //处理扫描成功后
+    @SuppressLint("StringFormatInvalid")
     private void scanSuccess() {
         //更新Title
         tvStopScan.setVisibility(View.GONE);
-        toolbar.setTitle(getString(R.string.title_scanned_device_num)+adapter.getCount());
+        toolbar.setTitle(getString(R.string.title_scanned_device_num,adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -1304,7 +1306,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                     isFirtst = false;
                     SharedPreferencesHelper.putBoolean(this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
-                toolbar.setTitle(getString(R.string.title_scanned_device_num)+adapter.getCount());
+                toolbar.setTitle(getString(R.string.title_scanned_device_num,adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
 
                 //                Log.d("ScanningTest", "update mesh success");

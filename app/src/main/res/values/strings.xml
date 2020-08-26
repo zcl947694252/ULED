@@ -1093,4 +1093,7 @@
     <string name="gp_not_exit">The target group does not exist. Refresh the group data</string>
     <string name="device_type_not_match">The device cannot be grouped into this group, the productUUID of the device does not match the deviceType of the group</string>
     <string name="please_config_all">Please complete all key configurations</string>
+    <string name="right_phone_num">Please fill in the correct cell phone number</string>
+    <string name="submit_error_code">The user submitted a verification code error for verification</string>
+    <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
 </resources>

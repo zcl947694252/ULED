@@ -876,7 +876,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
         scanning_no_device.visibility = View.GONE
         if (mAddDeviceType != DeviceType.GATE_WAY)
-            scanning_num.text = getString(R.string.title_scanned_device_num) + "0"
+            scanning_num.text = getString(R.string.title_scanned_device_num,0)
         else
             scanning_num.text = getString(R.string.scanning)
         btn_stop_scan?.setText(R.string.stop_scan)
@@ -1124,7 +1124,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 routerScanCount = cmdBodyBean.count
                 if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
                         mAddDeviceType == DeviceType.SMART_CURTAIN)
-                    scanning_num.text = getString(R.string.title_scanned_device_num) + routerScanCount
+                    scanning_num.text = getString(R.string.title_scanned_device_num,routerScanCount)
                 else
                     scanning_num.text = getString(R.string.scanning)
             }
@@ -1367,7 +1367,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }
                 // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
                 if (mAddDeviceType != DeviceType.GATE_WAY)
-                    scanning_num.text = getString(R.string.title_scanned_device_num) + mAddedDevices.size
+                    scanning_num.text = getString(R.string.title_scanned_device_num,mAddedDevices.size)
 
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
                 mUpdateMeshRetryCount = 0

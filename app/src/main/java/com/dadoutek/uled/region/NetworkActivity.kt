@@ -729,6 +729,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.VISIBLE
             view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.text_red)
             view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_cancel)
+
             view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = true
             view?.findViewById<View>(R.id.view19)?.visibility = View.VISIBLE
 
@@ -907,6 +908,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun trsansferCodeUsefulOrUnuseful(itView: View) {
          RegionModel.lookTransforRegionCode(regionBean!!.id)
                 ?.subscribe( {
@@ -928,6 +930,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     /**
      * 查看收授权qr是否过期
      */
+    @SuppressLint("CheckResult")
     private fun authorCodeUsefulOrUnuseful(itView: View) {
          RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe( {
                      LogUtils.e("zcl_network-------授权码信息是否可用-------$it")

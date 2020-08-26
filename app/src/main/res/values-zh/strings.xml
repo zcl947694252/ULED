@@ -386,35 +386,21 @@
     <string name="select_group_tip">请至少选择一个分组</string>
     <string name="much_lamp_tip">最高支持32768个灯</string>
     <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机蓝牙</string>
-
     <string name="clean_tip">缓存清空,App即将重启</string>
-
     <string name="rename_tip_check">不允许输入特殊符号！</string>
-
-    <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanned_device_num">已添加 %1$d 个设备 </string>
+    <string name="scan_lights_num">总计：当前扫描出了%1$s个灯</string>
+    <string name="title_scanned_device_num">已添加%1$d个设备 </string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
     <string name="factory_reset">恢复出厂</string>
-
     <string name="create_new_group">创建一个新组</string>
-
-
     <string name="please_wait">请稍后…</string>
-
-
     <string name="search">搜索</string>
-
-
     <string name="not_found_switch">未找到开关</string>
     <string name="searching">搜索中…</string>
-
-
     <string name="please_select_group">请至少选择一个分组</string>
-
     <string name="group_failed">分组失败,请检查要分组的设备是否已经通电</string>
     <string name="connected">已连接</string>
-
     <string name="tv_scene_name">场景名称：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">最少添加一个组</string>
@@ -428,41 +414,25 @@
     <string name="developer_mode">进入开发者模式</string>
     <string name="edit_phone">手机号</string>
     <string name="registing">正在注册</string>
-
-
     <string name="tip_register_input_error">用户名或密码不能包含特殊字符</string>
-
     <string name="logging_tip">正在登录</string>
     <string name="login_success">登录成功</string>
-
     <string name="name_or_password_error">用户名或密码错误！</string>
-
     <string name="add_timing_label">添加定时标签</string>
     <string name="open_location_service">请打开"位置服务"</string>
     <string name="send_verification">发送验证码</string>
-
     <string name="send_message_success">发送成功</string>
     <string name="send_message_fail">发送失败</string>
-
     <string name="successful_verification">验证成功</string>
-
     <string name="verification_phone">验证</string>
-
     <string name="tip_update_password_success">更改成功</string>
-
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
     <string name="login_timeout">登录超时</string>
-
-
     <string name="unknown_network_error">未知网络异常</string>
     <string name="network_error">网络异常！</string>
-
     <string name="network_unavailable">当前网络不可用，请检查网络设置</string>
-
     <string name="network_time_out">网络连接超时，请重试</string>
-
-
     <string name="delete_group_confirm">确定删除此组吗？</string>
     <string name="phone_or_password_can_not_be_empty">手机号不能为空</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
@@ -471,7 +441,6 @@
     <string name="saving">保存中…</string>
     <string name="open_blutooth">蓝牙开启</string>
     <string name="empty_tip">当前还没有任何灯,点击添加</string>
-
     <string name="add_scene_gp_tip">请选择需要的分组</string>
     <string name="group_fail_tip">有设备分组失败，请检查要分组的设备是否通电并重试！</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
@@ -483,9 +452,7 @@
     <string name="tip_start_sync">开始同步..</string>
     <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
-
     <string name="regetCount">重新获取(%1$d)</string>
-
     <string name="question_1">2.如何恢复出厂设置？</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源6秒，断开电源6s，重复约5-6次，直至灯闪烁。
@@ -525,24 +492,13 @@
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">1.去哪更新APP？</string>
-
-
-
     <string name="update_fail">升级失败！</string>
-
-
     <string name="tip_select_file">请先选择升级文件！</string>
-
-
     <string name="exit_update">2s后退出升级页面</string>
     <string name="get_server_version_fail">获取服务器版本失败！</string>
     <string name="download_pack_fail">升级包下载失败</string>
-
     <string name="verification_version_success">验证成功！</string>
-
     <string name="downloading">下载中：</string>
-
-
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
     <string name="register">注册</string>
@@ -864,6 +820,7 @@
     <string name="reset_gw_faile">用户复位失败</string>
     <string name="group_mode">群组模式</string>
     <string name="scene_mode">场景模式</string>
+    <string name="add_device_new">添加新设备 </string>
     <string name="see_help">查看帮助</string>
     <string name="dissupport">该批次设备不支持开关功能</string>
     <string name="china_code">中国+86</string>
@@ -1133,4 +1090,7 @@
     <string name="gp_not_exit">目标组不存在，重新刷新组数据</string>
     <string name="device_type_not_match">设备无法分入该组，设备的productUUID与组的deviceType不匹配</string>
     <string name="please_config_all">请完成所有按键配置</string>
+    <string name="right_phone_num">请填写正确的手机号码</string>
+    <string name="submit_error_code">用户提交校验的验证码错误</string>
+    <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
 </resources>

@@ -303,7 +303,7 @@
     <string name="tip_switch">Сначала добавьте режим</string>
     <string name="tip_add_gp">Сначала добавьте группу!</string>
     <string name="developer_mode">Переход в модель для разработчика</string>
-    <string name="edit_phone">Номер этого телефона</string>
+    <string name="edit_phone">Номер телефона.</string>
     <string name="registing">В процессе регистрации</string>
     <string name="register_success">Вы успешно зарегистрировались!</string>
     <string name="phone_input_error">Неверный формат номера телефона</string>
@@ -982,4 +982,7 @@
     <string name="gp_not_exit">Целевой группы не существует</string>
     <string name="device_type_not_match">Оборудование не может быть разделено на группы, и productUUID устройства не совпадает с devietype группы</string>
     <string name="please_config_all">Пожалуйста, закончите настройку клавиш</string>
+    <string name="right_phone_num">Пожалуйста, заполните правильный номер телефона</string>
+    <string name="submit_error_code">Ошибка капча, которую пользователь представил для проверки</string>
+    <string name="verification_code_invalid">Проверка не удалась 3 раза, код не работает</string>
 </resources>

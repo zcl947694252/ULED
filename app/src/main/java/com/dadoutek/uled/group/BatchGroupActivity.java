@@ -290,7 +290,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     //处理扫描成功后
     private void scanSuccess() {
-        toolbarTv.setText(getString(R.string.title_scanned_device_num)+adapter.getCount());
+        toolbarTv.setText(getString(R.string.title_scanned_device_num,adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界

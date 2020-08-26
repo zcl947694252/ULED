@@ -175,14 +175,20 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                                         val a = (data as Throwable)
                                         val jsonObject = JSONObject(a.localizedMessage)
                                         val message = jsonObject.opt("detail").toString()
-                                        ToastUtils.showLong(message)
+                                        when{
+                                            message.contains("请填写正确的")->ToastUtils.showShort(getString(R.string.right_phone_num))
+                                            message.contains("提交校验的验证")->ToastUtils.showShort(getString(R.string.submit_error_code))
+                                            message.contains("验证码失效")->ToastUtils.showShort(getString(R.string.verification_code_invalid))
+                                            else-> ToastUtils.showLong(message)
+                                        }
                                     } catch (ex: Exception) {
                                         ex.printStackTrace()
                                     }
                                 } else {
                                     val a = (data as Throwable)
                                     a.printStackTrace()
-                                    ToastUtils.showLong(a.message)
+                                    //ToastUtils.showLong(a.message)
+                                    ToastUtils.showShort(getString(R.string.send_message_fail))
                                 }
                                 hideLoadingDialog()
                             }

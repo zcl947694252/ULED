@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="38dp"
-                    android:src="@mipmap/sw_normal_add_minus" />
+                    android:src="@drawable/sw_normal_add_minus" />
 
             <LinearLayout
                     android:id="@+id/select_group"

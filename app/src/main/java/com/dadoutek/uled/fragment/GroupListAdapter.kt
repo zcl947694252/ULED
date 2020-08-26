@@ -72,7 +72,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
             else
                 helper.setText(R.id.template_device_group_name, group.name)
                         .setVisible(R.id.template_gp_name, Constant.IS_OPEN_AUXFUN)
-                        .setText(R.id.template_gp_name, mContext.getString(R.string.title_scanned_device_num)+ group.deviceCount)
+                        .setText(R.id.template_gp_name, mContext.getString(R.string.number)+":"+group.deviceCount)
 
             if (helper.adapterPosition != 0)
                 helper.setVisible(R.id.template_device_card_delete, isDelete)
