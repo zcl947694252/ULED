@@ -1,6 +1,7 @@
 package com.dadoutek.uled.model.routerModel
 
 import com.dadoutek.uled.gateway.bean.DbRouter
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.*
@@ -57,9 +58,9 @@ object RouterModel {
     /**
      * 删除路由
      */
-    fun delete(it: DbRouter): Observable<Long>? {
+    fun delete(it: DbRouter,ser_id:String): Observable<Long>? {
         return NetworkFactory.getApi()
-                .routerReset(it.macAddr, DBUtils.lastUser?.id ?: 0)
+                .routerReset(it.macAddr, ser_id)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {}
@@ -117,9 +118,9 @@ object RouterModel {
     /**
      * 路由开始扫描
      */
-    fun routeStartScan(): Observable<Long>? {
-        return NetworkFactory.getApi().routeScanDevcie()
-                .compose(NetworkTransformer())
+    fun routeStartScan( scanType:Int,ser_id:String): Observable<Response<Long>>? {
+        return NetworkFactory.getApi().routeScanDevcie(scanType,Constant.DEFAULT_MESH_FACTORY_NAME,ser_id)
+                //.compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

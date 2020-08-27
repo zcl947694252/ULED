@@ -1224,8 +1224,8 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private String getDeviceName(DbConnector light) {
         if (light.getBelongGroupId() != allLightId) {
-            if (DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId()) != "null") {
-                return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
+            if (DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId(),this) != "null") {
+                return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId(),this);
             }
             return getString(R.string.not_grouped);
         } else {

@@ -23,13 +23,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import cn.smssdk.gui.util.Const
 import com.allenliu.versionchecklib.v2.AllenVersionChecker
 import com.blankj.utilcode.util.*
-import com.blankj.utilcode.util.AppUtils
-import com.dadoutek.uled.mqtt.IGetMessageCallBack
-import com.dadoutek.uled.mqtt.MqttService
-import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
@@ -38,20 +33,27 @@ import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Lights
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.RegionModel
-import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.httpModel.UpdateModel
 import com.dadoutek.uled.model.httpModel.UserModel
-import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.mqtt.IGetMessageCallBack
+import com.dadoutek.uled.mqtt.MqttService
+import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -88,6 +90,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
     private lateinit var sceneFragment: SceneFragment
+    private  val TAG = "zcl-MainActivity"
 
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
@@ -147,12 +150,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener {}
+        main_toast.setOnClickListener {
+            RouterModel.routeStartScan(DeviceType.SMART_CURTAIN,TAG)?.subscribe({
+                LogUtils.v("zcl------------------成功")
+            }, {
+                ToastUtils.showShort(it.message)
+                LogUtils.v("zcl------------------失败")
+            })
+        }
         initBottomNavigation()
         checkVersionAvailable()
-       // getScanResult()
+        // getScanResult()
 
-       // getRouterStatus()
+        // getRouterStatus()
         getRegionList()
         getAllStatus()
     }
@@ -192,7 +202,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
         val subscribe = RouterModel.routeScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
-            if (it?.data != null &&it.data.status == 1) {
+            if (it?.data != null && it.data.status == 1) {
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, it)
                 startActivity(intent)
@@ -213,12 +223,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getRegionList() {
         val list = mutableListOf<String>()
         if (netWorkCheck(this))
-            RegionModel.get()?.subscribe( {
-                    for (i in it) {
-                        i.controlMesh?.let { it -> list.add(it) }
-                    }
-                    SharedPreferencesUtils.saveRegionNameList(list)
-                },{
+            RegionModel.get()?.subscribe({
+                for (i in it) {
+                    i.controlMesh?.let { it -> list.add(it) }
+                }
+                SharedPreferencesUtils.saveRegionNameList(list)
+            }, {
             })
     }
 
@@ -303,12 +313,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             UpdateModel.run {
                 isVersionAvailable(0, version)
                         .subscribe({
-                                if (!it.isUsable) {
-                                    syncDataAndExit()
-                                }
-                                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
-                            }, {
-                                //ToastUtils.showLong(R.string.get_server_version_fail)
+                            if (!it.isUsable) {
+                                syncDataAndExit()
+                            }
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
+                        }, {
+                            //ToastUtils.showLong(R.string.get_server_version_fail)
                         })
             }
     }
@@ -500,6 +510,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mCompositeDisposable.dispose()
         mConnectDisposal?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
+        //解绑服务
+        serviceConnection?.let {
+            unbindService(it)
+        }
     }
 
     private fun onServiceConnected(event: ServiceEvent) {}

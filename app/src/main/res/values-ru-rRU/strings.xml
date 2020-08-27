@@ -985,4 +985,6 @@
     <string name="right_phone_num">Пожалуйста, заполните правильный номер телефона</string>
     <string name="submit_error_code">Ошибка капча, которую пользователь представил для проверки</string>
     <string name="verification_code_invalid">Проверка не удалась 3 раза, код не работает</string>
+    <string name="salt_error">Пожалуйста, сначала убедитесь, что значение соли или ошибка значения соли или что она просрочена</string>
+
 </resources>

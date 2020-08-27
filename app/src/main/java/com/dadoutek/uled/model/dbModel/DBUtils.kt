@@ -386,12 +386,12 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getGroupNameByID(id: Long?): String {
+    fun getGroupNameByID(id: Long?,context: Context): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
         if (group != null) {
             return group.name
         }
-        return "null"
+        return context.getString(R.string.not_grouped)
     }
 
 

@@ -1096,4 +1096,5 @@
     <string name="right_phone_num">Please fill in the correct cell phone number</string>
     <string name="submit_error_code">The user submitted a verification code error for verification</string>
     <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
+    <string name="salt_error">Please get the salt value first or the salt value is wrong or the salt value is expired</string>
 </resources>

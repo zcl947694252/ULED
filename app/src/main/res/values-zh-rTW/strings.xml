@@ -677,6 +677,7 @@
     <string name="update_version">新版本升级</string>
     <string name="version_disabled">当前版本不可用</string>
     <string name="creater_name">创 建 者: </string>
+    <string name="equipment_quantity">设备数量：</string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
     <string name="developer_mode_open">开发者模式已开启</string>
     <string name="apply">应用</string>
@@ -1085,6 +1086,8 @@
     <string name="welcome_register">您好，欢迎注册账号</string>
     <string name="number">数量</string>
     <string name="verification_code_login">验证码登录</string>
+    <string name="login_account">登录</string>
+    <string name="cancel">取消</string>
     <string name="no_connect_device">无可自动连接设备!</string>
     <string name="select_icon_dot">选择图标:</string>
     <string name="select_icon">选择图标</string>
@@ -1136,4 +1139,5 @@
     <string name="right_phone_num">请填写正确的手机号码</string>
     <string name="submit_error_code">用户提交校验的验证码错误</string>
     <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
+    <string name="salt_error">请先获取盐值或盐值错误或盐值已过期</string>
 </resources>

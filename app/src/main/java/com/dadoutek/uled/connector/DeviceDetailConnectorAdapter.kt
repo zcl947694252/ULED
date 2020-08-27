@@ -42,7 +42,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
                     .addOnClickListener(R.id.template_device_icon)
                     .addOnClickListener(R.id.template_device_card_delete)
                     .setVisible(R.id.template_device_card_delete,isDelete)
-                    .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbConnector.belongGroupId))
+                    .setText(R.id.template_gp_name,DBUtils.getGroupNameByID(dbConnector.belongGroupId,mContext))
         }
     }
 }

@@ -36,6 +36,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
         updateUi()
 
+
         choose_mode_ble_iv.setOnClickListener(this)
         choose_mode_router_iv.setOnClickListener(this)
     }
@@ -53,14 +54,19 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.choose_mode_ble_iv -> Constant.IS_ROUTE_MODE = false
-            R.id.choose_mode_router_iv -> Constant.IS_ROUTE_MODE = true
+            R.id.choose_mode_ble_iv -> {
+                UserModel.updateModeStatus().subscribe({
+                    Constant.IS_ROUTE_MODE = false
+                    updateUi()
+                }, {})
+            }
+            R.id.choose_mode_router_iv -> {
+                UserModel.updateModeStatus().subscribe({
+                    Constant.IS_ROUTE_MODE = true
+                    updateUi()
+                }, {})
+            }
         }
-        updateUi()
-        UserModel.updateModeStatus().subscribe({
-                    ToastUtils.showShort(it.message)
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+
     }
 }

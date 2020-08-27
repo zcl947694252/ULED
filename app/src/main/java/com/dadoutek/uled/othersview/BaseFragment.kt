@@ -43,7 +43,7 @@ import org.json.JSONObject
 
 open class BaseFragment : Fragment() {
 
-    private  var stompRecevice: StompReceiver? = null
+    private var stompRecevice: StompReceiver? = null
     private lateinit var changeRecevicer: ChangeRecevicer
     private var loadDialog: Dialog? = null
     private lateinit var dialog: Dialog
@@ -91,24 +91,24 @@ open class BaseFragment : Fragment() {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
             when (val cmd = jsonObject.getInt("cmd")) {
-                Cmd.singleLogin, Cmd.parseQR,Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
                     when (cmd) {
-                        Cmd.gwControlCallback-> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                     }
                 }
             }
 
 
-     /*       when (intent?.action) {
-                Constant.GW_COMMEND_CODE -> {
-                    val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
-                    LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
-                    when (gwStompBean.cmd) {
-                        2500 -> receviedGwCmd2500(gwStompBean)
-                    }
-                }
-            }*/
+            /*       when (intent?.action) {
+                       Constant.GW_COMMEND_CODE -> {
+                           val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                           LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
+                           when (gwStompBean.cmd) {
+                               2500 -> receviedGwCmd2500(gwStompBean)
+                           }
+                       }
+                   }*/
         }
     }
 
@@ -206,22 +206,25 @@ open class BaseFragment : Fragment() {
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (isConnected) {
-                if (toolbar != null) {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                }//meFragment 不存在toolbar 所以要拉出来
-                setLoginChange()
-            } else {
-                if (toolbar != null) {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                        val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                        dialog.show()
+            if (Constant.IS_ROUTE_MODE)
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
+            else {
+                if (isConnected) {
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
+                    //meFragment 不存在toolbar 所以要拉出来
+                    setLoginChange()
+                } else {
+                    if (toolbar != null) {
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.bluetooth_no)
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = true
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setOnClickListener {
+                            val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
+                            dialog.show()
+                        }
                     }
+                    setLoginOutChange()
                 }
-                setLoginOutChange()
             }
         }
     }

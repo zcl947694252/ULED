@@ -342,7 +342,7 @@ class GwLoginActivity : TelinkBaseActivity() {
                 if (TelinkLightApplication.getApp().isConnectGwBle)
                     sendTimeZoneParmars()
 
-                if (Constant.IS_ROUTE_MODE)
+                if (!Constant.IS_ROUTE_MODE)
                     dbGw = intent.getParcelableExtra("data")
                 else
                     getScanResult()//获取路由扫描的网关
@@ -353,15 +353,19 @@ class GwLoginActivity : TelinkBaseActivity() {
                     gw_login_skip.visibility = View.VISIBLE
 
                 if (TelinkLightApplication.getApp().isConnectGwBle) {
-                    getDeviceVersion(dbGw!!.meshAddr).subscribe({ s: String ->
-                        dbGw!!.version = s
-                        bottom_version_number.text = dbGw?.version
-                        DBUtils.saveGateWay(dbGw!!, false)
-                    }, {
-                        ToastUtils.showLong(getString(R.string.get_version_fail))
-                    })
+                    dbGw?.let {
+                        getDeviceVersion(it.meshAddr).subscribe({ s: String ->
+                            it.version = s
+                            bottom_version_number.text = it.version
+                            DBUtils.saveGateWay(it, false)
+                        }, {
+                            ToastUtils.showLong(getString(R.string.get_version_fail))
+                        })
+                    }
                 }
                 bottom_version_number.text = dbGw?.version
+
+
                 // sendDeviceMacParmars()
             }
         }

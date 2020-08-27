@@ -52,7 +52,7 @@
 
             <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp_50"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -74,7 +74,7 @@
                     <LinearLayout
                             android:id="@+id/switch_double_touch_left"
                             android:layout_width="wrap_content"
-                            android:layout_height="35dp"
+                            android:layout_height="wrap_content"
                             android:background="@drawable/rectangle_black"
                             android:gravity="center"
                             android:orientation="horizontal">
@@ -87,7 +87,7 @@
                                 android:gravity="center"
                                 android:text="@string/select_group"
                                 android:textColor="@color/gray_3"
-                                android:textSize="17sp" />
+                                android:textSize="15sp" />
 
                         <ImageView
                                 android:layout_width="wrap_content"
@@ -96,7 +96,6 @@
                                 android:src="@drawable/icon_arrow_r" />
 
                     </LinearLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -117,7 +116,7 @@
                     <LinearLayout
                             android:id="@+id/switch_double_touch_right"
                             android:layout_width="wrap_content"
-                            android:layout_height="35dp"
+                            android:layout_height="wrap_content"
                             android:background="@drawable/rectangle_black"
                             android:gravity="center"
                             android:orientation="horizontal">
@@ -130,7 +129,7 @@
                                 android:gravity="center"
                                 android:text="@string/select_group"
                                 android:textColor="@color/gray_3"
-                                android:textSize="17sp" />
+                                android:textSize="15sp" />
 
                         <ImageView
                                 android:layout_width="wrap_content"

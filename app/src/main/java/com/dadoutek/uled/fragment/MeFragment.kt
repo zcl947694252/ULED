@@ -196,6 +196,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        if (Constant.IS_ROUTE_MODE)
+            bluetooth_image?.setImageResource(R.drawable.icon_cloud)
         mWakeLock?.acquire()
     }
 
@@ -445,10 +447,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     private fun userReset() {
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
         UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe({  //删除服务器数据
-                clearData()//删除本地数据
-                ToastUtils.showShort(getString(R.string.reset_user_success))
-            }, {
-                ToastUtils.showShort(it.message)
+            clearData()//删除本地数据
+            ToastUtils.showShort(getString(R.string.reset_user_success))
+        }, {
+            ToastUtils.showShort(it.message)
         })
     }
 
@@ -624,12 +626,18 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     override fun setLoginChange() {
         super.setLoginChange()
-        bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
+        if (Constant.IS_ROUTE_MODE)
+            bluetooth_image?.setImageResource(R.drawable.icon_cloud)
+        else
+            bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
     }
 
     override fun setLoginOutChange() {
         super.setLoginOutChange()
-        bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
+        if (Constant.IS_ROUTE_MODE)
+            bluetooth_image?.setImageResource(R.drawable.icon_cloud)
+        else
+            bluetooth_image?.setImageResource(R.drawable.bluetooth_no)
     }
 
 

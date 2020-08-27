@@ -105,7 +105,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     private var dialogGroupType: TextView? = null
     open lateinit var popMain: PopupWindow
     private val SHOW_LOADING_DIALOG_DELAY: Long = 300 //ms
-    var installDialog: AlertDialog? = null
+    open var installDialog: AlertDialog? = null
     var isRgbClick = false
     var clickRgb: Boolean = false
     var installId = 0
@@ -151,6 +151,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         registerReceiver(netWorkChangReceiver, filter)
         initOnLayoutListener()//加载view监听
         makeDialogAndPop()
+        makeInstallView()
         makeRenamePopuwindow()
         makeStopScanPop()
         makeDialog()
@@ -329,21 +330,22 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
      * @param isConnected       是否是连接状态
      */
     fun changeDisplayImgOnToolbar(isConnected: Boolean) {
-        if (isConnected) {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-            }
-        } else {
-            if (toolbar != null) {
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
+        if (Constant.IS_ROUTE_MODE)
+            toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
+        else {
+            if (isConnected) {
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
+            } else {
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.bluetooth_no)
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = true
+                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setOnClickListener {
                     val dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
                     dialog.show()
                 }
             }
         }
+
     }
 
     //打开基类的连接状态变化监听
@@ -418,6 +420,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 startTimerUpdate()
         }
 
+        if (Constant.IS_ROUTE_MODE)
+            toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
 
         if (LeBluetooth.getInstance().isEnabled) {
             if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
@@ -650,8 +654,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 Cmd.routeInAccount -> routerAccessIn(cmdBean)
-                Cmd.routeConfigWifi ->routerConfigWIFI(cmdBean)
-                Cmd.routeStartScann ->startRouterScan(cmdBean)
+                Cmd.routeConfigWifi -> routerConfigWIFI(cmdBean)
+                Cmd.routeStartScann -> startRouterScan(cmdBean)
                 Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
@@ -1080,11 +1084,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun showInstallDeviceDetail(describe: String, position: Int, string: String) {
-        makeInstallView()
-        installTitleTv?.text = string
-        installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
-        installDialog?.setOnShowListener {}
         installDialog?.dismiss()
+        installTitleTv?.text = string
+        if (installDialog == null)
+            installDialog = AlertDialog.Builder(this).setView(viewInstall).create()
+        installDialog?.setOnShowListener {}
         installDialog?.show()
     }
 

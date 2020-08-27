@@ -734,8 +734,9 @@ public interface RequestInterface {
      * "scanName": "dadousmart"
      * "ser_id": "app会话id，自己维护"
      */
+    @FormUrlEncoded
     @POST("router/scan-device")
-    Observable<Response<Long>> routeScanDevcie();
+    Observable<Response<Long>> routeScanDevcie(@Field("scanType") int scanType,@Field("scanName") String scanName,@Field("ser_id") String ser_id);
 
     /**
      * 停止扫描
@@ -791,7 +792,7 @@ public interface RequestInterface {
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "router/router-reset")
     Observable<Response<Long>> routerReset(@Field("macAddr") String macAddr,
-                                           @Field("ser_id") long ser_id);
+                                           @Field("ser_id") String ser_id);
 
     /**
      * 路由更新
@@ -894,5 +895,5 @@ public interface RequestInterface {
      */
     @GET("auth/settings/save")
     Observable<Response> updateAllModeStatus( @Query("auxiliaryFunction") boolean auxiliaryFunction,
-                                                           @Query("modeNum") int modeNum );
+                                                           @Query("mode") int modeNum );
 }

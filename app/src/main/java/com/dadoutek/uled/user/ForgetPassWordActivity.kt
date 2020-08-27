@@ -16,9 +16,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DbUser
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.CountryActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
@@ -56,6 +54,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
 
         edit_user_phone.addTextChangedListener(this)
+
         if (isChangePwd) {
             dbUser = DbUser()
             register_completed.setText(R.string.confirm)
@@ -78,11 +77,12 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun getAccount() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
-            val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
+            val userName = edit_user_phone.editableText.toString().trim { it <= ' ' }
                     .replace(" ".toRegex(), "")
-            send_verification()
+            sendVerification()
 
             if (TextUtils.isEmpty(userName)) {
                 toast(getString(R.string.please_phone_number))
@@ -96,29 +96,33 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                                hideLoadingDialog()
-                                if (it.errorCode == 0) {
-                                    LogUtils.e("logging" + it.errorCode + "获取成功account")
-                                    dbUser!!.account = it.t
-                                    //正式代码走短信验证
-                                    val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
-                                    intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
-                                    intent.putExtra("country_code",countryCode)
-                                    intent.putExtra("phone", userName)
-                                    intent.putExtra("account", dbUser!!.account)
-                                    startActivity(intent)
-                                    //调试程序直接修改
-                                    // val intent = Intent(this@ForgetPassWordActivity, InputPwdActivity::class.java)
-                                    // intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
-                                    // intent.putExtra("phone",  dbUser!!.account)
-                                    // startActivity(intent)
-                                    // finish()
-                                } else {
-                                    ToastUtils.showLong(it.message)
+                            hideLoadingDialog()
+                            if (it.errorCode == 0) {
+                                LogUtils.e("logging" + it.errorCode + "获取成功account")
+                                dbUser!!.account = it.t
+                                //正式代码走短信验证
+                                val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
+                                intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
+                                intent.putExtra("country_code", countryCode)
+                                intent.putExtra("phone", userName)
+                                intent.putExtra("account", dbUser!!.account)
+                                startActivity(intent)
+                                //调试程序直接修改
+                                // val intent = Intent(this@ForgetPassWordActivity, InputPwdActivity::class.java)
+                                // intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
+                                // intent.putExtra("phone",  dbUser!!.account)
+                                // startActivity(intent)
+                                // finish()
+                            } else {
+                                when {
+                                    it.message.contains("20001") -> ToastUtils.showShort(getString(R.string.account_not_exist))
+                                    it.message.contains("20003") -> ToastUtils.showLong(getString(R.string.salt_error))
+                                    else -> ToastUtils.showLong(it.message)
                                 }
-                            },{
-                                hideLoadingDialog()
-                                Toast.makeText(this@ForgetPassWordActivity, "onError:$it", Toast.LENGTH_SHORT).show()
+                            }
+                        }, {
+                            hideLoadingDialog()
+                            Toast.makeText(this@ForgetPassWordActivity, "onError:$it", Toast.LENGTH_SHORT).show()
                         })
             }
 
@@ -128,7 +132,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     }
 
 
-    private fun send_verification() {
+    private fun sendVerification() {
         val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showLong(R.string.phone_cannot_be_empty)
@@ -138,9 +142,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         }
     }
 
-    override fun afterTextChanged(p0: Editable?) {
-
-    }
+    override fun afterTextChanged(p0: Editable?) {}
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
@@ -172,7 +174,8 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                 countryCode = toString
                 ccp_tv.text = countryName + countryNumber
             }
-            else -> { }
+            else -> {
+            }
         }
     }
 }

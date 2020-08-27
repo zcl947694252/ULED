@@ -332,7 +332,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val elements = mAddedDevicesAdapter.data
         nowDeviceList.addAll(elements)
 
-               showLoadingDialog(resources.getString(R.string.please_wait))
+        showLoadingDialog(resources.getString(R.string.please_wait))
 
         disposableConnectTimer?.dispose()
         disposableConnectTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
@@ -587,10 +587,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun addGw(dbGw: DbGateway) {
-        GwModel.add(dbGw)?.subscribe( {
-                LogUtils.v("zcl-----网关失添成功返回-------------$it")
-            }, {
-                LogUtils.v("zcl-------网关失添加败-----------" + it.message)
+        GwModel.add(dbGw)?.subscribe({
+            LogUtils.v("zcl-----网关失添成功返回-------------$it")
+        }, {
+            LogUtils.v("zcl-------网关失添加败-----------" + it.message)
         })
     }
 
@@ -869,6 +869,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         initVisiable()
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun initVisiable() {
         image_bluetooth?.visibility = View.GONE
         btn_add_groups?.visibility = View.GONE
@@ -876,7 +877,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
         scanning_no_device.visibility = View.GONE
         if (mAddDeviceType != DeviceType.GATE_WAY)
-            scanning_num.text = getString(R.string.title_scanned_device_num,0)
+            scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
         else
             scanning_num.text = getString(R.string.scanning)
         btn_stop_scan?.setText(R.string.stop_scan)
@@ -1124,7 +1125,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 routerScanCount = cmdBodyBean.count
                 if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
                         mAddDeviceType == DeviceType.SMART_CURTAIN)
-                    scanning_num.text = getString(R.string.title_scanned_device_num,routerScanCount)
+                    scanning_num.text = getString(R.string.title_scanned_device_num, routerScanCount)
                 else
                     scanning_num.text = getString(R.string.scanning)
             }
@@ -1147,10 +1148,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startScan() {
         if (Constant.IS_ROUTE_MODE) {
             //发送命令
-            RouterModel.routeStartScan()?.subscribe({
-                routeScanTimeoutTime = it
+            RouterModel.routeStartScan(mAddDeviceType,TAG)?.subscribe({
+                routeScanTimeoutTime = it.t?:0
                 disposableTimer?.dispose()
-                disposableTimer = Observable.timer(it, TimeUnit.MILLISECONDS)
+                disposableTimer = Observable.timer(routeScanTimeoutTime, TimeUnit.MILLISECONDS)
                         .subscribe {
                             showLoadingDialog(getString(R.string.router_scan_faile))
                         }
@@ -1367,7 +1368,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }
                 // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
                 if (mAddDeviceType != DeviceType.GATE_WAY)
-                    scanning_num.text = getString(R.string.title_scanned_device_num,mAddedDevices.size)
+                    scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
 
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
                 mUpdateMeshRetryCount = 0
@@ -1594,10 +1595,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (Constant.IS_ROUTE_MODE) {//获取扫描数据
             RouterModel.routeScanningResult()?.subscribe({ it ->
                 val data = it.data
-                if (data.status == 0) {
+                if (data != null && data.status == 0) {
                     mAddedDevicesInfos.clear()
                     when {
-                        data != null && data.data.isNotEmpty() -> {
+                         data.data.isNotEmpty() -> {
                             showLoadingDialog(resources.getString(R.string.please_wait))
                             data.data.forEach { x ->
                                 val deviceInfo = DeviceInfo()
@@ -1627,7 +1628,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     routeTimerOut()
                 }
             }, {
-
+                LogUtils.v("zcl-----------$it-------")
             })
         } else {
             DBUtils.saveRegion(lastMyRegion, true)
@@ -1653,7 +1654,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 ?.subscribe({
                     skipeActivity(intent)
                 }) {
-                   ToastUtils.showShort(it.message)
+                    ToastUtils.showShort(it.message)
                 }
     }
 

@@ -193,8 +193,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr
-                        ?: 1000000))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr ?: 1000000))
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
@@ -324,8 +323,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override  fun initView() {
-        switch_double_touch_mb.visibility = View.VISIBLE
-        switch_double_touch_set.visibility = View.GONE
+        switch_double_touch_mb.visibility = View.GONE
+        switch_double_touch_set.visibility = View.VISIBLE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)
         switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
         toolbarTv.text = getString(R.string.double_switch)

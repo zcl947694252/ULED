@@ -1194,7 +1194,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private String getDeviceName(DbLight light) {
         if (light.getBelongGroupId() != allLightId) {
-            return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
+            return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId(),this);
         } else {
             return getString(R.string.not_grouped);
         }

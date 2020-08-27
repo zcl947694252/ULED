@@ -1175,7 +1175,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private String getDeviceName(DbLight light) {
         if (light.getBelongGroupId() != null) {
             if (light.getBelongGroupId() != allLightId) {
-                return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
+                return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId(),this);
             }
             return getString(R.string.not_grouped);
         } else {
