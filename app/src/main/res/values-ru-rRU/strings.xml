@@ -33,9 +33,9 @@
         <item>Голубой градиент</item>
         <item>Фиолетовый градиент</item>
         <item>Белый градиент</item>
-        <item>Красный Зеленый градиент</item>
-        <item>Красный Синий градиент</item>
-        <item>Зеленый Синий градиент</item>
+        <item>Красный и зеленый</item>
+        <item>Красный и синий</item>
+        <item>Зеленый и синий</item>
     </string-array>
 
     <string-array name="country_code_list">
@@ -283,7 +283,7 @@
     <string name="complete">Выполнено</string>
     <string name="not_found_switch">Коммутатора не найдено</string>
     <string name="searching">проходит…</string>
-    <string name="select_group">Выберите группу</string>
+    <string name="select_group">Выб. гр.</string>
     <string name="please_select_group">Выберите хотя бы одну группу</string>
     <string name="group_failed">Группировка прекращена. Убедитесь, что устройства, которое вы хотите сгруппировать, уже включены</string>
     <string name="connected">Подключено</string>
@@ -480,7 +480,7 @@
     <string name="get_update_file">Получает пакета обновления…</string>
     <string name="mode_preset">По умолчанию</string>
     <string name="mode_diy">Пользовательский режим</string>
-    <string name="please_check_group">Выберите группу:</string>
+    <string name="please_check_group">Выб. гр.:</string>
     <string name="save">Сохранить</string>
     <string name="name_not_null_tip">Название не может быть пустым</string>
     <string name="mode_str">Модель</string>
@@ -783,9 +783,9 @@
     <string name="old_light_rest">Устаревшая версия прошивки, попробуйте выполнить следующие шаги для сброса устройства:</string>
     <string name="warm_notice">Советы: Если у вас есть другие вопросы, ознакомьтесь с инструкцией.</string>
     <string name="config_success">Конфигурация выполнена успешно</string>
-    <string name="normal_swith">Обычный выключатель</string>
-    <string name="scene_switch">Переключатель сцен</string>
-    <string name="curtain_switch">Переключатель штор</string>
+    <string name="normal_swith">обычный</string>
+    <string name="scene_switch">Сцены</string>
+    <string name="curtain_switch">гардины</string>
     <string name="night_light">Ночной свет</string>
     <string name="click_config">Нажмите Настройку</string>
     <string name="choose_scene">Выбор сцены</string>
@@ -878,11 +878,11 @@
     <string name="mid">Уместно</string>
     <string name="fast">Быстро</string>
     <string name="recovery_active_equipment">Восстановление активных устройств</string>
-    <string name="left">Налево:</string>
-    <string name="right">Направо:</string>
+    <string name="left">л.:</string>
+    <string name="right">n.:</string>
     <string name="single_brighress_group_switch">Коммутатор регуляторов яркости</string>
-    <string name="eight_switch">универсальный</string>
-    <string name="double_switch">Коммутатор регуляторов яркости и цвета</string>
+    <string name="eight_switch">восьмёрка</string>
+    <string name="double_switch">две группы </string>
     <string name="delete_device">Удалить устройство</string>
     <string name="delete_device_tip">Нужно ли удалить?</string>
     <string name="delete_device_hard_tip">Не удалось удалить, нужно ли принудительно удалить?</string>
@@ -986,5 +986,6 @@
     <string name="submit_error_code">Ошибка капча, которую пользователь представил для проверки</string>
     <string name="verification_code_invalid">Проверка не удалась 3 раза, код не работает</string>
     <string name="salt_error">Пожалуйста, сначала убедитесь, что значение соли или ошибка значения соли или что она просрочена</string>
+    <string name="input_rgb_num">Введите значение RGB цвета</string>
 
 </resources>

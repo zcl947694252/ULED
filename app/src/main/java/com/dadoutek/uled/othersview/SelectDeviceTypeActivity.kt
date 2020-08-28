@@ -43,7 +43,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         deviceTypeList.add(DeviceItem(getString(R.string.curtain), 0, DeviceType.SMART_CURTAIN))
         deviceTypeList.add(DeviceItem(getString(R.string.relay), 0, DeviceType.SMART_RELAY))
         deviceTypeList.add(DeviceItem(getString(R.string.Gate_way), 0, DeviceType.GATE_WAY))
-        deviceTypeList.add(DeviceItem(getString(R.string.router), 0, DeviceType.ROUTER))
+        //deviceTypeList.add(DeviceItem(getString(R.string.router), 0, DeviceType.ROUTER))
 
         deviceAdapter.notifyDataSetChanged()
     }
@@ -120,20 +120,22 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
             REQUEST_CODE -> {  //处理扫描结果
                 if (null != data) {
                     var bundle: Bundle? = data.extras ?: return
-                    if (bundle!!.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                        var result = bundle.getString(CodeUtils.RESULT_STRING)
-                        LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
-                        if (result != null) {
-                            val intent = Intent(this@SelectDeviceTypeActivity, RoutingNetworkActivity::class.java)
-                            intent.putExtra(Constant.ONE_QR, result)
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            ToastUtils.showShort(getString(R.string.qr_not_null))
+                    when {
+                        bundle!!.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS -> {
+                            var result = bundle.getString(CodeUtils.RESULT_STRING)
+                            LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
+                            if (result != null) {
+                                val intent = Intent(this@SelectDeviceTypeActivity, RoutingNetworkActivity::class.java)
+                                intent.putExtra(Constant.ONE_QR, result)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                ToastUtils.showShort(getString(R.string.qr_not_null))
+                            }
                         }
-
-                    } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
-                        Toast.makeText(this, getString(R.string.fail_parse_qr), Toast.LENGTH_LONG).show()
+                        bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED -> {
+                            Toast.makeText(this, getString(R.string.fail_parse_qr), Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }

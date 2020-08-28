@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:text="输入RGB值"
+        android:text="@string/input_rgb_num"
         android:textColor="@color/blue_background"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"

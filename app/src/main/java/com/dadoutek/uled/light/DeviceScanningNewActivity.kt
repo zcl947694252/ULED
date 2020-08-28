@@ -809,9 +809,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                                     skipeType()
                                 }
                             }
-                        }) {
+                        },{
                             ToastUtils.showShort(it.message)
-                        }
+                        })
             } else {
                 stopScanTimer()
                 if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备

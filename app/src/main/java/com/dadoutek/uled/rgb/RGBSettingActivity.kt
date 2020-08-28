@@ -1075,12 +1075,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         if (isPresetMode) {
             buildInButton.setTextColor(resources.getColor(R.color.blue_background))
             buildInButton_image.setImageResource(R.drawable.icon_selected_rgb)
-            layoutModePreset.visibility = View.VISIBLE
+            builtInModeRecycleView.visibility = View.VISIBLE
             isPresetMode = false
         } else {
             buildInButton.setTextColor(resources.getColor(R.color.black_three))
             buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
-            layoutModePreset.visibility = View.GONE
+            builtInModeRecycleView.visibility = View.GONE
             isPresetMode = true
         }
         applyPresetView()
@@ -1203,12 +1203,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         if (isDiyMode) {
             diyButton.setTextColor(resources.getColor(R.color.blue_background))
             diyButton_image.setImageResource(R.drawable.icon_selected_rgb)
-            layoutModeDiy.visibility = View.VISIBLE
+            builtDiyModeRecycleView.visibility = View.VISIBLE
             isDiyMode = false
         } else {
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
-            layoutModeDiy.visibility = View.VISIBLE
+            builtDiyModeRecycleView.visibility = View.VISIBLE
             isDiyMode = true
         }
         applyDiyView()
@@ -1745,12 +1745,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun setDIyModeData() {
         buildInModeList.clear()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
-        for (i in 0..10) {
+        presetGradientList.indices.forEach { i ->
             var item = ItemRgbGradient()
             item.name = presetGradientList[i]
             item.select = i == postionAndNum?.position//如果等于该postion则表示选中
             buildInModeList?.add(item)
         }
+        LogUtils.v("zcl-----------添加完毕-------${buildInModeList.size}")
     }
 
     @SuppressLint("SetTextI18n")

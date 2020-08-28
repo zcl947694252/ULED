@@ -233,17 +233,17 @@
     </string-array>
 
     <string-array name="preset_gradient">   
-        <item>GRB Color Gradient</item>        
-        <item>Red Color Gradient</item>        
-        <item>Green Color Gradient</item>        
-        <item>Blue Color Gradient</item>        
-        <item> Yellow Color Gradient</item>        
-        <item> Cyan Color Gradient</item>        
-        <item> Purple Color Gradient</item>
-        <item>white Gradient </item>
-        <item> red and green gradient</item>
-        <item> red and blue gradient</item>
-        <item> green blue gradient</item>
+        <item>Colorful gradient</item>        
+        <item>Red gradient</item>        
+        <item>Green gradient</item>        
+        <item>Blue gradient</item>        
+        <item> Yellow gradient</item>        
+        <item> Cyan gradient</item>        
+        <item> Purple gradient</item>
+        <item>white gradient </item>
+        <item> Red green gradient</item>
+        <item> Red blue gradient</item>
+        <item> Green blue gradient</item>
     </string-array>
 
     <!-- Activity Labels -->
@@ -291,7 +291,7 @@
     <string name="confirm">Confirm</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
-    <string name="title_scanned_device_num">Num:</string>
+    <string name="title_scanned_device_num">%1$d devices have been added:</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_tip">Need to physically reset the light before clearing the data and start clearing the data?</string>
     <string name="factory_reset">Factory reset</string>
@@ -476,7 +476,7 @@
         
     <string name="normal_light">CW Light </string>
         
-    <string name="rgb_light">RGB Light</string>
+    <string name="rgb_light">RGBLight</string>
         
         
         
@@ -620,7 +620,7 @@
 
     <string name="delete_user">Make sure to delete the phone number？</string>
 
-    <string name="relay">BTReceiver</string>
+    <string name="relay">Receiver</string>
 
 
     <string name="title_connector_lights_num">Scanning %1$d</string>
@@ -1097,4 +1097,5 @@
     <string name="submit_error_code">The user submitted a verification code error for verification</string>
     <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
     <string name="salt_error">Please get the salt value first or the salt value is wrong or the salt value is expired</string>
+    <string name="input_rgb_num">Enter the color RGB value</string>
 </resources>

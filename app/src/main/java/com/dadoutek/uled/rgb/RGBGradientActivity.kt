@@ -363,19 +363,19 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 //        diyButton.setTextColor(resources.getColor(R.color.white))
 //        buildInButton.setBackgroundColor(resources.getColor(R.color.white))
 //        buildInButton.setTextColor(resources.getColor(R.color.primary))
-//        layoutModeDiy.visibility = View.VISIBLE
-//        layoutModePreset.visibility = View.GONE
+//        builtDiyModeRecycleView.visibility = View.VISIBLE
+//        builtInModeRecycleView.visibility = View.GONE
         if (isDiyMode) {
             diyButton.setTextColor(resources.getColor(R.color.blue_background))
             diyButton_image.setImageResource(R.drawable.icon_selected_rgb)
-            layoutModeDiy.visibility = View.VISIBLE
+            builtDiyModeRecycleView.visibility = View.VISIBLE
             buildInButton.setTextColor(resources.getColor(R.color.black_three))
             buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isDiyMode = false
         } else {
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
-            layoutModeDiy.visibility = View.GONE
+            builtDiyModeRecycleView.visibility = View.GONE
             buildInButton.setTextColor(resources.getColor(R.color.black_three))
             buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isDiyMode = true
@@ -388,14 +388,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         if (isPresetMode) {
             buildInButton.setTextColor(resources.getColor(R.color.blue_background))
             buildInButton_image.setImageResource(R.drawable.icon_selected_rgb)
-            layoutModePreset.visibility = View.VISIBLE
+            builtInModeRecycleView.visibility = View.VISIBLE
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isPresetMode = false
         } else {
             buildInButton.setTextColor(resources.getColor(R.color.black_three))
             buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
-            layoutModePreset.visibility = View.GONE
+            builtInModeRecycleView.visibility = View.GONE
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isPresetMode = true

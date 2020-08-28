@@ -20,10 +20,9 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-    public static Boolean isDebug = true;
+    public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-
 
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
@@ -211,9 +210,7 @@ public class Constant implements Serializable {
     public static final int INSTALL_LIGHT_OF_RGB = 11;
     public static final int INSTALL_CURTAIN_OF = 12;
     public static final int INSTALL_RELAY_OF = 13;
-
     //分组标识
-
 
     //默认分组
     public static final Long DEVICE_TYPE_DEFAULT_ALL = 0L;
