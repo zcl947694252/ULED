@@ -917,7 +917,7 @@
     <string name="group_max">Поддержка до 7 групп</string>
     <string name="dissupport">Эта партия устройств не поддерживает коммутатор</string>
     <string name="china_code">Китай+86</string>
-    <string name="select_country_area">Выберите страну</string>
+    <string name="select_country_area">Выберите страну/ареал</string>
     <string name="have_account">Вход с уже существующим аккаунтом</string>
     <string name="create_account">Создание нового аккаунта</string>
     <string name="privacy_statement">Политика о конфиденциальности</string>

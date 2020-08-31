@@ -825,7 +825,7 @@
     <string name="see_help">查看帮助</string>
     <string name="dissupport">该批次设备不支持开关功能</string>
     <string name="china_code">中国+86</string>
-    <string name="select_country_area">国家区号选择</string>
+    <string name="select_country_area">国家/地区区号选择</string>
     <string name="have_account">使用已有账户登录</string>
     <string name="create_account">创建新账户</string>
     <string name="privacy_statement">隐私声明</string>

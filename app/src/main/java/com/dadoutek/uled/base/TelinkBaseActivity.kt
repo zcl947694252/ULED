@@ -44,6 +44,8 @@ import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.router.bean.RouteGroupingBean
+import com.dadoutek.uled.router.bean.RouteInAccountBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -659,29 +661,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
+                    val fromJson = Gson().fromJson(msg, RouteGroupingBean::class.java)
+                    routerGroupResult(fromJson)
                 }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
-                Cmd.routeInAccount -> {
-                    ToastUtils.showShort(Gson().fromJson(msg, RouteInAccountBean::class.java).msg)
-                }
+
             }
 /*
             when (intent?.action) {
@@ -732,6 +715,9 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }*/
         }
+    }
+
+    open fun routerGroupResult(fromJson: RouteGroupingBean?) {
     }
 
     open fun startRouterScan(cmdBodyBean: CmdBodyBean) {

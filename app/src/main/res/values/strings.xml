@@ -1025,7 +1025,7 @@
     <string name="group_max">Maximum 7 groups are supported</string>
     <string name="dissupport">This batch of equipment does not support switching function</string>
     <string name="china_code">China+86</string>
-    <string name="select_country_area">Country code selection</string>
+    <string name="select_country_area">Country/area code selection</string>
     <string name="have_account">Existing account login</string>
     <string name="create_account">Create new account</string>
     <string name="privacy_statement">Privacy statement</string>
