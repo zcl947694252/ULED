@@ -1098,4 +1098,5 @@
     <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
     <string name="salt_error">Please get the salt value first or the salt value is wrong or the salt value is expired</string>
     <string name="input_rgb_num">Enter the color RGB value</string>
+    <string name="router_grouping">In groups, please hold on. %1$s devices have been successfully grouped</string>
 </resources>

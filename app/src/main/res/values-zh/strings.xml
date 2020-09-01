@@ -195,6 +195,7 @@
     <string name="QR_cancel">撤销二维码</string>
     <string name="refresh_qr_code">刷新二维码</string>
     <string name="see_qr">查看二维码</string>
+    <string name="region_transfer_code_invalid">区域移交二维码码失效</string>
     <string name="QR_canceled">当前二维码已撤销</string>
     <string name="change_region">确定切换到区域:</string>
     <!-- 区域 End-->
@@ -240,7 +241,7 @@
     <string name="normal_swith">普通开关</string>
     <string name="scene_switch">场景开关</string>
     <string name="curtain_switch">窗帘开关</string>
-
+    <string name="please_near_light">请靠近灯</string>
     <string name="button1">按键1</string>
     <string name="button2">按键2</string>
     <string name="button3">按键3</string>
@@ -1098,4 +1099,5 @@
     <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
     <string name="salt_error">请先获取盐值或盐值错误或盐值已过期</string>
     <string name="input_rgb_num">输入RGB值</string>
+    <string name="router_grouping">分组中，请稍后。已成功分组%1$s个设备</string>
 </resources>

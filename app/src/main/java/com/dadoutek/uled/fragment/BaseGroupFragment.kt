@@ -1,5 +1,6 @@
 package com.dadoutek.uled.fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -35,7 +36,6 @@ import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
@@ -47,7 +47,6 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.GwGattBody
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
@@ -297,15 +296,15 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     open fun seeHelpe() {
-       var wbType =  when(setGroupType()){
-           Constant.DEVICE_TYPE_LIGHT_NORMAL->"#control-normal-group"
-           Constant.DEVICE_TYPE_LIGHT_RGB->"#control-color-light-group"
-           Constant.DEVICE_TYPE_CURTAIN->"#control-curtain-group"
-           Constant.DEVICE_TYPE_CONNECTOR->"#control-relay-group"
-           else -> "#control-normal-group"
-       }
+        var wbType = when (setGroupType()) {
+            Constant.DEVICE_TYPE_LIGHT_NORMAL -> "#control-normal-group"
+            Constant.DEVICE_TYPE_LIGHT_RGB -> "#control-color-light-group"
+            Constant.DEVICE_TYPE_CURTAIN -> "#control-curtain-group"
+            Constant.DEVICE_TYPE_CONNECTOR -> "#control-relay-group"
+            else -> "#control-normal-group"
+        }
         var intent = Intent(mContext, InstructionsForUsActivity::class.java)
-        intent.putExtra(Constant.WB_TYPE,wbType)
+        intent.putExtra(Constant.WB_TYPE, wbType)
         startActivity(intent)
     }
 
@@ -372,64 +371,67 @@ abstract class BaseGroupFragment : BaseFragment() {
     abstract fun getGroupData(): Collection<DbGroup>
 
 
-                @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
         if (gateWay.size > 0)
-            GwModel.getGwList()?.subscribe( {
-                    TelinkLightApplication.getApp().offLine = true
-                    hideLoadingDialog()
+            GwModel.getGwList()?.subscribe({
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
                 it.forEach { db ->
-                        //网关在线状态，1表示在线，0表示离线
-                        if (db.state == 1)
-                            TelinkLightApplication.getApp().offLine = false
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
-                    if (!TelinkLightApplication.getApp().offLine) {
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                            hideLoadingDialog()
-                            runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
-                        }
-                        val low = currentGroup!!.meshAddr and 0xff
-                        val hight = (currentGroup!!.meshAddr shr 8) and 0xff
-                        val gattBody = GwGattBody()
-                        var gattPar: ByteArray
-                        if (isOpen) {
-                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_GROUP_ON
-                        } else {
-                            gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                            gattBody.ser_id = Constant.SER_ID_GROUP_OFF
-                        }
-
-                        //val encoder = Base64.getEncoder()
-                        // val s = encoder.encodeToString(gattPar)
-                        gattBody.data = Base64Utils.encodeToStrings(gattPar)
-                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                        gattBody.meshAddr = currentGroup!!.meshAddr
-                        sendToServer(gattBody)
+                    val low = currentGroup!!.meshAddr and 0xff
+                    val hight = (currentGroup!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray
+                    if (isOpen) {
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ON
                     } else {
-                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattBody.ser_id = Constant.SER_ID_GROUP_OFF
                     }
-                }, {
-                    hideLoadingDialog()
+
+                    //val encoder = Base64.getEncoder()
+                    // val s = encoder.encodeToString(gattPar)
+                    gattBody.data = Base64Utils.encodeToStrings(gattPar)
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentGroup!!.meshAddr
+                    sendToServer(gattBody, isOpen)
+                } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
             })
     }
 
-    private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendDeviceToGatt(gattBody)?.subscribe( {
-                disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$it")
-            },{
-                disposableTimer?.dispose()
-                ToastUtils.showShort(it.message)
-                LogUtils.v("zcl-----------远程控制-------${it.message}")
+    @SuppressLint("CheckResult")
+    private fun sendToServer(gattBody: GwGattBody, open: Boolean) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe({
+            disposableTimer?.dispose()
+            updateLights(open, currentGroup!!)
+            LogUtils.v("zcl-----------远程控制-------$it")
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGroup = groupList[position]
         currentPosition = position
@@ -440,7 +442,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             R.id.template_device_icon -> {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     goConnect(false)
-                    sendToGw(true)
+                    sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                 } else
                     if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
                             || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
@@ -516,7 +518,6 @@ abstract class BaseGroupFragment : BaseFragment() {
 
             R.id.template_device_card_delete -> deleteSingleGroup(currentGroup!!)
 
-
             //不能使用group_name否则会造成长按监听无效 跳转组详情
             //  R.id.item_layout -> {
             R.id.template_device_more -> {
@@ -543,6 +544,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun deleteSingleGroup(dbGroup: DbGroup) {
         AlertDialog.Builder(mContext)
                 .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
@@ -559,7 +561,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                         deleteFailToast()
                                     })
                         }
-                         Constant.DEVICE_TYPE_CURTAIN -> {
+                        Constant.DEVICE_TYPE_CURTAIN -> {
                             val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
                             showLoadingDialog(getString(R.string.please_wait))
                             deleteGroupCurtain(lights, dbGroup,
@@ -569,7 +571,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     failedCallback = {
                                         deleteFailToast()
                                     })
-                        } Constant.DEVICE_TYPE_CONNECTOR -> {
+                        }
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
                             val lights = DBUtils.getConnectorByGroupID(dbGroup.id)
                             showLoadingDialog(getString(R.string.please_wait))
                             deleteGroupRelay(lights, dbGroup,
@@ -789,11 +792,12 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
         }
     }
+
     /**
      * 删除组，并且把组里的灯的组也都删除。
      */
     private fun deleteGroupCurtain(lights: MutableList<DbCurtain>, group: DbGroup, retryCount: Int = 0,
-                                 successCallback: () -> Unit, failedCallback: () -> Unit) {
+                                   successCallback: () -> Unit, failedCallback: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             if (lights.count() != 0) {
                 val maxRetryCount = 3

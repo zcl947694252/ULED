@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
+import com.dadoutek.uled.router.bean.RouteGroupingBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -193,7 +194,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
 
         emptyGroupView = LayoutInflater.from(this).inflate(R.layout.empty_group_view, null)
-        btnAddGroups = emptyGroupView!!.findViewById<TextView>(R.id.add_groups_btn)
+        btnAddGroups = emptyGroupView!!.findViewById(R.id.add_groups_btn)
 
         batch_four_device_recycle.layoutManager = GridLayoutManager(this, 4)
         // batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
@@ -1903,5 +1904,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 .build()
         scanFilters.add(scanFilter)
         return scanFilters
+    }
+
+    override fun routerGroupResult(fromJson: RouteGroupingBean?) {
+        if (fromJson?.finish==true){
+            initData()
+        }else{
+            ToastUtils.showShort(getString(R.string.router_grouping))
+        }
     }
 }

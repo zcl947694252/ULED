@@ -55,7 +55,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var batchGp: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var group: DbGroup? = null
-    private  var lightList: MutableList<DbLight> = mutableListOf()
+    private var lightList: MutableList<DbLight> = mutableListOf()
     private var deviceAdapter: LightsOfGroupRecyclerViewAdapter? = LightsOfGroupRecyclerViewAdapter(R.layout.template_device_type_item, lightList)
     private var positionCurrent: Int = 0
     private var currentLight: DbLight? = null
@@ -184,7 +184,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         if (group?.meshAddr == 0xffff)
             filter("", false)
         else
-            lightList .addAll( DBUtils.getLightByGroupID(group!!.id))
+            lightList.addAll(DBUtils.getLightByGroupID(group!!.id))
 
         deviceAdapter?.notifyDataSetChanged()
         setEmptyAndToolbarTV()
@@ -355,7 +355,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 canBeRefresh = true
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
-                       Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
+                        Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
                         lightList[position]!!.connectionStatus = ConnectionStatus.ON.value
                     }
                     else -> {
@@ -395,16 +395,14 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
+        builder.setMessage(getString(R.string.sure_delete_device, dbLight.name))
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-            deletePreGroup(dbLight)
-
-            DBUtils.updateGroup(group!!)
-
-            dbLight.hasGroup = false
-            dbLight.belongGroupId = 1
-            DBUtils.updateLight(dbLight)
-
+            /*   deletePreGroup(dbLight)
+               DBUtils.updateGroup(group!!)
+               dbLight.hasGroup = false
+               dbLight.belongGroupId = 1
+               DBUtils.updateLight(dbLight)*/
+            DBUtils.deleteLight(dbLight)
             lightList.remove(dbLight)
             deviceAdapter?.notifyDataSetChanged()
             setEmptyAndToolbarTV()

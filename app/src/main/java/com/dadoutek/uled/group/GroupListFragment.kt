@@ -183,6 +183,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
@@ -506,6 +507,7 @@ class GroupListFragment : BaseFragment() {
     }
 
 
+    @SuppressLint("StringFormatInvalid")
     @RequiresApi(Build.VERSION_CODES.O)
     private val onClick = View.OnClickListener {
         var intent: Intent?

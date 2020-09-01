@@ -252,7 +252,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             setResult(Constant.RESULT_OK)
         }
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
@@ -263,7 +263,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     ToastUtils.showShort(getString(R.string.please_select_group))
                     return@setOnClickListener
                 }
-                if (mAdapter.selectedPos != -1) {
+                //if (mAdapter.selectedPos != -1) {
                     sw_progressBar.visibility = View.VISIBLE
                     setGroupForSwitch()
                     Thread.sleep(300)
@@ -287,9 +287,9 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                                     mIsConfiguring = false
                                 }
                             })
-                } else {
+               /* } else {
                     snackbar(view, getString(R.string.please_select_group))
-                }
+                }*/
             }
         }
 
@@ -316,7 +316,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     }
 
     override fun initData() {
-        TODO("Not yet implemented")
+
     }
 
 
@@ -435,7 +435,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + switchDate!!.meshAddr
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.belongGroupId = currentGroup?.id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress

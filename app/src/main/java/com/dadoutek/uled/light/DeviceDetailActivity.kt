@@ -205,6 +205,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         listAdapter?.notifyDataSetChanged()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     val onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
         if (position < lightsData.size) {
             currentDevice = lightsData[position]

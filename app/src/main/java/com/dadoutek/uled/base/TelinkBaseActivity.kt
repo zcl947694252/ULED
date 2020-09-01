@@ -661,8 +661,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
-                    val fromJson = Gson().fromJson(msg, RouteGroupingBean::class.java)
-                    routerGroupResult(fromJson)
+                    val routerGroup = Gson().fromJson(msg, RouteGroupingBean::class.java)
+                    routerGroupResult(routerGroup)
                 }
 
             }
@@ -717,7 +717,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun routerGroupResult(fromJson: RouteGroupingBean?) {
+    open fun routerGroupResult(routerGroup: RouteGroupingBean?) {
     }
 
     open fun startRouterScan(cmdBodyBean: CmdBodyBean) {
