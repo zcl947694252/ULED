@@ -17,7 +17,7 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity
 public class DbRouter {
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
     private int uid;
     private int belongRegionId;
     private String name;
@@ -26,17 +26,19 @@ public class DbRouter {
     private int timeZoneMin;
     private int productUUID;
     private int state;
-    private String ble_version;
-    private String esp_version;
-    private String lastOnlineTime;
-    private String lastOfflineTime;
+    private String version;
+    private String ble_version="";
+    private String esp_version ="";
+    private String lastOnlineTime="";
+    private String lastOfflineTime="";
     private int open;
-    public  boolean isChecked = false;
+    public  boolean isSelect = false;
 
-    @Generated(hash = 408447731)
-    public DbRouter(long id, int uid, int belongRegionId, String name, String macAddr, int timeZoneHour,
-            int timeZoneMin, int productUUID, int state, String ble_version, String esp_version,
-            String lastOnlineTime, String lastOfflineTime, int open, boolean isChecked) {
+    @Generated(hash = 1635290746)
+    public DbRouter(Long id, int uid, int belongRegionId, String name, String macAddr, int timeZoneHour,
+            int timeZoneMin, int productUUID, int state, String version, String ble_version,
+            String esp_version, String lastOnlineTime, String lastOfflineTime, int open,
+            boolean isSelect) {
         this.id = id;
         this.uid = uid;
         this.belongRegionId = belongRegionId;
@@ -46,21 +48,22 @@ public class DbRouter {
         this.timeZoneMin = timeZoneMin;
         this.productUUID = productUUID;
         this.state = state;
+        this.version = version;
         this.ble_version = ble_version;
         this.esp_version = esp_version;
         this.lastOnlineTime = lastOnlineTime;
         this.lastOfflineTime = lastOfflineTime;
         this.open = open;
-        this.isChecked = isChecked;
+        this.isSelect = isSelect;
     }
 
     @Generated(hash = 848701062)
     public DbRouter() {
     }
 
-    public long getId() { return id;}
+    public Long getId() { return id;}
 
-    public void setId(long id) { this.id = id;}
+    public void setId(Long id) { this.id = id;}
 
     public int getUid() { return uid;}
 
@@ -115,19 +118,35 @@ public class DbRouter {
 
     public void setOpen(int open) { this.open = open;}
 
-    public boolean getIsCheckedInGroup() {
-        return this.isChecked;
+    public boolean isSelect() {
+        return isSelect;
+    }
+
+    public void setSelect(boolean select) {
+        isSelect = select;
+    }
+
+    public boolean getSelect() {
+        return this.isSelect;
     }
 
     public void setIsCheckedInGroup(boolean isCheckedInGroup) {
-        this.isChecked = isCheckedInGroup;
+        this.isSelect = isCheckedInGroup;
     }
 
-    public boolean getIsChecked() {
-        return this.isChecked;
+    public boolean getIsSelect() {
+        return this.isSelect;
     }
 
-    public void setIsChecked(boolean isChecked) {
-        this.isChecked = isChecked;
+    public void setIsSelect(boolean isSelect) {
+        this.isSelect = isSelect;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

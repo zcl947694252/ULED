@@ -45,6 +45,9 @@ class DeviceTypeRecycleViewAdapter(layoutResId: Int, data: List<DeviceItem>?) : 
             DeviceType.GATE_WAY -> {
                 helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gateway)
             }
+            DeviceType.ROUTER -> {
+                helper.setImageResource(R.id.template_device_icon, R.drawable.icon_gateway)
+            }
         }
     }
 }

@@ -41,8 +41,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property IsSelected = new Property(14, boolean.class, "isSelected", false, "IS_SELECTED");
         public final static Property RouterName = new Property(15, String.class, "routerName", false, "ROUTER_NAME");
         public final static Property IsChecked = new Property(16, Boolean.class, "isChecked", false, "IS_CHECKED");
-        public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Selected = new Property(17, boolean.class, "selected", false, "SELECTED");
+        public final static Property BelongRouterMacAddr = new Property(18, String.class, "belongRouterMacAddr", false, "BELONG_ROUTER_MAC_ADDR");
+        public final static Property IsMostNew = new Property(19, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property IsSupportOta = new Property(20, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -75,8 +77,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"IS_SELECTED\" INTEGER NOT NULL ," + // 14: isSelected
                 "\"ROUTER_NAME\" TEXT," + // 15: routerName
                 "\"IS_CHECKED\" INTEGER," + // 16: isChecked
-                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 17: isMostNew
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 18: isSupportOta
+                "\"SELECTED\" INTEGER NOT NULL ," + // 17: selected
+                "\"BELONG_ROUTER_MAC_ADDR\" TEXT," + // 18: belongRouterMacAddr
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 19: isMostNew
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 20: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -141,8 +145,14 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (isChecked != null) {
             stmt.bindLong(17, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getSelected() ? 1L: 0L);
+ 
+        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
+        if (belongRouterMacAddr != null) {
+            stmt.bindString(19, belongRouterMacAddr);
+        }
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -201,8 +211,14 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (isChecked != null) {
             stmt.bindLong(17, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getSelected() ? 1L: 0L);
+ 
+        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
+        if (belongRouterMacAddr != null) {
+            stmt.bindString(19, belongRouterMacAddr);
+        }
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -230,8 +246,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.getShort(offset + 14) != 0, // isSelected
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // routerName
             cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0, // isChecked
-            cursor.getShort(offset + 17) != 0, // isMostNew
-            cursor.getShort(offset + 18) != 0 // isSupportOta
+            cursor.getShort(offset + 17) != 0, // selected
+            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // belongRouterMacAddr
+            cursor.getShort(offset + 19) != 0, // isMostNew
+            cursor.getShort(offset + 20) != 0 // isSupportOta
         );
         return entity;
     }
@@ -255,8 +273,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setIsSelected(cursor.getShort(offset + 14) != 0);
         entity.setRouterName(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
         entity.setIsChecked(cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
+        entity.setSelected(cursor.getShort(offset + 17) != 0);
+        entity.setBelongRouterMacAddr(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
+        entity.setIsMostNew(cursor.getShort(offset + 19) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 20) != 0);
      }
     
     @Override

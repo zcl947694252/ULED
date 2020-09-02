@@ -31,7 +31,8 @@ public class DbCurtain implements Serializable {
     private int speed;
     private boolean closeSlowStart;
     private int index;
-
+    public String routerName;
+    public String belongRouterMacAddr;
     public String getBoundMac() {
         return boundMac;
     }
@@ -64,11 +65,12 @@ public class DbCurtain implements Serializable {
     public boolean isMostNew = false;
 
 
-    @Generated(hash = 131630581)
+    @Generated(hash = 1022301937)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
             int productUUID, int status, boolean inverse, boolean closePull, int speed,
-            boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
-            String boundMac, int rssi, boolean isSupportOta, boolean isMostNew) {
+            boolean closeSlowStart, int index, String routerName, String belongRouterMacAddr,
+            Long belongGroupId, String groupName, String version, String boundMac, int rssi,
+            boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -81,6 +83,8 @@ public class DbCurtain implements Serializable {
         this.speed = speed;
         this.closeSlowStart = closeSlowStart;
         this.index = index;
+        this.routerName = routerName;
+        this.belongRouterMacAddr = belongRouterMacAddr;
         this.belongGroupId = belongGroupId;
         this.groupName = groupName;
         this.version = version;
@@ -94,6 +98,21 @@ public class DbCurtain implements Serializable {
     public DbCurtain() {
     }
 
+    public String getRouterName() {
+        return routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public String getBelongRouterMacAddr() {
+        return belongRouterMacAddr;
+    }
+
+    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
+        this.belongRouterMacAddr = belongRouterMacAddr;
+    }
 
     public boolean isSupportOta() {
         return isSupportOta;

@@ -25,6 +25,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.RouterDeviceDetailsActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -57,8 +58,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.template_device_type_item, deviceTypeList)
     private var isGuide = false
     private var isRgbClick = false
-    private var firstShowGuide = true
-    private var guideShowCurrentPage = false
     private val SCENE_MAX_COUNT = 100
 
     val CREATE_SCENE_REQUESTCODE = 2
@@ -68,13 +67,10 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initToolBar(view)
+        initToolBar()
         initData()
         initView()
         initListener()
-        if (firstShowGuide) {
-            firstShowGuide = false
-        }
     }
 
     private fun initListener() {
@@ -95,7 +91,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         initAdapterData()
     }
 
-    private fun initToolBar(view: View?) {
+    private fun initToolBar() {
         toolbarTv!!.setText(R.string.device)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
@@ -104,14 +100,14 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
             val lastUser = DBUtils.lastUser
             lastUser?.let {
-                if (it.id.toString() != it.last_authorizer_user_id)
-                    ToastUtils.showLong(getString(R.string.author_region_warm))
-                else {
-                    isGuide = false
-                    if (dialog_pop?.visibility == View.GONE) {
-                        showPopupMenu()
-                    } else {
-                        hidePopupMenu()
+                when {
+                    it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                    else -> {
+                        isGuide = false
+                        when (dialog_pop?.visibility) {
+                            View.GONE ->showPopupMenu()
+                            else -> hidePopupMenu()
+                        }
                     }
                 }
             }
@@ -151,7 +147,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        var intent: Intent = Intent()
+        var intent = Intent()
         when (deviceTypeList[position].installType) {
             Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
@@ -181,6 +177,10 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }
+            Constant.INSTALL_ROUTER -> {//不存在分组    sandian
+                intent = Intent(activity, RouterDeviceDetailsActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_ROUTER)
+            }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
     }
@@ -198,6 +198,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           ,Constant.INSTALL_CURTAIN)
         isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  ,Constant.INSTALL_CONNECTOR)
         isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constant.INSTALL_GATEWAY)
+        isAddDevice(R.string.router,DBUtils.getAllRouter().size,DeviceType.ROUTER                , Constant.INSTALL_ROUTER)
 
         deviceAdapter.notifyDataSetChanged()
     }

@@ -19,7 +19,7 @@ import com.dadoutek.uled.model.dbModel.DbConnector
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchFourRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
+class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return

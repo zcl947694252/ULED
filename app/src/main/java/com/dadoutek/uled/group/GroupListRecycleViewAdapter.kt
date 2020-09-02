@@ -58,7 +58,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
             var curtainNum:Int=0
             for(i in itemTypeGroup.list!!.indices){
                 if(OtherUtils.isConnector(itemTypeGroup.list[i])){
-                    num=DBUtils.getConnectorByGroupID(itemTypeGroup.list[i].id).size
+                    num=DBUtils.getRelayByGroupID(itemTypeGroup.list[i].id).size
                     curtainNum+=num
                 }
             }

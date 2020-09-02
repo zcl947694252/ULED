@@ -441,19 +441,19 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .gwList
                                 .compose(NetworkTransformer())
-                    }/*.flatMap {
+                    }.flatMap {
                         for (item in it) {
                             DBUtils.saveGateWay(item, true)
                         }
                         NetworkFactory.getApi().routerList.compose(NetworkTransformer())
-                    }*/
+                    }
                     .flatMap {
-                    /*    for (item in it) {
-                            DBUtils.saveRouter(item, true)
-                        }*/
                         for (item in it) {
-                            DBUtils.saveGateWay(item, true)
+                            DBUtils.saveRouter(item, true)
                         }
+                      /*  for (item in it) {
+                            DBUtils.saveGateWay(item, true)
+                        }*/
 
                         NetworkFactory.getApi()
                                 .getSwitchList(token)

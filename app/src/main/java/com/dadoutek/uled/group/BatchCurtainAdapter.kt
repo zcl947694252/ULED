@@ -19,7 +19,7 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchFourCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
+class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return

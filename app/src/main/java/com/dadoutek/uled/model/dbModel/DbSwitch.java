@@ -29,7 +29,7 @@ public class DbSwitch implements Serializable {
     private String controlSceneId;
     private int index;
     private Long belongGroupId;
-
+    public String belongRouterMacAddr;
     public int rssi =1000;
     private String keys = "";
     @Nullable
@@ -89,13 +89,13 @@ public class DbSwitch implements Serializable {
     public int type;
 
 
-    @Generated(hash = 362553851)
+    @Generated(hash = 544282101)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
-            Long belongGroupId, int rssi, String keys, String groupIds,
-            String sceneIds, String controlGroupAddrs, String version,
-            boolean isMostNew, String boundMac, String routerName, long routerId,
-            Boolean isChecked, boolean isSupportOta, int type) {
+            Long belongGroupId, String belongRouterMacAddr, int rssi, String keys,
+            String groupIds, String sceneIds, String controlGroupAddrs,
+            String version, boolean isMostNew, String boundMac, String routerName,
+            long routerId, Boolean isChecked, boolean isSupportOta, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -105,6 +105,7 @@ public class DbSwitch implements Serializable {
         this.controlSceneId = controlSceneId;
         this.index = index;
         this.belongGroupId = belongGroupId;
+        this.belongRouterMacAddr = belongRouterMacAddr;
         this.rssi = rssi;
         this.keys = keys;
         this.groupIds = groupIds;
@@ -124,6 +125,13 @@ public class DbSwitch implements Serializable {
     public DbSwitch() {
     }
 
+    public String getBelongRouterMacAddr() {
+        return belongRouterMacAddr;
+    }
+
+    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
+        this.belongRouterMacAddr = belongRouterMacAddr;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

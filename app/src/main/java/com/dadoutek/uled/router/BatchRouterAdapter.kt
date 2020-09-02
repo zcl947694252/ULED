@@ -25,7 +25,7 @@ class BatchRouterAdapter(layoutResId: Int, data: RxDeviceList<DbRouter>) : BaseQ
         helper.setText(R.id.template_device_batch_title, item.name)
                 .setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number))
 
-        if (item.isChecked) {
+        if (item.isSelect) {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)

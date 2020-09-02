@@ -27,6 +27,7 @@ import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -49,6 +50,7 @@ import java.util.*
  */
 
 class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListener {
+    private var bindRouter: MenuItem? = null
     private var deviceType: Int? = 0
     private var deleteDevice: MenuItem? = null
     private var onlineUpdate: MenuItem? = null
@@ -206,10 +208,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+        bindRouter = toolbar.menu?.findItem(R.id.toolbar_bind_router)
 
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
         deleteDevice?.title = getString(R.string.edite_device)
+        bindRouter?.isVisible = true
 
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true
@@ -222,10 +226,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                         R.id.toolbar_batch_gp -> skipeBatch()
                         R.id.toolbar_on_line -> goOta()
                         R.id.toolbar_delete_device -> editeDevice()
+                        R.id.toolbar_bind_router -> bindRouterDevice()
                     }
             }
             true
         }
+    }
+
+    private fun bindRouterDevice() {
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", group)
+        startActivity(intent)
     }
 
     private fun editeDevice() {

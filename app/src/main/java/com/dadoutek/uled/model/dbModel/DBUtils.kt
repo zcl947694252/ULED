@@ -386,7 +386,7 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getGroupNameByID(id: Long?,context: Context): String {
+    fun getGroupNameByID(id: Long?, context: Context): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
         if (group != null) {
             return group.name
@@ -635,7 +635,7 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getConnectorByGroupID(id: Long): ArrayList<DbConnector> {
+    fun getRelayByGroupID(id: Long): ArrayList<DbConnector> {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
     }
@@ -824,24 +824,18 @@ object DBUtils {
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
-        DaoSessionInstance.getInstance().dbRouterDao.insert(db)
+            DaoSessionInstance.getInstance().dbRouterDao.insert(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
-            if (existList.size > 0) {
-                recordingChange(db.id,
-                        DaoSessionInstance.getInstance().dbRouterDao.tablename,
-                        Constant.DB_UPDATE)
-            } else {
-                recordingChange(db.id,
-                        DaoSessionInstance.getInstance().dbRouterDao.tablename,
-                        Constant.DB_ADD)
+            when {
+                existList.size > 0 -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constant.DB_UPDATE)
+                else -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constant.DB_ADD)
             }
         }
     }
 
     fun saveEightSwitch(db: DbEightSwitch, isFromServer: Boolean) {
-        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.
-        Properties.MeshAddr.eq(db.meshAddr)).list()
+        val existList = DaoSessionInstance.getInstance().dbEightSwitchDao.queryBuilder().where(DbEightSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
 
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改
@@ -1019,6 +1013,7 @@ object DBUtils {
     fun updateRouter(router: DbRouter) {
         saveRouter(router, false)
     }
+
     @Deprecated("Use saveGateWay()")
     private fun updateGate(gateway: DbGateway) {
         saveGateWay(gateway, false)
@@ -1195,6 +1190,14 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbGatewayDao.delete(gateway)
         recordingChange(gateway.id,
                 DaoSessionInstance.getInstance().dbGatewayDao.tablename,
+                Constant.DB_DELETE
+        )
+    }
+
+    fun deleteRouter(dbRouter: DbRouter) {
+        DaoSessionInstance.getInstance().dbRouterDao.delete(dbRouter)
+        recordingChange(dbRouter.id,
+                DaoSessionInstance.getInstance().dbRouterDao.tablename,
                 Constant.DB_DELETE
         )
     }

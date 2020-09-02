@@ -126,9 +126,9 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-//        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
-//        if (DBUtils.getAllRouter().size > 1)
-//            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+        if (DBUtils.getAllRouter().size > 1)
+            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")
@@ -173,6 +173,7 @@ class SettingActivity : TelinkBaseActivity() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun userSet() {
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR, 1, 1, 1, 1, 1, 1, 1))
         UserModel.clearUserData((DBUtils.lastUser?.last_region_id ?: "0").toInt())?.subscribe({  //删除服务器数据

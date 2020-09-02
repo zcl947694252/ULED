@@ -309,7 +309,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun setRelayData() {
         relayList.clear()
         if (isGroup)
-            relayList.addAll(DBUtils.getConnectorByGroupID(dbGroup!!.id))
+            relayList.addAll(DBUtils.getRelayByGroupID(dbGroup!!.id))
         else
             relayList.addAll(DBUtils.allRely)
 

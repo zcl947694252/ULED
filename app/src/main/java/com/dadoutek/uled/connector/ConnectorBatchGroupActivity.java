@@ -936,7 +936,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         }
 
         if (relayType.equals("relayGroup")) {
-            List<DbConnector> relayList =DBUtils.INSTANCE.getConnectorByGroupID(selectGroupId);
+            List<DbConnector> relayList =DBUtils.INSTANCE.getRelayByGroupID(selectGroupId);
             this.adapter = new DeviceListAdapter(relayList, this);
             nowLightList.addAll(relayList);
         } else {

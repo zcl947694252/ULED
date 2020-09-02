@@ -36,6 +36,8 @@ public class DbSensor implements Serializable {
     public  boolean isSelected  =false;
     public  String routerName ="";
     public Boolean isChecked;
+    public boolean selected;
+    public String belongRouterMacAddr;
     public String getBoundMac() {
         return boundMac;
     }
@@ -58,13 +60,13 @@ public class DbSensor implements Serializable {
 
     public boolean isSupportOta =true;
 
-
-    @Generated(hash = 474504528)
+    @Generated(hash = 1597878934)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
-            String macAddr, int productUUID, int index, Long belongGroupId, String version,
-            int rssi, int openTag, int setType, int sceneId, String boundMac,
-            boolean isSelected, String routerName, Boolean isChecked, boolean isMostNew,
-            boolean isSupportOta) {
+            String macAddr, int productUUID, int index, Long belongGroupId,
+            String version, int rssi, int openTag, int setType, int sceneId,
+            String boundMac, boolean isSelected, String routerName,
+            Boolean isChecked, boolean selected, String belongRouterMacAddr,
+            boolean isMostNew, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -82,6 +84,8 @@ public class DbSensor implements Serializable {
         this.isSelected = isSelected;
         this.routerName = routerName;
         this.isChecked = isChecked;
+        this.selected = selected;
+        this.belongRouterMacAddr = belongRouterMacAddr;
         this.isMostNew = isMostNew;
         this.isSupportOta = isSupportOta;
     }
@@ -90,8 +94,13 @@ public class DbSensor implements Serializable {
     public DbSensor() {
     }
 
+    public String getBelongRouterMacAddr() {
+        return belongRouterMacAddr;
+    }
 
-
+    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
+        this.belongRouterMacAddr = belongRouterMacAddr;
+    }
 
     public int getIcon() {
         return icon;
@@ -180,6 +189,30 @@ public class DbSensor implements Serializable {
         this.version = version;
     }
 
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
+    }
+
     @Override
     public String toString() {
         return "DbSensor{" +
@@ -261,5 +294,9 @@ public class DbSensor implements Serializable {
 
     public void setIsChecked(Boolean isChecked) {
         this.isChecked = isChecked;
+    }
+
+    public boolean getSelected() {
+        return this.selected;
     }
 }

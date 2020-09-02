@@ -35,6 +35,8 @@ public class DbLight implements Serializable {
 
     public int color=0xffffff;//颜色
     public String version;
+    public String routerName;
+    public String belongRouterMacAddr;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -66,11 +68,12 @@ public class DbLight implements Serializable {
         this.boundMac = boundMac;
     }
 
-    @Generated(hash = 2032343110)
+    @Generated(hash = 468140823)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
             int productUUID, Long belongGroupId, int index, String boundMac,
-            int color, String version, int status, int rssi, boolean isSupportOta,
+            int color, String version, String routerName,
+            String belongRouterMacAddr, int status, int rssi, boolean isSupportOta,
             boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
@@ -86,6 +89,8 @@ public class DbLight implements Serializable {
         this.boundMac = boundMac;
         this.color = color;
         this.version = version;
+        this.routerName = routerName;
+        this.belongRouterMacAddr = belongRouterMacAddr;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
@@ -95,8 +100,30 @@ public class DbLight implements Serializable {
     @Generated(hash = 2075223479)
     public DbLight() {
     }
-    
 
+    public String getRouterName() {
+        return routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public String getBelongRouterMacAddr() {
+        return belongRouterMacAddr;
+    }
+
+    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
+        this.belongRouterMacAddr = belongRouterMacAddr;
+    }
+
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
     public boolean isSupportOta() {
         return isSupportOta;
     }

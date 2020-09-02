@@ -119,11 +119,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val lightAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, noGroup)
     private val lightGroupedAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, listGroup)
 
-    private val relayAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_small_item, noGroupRelay)
-    private val relayGroupedAdapter: BatchFourRelayAdapter = BatchFourRelayAdapter(R.layout.template_batch_small_item, listGroupRelay)
+    private val relayAdapterm: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, noGroupRelay)
+    private val relayGroupedAdapterm: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, listGroupRelay)
 
-    private val curtainAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_small_item, noGroupCutain)
-    private val curtainGroupedAdapter: BatchFourCurtainAdapter = BatchFourCurtainAdapter(R.layout.template_batch_small_item, listGroupCutain)
+    private val curtainAdapterm: BatchCurtainAdapter = BatchCurtainAdapter(R.layout.template_batch_small_item, noGroupCutain)
+    private val curtainGroupedAdapterm: BatchCurtainAdapter = BatchCurtainAdapter(R.layout.template_batch_small_item, listGroupCutain)
 
     private val allLightId: Long = 1//belongGroupId如果等于1则标识没有群组
     private var deviceType: Int = 100
@@ -238,15 +238,15 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
 
             DeviceType.SMART_CURTAIN -> {
-                curtainAdapter.bindToRecyclerView(batch_four_device_recycle)
-                curtainGroupedAdapter.bindToRecyclerView(batch_four_device_recycle_grouped)//默认是隐藏的显示未分组的界面
+                curtainAdapterm.bindToRecyclerView(batch_four_device_recycle)
+                curtainGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)//默认是隐藏的显示未分组的界面
 
                 //subCurtainData()
             }
 
             DeviceType.SMART_RELAY -> {
-                relayAdapter.bindToRecyclerView(batch_four_device_recycle)
-                relayGroupedAdapter.bindToRecyclerView(batch_four_device_recycle_grouped)
+                relayAdapterm.bindToRecyclerView(batch_four_device_recycle)
+                relayGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)
 
                 //subRelayData()
             }
@@ -262,7 +262,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         if (checkedNoGrouped)
             setDeviceListAndEmpty(noGroupRelay.size)
         setTitleTexts(noGroupRelay.size, listGroupRelay.size)
-        relayAdapter.notifyDataSetChanged()
+        relayAdapterm.notifyDataSetChanged()
 
 
         val observableGrouped = deviceDataRelayAll.filter {  it.belongGroupId!=0L&&it.belongGroupId!=1L }
@@ -272,7 +272,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         if (!checkedNoGrouped)
             setDeviceListAndEmpty(listGroupRelay.size)
         setTitleTexts(noGroupRelay.size, listGroupRelay.size)
-        relayGroupedAdapter.notifyDataSetChanged()
+        relayGroupedAdapterm.notifyDataSetChanged()
     }
 
     private fun subCurtainData() {
@@ -294,8 +294,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         setTitleTexts(noGroupCutain.size, listGroupCutain.size)
 
-        curtainAdapter.notifyDataSetChanged()
-        curtainGroupedAdapter.notifyDataSetChanged()
+        curtainAdapterm.notifyDataSetChanged()
+        curtainGroupedAdapterm.notifyDataSetChanged()
     }
 
     @SuppressLint("StringFormatMatches")
@@ -411,14 +411,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                     if (device.belongGroupId == group.id)
                                         device.groupName = group.name
                                 }
-                                curtainGroupedAdapter.notifyDataSetChanged()
+                                curtainGroupedAdapterm.notifyDataSetChanged()
                             }
                             DeviceType.SMART_RELAY -> {
                                 for (device in listGroupRelay) {
                                     if (device.belongGroupId == group.id)
                                         device.groupName = group.name
                                 }
-                                relayGroupedAdapter.notifyDataSetChanged()
+                                relayGroupedAdapterm.notifyDataSetChanged()
                             }
                         }
                     }
@@ -855,19 +855,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         //如果adapter内部使用了addLongclicklistener 那么外部必须使用longchildren否则addLongClick无效
         lightAdapterm.onItemClickListener = this
-        relayAdapter.onItemClickListener = this
-        curtainAdapter.onItemClickListener = this
+        relayAdapterm.onItemClickListener = this
+        curtainAdapterm.onItemClickListener = this
         lightGroupedAdapterm.onItemClickListener = this
-        relayGroupedAdapter.onItemClickListener = this
-        curtainGroupedAdapter.onItemClickListener = this
+        relayGroupedAdapterm.onItemClickListener = this
+        curtainGroupedAdapterm.onItemClickListener = this
 
         lightAdapterm.onItemLongClickListener = this
-        relayAdapter.onItemLongClickListener = this
-        curtainAdapter.onItemLongClickListener = this
+        relayAdapterm.onItemLongClickListener = this
+        curtainAdapterm.onItemLongClickListener = this
 
         lightGroupedAdapterm.onItemLongClickListener = this
-        relayGroupedAdapter.onItemLongClickListener = this
-        curtainGroupedAdapter.onItemLongClickListener = this
+        relayGroupedAdapterm.onItemLongClickListener = this
+        curtainGroupedAdapterm.onItemLongClickListener = this
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
@@ -893,7 +893,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         stopBlink(noGroupCutain[position].meshAddr, noGroupCutain[position].belongGroupId)
                     }
                     changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainAdapter.notifyItemRangeChanged(0, noGroupCutain.size)
+                    curtainAdapterm.notifyItemRangeChanged(0, noGroupCutain.size)
                     LogUtils.v("zcl更新后状态${noGroupCutain[position].selected}")
                 }
                 DeviceType.SMART_RELAY -> {
@@ -904,7 +904,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         stopBlink(noGroupRelay[position].meshAddr, noGroupRelay[position].belongGroupId)
                     }
                     changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayAdapter.notifyItemRangeChanged(0, noGroupRelay.size)
+                    relayAdapterm.notifyItemRangeChanged(0, noGroupRelay.size)
                     LogUtils.v("zcl更新后状态${noGroupRelay[position].selected}")
                 }
             }
@@ -930,7 +930,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         stopBlink(listGroupCutain[position].meshAddr, listGroupCutain[position].belongGroupId)
                     }
                     changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainGroupedAdapter.notifyItemRangeChanged(0, listGroupCutain.size)
+                    curtainGroupedAdapterm.notifyItemRangeChanged(0, listGroupCutain.size)
                     LogUtils.v("zcl更新后状态${listGroupCutain[position].selected}")
                 }
                 DeviceType.SMART_RELAY -> {
@@ -941,7 +941,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         stopBlink(listGroupRelay[position].meshAddr, listGroupRelay[position].belongGroupId)
                     }
                     changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayGroupedAdapter.notifyItemRangeChanged(0, listGroupRelay.size)
+                    relayGroupedAdapterm.notifyItemRangeChanged(0, listGroupRelay.size)
                     LogUtils.v("zcl更新后状态${listGroupRelay[position].selected}")
                 }
             }
@@ -1439,12 +1439,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 setTitleTexts(noGroupCutain.size, listGroupCutain.size)
                 setDeviceListAndEmpty(deviceDataCurtain.size)
-                curtainAdapter.notifyItemRangeInserted(0, deviceDataCurtain.size)
+                curtainAdapterm.notifyItemRangeInserted(0, deviceDataCurtain.size)
             }
             DeviceType.SMART_RELAY -> {
                 val size = deviceDataRelay.size
                 deviceDataRelay.clear()
-                relayAdapter.notifyItemRangeRemoved(0, size)
+                relayAdapterm.notifyItemRangeRemoved(0, size)
                 if (checkedNoGrouped) {
                     batch_four_no_group.isChecked = true
                     deviceDataRelay.addAll(noGroupRelay)
@@ -1455,7 +1455,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 setTitleTexts(noGroupRelay.size, listGroupRelay.size)
                 setDeviceListAndEmpty(deviceDataRelay.size)
-                relayAdapter.notifyItemRangeInserted(0, deviceDataRelay.size)
+                relayAdapterm.notifyItemRangeInserted(0, deviceDataRelay.size)
             }
         }
         changeTitleChecked()//改变title
@@ -1556,7 +1556,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
                 }
                 Constant.DEVICE_TYPE_CONNECTOR -> {
-                    group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
+                    group.deviceCount = DBUtils.getRelayByGroupID(group.id).size  //查询改组内设备数量
                 }
                 Constant.DEVICE_TYPE_CURTAIN -> {
                     group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
@@ -1616,7 +1616,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                     }
                     changeGroupingCompleteState(noGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainAdapter.notifyDataSetChanged()
+                    curtainAdapterm.notifyDataSetChanged()
                 } else {
                     for (device in listGroupCutain)
                         for (sourceDevice in deviceDataCurtainAll)
@@ -1629,7 +1629,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                     stopBlink(device.meshAddr, device.belongGroupId)
                             }
                     changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
-                    curtainGroupedAdapter.notifyDataSetChanged()
+                    curtainGroupedAdapterm.notifyDataSetChanged()
                 }
             }
             DeviceType.SMART_RELAY -> {
@@ -1647,7 +1647,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                     }
                     changeGroupingCompleteState(noGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayAdapter.notifyDataSetChanged()
+                    relayAdapterm.notifyDataSetChanged()
                 } else {
                     for (device in listGroupRelay) {
                         for (sourceDevice in deviceDataRelayAll) {
@@ -1662,7 +1662,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                     }
                     changeGroupingCompleteState(listGroupRelay.filter { it.isSelected }.size, noGroupRelay.size)
-                    relayGroupedAdapter.notifyDataSetChanged()
+                    relayGroupedAdapterm.notifyDataSetChanged()
                 }
             }
         }
@@ -1792,12 +1792,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                         DeviceType.SMART_CURTAIN -> {
                             deviceDataCurtainAll.sortBy { it1 -> it1.rssi }
-                            curtainAdapter.notifyDataSetChanged()
-                            curtainGroupedAdapter.notifyDataSetChanged()
+                            curtainAdapterm.notifyDataSetChanged()
+                            curtainGroupedAdapterm.notifyDataSetChanged()
                         }
                         DeviceType.SMART_RELAY -> {
-                            relayAdapter.notifyDataSetChanged()
-                            relayGroupedAdapter.notifyDataSetChanged()
+                            relayAdapterm.notifyDataSetChanged()
+                            relayGroupedAdapterm.notifyDataSetChanged()
                             deviceDataRelayAll.sortBy { it1 -> it1.rssi }
                         }
                     }

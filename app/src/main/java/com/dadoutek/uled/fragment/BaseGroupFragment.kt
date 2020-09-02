@@ -353,7 +353,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size
                 Constant.DEVICE_TYPE_LIGHT_RGB -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
-                Constant.DEVICE_TYPE_CONNECTOR -> group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size  //查询改组内设备数量
+                Constant.DEVICE_TYPE_CONNECTOR -> group.deviceCount = DBUtils.getRelayByGroupID(group.id).size  //查询改组内设备数量
                 Constant.DEVICE_TYPE_CURTAIN -> group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
             }
         }
@@ -491,7 +491,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
                                 Constant.DEVICE_TYPE_LIGHT_RGB -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
                                 //蓝牙接收器
-                                Constant.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getConnectorByGroupID(currentGroup!!.id).size
+                                Constant.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getRelayByGroupID(currentGroup!!.id).size
                                 Constant.DEVICE_TYPE_CURTAIN -> num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
                             }
 
@@ -573,7 +573,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     })
                         }
                         Constant.DEVICE_TYPE_CONNECTOR -> {
-                            val lights = DBUtils.getConnectorByGroupID(dbGroup.id)
+                            val lights = DBUtils.getRelayByGroupID(dbGroup.id)
                             showLoadingDialog(getString(R.string.please_wait))
                             deleteGroupRelay(lights, dbGroup,
                                     successCallback = {

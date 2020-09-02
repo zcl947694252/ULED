@@ -37,7 +37,6 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -253,7 +252,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             isSearch -> {
                 for (i in list.indices)
                     if (groupName == list[i].name || (list[i].name).startsWith(groupName!!))
-                        lightList.addAll(DBUtils.getConnectorByGroupID(list[i].id))
+                        lightList.addAll(DBUtils.getRelayByGroupID(list[i].id))
 
 
             }
@@ -263,7 +262,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                         Collections.swap(list, 0, i)
 
                 for (j in list.indices)
-                    lightList.addAll(DBUtils.getConnectorByGroupID(list[j].id))
+                    lightList.addAll(DBUtils.getRelayByGroupID(list[j].id))
             }
         }
     }
@@ -304,7 +303,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         lightList = ArrayList()
         when (group.meshAddr) {
             0xffff -> filter("", false)
-            else -> lightList = DBUtils.getConnectorByGroupID(group.id)
+            else -> lightList = DBUtils.getRelayByGroupID(group.id)
         }
         toolbar.title = group?.name+"(${group?.deviceCount})"
         if (lightList.size > 0) {
@@ -319,7 +318,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun getNewData(): MutableList<DbConnector> {
         when (group.meshAddr) {
             0xffff -> filter("", false)
-            else -> lightList = DBUtils.getConnectorByGroupID(group.id)
+            else -> lightList = DBUtils.getRelayByGroupID(group.id)
         }
 
         when (group.meshAddr) {

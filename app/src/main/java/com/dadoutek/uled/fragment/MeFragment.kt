@@ -41,7 +41,6 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
@@ -164,7 +163,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             val lightList = ArrayList<DbConnector>()
 
             for (i in groupList.indices) {
-                lightList.addAll(DBUtils.getConnectorByGroupID(groupList[i].id!!))
+                lightList.addAll(DBUtils.getRelayByGroupID(groupList[i].id!!))
             }
             return lightList
         }

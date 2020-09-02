@@ -29,7 +29,8 @@ public class DbConnector implements Serializable {
     public int color=0xffffff;//颜色
     public String version;
     private String boundMac ="";
-
+    public String routerName;
+    public String belongRouterMacAddr;
     public String getBoundMac() {
         return boundMac;
     }
@@ -58,11 +59,12 @@ public class DbConnector implements Serializable {
     public boolean isMostNew =false;
 
 
-    @Generated(hash = 991449584)
+    @Generated(hash = 7807775)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
             int index, String groupName, int color, String version, String boundMac,
-            int status, int rssi, boolean isSupportOta, boolean isMostNew) {
+            String routerName, String belongRouterMacAddr, int status, int rssi,
+            boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -76,6 +78,8 @@ public class DbConnector implements Serializable {
         this.color = color;
         this.version = version;
         this.boundMac = boundMac;
+        this.routerName = routerName;
+        this.belongRouterMacAddr = belongRouterMacAddr;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
@@ -86,6 +90,21 @@ public class DbConnector implements Serializable {
     public DbConnector() {
     }
 
+    public String getRouterName() {
+        return routerName;
+    }
+
+    public void setRouterName(String routerName) {
+        this.routerName = routerName;
+    }
+
+    public String getBelongRouterMacAddr() {
+        return belongRouterMacAddr;
+    }
+
+    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
+        this.belongRouterMacAddr = belongRouterMacAddr;
+    }
 
     public boolean isSupportOta() {
         return isSupportOta;

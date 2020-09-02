@@ -16,4 +16,10 @@
             android:orderInCategory="3"
             android:title="@string/delete_device"
             app:showAsAction="never" />
+    <item
+            android:id="@+id/toolbar_bind_router"
+            android:orderInCategory="3"
+            android:title="@string/bind_reouter"
+            android:visible="false"
+            app:showAsAction="never" />
 </menu>

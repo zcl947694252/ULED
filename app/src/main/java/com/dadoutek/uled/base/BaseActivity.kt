@@ -316,7 +316,7 @@ abstract class BaseActivity : AppCompatActivity() {
             val lightList = ArrayList<DbConnector>()
 
             for (i in groupList.indices) {
-                lightList.addAll(DBUtils.getConnectorByGroupID(groupList[i].id!!))
+                lightList.addAll(DBUtils.getRelayByGroupID(groupList[i].id!!))
             }
             return lightList
         }
