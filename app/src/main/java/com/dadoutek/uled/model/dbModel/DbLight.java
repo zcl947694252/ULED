@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -31,12 +31,11 @@ public class DbLight implements Serializable {
     private int productUUID;
     private Long belongGroupId;//belongGroupId如果等于1则标识没有群组
     private int index;
-    private String boundMac ="";
+    private String boundMac;
 
     public int color=0xffffff;//颜色
     public String version;
-    public String routerName;
-    public String belongRouterMacAddr;
+    public String boundMacName;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -60,21 +59,12 @@ public class DbLight implements Serializable {
     public boolean isSupportOta =true;
     public boolean isMostNew= false;
 
-    public String getBoundMac() {
-        return boundMac;
-    }
-
-    public void setBoundMac(String boundMac) {
-        this.boundMac = boundMac;
-    }
-
-    @Generated(hash = 468140823)
+    @Generated(hash = 2078462295)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, int meshUUID,
             int productUUID, Long belongGroupId, int index, String boundMac,
-            int color, String version, String routerName,
-            String belongRouterMacAddr, int status, int rssi, boolean isSupportOta,
-            boolean isMostNew) {
+            int color, String version, String boundMacName, int status, int rssi,
+            boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -89,8 +79,7 @@ public class DbLight implements Serializable {
         this.boundMac = boundMac;
         this.color = color;
         this.version = version;
-        this.routerName = routerName;
-        this.belongRouterMacAddr = belongRouterMacAddr;
+        this.boundMacName = boundMacName;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
@@ -101,20 +90,20 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    public String getRouterName() {
-        return routerName;
+    public String getBoundMac() {
+        return boundMac;
     }
 
-    public void setRouterName(String routerName) {
-        this.routerName = routerName;
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
     }
 
-    public String getBelongRouterMacAddr() {
-        return belongRouterMacAddr;
+    public String getBoundMacName() {
+        return boundMacName;
     }
 
-    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
-        this.belongRouterMacAddr = belongRouterMacAddr;
+    public void setBoundMacName(String boundMacName) {
+        this.boundMacName = boundMacName;
     }
 
     public boolean isMostNew() {

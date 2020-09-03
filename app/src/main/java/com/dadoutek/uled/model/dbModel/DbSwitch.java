@@ -5,13 +5,13 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSwitch implements Serializable {
@@ -29,7 +29,6 @@ public class DbSwitch implements Serializable {
     private String controlSceneId;
     private int index;
     private Long belongGroupId;
-    public String belongRouterMacAddr;
     public int rssi =1000;
     private String keys = "";
     @Nullable
@@ -39,9 +38,8 @@ public class DbSwitch implements Serializable {
     public  String controlGroupAddrs;
     public String version;
     public boolean isMostNew = false;
-    private String boundMac ="";
-    @Nullable
-    public  String routerName;
+    private String boundMac;
+    public String boundMacName;
     @Nullable
     public  long routerId = 1;
     public Boolean isChecked;
@@ -88,14 +86,13 @@ public class DbSwitch implements Serializable {
      */
     public int type;
 
-
-    @Generated(hash = 544282101)
+    @Generated(hash = 1636677906)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
-            Long belongGroupId, String belongRouterMacAddr, int rssi, String keys,
-            String groupIds, String sceneIds, String controlGroupAddrs,
-            String version, boolean isMostNew, String boundMac, String routerName,
-            long routerId, Boolean isChecked, boolean isSupportOta, int type) {
+            Long belongGroupId, int rssi, String keys, String groupIds,
+            String sceneIds, String controlGroupAddrs, String version,
+            boolean isMostNew, String boundMac, String boundMacName, long routerId,
+            Boolean isChecked, boolean isSupportOta, int type) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -105,7 +102,6 @@ public class DbSwitch implements Serializable {
         this.controlSceneId = controlSceneId;
         this.index = index;
         this.belongGroupId = belongGroupId;
-        this.belongRouterMacAddr = belongRouterMacAddr;
         this.rssi = rssi;
         this.keys = keys;
         this.groupIds = groupIds;
@@ -114,7 +110,7 @@ public class DbSwitch implements Serializable {
         this.version = version;
         this.isMostNew = isMostNew;
         this.boundMac = boundMac;
-        this.routerName = routerName;
+        this.boundMacName = boundMacName;
         this.routerId = routerId;
         this.isChecked = isChecked;
         this.isSupportOta = isSupportOta;
@@ -125,12 +121,12 @@ public class DbSwitch implements Serializable {
     public DbSwitch() {
     }
 
-    public String getBelongRouterMacAddr() {
-        return belongRouterMacAddr;
+    public String getBoundMacName() {
+        return boundMacName;
     }
 
-    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
-        this.belongRouterMacAddr = belongRouterMacAddr;
+    public void setBoundMacName(String boundMacName) {
+        this.boundMacName = boundMacName;
     }
 
     public static long getSerialVersionUID() {
@@ -330,14 +326,6 @@ public class DbSwitch implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
-    }
-
-    public String getRouterName() {
-        return this.routerName;
-    }
-
-    public void setRouterName(String routerName) {
-        this.routerName = routerName;
     }
 
     public long getRouterId() {

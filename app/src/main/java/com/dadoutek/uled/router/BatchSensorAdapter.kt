@@ -1,5 +1,6 @@
 package com.dadoutek.uled.router
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,15 +20,15 @@ class BatchSensorAdapter(layoutResId: Int, data: MutableList<DbSensor>) : BaseQu
 
         helper.setText(R.id.template_device_batch_title, item?.name)
 
-        if (item?.isSelected == true) {
+        if (item?.selected == true) {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
         } else {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
-        groupName.text = item?.routerName
+        groupName.text = item?.boundMacName
 
-        if (item?.belongGroupId != allLightId) {
+        if (!TextUtils.isEmpty(item?.boundMacName)) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE

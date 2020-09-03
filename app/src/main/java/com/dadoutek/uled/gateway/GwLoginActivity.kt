@@ -171,13 +171,8 @@ class GwLoginActivity : TelinkBaseActivity() {
         val split = timeZone.replace("GMT+", "").split(":")
         RouterModel.routerConfigWifi(mac!!, account, pwd, split[0].toInt(), split[1].toInt(), TAG)
                 ?.subscribe({
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(it.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
-                            }
+                    showLoadingDialog(getString(R.string.config_success))
+                    finish()
                 }, {
                     ToastUtils.showShort(it.message)
                 })
@@ -282,7 +277,6 @@ class GwLoginActivity : TelinkBaseActivity() {
                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02, tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
-
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
@@ -344,8 +338,6 @@ class GwLoginActivity : TelinkBaseActivity() {
 
                 if (!Constant.IS_ROUTE_MODE)
                     dbGw = intent.getParcelableExtra("data")
-                else
-                    getScanResult()//获取路由扫描的网关
 
                 if (SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false))
                     gw_login_skip.visibility = View.GONE
@@ -376,21 +368,6 @@ class GwLoginActivity : TelinkBaseActivity() {
                 .subscribe({
                     if (it) setWIFI()
                 }, { LogUtils.d(it) })
-    }
-
-    private fun getScanResult() {
-        showLoadingDialog(getString(R.string.please_wait))
-        val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouterModel.routeScanningResult()?.subscribe({
-            timeDisposable.dispose()
-            if (it != null && it.data.data.isNotEmpty()) {
-                dbGw = DbGateway()
-            } else {
-                //好像不支持网关
-            }
-        }, {
-            getScanResult()
-        })
     }
 
     private fun setWIFI() {

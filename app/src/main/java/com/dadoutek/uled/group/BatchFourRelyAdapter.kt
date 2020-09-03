@@ -19,7 +19,7 @@ import com.dadoutek.uled.model.dbModel.DbConnector
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
+class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbConnector, BaseViewHolder>(layoutResId, data) {
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbConnector?) {
         helper ?: return
@@ -30,14 +30,15 @@ class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : Base
 
         if (item?.isSelected == true)
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
-         else
+        else
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
 
 
-        if (item?.belongGroupId !=allLightId) {
+        if (item?.belongGroupId != allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
+
             if (TextUtils.isEmpty(item?.groupName)) {
                 if (item?.belongGroupId != 1L)
                     groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
@@ -49,6 +50,14 @@ class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>) : Base
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
             icon.setImageResource(R.drawable.icon_acceptor_s)
+        }
+
+        if (isRouterBind) {
+            groupName.text = item?.boundMacName
+            if (TextUtils.isEmpty(item?.boundMacName))
+                groupName.visibility = View.GONE
+            else
+                groupName.visibility = View.VISIBLE
         }
     }
 }

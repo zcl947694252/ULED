@@ -32,6 +32,9 @@ class DeviceTypeAdapter(resuresId: Int, data: MutableList<DeviceItem>) : BaseQui
             DeviceType.GATE_WAY -> {
                 helper?.setImageResource(R.id.select_device_image, R.drawable.icon_gateway)
             }
+            DeviceType.ROUTER -> {
+                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_wifi)
+            }
         }
     }
 

@@ -4,12 +4,12 @@ import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSensor implements Serializable {
@@ -32,12 +32,11 @@ public class DbSensor implements Serializable {
     private int setType = 1; //0代表群组模式 1代表场景模式
     private int sceneId = 0; //场景id
     private String boundMac ="";
+    public String boundMacName;
     @NotNull
     public  boolean isSelected  =false;
-    public  String routerName ="";
     public Boolean isChecked;
     public boolean selected;
-    public String belongRouterMacAddr;
     public String getBoundMac() {
         return boundMac;
     }
@@ -59,14 +58,13 @@ public class DbSensor implements Serializable {
     }
 
     public boolean isSupportOta =true;
-
-    @Generated(hash = 1597878934)
+    @Generated(hash = 289165652)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
             String version, int rssi, int openTag, int setType, int sceneId,
-            String boundMac, boolean isSelected, String routerName,
-            Boolean isChecked, boolean selected, String belongRouterMacAddr,
-            boolean isMostNew, boolean isSupportOta) {
+            String boundMac, String boundMacName, boolean isSelected,
+            Boolean isChecked, boolean selected, boolean isMostNew,
+            boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -81,25 +79,16 @@ public class DbSensor implements Serializable {
         this.setType = setType;
         this.sceneId = sceneId;
         this.boundMac = boundMac;
+        this.boundMacName = boundMacName;
         this.isSelected = isSelected;
-        this.routerName = routerName;
         this.isChecked = isChecked;
         this.selected = selected;
-        this.belongRouterMacAddr = belongRouterMacAddr;
         this.isMostNew = isMostNew;
         this.isSupportOta = isSupportOta;
     }
 
     @Generated(hash = 295132781)
     public DbSensor() {
-    }
-
-    public String getBelongRouterMacAddr() {
-        return belongRouterMacAddr;
-    }
-
-    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
-        this.belongRouterMacAddr = belongRouterMacAddr;
     }
 
     public int getIcon() {
@@ -280,12 +269,12 @@ public class DbSensor implements Serializable {
         this.isSelected = isSelected;
     }
 
-    public String getRouterName() {
-        return this.routerName;
+    public String getBoundMacName() {
+        return boundMacName;
     }
 
-    public void setRouterName(String routerName) {
-        this.routerName = routerName;
+    public void setBoundMacName(String boundMacName) {
+        this.boundMacName = boundMacName;
     }
 
     public Boolean getIsChecked() {

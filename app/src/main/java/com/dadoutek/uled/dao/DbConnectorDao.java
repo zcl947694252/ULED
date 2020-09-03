@@ -37,12 +37,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
         public final static Property Version = new Property(11, String.class, "version", false, "VERSION");
         public final static Property BoundMac = new Property(12, String.class, "boundMac", false, "BOUND_MAC");
-        public final static Property RouterName = new Property(13, String.class, "routerName", false, "ROUTER_NAME");
-        public final static Property BelongRouterMacAddr = new Property(14, String.class, "belongRouterMacAddr", false, "BELONG_ROUTER_MAC_ADDR");
-        public final static Property Status = new Property(15, int.class, "status", false, "STATUS");
-        public final static Property Rssi = new Property(16, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(17, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property IsMostNew = new Property(18, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property BoundMacName = new Property(13, String.class, "boundMacName", false, "BOUND_MAC_NAME");
+        public final static Property Status = new Property(14, int.class, "status", false, "STATUS");
+        public final static Property Rssi = new Property(15, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(16, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -71,12 +70,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
                 "\"COLOR\" INTEGER NOT NULL ," + // 10: color
                 "\"VERSION\" TEXT," + // 11: version
                 "\"BOUND_MAC\" TEXT," + // 12: boundMac
-                "\"ROUTER_NAME\" TEXT," + // 13: routerName
-                "\"BELONG_ROUTER_MAC_ADDR\" TEXT," + // 14: belongRouterMacAddr
-                "\"STATUS\" INTEGER NOT NULL ," + // 15: status
-                "\"RSSI\" INTEGER NOT NULL ," + // 16: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 17: isSupportOta
-                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 18: isMostNew
+                "\"BOUND_MAC_NAME\" TEXT," + // 13: boundMacName
+                "\"STATUS\" INTEGER NOT NULL ," + // 14: status
+                "\"RSSI\" INTEGER NOT NULL ," + // 15: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 16: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 17: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -130,19 +128,14 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindString(13, boundMac);
         }
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(14, routerName);
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(14, boundMacName);
         }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(15, belongRouterMacAddr);
-        }
-        stmt.bindLong(16, entity.getStatus());
-        stmt.bindLong(17, entity.getRssi());
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(15, entity.getStatus());
+        stmt.bindLong(16, entity.getRssi());
+        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -190,19 +183,14 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             stmt.bindString(13, boundMac);
         }
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(14, routerName);
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(14, boundMacName);
         }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(15, belongRouterMacAddr);
-        }
-        stmt.bindLong(16, entity.getStatus());
-        stmt.bindLong(17, entity.getRssi());
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(15, entity.getStatus());
+        stmt.bindLong(16, entity.getRssi());
+        stmt.bindLong(17, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -226,12 +214,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
             cursor.getInt(offset + 10), // color
             cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // version
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // boundMac
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // routerName
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // belongRouterMacAddr
-            cursor.getInt(offset + 15), // status
-            cursor.getInt(offset + 16), // rssi
-            cursor.getShort(offset + 17) != 0, // isSupportOta
-            cursor.getShort(offset + 18) != 0 // isMostNew
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // boundMacName
+            cursor.getInt(offset + 14), // status
+            cursor.getInt(offset + 15), // rssi
+            cursor.getShort(offset + 16) != 0, // isSupportOta
+            cursor.getShort(offset + 17) != 0 // isMostNew
         );
         return entity;
     }
@@ -251,12 +238,11 @@ public class DbConnectorDao extends AbstractDao<DbConnector, Long> {
         entity.setColor(cursor.getInt(offset + 10));
         entity.setVersion(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
         entity.setBoundMac(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setRouterName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setBelongRouterMacAddr(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setStatus(cursor.getInt(offset + 15));
-        entity.setRssi(cursor.getInt(offset + 16));
-        entity.setIsSupportOta(cursor.getShort(offset + 17) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 18) != 0);
+        entity.setBoundMacName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setStatus(cursor.getInt(offset + 14));
+        entity.setRssi(cursor.getInt(offset + 15));
+        entity.setIsSupportOta(cursor.getShort(offset + 16) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
      }
     
     @Override

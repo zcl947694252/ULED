@@ -153,7 +153,7 @@ object ServerResultException {
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_can_not_stop))
             }
             else -> {
-                //throw RuntimeException(response.message)
+                throw RuntimeException(response.message)
                 LogUtils.e("zcl-------RuntimeException---${response.message}")
             }
         }

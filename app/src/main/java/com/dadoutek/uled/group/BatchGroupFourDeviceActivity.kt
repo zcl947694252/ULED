@@ -116,8 +116,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private val groupAdapter: BatchGrouopEditListAdapter = BatchGrouopEditListAdapter(R.layout.template_batch_small_item, groupsByDeviceType, true)
 
-    private val lightAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, noGroup)
-    private val lightGroupedAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, listGroup)
+    private val lightAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, noGroup, false)
+    private val lightGroupedAdapterm: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, listGroup, false)
 
     private val relayAdapterm: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, noGroupRelay)
     private val relayGroupedAdapterm: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, listGroupRelay)

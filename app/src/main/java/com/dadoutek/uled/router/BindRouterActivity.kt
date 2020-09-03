@@ -5,21 +5,21 @@ import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
-import android.widget.LinearLayout
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.group.*
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.TitleBean
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_device_bind_router.*
 import kotlinx.android.synthetic.main.activity_device_bind_router.batch_see_help
 import kotlinx.android.synthetic.main.activity_device_bind_router.grouping_completed
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.toolbar
 import kotlinx.android.synthetic.main.toolbar.toolbarTv
 
@@ -48,9 +48,9 @@ class BindRouterActivity : TelinkBaseActivity() {
     private val deviceDataSw: MutableList<DbSwitch> = mutableListOf()
     private val deviceDataSensor: MutableList<DbSensor> = mutableListOf()
 
-    private val lightAdapter: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, deviceDataLight)
-    private val curtainAdapter: BatchCurtainAdapter = BatchCurtainAdapter(R.layout.template_batch_small_item, deviceDataCurtain)
-    private val relayAdapter: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, deviceDataRelay)
+    private val lightAdapter: BatchLightAdapter = BatchLightAdapter(R.layout.template_batch_small_item, deviceDataLight, true)
+    private val curtainAdapter: BatchCurtainAdapter = BatchCurtainAdapter(R.layout.template_batch_small_item, deviceDataCurtain, true)
+    private val relayAdapter: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, deviceDataRelay, true)
     private val swAdapter: BatchSwAdapter = BatchSwAdapter(R.layout.template_batch_small_item, deviceDataSw)
     private val senserAdapter: BatchSensorAdapter = BatchSensorAdapter(R.layout.template_batch_small_item, deviceDataSensor)
 
@@ -65,9 +65,7 @@ class BindRouterActivity : TelinkBaseActivity() {
 
     private fun initToolbar() {
         toolbarTv.text = getString(R.string.bind_reouter)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
+        toolbar.setNavigationOnClickListener { finish() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
     }
 
@@ -82,30 +80,21 @@ class BindRouterActivity : TelinkBaseActivity() {
             adapter.notifyDataSetChanged()
         }
 
-        routerAdapter.setOnItemClickListener { _, _, position ->
-            routerList.forEach { it.isSelect = false }
-            routerList[position].isSelect = true
-        }
-
         lightAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataLight.forEach {
-                it.selected = false
-            }
             deviceDataLight[position].selected = !deviceDataLight[position].selected
+            changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         curtainAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataCurtain.forEach {
-                it.selected = false
-            }
+            deviceDataCurtain.forEach { it.selected = false }
             deviceDataCurtain[position].selected = !deviceDataCurtain[position].selected
+            changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         relayAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataRelay.forEach {
-                it.selected = false
-            }
+            deviceDataRelay.forEach { it.selected = false }
             deviceDataRelay[position].selected = !deviceDataRelay[position].selected
+            changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         swAdapter.setOnItemClickListener { adapter, _, position ->
@@ -113,13 +102,13 @@ class BindRouterActivity : TelinkBaseActivity() {
                 it.selected = false
             }
             deviceDataSw[position].selected = !deviceDataSw[position].selected
+            changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         senserAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataSensor.forEach {
-                it.selected = false
-            }
+            deviceDataSensor.forEach { it.selected = false }
             deviceDataSensor[position].selected = !deviceDataSensor[position].selected
+            changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         batch_see_help.setOnClickListener { seeHelpe("#prepare") }
@@ -138,32 +127,47 @@ class BindRouterActivity : TelinkBaseActivity() {
             changeGroupSelectView(position)
         }
 
-        batch_four_device_all.setOnClickListener { changeDeviceAll() }
+        bind_router_all.setOnClickListener {
+            isAll = !isAll
+            if (isAll)
+                bind_router_all.setImageResource(R.drawable.icon_all_checked)
+            else
+                bind_router_all.setImageResource(R.drawable.icon_all_check)
+            setAllSelect(isAll) }
     }
 
-    /**
-     * 全选与取消功能相关
-     */
-    private fun changeDeviceAll() {
-        isAll = !isAll
-        if (isAll)
-            batch_four_device_all.setImageResource(R.drawable.icon_all_checked)
-        else
-            batch_four_device_all.setImageResource(R.drawable.icon_all_check)
-        setAllSelect(isAll)
-    }
 
     private fun setAllSelect(all: Boolean) {
-        when ((currentGroup?.deviceType?:0).toInt()) {
+        when ((currentGroup?.deviceType ?: 0).toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                deviceDataLight.forEach {
+                    it.selected = all
+                }
+                lightAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_CURTAIN -> {
+                deviceDataCurtain.forEach {
+                    it.selected = all
+                }
+                curtainAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelay.forEach {
-                    it.isSelected = all
+                    it.selected = all
+                }
+                relayAdapter.notifyDataSetChanged()
+            }
+           DeviceType.NORMAL_SWITCH -> {
+                deviceDataSw.forEach {
+                    it.selected = all
                 }
                 swAdapter.notifyDataSetChanged()
+            }
+            DeviceType.SENSOR -> {
+                deviceDataSensor.forEach {
+                    it.selected = all
+                }
+                senserAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -174,7 +178,9 @@ class BindRouterActivity : TelinkBaseActivity() {
             routerAdapter.notifyItemRangeChanged(lastCheckedGroupPostion, 1)
         }
         lastCheckedGroupPostion = position
-        routerList[position].isSelect = !routerList[position].select
+        routerList[position].select = !routerList[position].select
+        changeGroupingCompleteState()
+        routerAdapter.notifyDataSetChanged()
     }
 
     private fun relayBindRouter() {
@@ -214,7 +220,7 @@ class BindRouterActivity : TelinkBaseActivity() {
 
     private fun bindFilter(meshAddList: MutableList<Int>) {
         when {
-            meshAddList.isEmpty() -> ToastUtils.showShort(getString(R.string.please_select_sensor_at_leaset))
+            meshAddList.isEmpty() -> ToastUtils.showShort(getString(R.string.please_select_device_at_leaset))
             routerList.none { it.isSelect } -> ToastUtils.showShort(getString(R.string.please_select_router))
             else -> bindRouterHttp(meshAddList)
         }
@@ -222,6 +228,7 @@ class BindRouterActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun bindRouterHttp(meshAddList: MutableList<Int>) {
+        showLoadingDialog(getString(R.string.binding_router))
         /**
          * meshType 普通灯 = 4
          * 彩灯 = 6 蓝牙连接器 = 5  窗帘 = 16 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 开关统一使用99
@@ -232,22 +239,50 @@ class BindRouterActivity : TelinkBaseActivity() {
             DeviceType.LIGHT_RGB -> 6
             DeviceType.SMART_CURTAIN -> 16
             DeviceType.SMART_RELAY -> 5
-            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.EIGHT_SWITCH,DeviceType.DOUBLE_SWITCH,DeviceType.SCENE_SWITCH,
-            DeviceType.SMART_CURTAIN_SWITCH-> 99
+            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.EIGHT_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SCENE_SWITCH,
+            DeviceType.SMART_CURTAIN_SWITCH -> 99
             DeviceType.SENSOR -> 98
             else -> 4
         }
         RouterModel.bindRouter(meshAddList, meshType, routerList.filter { it.isSelect }[0].macAddr)?.subscribe({
-            ToastUtils.showShort(it.message)
-            resetRouterData()
+            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                override fun start() {}
+                override fun complete() {
+                    ToastUtils.showShort(getString(R.string.bind_success))
+                    changeDataUpdate()
+                    hideLoadingDialog()
+                }
+
+                override fun error(msg: String?) {
+                    ToastUtils.showShort(getString(R.string.bind_success))
+                    changeDataUpdate()
+                    hideLoadingDialog()
+                }
+            })
+            hideLoadingDialog()
         }, {
-            ToastUtils.showShort(it.message)
+            ToastUtils.showShort(getString(R.string.bind_fail)+it.message)
+            hideLoadingDialog()
         })
     }
 
-    private fun resetRouterData() {
-        routerList.forEach { it.isSelect = false }
-        routerAdapter.notifyDataSetChanged()
+    private fun changeGroupingCompleteState() {
+       var  selectSize  =when (currentGroup?.deviceType?.toInt()) {
+           DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> deviceDataLight.filter { it.isSelected }.size
+           DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH,
+           DeviceType.EIGHT_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH ->deviceDataSw.filter { it.isSelected }.size
+           DeviceType.SENSOR ->deviceDataSensor.filter { it.isSelected }.size
+           DeviceType.SMART_CURTAIN -> deviceDataCurtain.filter { it.isSelected }.size
+           DeviceType.SMART_RELAY ->deviceDataRelay.filter { it.isSelected }.size
+           else -> deviceDataLight.filter { it.isSelected }.size
+       }
+        if (selectSize > 0 && routerList.any { it.isSelect }) {//选中分组并且有选中设备的情况下
+            grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
+            grouping_completed.isClickable = true
+        } else {//没有选中设备或者未选中分组的情况下
+            grouping_completed.isClickable = false
+            grouping_completed.setBackgroundResource(R.drawable.rect_solid_radius5_e)
+        }
     }
 
     private fun changeDataUpdate() {
@@ -274,8 +309,14 @@ class BindRouterActivity : TelinkBaseActivity() {
             }
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH,
             DeviceType.EIGHT_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH -> {
+                deviceDataSw.clear()
+                deviceDataSw.addAll(DBUtils.getAllSwitch())
+                swAdapter.notifyDataSetChanged()
             }
             DeviceType.SENSOR -> {
+                deviceDataSensor.clear()
+                deviceDataSensor.addAll(DBUtils.getAllSensor())
+                senserAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtain.clear()
@@ -288,6 +329,8 @@ class BindRouterActivity : TelinkBaseActivity() {
                 relayAdapter.notifyDataSetChanged()
             }
         }
+        routerList.forEach { it.isSelect = false }
+        routerAdapter.notifyDataSetChanged()
     }
 
     private fun initData() {
@@ -311,7 +354,7 @@ class BindRouterActivity : TelinkBaseActivity() {
         routerList.clear()
         routerList.addAll(DBUtils.getAllRouter())
         routerList.forEach { it.isSelect = false }
-        bind_router_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false)
+        bind_router_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         routerAdapter.bindToRecyclerView(bind_router_recycle)
     }
 
@@ -319,9 +362,9 @@ class BindRouterActivity : TelinkBaseActivity() {
         bind_router_type.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         bind_router_type.adapter = titleAdapter
         listTitle.clear()
-       listTitle.addAll(mutableListOf(TitleBean(getString(R.string.normal_light), true), TitleBean(getString(R.string.rgb_light),
-               false), TitleBean(getString(R.string.switch_title), false), TitleBean(getString(R.string.sensor), false),
-               TitleBean(getString(R.string.curtain), false), TitleBean(getString(R.string.relay), false)))
+        listTitle.addAll(mutableListOf(TitleBean(getString(R.string.normal_light), true), TitleBean(getString(R.string.rgb_light),
+                false), TitleBean(getString(R.string.switch_title), false), TitleBean(getString(R.string.sensor), false),
+                TitleBean(getString(R.string.curtain), false), TitleBean(getString(R.string.relay), false)))
         titleAdapter.bindToRecyclerView(bind_router_type)
     }
 }

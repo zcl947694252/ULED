@@ -33,20 +33,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property ControlSceneId = new Property(6, String.class, "controlSceneId", false, "CONTROL_SCENE_ID");
         public final static Property Index = new Property(7, int.class, "index", false, "INDEX");
         public final static Property BelongGroupId = new Property(8, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
-        public final static Property BelongRouterMacAddr = new Property(9, String.class, "belongRouterMacAddr", false, "BELONG_ROUTER_MAC_ADDR");
-        public final static Property Rssi = new Property(10, int.class, "rssi", false, "RSSI");
-        public final static Property Keys = new Property(11, String.class, "keys", false, "KEYS");
-        public final static Property GroupIds = new Property(12, String.class, "groupIds", false, "GROUP_IDS");
-        public final static Property SceneIds = new Property(13, String.class, "sceneIds", false, "SCENE_IDS");
-        public final static Property ControlGroupAddrs = new Property(14, String.class, "controlGroupAddrs", false, "CONTROL_GROUP_ADDRS");
-        public final static Property Version = new Property(15, String.class, "version", false, "VERSION");
-        public final static Property IsMostNew = new Property(16, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property BoundMac = new Property(17, String.class, "boundMac", false, "BOUND_MAC");
-        public final static Property RouterName = new Property(18, String.class, "routerName", false, "ROUTER_NAME");
-        public final static Property RouterId = new Property(19, long.class, "routerId", false, "ROUTER_ID");
-        public final static Property IsChecked = new Property(20, Boolean.class, "isChecked", false, "IS_CHECKED");
-        public final static Property IsSupportOta = new Property(21, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property Type = new Property(22, int.class, "type", false, "TYPE");
+        public final static Property Rssi = new Property(9, int.class, "rssi", false, "RSSI");
+        public final static Property Keys = new Property(10, String.class, "keys", false, "KEYS");
+        public final static Property GroupIds = new Property(11, String.class, "groupIds", false, "GROUP_IDS");
+        public final static Property SceneIds = new Property(12, String.class, "sceneIds", false, "SCENE_IDS");
+        public final static Property ControlGroupAddrs = new Property(13, String.class, "controlGroupAddrs", false, "CONTROL_GROUP_ADDRS");
+        public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
+        public final static Property IsMostNew = new Property(15, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property BoundMac = new Property(16, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property BoundMacName = new Property(17, String.class, "boundMacName", false, "BOUND_MAC_NAME");
+        public final static Property RouterId = new Property(18, long.class, "routerId", false, "ROUTER_ID");
+        public final static Property IsChecked = new Property(19, Boolean.class, "isChecked", false, "IS_CHECKED");
+        public final static Property IsSupportOta = new Property(20, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Type = new Property(21, int.class, "type", false, "TYPE");
     }
 
 
@@ -71,20 +70,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"CONTROL_SCENE_ID\" TEXT," + // 6: controlSceneId
                 "\"INDEX\" INTEGER NOT NULL ," + // 7: index
                 "\"BELONG_GROUP_ID\" INTEGER," + // 8: belongGroupId
-                "\"BELONG_ROUTER_MAC_ADDR\" TEXT," + // 9: belongRouterMacAddr
-                "\"RSSI\" INTEGER NOT NULL ," + // 10: rssi
-                "\"KEYS\" TEXT," + // 11: keys
-                "\"GROUP_IDS\" TEXT," + // 12: groupIds
-                "\"SCENE_IDS\" TEXT," + // 13: sceneIds
-                "\"CONTROL_GROUP_ADDRS\" TEXT," + // 14: controlGroupAddrs
-                "\"VERSION\" TEXT," + // 15: version
-                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 16: isMostNew
-                "\"BOUND_MAC\" TEXT," + // 17: boundMac
-                "\"ROUTER_NAME\" TEXT," + // 18: routerName
-                "\"ROUTER_ID\" INTEGER NOT NULL ," + // 19: routerId
-                "\"IS_CHECKED\" INTEGER," + // 20: isChecked
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 21: isSupportOta
-                "\"TYPE\" INTEGER NOT NULL );"); // 22: type
+                "\"RSSI\" INTEGER NOT NULL ," + // 9: rssi
+                "\"KEYS\" TEXT," + // 10: keys
+                "\"GROUP_IDS\" TEXT," + // 11: groupIds
+                "\"SCENE_IDS\" TEXT," + // 12: sceneIds
+                "\"CONTROL_GROUP_ADDRS\" TEXT," + // 13: controlGroupAddrs
+                "\"VERSION\" TEXT," + // 14: version
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 15: isMostNew
+                "\"BOUND_MAC\" TEXT," + // 16: boundMac
+                "\"BOUND_MAC_NAME\" TEXT," + // 17: boundMacName
+                "\"ROUTER_ID\" INTEGER NOT NULL ," + // 18: routerId
+                "\"IS_CHECKED\" INTEGER," + // 19: isChecked
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 20: isSupportOta
+                "\"TYPE\" INTEGER NOT NULL );"); // 21: type
     }
 
     /** Drops the underlying database table. */
@@ -125,56 +123,51 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(10, belongRouterMacAddr);
-        }
-        stmt.bindLong(11, entity.getRssi());
+        stmt.bindLong(10, entity.getRssi());
  
         String keys = entity.getKeys();
         if (keys != null) {
-            stmt.bindString(12, keys);
+            stmt.bindString(11, keys);
         }
  
         String groupIds = entity.getGroupIds();
         if (groupIds != null) {
-            stmt.bindString(13, groupIds);
+            stmt.bindString(12, groupIds);
         }
  
         String sceneIds = entity.getSceneIds();
         if (sceneIds != null) {
-            stmt.bindString(14, sceneIds);
+            stmt.bindString(13, sceneIds);
         }
  
         String controlGroupAddrs = entity.getControlGroupAddrs();
         if (controlGroupAddrs != null) {
-            stmt.bindString(15, controlGroupAddrs);
+            stmt.bindString(14, controlGroupAddrs);
         }
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(16, version);
+            stmt.bindString(15, version);
         }
-        stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(18, boundMac);
+            stmt.bindString(17, boundMac);
         }
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(19, routerName);
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(18, boundMacName);
         }
-        stmt.bindLong(20, entity.getRouterId());
+        stmt.bindLong(19, entity.getRouterId());
  
         Boolean isChecked = entity.getIsChecked();
         if (isChecked != null) {
-            stmt.bindLong(21, isChecked ? 1L: 0L);
+            stmt.bindLong(20, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(22, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(23, entity.getType());
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(22, entity.getType());
     }
 
     @Override
@@ -209,56 +202,51 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(10, belongRouterMacAddr);
-        }
-        stmt.bindLong(11, entity.getRssi());
+        stmt.bindLong(10, entity.getRssi());
  
         String keys = entity.getKeys();
         if (keys != null) {
-            stmt.bindString(12, keys);
+            stmt.bindString(11, keys);
         }
  
         String groupIds = entity.getGroupIds();
         if (groupIds != null) {
-            stmt.bindString(13, groupIds);
+            stmt.bindString(12, groupIds);
         }
  
         String sceneIds = entity.getSceneIds();
         if (sceneIds != null) {
-            stmt.bindString(14, sceneIds);
+            stmt.bindString(13, sceneIds);
         }
  
         String controlGroupAddrs = entity.getControlGroupAddrs();
         if (controlGroupAddrs != null) {
-            stmt.bindString(15, controlGroupAddrs);
+            stmt.bindString(14, controlGroupAddrs);
         }
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(16, version);
+            stmt.bindString(15, version);
         }
-        stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(16, entity.getIsMostNew() ? 1L: 0L);
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(18, boundMac);
+            stmt.bindString(17, boundMac);
         }
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(19, routerName);
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(18, boundMacName);
         }
-        stmt.bindLong(20, entity.getRouterId());
+        stmt.bindLong(19, entity.getRouterId());
  
         Boolean isChecked = entity.getIsChecked();
         if (isChecked != null) {
-            stmt.bindLong(21, isChecked ? 1L: 0L);
+            stmt.bindLong(20, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(22, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(23, entity.getType());
+        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(22, entity.getType());
     }
 
     @Override
@@ -278,20 +266,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // controlSceneId
             cursor.getInt(offset + 7), // index
             cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // belongGroupId
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // belongRouterMacAddr
-            cursor.getInt(offset + 10), // rssi
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // keys
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // groupIds
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // sceneIds
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // controlGroupAddrs
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // version
-            cursor.getShort(offset + 16) != 0, // isMostNew
-            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // boundMac
-            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // routerName
-            cursor.getLong(offset + 19), // routerId
-            cursor.isNull(offset + 20) ? null : cursor.getShort(offset + 20) != 0, // isChecked
-            cursor.getShort(offset + 21) != 0, // isSupportOta
-            cursor.getInt(offset + 22) // type
+            cursor.getInt(offset + 9), // rssi
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // keys
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // groupIds
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // sceneIds
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // controlGroupAddrs
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
+            cursor.getShort(offset + 15) != 0, // isMostNew
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // boundMac
+            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // boundMacName
+            cursor.getLong(offset + 18), // routerId
+            cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // isChecked
+            cursor.getShort(offset + 20) != 0, // isSupportOta
+            cursor.getInt(offset + 21) // type
         );
         return entity;
     }
@@ -307,20 +294,19 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setControlSceneId(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setIndex(cursor.getInt(offset + 7));
         entity.setBelongGroupId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setBelongRouterMacAddr(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setRssi(cursor.getInt(offset + 10));
-        entity.setKeys(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setGroupIds(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setSceneIds(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setControlGroupAddrs(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setVersion(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
-        entity.setIsMostNew(cursor.getShort(offset + 16) != 0);
-        entity.setBoundMac(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
-        entity.setRouterName(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
-        entity.setRouterId(cursor.getLong(offset + 19));
-        entity.setIsChecked(cursor.isNull(offset + 20) ? null : cursor.getShort(offset + 20) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 21) != 0);
-        entity.setType(cursor.getInt(offset + 22));
+        entity.setRssi(cursor.getInt(offset + 9));
+        entity.setKeys(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setGroupIds(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setSceneIds(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setControlGroupAddrs(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setIsMostNew(cursor.getShort(offset + 15) != 0);
+        entity.setBoundMac(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setBoundMacName(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
+        entity.setRouterId(cursor.getLong(offset + 18));
+        entity.setIsChecked(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 20) != 0);
+        entity.setType(cursor.getInt(offset + 21));
      }
     
     @Override

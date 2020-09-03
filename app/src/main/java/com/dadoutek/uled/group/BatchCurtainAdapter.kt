@@ -19,7 +19,7 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
+class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>,var isRouterBind: Boolean = false) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return
@@ -34,22 +34,28 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>) : Base
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
+            icon.setImageResource(R.drawable.icon_curtain_s)
+
         if (item?.belongGroupId != allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-
             if (TextUtils.isEmpty(item?.groupName)) {
                 if (item?.belongGroupId != 1L)
                     groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
             } else
                 groupName.text = item?.groupName
-
-            icon.setImageResource(R.drawable.icon_curtain_s)
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            icon.setImageResource(R.drawable.icon_curtain_s)
+        }
+
+        if (isRouterBind) {
+            groupName.text = item?.boundMacName
+            if (TextUtils.isEmpty(item?.boundMacName))
+                groupName.visibility = View.GONE
+            else
+                groupName.visibility = View.VISIBLE
         }
     }
 }

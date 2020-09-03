@@ -131,7 +131,7 @@
 
     <!--   //VC_CurtainSetting Start-->
     <string name="pause">Pause</string>
-    <string name="commutation">换向</string>
+    <string name="commutation">电机换向</string>
     <string name="hand_recovery">手拉恢复</string>
     <string name="hand_cancel">手拉取消</string>
     <string name="software_restart">设备重启</string>
@@ -1143,4 +1143,8 @@
     <string name="salt_error">请先获取盐值或盐值错误或盐值已过期</string>
     <string name="input_rgb_num">输入RGB值</string>
     <string name="router_grouping">分组中，请稍后。已成功分组%1$s个设备</string>
+    <string name="binding_router">绑定路由中</string>
+    <string name="bind_success">绑定成功</string>
+    <string name="bind_fail">路由绑定失败</string>
+    <string name="please_select_device_at_leaset">请至少选择一个要绑定的设备</string>
 </resources>

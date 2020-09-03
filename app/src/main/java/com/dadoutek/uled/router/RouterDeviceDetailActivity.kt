@@ -16,11 +16,14 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
+import com.dadoutek.uled.gateway.GwEventListActivity
+import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.adapter.RouterDeviceDetailsAdapter
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -162,6 +165,11 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
 
     private fun goConfig() {
         if (isRightPos()) return
+        val intent = Intent(this@RouterDeviceDetailsActivity, GwLoginActivity::class.java)
+        intent.putExtra("is_router", true)
+        intent.putExtra("mac", currentDevice?.macAddr?.toLowerCase())
+        startActivity(intent)
+        finish()
     }
 
     private fun isRightPos(): Boolean {

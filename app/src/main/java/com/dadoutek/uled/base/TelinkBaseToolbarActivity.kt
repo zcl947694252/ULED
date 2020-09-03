@@ -19,6 +19,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.startActivity
 
 abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
+    private var bindRouter: MenuItem? = null
     lateinit var dialogTv: TextView
     var builder: AlertDialog.Builder? = null
     var dialogDelete: AlertDialog? = null
@@ -45,12 +46,15 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         batchGpAll = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdateAll = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDeviceAll = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+        bindRouter = toolbar.menu?.findItem(R.id.toolbar_bind_router)
 
         batchGpAll?.title = getString(R.string.batch_group)
         onlineUpdateAll?.title = getString(R.string.online_upgrade)
         deleteDeviceAll?.title = getString(R.string.edite_device)
 
         batchGpAll?.isVisible = gpAllVisible()
+        bindRouter?.isVisible = bindRouterVisible()
+
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
                 when {
@@ -61,6 +65,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                                 R.id.toolbar_batch_gp -> skipBatch()
                                 R.id.toolbar_on_line -> goOta()
                                 R.id.toolbar_delete_device -> editeDevice()
+                                R.id.toolbar_bind_router -> bindDeviceRouter()
                             }
                         else
                             ToastUtils.showShort(getString(R.string.no_device))
@@ -68,6 +73,14 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             }
             true
         }
+    }
+
+    open fun bindDeviceRouter() {
+
+    }
+
+    open fun bindRouterVisible(): Boolean {
+        return false
     }
 
     abstract fun gpAllVisible(): Boolean

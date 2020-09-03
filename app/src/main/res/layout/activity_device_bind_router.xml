@@ -108,10 +108,9 @@
     <android.support.v7.widget.RecyclerView
             android:id="@+id/bind_router_recycle"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_5"
-            android:layout_marginBottom="@dimen/dp_5"
-            android:background="@color/red" />
+            android:layout_marginBottom="@dimen/dp_5"/>
 
     <TextView
             android:id="@+id/batch_see_help"

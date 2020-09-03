@@ -24,11 +24,11 @@ class BatchRouterAdapter(layoutResId: Int, data: RxDeviceList<DbRouter>) : BaseQ
         tv.visibility = View.GONE
         helper.setText(R.id.template_device_batch_title, item.name)
                 .setText(R.id.template_device_batch_title_blow, mContext.getString(R.string.number))
+                .setImageResource(R.id.template_device_batch_icon,R.drawable.icon_wifi_small)
 
-        if (item.isSelect) {
-            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
-        } else {
-            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
+        when {
+            item.isSelect -> helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
+            else -> helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
     }
 }

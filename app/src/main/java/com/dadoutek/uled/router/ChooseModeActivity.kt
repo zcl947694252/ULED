@@ -3,10 +3,12 @@ package com.dadoutek.uled.router
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.httpModel.UserModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -36,6 +38,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
         updateUi()
 
+        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.visibility =View.GONE
 
         choose_mode_ble_iv.setOnClickListener(this)
         choose_mode_router_iv.setOnClickListener(this)
@@ -57,12 +60,14 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.choose_mode_ble_iv -> {
                 UserModel.updateModeStatus().subscribe({
                     Constant.IS_ROUTE_MODE = false
+                    SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, false)
                     updateUi()
                 }, {})
             }
             R.id.choose_mode_router_iv -> {
                 UserModel.updateModeStatus().subscribe({
                     Constant.IS_ROUTE_MODE = true
+                    SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, true)
                     updateUi()
                 }, {})
             }

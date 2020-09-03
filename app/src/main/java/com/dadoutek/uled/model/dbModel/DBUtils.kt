@@ -824,7 +824,7 @@ object DBUtils {
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
-            DaoSessionInstance.getInstance().dbRouterDao.insert(db)
+            DaoSessionInstance.getInstance().dbRouterDao.insertOrReplace(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             when {
@@ -927,14 +927,11 @@ object DBUtils {
     }
 
     fun saveScene(dbScene: DbScene, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbSceneDao.insert(dbScene)
-        } else {
+
             DaoSessionInstance.getInstance().dbSceneDao.insertOrReplace(dbScene)
-            recordingChange(dbScene.id,
-                    DaoSessionInstance.getInstance().dbSceneDao.tablename,
-                    Constant.DB_ADD)
-        }
+        if (!isFromServer)
+            recordingChange(dbScene.id, DaoSessionInstance.getInstance().dbSceneDao.tablename, Constant.DB_ADD)
+
     }
 
     fun saveSceneActions(sceneActions: DbSceneActions) {
@@ -945,14 +942,15 @@ object DBUtils {
     }
 
     fun saveGradient(dbDiyGradient: DbDiyGradient, isFromServer: Boolean) {
-        if (isFromServer) {
+    /*    if (isFromServer) {
             DaoSessionInstance.getInstance().dbDiyGradientDao.insert(dbDiyGradient)
-        } else {
+        } else {*/
             DaoSessionInstance.getInstance().dbDiyGradientDao.insertOrReplace(dbDiyGradient)
+        if (!isFromServer)
             recordingChange(dbDiyGradient.id,
                     DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
                     Constant.DB_ADD)
-        }
+        //}
     }
 
 

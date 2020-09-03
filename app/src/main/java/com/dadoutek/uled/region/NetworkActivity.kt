@@ -159,9 +159,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         pop?.setOnDismissListener {
             recycleBitmap()
         }
-        image_bluetooth.setOnClickListener {
+     /*   image_bluetooth.setOnClickListener {
             openScan()
-        }
+        }*/
         disposableEnsure = RxView.clicks(image_bluetooth)
                 .compose(mRxPermission.ensure(Manifest.permission.CAMERA))
                 .subscribe({

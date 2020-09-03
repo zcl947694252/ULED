@@ -1,5 +1,7 @@
 package com.dadoutek.uled.othersview
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -15,13 +17,17 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
 import com.dadoutek.uled.router.RoutingNetworkActivity
 import com.dadoutek.uled.util.StringUtils
+import com.jakewharton.rxbinding2.view.RxView
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
+import io.reactivex.internal.operators.observable.ObservableError
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class SelectDeviceTypeActivity : TelinkBaseActivity() {
+    private lateinit var mRxPermission: RxPermissions
     private val deviceTypeList = mutableListOf<DeviceItem>()
     private val deviceAdapter = DeviceTypeAdapter(R.layout.select_device_type_item, deviceTypeList)
     private val REQUEST_CODE: Int = 1000
@@ -55,6 +61,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         toolbarTv.text = getString(R.string.add_device_new)
         template_recycleView.layoutManager = GridLayoutManager(this@SelectDeviceTypeActivity, 3)
         template_recycleView.adapter = deviceAdapter
+        mRxPermission = RxPermissions(this)
     }
 
 
@@ -104,9 +111,14 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
     }
 
 
+    @SuppressLint("CheckResult")
     private fun openScan() {
-        var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE)
+        mRxPermission.request(Manifest.permission.CAMERA).subscribe({
+            var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+        },{
+            ToastUtils.showShort(it.message)
+        })
     }
 
     override fun onPause() {

@@ -36,15 +36,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property Speed = new Property(9, int.class, "speed", false, "SPEED");
         public final static Property CloseSlowStart = new Property(10, boolean.class, "closeSlowStart", false, "CLOSE_SLOW_START");
         public final static Property Index = new Property(11, int.class, "index", false, "INDEX");
-        public final static Property RouterName = new Property(12, String.class, "routerName", false, "ROUTER_NAME");
-        public final static Property BelongRouterMacAddr = new Property(13, String.class, "belongRouterMacAddr", false, "BELONG_ROUTER_MAC_ADDR");
-        public final static Property BelongGroupId = new Property(14, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
-        public final static Property GroupName = new Property(15, String.class, "groupName", false, "GROUP_NAME");
-        public final static Property Version = new Property(16, String.class, "version", false, "VERSION");
-        public final static Property BoundMac = new Property(17, String.class, "boundMac", false, "BOUND_MAC");
-        public final static Property Rssi = new Property(18, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(19, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property IsMostNew = new Property(20, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property BelongGroupId = new Property(12, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
+        public final static Property GroupName = new Property(13, String.class, "groupName", false, "GROUP_NAME");
+        public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
+        public final static Property BoundMac = new Property(15, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property BoundMacName = new Property(16, String.class, "boundMacName", false, "BOUND_MAC_NAME");
+        public final static Property Rssi = new Property(17, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(19, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -72,15 +71,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"SPEED\" INTEGER NOT NULL ," + // 9: speed
                 "\"CLOSE_SLOW_START\" INTEGER NOT NULL ," + // 10: closeSlowStart
                 "\"INDEX\" INTEGER NOT NULL ," + // 11: index
-                "\"ROUTER_NAME\" TEXT," + // 12: routerName
-                "\"BELONG_ROUTER_MAC_ADDR\" TEXT," + // 13: belongRouterMacAddr
-                "\"BELONG_GROUP_ID\" INTEGER," + // 14: belongGroupId
-                "\"GROUP_NAME\" TEXT," + // 15: groupName
-                "\"VERSION\" TEXT," + // 16: version
-                "\"BOUND_MAC\" TEXT," + // 17: boundMac
-                "\"RSSI\" INTEGER NOT NULL ," + // 18: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 19: isSupportOta
-                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 20: isMostNew
+                "\"BELONG_GROUP_ID\" INTEGER," + // 12: belongGroupId
+                "\"GROUP_NAME\" TEXT," + // 13: groupName
+                "\"VERSION\" TEXT," + // 14: version
+                "\"BOUND_MAC\" TEXT," + // 15: boundMac
+                "\"BOUND_MAC_NAME\" TEXT," + // 16: boundMacName
+                "\"RSSI\" INTEGER NOT NULL ," + // 17: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 19: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -117,38 +115,33 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(11, entity.getCloseSlowStart() ? 1L: 0L);
         stmt.bindLong(12, entity.getIndex());
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(13, routerName);
-        }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(14, belongRouterMacAddr);
-        }
- 
         Long belongGroupId = entity.getBelongGroupId();
         if (belongGroupId != null) {
-            stmt.bindLong(15, belongGroupId);
+            stmt.bindLong(13, belongGroupId);
         }
  
         String groupName = entity.getGroupName();
         if (groupName != null) {
-            stmt.bindString(16, groupName);
+            stmt.bindString(14, groupName);
         }
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(17, version);
+            stmt.bindString(15, version);
         }
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(18, boundMac);
+            stmt.bindString(16, boundMac);
         }
-        stmt.bindLong(19, entity.getRssi());
-        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(21, entity.getIsMostNew() ? 1L: 0L);
+ 
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(17, boundMacName);
+        }
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -179,38 +172,33 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(11, entity.getCloseSlowStart() ? 1L: 0L);
         stmt.bindLong(12, entity.getIndex());
  
-        String routerName = entity.getRouterName();
-        if (routerName != null) {
-            stmt.bindString(13, routerName);
-        }
- 
-        String belongRouterMacAddr = entity.getBelongRouterMacAddr();
-        if (belongRouterMacAddr != null) {
-            stmt.bindString(14, belongRouterMacAddr);
-        }
- 
         Long belongGroupId = entity.getBelongGroupId();
         if (belongGroupId != null) {
-            stmt.bindLong(15, belongGroupId);
+            stmt.bindLong(13, belongGroupId);
         }
  
         String groupName = entity.getGroupName();
         if (groupName != null) {
-            stmt.bindString(16, groupName);
+            stmt.bindString(14, groupName);
         }
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(17, version);
+            stmt.bindString(15, version);
         }
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(18, boundMac);
+            stmt.bindString(16, boundMac);
         }
-        stmt.bindLong(19, entity.getRssi());
-        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(21, entity.getIsMostNew() ? 1L: 0L);
+ 
+        String boundMacName = entity.getBoundMacName();
+        if (boundMacName != null) {
+            stmt.bindString(17, boundMacName);
+        }
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -233,15 +221,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.getInt(offset + 9), // speed
             cursor.getShort(offset + 10) != 0, // closeSlowStart
             cursor.getInt(offset + 11), // index
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // routerName
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // belongRouterMacAddr
-            cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14), // belongGroupId
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // groupName
-            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // version
-            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // boundMac
-            cursor.getInt(offset + 18), // rssi
-            cursor.getShort(offset + 19) != 0, // isSupportOta
-            cursor.getShort(offset + 20) != 0 // isMostNew
+            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // belongGroupId
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // groupName
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // boundMac
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // boundMacName
+            cursor.getInt(offset + 17), // rssi
+            cursor.getShort(offset + 18) != 0, // isSupportOta
+            cursor.getShort(offset + 19) != 0 // isMostNew
         );
         return entity;
     }
@@ -260,15 +247,14 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setSpeed(cursor.getInt(offset + 9));
         entity.setCloseSlowStart(cursor.getShort(offset + 10) != 0);
         entity.setIndex(cursor.getInt(offset + 11));
-        entity.setRouterName(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setBelongRouterMacAddr(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setBelongGroupId(cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14));
-        entity.setGroupName(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
-        entity.setVersion(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
-        entity.setBoundMac(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
-        entity.setRssi(cursor.getInt(offset + 18));
-        entity.setIsSupportOta(cursor.getShort(offset + 19) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 20) != 0);
+        entity.setBelongGroupId(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
+        entity.setGroupName(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setBoundMac(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setBoundMacName(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setRssi(cursor.getInt(offset + 17));
+        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 19) != 0);
      }
     
     @Override

@@ -28,7 +28,9 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -57,7 +59,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 开关列表
  */
-class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
+class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
     private var popupWindow: PopupWindow? = null
     private var popVersion: TextView? = null
     private var views: View? = null
@@ -105,6 +107,18 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
         return false
     }
 
+    override fun bindDeviceRouter() {
+        val dbGroup = DbGroup()
+        dbGroup.deviceType = DeviceType.NORMAL_SWITCH.toLong()
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", dbGroup)
+        startActivity(intent)
+    }
+
+    override fun bindRouterVisible(): Boolean {
+        return true
+    }
+
     override fun setPositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteSwitch(it)
@@ -132,7 +146,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
             val ota = itv.findViewById<TextView>(R.id.ota)
             val delete = itv.findViewById<TextView>(R.id.deleteBtn)
             val rename = itv.findViewById<TextView>(R.id.rename)
-            popVersion = itv.findViewById<TextView>(R.id.pop_version)
+            popVersion = itv.findViewById(R.id.pop_version)
+
             popVersion?.text = getString(R.string.firmware_version) + currentDevice?.version
             popVersion?.visibility = View.VISIBLE
             delete.text = getString(R.string.delete)
@@ -263,12 +278,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
         isEmptyDevice()
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.add_device_btn -> addDevice()
-        }
-    }
-
     private fun onLogin(bestRSSIDevice: DeviceInfo) {
         mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
@@ -338,11 +347,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
         create_scene = findViewById(R.id.create_scene)
+
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
 
-        add_device_btn.setOnClickListener(this)
+        add_device_btn.setOnClickListener{addDevice()}
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
@@ -550,7 +560,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                        startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
+                        startActivity(intent)
                     }
                 }
             }
@@ -591,13 +601,5 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickLis
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
-
-    private val CREATE_SCENE_REQUESTCODE = 2
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CREATE_SCENE_REQUESTCODE) {
-//            callbackLinkMainActAndFragment?.changeToScene()
-        }
     }
 }

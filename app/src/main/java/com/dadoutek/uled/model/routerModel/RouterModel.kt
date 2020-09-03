@@ -7,10 +7,12 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.router.bean.RouterBatchGpBean
+import com.dadoutek.uled.router.bean.ScanDataBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import retrofit2.http.Field
+import java.util.*
 
 
 /**
@@ -118,9 +120,9 @@ object RouterModel {
     /**
      * 路由开始扫描
      */
-    fun routeStartScan( scanType:Int,ser_id:String): Observable<Response<Long>>? {
+    fun routeStartScan( scanType:Int,ser_id:String): Observable<ScanDataBean>? {
         return NetworkFactory.getApi().routeScanDevcie(scanType,Constant.DEFAULT_MESH_FACTORY_NAME,ser_id)
-                //.compose(NetworkTransformer())
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

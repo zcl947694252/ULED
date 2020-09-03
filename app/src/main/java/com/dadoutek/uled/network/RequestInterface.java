@@ -29,6 +29,7 @@ import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
+import com.dadoutek.uled.router.bean.ScanDataBean;
 
 import java.util.List;
 import java.util.Map;
@@ -736,7 +737,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/scan-device")
-    Observable<Response<Long>> routeScanDevcie(@Field("scanType") int scanType,@Field("scanName") String scanName,@Field("ser_id") String ser_id);
+    Observable<Response<ScanDataBean>> routeScanDevcie(@Field("scanType") int scanType, @Field("scanName") String scanName, @Field("ser_id") String ser_id);
 
     /**
      * 停止扫描
@@ -826,7 +827,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/device/bound")
-    Observable<Response> bindRouter(@Field("meshAddrs") List meshAddrs,
+    Observable<Response> bindRouter(@Field("meshAddrs") List<Integer> meshAddrs,
                                     @Field("meshType") int meshType,
                                     @Field("macAddr") String macAddr);
 

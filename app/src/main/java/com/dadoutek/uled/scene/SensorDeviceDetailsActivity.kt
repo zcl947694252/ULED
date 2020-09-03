@@ -26,6 +26,7 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
@@ -36,6 +37,7 @@ import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -131,6 +133,18 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     override fun gpAllVisible(): Boolean {
         return false
+    }
+
+    override fun bindRouterVisible(): Boolean {
+        return true
+    }
+
+    override fun bindDeviceRouter() {
+        val dbGroup = DbGroup()
+        dbGroup.deviceType = DeviceType.SENSOR.toLong()
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", dbGroup)
+        startActivity(intent)
     }
 
     override fun setDeviceDataSize(num: Int): Int {

@@ -1,6 +1,7 @@
 package com.dadoutek.uled.curtains
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -216,6 +217,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
+    @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, curtainGroup?.name))
@@ -829,32 +831,39 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun electricCommutation() {
         if (typeStr == Constant.TYPE_GROUP) {
-            if (commutationBoolean) {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                commutationBoolean = false
-            } else {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x00, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                commutationBoolean = true
+            when {
+                commutationBoolean -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    commutationBoolean = false
+                }
+                else -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x00, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    commutationBoolean = true
+                }
             }
         } else {
-            if (commutationBoolean) {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                commutationBoolean = false
-                curtain!!.inverse = true
-                DBUtils.updateCurtain(curtain!!)
-            } else {
-                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x00, Opcode.CURTAIN_PACK_END)
-                val opcode = Opcode.CURTAIN_ON_OFF
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                commutationBoolean = true
-                curtain!!.inverse = false
-                DBUtils.updateCurtain(curtain!!)
+            when {
+                commutationBoolean -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+                    commutationBoolean = false
+
+                    curtain!!.inverse = true
+                    DBUtils.updateCurtain(curtain!!)
+                }
+                else -> {
+                    val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x00, Opcode.CURTAIN_PACK_END)
+                    val opcode = Opcode.CURTAIN_ON_OFF
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+                    commutationBoolean = true
+                    curtain!!.inverse = false
+                    DBUtils.updateCurtain(curtain!!)
+                }
             }
 
         }

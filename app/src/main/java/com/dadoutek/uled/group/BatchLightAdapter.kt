@@ -21,12 +21,11 @@ import com.dadoutek.uled.model.DeviceType
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
     // -70 至 -80一般  >=-65 很好
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
         helper ?: return
-        val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
         val groupName = helper.getView<TextView>(R.id.template_device_batch_title_blow)
 
         helper.setText(R.id.template_device_batch_title, item?.name)
@@ -42,25 +41,24 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>) : BaseQuic
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
                     .setTextColor(R.id.template_device_batch_title_blow, mContext.getColor(R.color.blue_text))
             groupName.visibility = View.VISIBLE
-            if (TextUtils.isEmpty(item?.groupName)) {
-                if (item?.belongGroupId != 1L)
-                    groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
-            } else
-                groupName.text = item?.groupName
-
-            if (item?.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_rgb_n)
-            } else {
-                icon.setImageResource(R.drawable.icon_light_n)
+            when {
+                TextUtils.isEmpty(item?.groupName) -> {
+                    if (item?.belongGroupId != 1L)
+                        groupName.text = DBUtils.getGroupByID(item?.belongGroupId ?: 1)?.name
+                }
+                else -> groupName.text = item?.groupName
             }
         } else {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
             groupName.visibility = View.GONE
-            if (item?.productUUID == DeviceType.LIGHT_RGB) {
-                icon.setImageResource(R.drawable.icon_rgb_n)
-            } else {
-                icon.setImageResource(R.drawable.icon_light_n)
-            }
+        }
+
+        if (isRouterBind) {
+            groupName.text = item?.boundMacName
+            if (TextUtils.isEmpty(item?.boundMacName))
+                groupName.visibility = View.GONE
+            else
+                groupName.visibility = View.VISIBLE
         }
     }
 }

@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbConnector implements Serializable {
@@ -29,8 +29,7 @@ public class DbConnector implements Serializable {
     public int color=0xffffff;//颜色
     public String version;
     private String boundMac ="";
-    public String routerName;
-    public String belongRouterMacAddr;
+    public String boundMacName;
     public String getBoundMac() {
         return boundMac;
     }
@@ -57,14 +56,12 @@ public class DbConnector implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
     public boolean isMostNew =false;
-
-
-    @Generated(hash = 7807775)
+    @Generated(hash = 924822306)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
             int index, String groupName, int color, String version, String boundMac,
-            String routerName, String belongRouterMacAddr, int status, int rssi,
-            boolean isSupportOta, boolean isMostNew) {
+            String boundMacName, int status, int rssi, boolean isSupportOta,
+            boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -78,8 +75,7 @@ public class DbConnector implements Serializable {
         this.color = color;
         this.version = version;
         this.boundMac = boundMac;
-        this.routerName = routerName;
-        this.belongRouterMacAddr = belongRouterMacAddr;
+        this.boundMacName = boundMacName;
         this.status = status;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
@@ -90,26 +86,17 @@ public class DbConnector implements Serializable {
     public DbConnector() {
     }
 
-    public String getRouterName() {
-        return routerName;
+    public String getBoundMacName() {
+        return boundMacName;
     }
 
-    public void setRouterName(String routerName) {
-        this.routerName = routerName;
-    }
-
-    public String getBelongRouterMacAddr() {
-        return belongRouterMacAddr;
-    }
-
-    public void setBelongRouterMacAddr(String belongRouterMacAddr) {
-        this.belongRouterMacAddr = belongRouterMacAddr;
+    public void setBoundMacName(String boundMacName) {
+        this.boundMacName = boundMacName;
     }
 
     public boolean isSupportOta() {
         return isSupportOta;
     }
-
     public void setSupportOta(boolean supportOta) {
         isSupportOta = supportOta;
     }
