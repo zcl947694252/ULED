@@ -39,11 +39,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property SceneId = new Property(12, int.class, "sceneId", false, "SCENE_ID");
         public final static Property BoundMac = new Property(13, String.class, "boundMac", false, "BOUND_MAC");
         public final static Property BoundMacName = new Property(14, String.class, "boundMacName", false, "BOUND_MAC_NAME");
-        public final static Property IsSelected = new Property(15, boolean.class, "isSelected", false, "IS_SELECTED");
-        public final static Property IsChecked = new Property(16, Boolean.class, "isChecked", false, "IS_CHECKED");
-        public final static Property Selected = new Property(17, boolean.class, "selected", false, "SELECTED");
-        public final static Property IsMostNew = new Property(18, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property IsSupportOta = new Property(19, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsChecked = new Property(15, Boolean.class, "isChecked", false, "IS_CHECKED");
+        public final static Property Selected = new Property(16, boolean.class, "selected", false, "SELECTED");
+        public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -74,11 +73,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"SCENE_ID\" INTEGER NOT NULL ," + // 12: sceneId
                 "\"BOUND_MAC\" TEXT," + // 13: boundMac
                 "\"BOUND_MAC_NAME\" TEXT," + // 14: boundMacName
-                "\"IS_SELECTED\" INTEGER NOT NULL ," + // 15: isSelected
-                "\"IS_CHECKED\" INTEGER," + // 16: isChecked
-                "\"SELECTED\" INTEGER NOT NULL ," + // 17: selected
-                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 18: isMostNew
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 19: isSupportOta
+                "\"IS_CHECKED\" INTEGER," + // 15: isChecked
+                "\"SELECTED\" INTEGER NOT NULL ," + // 16: selected
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 17: isMostNew
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 18: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -137,15 +135,14 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (boundMacName != null) {
             stmt.bindString(15, boundMacName);
         }
-        stmt.bindLong(16, entity.getIsSelected() ? 1L: 0L);
  
         Boolean isChecked = entity.getIsChecked();
         if (isChecked != null) {
-            stmt.bindLong(17, isChecked ? 1L: 0L);
+            stmt.bindLong(16, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(18, entity.getSelected() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(17, entity.getSelected() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -198,15 +195,14 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (boundMacName != null) {
             stmt.bindString(15, boundMacName);
         }
-        stmt.bindLong(16, entity.getIsSelected() ? 1L: 0L);
  
         Boolean isChecked = entity.getIsChecked();
         if (isChecked != null) {
-            stmt.bindLong(17, isChecked ? 1L: 0L);
+            stmt.bindLong(16, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(18, entity.getSelected() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(17, entity.getSelected() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -232,11 +228,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.getInt(offset + 12), // sceneId
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // boundMac
             cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // boundMacName
-            cursor.getShort(offset + 15) != 0, // isSelected
-            cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0, // isChecked
-            cursor.getShort(offset + 17) != 0, // selected
-            cursor.getShort(offset + 18) != 0, // isMostNew
-            cursor.getShort(offset + 19) != 0 // isSupportOta
+            cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0, // isChecked
+            cursor.getShort(offset + 16) != 0, // selected
+            cursor.getShort(offset + 17) != 0, // isMostNew
+            cursor.getShort(offset + 18) != 0 // isSupportOta
         );
         return entity;
     }
@@ -258,11 +253,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setSceneId(cursor.getInt(offset + 12));
         entity.setBoundMac(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
         entity.setBoundMacName(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setIsSelected(cursor.getShort(offset + 15) != 0);
-        entity.setIsChecked(cursor.isNull(offset + 16) ? null : cursor.getShort(offset + 16) != 0);
-        entity.setSelected(cursor.getShort(offset + 17) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 18) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 19) != 0);
+        entity.setIsChecked(cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0);
+        entity.setSelected(cursor.getShort(offset + 16) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
      }
     
     @Override

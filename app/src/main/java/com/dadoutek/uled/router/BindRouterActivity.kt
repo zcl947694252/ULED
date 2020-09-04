@@ -170,6 +170,8 @@ class BindRouterActivity : TelinkBaseActivity() {
                 senserAdapter.notifyDataSetChanged()
             }
         }
+
+        changeGroupingCompleteState()
     }
 
     private fun changeGroupSelectView(position: Int) {
@@ -230,8 +232,7 @@ class BindRouterActivity : TelinkBaseActivity() {
     private fun bindRouterHttp(meshAddList: MutableList<Int>) {
         showLoadingDialog(getString(R.string.binding_router))
         /**
-         * meshType 普通灯 = 4
-         * 彩灯 = 6 蓝牙连接器 = 5  窗帘 = 16 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 开关统一使用99
+         * meshType 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5  窗帘 = 16 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 开关统一使用99
          * 传感器 = 98 或 0x23 或 0x24
          */
         var meshType = when ((currentGroup?.deviceType ?: 0).toInt()) {
@@ -251,6 +252,7 @@ class BindRouterActivity : TelinkBaseActivity() {
                     ToastUtils.showShort(getString(R.string.bind_success))
                     changeDataUpdate()
                     hideLoadingDialog()
+                    bind_router_all.setImageResource(R.drawable.icon_all_check)
                 }
 
                 override fun error(msg: String?) {

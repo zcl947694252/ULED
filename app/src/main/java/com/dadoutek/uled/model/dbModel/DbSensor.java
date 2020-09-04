@@ -4,12 +4,12 @@ import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSensor implements Serializable {
@@ -33,38 +33,19 @@ public class DbSensor implements Serializable {
     private int sceneId = 0; //场景id
     private String boundMac ="";
     public String boundMacName;
-    @NotNull
-    public  boolean isSelected  =false;
     public Boolean isChecked;
     public boolean selected;
-    public String getBoundMac() {
-        return boundMac;
-    }
-
-    public void setBoundMac(String boundMac) {
-        this.boundMac = boundMac;
-    }
-
     @Transient
     public int icon = R.drawable.icon_sensor;//灯状态显示图
     public boolean isMostNew = false;
-
-    public boolean isSupportOta() {
-        return isSupportOta;
-    }
-
-    public void setSupportOta(boolean supportOta) {
-        isSupportOta = supportOta;
-    }
-
     public boolean isSupportOta =true;
-    @Generated(hash = 289165652)
+
+    @Generated(hash = 1826621490)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
             String version, int rssi, int openTag, int setType, int sceneId,
-            String boundMac, String boundMacName, boolean isSelected,
-            Boolean isChecked, boolean selected, boolean isMostNew,
-            boolean isSupportOta) {
+            String boundMac, String boundMacName, Boolean isChecked,
+            boolean selected, boolean isMostNew, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -80,7 +61,6 @@ public class DbSensor implements Serializable {
         this.sceneId = sceneId;
         this.boundMac = boundMac;
         this.boundMacName = boundMacName;
-        this.isSelected = isSelected;
         this.isChecked = isChecked;
         this.selected = selected;
         this.isMostNew = isMostNew;
@@ -91,6 +71,21 @@ public class DbSensor implements Serializable {
     public DbSensor() {
     }
 
+    public String getBoundMac() {
+        return boundMac;
+    }
+
+    public void setBoundMac(String boundMac) {
+        this.boundMac = boundMac;
+    }
+
+    public boolean isSupportOta() {
+        return isSupportOta;
+    }
+
+    public void setSupportOta(boolean supportOta) {
+        isSupportOta = supportOta;
+    }
     public int getIcon() {
         return icon;
     }
@@ -178,14 +173,6 @@ public class DbSensor implements Serializable {
         this.version = version;
     }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
-
     public boolean isMostNew() {
         return isMostNew;
     }
@@ -261,14 +248,6 @@ public class DbSensor implements Serializable {
         this.isMostNew = isMostNew;
     }
 
-    public boolean getIsSelected() {
-        return this.isSelected;
-    }
-
-    public void setIsSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
-
     public String getBoundMacName() {
         return boundMacName;
     }
@@ -283,6 +262,14 @@ public class DbSensor implements Serializable {
 
     public void setIsChecked(Boolean isChecked) {
         this.isChecked = isChecked;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public boolean getSelected() {

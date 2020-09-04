@@ -151,7 +151,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightService.Instance()?.idleMode(true)
         initData()
         initView()
-        initClick()
+        initListener()
         startScan()
     }
 
@@ -272,7 +272,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startTimer() {
         stopScanTimer()
         LogUtils.d("startTimer")
-        mTimer = Observable.timer((scanTimeoutTime).toLong(), TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        mTimer = Observable.timer(scanTimeoutTime, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe {
                     LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
@@ -735,7 +735,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         lottieAnimationView?.visibility = View.GONE
     }
 
-    private fun initClick() {
+    private fun initListener() {
+        cancelf.setOnClickListener { popFinish?.dismiss() }
+        confirmf.setOnClickListener {
+            popFinish?.dismiss()
+            stopScanTimer()
+            closeAnimation()
+            finish()
+        }
+
         scanning_no_factory_btn.setOnClickListener {
             seeHelpe("#QA1")
         }
@@ -839,14 +847,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun addListerner() {
-        cancelf.setOnClickListener { popFinish?.dismiss() }
-        confirmf.setOnClickListener {
-            popFinish?.dismiss()
-            stopScanTimer()
-            closeAnimation()
-            finish()
-        }
-
         //监听事件
         mApplication?.removeEventListener(this)
         mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)

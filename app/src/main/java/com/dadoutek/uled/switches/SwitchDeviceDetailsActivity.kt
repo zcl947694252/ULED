@@ -149,7 +149,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
             popVersion = itv.findViewById(R.id.pop_version)
 
             popVersion?.text = getString(R.string.firmware_version) + currentDevice?.version
-            popVersion?.visibility = View.VISIBLE
+            popVersion?.visibility = View.GONE
             delete.text = getString(R.string.delete)
             rename.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener

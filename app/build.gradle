@@ -48,8 +48,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 277
-        versionName "4.0.4"
+        versionCode 278
+        versionName "4.0.5"
 
         multiDexEnabled true
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
@@ -91,7 +91,7 @@ repositories {
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
 
-    schemaVersion 81
+    schemaVersion 80
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
 

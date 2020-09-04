@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -86,6 +87,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private lateinit var deviceInfo: DeviceInfo
     private var delete: TextView? = null
     private var group: TextView? = null
+
     private var ota: TextView? = null
     private var rename: TextView? = null
     private var views: View? = null
@@ -136,7 +138,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     override fun bindRouterVisible(): Boolean {
-        return true
+        return false
     }
 
     override fun bindDeviceRouter() {
@@ -284,29 +286,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
-    private fun renameSesor() {
-        if (!TextUtils.isEmpty(currentDevice?.name))
-            renameEt?.setText(currentDevice?.name)
-        renameEt?.setSelection(renameEt?.text.toString().length)
-
-        if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
-        }
-
-        renameConfirm?.setOnClickListener {    // 获取输入框的内容
-            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
-                ToastUtils.showLong(getString(R.string.rename_tip_check))
-            } else {
-                currentDevice?.name = renameEt?.text.toString()
-                DBUtils.saveSensor(currentDevice!!, true)
-                sensorDatas[positionCurrent].name = renameEt?.text.toString()
-                adapter?.notifyDataSetChanged()
-                renameDialog.dismiss()
-            }
-        }
-    }
-
     private fun showInstallDeviceList() {
         dialog_pir.visibility = View.GONE
         showInstallDeviceList(isGuide, isRgbClick)
@@ -315,7 +294,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private fun initData() {
         sensorDatas.clear()
         sensorDatas.addAll(DBUtils.getAllSensor())
-//        LogUtils.e("zcl人体本地数据----------$sensorData")
         setScanningMode(true)
         isEmptyDevice()
     }

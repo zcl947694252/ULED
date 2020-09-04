@@ -126,9 +126,9 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
-        if (DBUtils.getAllRouter().size > 1)
-            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+        //list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+      /*  if (DBUtils.getAllRouter().size > 1)
+            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))*/
     }
 
     @SuppressLint("StringFormatMatches")

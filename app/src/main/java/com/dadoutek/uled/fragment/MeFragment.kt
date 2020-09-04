@@ -222,7 +222,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         updata?.setOnClickListener(this)
         user_reset?.setOnClickListener(this)
         save_lock_ly?.setOnClickListener(this)
-        modle_chose?.setOnClickListener(this)
         bind_router?.setOnClickListener(this)
     }
 
@@ -406,10 +405,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             }
             R.id.save_lock_ly -> {
                 var intent = Intent(activity, SafeLockActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.modle_chose -> {
-                var intent = Intent(activity, ChooseModeActivity::class.java)
                 startActivity(intent)
             }
             R.id.bind_router -> {
