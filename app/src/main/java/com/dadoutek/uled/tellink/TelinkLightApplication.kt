@@ -133,9 +133,6 @@ class TelinkLightApplication : TelinkApplication() {
 
                 if (mStompManager?.mStompClient == null)
                     initStompClient()
-
-
-
                 singleLoginTopicDisposable = mStompManager?.singleLoginTopic()?.subscribe({
                     LogUtils.e("zcl单点登录 It's time to cancel $it")
 

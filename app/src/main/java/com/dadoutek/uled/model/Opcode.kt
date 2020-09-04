@@ -2,6 +2,11 @@ package com.dadoutek.uled.model
 
 object Opcode {
     /**
+     * 发送时间戳
+     */
+    const val TIME_ZONE: Byte= 0xE0.toByte()
+
+    /**
      * 配置单调光双组开关
      */
     const val CONFIG_DOUBLE_SWITCH: Byte = 0xf1.toByte()

@@ -115,8 +115,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         startActivity(intent)
     }
 
+    //显示路由
     override fun bindRouterVisible(): Boolean {
-        return true
+        return false
     }
 
     override fun setPositiveBtn() {
@@ -577,29 +578,4 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId, getString(R.string.Gate_way))
     }
 
-    private fun addNewGroup() {
-//        dialog?.visibility = View.GONE
-        val textGp = EditText(this)
-        textGp.singleLine = true
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(DBUtils.getDefaultNewGroupName())
-        //设置光标默认在最后
-        textGp.setSelection(textGp.text.toString().length)
-        android.app.AlertDialog.Builder(this)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DEVICE_TYPE_DEFAULT_ALL)
-                        dialog.dismiss()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
 }

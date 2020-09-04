@@ -17,6 +17,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -47,7 +48,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 /**
  * 人体感应器扫描新设备/已连接设备
@@ -376,6 +379,23 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         scanDisposable?.dispose()
         isSearchedDevice = false
 
+        val meshAddress = mDeviceInfo!!.meshAddress
+        val mac = mDeviceInfo!!.sixByteMacAddress.split(":")
+        if (mac != null && mac.size >= 6) {
+            val mac1 = Integer.getInteger(mac[3], 16)
+            val mac2 = Integer.getInteger(mac[4], 16)
+            val mac3 = Integer.getInteger(mac[5], 16)
+            val mac4 = Integer.getInteger(mac[6], 16)
+
+            val instance = Calendar.getInstance()
+            val second = instance.get(Calendar.SECOND).toByte()
+            val minute = instance.get(Calendar.MINUTE).toByte()
+            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
+            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
+            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
+                    mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+        }
 
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
         getVersion()

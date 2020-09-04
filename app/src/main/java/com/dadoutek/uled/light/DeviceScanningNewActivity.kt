@@ -137,6 +137,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
     private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_batch_small_item, mAddedDevices)
+
     //有无被选中的用来分组的灯
     private val isSelectLight: Boolean get() = mAddedDevices.any { it.isSelected }       //只要已添加的设备里有一个选中的，就返回False
 
@@ -156,7 +157,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
 
-    private val currentGroup: DbGroup? get() {
+    private val currentGroup: DbGroup?
+        get() {
             if (currentGroupIndex == -1) {
                 if (groups.size > 1)
                     Toast.makeText(this, R.string.please_select_group, Toast.LENGTH_SHORT).show()
@@ -171,7 +173,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 是否所有灯都分了组
      * @return false还有没有分组的灯 true所有灯都已经分组
      */
-    private val isAllLightsGrouped: Boolean get() {
+    private val isAllLightsGrouped: Boolean
+        get() {
             for (device in mAddedDevices)
                 if (device.belongGroupId == allLightId) {
                     return false
@@ -1343,7 +1346,25 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun onLogin() {
         //进入分组
+        val meshAddress = bestRssiDevice!!.meshAddress
+        val mac = bestRssiDevice!!.sixByteMacAddress.split(":")
+        if (mac != null && mac.size >= 6) {
+            val mac1 = Integer.getInteger(mac[3], 16)
+            val mac2 = Integer.getInteger(mac[4], 16)
+            val mac3 = Integer.getInteger(mac[5], 16)
+            val mac4 = Integer.getInteger(mac[6], 16)
+
+            val instance = Calendar.getInstance()
+            val second = instance.get(Calendar.SECOND).toByte()
+            val minute = instance.get(Calendar.MINUTE).toByte()
+            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
+            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
+            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
+                    mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+        }
         hideLoadingDialog()
+
         if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
             meshList.removeAll(mAddedDevices.map { it.meshAddress })
             startToRecoverDevices()

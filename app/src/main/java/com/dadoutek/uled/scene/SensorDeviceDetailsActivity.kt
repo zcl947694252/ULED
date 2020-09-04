@@ -137,6 +137,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         return false
     }
 
+    //显示路由
     override fun bindRouterVisible(): Boolean {
         return false
     }

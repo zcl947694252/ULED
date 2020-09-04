@@ -504,7 +504,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     private fun setGroupForSwitch() {
         val groupAddress = currentGroup!!.meshAddr
-        val paramBytes = byteArrayOf(0x01, (groupAddress shr 8 and 0xFF).toByte(), (groupAddress and 0xFF).toByte())
+        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
         //0x01 代表添加组
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress, paramBytes)
     }
