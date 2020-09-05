@@ -178,25 +178,24 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             val meshAddress = bestRSSIDevice!!.meshAddress
             val mac = bestRSSIDevice!!.sixByteMacAddress.split(":")
             if (mac != null && mac.size >= 6) {
-                val mac1 = Integer.getInteger(mac[3], 16)
-                val mac2 = Integer.getInteger(mac[4], 16)
-                val mac3 = Integer.getInteger(mac[5], 16)
-                val mac4 = Integer.getInteger(mac[6], 16)
+                val mac1 = Integer.valueOf(mac[2], 16)
+                val mac2 = Integer.valueOf(mac[3], 16)
+                val mac3 = Integer.valueOf(mac[4], 16)
+                val mac4 = Integer.valueOf(mac[5], 16)
 
                 val instance = Calendar.getInstance()
                 val second = instance.get(Calendar.SECOND).toByte()
                 val minute = instance.get(Calendar.MINUTE).toByte()
                 val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
                 val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
-                val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
-                        mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
+                val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(),
+                        mac1.toByte(), mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
             }
 
             val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { version ->
+                    .subscribe({ version ->
                                 if (version != null && version != "") {
                                     skipSwitch(version)
                                     finish()

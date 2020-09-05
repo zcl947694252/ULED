@@ -43,10 +43,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_sensor.*
 import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -74,7 +71,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
-        TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
         initView()
         initListener()
@@ -152,12 +148,14 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun closeAnimal() {
+        runOnUiThread {
         isScanning = false
         device_lottieAnimationView.cancelAnimation()
         //scanning_device_ly.visibility = View.GONE
         device_lottieAnimationView.visibility = View.GONE
         image_no_group.visibility = View.VISIBLE
         tv_tip.text = getString(R.string.see_help)
+        }
     }
 
 
@@ -207,10 +205,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+                    Thread.sleep(1500)
                     TelinkLightService.Instance()?.startScan(params)
                     scanDisposable?.dispose()
-                    scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
-                            .SECONDS)
+                    scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
@@ -379,22 +377,22 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         scanDisposable?.dispose()
         isSearchedDevice = false
 
-        val meshAddress = mDeviceInfo!!.meshAddress
-        val mac = mDeviceInfo!!.sixByteMacAddress.split(":")
+        val meshAddress = mDeviceInfo?.meshAddress
+        val mac = mDeviceInfo?.sixByteMacAddress?.split(":")
         if (mac != null && mac.size >= 6) {
-            val mac1 = Integer.getInteger(mac[3], 16)
-            val mac2 = Integer.getInteger(mac[4], 16)
-            val mac3 = Integer.getInteger(mac[5], 16)
-            val mac4 = Integer.getInteger(mac[6], 16)
+            val mac1 = Integer.valueOf(mac[2], 16)
+            val mac2 = Integer.valueOf(mac[3], 16)
+            val mac3 = Integer.valueOf(mac[4], 16)
+            val mac4 = Integer.valueOf(mac[5], 16)
 
             val instance = Calendar.getInstance()
             val second = instance.get(Calendar.SECOND).toByte()
             val minute = instance.get(Calendar.MINUTE).toByte()
             val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
             val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
-            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
+            val byteArrayOf = byteArrayOf((meshAddress?:0 and 0xFF).toByte(), (meshAddress?:0 shr 8 and 0xFF).toByte(), mac1.toByte(),
                     mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress?:0, byteArrayOf)
         }
 
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
@@ -409,23 +407,22 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             Commander.getDeviceVersion(dstAdress)
                     .subscribe({
                         closeAnimal()
-                        finish()
                         skipDevice(it)
+                        finish()
                     },
                             {
                                 getVersionRetryCount++
                                 if (getVersionRetryCount <= getVersionRetryMaxCount) {
                                     getVersion()
                                 } else {
-                                    //ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    ToastUtils.showLong(getString(R.string.get_version_fail))
                                     closeAnimal()
-                                    finish()
                                     skipDevice(mDeviceInfo!!.firmwareRevision)
+                                    finish()
                                 }
                                 LogUtils.e("zcl配置传感器前失败----$it")
                             }
                     )
-
         } else {
             ToastUtils.showLong(getString(R.string.get_version_fail))
             doFinish()
@@ -457,8 +454,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun connect() {
-        //showLoadingDialog(resources.getString(R.string.connecting_tip))
-        // closeAnimal()
         mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
@@ -467,6 +462,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         launch?.cancel()
         launch = GlobalScope.launch {
+            delay(200)
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
         }
         LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")

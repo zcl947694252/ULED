@@ -65,6 +65,7 @@ import kotlinx.android.synthetic.main.activity_device_scanning.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.singleLine
 import org.jetbrains.anko.startActivity
@@ -706,30 +707,30 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     private fun autoConnect(elements: MutableList<Int>) {
         isScanning = false
-        if (mAddDeviceType == DeviceType.GATE_WAY)
-            mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, fastestMode = true, retryTimes = 2)
+        when (mAddDeviceType) {
+            DeviceType.GATE_WAY -> mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, fastestMode = true, retryTimes = 2)
                     ?.subscribe(
                             {
                                 TelinkLightApplication.getApp().isConnectGwBle = true
                                 onLogin()
                             }, {
-                        onLogin()
-                        /*hideLoadingDialog()
+                        // onLogin()
+                        hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.connect_fail))
-                        LogUtils.d(it)*/
+                        LogUtils.d(it)
                     })
-        else
-            mAutoConnectDisposable = connect(deviceTypes = elements, fastestMode = true, retryTimes = 2)
+            else -> mAutoConnectDisposable = connect(deviceTypes = elements, fastestMode = true, retryTimes = 2)
                     ?.subscribe(
                             {
                                 onLogin()
                             }, {
-                        onLogin()
-                        /*    hideLoadingDialog()
-                            ToastUtils.showLong(getString(R.string.connect_fail))
-                            LogUtils.d(it)*/
+                        // onLogin()
+                        hideLoadingDialog()
+                        ToastUtils.showLong(getString(R.string.connect_fail))
+                        LogUtils.d(it)
                     }
                     )
+        }
     }
 
     private fun closeAnimation() {
@@ -1311,6 +1312,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
                 //刚开始扫的设备mac是null所以不能mac去重
                 mAddedDevices.add(scannedDeviceItem)
+                sendTimeZone(scannedDeviceItem)
                 updateDevice(scannedDeviceItem)
 
                 mAddedDevicesAdapter.notifyDataSetChanged()
@@ -1346,13 +1348,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun onLogin() {
         //进入分组
-        val meshAddress = bestRssiDevice!!.meshAddress
-        val mac = bestRssiDevice!!.sixByteMacAddress.split(":")
+        hideLoadingDialog()
+        if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
+            meshList.removeAll(mAddedDevices.map { it.meshAddress })
+            startToRecoverDevices()
+        } else {
+            skipeType()
+        }
+    }
+
+    private fun sendTimeZone(scannedDeviceItem: ScannedDeviceItem) {
+        val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
+        val mac = scannedDeviceItem.deviceInfo.sixByteMacAddress.split(":")
         if (mac != null && mac.size >= 6) {
-            val mac1 = Integer.getInteger(mac[3], 16)
-            val mac2 = Integer.getInteger(mac[4], 16)
-            val mac3 = Integer.getInteger(mac[5], 16)
-            val mac4 = Integer.getInteger(mac[6], 16)
+            val mac1 = Integer.valueOf(mac[2], 16)
+            val mac2 = Integer.valueOf(mac[3], 16)
+            val mac3 = Integer.valueOf(mac[4], 16)
+            val mac4 = Integer.valueOf(mac[5], 16)
 
             val instance = Calendar.getInstance()
             val second = instance.get(Calendar.SECOND).toByte()
@@ -1360,16 +1372,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
             val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
             val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
-                    mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
-        }
-        hideLoadingDialog()
+                    mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
 
-        if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
-            meshList.removeAll(mAddedDevices.map { it.meshAddress })
-            startToRecoverDevices()
-        } else {
-            skipeType()
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
         }
     }
 
