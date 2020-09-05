@@ -377,7 +377,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         scanDisposable?.dispose()
         isSearchedDevice = false
 
-        val meshAddress = mDeviceInfo?.meshAddress
+    /*    val meshAddress = mDeviceInfo?.meshAddress
         val mac = mDeviceInfo?.sixByteMacAddress?.split(":")
         if (mac != null && mac.size >= 6) {
             val mac1 = Integer.valueOf(mac[2], 16)
@@ -393,7 +393,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             val byteArrayOf = byteArrayOf((meshAddress?:0 and 0xFF).toByte(), (meshAddress?:0 shr 8 and 0xFF).toByte(), mac1.toByte(),
                     mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress?:0, byteArrayOf)
-        }
+        }*/
 
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
         getVersion()

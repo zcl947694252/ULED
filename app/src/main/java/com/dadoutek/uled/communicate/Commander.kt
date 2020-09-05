@@ -695,7 +695,6 @@ object Commander : EventListener<String> {
         val data = event.args.params
         version = if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
-
         } else {
             Strings.bytesToString(data)
         }

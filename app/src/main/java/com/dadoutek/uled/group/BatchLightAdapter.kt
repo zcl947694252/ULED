@@ -21,7 +21,8 @@ import com.dadoutek.uled.model.DeviceType
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>,var isRouterBind: Boolean = false) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+    var isRgb:Boolean = false
     // -70 至 -80一般  >=-65 很好
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
@@ -29,6 +30,13 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
         val groupName = helper.getView<TextView>(R.id.template_device_batch_title_blow)
 
         helper.setText(R.id.template_device_batch_title, item?.name)
+        val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
+        if (isRgb)
+        icon.setImageResource(R.drawable.icon_rgb_n)
+        else
+        icon.setImageResource(R.drawable.icon_light_n)
+
+
 
         if (item?.isSelected == true) {
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
@@ -60,5 +68,9 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
             else
                 groupName.visibility = View.VISIBLE
         }
+    }
+
+    open fun setIsRgb(boolean: Boolean){
+        isRgb = boolean
     }
 }

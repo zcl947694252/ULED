@@ -233,6 +233,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setAdapterAndSubscribleData() {
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                lightAdapterm.setIsRgb(deviceType == DeviceType.LIGHT_RGB)
+                lightGroupedAdapterm.setIsRgb(deviceType == DeviceType.LIGHT_RGB)
                 lightAdapterm.bindToRecyclerView(batch_four_device_recycle)
                 lightGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)
             }
@@ -255,7 +257,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun subRelayData() {
-        val observableNoGroup = deviceDataRelayAll.filter {  it.belongGroupId==0L||it.belongGroupId==1L }
+        val observableNoGroup = deviceDataRelayAll.filter { it.belongGroupId == 0L || it.belongGroupId == 1L }
         sortRelay(observableNoGroup)
         noGroupRelay.clear()
         noGroupRelay.addAll(observableNoGroup)
@@ -265,7 +267,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         relayAdapterm.notifyDataSetChanged()
 
 
-        val observableGrouped = deviceDataRelayAll.filter {  it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        val observableGrouped = deviceDataRelayAll.filter { it.belongGroupId != 0L && it.belongGroupId != 1L }
         sortRelay(observableGrouped)
         listGroupRelay.clear()
         listGroupRelay.addAll(observableGrouped)
@@ -276,21 +278,21 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun subCurtainData() {
-        val observableNoGroup = deviceDataCurtainAll.filter { it.belongGroupId==0L||it.belongGroupId==1L}
+        val observableNoGroup = deviceDataCurtainAll.filter { it.belongGroupId == 0L || it.belongGroupId == 1L }
         sortCurtain(observableNoGroup)
         noGroupCutain.clear()
         noGroupCutain.addAll(observableNoGroup)
 
 
         listGroupCutain.clear()
-        val observableGrouped = deviceDataCurtainAll.filter {  it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        val observableGrouped = deviceDataCurtainAll.filter { it.belongGroupId != 0L && it.belongGroupId != 1L }
         sortCurtain(observableGrouped)
         listGroupCutain.addAll(observableGrouped)
 
-            if (checkedNoGrouped)
-                setDeviceListAndEmpty(noGroupCutain.size)
-            else
-                setDeviceListAndEmpty(listGroupCutain.size)
+        if (checkedNoGrouped)
+            setDeviceListAndEmpty(noGroupCutain.size)
+        else
+            setDeviceListAndEmpty(listGroupCutain.size)
 
         setTitleTexts(noGroupCutain.size, listGroupCutain.size)
 
@@ -300,8 +302,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("StringFormatMatches")
     private fun subLightData() {
-        val observableNoGroup = deviceDataLightAll.filter {  it.belongGroupId==0L||it.belongGroupId==1L }
-        val observableGrouped = deviceDataLightAll.filter { it.belongGroupId!=0L&&it.belongGroupId!=1L }
+        val observableNoGroup = deviceDataLightAll.filter { it.belongGroupId == 0L || it.belongGroupId == 1L }
+        val observableGrouped = deviceDataLightAll.filter { it.belongGroupId != 0L && it.belongGroupId != 1L }
         sortList(observableNoGroup)
         sortList(observableGrouped)
 
@@ -836,7 +838,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                     }
                                 }
                             }, {
-                                    ToastUtils.showShort(it.message)
+                                ToastUtils.showShort(it.message)
                             })
                 }
             } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃
@@ -1907,9 +1909,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     override fun routerGroupResult(fromJson: RouteGroupingBean?) {
-        if (fromJson?.finish==true){
+        if (fromJson?.finish == true) {
             initData()
-        }else{
+        } else {
             ToastUtils.showShort(getString(R.string.router_grouping))
         }
     }

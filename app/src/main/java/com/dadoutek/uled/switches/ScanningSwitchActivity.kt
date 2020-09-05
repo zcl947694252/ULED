@@ -174,7 +174,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         count+1
         hideLoadingDialog()
         if (bestRSSIDevice != null) {
-
+/*
             val meshAddress = bestRSSIDevice!!.meshAddress
             val mac = bestRSSIDevice!!.sixByteMacAddress.split(":")
             if (mac != null && mac.size >= 6) {
@@ -191,9 +191,9 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                 val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(),
                         mac1.toByte(), mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
-            }
+            }*/
 
-            val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+            val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress,retryTimes = 2)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ version ->
                                 if (version != null && version != "") {
@@ -201,7 +201,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                     finish()
                                 } else {
                                     val version1 = bestRSSIDevice?.firmwareRevision ?: ""
-
                                     if (TextUtils.isEmpty(version1))
                                         ToastUtils.showLong(getString(R.string.get_version_fail))
                                     else
