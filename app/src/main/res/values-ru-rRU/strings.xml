@@ -987,10 +987,10 @@
     <string name="verification_code_invalid">Проверка не удалась 3 раза, код не работает</string>
     <string name="salt_error">Пожалуйста, сначала убедитесь, что значение соли или ошибка значения соли или что она просрочена</string>
     <string name="input_rgb_num">Введите значение RGB цвета</string>
-    <string name="router_grouping">分组中，请稍后。已成功分组%1$s个设备</string>
-    <string name="binding_router">绑定路由中</string>
-    <string name="bind_success">绑定成功</string>
-    <string name="bind_fail">路由绑定失败</string>
-    <string name="please_select_device_at_leaset">请至少选择一个要绑定的设备</string>
+    <string name="router_grouping">В группу, пожалуйста, позже. Успешно сгруппировано %1$s устройства</string>
+    <string name="binding_router">Связь установлена</string>
+    <string name="bind_success">Связь завершена.</string>
+    <string name="bind_fail">Связь маршрута не работает</string>
+    <string name="please_select_device_at_leaset">Пожалуйста, выберите хотя бы одно устройство, которое нужно связать</string>
 
 </resources>
