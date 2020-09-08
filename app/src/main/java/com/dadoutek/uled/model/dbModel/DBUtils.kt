@@ -777,7 +777,7 @@ object DBUtils {
     }
 
 
-    fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3, keys: String = "") {
+    fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3, keys: String = "[]") {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
             //如果该mesh地址的数据已经存在，就直接修改

@@ -94,7 +94,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
-    private var mConnectDisposal: Disposable? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
     private var retryConnectCount = 0
@@ -372,7 +371,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onPause()
         disableConnectionStatusListener()
         mCompositeDisposable.clear()
-        mConnectDisposal?.dispose()
+        mConnectDisposable?.dispose()
         progressBar.visibility = GONE
         try {
             this.unregisterReceiver(mReceiver)
@@ -449,14 +448,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
                                 if (size > 0) {
                                     ToastUtils.showLong(R.string.connecting_tip)
-                                    mConnectDisposal?.dispose()
-                                    mConnectDisposal = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+                                    mConnectDisposable?.dispose()
+                                    mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                                             ?.subscribe(
                                                     {//找回有效设备
                                                         //RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                         onLogin()
                                                     },
                                                     {
+                                                        autoConnect()
                                                         LogUtils.d("connect failed, reason = $it")
                                                     }
                                             )
@@ -478,7 +478,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun stopConnectTimer() {
-        mConnectDisposal?.dispose()
+        mConnectDisposable?.dispose()
     }
 
 
@@ -499,7 +499,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mDisposable.dispose()
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
-        mConnectDisposal?.dispose()
+        mConnectDisposable?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
         //解绑服务
         serviceConnection?.let {

@@ -202,7 +202,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                                 } else {
                                     val version1 = bestRSSIDevice?.firmwareRevision ?: ""
                                     if (TextUtils.isEmpty(version1))
-                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                        skipSwitch(version1)
                                     else
                                         skipSwitch(version1)
                                     finish()
@@ -214,7 +214,8 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                         val version1 = bestRSSIDevice?.firmwareRevision ?: ""
 
                         if (TextUtils.isEmpty(version1))
-                            ToastUtils.showLong(getString(R.string.get_version_fail))
+                            //ToastUtils.showLong(getString(R.string.get_version_fail))
+                            skipSwitch(version1)
                         else
                             skipSwitch(version1)
                         finish()

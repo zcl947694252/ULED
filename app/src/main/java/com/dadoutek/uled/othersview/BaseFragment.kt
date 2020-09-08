@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONException
 import org.json.JSONObject
 
 open class BaseFragment : Fragment() {
@@ -90,13 +91,18 @@ open class BaseFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
-            when (val cmd = jsonObject.getInt("cmd")) {
-                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
-                    val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
-                    when (cmd) {
-                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+            try {
+                val cmd = jsonObject.getInt("cmd")
+                when (cmd) {
+                    Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                        val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                        when (cmd) {
+                            Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                        }
                     }
                 }
+            } catch (js: JSONException) {
+                js.message
             }
 
 
@@ -210,8 +216,8 @@ open class BaseFragment : Fragment() {
                 toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
             else {
                 if (isConnected) {
-                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
-                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
+                    toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
+                    toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
                     //meFragment 不存在toolbar 所以要拉出来
                     setLoginChange()
                 } else {

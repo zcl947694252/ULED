@@ -5,13 +5,13 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSwitch implements Serializable {
@@ -30,7 +30,7 @@ public class DbSwitch implements Serializable {
     private int index;
     private Long belongGroupId;
     public int rssi =1000;
-    private String keys = "";
+    private String keys = "[]";
     @Nullable
     public String groupIds;
     @Nullable

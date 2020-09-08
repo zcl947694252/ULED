@@ -31,18 +31,19 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
         public final static Property ColorTemperature = new Property(5, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property MacAddr = new Property(6, String.class, "macAddr", false, "MAC_ADDR");
-        public final static Property MeshUUID = new Property(7, int.class, "meshUUID", false, "MESH_UUID");
-        public final static Property ProductUUID = new Property(8, int.class, "productUUID", false, "PRODUCT_UUID");
-        public final static Property BelongGroupId = new Property(9, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
-        public final static Property Index = new Property(10, int.class, "index", false, "INDEX");
-        public final static Property BoundMac = new Property(11, String.class, "boundMac", false, "BOUND_MAC");
-        public final static Property Color = new Property(12, int.class, "color", false, "COLOR");
-        public final static Property Version = new Property(13, String.class, "version", false, "VERSION");
-        public final static Property BoundMacName = new Property(14, String.class, "boundMacName", false, "BOUND_MAC_NAME");
-        public final static Property Status = new Property(15, int.class, "status", false, "STATUS");
-        public final static Property Rssi = new Property(16, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(17, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property IsMostNew = new Property(18, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property SixMac = new Property(7, String.class, "sixMac", false, "SIX_MAC");
+        public final static Property MeshUUID = new Property(8, int.class, "meshUUID", false, "MESH_UUID");
+        public final static Property ProductUUID = new Property(9, int.class, "productUUID", false, "PRODUCT_UUID");
+        public final static Property BelongGroupId = new Property(10, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
+        public final static Property Index = new Property(11, int.class, "index", false, "INDEX");
+        public final static Property BoundMac = new Property(12, String.class, "boundMac", false, "BOUND_MAC");
+        public final static Property Color = new Property(13, int.class, "color", false, "COLOR");
+        public final static Property Version = new Property(14, String.class, "version", false, "VERSION");
+        public final static Property BoundMacName = new Property(15, String.class, "boundMacName", false, "BOUND_MAC_NAME");
+        public final static Property Status = new Property(16, int.class, "status", false, "STATUS");
+        public final static Property Rssi = new Property(17, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsMostNew = new Property(19, boolean.class, "isMostNew", false, "IS_MOST_NEW");
     }
 
 
@@ -65,18 +66,19 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 5: colorTemperature
                 "\"MAC_ADDR\" TEXT," + // 6: macAddr
-                "\"MESH_UUID\" INTEGER NOT NULL ," + // 7: meshUUID
-                "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 8: productUUID
-                "\"BELONG_GROUP_ID\" INTEGER," + // 9: belongGroupId
-                "\"INDEX\" INTEGER NOT NULL ," + // 10: index
-                "\"BOUND_MAC\" TEXT," + // 11: boundMac
-                "\"COLOR\" INTEGER NOT NULL ," + // 12: color
-                "\"VERSION\" TEXT," + // 13: version
-                "\"BOUND_MAC_NAME\" TEXT," + // 14: boundMacName
-                "\"STATUS\" INTEGER NOT NULL ," + // 15: status
-                "\"RSSI\" INTEGER NOT NULL ," + // 16: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 17: isSupportOta
-                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 18: isMostNew
+                "\"SIX_MAC\" TEXT," + // 7: sixMac
+                "\"MESH_UUID\" INTEGER NOT NULL ," + // 8: meshUUID
+                "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 9: productUUID
+                "\"BELONG_GROUP_ID\" INTEGER," + // 10: belongGroupId
+                "\"INDEX\" INTEGER NOT NULL ," + // 11: index
+                "\"BOUND_MAC\" TEXT," + // 12: boundMac
+                "\"COLOR\" INTEGER NOT NULL ," + // 13: color
+                "\"VERSION\" TEXT," + // 14: version
+                "\"BOUND_MAC_NAME\" TEXT," + // 15: boundMacName
+                "\"STATUS\" INTEGER NOT NULL ," + // 16: status
+                "\"RSSI\" INTEGER NOT NULL ," + // 17: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
+                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 19: isMostNew
     }
 
     /** Drops the underlying database table. */
@@ -111,34 +113,39 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (macAddr != null) {
             stmt.bindString(7, macAddr);
         }
-        stmt.bindLong(8, entity.getMeshUUID());
-        stmt.bindLong(9, entity.getProductUUID());
+ 
+        String sixMac = entity.getSixMac();
+        if (sixMac != null) {
+            stmt.bindString(8, sixMac);
+        }
+        stmt.bindLong(9, entity.getMeshUUID());
+        stmt.bindLong(10, entity.getProductUUID());
  
         Long belongGroupId = entity.getBelongGroupId();
         if (belongGroupId != null) {
-            stmt.bindLong(10, belongGroupId);
+            stmt.bindLong(11, belongGroupId);
         }
-        stmt.bindLong(11, entity.getIndex());
+        stmt.bindLong(12, entity.getIndex());
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(12, boundMac);
+            stmt.bindString(13, boundMac);
         }
-        stmt.bindLong(13, entity.getColor());
+        stmt.bindLong(14, entity.getColor());
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(14, version);
+            stmt.bindString(15, version);
         }
  
         String boundMacName = entity.getBoundMacName();
         if (boundMacName != null) {
-            stmt.bindString(15, boundMacName);
+            stmt.bindString(16, boundMacName);
         }
-        stmt.bindLong(16, entity.getStatus());
-        stmt.bindLong(17, entity.getRssi());
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(17, entity.getStatus());
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -167,34 +174,39 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (macAddr != null) {
             stmt.bindString(7, macAddr);
         }
-        stmt.bindLong(8, entity.getMeshUUID());
-        stmt.bindLong(9, entity.getProductUUID());
+ 
+        String sixMac = entity.getSixMac();
+        if (sixMac != null) {
+            stmt.bindString(8, sixMac);
+        }
+        stmt.bindLong(9, entity.getMeshUUID());
+        stmt.bindLong(10, entity.getProductUUID());
  
         Long belongGroupId = entity.getBelongGroupId();
         if (belongGroupId != null) {
-            stmt.bindLong(10, belongGroupId);
+            stmt.bindLong(11, belongGroupId);
         }
-        stmt.bindLong(11, entity.getIndex());
+        stmt.bindLong(12, entity.getIndex());
  
         String boundMac = entity.getBoundMac();
         if (boundMac != null) {
-            stmt.bindString(12, boundMac);
+            stmt.bindString(13, boundMac);
         }
-        stmt.bindLong(13, entity.getColor());
+        stmt.bindLong(14, entity.getColor());
  
         String version = entity.getVersion();
         if (version != null) {
-            stmt.bindString(14, version);
+            stmt.bindString(15, version);
         }
  
         String boundMacName = entity.getBoundMacName();
         if (boundMacName != null) {
-            stmt.bindString(15, boundMacName);
+            stmt.bindString(16, boundMacName);
         }
-        stmt.bindLong(16, entity.getStatus());
-        stmt.bindLong(17, entity.getRssi());
-        stmt.bindLong(18, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(19, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(17, entity.getStatus());
+        stmt.bindLong(18, entity.getRssi());
+        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
     }
 
     @Override
@@ -212,18 +224,19 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.getInt(offset + 4), // brightness
             cursor.getInt(offset + 5), // colorTemperature
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // macAddr
-            cursor.getInt(offset + 7), // meshUUID
-            cursor.getInt(offset + 8), // productUUID
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // belongGroupId
-            cursor.getInt(offset + 10), // index
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // boundMac
-            cursor.getInt(offset + 12), // color
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // version
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // boundMacName
-            cursor.getInt(offset + 15), // status
-            cursor.getInt(offset + 16), // rssi
-            cursor.getShort(offset + 17) != 0, // isSupportOta
-            cursor.getShort(offset + 18) != 0 // isMostNew
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // sixMac
+            cursor.getInt(offset + 8), // meshUUID
+            cursor.getInt(offset + 9), // productUUID
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // belongGroupId
+            cursor.getInt(offset + 11), // index
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // boundMac
+            cursor.getInt(offset + 13), // color
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // version
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // boundMacName
+            cursor.getInt(offset + 16), // status
+            cursor.getInt(offset + 17), // rssi
+            cursor.getShort(offset + 18) != 0, // isSupportOta
+            cursor.getShort(offset + 19) != 0 // isMostNew
         );
         return entity;
     }
@@ -237,18 +250,19 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setBrightness(cursor.getInt(offset + 4));
         entity.setColorTemperature(cursor.getInt(offset + 5));
         entity.setMacAddr(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setMeshUUID(cursor.getInt(offset + 7));
-        entity.setProductUUID(cursor.getInt(offset + 8));
-        entity.setBelongGroupId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
-        entity.setIndex(cursor.getInt(offset + 10));
-        entity.setBoundMac(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setColor(cursor.getInt(offset + 12));
-        entity.setVersion(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setBoundMacName(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setStatus(cursor.getInt(offset + 15));
-        entity.setRssi(cursor.getInt(offset + 16));
-        entity.setIsSupportOta(cursor.getShort(offset + 17) != 0);
-        entity.setIsMostNew(cursor.getShort(offset + 18) != 0);
+        entity.setSixMac(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setMeshUUID(cursor.getInt(offset + 8));
+        entity.setProductUUID(cursor.getInt(offset + 9));
+        entity.setBelongGroupId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setIndex(cursor.getInt(offset + 11));
+        entity.setBoundMac(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setColor(cursor.getInt(offset + 13));
+        entity.setVersion(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setBoundMacName(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setStatus(cursor.getInt(offset + 16));
+        entity.setRssi(cursor.getInt(offset + 17));
+        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
+        entity.setIsMostNew(cursor.getShort(offset + 19) != 0);
      }
     
     @Override

@@ -507,6 +507,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     dbItem.textColor = this.resources.getColor(R.color.black)
                     dbItem.belongGroupId = item.belongGroupId
                     dbItem.macAddr = item.deviceInfo.macAddress
+                    dbItem.sixMac = item.deviceInfo.sixByteMacAddress
                     dbItem.meshUUID = item.deviceInfo.meshUUID
                     dbItem.productUUID = item.deviceInfo.productUUID
                     dbItem.isSelected = item.isSelected
@@ -1284,6 +1285,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(user?.controlMeshName)
+
         params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16))
         params.setUpdateDeviceList(deviceInfo)
         TelinkLightService.Instance()?.updateMesh(params)
@@ -1312,7 +1314,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
                 //刚开始扫的设备mac是null所以不能mac去重
                 mAddedDevices.add(scannedDeviceItem)
-                sendTimeZone(scannedDeviceItem)
+                Thread.sleep(500)
+              //  sendTimeZone(scannedDeviceItem)
                 updateDevice(scannedDeviceItem)
 
                 mAddedDevicesAdapter.notifyDataSetChanged()
@@ -1486,6 +1489,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
                         dbLightNew.name = string + dbLightNew.meshAddr
                         dbLightNew.macAddr = deviceInfo.macAddress
+                        dbLightNew.sixMac = deviceInfo.sixByteMacAddress
                         DBUtils.saveLight(dbLightNew, false)
                         LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
                         RecoverMeshDeviceUtil.count++
@@ -1582,6 +1586,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                                 deviceInfo.id = x.id
                                 deviceInfo.index = x.index
                                 deviceInfo.sixByteMacAddress = x.macAddr
+                                deviceInfo.macAddress = x.macAddr
                                 deviceInfo.macAddress = x.macAddr
                                 deviceInfo.meshAddress = x.meshAddr
                                 deviceInfo.meshUUID = x.meshUUID

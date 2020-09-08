@@ -86,7 +86,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        if (!localVersion.contains("BT")) {
+        if (!localVersion.contains("BT")&&!TextUtils.isEmpty(localVersion)) {
             sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {
@@ -97,7 +97,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
 
         if (TextUtils.isEmpty(localVersion))
-            localVersion = mDeviceInfo.firmwareRevision
+            localVersion = mDeviceInfo.firmwareRevision?:""
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
         fiVersion?.title = localVersion

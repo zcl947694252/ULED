@@ -27,6 +27,7 @@ public class DbLight implements Serializable {
     private int brightness =1;
     private int colorTemperature= 1;
     private String macAddr;
+    private String sixMac;
     private int meshUUID;
     private int productUUID;
     private Long belongGroupId;//belongGroupId如果等于1则标识没有群组
@@ -59,12 +60,12 @@ public class DbLight implements Serializable {
     public boolean isSupportOta =true;
     public boolean isMostNew= false;
 
-    @Generated(hash = 2078462295)
+    @Generated(hash = 595330405)
     public DbLight(Long id, int meshAddr, String name, String groupName,
-            int brightness, int colorTemperature, String macAddr, int meshUUID,
-            int productUUID, Long belongGroupId, int index, String boundMac,
-            int color, String version, String boundMacName, int status, int rssi,
-            boolean isSupportOta, boolean isMostNew) {
+            int brightness, int colorTemperature, String macAddr, String sixMac,
+            int meshUUID, int productUUID, Long belongGroupId, int index,
+            String boundMac, int color, String version, String boundMacName,
+            int status, int rssi, boolean isSupportOta, boolean isMostNew) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -72,6 +73,7 @@ public class DbLight implements Serializable {
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.macAddr = macAddr;
+        this.sixMac = sixMac;
         this.meshUUID = meshUUID;
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
@@ -88,6 +90,14 @@ public class DbLight implements Serializable {
 
     @Generated(hash = 2075223479)
     public DbLight() {
+    }
+
+    public String getSixMac() {
+        return sixMac;
+    }
+
+    public void setSixMac(String sixMac) {
+        this.sixMac = sixMac;
     }
 
     public String getBoundMac() {

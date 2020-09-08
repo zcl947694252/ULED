@@ -117,10 +117,13 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                val progress = if (sbBrightnessRGB!!.progress != 0) {
+                    sbBrightnessRGB!!.progress
+                } else 1
                 helper.setProgress(R.id.sbBrightness, item.brightness)
                         .setProgress(R.id.sb_w_bright, item.temperature)
                         //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
-                        .setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
+                        .setText(R.id.sbBrightness_num, "$progress%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
                         .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
                 speedSeekbar?.setProgress(item.gradientSpeed.toFloat())
@@ -260,9 +263,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
         speedSeekbar!!.onSeekChangeListener = object : OnSeekChangeListener {
-            override fun onSeeking(seekParams: SeekParams?){
+            override fun onSeeking(seekParams: SeekParams?) {
                 //解决seekbar 设置min 为1时,滑动不到100%
-                var value = seekParams?.progress?:0
+                var value = seekParams?.progress ?: 0
                 helper.setText(R.id.speed_seekbar_alg_tv, "$value%")
                 data[position].gradientSpeed = value
                 when {
@@ -1020,7 +1023,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
 
-            if (seekBar!!.progress > 0) {
+            if (seekBar!!.progress > 1) {
                 lessImage!!.isEnabled = true
             }
         }
@@ -1045,6 +1048,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             when {
                 seekBar!!.progress < 1 -> {
+                    seekBar!!.progress = 1
                     lessImage!!.isEnabled = false
                     onBtnTouch = false
                 }
@@ -1059,7 +1063,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
                 else -> {
                     lessImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
+                    var progress = seekBar!!.progress
+                    if (progress==0)
+                        progress=1
+                    brightnText!!.text = "$progress%"
                     itemGroup.brightness = seekBar!!.progress
                     opcode = Opcode.SET_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
@@ -1092,7 +1099,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     addImage!!.isEnabled = false
                     onBtnTouch = false
                 }
-                seekBar!!.progress ==5 -> {
+                seekBar!!.progress == 5 -> {
                     addImage!!.isEnabled = false
                     speedTv!!.text = seekBar!!.progress.toString() + "%"
                     onBtnTouch = false
@@ -1310,7 +1317,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
             }
             R.id.sbBrightness -> {
-                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = seekBar.progress.toString() + "%"
+                var progress = seekBar.progress
+                if (progress == 0) progress = 1
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = "$progress%"
                 itemGroup.brightness = seekBar.progress
                 opcode = Opcode.SET_LUM
                 Thread { sendCmd(opcode, address, seekBar.progress) }.start()
@@ -1374,7 +1383,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?
                 if (tvBrightnessRGB != null) {
-                    tvBrightnessRGB.text = "$progress%"
+                    if (progress == 0)
+                        tvBrightnessRGB.text = "1%"
+                    else
+                        tvBrightnessRGB.text = "$progress%"
+
                 }
             }
             R.id.sb_w_bright -> {

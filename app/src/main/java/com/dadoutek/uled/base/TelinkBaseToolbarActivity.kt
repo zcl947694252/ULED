@@ -107,7 +107,6 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
 
 
     private fun goOta() {
-        if (TelinkLightApplication.getApp().connectDevice != null)
             when (type) {
                 Constant.INSTALL_NORMAL_LIGHT -> {
                     if (DBUtils.getAllNormalLight().size == 0)
@@ -153,9 +152,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                         startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.GATE_WAY)
                 }
             }
-        else
-            autoConnectAll()
-    }
+     }
 
     private fun editeDevice() {
         isEdite = !isEdite

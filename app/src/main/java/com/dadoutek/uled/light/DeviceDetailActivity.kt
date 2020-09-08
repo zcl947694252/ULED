@@ -21,7 +21,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.model.Constant
@@ -31,9 +30,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -49,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -65,7 +63,6 @@ import kotlin.collections.ArrayList
 class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var disposableTimer: Disposable? = null
     private var allLightData: ArrayList<DbLight> = arrayListOf()
-    private var mConnectDisposable: Disposable? = null
     private var lightsData: ArrayList<DbLight> = arrayListOf()
     private var listAdapter: DeviceDetailListAdapter? = null
     private val SCENE_MAX_COUNT = 100
@@ -226,6 +223,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         }
                         DBUtils.updateLight(currentDevice!!)
                         adapter?.notifyDataSetChanged()
+
+                       // sendTimeZone(currentDevice!!)
                     }
                     R.id.template_device_card_delete -> {
                         val string = getString(R.string.sure_delete_device, currentDevice?.name)
@@ -321,6 +320,27 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         search_btn.text = getString(R.string.search)
         search_btn.setTextColor(getColor(R.color.gray_6))
         search_view.setText("")
+    }
+
+    private fun sendTimeZone(scannedDeviceItem: DbLight) {
+        val meshAddress = scannedDeviceItem?.meshAddr
+        val mac = scannedDeviceItem?.sixMac?.split(":")
+        if (mac != null && mac.size >= 6) {
+            val mac1 = Integer.valueOf(mac[2], 16)
+            val mac2 = Integer.valueOf(mac[3], 16)
+            val mac3 = Integer.valueOf(mac[4], 16)
+            val mac4 = Integer.valueOf(mac[5], 16)
+
+            val instance = Calendar.getInstance()
+            val second = instance.get(Calendar.SECOND).toByte()
+            val minute = instance.get(Calendar.MINUTE).toByte()
+            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
+            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
+            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
+                    mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
+
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+        }
     }
 
 

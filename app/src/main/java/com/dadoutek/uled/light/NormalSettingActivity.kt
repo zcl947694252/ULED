@@ -72,7 +72,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var typeStr: String? = null
     private var isAllGroup: Boolean = false
     private var downloadDispoable: Disposable? = null
-    private var mConnectDisposable: Disposable? = null
     private var localVersion: String? = null
     private lateinit var light: DbLight
     private val mDisposable = CompositeDisposable()

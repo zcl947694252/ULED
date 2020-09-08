@@ -78,7 +78,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
     private var isResume: Boolean = false
-    private var mConnectDisposable: Disposable? = null
+    var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
     private var authorStompClient: Disposable? = null
@@ -878,7 +878,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
+                retryTimes: Long = 2, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {

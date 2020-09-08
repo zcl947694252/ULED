@@ -176,7 +176,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         if (!TextUtils.isEmpty(switchDate?.name))
             renameEt?.setText(switchDate?.name)
         else
-            renameEt?.setText(StringUtils.getSwitchPirDefaultName(switchDate!!.productUUID, this) + "-" + DBUtils.getAllSwitch().size)
+            renameEt?.setText(getString(R.string.eight_switch) + "-" + DBUtils.getAllSwitch().size)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {

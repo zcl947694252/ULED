@@ -28,16 +28,15 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.dbModel.DBUtils;
-import com.dadoutek.uled.model.dbModel.DbConnector;
-import com.dadoutek.uled.model.dbModel.DbCurtain;
-import com.dadoutek.uled.model.dbModel.DbEightSwitch;
-import com.dadoutek.uled.model.dbModel.DbLight;
-import com.dadoutek.uled.model.dbModel.DbSwitch;
-import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbConnector;
+import com.dadoutek.uled.model.dbModel.DbCurtain;
+import com.dadoutek.uled.model.dbModel.DbLight;
+import com.dadoutek.uled.model.dbModel.DbSwitch;
+import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.othersview.MainActivity;
@@ -431,9 +430,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 DBUtils.INSTANCE.saveSwitch(dbSwitch,true,lightType,dbSwitch.getKeys());
                 break;
             case DeviceType.EIGHT_SWITCH:
-                DbEightSwitch dbSwitch8 = DBUtils.INSTANCE.getEightSwitchByMeshAddr(lightMeshAddr);
-                dbSwitch8.setFirmwareVersion(StringUtils.versionResolutionURL(mPath, 2));
-                DBUtils.INSTANCE.saveEightSwitch(dbSwitch8,true);
+                DbSwitch dbSwitch8 = DBUtils.INSTANCE.getSwitchByMeshAddr(lightMeshAddr);
+                dbSwitch8.setVersion(StringUtils.versionResolutionURL(mPath, 2));
+                DBUtils.INSTANCE.saveSwitch(dbSwitch8,true, dbSwitch8.type, dbSwitch8.getKeys());
                 break;
         }
         ToastUtils.showLong(R.string.exit_update);

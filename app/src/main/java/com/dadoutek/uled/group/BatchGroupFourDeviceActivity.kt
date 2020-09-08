@@ -447,6 +447,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     for (item in scanningList!!) {
                         val light = DbLight()
                         light.macAddr = item.macAddress
+                        light.sixMac = item.sixByteMacAddress
                         light.meshAddr = item.meshAddress
                         light.productUUID = item.productUUID
                         light.meshUUID = item.meshUUID
@@ -1908,11 +1909,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         return scanFilters
     }
 
+    @SuppressLint("StringFormatMatches")
     override fun routerGroupResult(fromJson: RouteGroupingBean?) {
         if (fromJson?.finish == true) {
             initData()
         } else {
-            ToastUtils.showShort(getString(R.string.router_grouping))
+            ToastUtils.showShort(getString(R.string.router_grouping,fromJson?.succeedNow?.size?:0))
         }
     }
 }

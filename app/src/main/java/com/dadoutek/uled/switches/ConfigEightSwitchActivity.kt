@@ -800,8 +800,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
 
     private fun finishAc() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
