@@ -1620,7 +1620,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 if (data != null && data.status == 0) {
                     mAddedDevicesInfos.clear()
                     when {
-                         data.data.isNotEmpty() -> {
+                        data.data.isNotEmpty() -> {
                             showLoadingDialog(resources.getString(R.string.please_wait))
                             data.data.forEach { x ->
                                 val deviceInfo = DeviceInfo()
