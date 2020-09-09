@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
+import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -46,11 +47,14 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -65,6 +69,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -549,45 +554,65 @@ abstract class BaseGroupFragment : BaseFragment() {
         AlertDialog.Builder(mContext)
                 .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    when (dbGroup.deviceType) {
-                        Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                            val lights = DBUtils.getLightByGroupID(dbGroup.id)
-                            showLoadingDialog(getString(R.string.please_wait))
-                            deleteGroup(lights, dbGroup,
-                                    successCallback = {
-                                        deleteComplete()
-                                    },
-                                    failedCallback = {
-                                        deleteFailToast()
-                                    })
+                    if (Constant.IS_ROUTE_MODE) {
+                        RouterModel.routerDelGp(dbGroup.meshAddr)?.subscribe({
+                            startDelGpTimeOut(it)
+                        },{
+                            if (it.message?.contains("本地删除")==true){
+                                DBUtils.deleteGroupOnly(dbGroup)
+                                deleteComplete()
+                            }else{
+                                ToastUtils.showShort(it.message)
+                            }
+                        })
+                    } else
+                        when (dbGroup.deviceType) {
+                            Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                                val lights = DBUtils.getLightByGroupID(dbGroup.id)
+                                showLoadingDialog(getString(R.string.please_wait))
+                                deleteGroup(lights, dbGroup,
+                                        successCallback = {
+                                            deleteComplete()
+                                        },
+                                        failedCallback = {
+                                            deleteFailToast()
+                                        })
+                            }
+                            Constant.DEVICE_TYPE_CURTAIN -> {
+                                val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
+                                showLoadingDialog(getString(R.string.please_wait))
+                                deleteGroupCurtain(lights, dbGroup,
+                                        successCallback = {
+                                            deleteComplete()
+                                        },
+                                        failedCallback = {
+                                            deleteFailToast()
+                                        })
+                            }
+                            Constant.DEVICE_TYPE_CONNECTOR -> {
+                                val lights = DBUtils.getRelayByGroupID(dbGroup.id)
+                                showLoadingDialog(getString(R.string.please_wait))
+                                deleteGroupRelay(lights, dbGroup,
+                                        successCallback = {
+                                            deleteComplete()
+                                        },
+                                        failedCallback = {
+                                            deleteFailToast()
+                                        })
+                            }
                         }
-                        Constant.DEVICE_TYPE_CURTAIN -> {
-                            val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
-                            showLoadingDialog(getString(R.string.please_wait))
-                            deleteGroupCurtain(lights, dbGroup,
-                                    successCallback = {
-                                        deleteComplete()
-                                    },
-                                    failedCallback = {
-                                        deleteFailToast()
-                                    })
-                        }
-                        Constant.DEVICE_TYPE_CONNECTOR -> {
-                            val lights = DBUtils.getRelayByGroupID(dbGroup.id)
-                            showLoadingDialog(getString(R.string.please_wait))
-                            deleteGroupRelay(lights, dbGroup,
-                                    successCallback = {
-                                        deleteComplete()
-                                    },
-                                    failedCallback = {
-                                        deleteFailToast()
-                                    })
-                        }
-                    }
 
                     dialog.dismiss()
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    private fun startDelGpTimeOut(it: RouterTimeoutBean?) {
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer((it?.timeout?:10).toLong(), TimeUnit.SECONDS)
+                .subscribe {
+                showLoadingDialog(getString(R.string.delete_gp_fail))
+        }
     }
 
     private fun deleteFailToast() {
@@ -892,6 +917,18 @@ abstract class BaseGroupFragment : BaseFragment() {
                 hideLoadingDialog()
                 groupCloseSuccess(currentPosition)
             }
+        }
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+        disposableTimer?.dispose()
+        if (routerGroup?.finish == true) {
+            val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
+            DBUtils.deleteGroupOnly(gp!!)
+            deleteComplete()
+        } else {
+            ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup?.succeedNow?.size))
         }
     }
 }

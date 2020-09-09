@@ -992,5 +992,8 @@
     <string name="bind_success">Связь завершена.</string>
     <string name="bind_fail">Связь маршрута не работает</string>
     <string name="please_select_device_at_leaset">Пожалуйста, выберите хотя бы одно устройство, которое нужно связать</string>
+    <string name="router_del_gp">Удалённая группа, пожалуйста, позже успешно удалила 1%$s оборудования для реорганизации</string>
+    <string name="delete_gp_fail">删除群组失败</string>
+    <string name="add_scene_fail">添加场景失败</string>
 
 </resources>

@@ -22,6 +22,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.CmdBodyBean
+import com.dadoutek.uled.ble.RxBleManager
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
@@ -46,6 +47,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
+import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -65,7 +67,6 @@ import kotlinx.android.synthetic.main.activity_device_scanning.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.singleLine
 import org.jetbrains.anko.startActivity
@@ -83,6 +84,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var disposableRxScan: Disposable? = null
     private var scanRouterTimeoutTime: Long = 0
     private var routerScanCount: Int = 0
     private val TAG = "zcl-DeviceScanningNewActivity"
@@ -1109,7 +1111,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("CheckResult")
     private fun startScan() {
         if (Constant.IS_ROUTE_MODE) {//发送命令
-            RouterModel.routeStartScan(mAddDeviceType, TAG)?.subscribe({
+            RouterModel.routerStartScan(mAddDeviceType, TAG)?.subscribe({
                 scanRouterTimeoutTime = it.timeout.toLong()
                 routeTimerOut()
                 startAnimation()
@@ -1315,7 +1317,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 //刚开始扫的设备mac是null所以不能mac去重
                 mAddedDevices.add(scannedDeviceItem)
                 Thread.sleep(500)
-              //  sendTimeZone(scannedDeviceItem)
+                sendTimeZone(scannedDeviceItem)
                 updateDevice(scannedDeviceItem)
 
                 mAddedDevicesAdapter.notifyDataSetChanged()
@@ -1361,7 +1363,18 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun sendTimeZone(scannedDeviceItem: ScannedDeviceItem) {
-        val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
+        disposableRxScan?.dispose()
+        disposableRxScan = RxBleManager.scan()
+                ?.filter {
+                    it.bleDevice.macAddress == scannedDeviceItem?.sixByteMacAddress
+                }?.subscribe({
+
+                        connectBestRssi(it,scannedDeviceItem)
+                }, {
+                    LogUtils.v("zcl-----------额外发送时间戳失败-------${it.message}")
+                })
+
+        /*val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
         val mac = scannedDeviceItem.deviceInfo.sixByteMacAddress.split(":")
         if (mac != null && mac.size >= 6) {
             val mac1 = Integer.valueOf(mac[2], 16)
@@ -1377,7 +1390,35 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
                     mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
 
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)*/
+        }
+
+    private fun connectBestRssi(scan: ScanResult, scannedDeviceItem: ScannedDeviceItem) {
+        val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
+        val mac = scannedDeviceItem.deviceInfo.sixByteMacAddress.split(":")
+        if (mac != null && mac.size >= 6) {
+            val mac1 = Integer.valueOf(mac[2], 16)
+            val mac2 = Integer.valueOf(mac[3], 16)
+            val mac3 = Integer.valueOf(mac[4], 16)
+            val mac4 = Integer.valueOf(mac[5], 16)
+
+            val instance = Calendar.getInstance()
+            val second = instance.get(Calendar.SECOND).toByte()
+            val minute = instance.get(Calendar.MINUTE).toByte()
+            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
+            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
+            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
+                    mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
+            val subscribe = RxBleManager.writeData(scan.bleDevice, byteArrayOf)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        RxBleManager.disconnectAllDevice()
+                        LogUtils.v("zcl物理写入数据成功$it")
+                    }, {
+                        LogUtils.v("zcl物理写入数据错误$it")
+                        RxBleManager.disconnectAllDevice()
+                    })
         }
     }
 

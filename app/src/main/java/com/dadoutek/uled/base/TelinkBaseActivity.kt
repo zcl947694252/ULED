@@ -44,8 +44,8 @@ import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.router.bean.RouteGroupingBean
-import com.dadoutek.uled.router.bean.RouteInAccountBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
+import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -661,8 +661,13 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
-                    val routerGroup = Gson().fromJson(msg, RouteGroupingBean::class.java)
+                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                     routerGroupResult(routerGroup)
+                }
+
+                Cmd.routeAddScenes ->{
+                    val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
+                    routerAddScene(routerScene)
                 }
 
             }
@@ -717,7 +722,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun routerGroupResult(routerGroup: RouteGroupingBean?) {
+    open fun routerAddScene(routerScene: RouteSceneBean?) {
+
+    }
+
+    open fun routerGroupResult(routerGroup: RouteGroupingOrDelBean?) {
     }
 
     open fun startRouterScan(cmdBodyBean: CmdBodyBean) {

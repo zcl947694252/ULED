@@ -1099,8 +1099,11 @@
     <string name="salt_error">Please get the salt value first or the salt value is wrong or the salt value is expired</string>
     <string name="input_rgb_num">Enter the color RGB value</string>
     <string name="router_grouping">In groups, please hold on. %1$s devices have been successfully grouped</string>
-    <string name="binding_router">绑定路由中</string>
-    <string name="bind_success">绑定成功</string>
-    <string name="bind_fail">路由绑定失败</string>
-    <string name="please_select_device_at_leaset">请至少选择一个要绑定的设备</string>
+    <string name="binding_router">Bind routing</string>
+    <string name="bind_success">Binding success</string>
+    <string name="bind_fail">Route binding failed</string>
+    <string name="please_select_device_at_leaset">Please select at least one device to bind to</string>
+    <string name="router_del_gp">In delete group, please wait a moment, %1$s devices have been successfully removed and reorganized</string>
+    <string name="delete_gp_fail">删除群组失败</string>
+    <string name="add_scene_fail">添加场景失败</string>
 </resources>

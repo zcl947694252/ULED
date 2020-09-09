@@ -32,6 +32,7 @@ import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -73,6 +74,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         try {
             if (position < adapter.data.size) {
@@ -87,6 +89,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
             Log.e("zcl场景", "zcl场景******onItemChildClickListener")
@@ -682,4 +685,5 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }
         }
     }
+
 }

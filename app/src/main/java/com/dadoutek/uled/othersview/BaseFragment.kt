@@ -20,11 +20,14 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.CmdBodyBean
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
+import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
@@ -90,17 +93,27 @@ open class BaseFragment : Fragment() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
-            var jsonObject = JSONObject(msg)
+            val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             try {
-                val cmd = jsonObject.getInt("cmd")
-                when (cmd) {
+                when (cmdBean.cmd) {
                     Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
-                        val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
-                        when (cmd) {
+                        val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                        when (cmdBean.cmd) {
+                            Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
                             Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                         }
                     }
+                    Cmd.routeDeleteGroup -> {
+                        val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
+                        routerDelGroupResult(routerGroup)
+                    }
+                    Cmd.routeDeleteScenes ->{
+
+                    }
+                    Cmd.routeUpdateScenes ->{}
+
                 }
+
             } catch (js: JSONException) {
                 js.message
             }
@@ -116,6 +129,14 @@ open class BaseFragment : Fragment() {
                        }
                    }*/
         }
+    }
+
+    open fun routerAddScene(routerScene: RouteSceneBean?) {
+
+    }
+
+    open fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+
     }
 
     open fun receviedGwCmd2500M(codeBean: MqttBodyBean) {

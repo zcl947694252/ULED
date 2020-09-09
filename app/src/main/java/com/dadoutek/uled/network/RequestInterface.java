@@ -833,8 +833,7 @@ public interface RequestInterface {
 
     /**
      * 路由入账号
-     * https://dev.dadoutek.com/xxxx/router/access-in
-     * POST
+     * https://dev.dadoutek.com/xxxx/router/access-in POST
      * macAddr	是	string	扫码得到的macAddr
      * ser_id	是	string	会话id，推送中回传
      * timeZoneHour	是	int	时区小时数。+8:00北京时区就是8，-4:30委内瑞拉时区就是-4
@@ -848,8 +847,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/access-in")
-    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field(
-            "timeZoneHour")
+    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field("timeZoneHour")
             int timeZoneHour, @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
 
     /**
@@ -897,4 +895,41 @@ public interface RequestInterface {
     @GET("auth/settings/save")
     Observable<Response> updateAllModeStatus( @Query("auxiliaryFunction") boolean auxiliaryFunction,
                                                            @Query("mode") int modeNum );
+    /**
+     * 通过路由删除组
+     * https://dev.dadoutek.com/xxxx/router/del-group  DELETE
+     * meshAddr	是	int	目标组meshAddr
+     * ser_id	是	string	app会话id，推送时回传
+     *     "targetGroupMeshAddr" : 32769,
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @HTTP(method = "DELETE",path = "router/del-group")
+    Observable<Response<RouterTimeoutBean>> routerDeleteGroup(@Field("targetGroupMeshAddr") int targetGroupMeshAddr,@Field("ser_id") String ser_id);
+
+    /**
+     * 通过路由添加场景
+     * 请求URL
+     * https://dev.dadoutek.com/xxxx/router/add-scene POST
+     * name	是	string	场景名称
+     * imgName	是	string	场景展示icon名
+     * actions	是	List<Action>	本地生成的actions直接上传即可，已做好兼容
+     * ser_id	是	string	app会话id，推送时回传
+     *     "name": "场景1",
+     *     "imgName": "icon_out",
+     *     "actions": [
+     *         // 都兼容
+     *         {"id": 1, "isOn": false, "color": 16777215, "groupAddr": 32769, "brightness": 100,
+     *         "deviceType": 4, "belongSceneId": 2, "colorTemperature": 100},
+     *         {"id": 2, "color": 0, "status": 1, "rgbType": 0, "groupAddr": 32792, "brightness":
+     *         90, "gradientId": 1, "gradientName": "七彩渐变", "gradientType": 2, "belongSceneId":
+     *         7, "gradientSpeed": 50, "colorTemperature": 50}
+     *         ],
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @POST("router/del-group")
+    Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,@Field("imgName") String imgName
+    ,@Field("actions") List actions,@Field("ser_id") String ser_id);
+
 }

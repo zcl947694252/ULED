@@ -4,6 +4,7 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.router.bean.RouterBatchGpBean
@@ -72,7 +73,7 @@ object RouterModel {
     /**
      * 更新路由相关信息
      */
-    fun update(it: DbRouter): Observable<Any>? {
+    fun updateRouter(it: DbRouter): Observable<Any>? {
         return NetworkFactory.getApi()
                 .updateRouter(it.id, it.name)
                 .compose(NetworkTransformer())
@@ -120,7 +121,7 @@ object RouterModel {
     /**
      * 路由开始扫描
      */
-    fun routeStartScan( scanType:Int,ser_id:String): Observable<ScanDataBean>? {
+    fun routerStartScan(scanType:Int, ser_id:String): Observable<ScanDataBean>? {
         return NetworkFactory.getApi().routeScanDevcie(scanType,Constant.DEFAULT_MESH_FACTORY_NAME,ser_id)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
@@ -136,4 +137,23 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    /**
+     * 路由删除群组
+     */
+    fun routerDelGp(gpMeshAddr:Int): Observable<RouterTimeoutBean>? {
+        return NetworkFactory.getApi().routerDeleteGroup(gpMeshAddr,"delGp")
+                .compose(NetworkTransformer())
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 路由添加场景
+     */
+    fun routeAddScene(sceneName:String,sceneIcon:String,actions: List<DbSceneActions>): Observable<RouterTimeoutBean>? {
+        return NetworkFactory.getApi().routerAddScene(sceneName,sceneIcon,actions,"addScene")
+                .compose(NetworkTransformer())
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+    }
 }

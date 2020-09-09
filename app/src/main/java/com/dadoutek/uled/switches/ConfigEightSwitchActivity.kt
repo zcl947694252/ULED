@@ -475,7 +475,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val dbSceneFirst = sceneMap[firstNum]
         val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 1000000L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes =0))
             1000000L
         } else {
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
@@ -488,10 +488,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             //位置 功能 保留 14场景id
             val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 1000000L) {
                 secondOpcode = Opcode.DEFAULT_SWITCH8K
-                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
                 1000000L
             } else {
-                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = firsDbSceneId.toInt()))
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
                 dbSceneSecond.id
             }
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
@@ -568,7 +568,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 eight_switch_b3.setTextColor(getColor(R.color.brightness_add_color))
                 eight_switch_b4.setTextColor(getColor(R.color.brightness_add_color))
                 eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
-
+                configSwitchTypeNum = 1
                 eight_switch_b1.text = getString(R.string.brightness_add)
                 eight_switch_b2.text = getString(R.string.color_temperature_add)
                 eight_switch_b3.text = getString(R.string.brightness_minus)
@@ -585,7 +585,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
-
+                configSwitchTypeNum = 2
                 eight_switch_b1.text = getString(R.string.click_config)
                 eight_switch_b2.text = getString(R.string.click_config)
                 eight_switch_b3.text = getString(R.string.click_config)
@@ -601,7 +601,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
-
+                configSwitchTypeNum = 3
                 eight_switch_b1.text = getString(R.string.brightness_minus)
                 eight_switch_b2.text = getString(R.string.brightness_add)
                 eight_switch_b3.text = getString(R.string.click_config)

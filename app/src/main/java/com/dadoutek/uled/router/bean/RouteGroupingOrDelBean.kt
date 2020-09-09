@@ -2,7 +2,7 @@ package com.dadoutek.uled.router.bean
 
 import java.io.Serializable
 
-data class RouteGroupingBean(
+data class RouteGroupingOrDelBean(
     val cmd: Int,
     val finish: Boolean,
     val msg: String,

@@ -349,7 +349,7 @@ class PhysicalRecoveryActivity : AppCompatActivity() {
                 }
     }
 
-    @SuppressLint("StringFormatMatches")
+    @SuppressLint("StringFormatMatches", "StringFormatInvalid")
     private fun changePowerOnColor(num: Long) {
         val style = SpannableStringBuilder(getString(R.string.second_power_on, num))//请在30秒内通电,等待连接
         if (isZh(this))
