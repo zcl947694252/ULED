@@ -846,7 +846,7 @@ public class Peripheral extends BluetoothGattCallback {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             byte[] data = characteristic.getValue();
             String s = Arrays.bytesToHexString(data, ",");
-            Log.v("蓝牙数据 ", "zcl------------------" + s);
+            Log.v("获取蓝牙数据 ", "zcl------------------" + s);
             this.commandSuccess(data);
         } else {
             this.commandError("read characteristic failed");

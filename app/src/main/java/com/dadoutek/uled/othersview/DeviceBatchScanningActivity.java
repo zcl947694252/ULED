@@ -219,6 +219,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                 dadouDeviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
                 dadouDeviceInfo1.longTermKey = deviceInfo.longTermKey;
                 dadouDeviceInfo1.macAddress = deviceInfo.macAddress;
+                dadouDeviceInfo1.macAddress = deviceInfo.sixByteMacAddress;
                 dadouDeviceInfo1.meshAddress = deviceInfo.meshAddress;
                 dadouDeviceInfo1.meshUUID = deviceInfo.meshUUID;
                 dadouDeviceInfo1.productUUID = deviceInfo.productUUID;

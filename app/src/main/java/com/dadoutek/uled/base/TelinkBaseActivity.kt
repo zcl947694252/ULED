@@ -44,6 +44,7 @@ import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -72,6 +73,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
+///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
     private var viewInstall: View? = null
@@ -205,7 +207,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         if (size > 0) {
             ToastUtils.showLong(getString(R.string.connecting_tip))
             mConnectDisposable?.dispose()
-            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
+            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
                     ?.subscribe({
                         LogUtils.d("connection success")
                     }, {
@@ -386,7 +388,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 // RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
-//              LogUtils.v("zcl---baseactivity收到登出广播")
+              LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     changeDisplayImgOnToolbar(false)
                     afterLoginOut()
@@ -826,14 +828,14 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        LogUtils.d("蓝牙未开启")
+                        LogUtils.d("TelinkBluetoothSDK蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        LogUtils.d("无法收到广播包以及响应包")
+                        LogUtils.d("TelinkBluetoothSDK无法收到广播包以及响应包")
 //                        showToast("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        LogUtils.d("未扫到目标设备")
+                        LogUtils.d("TelinkBluetoothSDK未扫到目标设备")
 //                        showToast("未扫到目标设备")
                     }
                 }
@@ -842,11 +844,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        LogUtils.d("未读到att表")
+                        LogUtils.d("TelinkBluetoothSDK未读到att表")
 //                        showToast("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        LogUtils.d("未建立物理连接")
+                        LogUtils.d("TelinkBluetoothSDK未建立物理连接")
 //                        showToast("未建立物理连接")
                     }
                 }
@@ -854,15 +856,15 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        LogUtils.d("value check失败： 密码错误")
+                        LogUtils.d("TelinkBluetoothSDK value check失败： 密码错误")
 //                        showToast("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        LogUtils.d("read login data 没有收到response")
+                        LogUtils.d("TelinkBluetoothSDK read login data 没有收到response")
 //                        showToast("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        LogUtils.d("write login data 没有收到response")
+                        LogUtils.d("TelinkBluetoothSDK write login data 没有收到response")
 //                        showToast("write login data 没有收到response")
                     }
                 }
@@ -886,8 +888,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
-                meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 2, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
+                meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
+                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.TelinkLog;
 
@@ -457,6 +458,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             intent.setAction(ACTION_OFFLINE);
         } else if (newStatus == LightAdapter.STATUS_UPDATE_ALL_MESH_COMPLETED) {
             intent.setAction(ACTION_UPDATE_MESH_COMPLETED);
+            LogUtils.v("zcl-----------完整流程收到更新mesh完成指令发送广播-------");
         } else if (newStatus == LightAdapter.STATUS_OTA_PROGRESS) {
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
@@ -471,26 +473,31 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
 //            TelinkLog.d("onLeScanResult1："+deviceInfo.macAddress);
         } else {
-            DeviceInfo deviceInfo = new DeviceInfo();
-            deviceInfo.macAddress = light.getMacAddress();
-            deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
-            deviceInfo.gwVoipState = light.getGwVoipState();
-            deviceInfo.gwWifiState = light.getGwWifiState();
-            deviceInfo.deviceName = light.getDeviceName();
-            deviceInfo.meshName = light.getMeshNameStr();
-            deviceInfo.meshAddress = light.getMeshAddress();
-            deviceInfo.meshUUID = light.getMeshUUID();
-            deviceInfo.productUUID = light.getProductUUID();
-            deviceInfo.status = newStatus;
-            deviceInfo.rssi = light.getRssi();
-            deviceInfo.firmwareRevision = light.getFirmwareRevision();
+            DeviceInfo deviceInfo = getDeviceInfo(newStatus, light);
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
 //            TelinkLog.d("onLeScanResult2："+deviceInfo.macAddress);
         }
-        sendBroadcast(intent);//使用系统广播来操作网关回调 下面时灵时不灵
         LocalBroadcastManager.getInstance(LightService.this).sendBroadcast(intent);
+        sendBroadcast(intent);//使用系统广播来操作网关回调 下面时灵时不灵
+    }
+
+    private DeviceInfo getDeviceInfo(int newStatus, LightPeripheral light) {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.macAddress = light.getMacAddress();
+        deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
+        deviceInfo.gwVoipState = light.getGwVoipState();
+        deviceInfo.gwWifiState = light.getGwWifiState();
+        deviceInfo.deviceName = light.getDeviceName();
+        deviceInfo.meshName = light.getMeshNameStr();
+        deviceInfo.meshAddress = light.getMeshAddress();
+        deviceInfo.meshUUID = light.getMeshUUID();
+        deviceInfo.productUUID = light.getProductUUID();
+        deviceInfo.status = newStatus;
+        deviceInfo.rssi = light.getRssi();
+        deviceInfo.firmwareRevision = light.getFirmwareRevision();
+        return deviceInfo;
     }
 
     @Override

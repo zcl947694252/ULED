@@ -79,7 +79,7 @@ public class LightAdapter {
     public static final int AUTO_REFRESH_NOTIFICATION_DELAY = 2 * 1000;
     public static final int CHECK_OFFLINE_TIME = 10 * 1000;
 
-    public static final int MIN_SCAN_PERIOD = 9 * 1000;
+    public static final int MIN_SCAN_PERIOD = 7 * 1000;
 
     private static final int STATE_PENDING = 1;
     private static final int STATE_RUNNING = 2;
@@ -599,6 +599,10 @@ public class LightAdapter {
     // 未扫描到目标设备
     private AtomicBoolean scanNoTarget = new AtomicBoolean(false);
 
+    /**
+     * 设置扫描间隔
+     * @return
+     */
     private boolean startLeScan() {
 
         if (!LeBluetooth.getInstance().isScanning()) {
@@ -1217,7 +1221,7 @@ public class LightAdapter {
             TelinkLog.e("onResetMeshSuccess "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
-            Log.d("Saw", "LightAdapter setStatus STATUS_UPDATE_MESH_COMPLETED");
+            Log.d("Saw", "完整流程设置mesh成功回调LightAdapter setStatus STATUS_UPDATE_MESH_COMPLETED");
             setStatus(STATUS_UPDATE_MESH_COMPLETED, true);
 
             if (getMode() == MODE_UPDATE_MESH) {
@@ -1231,7 +1235,7 @@ public class LightAdapter {
 
         private void onResetMeshFailure(String reason) {
 
-            TelinkLog.e("onResetMeshFail "
+            TelinkLog.e("完整流程设置mesh失败回调onResetMeshFail "
                     + mLightCtrl.getCurrentLight().getMacAddress()
                     + " error msg : " + reason);
 
@@ -1527,7 +1531,7 @@ public class LightAdapter {
             //只有当没有指定mac时，需要这样做。
             boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
 //            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
-            if ((!fastestMode) ) {
+            if (!fastestMode) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
                 }
@@ -1556,8 +1560,7 @@ public class LightAdapter {
 
             Log.d("Saw", "stopLeScan() ");
 //            lastLogoutTime = 0;
-            int timeoutSeconds = mParams
-                    .getInt(Parameters.PARAM_TIMEOUT_SECONDS);
+            int timeoutSeconds = mParams.getInt(Parameters.PARAM_TIMEOUT_SECONDS);
 //            LightPeripheral light = mScannedLights.getTop();
 //            LightPeripheral light = mScannedLights.get(0);           // 默认用的是这个
             LightPeripheral light = mScannedLights.getByMaxRssi();  //改为获取信号最好的设备，很关键的改动。

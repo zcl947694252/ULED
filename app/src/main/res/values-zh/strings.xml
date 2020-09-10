@@ -1106,4 +1106,8 @@
     <string name="router_del_gp">删组中,请稍后,已成功将%1$s个设备移除改组</string>
     <string name="delete_gp_fail">删除群组失败</string>
     <string name="add_scene_fail">添加场景失败</string>
+    <string name="all_gp_cont_del">删除失败,默认组不能删除</string>
+    <string name="route_cant_ota">扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描</string>
+    <string name="route_otaing_cont_to_ota">OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA</string>
+    <string name="loacal_del">本地删除</string>
 </resources>

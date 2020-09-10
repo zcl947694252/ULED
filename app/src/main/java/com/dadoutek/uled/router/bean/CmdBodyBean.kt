@@ -1,4 +1,4 @@
-package com.dadoutek.uled.base
+package com.dadoutek.uled.router.bean
 
 import java.io.Serializable
 

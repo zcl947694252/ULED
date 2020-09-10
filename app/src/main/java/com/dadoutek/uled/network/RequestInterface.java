@@ -29,6 +29,7 @@ import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
+import com.dadoutek.uled.router.bean.RouterVersionsBean;
 import com.dadoutek.uled.router.bean.ScanDataBean;
 
 import java.util.List;
@@ -932,4 +933,35 @@ public interface RequestInterface {
     Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,@Field("imgName") String imgName
     ,@Field("actions") List actions,@Field("ser_id") String ser_id);
 
+    /**
+     * 通过路由删除组
+     * 请求URL
+     * https://dev.dadoutek.com/xxxx/router/del-scene DELETE
+     * sid	是	int	目标场景id
+     *     "sid" : 1,
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @HTTP(method = "DELETE" ,path="router/del-scene")
+    Observable<Response<RouterTimeoutBean>> routerDelScene(@Field("sid") int sid, @Field("ser_id") String ser_id);
+
+    /**
+     * 路由器获取版本号
+     *   https://dev.dadoutek.com/xxxx/router/device-version  POST
+     *     "meshAddrs" : [1, 2, 3],
+     *     "meshType": 4,
+     *     "ser_id": "app会话id，自己维护"
+     *     meshType
+     *     普通灯 = 4
+     *     彩灯 = 6
+     *     蓝牙连接器 = 5
+     *     窗帘 = 16
+     *     开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
+     *     传感器 = 98 或 0x23 或 0x24n
+     */
+    @FormUrlEncoded
+    @POST("router/device-version")
+    Observable<Response<RouterVersionsBean>> routerGetDevicesVersion(@Field("meshAddrs")  List<Integer> meshAddrs,
+                                                                     @Field("meshType") int meshType,
+                                                                     @Field("ser_id") String ser_id);
 }

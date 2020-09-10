@@ -2,18 +2,16 @@ package com.dadoutek.uled.model.routerModel
 
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.router.bean.RouterBatchGpBean
+import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.router.bean.ScanDataBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import retrofit2.http.Field
-import java.util.*
 
 
 /**
@@ -155,5 +153,26 @@ object RouterModel {
                 .compose(NetworkTransformer())
                  .subscribeOn(Schedulers.io())
                                  .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 路由添加场景
+     */
+    fun routeDelScene(sceneActionId:Int): Observable<RouterTimeoutBean>? {
+        return NetworkFactory.getApi().routerDelScene(sceneActionId,"delScene")
+                .compose(NetworkTransformer())
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     *获取设备版本号
+     */
+
+    fun getDevicesVersion(meshAddrs:MutableList<Int>,meshType:Int): Observable<RouterVersionsBean>? {
+        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs,meshType,"delScene")
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 }

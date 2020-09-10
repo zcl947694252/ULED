@@ -1,4 +1,4 @@
-package com.dadoutek.uled.gateway
+package com.dadoutek.uled.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context

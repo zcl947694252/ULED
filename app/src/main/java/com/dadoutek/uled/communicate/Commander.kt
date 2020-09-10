@@ -621,7 +621,7 @@ object Commander : EventListener<String> {
     @JvmStatic
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 20): Observable<DeviceInfo>? {
+                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8): Observable<DeviceInfo>? {
 
         if (mConnectObservable == null) {
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
@@ -630,21 +630,20 @@ object Commander : EventListener<String> {
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
                 when {
-                    macAddress != null && macAddress != "0" -> connectParams.setConnectMac(macAddress)
+                    macAddress != null && macAddress != "0"&&macAddress!="" -> connectParams.setConnectMac(macAddress)
                     meshAddr != 0 -> connectParams.setConnectMeshAddress(meshAddr)
                     //true == 快速模式(不会扫几秒去找信号最好的)   //1367540967
                 }
 
                 if (deviceTypes != null)
                     connectParams.setConnectDeviceType(deviceTypes)
-
                 connectParams.setPassword(meshPwd)
                 connectParams.autoEnableNotification(true)
                 connectParams.setFastestMode(fastestMode)      //true == 快速模式(不会扫几秒去找信号最好的)
 
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-                LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
+                //LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
                 TelinkLightService.Instance()?.autoConnect(connectParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 it.onError(Throwable("connect timeout"))
@@ -652,7 +651,6 @@ object Commander : EventListener<String> {
                 // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
-
             return mConnectObservable
         } else {
             DeviceType.NORMAL_SWITCH

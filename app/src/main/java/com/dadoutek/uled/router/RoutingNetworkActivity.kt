@@ -9,12 +9,12 @@ import android.view.inputmethod.InputMethodManager
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.CmdBodyBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable

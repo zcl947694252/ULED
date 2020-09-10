@@ -313,7 +313,7 @@ public class TelinkApplication extends Application {
         TelinkLog.d("dispatchEvent_device" + deviceInfo.macAddress + "--" + deviceInfo.rssi);
     }
 
-    protected void onLeScanCompleted(Intent intent) {
+    protected void onLeScanCompleted(Intent intent) {//发送mesh更新成功或者失败命令
         this.dispatchEvent(LeScanEvent.newInstance(this, LeScanEvent.LE_SCAN_COMPLETED, null));
     }
 
@@ -339,8 +339,9 @@ public class TelinkApplication extends Application {
         this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.STATUS_CHANGED, deviceInfo));
     }
 
-    protected void onUpdateMeshCompleted(Intent intent) {
-        this.dispatchEvent(MeshEvent.newInstance(this, MeshEvent.UPDATE_COMPLETED, -1));
+    protected void onUpdateMeshCompleted(Intent intent) {//如果是修改已有的通知name发送的数据需要从这里获取
+        MeshEvent event = MeshEvent.newInstance(this, MeshEvent.UPDATE_COMPLETED, -1);
+        this.dispatchEvent(event);
     }
 
     protected void onMeshOffline(Intent intent) {

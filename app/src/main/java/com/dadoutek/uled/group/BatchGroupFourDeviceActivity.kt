@@ -818,7 +818,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                         //等待会回调
                                     }
                                     NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                                    NetworkStatusCode.DEVICETYPE_NOT_IS_ROUTER_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
+                                    NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
                                     NetworkStatusCode.ROUTER_ALL_OFFLINE -> {
                                         if (itR.t != null)
                                             nameLists.addAll(itR.t.offlineRouterNames)

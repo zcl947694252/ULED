@@ -20,14 +20,13 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.CmdBodyBean
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
-import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
@@ -43,7 +42,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONException
-import org.json.JSONObject
 
 open class BaseFragment : Fragment() {
 
@@ -108,10 +106,9 @@ open class BaseFragment : Fragment() {
                         routerDelGroupResult(routerGroup)
                     }
                     Cmd.routeDeleteScenes ->{
-
+                        routerDelSceneResult(cmdBean)
                     }
                     Cmd.routeUpdateScenes ->{}
-
                 }
 
             } catch (js: JSONException) {
@@ -131,11 +128,12 @@ open class BaseFragment : Fragment() {
         }
     }
 
-    open fun routerAddScene(routerScene: RouteSceneBean?) {
+    open fun routerDelSceneResult(cmdBean: CmdBodyBean) {//1 0 -1  部分成功 成功 失败
 
     }
 
-    open fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+
+    open fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
 
     }
 

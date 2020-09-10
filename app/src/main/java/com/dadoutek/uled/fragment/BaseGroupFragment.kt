@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
-import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -69,7 +68,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -921,7 +919,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
         disposableTimer?.dispose()
         if (routerGroup?.finish == true) {
             val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())

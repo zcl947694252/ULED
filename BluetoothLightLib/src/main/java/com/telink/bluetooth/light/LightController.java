@@ -23,6 +23,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -343,6 +344,11 @@ public final class LightController extends EventBus<Integer> implements LightPer
         this.sendCommand(this.resetCallback, checkCmd);
     }
 
+    /**
+     * 根据opcode命令查找对应的sendCommend位置  次数是发送更新mesh地址的位置
+     *
+     * @return
+     */
     protected boolean resetDeviceAddress() {
 
         int newAddress = this.light.getNewMeshAddress();
@@ -355,16 +361,35 @@ public final class LightController extends EventBus<Integer> implements LightPer
 
         this.enableNotification(this.notifyCallback, TAG_RESET_MESH_ADDRESS_NOTIFY_DATA);
         byte opcode = (byte) 0xE0;
-        byte[] params = new byte[]{(byte) (newAddress & 0xFF), (byte) (newAddress >> 8 & 0xFF)};
 
-        TelinkLog.d("prepare update mesh address -->" + light.getMacAddress() + " src : " + Integer.toHexString(oldAddress) + " new : " + Integer.toHexString(newAddress));
+        String[] mac = light.getSixByteMacAddress().split(":");
+        byte[] params;
+        if (mac != null && mac.length >= 6) {
+            Integer mac1 = Integer.valueOf(mac[2], 16);
+            Integer mac2 = Integer.valueOf(mac[3], 16);
+            Integer mac3 = Integer.valueOf(mac[4], 16);
+            Integer mac4 = Integer.valueOf(mac[5], 16);
+
+            Calendar instance = Calendar.getInstance();
+            byte second = (byte) instance.get(Calendar.SECOND);
+            byte minute = (byte) instance.get(Calendar.MINUTE);
+            byte hour = (byte) instance.get(Calendar.HOUR_OF_DAY);
+            byte day = (byte) instance.get(Calendar.DAY_OF_MONTH);
+
+            params = new byte[]{(byte) (newAddress & 0xFF), (byte) (newAddress >> 8 & 0xFF),
+                    (byte) (mac1 & 0xFF), (byte) (mac2 & 0xFF), (byte) (mac3 & 0xFF),
+                    (byte) (mac4 & 0xFF), second, minute, hour, day};
+        } else {
+            params = new byte[]{(byte) (newAddress & 0xFF), (byte) (newAddress >> 8 & 0xFF)};
+       }
+        TelinkLog.d("完整流程prepare update mesh address -->" + light.getMacAddress() + " src : " + Integer.toHexString(oldAddress) + " new : " + Integer.toHexString(newAddress));
 
         this.sendCommand(this.normalCallback, opcode, 0x0000, params, true,
                 TAG_RESET_MESH_ADDRESS, 0);
         //        byte[] params1 = new byte[]{(byte) 0xFF, (byte) 0xFF};
         //        this.sendCommand(this.normalCallback, opcode, 0x0000, params1, false,
-        //        TAG_NORMAL_COMMAND, 0);
-        this.mDelayHandler.postDelayed(this.mAllocAddressTask, 3000);
+        //        TAG_NORMAL_COMMAND, 0);    3000改成2500
+        this.mDelayHandler.postDelayed(this.mAllocAddressTask, 2500);
 
         return true;
     }
@@ -774,13 +799,17 @@ public final class LightController extends EventBus<Integer> implements LightPer
         return this.sendCommand(opcode, address, params, noResponse, TAG_NORMAL_COMMAND, delay);
     }
 
-    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse, Object tag, int delay) {
+    public boolean sendCommand(byte opcode, int address, byte[] params, boolean noResponse,
+                               Object tag, int delay) {
         if (tag.toString() == "0")
-            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse, tag, delay);
+            return this.sendCommand(this.deviceMacCallback, opcode, address, params, noResponse,
+                    tag, delay);
         else if (tag.toString() == "1")
-            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag, delay);
+            return this.sendCommand(this.setGwCallback, opcode, address, params, noResponse, tag,
+                    delay);
         else
-            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag, delay);
+            return this.sendCommand(this.normalCallback, opcode, address, params, noResponse, tag
+                    , delay);
     }
 
     /********************************************************************************

@@ -221,11 +221,45 @@ object NetworkStatusCode {
     const val ROUTER_OTHER_ADD= 90003
     //此时无法停止，请稍等
     const val ROUTER_CAN_NOT_STOP= 90027
-
+    //当前群组不存在
     const val CURRENT_GP_NOT_EXITE= 90007
+    //该账号该区域下没有路由，无法操作
+    const val ROUTER_NO_EXITE= 90004
+    //以下路由没有上线，无法删除场景
     const val ROUTER_ALL_OFFLINE= 90005
+    //该组里的全部设备都未绑定路由
     const val DEVICE_NOT_BINDROUTER= 90008
-    const val DEVICETYPE_NOT_IS_ROUTER_TYPE= 90016
+
+
+    /**
+     * 路由删除场景返回结果
+     */
+    //该场景不存在，本地删除即可
+    const val ROUTER_DEL_SCENE_NOT_EXITE= 90011
+    //无法解析该场景的ACTIONS，本地删除该场景即可，后台数据库也会同步删除(无需app调用删除接口)
+    const val ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE= 90012
+    //该场景没有配置组，本地删除该场景即可，后台数据库也会同步删除(无需app调用删除接口)
+    const val ROUTER_DEL_SCENE_NO_GP= 90014
+
+    /**
+     * 路由组
+     */
+    //默认组无法删除
+    const val ALL_GROUP_CONT_DEL= 90009
+    //空组直接本地删除，后台数据库也会同步删除(无需app调用删除接口)
+    const val ROUTER_DEL_GP_TO_LOCAL_DEL= 90015
+    //设备无法分入该组，设备的productUUID与组的deviceType不匹配
+    const val PRODUCTUUID_NOT_MATCH_DEVICE_TYPE= 90016
+
+    /**
+     * OTA
+     */
+    //扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
+    const val ROUTER_CONT_OTA_TO_GET_LAST_OTA= 90999
+    //OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
+    const val ROUTER_OTAING_CONT_OTA= 90998
+
+
 
     /**
      * 请求成功处理: 0

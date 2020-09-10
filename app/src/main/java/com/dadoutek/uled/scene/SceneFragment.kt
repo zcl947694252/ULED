@@ -19,7 +19,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -28,11 +27,13 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DbSceneActions
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
-import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
-import com.dadoutek.uled.router.bean.RouteSceneBean
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -47,6 +48,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 /**
  * Created by hejiajun on 2018/5/2.
@@ -54,7 +56,8 @@ import java.util.concurrent.TimeUnit
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
-    private var goHelp: TextView?=null
+    private var currentDbScene: DbScene? = null
+    private var goHelp: TextView? = null
     private var disposableTimer: Disposable? = null
     private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
@@ -91,10 +94,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        currentDbScene = scenesListData!![position]
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
             Log.e("zcl场景", "zcl场景******onItemChildClickListener")
             when (view.id) {
-                R.id.template_device_card_delete -> showDeleteSingleDialog(scenesListData!![position])//scenesListData!![position].isSelected = !scenesListData!![position].isSelected
+                R.id.template_device_card_delete -> {
+                    showDeleteSingleDialog(currentDbScene!!)
+                }//scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.template_device_setting -> {
                     if (TelinkLightApplication.getApp().connectDevice == null) {
@@ -138,68 +144,89 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
-            val opcode = Opcode.SCENE_ADD_OR_DEL
-            val params: ByteArray
-            Thread.sleep(300)
             val id = dbScene.id!!
             val list = DBUtils.getActionsBySceneId(id)
-            params = byteArrayOf(0x00, id.toByte())
-            Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
-            DBUtils.deleteSceneActionsList(list)
-            DBUtils.deleteScene(dbScene)
-            refreshAllData()
-            refreshView()
+            if (Constant.IS_ROUTE_MODE) {
+                RouterModel.routeDelScene(id.toInt())
+                        ?.subscribe({
+                            startDelSceneTimeOut(it)
+                        }, {
+                            if (it.message?.contains(getString(R.string.loacal_del)) == true) {
+                                deleteSceneSuccess(list, dbScene)
+                            } else {
+                                ToastUtils.showShort(it.message)
+                            }
+                        })
+            } else {
+                val opcode = Opcode.SCENE_ADD_OR_DEL
+                Thread.sleep(300)
+                val params: ByteArray = byteArrayOf(0x00, id.toByte())
+                Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
+                deleteSceneSuccess(list, dbScene)
+            }
+
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { _, _ -> }
         val dialog = builder.show()
         dialog.show()
     }
 
-                @RequiresApi(Build.VERSION_CODES.O)
+    private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
+
+    }
+
+    private fun deleteSceneSuccess(list: ArrayList<DbSceneActions>, dbScene: DbScene) {
+        DBUtils.deleteSceneActionsList(list)
+        DBUtils.deleteScene(dbScene)
+        refreshAllData()
+        refreshView()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(dbScene: DbScene) {
         if (DBUtils.getAllGateWay().size > 0)
-            GwModel.getGwList()?.subscribe( {
-                    TelinkLightApplication.getApp().offLine = true
-                    hideLoadingDialog()
-                    it.forEach { db ->
-                        //网关在线状态，1表示在线，0表示离线
-                        if (db.state == 1)
-                            TelinkLightApplication.getApp().offLine = false
-                    }
+            GwModel.getGwList()?.subscribe({
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                it.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
 
-                    if (!TelinkLightApplication.getApp().offLine) {
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.gate_way_offline))
-                        }
-                        var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
-                                dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-                        val gattBody = GwGattBody()
-                        gattBody.ser_id = Constant.SER_ID_SCENE_ON
-                        val s = Base64Utils.encodeToStrings(gattPar)
-                        gattBody.data = s
-                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                        gattBody.meshAddr = Constant.SER_ID_SCENE_ON
-                        sendToServer(gattBody)
-                    } else {
-                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.gate_way_offline))
                     }
-                }, {
-                    hideLoadingDialog()
+                    var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
+                            dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+                    val gattBody = GwGattBody()
+                    gattBody.ser_id = Constant.SER_ID_SCENE_ON
+                    val s = Base64Utils.encodeToStrings(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = Constant.SER_ID_SCENE_ON
+                    sendToServer(gattBody)
+                } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
+                }
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
             })
     }
 
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
-                disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$it")
-            },{
-                disposableTimer?.dispose()
-                ToastUtils.showShort(it.message)
-                LogUtils.v("zcl-----------远程控制-------${it.message}")
+            disposableTimer?.dispose()
+            LogUtils.v("zcl-----------远程控制-------$it")
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
@@ -309,7 +336,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         btn_add?.setOnClickListener(this)
         btn_delete?.setOnClickListener(this)
     }
-
 
 
     private fun initOnLayoutListener() {
@@ -436,7 +462,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         initView()
     }
 
-
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
         GlobalScope.launch {
@@ -497,7 +522,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun refreshAllData() {
-
         val mOldDatas = scenesListData
         val mNewDatas = loadData()
 
@@ -611,9 +635,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }
         }
     }
+
     private fun seeHelpe() {
         var intent = Intent(context, InstructionsForUsActivity::class.java)
-        intent.putExtra(Constant.WB_TYPE,"#control-scene")
+        intent.putExtra(Constant.WB_TYPE, "#control-scene")
         startActivity(intent)
     }
 
@@ -675,7 +700,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 hideLoadingDialog()
             }
         }
-    }  override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
+    }
+
+    override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_SCENE_ON -> {
                 LogUtils.v("zcl-----------远程控制场景开启成功-------")
@@ -686,4 +713,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
+    override fun routerDelSceneResult(cmdBean: CmdBodyBean) {
+        if (cmdBean.finish && cmdBean.status == 1) {////1 0 -1  部分成功 成功 失败
+            currentDbScene?.let {
+                val list = DBUtils.getActionsBySceneId(it.id)
+                deleteSceneSuccess(list, it)
+            }
+        } else {
+            ToastUtils.showShort(cmdBean.msg)
+        }
+    }
 }

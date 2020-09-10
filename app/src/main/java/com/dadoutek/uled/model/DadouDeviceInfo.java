@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class DadouDeviceInfo implements Serializable {
 
     public String macAddress;
+    public String sixByteMacAddress;
     public String deviceName;
 
     public String meshName;

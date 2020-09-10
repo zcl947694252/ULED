@@ -16,7 +16,8 @@ object ServerResultException {
             0 -> {
                 //成功无数据
                 throw   ServerException("请求成功")
-            }  NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
+            }
+            NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
                 //token 过期
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.login_timeout))
             }
@@ -148,9 +149,23 @@ object ServerResultException {
                 ToastUtils.showShort(TelinkLightApplication.getApp().getString(R.string.route_other_add))
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_other_add))
             }
-            NetworkStatusCode.ROUTER_CAN_NOT_STOP -> {//该路由器已被其他人添加
+            NetworkStatusCode.CURRENT_GP_NOT_EXITE -> {//该群组不存在
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.gp_not_exit))
+
+            }
+            NetworkStatusCode.ROUTER_CAN_NOT_STOP -> {//此时无法停止，请稍等
                 ToastUtils.showShort(TelinkLightApplication.getApp().getString(R.string.route_can_not_stop))
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_can_not_stop))
+
+            }
+            NetworkStatusCode.ALL_GROUP_CONT_DEL -> {//默认组无法删除
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.all_gp_cont_del))
+            }
+            NetworkStatusCode.ROUTER_CONT_OTA_TO_GET_LAST_OTA -> {//该路由器已被其他人添加
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_cant_ota))
+            }
+            NetworkStatusCode.ROUTER_OTAING_CONT_OTA -> {//该路由器已被其他人添加
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_otaing_cont_to_ota))
             }
             else -> {
                 throw RuntimeException(response.message)

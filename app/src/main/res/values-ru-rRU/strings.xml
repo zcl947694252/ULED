@@ -993,7 +993,11 @@
     <string name="bind_fail">Связь маршрута не работает</string>
     <string name="please_select_device_at_leaset">Пожалуйста, выберите хотя бы одно устройство, которое нужно связать</string>
     <string name="router_del_gp">Удалённая группа, пожалуйста, позже успешно удалила 1%$s оборудования для реорганизации</string>
-    <string name="delete_gp_fail">删除群组失败</string>
-    <string name="add_scene_fail">添加场景失败</string>
+    <string name="delete_gp_fail">Group deletion failed</string>
+    <string name="add_scene_fail">Add scene failure</string>
+    <string name="all_gp_cont_del">Delete failed. Default group cannot be deleted</string>
+    <string name="route_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
+    <string name="route_otaing_cont_to_ota">In OTA, OTA cannot be performed again.Try to get the state in routing mode to restore the last OTA</string>
+    <string name="loacal_del">local deletion</string>
 
 </resources>
