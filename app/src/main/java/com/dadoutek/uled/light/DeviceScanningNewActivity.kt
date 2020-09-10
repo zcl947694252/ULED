@@ -1188,6 +1188,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         updateMesh(bestRssiDevice!!, meshAddress, mesh)
                     }
                 }
+        startMeshTimeoutTimer()//更新mesh超时时间
     }
 
     private fun getGwId(): Long {
@@ -1294,7 +1295,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightService.Instance()?.updateMesh(params)
         LogUtils.d("####TelinkBluetoothSDK 完整流程更新meshName--####")
         stopScanTimer()
-        startMeshTimeoutTimer()//更新mesh超时时间
         LogUtils.d("updateMesh: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
