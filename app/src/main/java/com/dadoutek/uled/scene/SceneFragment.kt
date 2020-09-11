@@ -30,6 +30,12 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkStatusCode.OK
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_ALL_OFFLINE
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_DEL_SCENE_NOT_EXITE
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_DEL_SCENE_NO_GP
+import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_NO_EXITE
 import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
@@ -149,13 +155,17 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (Constant.IS_ROUTE_MODE) {
                 RouterModel.routeDelScene(id.toInt())
                         ?.subscribe({
-                            startDelSceneTimeOut(it)
-                        }, {
-                            if (it.message?.contains(getString(R.string.loacal_del)) == true) {
-                                deleteSceneSuccess(list, dbScene)
-                            } else {
-                                ToastUtils.showShort(it.message)
+                            startDelSceneTimeOut(it.t)
+                            when (it.errorCode) {
+                                OK, ROUTER_DEL_SCENE_NOT_EXITE,ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE,ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
+                                //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                                // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                                ROUTER_NO_EXITE->ToastUtils.showShort(getString(R.string.region_not_router))
+                                ROUTER_ALL_OFFLINE->ToastUtils.showShort(getString(R.string.router_offline))
                             }
+
+                        }, {
+                         ToastUtils.showShort(it.message)
                         })
             } else {
                 val opcode = Opcode.SCENE_ADD_OR_DEL
@@ -172,7 +182,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
-
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer((it?.timeout?:0).toLong(), TimeUnit.MILLISECONDS)
+                .subscribe {
+                showLoadingDialog(getString(R.string.delete_scene_fail))
+        }
     }
 
     private fun deleteSceneSuccess(list: ArrayList<DbSceneActions>, dbScene: DbScene) {

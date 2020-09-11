@@ -158,9 +158,8 @@ object RouterModel {
     /**
      * 路由添加场景
      */
-    fun routeDelScene(sceneActionId:Int): Observable<RouterTimeoutBean>? {
+    fun routeDelScene(sceneActionId:Int): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routerDelScene(sceneActionId,"delScene")
-                .compose(NetworkTransformer())
                  .subscribeOn(Schedulers.io())
                                  .observeOn(AndroidSchedulers.mainThread())
     }
@@ -169,9 +168,8 @@ object RouterModel {
      *获取设备版本号
      */
 
-    fun getDevicesVersion(meshAddrs:MutableList<Int>,meshType:Int): Observable<RouterVersionsBean>? {
-        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs,meshType,"delScene")
-                .compose(NetworkTransformer())
+    fun getDevicesVersion(meshAddrs:MutableList<Int>,meshType:Int): Observable<Response<RouterVersionsBean>>? {
+        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs,meshType,"getVersion")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

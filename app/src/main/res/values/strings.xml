@@ -1076,7 +1076,7 @@
     <string name="qr_not_null">One-dimensional code cannot be empty</string>
     <string name="routing_network">Router access</string>
     <string name="please_check_device_code">Please check the equipment code:</string>
-    <string name="router_offline">Router offline</string>
+    <string name="router_offline">Route is offline and cannot be performed</string>
     <string name="router_added">The router has been added</string>
     <string name="route_code_error">The router has been added that the device code is not a router device code, please contact the supplier that the device code is not a router device code, please contact the supplier</string>
     <string name="route_other_add">The router has been added by others</string>
@@ -1110,4 +1110,8 @@
     <string name="route_cant_ota">扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描</string>
     <string name="route_otaing_cont_to_ota">OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA</string>
     <string name="loacal_del">本地删除</string>
+    <string name="region_not_router">该账号该区域下没有路由，无法操作</string>
+    <string name="delete_scene_fail">删除场景失败</string>
+    <string name="no_bind_router_cant_version">全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由</string>
+    <string name="get_version_success_num">获取设备版本号中，当前有5个设备刷新了版本号</string>
 </resources>

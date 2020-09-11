@@ -53,7 +53,7 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -919,7 +919,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
+    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
         disposableTimer?.dispose()
         if (routerGroup?.finish == true) {
             val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())

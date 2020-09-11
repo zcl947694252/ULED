@@ -45,7 +45,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
@@ -529,7 +529,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     open var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
-        override fun complete() {}
+        override fun complete() {
+        }
 
         @SuppressLint("CheckResult")
         override fun error(msg: String) {
@@ -663,13 +664,16 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
-                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
+                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     routerGroupResult(routerGroup)
                 }
-
                 Cmd.routeAddScenes ->{
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
                     routerAddScene(routerScene)
+                }
+                Cmd.routeUpdateDeviceVersion ->{
+                    val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
+                    routerUpdateVersion(routerVersion)
                 }
 
             }
@@ -724,11 +728,15 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    open fun routerUpdateVersion(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+
+    }
+
     open fun routerAddScene(routerScene: RouteSceneBean?) {
 
     }
 
-    open fun routerGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+    open fun routerGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
     }
 
     open fun startRouterScan(cmdBodyBean: CmdBodyBean) {

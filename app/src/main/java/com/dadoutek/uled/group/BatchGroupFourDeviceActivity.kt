@@ -31,7 +31,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -1910,7 +1910,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     @SuppressLint("StringFormatMatches")
-    override fun routerGroupResult(fromJson: RouteGroupingOrDelBean?) {
+    override fun routerGroupResult(fromJson: RouteGroupingOrDelOrGetVerBean?) {
         if (fromJson?.finish == true) {
             initData()
         } else {

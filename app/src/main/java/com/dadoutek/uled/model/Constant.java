@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 /**
  * Created by hejiajun on 2018/3/22.
+ * dadoutek2018
  */
 public class Constant implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换

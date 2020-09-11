@@ -967,7 +967,7 @@
     <string name="qr_not_null">Одномерный код не может быть пустым</string>
     <string name="routing_network">Роутер включен</string>
     <string name="please_check_device_code">Пожалуйста, проверьте код устройства:</string>
-    <string name="router_offline">Маршрут отключен</string>
+    <string name="router_offline">Маршруты отключены и не могут выполнить эту операцию</string>
     <string name="router_added">Дорога была добавлена</string>
     <string name="route_code_error">Код устройства-это не код роутера, пожалуйста, свяжитесь с поставщиком</string>
     <string name="route_other_add">Роутер был добавлен другими</string>
@@ -999,5 +999,9 @@
     <string name="route_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
     <string name="route_otaing_cont_to_ota">In OTA, OTA cannot be performed again.Try to get the state in routing mode to restore the last OTA</string>
     <string name="loacal_del">local deletion</string>
+    <string name="region_not_router">该账号该区域下没有路由，无法操作</string>
+    <string name="delete_scene_fail">删除场景失败</string>
+    <string name="no_bind_router_cant_version">全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由</string>
+    <string name="get_version_success_num">获取设备版本号中，当前有5个设备刷新了版本号</string>
 
 </resources>

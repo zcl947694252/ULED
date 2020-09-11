@@ -18,16 +18,22 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.*
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.RecoverMeshDeviceUtil
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.dadoutek.uled.widget.RecyclerGridDecoration
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.telink.bluetooth.light.DeviceInfo
@@ -42,6 +48,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -55,6 +62,7 @@ import java.util.regex.Pattern
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
+    private var disposableTimer: Disposable? = null
     private var deviceType: Int = 0
     private var isGroup: Boolean = false
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -67,6 +75,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private var sensorList: MutableList<DbSensor> = mutableListOf()
     private var curtainList: MutableList<DbCurtain> = mutableListOf()
     private var relayList: MutableList<DbConnector> = mutableListOf()
+    private var meshAddrList: MutableList<Int> = mutableListOf()
     private var gwList: MutableList<DbGateway> = mutableListOf()
     private var mapBin = mutableMapOf<String, Int>()
     private var lightAdaper = GroupOTALightAdapter(R.layout.group_ota_item, lightList)
@@ -76,13 +85,79 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private var sensorAdaper = GroupOTASensorAdapter(R.layout.group_ota_item, sensorList)
     private var gwAdaper = GroupOTAGwAdapter(R.layout.group_ota_item, gwList)
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_ota_list)
-        initView()
-        initData()
-        initListener()
+        if (Constant.IS_ROUTE_MODE) {
+            showLoadingDialog(getString(R.string.please_wait))
+            getIntentData()
+            getOtaData()
+            RouterModel.getDevicesVersion(meshAddrList, deviceType)?.subscribe({
+                when (it.errorCode) {
+                    NetworkStatusCode.OK -> startGetVersionTimer(it.t)
+                    //全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由 DEVICE_NOT_BINDROUTER 90008
+                    // 以下路由没有上线，无法删获取版本  ROUTER_ALL_OFFLINE= 90005
+                    NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
+                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+                        finish()
+                    }
+                    NetworkStatusCode.ROUTER_ALL_OFFLINE -> {
+                        ToastUtils.showShort(getString(R.string.router_offline))
+                        finish()
+                    }
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+                finish()
+            })
+        } else {
+            initView()
+            initData()
+            initListener()
+        }
+    }
+
+    private fun startGetVersionTimer(t: RouterVersionsBean?) {
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer((t?.timeout ?: 0).toLong(), TimeUnit.MILLISECONDS)
+                .subscribe {
+                    showLoadingDialog(getString(R.string.get_version_fail))
+                    finish()
+                }
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    override fun routerUpdateVersion(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+        disposableTimer?.dispose()
+        if (routerVersion?.finish==true){
+            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                override fun start() {}
+                override fun complete() {
+                    startActivity<RouterOtaActivity>("group" to dbGroup!!, "DeviceType" to deviceType)
+                }
+
+                override fun error(msg: String?) {
+                    startActivity<RouterOtaActivity>("group" to dbGroup!!, "DeviceType" to deviceType)
+                }
+            })
+
+        }else{
+            ToastUtils.showShort(getString(R.string.get_version_success_num,routerVersion?.succeedTotal?.size))
+        }
+    }
+
+    private fun getOtaData() {
+        meshAddrList.clear()
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> getLightData()
+            DeviceType.SMART_CURTAIN -> getCurtainData()
+            DeviceType.SMART_RELAY -> getRelayData()
+            DeviceType.NORMAL_SWITCH -> getSwtichData()
+            DeviceType.SENSOR -> getSensorData()
+            DeviceType.GATE_WAY -> getGwData()
+        }
     }
 
     private fun initListener() {
@@ -259,12 +334,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var emptyView = View.inflate(this, R.layout.empty_view, null)
         val addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
         addBtn.visibility = View.INVISIBLE
-        val serializableExtra = intent.getSerializableExtra("group")
-        if (serializableExtra != null)
-            dbGroup = serializableExtra as DbGroup
-
-        deviceType = intent.getIntExtra("DeviceType", 0)
-        isGroup = dbGroup != null
+        getIntentData()
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -299,81 +369,98 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 gwAdaper.emptyView = emptyView
             }
         }
-
         getBin()
+    }
 
+    private fun getIntentData() {
+        val serializableExtra = intent.getSerializableExtra("group")
+        if (serializableExtra != null)
+            dbGroup = serializableExtra as DbGroup
+        deviceType = intent.getIntExtra("DeviceType", 0)
+        isGroup = dbGroup != null
     }
 
     private fun setRelayData() {
-        relayList.clear()
-        if (isGroup)
-            relayList.addAll(DBUtils.getRelayByGroupID(dbGroup!!.id))
-        else
-            relayList.addAll(DBUtils.allRely)
-
+        getRelayData()
         relayAdaper.onItemClickListener = onItemClickListener
         supportAndUNConnector()
     }
 
+    private fun getRelayData() {
+        relayList.clear()
+        if (isGroup) relayList.addAll(DBUtils.getRelayByGroupID(dbGroup!!.id)) else relayList.addAll(DBUtils.allRely)
+        relayList.forEach { meshAddrList.add(it.meshAddr) }
+    }
+
     private fun setCurtainData() {
-        curtainList.clear()
-        if (isGroup)
-            curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id))
-        else
-            curtainList.addAll(DBUtils.allCurtain)
-
+        getCurtainData()
         curtainAdaper.onItemClickListener = onItemClickListener
-
         supportAndUNCurtain()
         curtainAdaper.notifyDataSetChanged()
     }
 
-    private fun setLightData() {
-        lightList.clear()
+    private fun getCurtainData() {
+        curtainList.clear()
         if (isGroup)
-            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
-        else {
-            when (deviceType) {
-                DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
-                DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
-            }
-        }
+            curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id)) else curtainList.addAll(DBUtils.allCurtain)
+        curtainList.forEach { meshAddrList.add(it.meshAddr) }
+    }
+
+    private fun setLightData() {
+        getLightData()
         lightAdaper.onItemClickListener = onItemClickListener
         supportAndUNLight()
         lightAdaper.notifyDataSetChanged()
     }
 
-    private fun setSwtichData() {
-        switchList.clear()
+    private fun getLightData() {
+        lightList.clear()
         if (isGroup)
-            switchList
-        else
-            switchList.addAll(DBUtils.getAllSwitch())
+            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
+        else when (deviceType) {
+            DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
+            DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
+        }
+        lightList.forEach { meshAddrList.add(it.meshAddr) }
+    }
+
+    private fun setSwtichData() {
+        getSwtichData()
         switchAdaper.onItemClickListener = onItemClickListener
         supportAndUNSwitch()
         switchAdaper.notifyDataSetChanged()
     }
 
+    private fun getSwtichData() {
+        switchList.clear()
+        if (isGroup) switchList else switchList.addAll(DBUtils.getAllSwitch())
+        switchList.forEach { meshAddrList.add(it.meshAddr) }
+    }
+
     private fun setGwData() {
-        gwList.clear()
-        if (isGroup)
-            gwList
-        else
-            gwList.addAll(DBUtils.getAllGateWay())
+        getGwData()
         gwAdaper.onItemClickListener = onItemClickListener
         supportAndUNGateway()
         gwAdaper.notifyDataSetChanged()
     }
 
+    private fun getGwData() {
+        gwList.clear()
+        if (isGroup) gwList else gwList.addAll(DBUtils.getAllGateWay())
+        gwList.forEach { meshAddrList.add(it.meshAddr) }
+    }
+
     private fun setSensorData() {
-        sensorList.clear()
-        if (isGroup)
-            sensorList
-        else
-            sensorList.addAll(DBUtils.getAllSensor())
+        getSensorData()
         sensorAdaper.onItemClickListener = onItemClickListener
         supportAndUNSensor()
         sensorAdaper.notifyDataSetChanged()
+    }
+
+    private fun getSensorData() {
+        sensorList.clear()
+        if (isGroup) sensorList else sensorList.addAll(DBUtils.getAllSensor())
+        sensorList.forEach { meshAddrList.add(it.meshAddr) }
     }
 
     private fun supportAndUNLight() {
@@ -558,6 +645,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun updataDevice() {
+        meshAddrList.clear()
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> setLightData()
             DeviceType.SMART_CURTAIN -> setCurtainData()
